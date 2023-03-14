@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ window.hostgroup_edit_popup = new class {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.groupid !== null ? 'hostgroup.update' : 'hostgroup.create');
 
 		this._post(curl.getUrl(), fields, (response) => {
@@ -65,9 +65,11 @@ window.hostgroup_edit_popup = new class {
 	}
 
 	delete() {
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'hostgroup.delete');
-		curl.addSID();
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('hostgroup')) ?>
+		);
 
 		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

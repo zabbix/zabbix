@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -576,22 +576,19 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateCreate(array &$graphs) {
 		$colorValidator = new CColorValidator();
 
+		$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
+			'uuid' => ['type' => API_UUID],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+		]];
+
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-					'uuid' =>		['type' => API_UUID],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
-				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-					'uuid' =>		['type' => API_UUID],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')],
-					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
-				]];
+				$api_input_rules['fields'] += ['discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]];
 				break;
 
 			default:
@@ -767,27 +764,25 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
 
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'uuid' => ['type' => API_UUID],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+		]];
+
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
-				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')],
-					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
-				]];
+				$api_input_rules['fields'] += ['discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]];
 				break;
 
 			default:
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
-		$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
 		$read_only_fields = ['templateid', 'flags'];
 
 		foreach ($graphs as $key => $graph) {

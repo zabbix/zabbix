@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -474,8 +474,8 @@ close:
 	if (0 > sigaddset(&mask, SIGUSR2))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add SIGUSR2 signal to signal mask: %s", zbx_strerror(errno));
 
-	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal: %s", zbx_strerror(errno));
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the signal: %s", zbx_strerror(errno));
 
 	zbx_alarm_on(timeout);
 
@@ -548,8 +548,8 @@ close:
 
 	zbx_alarm_off();
 
-	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot restore sigprocmask: %s", zbx_strerror(errno));
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask: %s", zbx_strerror(errno));
 
 #endif	/* _WINDOWS */
 

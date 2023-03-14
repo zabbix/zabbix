@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ zbx_sql_writer_t;
 
 static zbx_sql_writer_t	writer;
 
-typedef void (*vc_str2value_func_t)(zbx_history_value_t *value, DB_ROW row);
+typedef void (*vc_str2value_func_t)(zbx_history_value_t *value, zbx_db_row_t row);
 
 /* history table data */
 typedef struct
@@ -52,23 +52,23 @@ typedef struct
 zbx_vc_history_table_t;
 
 /* row to value converters for all value types */
-static void	row2value_str(zbx_history_value_t *value, DB_ROW row)
+static void	row2value_str(zbx_history_value_t *value, zbx_db_row_t row)
 {
 	value->str = zbx_strdup(NULL, row[0]);
 }
 
-static void	row2value_dbl(zbx_history_value_t *value, DB_ROW row)
+static void	row2value_dbl(zbx_history_value_t *value, zbx_db_row_t row)
 {
 	value->dbl = atof(row[0]);
 }
 
-static void	row2value_ui64(zbx_history_value_t *value, DB_ROW row)
+static void	row2value_ui64(zbx_history_value_t *value, zbx_db_row_t row)
 {
 	ZBX_STR2UINT64(value->ui64, row[0]);
 }
 
 /* timestamp, logeventid, severity, source, value */
-static void	row2value_log(zbx_history_value_t *value, DB_ROW row)
+static void	row2value_log(zbx_history_value_t *value, zbx_db_row_t row)
 {
 	value->log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 
@@ -161,7 +161,7 @@ static int	sql_writer_flush(void)
 
 	do
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		for (i = 0; i < writer.dbinserts.values_num; i++)
 		{
@@ -169,7 +169,7 @@ static int	sql_writer_flush(void)
 			zbx_db_insert_execute(db_insert);
 		}
 	}
-	while (ZBX_DB_DOWN == (txn_error = DBcommit()));
+	while (ZBX_DB_DOWN == (txn_error = zbx_db_commit()));
 
 	sql_writer_release();
 
@@ -330,8 +330,8 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -354,14 +354,14 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 				end_timestamp - seconds, end_timestamp);
 	}
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
 	zbx_free(sql);
 
 	if (NULL == result)
 		goto out;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_history_record_t	value;
 
@@ -371,7 +371,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 
 		zbx_vector_history_record_append_ptr(values, &value);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	return SUCCEED;
 }
@@ -405,8 +405,8 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
 	int			clock_to, clock_from, step = 0, ret = FAIL;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
 	const int		periods[] = {SEC_PER_HOUR, 12 * SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_DAY, SEC_PER_WEEK,
 					SEC_PER_MONTH, 0, -1};
@@ -435,12 +435,12 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc");
 
-		result = DBselectN(sql, count);
+		result = zbx_db_select_n(sql, count);
 
 		if (NULL == result)
 			goto out;
 
-		while (NULL != (row = DBfetch(result)))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_history_record_t	value;
 
@@ -452,7 +452,7 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 
 			count--;
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		clock_to -= periods[step];
 		step++;
@@ -507,8 +507,8 @@ static int	db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 	int			ret = FAIL;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -527,14 +527,14 @@ static int	db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 				end_timestamp - seconds, end_timestamp);
 	}
 
-	result = DBselectN(sql, count);
+	result = zbx_db_select_n(sql, count);
 
 	zbx_free(sql);
 
 	if (NULL == result)
 		goto out;
 
-	while (NULL != (row = DBfetch(result)) && 0 < count--)
+	while (NULL != (row = zbx_db_fetch(result)) && 0 < count--)
 	{
 		zbx_history_record_t	value;
 
@@ -544,7 +544,7 @@ static int	db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 
 		zbx_vector_history_record_append_ptr(values, &value);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < count)
 	{
@@ -553,10 +553,10 @@ static int	db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 		goto out;
 	}
 
-	/* Drop data from the last second and read the whole second again     */
-	/* to ensure that data is cached by seconds.                          */
-	/* Because the initial select has limit option (DBselectN()) we have  */
-	/* to perform another select to read the last second data.            */
+	/* Drop data from the last second and read the whole second again  */
+	/* to ensure that data is cached by seconds.                       */
+	/* Because the initial select has limit option (zbx_db_select_n()) */
+	/* we have to perform another select to read the last second data. */
 	end_timestamp = values->values[values->values_num - 1].timestamp.sec;
 
 	while (0 < values->values_num && values->values[values->values_num - 1].timestamp.sec == end_timestamp)

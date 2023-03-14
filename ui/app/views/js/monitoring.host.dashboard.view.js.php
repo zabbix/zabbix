@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period: time_period,
 				dynamic_hostid: host.hostid,
+				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
 
 			for (const page of dashboard.pages) {

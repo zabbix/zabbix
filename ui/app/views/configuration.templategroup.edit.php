@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 $data += [
 	'buttons' => ($data['groupid'] == 0)
 		? [
-			(new CSubmit('add', _('Add')))->addClass('js-create-templategroup'),
+			new CSubmit('add', _('Add')),
 			$cancel_button
 		]
 		: [

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -482,8 +482,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 			}
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
-				if ($item['authtype'] == HTTPTEST_AUTH_NONE) {
+				// Clean username and password when authtype is set to ZBX_HTTP_AUTH_NONE.
+				if ($item['authtype'] == ZBX_HTTP_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}
@@ -2446,7 +2446,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 		if ($dep_itemids) {
 			$master_items = API::Item()->get([
 				'output' => ['itemid', 'key_'],
-				'itemids' => array_keys($dep_itemids)
+				'itemids' => array_keys($dep_itemids),
+				'webitems' => true
 			]);
 
 			$options = $dst_host['status'] == HOST_STATUS_TEMPLATE
@@ -2455,7 +2456,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 
 			$dst_master_items = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'key_'],
-				'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))]
+				'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))],
+				'webitems' => true
 			] + $options);
 
 			$dst_master_itemids = [];

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,12 +304,12 @@ void	zbx_audit_graph_update_json_delete_gitems(zbx_uint64_t graphid, int flags, 
 
 void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *ids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		int		flags;
 		zbx_uint64_t	id;
@@ -321,7 +321,7 @@ void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *i
 		zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1], flags);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,9 @@ class CWidgetFieldThresholds extends CWidgetField {
 			}
 		}
 
-		CArrayHelper::sort($thresholds, ['threshold_value']);
+		uasort($thresholds, static function (array $threshold_1, array $threshold_2): int {
+			return $threshold_1['threshold_value'] <=> $threshold_2['threshold_value'];
+		});
 
 		$thresholds = array_values($thresholds);
 

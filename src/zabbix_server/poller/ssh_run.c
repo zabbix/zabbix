@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,14 +33,114 @@
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_SSH_KEY_LOCATION;
 
+static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const char *key_str, const char *value,
+		char **err_msg)
+{
+	int ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_str:'%s' value:'%s'", __func__, key_str, value);
+
+	if (0 > ssh_options_set(session, type, value))
+	{
+		*err_msg = zbx_dsprintf(NULL, "Cannot set SSH option \"%s\": %s.", key_str, ssh_get_error(session));
+
+		ret = FAIL;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	ssh_parse_options(ssh_session session, const char *options, char **err_msg)
+{
+	int	ret = SUCCEED;
+	char	opt_copy[1024] = {0};
+	char	*line, *saveptr;
+
+	zbx_strscpy(opt_copy, options);
+
+	for (line = strtok_r(opt_copy, ";", &saveptr); NULL != line; line = strtok_r(NULL, ";", &saveptr))
+	{
+		char	*eq_str = strchr(line, '=');
+
+		if (NULL != eq_str)
+			*eq_str++ = '\0';
+
+		eq_str = ZBX_NULL2EMPTY_STR(eq_str);
+
+#ifdef HAVE_SSH_OPTIONS_KEY_EXCHANGE
+		if (0 == strncmp(line, KEY_EXCHANGE_STR, ZBX_CONST_STRLEN(KEY_EXCHANGE_STR)))
+		{
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_KEY_EXCHANGE, KEY_EXCHANGE_STR,
+					eq_str, err_msg)))
+			{
+				break;
+			}
+			continue;
+		}
+#endif
+#ifdef HAVE_SSH_OPTIONS_HOSTKEYS
+		if (0 == strncmp(line, KEY_HOSTKEY_STR, ZBX_CONST_STRLEN(KEY_HOSTKEY_STR)))
+		{
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_HOSTKEYS, KEY_HOSTKEY_STR, eq_str,
+					err_msg)))
+			{
+				break;
+			}
+			continue;
+		}
+#endif
+#if defined(HAVE_SSH_OPTIONS_CIPHERS_C_S) && defined(HAVE_SSH_OPTIONS_CIPHERS_S_C)
+		if (0 == strncmp(line, KEY_CIPHERS_STR, ZBX_CONST_STRLEN(KEY_CIPHERS_STR)))
+		{
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_CIPHERS_C_S, KEY_CIPHERS_STR,
+					eq_str, err_msg)))
+			{
+				break;
+			}
+
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_CIPHERS_S_C, KEY_CIPHERS_STR,
+					eq_str, err_msg)))
+			{
+				break;
+			}
+			continue;
+		}
+#endif
+#if defined(HAVE_SSH_OPTIONS_HMAC_C_S) && defined(HAVE_SSH_OPTIONS_HMAC_S_C)
+		if (0 == strncmp(line, KEY_MACS_STR, ZBX_CONST_STRLEN(KEY_MACS_STR)))
+		{
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_HMAC_C_S, KEY_MACS_STR, eq_str,
+					err_msg)))
+			{
+				break;
+			}
+
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_HMAC_S_C, KEY_MACS_STR, eq_str,
+					err_msg)))
+			{
+				break;
+			}
+			continue;
+		}
+#endif
+		*err_msg = zbx_dsprintf(NULL, "SSH option \"%s\" is not supported.", line);
+		ret = FAIL;
+		break;
+	}
+
+	return ret;
+}
+
 /* example ssh.run["ls /"] */
-int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
 {
 	ssh_session	session;
 	ssh_channel	channel;
 	ssh_key 	privkey = NULL, pubkey = NULL;
 	int		rc, userauth, ret = NOTSUPPORTED;
-	char		*output, *publickey = NULL, *privatekey = NULL, *buffer = NULL;
+	char		*output, *publickey = NULL, *privatekey = NULL, *buffer = NULL, *err_msg = NULL;
 	char		tmp_buf[DATA_BUFFER_SIZE], userauthlist[64];
 	size_t		offset = 0, buf_size = DATA_BUFFER_SIZE;
 
@@ -66,6 +166,24 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set SSH session options: %s",
 				ssh_get_error(session)));
 		goto session_free;
+	}
+
+	if (0 < strlen(options))
+	{
+		int	proc_config = 0;
+
+		if (0 != ssh_options_set(session, SSH_OPTIONS_PROCESS_CONFIG, &proc_config))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot turn off SSH default config processing: %s",
+					ssh_get_error(session)));
+			goto session_free;
+		}
+
+		if (SUCCEED != ssh_parse_options(session, options, &err_msg))
+		{
+			SET_MSG_RESULT(result, err_msg);
+			goto session_free;
+		}
 	}
 
 	if (SSH_OK != ssh_connect(session))
@@ -272,14 +390,14 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			goto channel_close;
 		}
 
-		if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
+		if (MAX_EXECUTE_OUTPUT_LEN <= offset + (size_t)rc)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE));
 			goto channel_close;
 		}
 
-		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, rc);
+		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, (size_t)rc);
 	}
 
 	output = zbx_convert_to_utf8(buffer, offset, encoding);

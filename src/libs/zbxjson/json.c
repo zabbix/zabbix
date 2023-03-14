@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -457,6 +457,14 @@ void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value)
 	char	buffer[MAX_ID_LEN];
 
 	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, value);
+	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
+}
+
+void	zbx_json_adddouble(struct zbx_json *j, const char *name, double value)
+{
+	char	buffer[MAX_ID_LEN];
+
+	zbx_print_double(buffer, sizeof(buffer), value);
 	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
 }
 

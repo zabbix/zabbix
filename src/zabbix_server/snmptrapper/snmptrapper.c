@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxregexp.h"
-#include "preproc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbxpreproc.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
@@ -40,31 +40,31 @@ static int	force = 0;
 
 static void	DBget_lastsize(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
-	DBbegin();
+	zbx_db_begin();
 
-	result = DBselect("select snmp_lastsize from globalvars");
+	result = zbx_db_select("select snmp_lastsize from globalvars");
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = zbx_db_fetch(result)))
 	{
-		DBexecute("insert into globalvars (globalvarid,snmp_lastsize) values (1,0)");
+		zbx_db_execute("insert into globalvars (globalvarid,snmp_lastsize) values (1,0)");
 		trap_lastsize = 0;
 	}
 	else
 		ZBX_STR2UINT64(trap_lastsize, row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	DBcommit();
+	zbx_db_commit();
 }
 
 static void	DBupdate_lastsize(void)
 {
-	DBbegin();
-	DBexecute("update globalvars set snmp_lastsize=%lld", (long long int)trap_lastsize);
-	DBcommit();
+	zbx_db_begin();
+	zbx_db_execute("update globalvars set snmp_lastsize=%lld", (long long int)trap_lastsize);
+	zbx_db_commit();
 }
 
 /******************************************************************************
@@ -182,7 +182,7 @@ next:
 			case SUCCEED:
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
 				{
-					calc_timestamp(results[i].log->value, &results[i].log->timestamp,
+					zbx_calc_timestamp(results[i].log->value, &results[i].log->timestamp,
 							items[i].logtimefmt);
 				}
 
@@ -601,7 +601,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	DBget_lastsize();
 

@@ -140,6 +140,7 @@ $input-placeholder-color: #9d9d9d !default;
 // Error messages
 $msg-bad-color: darken(desaturate($red, 10%), 20%) !default;
 $msg-bad-border-color: $light-red !default;
+$msg-btn-text-color: darken(desaturate($red, 10%), 20%) !default;
 $msg-good-color: darken(desaturate($green, 10%), 20%) !default;
 $msg-good-border-color: $light-green !default;
 $msg-warning-color: #9a7938 !default;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,11 @@
 #define ZABBIX_UPGRADE_H
 
 #include "zbxcommon.h"
+#include "zbxdbhigh.h"
 
 void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb);
 
 int	DBcheck_version(void);
-int	DBcheck_double_type(void);
+int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh);
 
 #endif

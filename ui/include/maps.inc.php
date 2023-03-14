@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1313,6 +1313,7 @@ function getMapHighligts(array $map, array $map_info) {
  * Get trigger data for all linktriggers.
  *
  * @param array $sysmap
+ * @param array $sysmap['links']            Map element link options.
  * @param array $sysmap['show_suppressed']  Whether to show suppressed problems.
  * @param array $sysmap['show_unack']       Property specified in sysmap's 'Problem display' field. Used to determine
  *                                          whether to show unacknowledged problems only.

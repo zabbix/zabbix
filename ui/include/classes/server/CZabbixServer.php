@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,14 +65,14 @@ class CZabbixServer {
 	/**
 	 * Zabbix server host name.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $host;
 
 	/**
 	 * Zabbix server port number.
 	 *
-	 * @var string
+	 * @var int|null
 	 */
 	protected $port;
 
@@ -610,7 +610,7 @@ class CZabbixServer {
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
 				}
 
-				$this->error = $dErrorMsg.$errorMsg;
+				$this->error = rtrim($dErrorMsg.$errorMsg);
 			}
 
 			$this->socket = $socket;

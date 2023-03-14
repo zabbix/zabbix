@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -225,7 +225,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 
-			// Drop all inaccessible triggers.
+			// Drop all disabled and inaccessible triggers.
 			if ($problems_per_trigger) {
 				$triggers = API::Trigger()->get([
 					'output' => [],
@@ -336,8 +336,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 							);
 
 							foreach ($uncounted_problem_triggers as $triggerid => $var) {
-								$problems_to_add = $problems_per_trigger[$triggerid];
 								$problems_counted[$triggerid] = true;
+
+								// Skip disabled and inaccessible triggers.
+								if (!array_key_exists($triggerid, $problems_per_trigger)) {
+									continue;
+								}
+
+								$problems_to_add = $problems_per_trigger[$triggerid];
 
 								// Remove problems which are less important than map's min-severity.
 								if ($map['severity_min'] > 0) {
@@ -384,7 +390,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 						);
 						foreach ($uncounted_problem_triggers as $triggerid => $var) {
 							$problems_counted[$triggerid] = true;
-							$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+
+							// Skip disabled and inaccessible triggers.
+							if (array_key_exists($triggerid, $problems_per_trigger)) {
+								$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+							}
 						}
 						unset($uncounted_problem_triggers);
 					}
@@ -400,6 +410,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				foreach ($uncounted_problem_triggers as $triggerid => $var) {
 					$problems_counted[$triggerid] = true;
 
+					// Skip disabled and inaccessible triggers.
 					if (array_key_exists($triggerid, $problems_per_trigger)) {
 						$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
 					}
@@ -417,7 +428,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 						);
 						foreach ($uncounted_problem_triggers as $triggerid => $var) {
 							$problems_counted[$triggerid] = true;
-							$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+
+							// Skip disabled and inaccessible triggers.
+							if (array_key_exists($triggerid, $problems_per_trigger)) {
+								$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+							}
 						}
 						unset($uncounted_problem_triggers);
 					}
@@ -474,7 +489,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 									);
 									foreach ($uncounted_problem_triggers as $triggerid => $var) {
 										$problems_counted[$triggerid] = true;
-										$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+
+										// Skip disabled and inaccessible triggers.
+										if (array_key_exists($triggerid, $problems_per_trigger)) {
+											$problems = self::sumArrayValues($problems,
+												$problems_per_trigger[$triggerid]
+											);
+										}
 									}
 									unset($uncounted_problem_triggers);
 								}

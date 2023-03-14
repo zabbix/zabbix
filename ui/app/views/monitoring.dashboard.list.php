@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,7 +123,8 @@ $form->addItem([
 		'dashboard.delete' => [
 			'name' => _('Delete'),
 			'confirm' => _('Delete selected dashboards?'),
-			'disabled' => !$data['allowed_edit']
+			'disabled' => !$data['allowed_edit'],
+			'csrf_token' => CCsrfTokenHelper::get('dashboard')
 		]
 	], 'dashboard')
 ]);

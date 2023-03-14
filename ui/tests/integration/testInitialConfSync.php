@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -245,7 +245,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'hgroups' =>
 			[
-				'insert' => '17',
+				'insert' => '16',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -286,6 +286,22 @@ class testInitialConfSync extends CIntegrationTest
 			'httptests' =>
 			[
 				'insert' => '5',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -642,6 +658,28 @@ class testInitialConfSync extends CIntegrationTest
 				"delete" =>
 				"0"
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -987,6 +1025,22 @@ class testInitialConfSync extends CIntegrationTest
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '5'
+			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
 			]
 		]
 	];

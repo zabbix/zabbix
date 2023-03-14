@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -286,6 +286,22 @@ class testProxyConfSync extends CIntegrationTest
 			'httptests' =>
 			[
 				'insert' => '3',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -642,6 +658,28 @@ class testProxyConfSync extends CIntegrationTest
 				"delete" =>
 				"0"
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -987,6 +1025,22 @@ class testProxyConfSync extends CIntegrationTest
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '3'
+			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
 			]
 		]
 	];

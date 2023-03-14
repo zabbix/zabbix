@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,11 +106,11 @@ class CXmlConstantValue {
 	const PASSWORD = ITEM_AUTHTYPE_PASSWORD;
 	const PUBLIC_KEY = ITEM_AUTHTYPE_PUBLICKEY;
 
-	// const NONE = HTTPTEST_AUTH_NONE; // Duplicate.
-	const BASIC = HTTPTEST_AUTH_BASIC;
-	const NTLM = HTTPTEST_AUTH_NTLM;
-	const KERBEROS = HTTPTEST_AUTH_KERBEROS;
-	const DIGEST = HTTPTEST_AUTH_DIGEST;
+	// const NONE = ZBX_HTTP_AUTH_NONE; // Duplicate.
+	const BASIC = ZBX_HTTP_AUTH_BASIC;
+	const NTLM = ZBX_HTTP_AUTH_NTLM;
+	const KERBEROS = ZBX_HTTP_AUTH_KERBEROS;
+	const DIGEST = ZBX_HTTP_AUTH_DIGEST;
 
 	const ALIAS = 4;
 	const ASSET_TAG = 11;
