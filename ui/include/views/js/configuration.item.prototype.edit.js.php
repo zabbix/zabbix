@@ -39,24 +39,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
 
 			$('#value_type')
-				.change(function() {
-					// If non-numeric type is changed to numeric, set the default value for trends.
-					if ((this.value == <?= ITEM_VALUE_TYPE_FLOAT ?> || this.value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
-							&& <?= json_encode([
-								ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
-							]) ?>.includes($(this).data('old-value'))) {
-						const trends = $('#trends');
-
-						if (trends.val() == 0) {
-							trends.val(trends_default);
-						}
-
-						$('#trends_mode_1').prop('checked', true);
-					}
-
-					$('#trends_mode').trigger('change');
-					$(this).data('old-value', this.value);
-				})
+				.change(this.valueTypeChangeHandler)
 				.data('old-value', $('#value_type').val());
 
 			$('#type')
@@ -106,6 +89,25 @@ include dirname(__FILE__).'/itemtest.js.php';
 			}
 
 			jQuery('z-select[name="value_type"]').trigger('change');
+		},
+
+		valueTypeChangeHandler() {
+			// If non-numeric type is changed to numeric, set the default value for trends.
+			if ((this.value == <?= ITEM_VALUE_TYPE_FLOAT ?> || this.value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
+					&& <?= json_encode([
+						ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+					]) ?>.includes($(this).data('old-value'))) {
+				const trends = $('#trends');
+
+				if (trends.val() == 0) {
+					trends.val(trends_default);
+				}
+
+				$('#trends_mode_1').prop('checked', true);
+			}
+
+			$('#trends_mode').trigger('change');
+			$(this).data('old-value', this.value);
 		},
 
 		editHost(e, hostid) {
