@@ -1972,9 +1972,7 @@ class CItem extends CItemGeneral {
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
 				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 0)) {
-			array_push($table_names, 'history', 'history_log', 'history_str', 'history_text', 'history_uint',
-				'history_bin'
-			);
+			$table_names = array_merge($table_names, CHistoryManager::getTableName());
 		}
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1
