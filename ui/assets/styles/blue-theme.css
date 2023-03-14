@@ -347,6 +347,9 @@ svg a {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
     position: absolute; }
+  .sortable.sortable-opacity .sortable-item.sortable-dragging {
+    opacity: 0.6;
+    z-index: 1; }
 
 html,
 body {
