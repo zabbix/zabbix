@@ -47,17 +47,14 @@ zbx_crypto_hash_t;
 int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
 		char **out);
 
-<<<<<<< HEAD
 
 #if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
 void	zbx_normalize_pem(char **key, size_t *key_len);
 int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsigned char **output,
 		size_t *output_len, char **error);
 #endif
-=======
 void	zbx_base64_encode(const char *p_str, char *p_b64str, int in_size);
 void	zbx_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size);
 void	zbx_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size);
->>>>>>> origin/master
 
 #endif /* ZABBIX_ZBXCRYPTO_H */
