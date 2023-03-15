@@ -260,7 +260,7 @@ int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char 
 	zbx_cb_nextid = cb_nextid;
 
 	if (ZBX_PROGRAM_TYPE_SERVER != program)
-		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, db_schema, error);
+		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(), error);
 
 	return SUCCEED;
 }
@@ -618,9 +618,9 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 
 const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
 {
-	int	t;
+	const zbx_db_table_t*	tables = zbx_dbschema_get_tables();
 
-	for (t = 0; NULL != tables[t].table; t++)
+	for (int t = 0; NULL != tables[t].table; t++)
 	{
 		if (0 == strcmp(tables[t].table, tablename))
 			return &tables[t];
