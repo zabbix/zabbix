@@ -723,8 +723,7 @@ class CDashboardPage extends CBaseComponent {
 			}
 			while (!element.classList.contains('wrapper'));
 
-			height = Math.max(height, min_height);
-			height = Math.min(height, this._cell_height * this._max_rows);
+			height = Math.min(Math.max(height, min_height), this._cell_height * this._max_rows);
 		}
 
 		this._dashboard_grid.style.height = `${height}px`;
