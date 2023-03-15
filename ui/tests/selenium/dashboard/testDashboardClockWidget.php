@@ -58,8 +58,8 @@ class testDashboardClockWidget extends CWebTest {
 	public function testDashboardClockWidget_Layout() {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
-		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
+		$form = $dialog->asForm();
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Clock')]);
 
