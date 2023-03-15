@@ -1760,7 +1760,7 @@ class CUser extends CApiService {
 				&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
 				&& !$this->provisionLdapUser($db_user)) {
 			$db_user['deprovisioned'] = true;
-		}
+			}
 
 			// Check system permissions.
 			if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
