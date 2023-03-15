@@ -2024,7 +2024,7 @@ class CApiInputValidator {
 	/**
 	 * Array of ids, int32 or strings uniqueness validator.
 	 *
-	 * @param bool       $rule
+	 * @param array      $rule
 	 * @param integer    $rule['type']
 	 * @param bool       $rule['uniq']    (optional)
 	 * @param array|null $data
