@@ -464,12 +464,10 @@ static void	results_free(zbx_discoverer_results_t *result)
 }
 
 static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dcheck, char *ip,
-		int *need_resolve, zbx_hashset_t *tasks)
+		int *need_resolve, zbx_int64_t *queue_capacity, zbx_hashset_t *tasks)
 {
 	const char	*start;
 	zbx_uint64_t	checks_count = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (start = dcheck->ports; '\0' != *start;)
 	{
@@ -493,6 +491,16 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 		{
 			zbx_discoverer_task_t	task_local, *task;
 			zbx_dc_dcheck_t		*dcheck_ptr;
+
+			(*queue_capacity)--;
+
+			if (0 >= *queue_capacity)
+			{
+				zabbix_log(LOG_LEVEL_WARNING,
+						"discoverer queue is full, skipping discovery rule '%s' network checks",
+						drule->name);
+				return checks_count;
+			}
 
 			task_local.ip = zbx_strdup(NULL, SVC_ICMPPING == dcheck->type ? "" : ip);
 			task_local.port = (unsigned short)port;
@@ -576,13 +584,11 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 			break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
 	return checks_count;
 }
 
 static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, int *need_resolve,
-		zbx_hashset_t *tasks)
+		zbx_int64_t *queue_capacity, zbx_hashset_t *tasks)
 {
 	int		i;
 	zbx_uint64_t	checks_count = 0;
@@ -598,7 +604,10 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 			continue;
 		}
 
-		checks_count += process_check(drule, dcheck, ip, need_resolve, tasks);
+		checks_count += process_check(drule, dcheck, ip, need_resolve, queue_capacity, tasks);
+
+		if (0 >= *queue_capacity)
+			break;
 	}
 
 	return checks_count;
@@ -640,7 +649,8 @@ static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const cha
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts)
+static void	process_rule(zbx_dc_drule_t *drule, zbx_int64_t *queue_capacity, zbx_hashset_t *tasks,
+		zbx_hashset_t *check_counts)
 {
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma;
 	int		ipaddress[8];
@@ -703,9 +713,15 @@ static void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashse
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:'%s'", __func__, ip);
 
 			if (0 != drule->unique_dcheckid)
-				checks_count = process_checks(drule, ip, 1, &need_resolve, tasks);
+				checks_count = process_checks(drule, ip, 1, &need_resolve, queue_capacity, tasks);
 
-			checks_count += process_checks(drule, ip, 0, &need_resolve, tasks);
+			if (0 >= *queue_capacity)
+				goto out;
+
+			checks_count += process_checks(drule, ip, 0, &need_resolve, queue_capacity, tasks);
+
+			if (0 >= *queue_capacity)
+				goto out;
 
 			if (0 < checks_count)
 			{
@@ -730,7 +746,7 @@ next:
 		else
 			break;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -935,6 +951,8 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 	time_t			now;
 	zbx_dc_drule_t		*drule;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	now = time(NULL);
 
 	um_handle = zbx_dc_open_user_macros();
@@ -942,14 +960,23 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 	while (ZBX_IS_RUNNING() && NULL != (drule = zbx_dc_drule_next(now, nextcheck)))
 	{
 		zbx_discoverer_job_ref_t	cmp = {.druleid = drule->druleid};
+		zbx_int64_t			queue_capacity;
 
 		discoverer_queue_lock(&dmanager.queue);
 		i = zbx_vector_discoverer_job_refs_bsearch(&dmanager.job_refs, cmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - (zbx_int64_t)dmanager.queue.pending_checks_count;
 		discoverer_queue_unlock(&dmanager.queue);
 
-		if (FAIL != i)
+		if (FAIL != i || 0 >= queue_capacity)
 		{
 			zbx_dc_drule_queue(now, drule->druleid, drule->delay);
+
+			if (0 >= queue_capacity)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "discoverer queue is full, skipping discovery rule '%s'",
+						drule->name);
+			}
+
 			zbx_discovery_drule_free(drule);
 			continue;
 		}
@@ -989,7 +1016,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 
 			zbx_hashset_create(&tasks, 1, discoverer_task_hash, discoverer_task_compare);
 
-			process_rule(drule, &tasks, check_counts);
+			process_rule(drule, &queue_capacity, &tasks, check_counts);
 
 			job = discoverer_job_create(drule, config_timeout);
 
@@ -1019,6 +1046,8 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 	}
 
 	zbx_dc_close_user_macros(um_handle);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rule_count:%d", __func__, rule_count);
 
 	return rule_count;	/* performance metric */
 }
