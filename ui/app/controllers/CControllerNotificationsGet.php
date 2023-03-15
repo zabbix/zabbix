@@ -221,13 +221,13 @@ class CControllerNotificationsGet extends CController {
 
 				$url_problems = (new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
+					->setArgument('filter_set', '1')
 					->setArgument('hostids[]', $trigger['hosts'][0]['hostid'])
 					->getUrl();
 
 				$url_events = (new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
+					->setArgument('filter_set', '1')
 					->setArgument('triggerids[]', $triggerid)
 					->getUrl();
 

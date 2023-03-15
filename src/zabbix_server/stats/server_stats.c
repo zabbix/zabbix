@@ -24,8 +24,8 @@
 #include "zbxlld.h"
 #include "log.h"
 #include "zbxtrends.h"
-#include "zbxha.h"
 #include "zbxconnector.h"
+#include "../ha/ha.h"
 
 /******************************************************************************
  *                                                                            *

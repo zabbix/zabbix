@@ -187,9 +187,9 @@ static void	event_suppress_data_free(zbx_event_suppress_data_t *data)
  * Purpose: fetch events that need to be queried for maintenance              *
  *                                                                            *
  ******************************************************************************/
-static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_queries)
+static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_ptr_t *event_queries)
 {
-	DB_ROW				row;
+	zbx_db_row_t			row;
 	zbx_uint64_t			eventid;
 	zbx_event_suppress_query_t	*query = NULL;
 
@@ -231,8 +231,8 @@ static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_querie
  ******************************************************************************/
 static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data, int process_num)
 {
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 	zbx_event_suppress_data_t	*data = NULL;
 	zbx_uint64_t			eventid;
 	zbx_uint64_pair_t		pair;

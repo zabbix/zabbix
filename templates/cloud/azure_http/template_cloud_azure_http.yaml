@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.0'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -19,21 +19,21 @@ zabbix_export:
       description: |
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
-        Currently the template supports discovery of virtual machines (VMs), MySQL and PostgreSQL servers.
+        Currently the template supports the discovery of virtual machines (VMs), Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
+          3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, and `{$AZURE.SUBSCRIPTION.ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -244,20 +244,201 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
           tags:
             -
               tag: component
               value: raw
+        -
+          uuid: 91b2290d65b949ad9ea801763c35cf40
+          name: 'Azure: Get storage accounts'
+          type: SCRIPT
+          key: azure.get.storage.acc
+          delay: 10m
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Azure = {
+                params: {},
+                token: '',
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    Azure.params = params;
+                },
+            
+                login: function () {
+                    var response, login = new HttpRequest();
+                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
+                    response = login.post(
+                        'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
+                    );
+            
+                    if (login.getStatus() !== 200) {
+                        throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+                    }
+                    try {
+                        response = JSON.parse(response);
+                        if (!response.hasOwnProperty('access_token')) {
+                            throw null;
+                        }
+                    }
+                    catch (error) {
+                        throw 'Authentication response does not contain access token.';
+                    }
+            
+                    Azure.token = response['access_token'];
+                },
+            
+                request: function (url) {
+                    var response, request = new HttpRequest();
+            
+                    if (!Azure.token) {
+                        throw 'Request does not contain access token.'; 
+                    }
+                    request.addHeader('Accept: application/json');
+                    request.addHeader('Authorization: Bearer ' + Azure.token);
+                    response = request.get(url);
+            
+                    if (request.getStatus() !== 200) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+                },
+            
+                getField: function (data, path) {
+                    var steps = path.split('.');
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            throw 'Required field was not found: ' + path;
+                        }
+            
+                        data = data[step];
+                    }
+            
+                    return data;
+                },
+            
+                getMetricsData: function () {
+                    var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Storage/storageAccounts?api-version=2021-05-01');
+                        data = [];
+            
+                    if (!metric.hasOwnProperty('value')) {
+                        throw 'Failed getting required field. Check debug log for more information.';
+                    }
+                    for (k in metric.value) {
+                        id = Azure.getField(metric.value[k], 'id');
+                        json = {};
+                        input = id.split('/');
+                        for (var i = 1; i < input.length; i += 2) {
+                            json[input[i]] = input[i + 1];
+                        }
+                        data.push({
+                            'name': Azure.getField(metric.value[k], 'name'),
+                            'id': id,
+                            'resourceGroup': Azure.getField(json, 'resourceGroups'),
+                            'location': Azure.getField(metric.value[k], 'location'),
+                            'token': Azure.token
+                        });
+                    }
+            
+                    return data;
+                }
+            };
+            
+            try {
+                Azure.setParams(JSON.parse(value));
+                Azure.login();
+                return JSON.stringify(Azure.getMetricsData());
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ Azure ] ERROR: ' + error);
+                return JSON.stringify({'error': error});
+            }
+          description: 'The result of API requests is expressed in the JSON.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP.ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT.ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION.ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 2e425a9ef8d34ea68f7998ceed30ebc4
+          name: 'Azure: Get storage accounts errors'
+          type: DEPENDENT
+          key: azure.get.storage.acc.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'The errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.get.storage.acc
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 253f0835cd134d2591bb2be1b9dc9b29
+              expression: 'length(last(/Azure by HTTP/azure.get.storage.acc.errors))>0'
+              name: 'Azure: There are errors in storages requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              dependencies:
+                -
+                  name: 'Azure: There are errors in requests to API'
+                  expression: 'length(last(/Azure by HTTP/azure.get.errors))>0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: c875a410ddd84ccfbc5b407cd6e34803
@@ -278,7 +459,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}'
+                value: '{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -287,7 +468,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -296,12 +477,12 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
               -
                 macro: '{#SIZE}'
-                value: '{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}'
+                value: '{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: G
           description: 'The list of the Microsoft SQL databases is provided by the subscription.'
@@ -316,7 +497,7 @@ zabbix_export:
                     name: Databases
               macros:
                 -
-                  macro: '{$AZURE.RESOURCE_ID}'
+                  macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
               tags:
                 -
@@ -380,7 +561,7 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     -
-                      name: 'Azure Microsoft SQL database by HTTP'
+                      name: 'Azure Microsoft SQL Database by HTTP'
             -
               name: Serverless
               step: '1'
@@ -396,7 +577,7 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     -
-                      name: 'Azure Microsoft SQL serverless database by HTTP'
+                      name: 'Azure Microsoft SQL Serverless Database by HTTP'
         -
           uuid: 7fafbef68f8b46d083eb43da7cd1e2cc
           name: 'MySQL servers discovery'
@@ -416,7 +597,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
+                value: '{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -425,7 +606,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -434,7 +615,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the MySQL servers is provided by the subscription.'
@@ -449,7 +630,7 @@ zabbix_export:
                     name: Databases
               macros:
                 -
-                  macro: '{$AZURE.RESOURCE_ID}'
+                  macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
               tags:
                 -
@@ -513,7 +694,7 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     -
-                      name: 'Azure MySQL flexible server by HTTP'
+                      name: 'Azure MySQL Flexible Server by HTTP'
             -
               name: 'Single server'
               step: '2'
@@ -529,7 +710,7 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     -
-                      name: 'Azure MySQL single server by HTTP'
+                      name: 'Azure MySQL Single Server by HTTP'
         -
           uuid: a4b35b5fe8c04b52a9640f2f41013230
           name: 'PostgreSQL servers discovery'
@@ -549,7 +730,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}'
+                value: '{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -558,7 +739,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -567,7 +748,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the PostgreSQL servers is provided by the subscription.'
@@ -582,7 +763,7 @@ zabbix_export:
                     name: Databases
               macros:
                 -
-                  macro: '{$AZURE.RESOURCE_ID}'
+                  macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
               tags:
                 -
@@ -646,7 +827,7 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     -
-                      name: 'Azure PostgreSQL flexible server by HTTP'
+                      name: 'Azure PostgreSQL Flexible Server by HTTP'
             -
               name: 'Single server'
               step: '2'
@@ -662,7 +843,1792 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     -
-                      name: 'Azure PostgreSQL single server by HTTP'
+                      name: 'Azure PostgreSQL Single Server by HTTP'
+        -
+          uuid: 3b9bde32dd6b4e3aa2dd8d7949f655e9
+          name: 'Storage accounts discovery'
+          type: DEPENDENT
+          key: azure.starage.acc.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.STORAGE.ACC.NAME.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'The list of all storage accounts available under the subscription.'
+          item_prototypes:
+            -
+              uuid: 3361508a601748f5aca339f952430889
+              name: 'Azure: Storage account [{#NAME}]: Get data'
+              type: SCRIPT
+              key: 'azure.get.storage.acc[{#NAME}]'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              params: |
+                var AzureStorage = {
+                    params: {},
+                
+                    setParams: function (params) {
+                        ['token', 'id'].forEach(function (field) {
+                            if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                                throw 'Required param is not set: ' + field + '.';
+                            }
+                        });
+                
+                        AzureStorage.params = params;
+                    },
+                
+                    request: function (url) {
+                        var response, request = new HttpRequest();
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
+                        Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+                        response = request.get(url);
+                        if (request.getStatus() !== 200) {
+                            throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                        }
+                        try {
+                            return JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from API.';
+                        }
+                    },
+                
+                    getField: function (data, path) {
+                        var steps = path.split('.');
+                        for (var i = 0; i < steps.length; i++) {
+                            var step = steps[i];
+                            if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                                throw 'Required field was not found: ' + path + ' input data: ' + JSON.stringify(data);
+                            }
+                
+                            data = data[step];
+                        }
+                
+                        return data;
+                    },
+                
+                    getMetricsData: function () {
+                        var data = {};
+                        start_date = new Date((new Date().getTime()) - 4200000).toISOString().replace(/\.\d+/, '');
+                        end_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
+                        endpoints = {
+                            'tableServices': '/tableServices/default/providers/Microsoft.Insights/metrics?metricnames=TableCapacity,TableCount,TableEntityCount,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                            'blobServices': '/blobServices/default/providers/Microsoft.Insights/metrics?metricnames=BlobCapacity,BlobCount,ContainerCount,IndexCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                            'fileServices': '/fileServices/default/providers/Microsoft.Insights/metrics?metricnames=FileCapacity,FileCount,FileShareCount,FileShareSnapshotCount,FileShareSnapshotSize,FileShareCapacityQuota,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                            'storageAccount': '/providers/Microsoft.Insights/metrics?metricnames=UsedCapacity,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                            'queueServices': '/queueServices/default/providers/Microsoft.Insights/metrics?metricnames=QueueCapacity,QueueCount,QueueMessageCount,Transactions,Ingress,Egress,SuccessServerLatency,SuccessE2ELatency,Availability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date)
+                        };
+                
+                        Object.keys(endpoints).forEach(function (field) {
+                            data[field] = {};
+                            metrics = AzureStorage.request('https://management.azure.com' + AzureStorage.params.id + endpoints[field]);
+                
+                            if (!metrics.hasOwnProperty('value')) {
+                                throw 'Failed getting required field. Check debug log for more information.';
+                            }
+                
+                            for (k in metrics.value) {
+                                key = AzureStorage.getField(metrics.value[k], 'name.value')
+                                if (metrics.value[k].timeseries.length === 0) {
+                                    metrics.value[k].timeseries.push({ 'data': ['nodata'] })
+                                }
+                                data[field][key] = AzureStorage.getField(metrics.value[k], 'timeseries.0.data.0');
+                            }
+                        });
+                        return data
+                    }
+                
+                };
+                
+                try {
+                    AzureStorage.setParams(JSON.parse(value));
+                    return JSON.stringify(AzureStorage.getMetricsData());
+                }
+                catch (error) {
+                    error += (String(error).endsWith('.')) ? '' : '.';
+                    Zabbix.log(3, '[ Azure ] ERROR: ' + error);
+                    return JSON.stringify({ 'error': error });
+                }
+              description: 'The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.'
+              timeout: '{$AZURE.DATA.TIMEOUT}'
+              parameters:
+                -
+                  name: id
+                  value: '{#ID}'
+                -
+                  name: token
+                  value: '{#TOKEN}'
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 08ce66b39b084182bdb60a5556b88c88
+              name: 'Azure: Storage account [{#NAME}]: Availability'
+              type: DEPENDENT
+              key: 'azure.storage.availability[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                The percentage of availability for the storage service or a specified API operation.
+                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
+                All unexpected errors result in reduced availability for the storage service or the specified API operation.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.Availability.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: common
+                -
+                  tag: storage
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 6a0b3edebded4d848ad76f86f8152377
+                  expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: Availability is low'
+                  event_name: 'Azure: Storage account [{#NAME} availability are too low (less than {$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}%)'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 9ae0af76a37047f5ba84de2f43dfb5c4
+              name: 'Azure: Storage account [{#NAME}]: Blob Availability'
+              type: DEPENDENT
+              key: 'azure.storage.blob.availability[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                The percentage of availability for the storage service or a specified API operation.
+                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
+                All unexpected errors result in reduced availability for the storage service or the specified API operation.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.Availability.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 4cd8ac56b50c4120bf9de56bb1f06245
+                  expression: '(min(/Azure by HTTP/azure.storage.blob.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: Blob Availability is low'
+                  event_name: 'Azure: Storage account [{#NAME} blob availability are too low (less than {$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}%)'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: c6437ade4fee44f783ab379fb179508d
+              name: 'Azure: Storage account [{#NAME}]: Blob Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.blob.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.BlobCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 707be15f02a141548ce5f89097c303a0
+              name: 'Azure: Storage account [{#NAME}]: Blob Container Count'
+              type: DEPENDENT
+              key: 'azure.storage.blob.container.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of containers in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.ContainerCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9bd8b8f1b5844298a245d449548de46e
+              name: 'Azure: Storage account [{#NAME}]: Blob Count'
+              type: DEPENDENT
+              key: 'azure.storage.blob.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of blob objects stored in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.BlobCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: ae28bbd289644619b20b1907212d8293
+              name: 'Azure: Storage account [{#NAME}]: Blob Egress'
+              type: DEPENDENT
+              key: 'azure.storage.blob.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 8e73a2aba92444dd9c02c6f94227a4e5
+              name: 'Azure: Storage account [{#NAME}]: Blob Index Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.blob.index.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of storage with the name `[{#NAME}]` used by the Azure Data Lake Storage Gen2 hierarchical index.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.IndexCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: ff40325efb174839bef7bc775049837e
+              name: 'Azure: Storage account [{#NAME}]: Blob Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.blob.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: e17d6f2ed79c4b5eaa54730c82d6840f
+              name: 'Azure: Storage account [{#NAME}]: Blob Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.blob.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 727fb792fe5c4229995f7aa5bbb681ed
+              name: 'Azure: Storage account [{#NAME}]: Blob Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.blob.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 48ecb880def34474b73a03eb895db3ea
+              name: 'Azure: Storage account [{#NAME}]: Blob Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.blob.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.blobServices.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: blob
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 4198807e1e08439a9009481ddcfd3bab
+              name: 'Azure: Storage account [{#NAME}]: Egress'
+              type: DEPENDENT
+              key: 'azure.storage.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: common
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 43069f165849449d8403d1a8c82fe634
+              name: 'Azure: Storage account [{#NAME}]: File Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.file.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of File storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 3483741c11a141c2866ea58a74a91135
+              name: 'Azure: Storage account [{#NAME}]: File Count'
+              type: DEPENDENT
+              key: 'azure.storage.file.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of files in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 7f6d01573bf24d9889f41a14cb581075
+              name: 'Azure: Storage account [{#NAME}]: File Egress'
+              type: DEPENDENT
+              key: 'azure.storage.file.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9f9b6772f9d9478ba3be3a93c5408ba2
+              name: 'Azure: Storage account [{#NAME}]: File Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.file.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 4cb60e5473ce46a08bc962dc97c1f4db
+              name: 'Azure: Storage account [{#NAME}]: File Share Capacity Quota'
+              type: DEPENDENT
+              key: 'azure.storage.file.share.capacity.quota[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The upper limit on the amount of storage that can be used by Azure Files Service in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileShareCapacityQuota.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 220673a2e99a4108b034d04d79108231
+              name: 'Azure: Storage account [{#NAME}]: File Share Count'
+              type: DEPENDENT
+              key: 'azure.storage.file.share.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of file shares in the storage account.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileShareCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 47c48f39b9744a92ac13e9db69f6e629
+              name: 'Azure: Storage account [{#NAME}]: File Share Snapshot Size'
+              type: DEPENDENT
+              key: 'azure.storage.file.share.snapshot.size[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The amount of storage used by the snapshots in storage account''s File service in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileShareSnapshotSize.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: f0394f8f2d55471c8ab557045349a6ec
+              name: 'Azure: Storage account [{#NAME}]: File Share Snapshot Count'
+              type: DEPENDENT
+              key: 'azure.storage.file.shares.snapshot.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of snapshots present on the share in storage account''s Files Service.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.FileShareSnapshotCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 431a6c51418d401697d105a0d9b62d23
+              name: 'Azure: Storage account [{#NAME}]: File Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.file.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.file.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 43b6c0b948f64d9daada7aaac520c839
+              name: 'Azure: Storage account [{#NAME}]: File Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.file.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: ed4b7ac10368493ba01c7cbeffba3042
+              name: 'Azure: Storage account [{#NAME}]: File Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.file.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.fileServices.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: file
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: caeaa6805904471a8b18480f34ef9807
+              name: 'Azure: Storage account [{#NAME}]: Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: common
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: be8b82396ff243e8a52864069b192dea
+              name: 'Azure: Storage account [{#NAME}]: Queue Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.queue.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of Queue storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.QueueCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: queue
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9174d372235e4d14a4896a79ddcbc051
+              name: 'Azure: Storage account [{#NAME}]: Queue Count'
+              type: DEPENDENT
+              key: 'azure.storage.queue.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of queues in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.QueueCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: queue
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: b8cff599c4194b4abd74f4a27ca93284
+              name: 'Azure: Storage account [{#NAME}]: Queue Egress'
+              type: DEPENDENT
+              key: 'azure.storage.queue.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: queue
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 599f612c3cc64e81a53d507ae0078ab1
+              name: 'Azure: Storage account [{#NAME}]: Queue Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.queue.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: queue
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 70c7b436a03145c5ab694b3a20ac52b1
+              name: 'Azure: Storage account [{#NAME}]: Queue Message Count'
+              type: DEPENDENT
+              key: 'azure.storage.queue.message.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of unexpired queue messages in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.QueueMessageCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: queue
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: eccdbf48412e4c28afc3bbf87c545cc2
+              name: 'Azure: Storage account [{#NAME}]: Queue Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.queue.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.queue.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: queue
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 4d9aa2753d944690b01a23bcd44fd52d
+              name: 'Azure: Storage account [{#NAME}]: Queue Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.queue.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: queue
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: e472739df4634b55be2466bd91af9886
+              name: 'Azure: Storage account [{#NAME}]: Queue Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.queue.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.queueServices.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: queue
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 48437de0bdca4f5392c295ca8b82bd0a
+              name: 'Azure: Storage account [{#NAME}]: Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: common
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 7076dbfb45cd49828b96064aa892e8e4
+              name: 'Azure: Storage account [{#NAME}]: Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: common
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 918f1d1c70964e7c9f5521cf99bbb21d
+              name: 'Azure: Storage account [{#NAME}]: Table Availability'
+              type: DEPENDENT
+              key: 'azure.storage.table.availability[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                The percentage of availability for the storage service or a specified API operation.
+                Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
+                All unexpected errors result in reduced availability for the storage service or the specified API operation.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.Availability.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: bfb1e82685224048ba8082447cad57ca
+                  expression: '(min(/Azure by HTTP/azure.storage.table.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}'
+                  name: 'Azure: Storage account [{#NAME}]: Table Availability is low'
+                  event_name: 'Azure: Storage account [{#NAME} table availability are too low (less than {$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}%)'
+                  opdata: '{ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: ee19a3857a7a4650952eb855193991ee
+              name: 'Azure: Storage account [{#NAME}]: Table Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.table.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of storage used by the table service of the storage account with the name `[{#NAME}]`, expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.TableCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: a3d11321b1cc4c1b9c322c0a7162e76e
+              name: 'Azure: Storage account [{#NAME}]: Table Count'
+              type: DEPENDENT
+              key: 'azure.storage.table.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of tables in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.TableCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: d75bd57fdd9f4377aea7c1e52a109c18
+              name: 'Azure: Storage account [{#NAME}]: Table Egress'
+              type: DEPENDENT
+              key: 'azure.storage.table.engress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
+                As a result, this number does not reflect billable egress.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.Egress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: f2911504457b4d329ae7cf7d7a24594a
+              name: 'Azure: Storage account [{#NAME}]: Table Entity Count'
+              type: DEPENDENT
+              key: 'azure.storage.table.entity.count[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of table entities in the storage account with the name `[{#NAME}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.TableEntityCount.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 993ca2e5bcd74d27b19998d77f0abec8
+              name: 'Azure: Storage account [{#NAME}]: Table Ingress'
+              type: DEPENDENT
+              key: 'azure.storage.table.ingress[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.Ingress.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 00c441cc77f4447584d4bffbefc304e0
+              name: 'Azure: Storage account [{#NAME}]: Table Success E2E Latency'
+              type: DEPENDENT
+              key: 'azure.storage.table.success.e2e.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.SuccessE2ELatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: f29e3ad4be034f38932cb85654397926
+              name: 'Azure: Storage account [{#NAME}]: Table Success Server Latency'
+              type: DEPENDENT
+              key: 'azure.storage.table.success.server.latency[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: |
+                The average time used to process a successful request by Azure Storage.
+                This value does not include the network latency specified in `SuccessE2ELatency`.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.SuccessServerLatency.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 9ba25e87c5bb466a99855a9fb893283d
+              name: 'Azure: Storage account [{#NAME}]: Table Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.table.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.tableServices.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: table
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 6f68f0d8a63640ffa549fde44e8fe56c
+              name: 'Azure: Storage account [{#NAME}]: Transactions'
+              type: DEPENDENT
+              key: 'azure.storage.transactions[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests, which produced errors.
+                Use `ResponseType` dimension for the number of different type of responses.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.Transactions.total
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: common
+                -
+                  tag: storage
+                  value: '{#NAME}'
+            -
+              uuid: 08ef07d874db4823bd167482bf049916
+              name: 'Azure: Storage account [{#NAME}]: Used Capacity'
+              type: DEPENDENT
+              key: 'azure.storage.used.capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: |
+                The amount of storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.
+                For standard storage accounts, it's the sum of capacity used by blob, table, file, and queue. 
+                For premium storage accounts and Blob storage accounts, it is the same as BlobCapacity or FileCapacity.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.storageAccount.UsedCapacity.average
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'azure.get.storage.acc[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storages
+                -
+                  tag: metrics
+                  value: common
+                -
+                  tag: storage
+                  value: '{#NAME}'
+          graph_prototypes:
+            -
+              uuid: d569e0daf1974df58584432805f95557
+              name: 'Azure: Capacity by storage [{#NAME}]'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.used.capacity[{#NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.blob.capacity[{#NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.table.capacity[{#NAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.file.capacity[{#NAME}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.queue.capacity[{#NAME}]'
+            -
+              uuid: 9c87dfb9ed7e4c1ea32c8e35c6e23381
+              name: 'Azure: Transactions by storage [{#NAME}]'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.transactions[{#NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.blob.transactions[{#NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.table.transactions[{#NAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.file.transactions[{#NAME}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.queue.transactions[{#NAME}]'
+          master_item:
+            key: azure.get.storage.acc
+          lld_macro_paths:
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#TOKEN}'
+              path: $.token
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         -
           uuid: f9386233186648ce828f406c52972ce5
           name: 'Virtual machines discovery'
@@ -682,7 +2648,7 @@ zabbix_export:
                 formulaid: E
               -
                 macro: '{#NAME}'
-                value: '{$AZURE.VM.NAME.NOT_MATCHES}'
+                value: '{$AZURE.VM.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               -
@@ -691,7 +2657,7 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#LOCATION}'
-                value: '{$AZURE.VM.LOCATION.NOT_MATCHES}'
+                value: '{$AZURE.VM.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               -
@@ -700,7 +2666,7 @@ zabbix_export:
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the virtual machines is provided by the subscription.'
@@ -715,10 +2681,10 @@ zabbix_export:
                     name: 'Virtual machines'
               templates:
                 -
-                  name: 'Azure virtual machine by HTTP'
+                  name: 'Azure Virtual Machine by HTTP'
               macros:
                 -
-                  macro: '{$AZURE.RESOURCE_ID}'
+                  macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
               tags:
                 -
@@ -775,8 +2741,8 @@ zabbix_export:
           value: azure
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
-          description: 'The AppID of Microsoft Azure.'
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
@@ -786,7 +2752,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
-          macro: '{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
@@ -794,11 +2760,11 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
-          macro: '{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
-          macro: '{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}'
+          macro: '{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}'
           value: ^System$
           description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
@@ -806,7 +2772,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in MySQL servers discovery rule.'
         -
-          macro: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in MySQL servers discovery rule.'
         -
@@ -814,7 +2780,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in MySQL servers discovery rule.'
         -
-          macro: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in MySQL servers discovery rule.'
         -
@@ -826,7 +2792,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
-          macro: '{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
@@ -834,7 +2800,7 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
-          macro: '{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
@@ -842,21 +2808,49 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in discovery rules.'
         -
-          macro: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+          macro: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in discovery rules.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.STORAGE.ACC.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the storage account availability.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the storage account blob services availability.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in storage accounts discovery rule.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in storage accounts discovery rule.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in storage accounts discovery rule.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in storage accounts discovery rule.'
+        -
+          macro: '{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the storage account table services availability.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
         -
           macro: '{$AZURE.VM.LOCATION.MATCHES}'
           value: '.*'
           description: 'This macro is used in virtual machines discovery rule.'
         -
-          macro: '{$AZURE.VM.LOCATION.NOT_MATCHES}'
+          macro: '{$AZURE.VM.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in virtual machines discovery rule.'
         -
@@ -864,13 +2858,13 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in virtual machines discovery rule.'
         -
-          macro: '{$AZURE.VM.NAME.NOT_MATCHES}'
+          macro: '{$AZURE.VM.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in virtual machines discovery rule.'
     -
       uuid: 2d8b9329b5d04cdf85bf17d2d0db2b29
-      template: 'Azure Microsoft SQL database by HTTP'
-      name: 'Azure Microsoft SQL database by HTTP'
+      template: 'Azure Microsoft SQL Database by HTTP'
+      name: 'Azure Microsoft SQL Database by HTTP'
       description: |
         This template is designed to monitor Microsoft SQL databases by HTTP.
         It works without any external scripts and uses the script item.
@@ -880,14 +2874,14 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -974,7 +2968,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5156f35b82084fd3b1d1a11c35757993
-              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=1'
+              expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=1'
               name: 'Azure Microsoft SQL: Microsoft SQL database is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -985,7 +2979,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 0cf3cce995c241838e13df12d5908b61
-              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=3'
+              expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=3'
               name: 'Azure Microsoft SQL: Microsoft SQL database is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -996,7 +2990,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 2130dc83dee94fdfad87894127c6a578
-              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=2'
+              expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=2'
               name: 'Azure Microsoft SQL: Microsoft SQL database is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -1053,7 +3047,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The CPU limit. Applies to vCore-based databases.'
+          description: 'The CPU limit. Applies to the vCore-based databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -1090,7 +3084,7 @@ zabbix_export:
           triggers:
             -
               uuid: 506c034e707442519792a4366bc0879d
-              expression: 'min(/Azure Microsoft SQL database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure Microsoft SQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -1107,7 +3101,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'CPU used. Applies to vCore-based databases.'
+          description: 'The CPU used. Applies to the vCore-based databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -1148,7 +3142,7 @@ zabbix_export:
           triggers:
             -
               uuid: 62d08fe430bd45e890c81547860d5c3d
-              expression: 'length(last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.data.errors))>0'
+              expression: 'length(last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.data.errors))>0'
               name: 'Azure Microsoft SQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1343,19 +3337,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -1369,7 +3363,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The physical data read percentage.'
+          description: 'The percentage of physical data read.'
           preprocessing:
             -
               type: JSONPATH
@@ -1389,7 +3383,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The count of deadlocks. Not applicable to data warehouses.'
+          description: 'The count of deadlocks. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1409,7 +3403,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The count of connections blocked by firewall.'
+          description: 'The count of connections blocked by a firewall.'
           preprocessing:
             -
               type: JSONPATH
@@ -1430,7 +3424,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Log IO percentage. Not applicable to data warehouses.'
+          description: 'The percentage of I/O log. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1451,7 +3445,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU usage as a percentage of the SQL DB process. Not applicable to data warehouses.'
+          description: 'The CPU usage as a percentage of the SQL DB process. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1521,7 +3515,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Sessions percentage. Not applicable to data warehouses.'
+          description: 'The percentage of sessions. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1542,7 +3536,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Allocated data storage. Not applicable to data warehouses.'
+          description: 'The allocated data storage. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1564,7 +3558,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Cumulative differential backup storage size. Applies to vCore-based databases. Not applicable to Hyperscale databases.'
+          description: 'Cumulative differential backup storage size. Applies to the vCore-based databases. Not applicable to the Hyperscale databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -1589,7 +3583,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Cumulative log backup storage size. Applies to vCore-based and Hyperscale databases.'
+          description: 'Cumulative log backup storage size. Applies to the vCore-based and Hyperscale databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -1614,7 +3608,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Cumulative full backup storage size. Applies to vCore-based databases. Not applicable to Hyperscale databases.'
+          description: 'Cumulative full backup storage size. Applies to the vCore-based databases. Not applicable to the Hyperscale databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -1639,7 +3633,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Data space used percent. Not applicable to data warehouses or hyperscale databases.'
+          description: 'Data space used percent. Not applicable to the data warehouses or hyperscale databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -1655,7 +3649,7 @@ zabbix_export:
           triggers:
             -
               uuid: a2d6cf9ac67d4d0eb312e9536299b345
-              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure Microsoft SQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1666,7 +3660,7 @@ zabbix_export:
                   value: capacity
             -
               uuid: 6dbf1d3aeb8b44b8bd96a9ca75f5249e
-              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure Microsoft SQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -1684,7 +3678,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Data space used. Not applicable to data warehouses.'
+          description: 'Data space used. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1706,7 +3700,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'In-Memory OLTP storage percent. Not applicable to data warehouses.'
+          description: 'In-Memory OLTP storage percent. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1727,7 +3721,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Space used in tempdb data files in bytes. Not applicable to data warehouses.'
+          description: 'The space used in `tempdb` data files expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1753,7 +3747,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Space used percentage in tempdb transaction log file. Not applicable to data warehouses.'
+          description: 'The percentage of space used in `tempdb` transaction log file. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1775,7 +3769,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Space used in tempdb transaction log file in bytes. Not applicable to data warehouses.'
+          description: 'The space used in `tempdb` transaction log file in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1801,7 +3795,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Workers percentage. Not applicable to data warehouses.'
+          description: 'The percantage of workers. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -1825,8 +3819,8 @@ zabbix_export:
           value: mssql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
-          description: 'The AppID of Microsoft Azure.'
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
@@ -1834,31 +3828,31 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Microsoft SQL database ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -1879,8 +3873,8 @@ zabbix_export:
               newvalue: Unknown
     -
       uuid: 5175afdf713744d9a81ce53864ccfc1d
-      template: 'Azure Microsoft SQL serverless database by HTTP'
-      name: 'Azure Microsoft SQL serverless database by HTTP'
+      template: 'Azure Microsoft SQL Serverless Database by HTTP'
+      name: 'Azure Microsoft SQL Serverless Database by HTTP'
       description: |
         This template is designed to monitor Microsoft SQL serverless databases by HTTP.
         It works without any external scripts and uses the script item.
@@ -1890,14 +3884,14 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -2049,7 +4043,7 @@ zabbix_export:
           triggers:
             -
               uuid: 37c52a28908a45378266f68acdf5c308
-              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=1'
+              expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=1'
               name: 'Azure Microsoft SQL: Microsoft SQL database is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -2060,7 +4054,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 20bd79f05f3241a9950a83dcd9e325ba
-              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=3'
+              expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=3'
               name: 'Azure Microsoft SQL: Microsoft SQL database is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -2071,7 +4065,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 124813388e9844e8aae5ce474a66a774
-              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=2'
+              expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=2'
               name: 'Azure Microsoft SQL: Microsoft SQL database is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -2128,7 +4122,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The CPU limit. Applies to vCore-based databases.'
+          description: 'The CPU limit. Applies to the vCore-based databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -2165,7 +4159,7 @@ zabbix_export:
           triggers:
             -
               uuid: 933a04a1455b4a89b1527f9ce7848259
-              expression: 'min(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure Microsoft SQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -2182,7 +4176,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'CPU used. Applies to vCore-based databases.'
+          description: 'The CPU used. Applies to the vCore-based databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -2223,7 +4217,7 @@ zabbix_export:
           triggers:
             -
               uuid: f56b125a8eff49d2aa002609c7df8b34
-              expression: 'length(last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.data.errors))>0'
+              expression: 'length(last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.data.errors))>0'
               name: 'Azure Microsoft SQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -2404,19 +4398,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -2450,7 +4444,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The count of deadlocks. Not applicable to data warehouses.'
+          description: 'The count of deadlocks. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2470,7 +4464,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The count of connections blocked by firewall.'
+          description: 'The count of connections blocked by a firewall.'
           preprocessing:
             -
               type: JSONPATH
@@ -2491,7 +4485,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Log IO percentage. Not applicable to data warehouses.'
+          description: 'The percentage of I/O log. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2512,7 +4506,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU usage as a percentage of the SQL DB process. Not applicable to data warehouses.'
+          description: 'The CPU usage as a percentage of the SQL DB process. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2537,7 +4531,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Memory usage as a percentage of the SQL DB process. Not applicable to data warehouses.'
+          description: 'Memory usage as a percentage of the SQL DB process. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2562,7 +4556,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Sessions percentage. Not applicable to data warehouses.'
+          description: 'The percentage of sessions. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2583,7 +4577,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Allocated data storage. Not applicable to data warehouses.'
+          description: 'The allocated data storage. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2605,7 +4599,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Data space used percent. Not applicable to data warehouses or hyperscale databases.'
+          description: 'The percentage of used data space. Not applicable to the data warehouses or hyperscale databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -2621,7 +4615,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4638130e599243fba3206abc85a7447f
-              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure Microsoft SQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -2632,7 +4626,7 @@ zabbix_export:
                   value: capacity
             -
               uuid: 4732eab4aabf439fa0b2d80b63e821e5
-              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure Microsoft SQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -2650,7 +4644,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Data space used. Not applicable to data warehouses.'
+          description: 'Data space used. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2672,7 +4666,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'In-Memory OLTP storage percent. Not applicable to data warehouses.'
+          description: 'In-Memory OLTP storage percent. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2693,7 +4687,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Space used in tempdb data files in bytes. Not applicable to data warehouses.'
+          description: 'Space used in `tempdb` data files expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2719,7 +4713,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Space used percentage in tempdb transaction log file. Not applicable to data warehouses.'
+          description: 'The percentage of space used in `tempdb` transaction log files. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2741,7 +4735,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Space used in tempdb transaction log file in bytes. Not applicable to data warehouses.'
+          description: 'Space used in `tempdb` transaction log files expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2767,7 +4761,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Workers percentage. Not applicable to data warehouses.'
+          description: 'The percentage of workers. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -2791,8 +4785,8 @@ zabbix_export:
           value: mssql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
-          description: 'The AppID of Microsoft Azure.'
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
@@ -2800,31 +4794,31 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Microsoft SQL database ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -2845,8 +4839,8 @@ zabbix_export:
               newvalue: Unknown
     -
       uuid: ec92c7b0b1d14946b6ac61de89357199
-      template: 'Azure MySQL flexible server by HTTP'
-      name: 'Azure MySQL flexible server by HTTP'
+      template: 'Azure MySQL Flexible Server by HTTP'
+      name: 'Azure MySQL Flexible Server by HTTP'
       description: |
         This template is designed to monitor Microsoft Azure MySQL flexible servers by HTTP.
         It works without any external scripts and uses the script item.
@@ -2856,14 +4850,14 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -2950,7 +4944,7 @@ zabbix_export:
           triggers:
             -
               uuid: e822fd2214fb41db9b57cdb8eec0444a
-              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1'
+              expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=1'
               name: 'Azure MySQL: MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -2961,7 +4955,7 @@ zabbix_export:
                   value: availability
             -
               uuid: ebb35037a5b646a0bd2c6be44bb1f3c6
-              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3'
+              expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=3'
               name: 'Azure MySQL: MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -2972,7 +4966,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 240b861c09a94e209036782b6c7496fa
-              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=2'
+              expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=2'
               name: 'Azure MySQL: MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -3004,11 +4998,11 @@ zabbix_export:
           triggers:
             -
               uuid: 3346ea2331c14fa18658eb33e461ec7c
-              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+              expression: 'min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
               name: 'Azure MySQL: Server has aborted connections'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.ABORTED_CONN.MAX.WARN}.'
+              description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED_CONN.MAX.WARN}`.'
               tags:
                 -
                   tag: scope
@@ -3061,7 +5055,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Consumed CPU credits.'
+          description: 'The consumed CPU credits.'
           preprocessing:
             -
               type: JSONPATH
@@ -3082,7 +5076,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Remaining CPU credits.'
+          description: 'The remaining CPU credits.'
           preprocessing:
             -
               type: JSONPATH
@@ -3119,7 +5113,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5af82cc95239479c86c7ab3dabcfb592
-              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -3156,7 +5150,7 @@ zabbix_export:
           triggers:
             -
               uuid: 98c1b86b79e9469cac2870fb2ba42949
-              expression: 'length(last(/Azure MySQL flexible server by HTTP/azure.db.mysql.data.errors))>0'
+              expression: 'length(last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.data.errors))>0'
               name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -3330,19 +5324,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -3356,7 +5350,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The IO percent.'
+          description: 'The consumption percent of I/O.'
           preprocessing:
             -
               type: JSONPATH
@@ -3398,7 +5392,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network egress of a host in bytes.'
+          description: 'Network egress of a host expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3423,7 +5417,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network ingress of a host in bytes.'
+          description: 'Network ingress of a host expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3547,7 +5541,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1703edc1553644e5aa25d35928c5eafd
-              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -3558,7 +5552,7 @@ zabbix_export:
                   value: capacity
             -
               uuid: a2ec23a5e77c40aa9e45d214f4e06ca1
-              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -3600,8 +5594,8 @@ zabbix_export:
           value: mysql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
-          description: 'The AppID of Microsoft Azure.'
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
@@ -3609,11 +5603,11 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
           value: '25'
-          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
+          description: 'The number of failed attempts to connect to the MySQL server for a trigger expression.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
@@ -3627,13 +5621,13 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure MySQL server ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -3654,8 +5648,8 @@ zabbix_export:
               newvalue: Unknown
     -
       uuid: c1396bf1e8cf46f6a407e88ddceef0b8
-      template: 'Azure MySQL single server by HTTP'
-      name: 'Azure MySQL single server by HTTP'
+      template: 'Azure MySQL Single Server by HTTP'
+      name: 'Azure MySQL Single Server by HTTP'
       description: |
         This template is designed to monitor Microsoft Azure MySQL single servers by HTTP.
         It works without any external scripts and uses the script item.
@@ -3665,14 +5659,14 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -3759,7 +5753,7 @@ zabbix_export:
           triggers:
             -
               uuid: 91a32645266547d78df3a70b44c7782b
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=1'
+              expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=1'
               name: 'Azure MySQL: MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -3770,7 +5764,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 852aba88476a40aeb2170b933726b7d8
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3'
+              expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=3'
               name: 'Azure MySQL: MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -3781,7 +5775,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 5f2d2254dfc24f5481207585bed0d933
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=2'
+              expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=2'
               name: 'Azure MySQL: MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -3834,11 +5828,11 @@ zabbix_export:
           triggers:
             -
               uuid: 5b3a09ca04704e6a9972ee4865d358cd
-              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+              expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}'
               name: 'Azure MySQL: Server has failed connections'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.FAILED_CONN.MAX.WARN}.'
+              description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED_CONN.MAX.WARN}`.'
               tags:
                 -
                   tag: scope
@@ -3867,7 +5861,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7115fb320e2b4cc1ad1739c8a6cee155
-              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -3904,7 +5898,7 @@ zabbix_export:
           triggers:
             -
               uuid: df5fa33f8c13413bb9d61ea4470b9b2d
-              expression: 'length(last(/Azure MySQL single server by HTTP/azure.db.mysql.data.errors))>0'
+              expression: 'length(last(/Azure MySQL Single Server by HTTP/azure.db.mysql.data.errors))>0'
               name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -4077,19 +6071,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -4103,7 +6097,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The IO percent.'
+          description: 'The consumption percent of I/O.'
           preprocessing:
             -
               type: JSONPATH
@@ -4139,7 +6133,7 @@ zabbix_export:
           triggers:
             -
               uuid: a67b35f1ac674d6692b0b2bcd6f89bd8
-              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
               name: 'Azure MySQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -4157,7 +6151,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network outbound traffic across the active connections.'
+          description: 'The network outbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -4183,7 +6177,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network inbound traffic across the active connections.'
+          description: 'The network inbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -4288,7 +6282,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3afcb840e8004822a2dada2a89971f69
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -4299,7 +6293,7 @@ zabbix_export:
                   value: capacity
             -
               uuid: 2e605f906b284f769e7c880d4e642b43
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -4404,8 +6398,8 @@ zabbix_export:
           value: mysql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
-          description: 'The AppID of Microsoft Azure.'
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
@@ -4413,7 +6407,7 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.FAILED_CONN.MAX.WARN}'
           value: '25'
@@ -4421,27 +6415,27 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure MySQL server ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -4462,8 +6456,8 @@ zabbix_export:
               newvalue: Unknown
     -
       uuid: 35ef29f24158444097272d2ea7fa6044
-      template: 'Azure PostgreSQL flexible server by HTTP'
-      name: 'Azure PostgreSQL flexible server by HTTP'
+      template: 'Azure PostgreSQL Flexible Server by HTTP'
+      name: 'Azure PostgreSQL Flexible Server by HTTP'
       description: |
         This template is designed to monitor Microsoft Azure PostgreSQL flexible servers by HTTP.
         It works without any external scripts and uses the script item.
@@ -4473,14 +6467,14 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -4567,7 +6561,7 @@ zabbix_export:
           triggers:
             -
               uuid: 65b5c39b48e248c4866c511bbba91e1b
-              expression: 'last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=1'
+              expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=1'
               name: 'Azure PostgreSQL: PostgreSQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -4578,7 +6572,7 @@ zabbix_export:
                   value: availability
             -
               uuid: d8ce86c853064cba80c9883052ed1403
-              expression: 'last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=3'
+              expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=3'
               name: 'Azure PostgreSQL: PostgreSQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -4589,7 +6583,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 9572c9e56a6b44368bcf2d8a17a220d8
-              expression: 'last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=2'
+              expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=2'
               name: 'Azure PostgreSQL: PostgreSQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -4725,7 +6719,7 @@ zabbix_export:
           triggers:
             -
               uuid: f8672e4488b740a9a17395689c3d853c
-              expression: 'min(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure PostgreSQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -4762,7 +6756,7 @@ zabbix_export:
           triggers:
             -
               uuid: 55962f0d8a4c44c9a6b09da705e94c59
-              expression: 'length(last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.data.errors))>0'
+              expression: 'length(last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.data.errors))>0'
               name: 'Azure PostgreSQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -4949,19 +6943,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -5040,7 +7034,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!ops'
-          description: 'I/O Operations per second.'
+          description: 'I/O operations per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -5120,7 +7114,7 @@ zabbix_export:
           triggers:
             -
               uuid: aac52a89709044ed987a365a1d5af17b
-              expression: 'min(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              expression: 'min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
               name: 'Azure PostgreSQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -5138,7 +7132,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network outbound traffic across the active connections.'
+          description: 'The network outbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -5163,7 +7157,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network inbound traffic across the active connections.'
+          description: 'The network inbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -5246,7 +7240,7 @@ zabbix_export:
           triggers:
             -
               uuid: de3142bed28340d9abe518cd3967b024
-              expression: 'last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure PostgreSQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -5257,7 +7251,7 @@ zabbix_export:
                   value: capacity
             -
               uuid: e948600affaa4ff4a0ab4e50f4858c0a
-              expression: 'last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure PostgreSQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -5340,8 +7334,8 @@ zabbix_export:
           value: postgresql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
-          description: 'The AppID of Microsoft Azure.'
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
@@ -5349,31 +7343,31 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure PostgreSQL server ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -5394,8 +7388,8 @@ zabbix_export:
               newvalue: Unknown
     -
       uuid: d023e2cd326c486f908e3e361d1fe157
-      template: 'Azure PostgreSQL single server by HTTP'
-      name: 'Azure PostgreSQL single server by HTTP'
+      template: 'Azure PostgreSQL Single Server by HTTP'
+      name: 'Azure PostgreSQL Single Server by HTTP'
       description: |
         This template is designed to monitor Microsoft Azure PostgreSQL servers by HTTP.
         It works without any external scripts and uses the script item.
@@ -5405,14 +7399,14 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -5499,7 +7493,7 @@ zabbix_export:
           triggers:
             -
               uuid: 699ca12c916746b1bf1e121261771cc3
-              expression: 'last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=1'
+              expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=1'
               name: 'Azure PostgreSQL: PostgreSQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -5510,7 +7504,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 14e45ba0bc26409a89d92edfda152947
-              expression: 'last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=3'
+              expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=3'
               name: 'Azure PostgreSQL: PostgreSQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -5521,7 +7515,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 4dc9113f8a914ac098d8736dba5aed4a
-              expression: 'last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=2'
+              expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=2'
               name: 'Azure PostgreSQL: PostgreSQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -5595,7 +7589,7 @@ zabbix_export:
           triggers:
             -
               uuid: 33bd2ef88ad3468b9f0b2b1358cc7448
-              expression: 'min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
               name: 'Azure PostgreSQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -5632,7 +7626,7 @@ zabbix_export:
           triggers:
             -
               uuid: dd3d0be997204f8b9968ef5839fb7a9b
-              expression: 'length(last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.data.errors))>0'
+              expression: 'length(last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.data.errors))>0'
               name: 'Azure PostgreSQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -5806,19 +7800,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -5832,7 +7826,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The IO Percent.'
+          description: 'The consumption percent of I/O.'
           preprocessing:
             -
               type: JSONPATH
@@ -5868,7 +7862,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3119f21167a546369c05d31cda2e0147
-              expression: 'min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              expression: 'min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
               name: 'Azure PostgreSQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -5886,7 +7880,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network outbound traffic across the active connections.'
+          description: 'The network outbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -5912,7 +7906,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network inbound traffic across the active connections.'
+          description: 'The network inbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -6039,7 +8033,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6538d2c8ed774feb951204308f1458ce
-              expression: 'last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
               name: 'Azure PostgreSQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -6050,7 +8044,7 @@ zabbix_export:
                   value: capacity
             -
               uuid: 7f7a004cfc2a492092dd74c475888e8b
-              expression: 'last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
               name: 'Azure PostgreSQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -6155,8 +8149,8 @@ zabbix_export:
           value: postgresql
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
-          description: 'The AppID of Microsoft Azure.'
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
@@ -6164,31 +8158,31 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
+          macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure PostgreSQL server ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
@@ -6209,10 +8203,10 @@ zabbix_export:
               newvalue: Unknown
     -
       uuid: 820fa4a1565c43e4aac07a691a5bface
-      template: 'Azure virtual machine by HTTP'
-      name: 'Azure virtual machine by HTTP'
+      template: 'Azure Virtual Machine by HTTP'
+      name: 'Azure Virtual Machine by HTTP'
       description: |
-        This template is designed to monitor Microsoft Azure virtual machines by HTTP.
+        This template is designed to monitor Microsoft Azure Virtual Machines (VMs) by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
@@ -6220,14 +8214,14 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Cloud
@@ -6241,7 +8235,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The summary description of the availability status.'
+          description: 'The summary description of availability status.'
           preprocessing:
             -
               type: JSONPATH
@@ -6314,7 +8308,7 @@ zabbix_export:
           triggers:
             -
               uuid: c0170d8a09ae460da923fe773b2b0bd0
-              expression: 'last(/Azure virtual machine by HTTP/azure.vm.availability.state)=1'
+              expression: 'last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=1'
               name: 'Azure: Virtual machine is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -6325,7 +8319,7 @@ zabbix_export:
                   value: availability
             -
               uuid: e1b85765b83445ebbf15f02d782b9858
-              expression: 'last(/Azure virtual machine by HTTP/azure.vm.availability.state)=3'
+              expression: 'last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=3'
               name: 'Azure: Virtual machine is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -6336,7 +8330,7 @@ zabbix_export:
                   value: availability
             -
               uuid: b3d764ff735e44f8806cc4d29090719e
-              expression: 'last(/Azure virtual machine by HTTP/azure.vm.availability.state)=2'
+              expression: 'last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=2'
               name: 'Azure: Virtual machine is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -6353,7 +8347,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Percentage of cached disk bandwidth consumed by the VM.'
+          description: 'The percentage of the cached disk bandwidth consumed by the VM.'
           preprocessing:
             -
               type: JSONPATH
@@ -6373,7 +8367,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Percentage of cached disk IOPS consumed by the VM.'
+          description: 'The percentage of the cached disk IOPS consumed by the VM.'
           preprocessing:
             -
               type: JSONPATH
@@ -6414,7 +8408,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of credits available to burst. Only available on B-series burstable VMs.'
+          description: 'The total number of credits available to burst. Available only on B-series burstable VMs.'
           preprocessing:
             -
               type: JSONPATH
@@ -6436,7 +8430,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of allocated compute units that are currently in use by the Virtual Machine(s).'
+          description: 'The percentage of allocated computing units that are currently in use by VMs.'
           preprocessing:
             -
               type: JSONPATH
@@ -6451,7 +8445,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9e6d9394570641418b4291befb1e38e5
-              expression: 'min(/Azure virtual machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}'
+              expression: 'min(/Azure Virtual Machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}'
               name: 'Azure: High CPU utilization'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -6469,7 +8463,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of the Data Disk bandwidth consumed per minute.'
+          description: 'The percentage of the data disk''s bandwidth consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -6491,7 +8485,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of the Data Disk I/Os consumed per minute.'
+          description: 'The percentage of the data disk input/output (I/O) consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -6513,7 +8507,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Maximum bytes per second throughput Data Disk can achieve with bursting.'
+          description: 'The maximum bytes per second throughput that the data disk can achieve with bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -6535,7 +8529,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Maximum IOPS Data Disk can achieve with bursting.'
+          description: 'The maximum IOPS that the data disk can achieve with bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -6556,7 +8550,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The queue depth (or queue length) of the Data Disk.'
+          description: 'The number of outstanding IO requests that are waiting to be performed on a disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -6578,7 +8572,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec read from a single disk during the monitoring period.'
+          description: 'Bytes per second read from a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -6644,7 +8638,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Baseline IOPS Data Disk can achieve without bursting.'
+          description: 'The baseline IOPS that the data disk can achieve without bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -6666,7 +8660,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of the Data Disk burst bandwidth credits used so far.'
+          description: 'The percentage of the data disk burst bandwidth credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -6688,7 +8682,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of the Data Disk burst I/O credits used so far.'
+          description: 'The percentage of the data disk burst I/O credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -6710,7 +8704,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec written to a single disk during the monitoring period.'
+          description: 'Bytes per second written to a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -6773,7 +8767,7 @@ zabbix_export:
           triggers:
             -
               uuid: 87236c99652643ba800601a461d66d94
-              expression: 'length(last(/Azure virtual machine by HTTP/azure.vm.data.errors))>0'
+              expression: 'length(last(/Azure Virtual Machine by HTTP/azure.vm.data.errors))>0'
               name: 'Azure: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -6981,19 +8975,19 @@ zabbix_export:
           parameters:
             -
               name: app_id
-              value: '{$AZURE.APP_ID}'
+              value: '{$AZURE.APP.ID}'
             -
               name: password
               value: '{$AZURE.PASSWORD}'
             -
               name: tenant_id
-              value: '{$AZURE.TENANT_ID}'
+              value: '{$AZURE.TENANT.ID}'
             -
               name: subscription_id
-              value: '{$AZURE.SUBSCRIPTION_ID}'
+              value: '{$AZURE.SUBSCRIPTION.ID}'
             -
               name: resource_id
-              value: '{$AZURE.RESOURCE_ID}'
+              value: '{$AZURE.RESOURCE.ID}'
           tags:
             -
               tag: component
@@ -7098,7 +9092,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Inbound Flows are number of the current flows in the inbound direction (traffic going into the VM).'
+          description: 'Inbound Flows are a number of the current flows in the inbound direction (the traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -7119,7 +9113,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The maximum creation rate of the inbound flows (traffic going into the VM).'
+          description: 'The maximum creation rate of the inbound flows (the traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -7140,7 +9134,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Outbound Flows are number of the current flows in the outbound direction (traffic going out of the VM).'
+          description: 'Outbound Flows are a number of the current flows in the outbound direction (the traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -7161,7 +9155,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The maximum creation rate of the outbound flows (traffic going out of the VM).'
+          description: 'The maximum creation rate of the outbound flows (the traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -7182,7 +9176,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the Virtual Machine.'
+          description: 'The amount of physical memory (in bytes) immediately available for the allocation to a process or for a system use in the VM.'
           preprocessing:
             -
               type: JSONPATH
@@ -7203,7 +9197,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'The number of bytes received on all network interfaces by the Virtual Machine(s) (Incoming Traffic).'
+          description: 'The number of bytes received on all network interfaces by the VMs (incoming traffic).'
           preprocessing:
             -
               type: JSONPATH
@@ -7229,7 +9223,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'The number of bytes out on all network interfaces by the Virtual Machine(s) (Outgoing Traffic).'
+          description: 'The number of bytes out on all network interfaces by the VMs (outgoing traffic).'
           preprocessing:
             -
               type: JSONPATH
@@ -7255,7 +9249,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of the operating system disk bandwidth consumed per minute.'
+          description: 'The percentage of the operating system''s disk bandwidth consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -7277,7 +9271,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of the operating system disk I/Os consumed per minute.'
+          description: 'The percentage of the operating system''s disk I/Os consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -7364,7 +9358,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec read from a single disk during the monitoring period for OS disk.'
+          description: 'Bytes per second read from a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -7430,7 +9424,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Baseline IOPS OS Disk can achieve without bursting.'
+          description: 'Baseline IOPS that the OS disk can achieve without bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -7474,7 +9468,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of OS Disk burst I/O credits used so far.'
+          description: 'The percentage of the OS disk burst I/O credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -7496,7 +9490,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec written to a single disk during the monitoring period for OS disk.'
+          description: 'Bytes per second written to a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -7539,7 +9533,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Premium Data Disk cache read hit.'
+          description: 'Premium data disk cache read hit.'
           preprocessing:
             -
               type: JSONPATH
@@ -7560,7 +9554,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Premium Data Disk cache read miss.'
+          description: 'Premium data disk cache read miss.'
           preprocessing:
             -
               type: JSONPATH
@@ -7664,8 +9658,8 @@ zabbix_export:
           value: azure
       macros:
         -
-          macro: '{$AZURE.APP_ID}'
-          description: 'The AppID of Microsoft Azure.'
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
@@ -7675,18 +9669,18 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
         -
-          macro: '{$AZURE.RESOURCE_ID}'
-          description: 'Microsoft Azure virtual machine ID.'
+          macro: '{$AZURE.RESOURCE.ID}'
+          description: 'Microsoft Azure Virtual Machine ID.'
         -
-          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
           description: 'Microsoft Azure subscription ID.'
         -
-          macro: '{$AZURE.TENANT_ID}'
+          macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
         -
           macro: '{$AZURE.VM.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
       valuemaps:
         -
           uuid: 38c8ce1516704ec2a6f1ea9686db56b9
@@ -7712,13 +9706,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.read.bps
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.write.bps
     -
       uuid: 7d198b2f6186498ab39ece80f3f7b30e
@@ -7727,13 +9721,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.read.ops
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.write.ops
     -
       uuid: a2d0eb282276486896067f8a30f8ea51
@@ -7742,13 +9736,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.read.bytes
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.write.bytes
     -
       uuid: 58a8c6942314408ab0e88b15d53f67e5
@@ -7757,13 +9751,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.read.ops
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.write.ops
     -
       uuid: b427ad3dbb8d4f8caf1edfb0cab04733
@@ -7772,25 +9766,25 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.inbound
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.outbound
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.inbound.max
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.outbound.max
     -
       uuid: f0f37dc8840a45ba8e8cb62f5fea6804
@@ -7799,13 +9793,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.network.in.total
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.network.out.total
     -
       uuid: 41bd1642704c4d3fbe4fb34c8c389320
@@ -7814,13 +9808,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.read.bps
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.write.bps
     -
       uuid: df77fe1de4ae46f98744ff73ed427b3b
@@ -7829,13 +9823,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.read.ops
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.write.ops
     -
       uuid: 3051d683b44b48ee94030465254abc7f
@@ -7844,13 +9838,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.data.disk.cache.read.hit
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.data.disk.cache.read.miss
     -
       uuid: d727dc11deaa46b282892552c9b03752
@@ -7859,13 +9853,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.hit
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure virtual machine by HTTP'
+            host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
     -
       uuid: 3b278de1b81a4be7acc865568962c323
@@ -7874,19 +9868,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure Microsoft SQL database by HTTP'
+            host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure Microsoft SQL database by HTTP'
+            host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.connections.failed.system
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Azure Microsoft SQL database by HTTP'
+            host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.firewall.blocked
     -
       uuid: 62a9a5e1fb044a52a0b534bd4eeea914
@@ -7895,19 +9889,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.connections.failed.system
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.firewall.blocked
     -
       uuid: fe250a5f509d45babea9fcd12accbcac
@@ -7916,13 +9910,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure Microsoft SQL database by HTTP'
+            host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.cpu.limit
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure Microsoft SQL database by HTTP'
+            host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.cpu.used
     -
       uuid: 083d307db8954fc59e8e5cfccefc16c1
@@ -7931,13 +9925,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.cpu.limit
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.cpu.used
     -
       uuid: ec5714017c744484be8c264d24a0e694
@@ -7946,13 +9940,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure Microsoft SQL database by HTTP'
+            host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure Microsoft SQL database by HTTP'
+            host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.storage.allocated
     -
       uuid: f541b6591683433aba4b3e58a8ad1e5c
@@ -7961,13 +9955,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.storage.allocated
     -
       uuid: 750ae48e6ef749c19a06f4bbe716f92f
@@ -7976,19 +9970,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL flexible server by HTTP'
+            host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL flexible server by HTTP'
+            host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.connections.total
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Azure MySQL flexible server by HTTP'
+            host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.connections.aborted
     -
       uuid: 360a24b56be74cf48df3135008437824
@@ -7997,13 +9991,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single server by HTTP'
+            host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single server by HTTP'
+            host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.connections.failed
     -
       uuid: f929f47602734f82a79f22a5f4446f61
@@ -8012,13 +10006,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL flexible server by HTTP'
+            host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.network.egress
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL flexible server by HTTP'
+            host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.network.ingress
     -
       uuid: dc6840162405481ebc1c3c98fdfcaef1
@@ -8027,13 +10021,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single server by HTTP'
+            host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.network.egress
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single server by HTTP'
+            host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.network.ingress
     -
       uuid: 3fcf43fd338e4902874d940fc0bec8b9
@@ -8042,13 +10036,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single server by HTTP'
+            host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.server.log.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single server by HTTP'
+            host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.server.log.limit
     -
       uuid: 4210e6b4ed8744589dce88217e961a56
@@ -8057,13 +10051,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL flexible server by HTTP'
+            host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL flexible server by HTTP'
+            host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.storage.limit
     -
       uuid: bdc178e6faaa4850badc0c60c7c80d40
@@ -8072,13 +10066,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure MySQL single server by HTTP'
+            host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure MySQL single server by HTTP'
+            host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.limit
     -
       uuid: 2b60e8b1fd7c43f4ac61812e43c0e1ca
@@ -8087,19 +10081,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure PostgreSQL flexible server by HTTP'
+            host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure PostgreSQL flexible server by HTTP'
+            host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.connections.succeeded
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Azure PostgreSQL flexible server by HTTP'
+            host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.connections.failed
     -
       uuid: c76cf8ec6a584af6be815ec4a9257a8c
@@ -8108,13 +10102,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
+            host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
+            host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.connections.failed
     -
       uuid: a4679d243b574bea84397c980723c68b
@@ -8123,13 +10117,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure PostgreSQL flexible server by HTTP'
+            host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.network.egress
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure PostgreSQL flexible server by HTTP'
+            host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.network.ingress
     -
       uuid: 8bc17d843775414ea971e640e1fe5ec0
@@ -8138,13 +10132,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
+            host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.network.egress
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
+            host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.network.ingress
     -
       uuid: 9e750a5a462b4429ac5a36a72bd60c66
@@ -8153,13 +10147,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
+            host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.server.log.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
+            host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.server.log.limit
     -
       uuid: 5fa13cfbdd784475818fae06ff94f879
@@ -8168,13 +10162,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure PostgreSQL flexible server by HTTP'
+            host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure PostgreSQL flexible server by HTTP'
+            host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.storage.free
     -
       uuid: 9ecd071a77364c4486fa5f63125cd985
@@ -8183,11 +10177,11 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
+            host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
+            host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.limit
