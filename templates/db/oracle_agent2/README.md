@@ -4,6 +4,7 @@
 ## Overview
 
 The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2.
+## Tested versions
 
 This template has been tested on:
 
@@ -20,6 +21,8 @@ For Zabbix version: 6.0 and higher.
 1. Setup and configure Zabbix agent 2 compiled with the Oracle monitoring plugin. See the setup instructions for [Oracle Database plugin](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/oracle/README.md).
 2. Set the {$ORACLE.CONNSTRING} macro value using either <protocol(host:port)> or named session.
 3. If you want to override parameters from Zabbix agent configuration file, set the user name, password and service name in host macros ({$ORACLE.USER}, {$ORACLE.PASSWORD}, and {$ORACLE.SERVICE}).
+
+   User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
 
 Test availability:
  ```zabbix_get -s oracle-host -k  oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]```
