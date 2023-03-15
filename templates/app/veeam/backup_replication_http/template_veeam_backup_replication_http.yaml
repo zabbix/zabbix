@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-03-10T14:06:13Z'
+  date: '2023-03-15T13:27:20Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         - Veeam Backup and Replication, version 11.0
         
-        ***NOTE:*** Since the RESTful API may not be available for some editions, template will only work in the following editions of Veeam Backup and Replication:
+        ***NOTE:*** Since the RESTful API may not be available for some editions, the template will only work with the following editions of Veeam Backup and Replication:
         
         1. Veeam Universal License (VUL) editions:
         * Foundation

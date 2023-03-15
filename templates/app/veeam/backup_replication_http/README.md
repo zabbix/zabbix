@@ -10,7 +10,7 @@ This template has been tested on:
 
 - Veeam Backup and Replication, version 11.0
 
-***NOTE:*** Since the RESTful API may not be available for some editions, template will only work in the following editions of Veeam Backup and Replication:
+***NOTE:*** Since the RESTful API may not be available for some editions, the template will only work with the following editions of Veeam Backup and Replication:
 
 1. Veeam Universal License (VUL) editions:
 * Foundation

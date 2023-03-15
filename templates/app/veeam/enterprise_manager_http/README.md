@@ -10,7 +10,7 @@ This template has been tested on:
 
 - Veeam Backup and Replication, version 11.0
 
-***NOTE:*** Veeam Backup Enterprise Manager REST API may not be available for some editions, template will only work in the following editions of Veeam Backup and Replication:
+***NOTE:*** Veeam Backup Enterprise Manager REST API may not be available for some editions, the template will only work with the following editions of Veeam Backup and Replication:
 
 1. Veeam Universal License (VUL) editions:
 * Foundation
@@ -32,7 +32,8 @@ For Zabbix version: 6.0 and higher.
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create a user to monitor the service, or use an existing read-only account.
-   Similar to user authentication in the Veeam Backup Enterprise Manager Web UI, client authentication in the REST API dictates what operations the client is allowed to perform when working with the REST API. 
+   Similarly to the user authentication in the Veeam Backup Enterprise Manager Web UI, 
+   the client authentication in the REST API dictates which operations a client is allowed to perform when working with the REST API.
    That is, if the client is authenticated using an account that does not have enough permissions to perform some actions, it will not be able to execute them.
    You can also obtain the collected jobs if you are logged in under an account having only `Portal Administrator` role.
 > See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
