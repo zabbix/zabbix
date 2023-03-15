@@ -194,7 +194,7 @@ fail:
 
 int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
-	DB_RESULT		result;
+	zbx_db_result_t		result;
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	groupids;
 	char			*sql = NULL;
@@ -236,7 +236,7 @@ exit:
 int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, zbx_script_t *script)
 {
 	int		ret = SUCCEED;
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
 			__func__, userid, hostid, script->scriptid);
@@ -395,8 +395,8 @@ out:
 int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
 {
 	int		ret = SUCCEED;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_ptr_pair_t	pair;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64, __func__, scriptid);

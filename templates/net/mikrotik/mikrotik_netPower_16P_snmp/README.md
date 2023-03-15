@@ -3,14 +3,14 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template for monitoring Switch MikroTik netPower 16P.
 
 An outdoor 18 port switch with 16 Gigabit PoE-out ports and 2 SFP+. Power all your access points anywhere!
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 

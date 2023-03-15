@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template is developed to monitor a single DBMS Oracle Database instance with ODBC.
 
 This template was tested on:
@@ -12,7 +12,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/odbc_checks) for basic instructions.
 
 1. Create an Oracle DB user for monitoring:
 

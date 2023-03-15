@@ -7,11 +7,11 @@ New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or
 
 ## Requirements
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 
-Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
+Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/7.0/manual/concepts/agent#agent-on-unix-like-systems).
 
 ## Configuration
 

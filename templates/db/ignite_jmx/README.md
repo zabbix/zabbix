@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 7.0 and higher  
 Official JMX Template for Apache Ignite computing platform.
 This template is based on the original template developed by Igor Akkuratov, Senior Engineer at GridGain Systems and Apache Ignite Contributor.
 
@@ -14,7 +14,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/jmx) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
 This template works with standalone and cluster instances. Metrics are collected by JMX. All metrics are discoverable.
 

@@ -19,11 +19,10 @@
 
 #include "global.h"
 
-#include "zbxstr.h"
 #include "embed.h"
 #include "duktape.h"
-#include "base64.h"
 #include "zbxcrypto.h"
+#include "zbxjson.h"
 
 /******************************************************************************
  *                                                                            *
@@ -43,7 +42,7 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 	if (SUCCEED != es_duktape_string_decode(duk_require_string(ctx, 0), &str))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
 
-	str_base64_encode_dyn(str, &b64str, (int)strlen(str));
+	zbx_base64_encode_dyn(str, &b64str, (int)strlen(str));
 	duk_push_string(ctx, b64str);
 	zbx_free(str);
 	zbx_free(b64str);
@@ -71,7 +70,7 @@ static duk_ret_t	es_atob(duk_context *ctx)
 
 	buffer_size = (int)strlen(str) * 3 / 4 + 1;
 	buffer = zbx_malloc(buffer, (size_t)buffer_size);
-	str_base64_decode(str, buffer, buffer_size, &out_size);
+	zbx_base64_decode(str, buffer, buffer_size, &out_size);
 	duk_push_lstring(ctx, buffer, (duk_size_t)out_size);
 	zbx_free(str);
 	zbx_free(buffer);
@@ -246,6 +245,132 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	return 1;
 }
 
+#if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
+static void	unescape_newlines(const char *in, size_t *len, char *out)
+{
+	const char	*end = in + *len;
+
+	for (; in < end; in++, out++)
+	{
+		if ('\\' == *in)
+		{
+			if ('n' == *(++in))
+			{
+				*out = '\n';
+				*len = *len - 1;
+			}
+			else
+				*out = *(--in);
+		}
+		else
+			*out = *in;
+	}
+
+	*out = '\0';
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sign data using RSA with SHA-256                                  *
+ *                                                                            *
+ * Parameters: ctx - [IN] pointer to duk_context                              *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is not a string        *
+ *               - if the value stack is empty                                *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_rsa_sign(duk_context *ctx)
+{
+#if !defined(HAVE_OPENSSL) && !defined(HAVE_GNUTLS)
+	ZBX_UNUSED(ctx);
+
+	return duk_error(ctx, DUK_RET_TYPE_ERROR, "encryption support was not compiled in");
+#else
+	char		*key_unesc = NULL, *data = NULL, *error = NULL;
+	unsigned char	*raw_sig = NULL;
+	const char	*key_ptr;
+	duk_size_t	key_len, data_len;
+	duk_int_t	arg_type;
+	size_t		raw_sig_len, key_unesc_alloc = 0;
+	int		err_index = -1;
+
+	if (0 != strcmp(duk_require_string(ctx, 0), "sha256"))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "unsupported hash function, only 'sha256' is supported");
+
+	if (DUK_TYPE_UNDEFINED == (arg_type = duk_get_type(ctx, 1)))
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "parameter 'key' is missing or is undefined");
+		goto out;
+	}
+	else
+	{
+		if (DUK_TYPE_BUFFER == arg_type || DUK_TYPE_OBJECT == arg_type)
+		{
+			key_ptr = duk_buffer_to_string(ctx, 1);
+			key_len = strlen(key_ptr);
+		}
+		else
+			key_ptr = duk_require_lstring(ctx, 1, &key_len);
+
+		if ('\0' == key_ptr[0])
+		{
+			err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "private key cannot be empty");
+			goto out;
+		}
+	}
+
+	data = es_get_buffer_dyn(ctx, 2, &data_len);
+
+	if (0 == data_len)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "data cannot be empty");
+		goto out;
+	}
+
+	if (NULL != zbx_json_decodevalue_dyn(key_ptr, &key_unesc, &key_unesc_alloc, NULL))
+	{
+		key_len = strlen(key_unesc);
+	}
+	else if (NULL != strstr(key_ptr, "\\n"))
+	{
+		key_unesc = zbx_calloc(NULL, key_len + 1, sizeof(char));
+		unescape_newlines(key_ptr, &key_len, key_unesc);
+	}
+	else
+	{
+		key_unesc = zbx_strdup(NULL, key_ptr);
+		zbx_normalize_pem(&key_unesc, &key_len);
+	}
+
+	if (SUCCEED == zbx_rs256_sign(key_unesc, key_len, data, data_len, &raw_sig, &raw_sig_len, &error))
+	{
+		size_t	hex_sig_len;
+		char	*out = NULL;
+
+		hex_sig_len = raw_sig_len * 2 + 1;
+		out = (char *)zbx_malloc(NULL, hex_sig_len);
+		zbx_bin2hex(raw_sig, raw_sig_len, out, hex_sig_len);
+		zbx_free(raw_sig);
+
+		duk_push_string(ctx, out);
+		zbx_free(out);
+	}
+	else
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, error);
+out:
+	zbx_free(error);
+	zbx_free(data);
+	zbx_free(key_unesc);
+
+	if (-1 != err_index)
+		return duk_throw(ctx);
+
+	return 1;
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initializes additional global functions                           *
@@ -270,4 +395,6 @@ void	es_init_global_functions(zbx_es_t *es)
 	duk_push_c_function(es->env->ctx, es_hmac, 3);
 	duk_put_global_string(es->env->ctx, "hmac");
 
+	duk_push_c_function(es->env->ctx, es_rsa_sign, 3);
+	duk_put_global_string(es->env->ctx, "sign");
 }
