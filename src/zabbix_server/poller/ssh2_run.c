@@ -25,6 +25,12 @@
 #include "log.h"
 #include "zbxnum.h"
 
+#if !defined(HAVE_LIBSSH2_METHOD_KEX) && !defined(HAVE_LIBSSH2_METHOD_HOSTKEY) && \
+		!defined(HAVE_LIBSSH2_METHOD_CRYPT_CS) && !defined(HAVE_LIBSSH2_METHOD_CRYPT_SC) && \
+		!defined(HAVE_LIBSSH2_METHOD_MAC_CS) && !defined(HAVE_LIBSSH2_METHOD_MAC_SC)
+#define HAVE_NO_LIBSSH2_METHODS	1
+#endif
+
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
 
@@ -33,6 +39,7 @@ extern char	*CONFIG_SSH_KEY_LOCATION;
 
 static const char	*password;
 
+#ifndef HAVE_NO_LIBSSH2_METHODS
 static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_str, const char *value,
 		char **err_msg)
 {
@@ -81,6 +88,7 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 
 	return ret;
 }
+#endif
 
 static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char **err_msg)
 {
@@ -98,6 +106,11 @@ static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char
 			*eq_str++ = '\0';
 
 		eq_str = ZBX_NULL2EMPTY_STR(eq_str);
+
+#ifdef HAVE_NO_LIBSSH2_METHODS
+		ZBX_UNUSED(session);
+		ZBX_UNUSED(eq_str);
+#endif
 
 #ifdef HAVE_LIBSSH2_METHOD_KEX
 		if (0 == strncmp(line, KEY_EXCHANGE_STR, ZBX_CONST_STRLEN(KEY_EXCHANGE_STR)))
@@ -162,6 +175,7 @@ static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char
 
 	return ret;
 }
+#undef HAVE_NO_LIBSSH2_METHODS
 
 static void	kbd_callback(const char *name, int name_len, const char *instruction,
 		int instruction_len, int num_prompts,

@@ -42,8 +42,8 @@
  ******************************************************************************/
 static int	get_trigger_count(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		triggers_num;
 
 	result = zbx_db_select("select count(*) from triggers");
@@ -278,8 +278,8 @@ static int	process_event_bulk_update(const zbx_db_trigger *trigger, char **sql, 
  ******************************************************************************/
 static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_db_event	event;
 	char		*name, *name_esc;
 	int		ret = SUCCEED;
@@ -351,8 +351,8 @@ static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_
  ******************************************************************************/
 static int	update_event_names(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_db_trigger		trigger;
 	int			ret = SUCCEED, historical, triggers_num, processed_num = 0, completed,
 				last_completed = 0;
@@ -441,8 +441,8 @@ out:
  ******************************************************************************/
 int	zbx_check_postinit_tasks(char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
 	/* avoid filling value cache with unnecessary data during event name update */
