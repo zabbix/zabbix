@@ -349,15 +349,13 @@ class CControllerPopupImportCompare extends CController {
 		unset($all_keys['uuid']);
 
 		$rows = [];
-		$prefix = '- ';
-		$prefix_depth = 0;
 
 		foreach ($all_keys as $key => $change_type) {
 			switch ($change_type) {
 				case 'no_change':
 					$rows[] = [
-						'value' => $prefix.$this->convertToYaml([$key => $before[$key]]),
-						'depth' => $depth + $prefix_depth,
+						'value' => $this->convertToYaml([$key => $before[$key]]),
+						'depth' => $depth + 1,
 						'change_type' => self::CHANGE_NONE
 					];
 
@@ -365,13 +363,13 @@ class CControllerPopupImportCompare extends CController {
 
 				case 'updated':
 					$rows[] = [
-						'value' => $prefix.$this->convertToYaml([$key => $before[$key]]),
-						'depth' => $depth + $prefix_depth,
+						'value' => $this->convertToYaml([$key => $before[$key]]),
+						'depth' => $depth + 1,
 						'change_type' => self::CHANGE_REMOVED
 					];
 					$rows[] = [
-						'value' => $prefix.$this->convertToYaml([$key => $after[$key]]),
-						'depth' => $depth + $prefix_depth,
+						'value' => $this->convertToYaml([$key => $after[$key]]),
+						'depth' => $depth + 1,
 						'change_type' => self::CHANGE_ADDED
 					];
 
@@ -379,8 +377,8 @@ class CControllerPopupImportCompare extends CController {
 
 				case 'removed':
 					$rows[] = [
-						'value' => $prefix.$this->convertToYaml([$key => $before[$key]]),
-						'depth' => $depth + $prefix_depth,
+						'value' => $this->convertToYaml([$key => $before[$key]]),
+						'depth' => $depth + 1,
 						'change_type' => self::CHANGE_REMOVED
 					];
 
@@ -388,8 +386,8 @@ class CControllerPopupImportCompare extends CController {
 
 				case 'added':
 					$rows[] = [
-						'value' => $prefix.$this->convertToYaml([$key => $after[$key]]),
-						'depth' => $depth + $prefix_depth,
+						'value' => $this->convertToYaml([$key => $after[$key]]),
+						'depth' => $depth + 1,
 						'change_type' => self::CHANGE_ADDED
 					];
 
@@ -400,9 +398,6 @@ class CControllerPopupImportCompare extends CController {
 
 					break;
 			}
-
-			$prefix = '';
-			$prefix_depth = 1;
 		}
 
 		return $rows;
@@ -427,7 +422,7 @@ class CControllerPopupImportCompare extends CController {
 				foreach ($entities as $entity) {
 					$before = array_key_exists('before', $entity) ? $entity['before'] : [];
 					$after = array_key_exists('after', $entity) ? $entity['after'] : [];
-					$object = $before ? $before : $after;
+					$object = $before ?: $after;
 					unset($entity['before'], $entity['after']);
 
 					$id = $object['uuid'];
