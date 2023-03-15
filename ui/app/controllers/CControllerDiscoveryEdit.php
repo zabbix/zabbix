@@ -155,7 +155,8 @@ class CControllerDiscoveryEdit extends CController {
 		$dcheck['name'] = discovery_check2str(
 			$db_dcheck['type'],
 			array_key_exists('key_', $db_dcheck) ? $db_dcheck['key_'] : '',
-			array_key_exists('ports', $db_dcheck) ? $db_dcheck['ports'] : ''
+			array_key_exists('ports', $db_dcheck) ? $db_dcheck['ports'] : '',
+			array_key_exists('allow_redirect', $db_dcheck) ? $db_dcheck['allow_redirect'] : 0
 		);
 
 		switch($db_dcheck['type']) {

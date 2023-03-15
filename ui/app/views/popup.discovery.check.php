@@ -123,8 +123,7 @@ $form_list = (new CFormList())
 		'row_dcheck_snmpv3_privpassphrase'
 	)
 	->addRow((new CLabel(_('Allow redirect'), 'allow_redirect')),
-		(new CCheckBox('allow_redirect'))
-			->setChecked($data['params']['allow_redirect'] == 1),
+		(new CCheckBox('allow_redirect'))->setChecked($data['params']['allow_redirect'] == 1),
 		'row_dcheck_allow_redirect'
 	);
 

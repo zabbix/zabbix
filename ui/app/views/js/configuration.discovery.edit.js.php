@@ -87,10 +87,6 @@
 		var addNewValue = function(value) {
 			ZBX_CHECKLIST[value.dcheckid] = value;
 
-			if (value.allow_redirect == 1) {
-				value.name += ' "allow redirect"';
-			}
-
 			jQuery('#dcheckListFooter').before(new Template(jQuery('#dcheck-row-tmpl').html()).evaluate(value));
 
 			for (var field_name in value) {
@@ -108,10 +104,6 @@
 
 		var updateNewValue = function(value) {
 			ZBX_CHECKLIST[value.dcheckid] = value;
-
-			if (value.allow_redirect == 1) {
-				value.name += ' "allow redirect"';
-			}
 
 			var ignore_names = ['druleid', 'dcheckid', 'name', 'ports', 'type', 'uniq'];
 
@@ -389,6 +381,9 @@
 				}
 				if (dcheck.key_) {
 					dcheck.name += ' "' + dcheck.key_ + '"';
+				}
+				if (dcheck.allow_redirect == 1) {
+					dcheck.name += ' "' + <?= json_encode(_('allow redirect')) ?> + '"';
 				}
 				dcheck.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val()
 					|| '<?= ZBX_DISCOVERY_DNS ?>';
