@@ -61,15 +61,6 @@ typedef struct
 }
 zbx_discoverer_check_count_t;
 
-typedef struct
-{
-	zbx_uint64_t		druleid;
-	zbx_discoverer_job_t	*job;
-}
-zbx_discoverer_job_ref_t;
-
-ZBX_VECTOR_DECL(discoverer_job_refs, zbx_discoverer_job_ref_t)
-
 #define DISCOVERER_WORKER_INIT_NONE	0x00
 #define DISCOVERER_WORKER_INIT_THREAD	0x01
 
@@ -84,11 +75,17 @@ typedef struct
 }
 zbx_discoverer_worker_t;
 
+ZBX_PTR_VECTOR_DECL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
+
+ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_dservice_t*)
+ZBX_PTR_VECTOR_IMPL(discoverer_results_ptr, zbx_discoverer_results_t*)
+ZBX_PTR_VECTOR_IMPL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
+
 typedef struct
 {
 	int					workers_num;
 	zbx_discoverer_worker_t			*workers;
-	zbx_vector_discoverer_job_refs_t	job_refs;
+	zbx_vector_discoverer_jobs_ptr_t	job_refs;
 	zbx_discoverer_queue_t			queue;
 
 	zbx_hashset_t				incomplete_checks_count;
@@ -98,13 +95,6 @@ typedef struct
 	zbx_timekeeper_t			*timekeeper;
 }
 zbx_discoverer_manager_t;
-
-ZBX_PTR_VECTOR_DECL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
-
-ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_dservice_t*)
-ZBX_PTR_VECTOR_IMPL(discoverer_results_ptr, zbx_discoverer_results_t*)
-ZBX_PTR_VECTOR_IMPL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
-ZBX_VECTOR_IMPL(discoverer_job_refs, zbx_discoverer_job_ref_t)
 
 extern unsigned char			program_type;
 
@@ -959,11 +949,12 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 
 	while (ZBX_IS_RUNNING() && NULL != (drule = zbx_dc_drule_next(now, nextcheck)))
 	{
-		zbx_discoverer_job_ref_t	cmp = {.druleid = drule->druleid};
-		zbx_int64_t			queue_capacity;
+		zbx_discoverer_job_t	cmp = {.druleid = drule->druleid};
+		zbx_int64_t		queue_capacity;
 
 		discoverer_queue_lock(&dmanager.queue);
-		i = zbx_vector_discoverer_job_refs_bsearch(&dmanager.job_refs, cmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		i = zbx_vector_discoverer_jobs_ptr_bsearch(&dmanager.job_refs, &cmp,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - (zbx_int64_t)dmanager.queue.pending_checks_count;
 		discoverer_queue_unlock(&dmanager.queue);
 
@@ -1054,13 +1045,13 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 
 static void	discoverer_job_remove(zbx_discoverer_job_t *job)
 {
-	int				i;
-	zbx_discoverer_job_ref_t	cmp = {.druleid = job->druleid};
+	int			i;
+	zbx_discoverer_job_t	cmp = {.druleid = job->druleid};
 
-	if (FAIL != (i = zbx_vector_discoverer_job_refs_bsearch(&dmanager.job_refs, cmp,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	if (FAIL != (i = zbx_vector_discoverer_jobs_ptr_bsearch(&dmanager.job_refs, &cmp,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
-		zbx_vector_discoverer_job_refs_remove(&dmanager.job_refs, i);
+		zbx_vector_discoverer_jobs_ptr_remove(&dmanager.job_refs, i);
 	}
 
 	discoverer_job_free(job);
@@ -1461,7 +1452,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 	zbx_hashset_create(&manager->incomplete_checks_count, 1, discoverer_check_count_hash,
 			discoverer_check_count_compare);
 
-	zbx_vector_discoverer_job_refs_create(&manager->job_refs);
+	zbx_vector_discoverer_jobs_ptr_create(&manager->job_refs);
 
 	manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
 
@@ -1509,7 +1500,7 @@ out:
 
 		zbx_hashset_destroy(&manager->results);
 		zbx_hashset_destroy(&manager->incomplete_checks_count);
-		zbx_vector_discoverer_job_refs_destroy(&manager->job_refs);
+		zbx_vector_discoverer_jobs_ptr_destroy(&manager->job_refs);
 
 		manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
 		zbx_timekeeper_free(manager->timekeeper);
@@ -1543,8 +1534,8 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 
 	zbx_hashset_destroy(&manager->incomplete_checks_count);
 
-	zbx_vector_discoverer_job_refs_clear(&manager->job_refs);
-	zbx_vector_discoverer_job_refs_destroy(&manager->job_refs);
+	zbx_vector_discoverer_jobs_ptr_clear(&manager->job_refs);
+	zbx_vector_discoverer_jobs_ptr_destroy(&manager->job_refs);
 
 	zbx_hashset_iter_reset(&manager->results, &iter);
 
@@ -1667,19 +1658,19 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		for (i = 0; i < dmanager.job_refs.values_num; i++)
 		{
-			int				k;
-			zbx_uint64_pair_t		revision;
-			zbx_discoverer_job_ref_t	*jref = (zbx_discoverer_job_ref_t*)&dmanager.job_refs.values[i];
+			int			k;
+			zbx_uint64_pair_t	revision;
+			zbx_discoverer_job_t	*job = dmanager.job_refs.values[i];
 
-			revision.first = jref->druleid;
+			revision.first = job->druleid;
 
 			if (FAIL != (k = zbx_vector_uint64_pair_bsearch(&revisions, revision,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				zbx_uint64_pair_t	*rev = (zbx_uint64_pair_t*)&revisions.values[k];
 
-				if (rev->second != jref->job->drule_revision)
-					discoverer_job_tasks_free(jref->job);
+				if (rev->second != job->drule_revision)
+					discoverer_job_tasks_free(job);
 			}
 		}
 
@@ -1729,18 +1720,15 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 				for (i = 0; i < jobs.values_num; i++)
 				{
-					zbx_discoverer_job_t		*job;
-					zbx_discoverer_job_ref_t	job_ref;
+					zbx_discoverer_job_t	*job;
 
-					job = (zbx_discoverer_job_t*)jobs.values[i];
+					job = jobs.values[i];
 					discoverer_queue_push(&dmanager.queue, job);
-					job_ref.druleid = job->druleid;
-					job_ref.job = job;
-					zbx_vector_discoverer_job_refs_append(&dmanager.job_refs, job_ref);
+					zbx_vector_discoverer_jobs_ptr_append(&dmanager.job_refs, job);
 				}
 
-				zbx_vector_discoverer_job_refs_sort(&dmanager.job_refs,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+				zbx_vector_discoverer_jobs_ptr_sort(&dmanager.job_refs,
+						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 				discoverer_queue_notify_all(&dmanager.queue);
 				discoverer_queue_unlock(&dmanager.queue);
@@ -1789,11 +1777,13 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		if (NULL != message)
 		{
+			zbx_uint64_t	count;
+
 			switch (message->code)
 			{
 				case ZBX_IPC_DISCOVERER_QUEUE:
 					discoverer_queue_lock(&dmanager.queue);
-					zbx_uint64_t	count = dmanager.queue.pending_checks_count;
+					count = dmanager.queue.pending_checks_count;
 					discoverer_queue_unlock(&dmanager.queue);
 
 					zbx_ipc_client_send(client, ZBX_IPC_DISCOVERER_QUEUE, (unsigned char *)&count,
