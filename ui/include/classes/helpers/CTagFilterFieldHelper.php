@@ -34,7 +34,7 @@ class CTagFilterFieldHelper {
 	 *
 	 * @return CTable
 	 */
-	public static function getTagFilterField(array $data = [], array $options = []): CTable {
+	public static function getTagFilterField(array $data = [], array $options = [], bool $allow_empty = false): CTable {
 		$options += [
 			'tag_field_name' => 'filter_tags',
 			'evaltype_field_name' => 'filter_evaltype'
@@ -44,6 +44,8 @@ class CTagFilterFieldHelper {
 			'evaltype' => TAG_EVAL_TYPE_AND_OR,
 			'tags' => []
 		];
+
+		$tags_count = count($data['tags']);
 
 		$tags_table = (new CTable())->setId('filter-tags');
 
@@ -83,7 +85,8 @@ class CTagFilterFieldHelper {
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
 						->removeId()
-						->setEnabled(false)
+						->setEnabled($allow_empty
+							|| ($tags_count > 1 || ($tag['value'] !== '' || $tag['tag'] !== '' )))
 				))->addClass(ZBX_STYLE_NOWRAP)
 			], 'form_row');
 		}

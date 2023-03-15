@@ -43,7 +43,7 @@
 				const $table = $panel.find('.tags-table');
 
 				$table
-					.dynamicRows({template: '#tag-row-tmpl'})
+					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
 					.on('afteradd.dynamicRows', () => {
 						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
 					})
