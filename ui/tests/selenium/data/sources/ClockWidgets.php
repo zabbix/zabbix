@@ -34,44 +34,38 @@ class ClockWidgets {
 		]);
 		$hostgrpid = CDataHelper::getIds('name');
 
-		CDataHelper::call('host.create', [
-			'host' => 'Host for clock widget',
-			'groups' => [
-				[
+		CDataHelper::createHosts([
+			[
+				'host' => 'Host for clock widget',
+				'groups' => [
 					'groupid' => $hostgrpid['Host group for clock widget']
+				],
+				'interfaces' => [
+					[
+						'type'=> 1,
+						'main' => 1,
+						'useip' => 1,
+						'ip' => '192.168.3.217',
+						'dns' => '',
+						'port' => '10050'
+					]
+				],
+				'items' => [
+					[
+						'name' => 'Item for clock widget',
+						'key_' => 'system.localtime[local]',
+						'type' => 0,
+						'value_type' => 1,
+						'delay' => '5s'
+					],
+					[
+						'name' => 'Item for clock widget 2',
+						'key_' => 'system.localtime[local2]',
+						'type' => 0,
+						'value_type' => 1,
+						'delay' => '5s'
+					]
 				]
-			],
-			'interfaces' => [
-				'type'=> 1,
-				'main' => 1,
-				'useip' => 1,
-				'ip' => '192.168.3.217',
-				'dns' => '',
-				'port' => '10050'
-			]
-		]);
-		$hostid = CDataHelper::getIds('host');
-
-		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.$hostid['Host for clock widget']);
-
-		CDataHelper::call('item.create', [
-			[
-				'hostid' => $hostid['Host for clock widget'],
-				'name' => 'Item for clock widget',
-				'key_' => 'system.localtime[local]',
-				'type' => 0,
-				'value_type' => 1,
-				'interfaceid' => $interfaceid,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for clock widget'],
-				'name' => 'Item for clock widget 2',
-				'key_' => 'system.localtime[local2]',
-				'type' => 0,
-				'value_type' => 1,
-				'interfaceid' => $interfaceid,
-				'delay' => '5s'
 			]
 		]);
 		$itemid = CDataHelper::getIds('name');
