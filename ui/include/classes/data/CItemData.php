@@ -113,8 +113,8 @@ final class CItemData {
 			'web.page.get[host,<path>,<port>]',
 			'web.page.perf[host,<path>,<port>]',
 			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
-			'wmi.get[<namespace>,<query>]',
-			'wmi.getall[<namespace>,<query>]',
+			'wmi.get[namespace,query]',
+			'wmi.getall[namespace,query]',
 			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
 			'zabbix.stats[<ip>,<port>]'
 		],
@@ -212,7 +212,7 @@ final class CItemData {
 			'web.page.get[host,<path>,<port>]',
 			'web.page.perf[host,<path>,<port>]',
 			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
-			'wmi.get[<namespace>,<query>]',
+			'wmi.get[namespace,query]',
 			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
 			'zabbix.stats[<ip>,<port>]'
 		],
@@ -1598,11 +1598,11 @@ final class CItemData {
 				'description' => _('Find string on a web page. Returns the matched string, or as specified by the optional output parameter'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
-			'wmi.get[<namespace>,<query>]' => [
+			'wmi.get[namespace,query]' => [
 				'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)'),
 				'value_type' => null
 			],
-			'wmi.getall[<namespace>,<query>]' => [
+			'wmi.getall[namespace,query]' => [
 				'description' => _('Execute WMI query and return the JSON document with all selected objects'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],

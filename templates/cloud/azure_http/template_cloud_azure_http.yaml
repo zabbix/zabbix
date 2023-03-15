@@ -2940,10 +2940,6 @@ zabbix_export:
           value: '70'
           description: 'The warning threshold of the storage account blob services availability.'
         -
-          macro: '{$AZURE.STORAGE.ACC.FILE.AVAILABILITY}'
-          value: '70'
-          description: 'The warning threshold of the storage account file services availability.'
-        -
           macro: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
           value: '.*'
           description: 'This macro is used in storage accounts discovery rule.'
@@ -2959,10 +2955,6 @@ zabbix_export:
           macro: '{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in storage accounts discovery rule.'
-        -
-          macro: '{$AZURE.STORAGE.ACC.QUEUE.AVAILABILITY}'
-          value: '70'
-          description: 'The warning threshold of the storage account queue services availability.'
         -
           macro: '{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY}'
           value: '70'
