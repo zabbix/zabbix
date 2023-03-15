@@ -43,6 +43,7 @@ class testPageConnectors extends CWebTest {
 	}
 
 	private static $connectors;
+	private static $connector_sql = 'SELECT * FROM connector ORDER BY connectorid';
 	private static $delete_connector = 'Connector для удаления - ⊏∅∩∩∈©⊤∅Ř';
 	private static $update_connector = 'Update connector';
 
@@ -175,10 +176,10 @@ class testPageConnectors extends CWebTest {
 		// Check the count of returned Connectors and the count of selected Connectors.
 		$this->assertTableStats($connectors_count);
 		$selected_count = $this->query('id:selected_count')->one();
-		$this->assertEquals('0 selected', $selected_count->getText());
+		$this->assertSelectedCount(0);
 		$all_connectors = $this->query('id:all_connectors')->asCheckbox()->one();
 		$all_connectors->check();
-		$this->assertEquals($connectors_count.' selected', $selected_count->getText());
+		$this->assertSelectedCount($connectors_count);
 
 		// Check that buttons became enabled.
 		$this->assertEquals(3, $this->query('button', ['Enable', 'Disable', 'Delete'])
@@ -186,7 +187,7 @@ class testPageConnectors extends CWebTest {
 		);
 
 		$all_connectors->uncheck();
-		$this->assertEquals('0 selected', $selected_count->getText());
+		$this->assertSelectedCount(0);
 
 		// Check Connectors table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -206,57 +207,6 @@ class testPageConnectors extends CWebTest {
 
 		// Check Connectors table content.
 		$this->assertTableHasData($connectors_data);
-	}
-
-	public function testPageConnectors_ChangeStatus() {
-		$this->page->login()->open('zabbix.php?action=connector.list');
-
-		// Disable Connector.
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', self::$update_connector);
-		$status = $row->getColumn('Status')->query('xpath:.//a')->one();
-		$status->click();
-		// Check that Connector is disabled.
-		$this->checkConnectorStatus($row, 'disabled', self::$update_connector);
-
-		// Enable Connector.
-		$status->click();
-
-		// Check Connector enabled.
-		$this->checkConnectorStatus($row, 'enabled', self::$update_connector);
-
-		// Disable Connector via button.
-		foreach (['Disable' => 'disabled', 'Enable' => 'enabled'] as $button => $status) {
-			$row->select();
-			$this->query('button', $button)->one()->waitUntilClickable()->click();
-			$this->checkConnectorStatus($row, $status, self::$update_connector);
-		}
-	}
-
-	/**
-	 * Check the status of the Connector in the Connector list table.
-	 *
-	 * @param CTableRow	$row		Table row that contains the Connector with changed status.
-	 * @param string	$expected	Flag that determines if the Connector should be enabled or disabled.
-	 * @param string	$connector	Connectors name.
-	 */
-	private function checkConnectorStatus($row, $expected, $connector) {
-		if ($expected === 'enabled') {
-			$message_title = 'Connector enabled';
-			$column_status = 'Enabled';
-			$db_status = '1';
-		}
-		else {
-			$message_title = 'Connector disabled';
-			$column_status = 'Disabled';
-			$db_status = '0';
-		}
-
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, $message_title);
-		CMessageElement::find()->one()->close();
-		$this->assertEquals($column_status, $row->getColumn('Status')->getText());
-		$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM connector WHERE name='.zbx_dbstr($connector)));
 	}
 
 	public function getFilterData() {
@@ -459,14 +409,8 @@ class testPageConnectors extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		if (array_key_exists('expected', $data)) {
-			// Using column Name check that only the expected Connectors are returned in the list.
-			$this->assertTableDataColumn($data['expected']);
-		}
-		else {
-			// Check that 'No data found.' string is returned if no results are expected.
-			$this->assertTableData();
-		}
+		// Check that expected Connectors are returned in the list.
+		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected', []));
 
 		// Reset filter due to not influence further tests.
 		$this->query('button:Reset')->one()->click();
@@ -516,7 +460,7 @@ class testPageConnectors extends CWebTest {
 	public function testPageConnectors_Sort($data) {
 		$this->page->login()->open('zabbix.php?action=connector.list');
 		$table = $this->query('class:list-table')->asTable()->one();
-		$header = $table->query('xpath:.//a[text()="'.$data['sort_field'].'"]')->one();
+		$header = $table->query('link', $data['sort_field'])->one();
 
 		foreach(['desc', 'asc'] as $sorting) {
 			$expected = ($sorting === 'desc') ? $data['expected'] : array_reverse($data['expected']);
@@ -525,38 +469,259 @@ class testPageConnectors extends CWebTest {
 		}
 	}
 
+	public function getCancelData() {
+		return [
+			[
+				[
+					'link_button' => true,
+					'action' => 'Disable',
+					'name' => self::$update_connector,
+					'message' => 'Disable selected connector?'
+				]
+			],
+			[
+				[
+					'link_button' => true,
+					'action' => 'Enable',
+					'name' =>'Disabled connector',
+					'message' => 'Enable selected connector?'
+				]
+			],
+			[
+				[
+					'action' => 'Enable',
+					'message' => 'Enable selected connectors?'
+				]
+			],
+			[
+				[
+					'action' => 'Enable',
+					'name' => 'Disabled connector',
+					'message' => 'Enable selected connector?'
+				]
+			],
+			[
+				[
+					'action' => 'Disable',
+					'message' => 'Disable selected connectors?'
+				]
+			],
+			[
+				[
+					'action' => 'Disable',
+					'name' => self::$update_connector,
+					'message' => 'Disable selected connector?'
+				]
+			],
+			[
+				[
+					'action' => 'Delete',
+					'message' => 'Delete selected connectors?'
+				]
+			],
+			[
+				[
+					'action' => 'Delete',
+					'name' => self::$delete_connector,
+					'message' => 'Delete selected connector?'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testPageConnectors_CancelAction($data) {
+		$old_hash = CDBHelper::getHash(self::$connector_sql);
+
+		$this->page->login()->open('zabbix.php?action=connector.list');
+
+		// Connectors count that will be selected before Enable/Disable/Delete action.
+		$selected_count = (!array_key_exists('name', $data))
+				? CDBHelper::getCount(self::$connector_sql)
+				: CDBHelper::getCount('SELECT NULL FROM connector WHERE name IN ('. CDBHelper::escape($data['name']).')');
+
+		if (array_key_exists('link_button', $data)) {
+			// Disable or enable Connector via Enabled/Disabled button.
+			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
+			$status = $row->getColumn('Status')->query('xpath:.//a')->one()->click();
+		}
+		else {
+			$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
+			$this->assertSelectedCount($selected_count);
+			$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
+		}
+
+		$this->assertEquals($data['message'], $this->page->getAlertText());
+		$this->page->dismissAlert();
+		$this->page->waitUntilReady();
+
+		$this->assertSelectedCount((array_key_exists('link_button', $data)) ? 0 : $selected_count);
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$connector_sql));
+	}
+
+	public function getStatusData() {
+		return [
+			[
+				[
+					'link_button' => true,
+					'action' => 'Disable',
+					'name' => self::$update_connector,
+					'message' => 'Connector disabled',
+					'alert_message' => 'Disable selected connector?',
+					'db_status' => ZBX_CONNECTOR_STATUS_DISABLED
+				]
+			],
+			[
+				[
+					'link_button' => true,
+					'action' => 'Enable',
+					'name' => 'Disabled connector',
+					'message' => 'Connector enabled',
+					'alert_message' => 'Enable selected connector?',
+					'db_status' => ZBX_CONNECTOR_STATUS_ENABLED
+				]
+			],
+			[
+				[
+					'message' => 'Connector enabled',
+					'action' => 'Enable',
+					'name' => 'ZABBIX',
+					'alert_message' => 'Enable selected connector?',
+					'db_status' => ZBX_CONNECTOR_STATUS_ENABLED
+				]
+			],
+			[
+				[
+					'message' => 'Connector disabled',
+					'action' => 'Disable',
+					'name' => 'Enabled connector',
+					'alert_message' => 'Disable selected connector?',
+					'db_status' => ZBX_CONNECTOR_STATUS_DISABLED
+				]
+			],
+			[
+				[
+					'message' => 'Connectors disabled',
+					'action' => 'Disable',
+					'name' => [
+						'Events connector',
+						'Item value connector'
+					],
+					'alert_message' => 'Disable selected connectors?',
+					'db_status' => ZBX_CONNECTOR_STATUS_DISABLED
+				]
+			],
+			[
+				[
+					'message' => 'Connectors disabled',
+					'action' => 'Disable',
+					'alert_message' => 'Disable selected connectors?',
+					'db_status' => ZBX_CONNECTOR_STATUS_DISABLED
+				]
+			],
+			[
+				[
+					'message' => 'Connectors enabled',
+					'action' => 'Enable',
+					'name' => [
+						self::$update_connector,
+						self::$delete_connector
+					],
+					'alert_message' => 'Enable selected connectors?',
+					'db_status' => ZBX_CONNECTOR_STATUS_ENABLED
+				]
+			],
+			[
+				[
+					'message' => 'Connectors enabled',
+					'action' => 'Enable',
+					'alert_message' => 'Enable selected connectors?',
+					'db_status' => ZBX_CONNECTOR_STATUS_ENABLED
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getStatusData
+	 */
+	public function testPageConnectors_ChangeStatus($data) {
+		$this->page->login()->open('zabbix.php?action=connector.list');
+
+		// Connectors count that will be enabled or disabled via button.
+		$selected_count = (!array_key_exists('name', $data))
+				? CDBHelper::getCount(self::$connector_sql)
+				: CDBHelper::getCount('SELECT NULL FROM connector WHERE name IN ('.CDBHelper::escape($data['name']).')');
+
+		if (array_key_exists('link_button', $data)) {
+			// Disable or enable Connector via Enabled/Disabled button.
+			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
+			$status = $row->getColumn('Status')->query('xpath:.//a')->one()->click();
+		}
+		else {
+			$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
+			$this->assertSelectedCount($selected_count);
+			$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
+		}
+
+		// Check alert and success message.
+		$this->assertEquals($data['alert_message'], $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, $data['message']);
+		CMessageElement::find()->one()->close();
+
+		// Check that status in 'Status' column is correct.
+		if (array_key_exists('link_button', $data)) {
+			$this->assertEquals($data['action'].'d', $row->getColumn('Status')->getText());
+		}
+
+		// Check status in database.
+		if (array_key_exists('name', $data)) {
+			$this->assertEquals($data['db_status'], CDBHelper::getValue('SELECT status FROM connector WHERE name IN ('.
+					CDBHelper::escape($data['name']).')')
+			);
+		}
+		else {
+			$this->assertEquals($selected_count, CDBHelper::getCount('SELECT NULL FROM connector WHERE status IN ('.
+					CDBHelper::escape($data['db_status']).')')
+			);
+		}
+
+		// Verify that there is no selected connectors.
+		$this->assertSelectedCount(0);
+	}
+
 	public function testPageConnectors_Delete() {
-		$this->deleteAction(false);
+		$this->deleteAction(self::$delete_connector);
 	}
 
 	public function testPageConnectors_MassDelete() {
-		$this->deleteAction(true);
+		$this->deleteAction();
 	}
 
 	/**
 	 * Function for delete action.
 	 *
-	 * @param boolean $all	if true delete will perform for all connectors.
+	 * @param array $name	connector name, if empty delete will perform for all connectors
 	 */
-	private function deleteAction($all) {
+	private function deleteAction($name = []) {
 		$this->page->login()->open('zabbix.php?action=connector.list');
 
-		// Delete Connector.
-		if ($all) {
-			$this->selectTableRows();
-		}
-		else {
-			$this->selectTableRows(self::$delete_connector);
-		}
+		// Delete Connector(s).
+		$this->selectTableRows($name);
 
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$this->assertEquals('Delete selected connector'.($name ? '' : 's').'?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
-		// Check that Connector is deleted.
-		$this->assertMessage(TEST_GOOD, $all ? 'Connectors deleted' : 'Connector deleted');
-		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
-		$this->assertEquals(0, $all ? CDBHelper::getCount('SELECT connectorid FROM connector')
+		// Check that Connector(s) is/are deleted.
+		$this->assertMessage(TEST_GOOD, 'Connector'.($name ? '' : 's').' deleted');
+		$this->assertSelectedCount(0);
+		$this->assertEquals(0, $name === null ? CDBHelper::getCount(self::$connector_sql)
 				: CDBHelper::getCount('SELECT connectorid FROM connector WHERE name='.zbx_dbstr(self::$delete_connector))
 		);
 	}
