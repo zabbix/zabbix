@@ -27,7 +27,6 @@
 #include "cfg.h"
 #include "zbxcrypto.h"
 #include "zbxvault.h"
-#include "base64.h"
 #include "zbxdbhigh.h"
 #include "dbsync.h"
 #include "actions.h"
@@ -49,8 +48,8 @@
 
 int	sync_in_progress = 0;
 
-#define START_SYNC	WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; sync_in_progress = 1
-#define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE; UNLOCK_CACHE_CONFIG_HISTORY;
+#define START_SYNC	do { WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; sync_in_progress = 1; } while(0)
+#define FINISH_SYNC	do { sync_in_progress = 0; UNLOCK_CACHE; UNLOCK_CACHE_CONFIG_HISTORY; } while(0)
 
 #define ZBX_SNMP_OID_TYPE_NORMAL	0
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
@@ -748,7 +747,7 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 
 static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 {
-	const ZBX_TABLE	*config_table;
+	const zbx_db_table_t	*config_table;
 
 	/* sync with zbx_dbsync_compare_config() */
 	const char	*selected_fields[] = {"discovery_groupid", "snmptrap_logging",
@@ -2481,7 +2480,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 
 	src_len = strlen(src) * 3 / 4;
 	dst = __config_shmem_malloc_func(NULL, src_len);
-	str_base64_decode(src, (char *)dst, src_len, &data_len);
+	zbx_base64_decode(src, (char *)dst, src_len, &data_len);
 
 	return dst;
 }
@@ -11133,23 +11132,31 @@ static void	DCinterface_get_agent_availability(const ZBX_DC_INTERFACE *dc_interf
 static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned char *available, const char **error,
 		int *errors_from, int *disable_until)
 {
-#define AGENT_AVAILABILITY_ASSIGN(flags, mask, dst, src)	\
-	if (0 != (flags & mask))				\
-	{							\
-		if (dst != src)					\
-			dst = src;				\
-		else						\
-			flags &= (unsigned char)(~(mask));	\
-	}
+#define AGENT_AVAILABILITY_ASSIGN(flags, mask, dst, src)		\
+	do								\
+	{								\
+		if (0 != (flags & mask))				\
+		{							\
+			if (dst != src)					\
+				dst = src;				\
+			else						\
+				flags &= (unsigned char)(~(mask));	\
+		}							\
+	}								\
+	while(0)
 
-#define AGENT_AVAILABILITY_ASSIGN_STR(flags, mask, dst, src)	\
-	if (0 != (flags & mask))				\
-	{							\
-		if (0 != strcmp(dst, src))			\
-			dc_strpool_replace(1, &dst, src);	\
-		else						\
-			flags &= (unsigned char)(~(mask));	\
-	}
+#define AGENT_AVAILABILITY_ASSIGN_STR(flags, mask, dst, src)		\
+	do								\
+	{								\
+		if (0 != (flags & mask))				\
+		{							\
+			if (0 != strcmp(dst, src))			\
+				dc_strpool_replace(1, &dst, src);	\
+			else						\
+				flags &= (unsigned char)(~(mask));	\
+		}							\
+	}								\
+	while(0)
 
 	AGENT_AVAILABILITY_ASSIGN(av->flags, ZBX_FLAGS_AGENT_STATUS_AVAILABLE, *available, av->available);
 	AGENT_AVAILABILITY_ASSIGN_STR(av->flags, ZBX_FLAGS_AGENT_STATUS_ERROR, *error, av->error);

@@ -17,11 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PREPROCESSING_STATS_H
-#define ZABBIX_PREPROCESSING_STATS_H
+#ifndef ZABBIX_PREPROC_PREPROC_SERVER_H
+#define ZABBIX_PREPROC_PREPROC_SERVER_H
 
-#include "zbxjson.h"
+#include "zbxpreproc.h"
+#include "zbxtime.h"
+#include "zbxtypes.h"
 
-void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg);
+void	preproc_flush_value_server(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
+	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
 
 #endif

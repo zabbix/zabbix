@@ -19,8 +19,7 @@
 
 #include "pp_task.h"
 #include "pp_error.h"
-#include "zbxcommon.h"
-#include "log.h"
+#include "pp_item.h"
 #include "zbxalgo.h"
 #include "zbxsysinc.h"
 #include "zbxipcservice.h"
@@ -31,36 +30,30 @@
 
 ZBX_PTR_VECTOR_IMPL(pp_task_ptr, zbx_pp_task_t *)
 
-void	pp_task_free(zbx_pp_task_t *task);
-
 /******************************************************************************
  *                                                                            *
  * Purpose: create task                                                       *
  *                                                                            *
- * Parameters: size - [IN] the task data size                                 *
+ * Parameters: size - [IN] task data size                                     *
  *                                                                            *
  * Return value: The created task.                                            *
  *                                                                            *
  ******************************************************************************/
 static zbx_pp_task_t	*pp_task_create(size_t size)
 {
-	zbx_pp_task_t	*task;
-
-	task = (zbx_pp_task_t *)zbx_malloc(NULL, offsetof(zbx_pp_task_t, data) + size);
-
-	return task;
+	return (zbx_pp_task_t *)zbx_malloc(NULL, offsetof(zbx_pp_task_t, data) + size);
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: create preprocessing test task                                    *
  *                                                                            *
- * Parameters: preproc   - [IN] the item preprocessing data                   *
- *             value     - [IN] the value to preprocess, its contents will be *
+ * Parameters: preproc   - [IN] item preprocessing data                       *
+ *             value     - [IN] value to preprocess, its contents will be     *
  *                              directly copied over and cleared by the task  *
  *                              (optional)                                    *
- *             ts        - [IN] the value timestamp                           *
- *             client    - [IN] the request source                            *
+ *             ts        - [IN] value timestamp                               *
+ *             client    - [IN] request source                                *
  *                                                                            *
  * Return value: The created task.                                            *
  *                                                                            *
@@ -92,7 +85,7 @@ zbx_pp_task_t	*pp_task_test_create(zbx_pp_item_preproc_t *preproc, zbx_variant_t
  *                                                                            *
  * Purpose: clear test task                                                   *
  *                                                                            *
- * Parameters: task - [IN] the task to clear                                  *
+ * Parameters: task - [IN] task to clear                                      *
  *                                                                            *
  ******************************************************************************/
 static void	pp_task_test_clear(zbx_pp_task_test_t *task)
@@ -108,16 +101,16 @@ static void	pp_task_test_clear(zbx_pp_task_test_t *task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create value preprocesing task                                    *
+ * Purpose: create value preprocessing task                                   *
  *                                                                            *
- * Parameters: itemid    - [IN] the item identifier                           *
- *             preproc   - [IN] the item preprocessing data                   *
- *             value     - [IN] the value to preprocess, its contents will be *
+ * Parameters: itemid    - [IN] item identifier                               *
+ *             preproc   - [IN] item preprocessing data                       *
+ *             value     - [IN] value to preprocess, its contents will be     *
  *                              directly copied over and cleared by the task  *
  *                              (optional)                                    *
- *             ts        - [IN] the value timestamp                           *
- *             value_opt - [IN] the optional value data (optional)            *
- *             cache     - [IN] the preprocessing cache (optional)            *
+ *             ts        - [IN] value timestamp                               *
+ *             value_opt - [IN] optional value data (optional)                *
+ *             cache     - [IN] preprocessing cache (optional)                *
  *                                                                            *
  * Return value: The created task.                                            *
  *                                                                            *
@@ -153,7 +146,7 @@ zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *
  *                                                                            *
  * Purpose: clear value preprocessing task                                    *
  *                                                                            *
- * Parameters: task - [IN] the task to clear                                  *
+ * Parameters: task - [IN] task to clear                                      *
  *                                                                            *
  ******************************************************************************/
 static void	pp_task_value_clear(zbx_pp_task_value_t *task)
@@ -168,16 +161,16 @@ static void	pp_task_value_clear(zbx_pp_task_value_t *task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create serial value preprocesing task                             *
+ * Purpose: create serial value preprocessing task                            *
  *                                                                            *
- * Parameters: itemid    - [IN] the item identifier                           *
- *             preproc   - [IN] the item preprocessing data                   *
- *             value     - [IN] the value to preprocess, its contents will be *
+ * Parameters: itemid    - [IN] item identifier                               *
+ *             preproc   - [IN] item preprocessing data                       *
+ *             value     - [IN] value to preprocess, its contents will be     *
  *                              directly copied over and cleared by the task  *
  *                              (optional)                                    *
- *             ts        - [IN] the value timestamp                           *
- *             value_opt - [IN] the optional value data (optional)            *
- *             cache     - [IN] the preprocessing cache (optional)            *
+ *             ts        - [IN] value timestamp                               *
+ *             value_opt - [IN] optional value data (optional)                *
+ *             cache     - [IN] preprocessing cache (optional)                *
  *                                                                            *
  * Return value: The created task.                                            *
  *                                                                            *
@@ -196,8 +189,8 @@ zbx_pp_task_t	*pp_task_value_seq_create(zbx_uint64_t itemid, zbx_pp_item_preproc
  *                                                                            *
  * Purpose: create dependent item preprocessing task                          *
  *                                                                            *
- * Parameters: itemid    - [IN] the item identifier                           *
- *             preproc   - [IN] the item preprocessing data                   *
+ * Parameters: itemid  - [IN] item identifier                                 *
+ *             preproc - [IN] item preprocessing data                         *
  *                                                                            *
  * Return value: The created task.                                            *
  *                                                                            *
@@ -222,7 +215,7 @@ zbx_pp_task_t	*pp_task_dependent_create(zbx_uint64_t itemid, zbx_pp_item_preproc
  *                                                                            *
  * Purpose: clear dependent item preprocessing task                           *
  *                                                                            *
- * Parameters: task - [IN] the task to clear                                  *
+ * Parameters: task - [IN] task to clear                                      *
  *                                                                            *
  ******************************************************************************/
 static void	pp_task_dependent_clear(zbx_pp_task_dependent_t *task)
@@ -239,7 +232,7 @@ static void	pp_task_dependent_clear(zbx_pp_task_dependent_t *task)
  *                                                                            *
  * Purpose: create sequence task                                              *
  *                                                                            *
- * Parameters: itemid    - [IN] the item identifier                           *
+ * Parameters: itemid - [IN] item identifier                                  *
  *                                                                            *
  * Return value: The created task.                                            *
  *                                                                            *
@@ -258,9 +251,9 @@ zbx_pp_task_t	*pp_task_sequence_create(zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clear sequence task task                                          *
+ * Purpose: clear sequence of tasks                                           *
  *                                                                            *
- * Parameters: task - [IN] the task to clear                                  *
+ * Parameters: seq - [IN] tasks to clear                                      *
  *                                                                            *
  ******************************************************************************/
 static void	pp_task_sequence_clear(zbx_pp_task_sequence_t *seq)

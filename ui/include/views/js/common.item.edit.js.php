@@ -61,14 +61,16 @@
 	}
 
 	const item_form = {
-		init({interfaces, value_type_by_keys, keys_by_item_type, testable_item_types, field_switches, interface_types}) {
+		init({interfaces, value_type_by_keys, keys_by_item_type, testable_item_types, field_switches, interface_types,
+				discovered_item}) {
 			this.interfaces = interfaces;
 			this.testable_item_types = testable_item_types;
 			this.field_switches = field_switches;
 			this.interface_types = interface_types;
+			this.discovered_item = discovered_item === undefined ? false : discovered_item;
 
 			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
-				item_type_lookup.init(value_type_by_keys, keys_by_item_type);
+				item_type_lookup.init(value_type_by_keys, keys_by_item_type, this.discovered_item);
 			}
 		}
 	}
@@ -246,7 +248,7 @@
 		inferred_type: null,
 		item_type: null,
 
-		init(value_type_by_keys, keys_by_item_type) {
+		init(value_type_by_keys, keys_by_item_type, discovered_item) {
 			this.value_type_by_keys = value_type_by_keys;
 			this.keys_by_item_type = keys_by_item_type;
 			this.form = document.querySelector('#item-form, #item-prototype-form');
@@ -254,6 +256,7 @@
 			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
 			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
 			this.item_type = this.form.querySelector('[name=type]');
+			this.discovered_item = discovered_item;
 
 			this.updateKeyTypeSuggestions();
 
@@ -267,7 +270,7 @@
 				this.updateHintDisplay();
 
 				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
-				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?>) {
+				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?> && !this.discovered_item) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {
 						this.form.querySelector('#trends_mode_1').disabled = false;

@@ -60,7 +60,7 @@ static int	DBpatch_3040004(void)
 
 static int	DBpatch_3040005(void)
 {
-	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sessions", 1, &field);
 }

@@ -20,7 +20,6 @@
 #include "httptest.h"
 
 #include "log.h"
-#include "preproc.h"
 #include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -30,6 +29,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxpreproc.h"
 
 /* HTTP item types */
 #define ZBX_HTTPITEM_TYPE_RSPCODE	0

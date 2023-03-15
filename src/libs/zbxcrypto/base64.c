@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "base64.h"
+#include "zbxcrypto.h"
 
 #include <assert.h>
 #include "zbxcommon.h"
@@ -106,7 +106,7 @@ static unsigned char	char_base64_decode(char c)
  *             in_size  - [IN] size (length) of input str                     *
  *                                                                            *
  ******************************************************************************/
-void	str_base64_encode(const char *p_str, char *p_b64str, int in_size)
+void	zbx_base64_encode(const char *p_str, char *p_b64str, int in_size)
 {
 	int		i;
 	unsigned char	from1, from2, from3;
@@ -173,7 +173,7 @@ void	str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
-void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
+void	zbx_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 {
 	const char 	*pc;
 	char		*pc_r;
@@ -195,11 +195,11 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 	bytes_for_left = (bytes_left + 2) / 3 * 4;
 
 	for (pc = p_str, pc_r = *p_b64str; 0 != full_block_num; pc += c_per_block, pc_r += b_per_block, full_block_num--)
-		str_base64_encode(pc, pc_r, c_per_block);
+		zbx_base64_encode(pc, pc_r, c_per_block);
 
 	if (0 != bytes_left)
 	{
-		str_base64_encode(pc, pc_r, bytes_left);
+		zbx_base64_encode(pc, pc_r, bytes_left);
 		pc_r += bytes_for_left;
 	}
 
@@ -216,7 +216,7 @@ void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
  *             p_out_size - [OUT] the size (length) of the str decoded        *
  *                                                                            *
  ******************************************************************************/
-void	str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size)
+void	zbx_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size)
 {
 	const char	*p;
 	char		from[4];

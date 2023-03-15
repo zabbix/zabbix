@@ -24,7 +24,6 @@
 #include "../db_lengths.h"
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "base64.h"
 #include "../zbxreport.h"
 #include "zbxcrypto.h"
 #include "../alerter/alerter.h"
@@ -412,7 +411,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	}
 
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
-	str_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
+	zbx_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
 	zbx_json_clean(&j);
 	zbx_free(out_str);
