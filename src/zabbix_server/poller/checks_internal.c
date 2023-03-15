@@ -605,7 +605,8 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				goto out;
 			}
 
-			if (ZBX_PROCESS_TYPE_PREPROCESSOR == process_type || ZBX_PROCESS_TYPE_DISCOVERER)
+			if (ZBX_PROCESS_TYPE_PREPROCESSOR == process_type ||
+					ZBX_PROCESS_TYPE_DISCOVERER == process_type)
 			{
 				zbx_selfmon_stats_threads_cb_t	stats_func;
 
