@@ -30,8 +30,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 	public const DEFAULT_VALUE = [];
 
+	public ?string $templateid;
+
 	public function __construct(string $name, string $label = null, ?string $templateid = null) {
 		parent::__construct($name, $label);
+		$this->templateid = $templateid;
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
@@ -77,7 +80,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$strict_validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+
+			if ($this->templateid === null) {
+				self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+			}
+
 			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($strict_validation_rules['fields']['color'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($strict_validation_rules['fields']['timeshift'], API_NOT_EMPTY);

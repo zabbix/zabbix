@@ -1846,6 +1846,8 @@ form.dashboard-widget-svggraph .list-accordion-item {
     display: none; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
     padding-left: 0; }
+  form.dashboard-widget-svggraph .list-accordion-item.with-hosts-multiselect .multiselect-control {
+    grid-column: span 2; }
 form.dashboard-widget-svggraph .single-item-table .table-col-handle {
   width: 26px; }
 form.dashboard-widget-svggraph .single-item-table .table-col-no {
@@ -1882,6 +1884,8 @@ form.dashboard-widget-svggraph .overrides-list-item {
     right: 0;
     top: 0;
     vertical-align: baseline; }
+  form.dashboard-widget-svggraph .overrides-list-item.with-hosts-multiselect .multiselect-control {
+    grid-column: span 2; }
 form.dashboard-widget-svggraph .overrides-foot {
   padding: 5px 0; }
 form.dashboard-widget-svggraph .overrides-options-list {

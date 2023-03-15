@@ -52,16 +52,10 @@ $form_tabs = (new CTabView())
 	)
 	->addTab('problems', _('Problems'), getProblemsTab($form, $data['fields']),
 		TAB_INDICATOR_GRAPH_PROBLEMS
-	);
-
-if ($data['fields']['ds']->templateid === null) {
-	$form_tabs
-		->addTab('overrides', _('Overrides'), getOverridesTab($form, $data['fields']),
+	)
+	->addTab('overrides', _('Overrides'), getOverridesTab($form, $data['fields']),
 		TAB_INDICATOR_GRAPH_OVERRIDES
-	);
-}
-
-$form_tabs
+	)
 	->addClass('graph-widget-config-tabs')
 	->setSelected(0);
 
@@ -80,7 +74,7 @@ function getDatasetTab(CWidgetFormView $form, array $fields): array {
 	$dataset = new CWidgetFieldGraphDataSetView($fields['ds']);
 
 	return $form->makeCustomField($dataset, [
-		(new CDiv($dataset->getView($fields['ds']->templateid)))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
+		(new CDiv($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
 		(new CDiv($dataset->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
 	]);
 }

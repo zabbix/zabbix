@@ -238,25 +238,14 @@ class WidgetForm extends CWidgetForm {
 	}
 
 	public function addFields(): self {
-		if ($this->templateid === null ) {
-			return $this
-				->initDataSetFields()
-				->initDisplayingOptionsFields()
-				->initTimePeriodFields()
-				->initAxesFields()
-				->initLegendFields()
-				->initProblemsFields()
-				->initOverridesFields();
-		}
-		else {
-			return $this
-				->initDataSetFields()
-				->initDisplayingOptionsFields()
-				->initTimePeriodFields()
-				->initAxesFields()
-				->initLegendFields()
-				->initProblemsFields();
-		}
+		return $this
+			->initDataSetFields()
+			->initDisplayingOptionsFields()
+			->initTimePeriodFields()
+			->initAxesFields()
+			->initLegendFields()
+			->initProblemsFields()
+			->initOverridesFields();
 	}
 
 	private function initDataSetFields(): self {
@@ -440,7 +429,8 @@ class WidgetForm extends CWidgetForm {
 
 	private function initOverridesFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldGraphOverride('or', _('Overrides'), $this->templateid))
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 
