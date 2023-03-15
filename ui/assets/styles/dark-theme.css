@@ -728,6 +728,8 @@ footer {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
     line-height: 1.4em; }
+  .form-grid .form-field .icon-info {
+    margin-left: 5px; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
     .form-grid.form-grid-1-1.label-width-true {
@@ -4107,6 +4109,8 @@ form.is-loading {
       display: block;
       height: 24px;
       line-height: 24px; }
+      .table-forms .table-forms-td-left label .icon-info {
+        margin-left: 5px; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;
@@ -4130,6 +4134,8 @@ form.is-loading {
         word-wrap: break-word; }
       .table-forms .table-forms-td-right td:last-child {
         padding-right: 0; }
+      .table-forms .table-forms-td-right td .icon-info {
+        margin-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
