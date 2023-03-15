@@ -238,22 +238,25 @@ class WidgetForm extends CWidgetForm {
 	}
 
 	public function addFields(): self {
-		return $this->templateid === null
-			? $this
+		if ($this->templateid === null ) {
+			return $this
 				->initDataSetFields()
 				->initDisplayingOptionsFields()
 				->initTimePeriodFields()
 				->initAxesFields()
 				->initLegendFields()
 				->initProblemsFields()
-				->initOverridesFields()
-			: $this
+				->initOverridesFields();
+		}
+		else {
+			return $this
 				->initDataSetFields()
 				->initDisplayingOptionsFields()
 				->initTimePeriodFields()
 				->initAxesFields()
 				->initLegendFields()
 				->initProblemsFields();
+		}
 	}
 
 	private function initDataSetFields(): self {
