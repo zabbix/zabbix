@@ -117,7 +117,9 @@ jQuery(function() {
 
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
-			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0', graph.parent());
+			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0',
+				graph.closest('.dashboard-grid-widget-container')
+			);
 
 			if (graph.data('simpleTriggersHintbox')) {
 				data.isTriggerHintBoxFrozen = true;
@@ -436,7 +438,7 @@ jQuery(function() {
 	// Position hintbox near current mouse position.
 	function repositionHintBox(e, graph) {
 		// Use closest positioned ancestor for offset calculation.
-		var offset = graph.parent().offsetParent().offset(),
+		var offset = graph.closest('.dashboard-grid-widget-container').offsetParent().offset(),
 			hbox = jQuery(graph.hintBoxItem),
 			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
 			mouse_distance = 15,
@@ -604,7 +606,9 @@ jQuery(function() {
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
+				hbox = hintBox.createBox(e, graph, html, '', false, false,
+					graph.closest('.dashboard-grid-widget-container')
+				);
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
@@ -770,7 +774,9 @@ jQuery(function() {
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
+				hbox = hintBox.createBox(e, graph, html, '', false, false,
+					graph.closest('.dashboard-grid-widget-container')
+				);
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
