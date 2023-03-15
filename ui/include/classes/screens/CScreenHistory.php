@@ -311,8 +311,8 @@ class CScreenHistory extends CScreenBase {
 				foreach ($history_data as $data) {
 					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 						$data['value'] = $this->plaintext
-							? _('binary data')
-							: (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
+							? _('binary value')
+							: (new CTag('em', true, _('binary value')))->addClass(ZBX_STYLE_GREY);
 					}
 					else {
 						$data['value'] = rtrim($data['value'], " \t\r\n");
@@ -435,8 +435,8 @@ class CScreenHistory extends CScreenBase {
 
 					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 						$value = $this->plaintext
-							? _('binary data')
-							: (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
+							? _('binary value')
+							: (new CTag('em', true, _('binary value')))->addClass(ZBX_STYLE_GREY);
 					}
 					else {
 						$value = $history_row['value'];
@@ -531,8 +531,8 @@ class CScreenHistory extends CScreenBase {
 					foreach ($items as $item) {
 						if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 							$value = $this->plaintext
-								? _('binary data')
-								: (new CTag('em', true, _('binary data')))->addClass(ZBX_STYLE_GREY);
+								? _('binary value')
+								: (new CTag('em', true, _('binary value')))->addClass(ZBX_STYLE_GREY);
 						}
 						else {
 							$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
