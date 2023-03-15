@@ -110,8 +110,6 @@ else {
 	access_deny();
 }
 
-$tags = getRequest('tags', []);
-
 // Remove inherited macros data (actions: 'add', 'update' and 'form').
 $macros = cleanInheritedMacros(getRequest('macros', []));
 
@@ -310,7 +308,7 @@ if (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'groups' => [],
-		'tags' => $tags,
+		'tags' => getRequest('tags', []),
 		'context' => getRequest('context'),
 		// Parent discovery rules.
 		'templates' => []
