@@ -149,9 +149,11 @@ $filter_inventory_table = new CTable();
 $filter_inventory_table->setId('filter-inventory_#{uniqid}');
 $inventories = array_column(getHostInventories(), 'title', 'db_field');
 
-if(!$data['inventory']){
+if(!$data['inventory']) {
 	$data['inventory'] = [['field' => '', 'value' => '']];
 }
+
+$inventory_count = count($data['inventory']);
 
 $i = 0;
 foreach ($data['inventory'] as $field) {
@@ -164,7 +166,7 @@ foreach ($data['inventory'] as $field) {
 			(new CButton('inventory['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
-				->setEnabled(false)
+				->setEnabled($inventory_count > 1 || ($field['field'] !== '' || $field['value'] !== ''))
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 
@@ -192,9 +194,11 @@ $filter_tags_table->addRow(
 	))->setColSpan(4)
 );
 
-if(!$data['tags']){
+if(!$data['tags']) {
 	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
+
+$tags_count = count($data['tags']);
 
 $i = 0;
 foreach ($data['tags'] as $tag) {
@@ -223,7 +227,7 @@ foreach ($data['tags'] as $tag) {
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 				->removeId()
-				->setEnabled(false)
+				->setEnabled($tags_count > 1 || ($tag['tag'] !== '' || $tag['value'] !== ''))
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 
@@ -478,8 +482,10 @@ if (array_key_exists('render_html', $data)) {
 		}
 
 		// Inventory table.
-		if (data.inventory.length !== 0) {
-			$('#filter-inventory_' + data.uniqid, container).find('.form_row')[0].remove();
+		$('#filter-inventory_' + data.uniqid, container).find('.form_row')[0].remove();
+
+		if (data.inventory.length === 0) {
+			data.inventory.push({'field': '', 'value': ''});
 		}
 
 		$('#filter-inventory_' + data.uniqid, container).dynamicRows({
@@ -489,8 +495,10 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Tags table.
-		if (data.tags.length !== 0) {
-			$('#filter-tags_' + data.uniqid, container).find('.form_row')[0].remove();
+		$('#filter-tags_' + data.uniqid, container).find('.form_row').remove();
+
+		if (data.tags.length === 0) {
+			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});
 		}
 
 		$('#filter-tags_' + data.uniqid, container)

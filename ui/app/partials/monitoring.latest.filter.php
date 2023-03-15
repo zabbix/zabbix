@@ -102,6 +102,8 @@ if(!$data['tags']) {
 	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
 
+$tags_count = count($data['tags']);
+
 $i = 0;
 foreach ($data['tags'] as $tag) {
 	$filter_tags_table->addRow([
@@ -129,7 +131,7 @@ foreach ($data['tags'] as $tag) {
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 				->removeId()
-				->setEnabled(false)
+				->setEnabled($tags_count > 1 || ($tag['tag'] !== '' || $tag['value'] !== ''))
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 
@@ -317,8 +319,10 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// tags table
-		if (data.tags.length !== 0) {
-			$('#tags_' + data.uniqid, container).find('.form_row')[0].remove();
+		$('#tags_' + data.uniqid, container).find('.form_row')[0].remove();
+
+		if (data.tags.length === 0) {
+			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});
 		}
 
 		$('#tags_' + data.uniqid, container)
