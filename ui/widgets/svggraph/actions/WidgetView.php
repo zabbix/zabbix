@@ -26,11 +26,9 @@ use CControllerDashboardWidgetView,
 	CNumberParser,
 	CParser,
 	CRangeTimeParser,
-	CSvgGraphHelper,
-	API;
+	CSvgGraphHelper;
 
 use Widgets\SvgGraph\Includes\WidgetForm;
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -55,16 +53,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
 		$is_template_dashboard = $this->hasInput('templateid');
-		$dynamic_host_name = null;
-
-		if ($is_template_dashboard && $this->hasInput('dynamic_hostid')) {
-			$dynamic_host = API::Host()->get([
-				'output' => ['name'],
-				'hostids' => [$this->getInput('dynamic_hostid')]
-			]);
-			$dynamic_host_name = $dynamic_host[0]['name'];
-		}
-
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
@@ -155,7 +143,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'problems' => [
 				'show_problems' => $this->fields_values['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
 				'graph_item_problems' => $this->fields_values['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS,
-				'problemhosts' => !$is_template_dashboard ? $this->fields_values['problemhosts'] : [$dynamic_host_name],
+				'problemhosts' => $is_template_dashboard ? '' : $this->fields_values['problemhosts'],
 				'severities' => $this->fields_values['severities'],
 				'problem_name' => $this->fields_values['problem_name'],
 				'evaltype' => $this->fields_values['evaltype'],

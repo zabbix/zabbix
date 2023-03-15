@@ -79,7 +79,9 @@ class CSvgGraphHelper {
 			->setSize($width, $svg_height)
 			->addMetrics($metrics)
 			->addSimpleTriggers(self::getSimpleTriggers($metrics, $options['displaying']))
-			->addProblems(self::getProblems($metrics, $options['problems'], $options['time_period']))
+			->addProblems(self::getProblems($metrics, $options['problems'], $options['time_period'],
+				$options['templateid'], $options['dynamic_hostid'])
+			)
 			->draw();
 
 		// SBox available only for graphs without overridden relative time.
@@ -814,9 +816,18 @@ class CSvgGraphHelper {
 	/**
 	 * Find problems at given time period that matches specified problem options.
 	 */
-	private static function getProblems(array $metrics, array $problem_options, array $time_period): array {
+	private static function getProblems(array $metrics, array $problem_options, array $time_period, string $templateid,
+			string $dynamic_hostid): array {
 		if ($problem_options['show_problems'] == SVG_GRAPH_PROBLEMS_OFF) {
 			return [];
+		}
+
+		if ($templateid !== '' && $dynamic_hostid !== '') {
+			$dynamic_host = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => [$dynamic_hostid]
+			]);
+			$problem_options['problemhosts'] = [$dynamic_host[0]['name']];
 		}
 
 		$options = [
