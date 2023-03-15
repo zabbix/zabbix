@@ -2468,8 +2468,14 @@ static void	zbx_init_snmp(void)
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-void	zbx_mt_init_snmp(void)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Initialize snmp and load mibs files for multithread environment   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_init_library_mt_snmp(void)
 {
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 0);
 	zbx_init_snmp();
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 
@@ -2582,6 +2588,14 @@ static void	zbx_shutdown_snmp(void)
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear snmpv3 user authentication cache                            *
+ *                                                                            *
+ * Parameters: process_type - [IN] type of process                            *
+ *             process_num  - [IN] unique id of process                       *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d]",
@@ -2594,10 +2608,9 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp();
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 0);
 
 	if (0 != snmp_rwlock_init_done)
-		zbx_mt_init_snmp();
+		zbx_init_library_mt_snmp();
 
 	SNMP_MT_UNLOCK;
 }

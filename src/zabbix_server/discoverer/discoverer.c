@@ -1631,7 +1631,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
 
 #ifdef HAVE_NETSNMP
-	zbx_mt_init_snmp();
+	zbx_init_library_mt_snmp();
 #endif
 	zbx_vector_uint64_pair_create(&revisions);
 
