@@ -901,7 +901,7 @@ class CHostPrototype extends CHostBase {
 
 		while ($db_interface = DBfetch($db_interfaces)) {
 			$db_hosts[$db_interface['hostid']]['interfaces'][$db_interface['interfaceid']] =
-				array_diff_key($db_interface, array_flip(['hostid']));
+				array_diff_key($db_interface, array_flip(['hostid'])) + ['details' => []];
 
 			if ($db_interface['type'] == INTERFACE_TYPE_SNMP) {
 				$details_interfaces[$db_interface['interfaceid']] = $db_interface['hostid'];
@@ -1008,7 +1008,7 @@ class CHostPrototype extends CHostBase {
 				}
 			}
 
-			if (!$inherited && array_key_exists('name', $host)) {
+			if (array_key_exists('name', $host)) {
 				if ($db_hosts === null
 						|| $host['name'] !== $db_hosts[$host['hostid']]['name']) {
 					$v_names[$host['ruleid']][] = $host['name'];
@@ -1071,20 +1071,46 @@ class CHostPrototype extends CHostBase {
 				$where[] = '('.dbConditionId('i.itemid', [$ruleid]).' AND '.dbConditionString('h.name', $names).')';
 			}
 
-			$duplicates = DBfetchArray(DBselect(
-				'SELECT i.name AS rule,h.name'.
-				' FROM items i,host_discovery hd,hosts h'.
-				' WHERE i.itemid=hd.parent_itemid'.
-					' AND hd.hostid=h.hostid'.
-					' AND ('.implode(' OR ', $where).')',
-				1
-			));
-
-			if ($duplicates) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".',
-					$duplicates[0]['name'], $duplicates[0]['rule']
+			if (!$inherited) {
+				$duplicates = DBfetchArray(DBselect(
+					'SELECT i.name AS rule,h.name'.
+					' FROM items i,host_discovery hd,hosts h'.
+					' WHERE i.itemid=hd.parent_itemid'.
+						' AND hd.hostid=h.hostid'.
+						' AND ('.implode(' OR ', $where).')',
+					1
 				));
+
+				if ($duplicates) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Host prototype with visible name "%1$s" already exists in discovery rule "%2$s".',
+						$duplicates[0]['name'], $duplicates[0]['rule']
+					));
+				}
+			}
+			else {
+				$duplicates = DBfetchArray(DBselect(
+					'SELECT i.name AS rule,h.name,hh.host AS parent_host,hh.status'.
+					' FROM items i,host_discovery hd,hosts h,hosts hh'.
+					' WHERE i.itemid=hd.parent_itemid'.
+						' AND hd.hostid=h.hostid'.
+						' AND i.hostid=hh.hostid'.
+						' AND ('.implode(' OR ', $where).')',
+					1
+				));
+
+				if ($duplicates) {
+					if ($duplicates[0]['status'] == HOST_STATUS_TEMPLATE) {
+						$error = _('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s" of template "%3$s".');
+					}
+					else {
+						$error = _('Host prototype with visible name "%1$s" already exists in discovery rule "%2$s" of host "%3$s".');
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $duplicates[0]['name'],
+						$duplicates[0]['rule'], $duplicates[0]['parent_host']
+					));
+				}
 			}
 		}
 	}
@@ -1363,6 +1389,7 @@ class CHostPrototype extends CHostBase {
 				elseif ($db_hosts[$host['hostid']]['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM
 						&& $db_hosts[$host['hostid']]['interfaces']) {
 					$update = true;
+					$host['interfaces'] = [];
 				}
 			}
 
@@ -1455,23 +1482,18 @@ class CHostPrototype extends CHostBase {
 		$interface += $def_interface;
 		$details = array_key_exists('details', $interface) ? $interface['details'] : [];
 
-		if (array_key_exists('details', $interface)) {
+		if ($interface['type'] == INTERFACE_TYPE_SNMP && array_key_exists('details', $interface)) {
 			$details += $def_details;
 		}
 
 		foreach ($db_interfaces as $db_interface) {
-			$db_details = array_key_exists('details', $db_interface) ? $db_interface['details'] : [];
-
 			if (!DB::getUpdatedValues('interface', $interface, $db_interface)) {
-				if (!array_key_exists('details', $interface)) {
-					return $db_interface['interfaceid'];
+				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+					if (!DB::getUpdatedValues('interface_snmp', $details, $db_interface['details'])) {
+						return $db_interface['interfaceid'];
+					}
 				}
-
-				if (!array_key_exists('details', $db_interface)) {
-					continue;
-				}
-
-				if (!DB::getUpdatedValues('interface_snmp', $details, $db_details)) {
+				else {
 					return $db_interface['interfaceid'];
 				}
 			}
@@ -2060,7 +2082,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$result = DBselect(
-			'SELECT h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,'.
+			'SELECT h.hostid,h.uuid,h.host,h.name,h.custom_interfaces,h.status,h.discover,'.
 				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM hosts h'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
@@ -2115,7 +2137,7 @@ class CHostPrototype extends CHostBase {
 			$upd_host = [
 				'uuid' => '',
 				'hostid' => $upd_db_host['hostid'],
-				'templateid' => $host['templateid'],
+				'templateid' => $host['hostid'],
 				'ruleid' => $upd_db_host['ruleid'],
 				'host_status' => $upd_db_host['host_status']
 			];
@@ -2152,7 +2174,7 @@ class CHostPrototype extends CHostBase {
 		$upd_host_names = [];
 
 		foreach ($upd_db_hosts as $upd_db_host) {
-			$upd_host_names[$upd_db_host['parent_ruleid']][] = $upd_db_host['host'];
+			$upd_host_names[$upd_db_host['ruleid']][] = $upd_db_host['host'];
 		}
 
 		foreach ($hosts as $host) {
@@ -2254,7 +2276,7 @@ class CHostPrototype extends CHostBase {
 			$host = $hosts[$parent_indexes[$upd_db_host['templateid']]];
 
 			$upd_host = array_intersect_key($upd_db_host,
-				array_flip(['hostid', 'templateid', 'ruleid', 'host_status'])
+				array_flip(['hostid', 'ruleid', 'host_status'])
 			);
 
 			self::addInheritedFields($upd_host, $upd_db_host, $host);
@@ -2272,7 +2294,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function addInheritedFields(array &$inh_host, array $upd_db_host = null, array $host): void {
 		$inh_host += array_intersect_key($host,
-			['host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode']
+			array_flip(['host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'])
 		);
 
 		if (array_key_exists('interfaces', $host)) {
