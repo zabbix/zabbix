@@ -1898,12 +1898,6 @@ select {
 		&::before {
 			font-size: 22px;
 		}
-
-		&:disabled {
-			&::before {
-				opacity: .3;
-			}
-		}
 	}
 }
 
@@ -4120,7 +4114,6 @@ svg {
 	.preprocessing-step {
 		.zi-drag-handle {
 			left: -8px;
-			top: 4px;
 		}
 	}
 
@@ -4347,7 +4340,7 @@ svg {
 
 			.zi-drag-handle {
 				position: relative;
-				top: 3px;
+				top: 0;
 				left: 0;
 				opacity: .35;
 			}
@@ -4494,6 +4487,8 @@ a.icon-count {
 }
 
 .zi-circle-question-filled {
+	margin-left: 5px;
+
 	&::before {
 		top: -2px;
 		color: $icon-help-hint-color;
@@ -5256,7 +5251,7 @@ z-select,
 .zi-drag-handle {
 	position: absolute;
 	left: -22px;
-	top: 2px;
+	top: 5px;
 	opacity: .5;
 
 	&::before {

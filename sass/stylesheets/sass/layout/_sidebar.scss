@@ -30,7 +30,7 @@ $sidebar-padding: 12px;
 		.btn-icon {
 			&::before {
 				font-size: $icon-default-size;
-				color: $icon-sidebar-mode-color;
+				color: $sidebar-mode-icon-color;
 			}
 
 			&:hover,

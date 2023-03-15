@@ -25,10 +25,6 @@
 		}
 	}
 
-	button {
-		background-color: $white;
-	}
-
 	&::after {
 		content: '';
 		position: absolute;
@@ -55,7 +51,7 @@
 }
 
 .msg-bad {
-	border-color: $msg-bad-border-color;
+	border-color: $msg-bad-color;
 
 	.link-action {
 		color: $msg-bad-color;
@@ -70,21 +66,16 @@
 	}
 
 	ul {
-		border-top-color: $msg-bad-border-color;
-	}
-
-	button {
-		color: $msg-bad-color;
-		border-color: $msg-bad-border-color;
+		border-top-color: $msg-bad-color;
 	}
 
 	&::after {
-		background-color: $msg-bad-border-color;
+		background-color: $msg-bad-color;
 	}
 }
 
 .msg-good {
-	border-color: $msg-good-border-color;
+	border-color: $msg-good-color;
 
 	.link-action {
 		color: $msg-good-color;
@@ -99,12 +90,7 @@
 	}
 
 	ul {
-		border-top-color: $msg-good-border-color;
-	}
-
-	button {
-		color: $msg-good-color;
-		border-color: $msg-good-border-color;
+		border-top-color: $msg-good-color;
 	}
 
 	&::after {
@@ -113,7 +99,7 @@
 }
 
 .msg-warning {
-	border-color: $msg-warning-border-color;
+	border-color: $msg-warning-color;
 
 	.link-action {
 		color: $msg-warning-color;
@@ -128,16 +114,11 @@
 	}
 
 	ul {
-		border-top-color: $msg-warning-border-color;
-	}
-
-	button {
-		color: $msg-warning-color;
-		border-color: $msg-warning-border-color;
+		border-top-color: $msg-warning-color;
 	}
 
 	&::after {
-		background-color: $msg-warning-border-color;
+		background-color: $msg-warning-color;
 	}
 }
 

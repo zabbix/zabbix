@@ -41,13 +41,14 @@ $body-bg-color: #0e1012;
 $overlay-bg-color: #000000;
 $overlay-border-color: #383838;
 
-$icon-btn-icon-color: #8c979c;
-$icon-btn-icon-hover-color: #acbbc2;
+$icon-btn-icon-color: #505c62;
+$icon-btn-icon-hover-color: #5e737e;
+$icon-btn-icon-disabled-color: #3e4346;
 $icon-doc-color: #4f4f4f;
 $icon-doc-hover-color: #737373;
 $icon-help-hint-color: #4f4f4f;
-$icon-sidebar-mode-color:#b1b1b1;
-$icon-form-search-color: #b1b1b1;
+$sidebar-mode-icon-color:#b1b1b1;
+$form-search-icon-color: #b1b1b1;
 
 // Main menu
 $menu-icon-color: #b1b1b1;
@@ -67,21 +68,6 @@ $menu-main-submenu-selected-border-color: #c5c5c5;
 
 $menu-main-submenu-next-level-bg: #454545 !default;
 $menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
-
-$menu-main-icons: (
-	dashboards: -570px -856px,
-	dashboard: -570px -664px,
-	problems: -570px -688px,
-	monitoring: -570px -712px,
-	services: -570px -832px,
-	inventory: -570px -736px,
-	reports: -570px -760px,
-	data-collection: -570px -784px,
-	alerts: -570px -879px,
-	configuration: -570px -784px,
-	users: -570px -904px,
-	administration: -570px -808px
-);
 
 // UI
 $ui-bg-color: #2b2b2b;
@@ -123,9 +109,7 @@ $form-search-icon-bg-position: -570px -616px;
 // Error messages
 $msg-bad-color: darken(desaturate($red, 10%), 20%);
 $msg-good-color: #344e3f;
-$msg-good-border-color: #344e3f;
 $msg-warning-color: #a97d38;
-$msg-warning-border-color: #614f32;
 
 // Buttons
 $btn-font-color: #f2f2f2;
@@ -363,38 +347,6 @@ $toc-title-bg-color: #4f4f4f;
 	}
 }
 
-// Graph and map.
-.btn-back-map-container {
-	.btn-back-map {
-		.btn-back-map-icon {
-			background-position: -85px -725px;
-		}
-	}
-}
-
-// Time selection.
-.ui-tabs-nav {
-	.ui-tabs-active {
-		.btn-info {
-			&::after {
-				background: url($sprite-path) no-repeat -431px -621px; // TODO - AS: should be removed
-			}
-		}
-
-		.btn-time {
-			&::after {
-				background-position: -87px -583px;
-			}
-		}
-
-		.filter-trigger {
-			&::after {
-				// background-position: -87px -547px; // TODO acikuns themes
-			}
-		}
-	}
-}
-
 .time-quick {
 	li {
 		a {
@@ -411,23 +363,10 @@ $toc-title-bg-color: #4f4f4f;
 	}
 }
 
-.icon-action-severity-up::before {
-	background-position: -624px -245px;
-}
-
-.icon-action-severity-down::before {
-	background-position: -649px -245px;
-}
-
 .icon-actions-number-gray {
-
 	&[data-count]::after {
 		color: $font-selected-color;
 	}
-}
-
-.icon-action-ack-green::before {
-	background-position: -423px -356px;
 }
 
 .icon-description::after {
@@ -462,8 +401,4 @@ $toc-title-bg-color: #4f4f4f;
 	&>:last-child::after {
 		content: "";
 	}
-}
-
-.icon-filter::before {
-	background: url($sprite-path) no-repeat -87px -547px; // TODO - AS: should be removed
 }

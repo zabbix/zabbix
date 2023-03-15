@@ -758,10 +758,6 @@ header {
     padding: 2px; }
     header .header-doc-link + .header-controls {
       margin-left: 0; }
-    header .header-doc-link .zi-help::before {
-      color: #bbc6cc; }
-    header .header-doc-link .zi-help:hover::before, header .header-doc-link .zi-help:focus::before {
-      color: #768d99; }
   header .header-controls {
     flex-shrink: 0;
     margin: 0 -2px 0 auto;
@@ -2925,12 +2921,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
     .msg-good .link-action .arrow-down,
     .msg-warning .link-action .arrow-down {
       border-top-color: #1c762d; }
-  .msg-bad button, .msg-bad a.btn-icon,
-  .msg-good button,
-  .msg-good a.btn-icon,
-  .msg-warning button,
-  .msg-warning a.btn-icon {
-    background-color: #000000 !important; }
   .msg-bad::after,
   .msg-good::after,
   .msg-warning::after {
@@ -2954,7 +2944,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   opacity: 0.9; }
 
 .msg-bad {
-  border-color: #dc3545; }
+  border-color: #ff3a3a; }
   .msg-bad .link-action {
     color: #ff3a3a; }
     .msg-bad .link-action .arrow-up {
@@ -2962,15 +2952,12 @@ div.dashboard-widget-tophosts z-bar-gauge {
     .msg-bad .link-action .arrow-down {
       border-top-color: #ff3a3a; }
   .msg-bad ul {
-    border-top-color: #dc3545; }
-  .msg-bad button, .msg-bad a.btn-icon {
-    color: #ff3a3a;
-    border-color: #dc3545; }
+    border-top-color: #ff3a3a; }
   .msg-bad::after {
-    background-color: #dc3545; }
+    background-color: #ff3a3a; }
 
 .msg-good {
-  border-color: #28a745; }
+  border-color: #23d545; }
   .msg-good .link-action {
     color: #23d545; }
     .msg-good .link-action .arrow-up {
@@ -2978,10 +2965,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     .msg-good .link-action .arrow-down {
       border-top-color: #23d545; }
   .msg-good ul {
-    border-top-color: #28a745; }
-  .msg-good button, .msg-good a.btn-icon {
-    color: #23d545;
-    border-color: #28a745; }
+    border-top-color: #23d545; }
   .msg-good::after {
     background-color: #23d545; }
 
@@ -2995,9 +2979,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
       border-top-color: #ffb319; }
   .msg-warning ul {
     border-top-color: #ffb319; }
-  .msg-warning button, .msg-warning a.btn-icon {
-    color: #ffb319;
-    border-color: #ffb319; }
   .msg-warning::after {
     background-color: #ffb319; }
 
@@ -4804,8 +4785,6 @@ z-select button.focusable, z-select a.focusable.btn-icon,
 
 .calendar-control .zi-calendar::before {
   font-size: 22px; }
-.calendar-control .zi-calendar:disabled::before {
-  opacity: .3; }
 
 .header-kioskmode-controls {
   position: fixed;
@@ -6294,8 +6273,7 @@ svg {
     align-items: center;
     box-sizing: border-box; }
   .preprocessing-list .preprocessing-step .zi-drag-handle {
-    left: -8px;
-    top: 4px; }
+    left: -8px; }
   .preprocessing-list .step-name,
   .preprocessing-list .step-parameters,
   .preprocessing-list .step-on-fail,
@@ -6486,7 +6464,7 @@ svg {
       margin-left: 5px; }
   .navtree .tree .tree-item .zi-drag-handle {
     position: relative;
-    top: 3px;
+    top: 0;
     left: 0;
     opacity: .35; }
   .navtree .tree .tree-item.is-parent > .tree-row > .content > .arrow > .treeview {
@@ -6560,14 +6538,16 @@ a.icon-count {
 ::placeholder {
   color: #bbbbbb; }
 
-.zi-circle-question-filled::before {
-  top: -2px;
-  color: #768d99; }
-.zi-circle-question-filled:focus, .zi-circle-question-filled:hover, .zi-circle-question-filled:active {
-  border: none; }
-.zi-circle-question-filled:focus::before {
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 2px #ffffff; }
+.zi-circle-question-filled {
+  margin-left: 5px; }
+  .zi-circle-question-filled::before {
+    top: -2px;
+    color: #768d99; }
+  .zi-circle-question-filled:focus, .zi-circle-question-filled:hover, .zi-circle-question-filled:active {
+    border: none; }
+  .zi-circle-question-filled:focus::before {
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 2px #ffffff; }
 
 #expressions_list .ui-sortable-helper {
   display: table; }
@@ -7043,7 +7023,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .zi-drag-handle {
   position: absolute;
   left: -22px;
-  top: 2px;
+  top: 5px;
   opacity: .5; }
   .zi-drag-handle::before {
     font-size: 24px; }
