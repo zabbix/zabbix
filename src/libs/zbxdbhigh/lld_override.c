@@ -55,8 +55,8 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 		zbx_vector_ptr_t *ops)
 {
 	size_t				sql_offset = 0;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_lld_override_operation_t	*op = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -116,8 +116,8 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
 		size_t *sql_alloc, zbx_vector_ptr_t *ops)
 {
 	size_t				sql_offset = 0;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_lld_override_operation_t	*op = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -175,8 +175,8 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		zbx_vector_ptr_t *ops)
 {
 	size_t				sql_offset = 0;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_lld_override_operation_t	*override_operation = NULL;
 	zbx_uint64_t			object_mask = 0;
 

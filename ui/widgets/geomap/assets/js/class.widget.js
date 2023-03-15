@@ -27,9 +27,7 @@ class CWidgetGeoMap extends CWidget {
 	static SEVERITY_HIGH = 4;
 	static SEVERITY_DISASTER = 5;
 
-	_init() {
-		super._init();
-
+	onInitialize() {
 		this._map = null;
 		this._icons = {};
 		this._initial_load = true;
@@ -37,28 +35,17 @@ class CWidgetGeoMap extends CWidget {
 		this._severity_levels = new Map();
 	}
 
-	_getUpdateRequestData() {
+	getUpdateRequestData() {
 		return {
-			...super._getUpdateRequestData(),
+			...super.getUpdateRequestData(),
 			initial_load: this._initial_load ? 1 : 0,
 			unique_id: this._unique_id
 		};
 	}
 
-	_processUpdateResponse(response) {
+	setContents(response) {
 		if (this._initial_load) {
-			super._processUpdateResponse(response);
-		}
-		else {
-			let message_box = this._content_body.querySelector('output');
-
-			if (message_box !== null) {
-				message_box.remove();
-			}
-
-			if (response.messages !== undefined) {
-				this._content_body.prepend(makeMessageBox('bad', response.messages)[0]);
-			}
+			super.setContents(response);
 		}
 
 		if (response.geomap !== undefined) {

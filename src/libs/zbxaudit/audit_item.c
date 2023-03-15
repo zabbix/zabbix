@@ -414,8 +414,8 @@ void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, i
 int	zbx_audit_DBselect_delete_for_item(const char *sql, zbx_vector_uint64_t *ids)
 {
 	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	id;
 
 	if (NULL == (result = zbx_db_select("%s", sql)))

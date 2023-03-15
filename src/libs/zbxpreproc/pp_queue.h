@@ -20,11 +20,7 @@
 #ifndef ZABBIX_PP_QUEUE_H
 #define ZABBIX_PP_QUEUE_H
 
-#include "pp_item.h"
-#include "pp_task.h"
 #include "zbxpreproc.h"
-
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 
 typedef struct
