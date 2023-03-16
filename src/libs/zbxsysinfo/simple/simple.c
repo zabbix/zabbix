@@ -51,13 +51,14 @@ ZBX_METRIC	parameters_simple[] =
 };
 
 #ifdef HAVE_LDAP
-static int	check_ldap(const char *host, unsigned short port, int *value_int)
+static int	check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	LDAP		*ldap	= NULL;
 	LDAPMessage	*res	= NULL;
 	LDAPMessage	*msg	= NULL;
 	BerElement	*ber	= NULL;
 
+	struct timeval	tm;
 	char		*attrs[2] = {"namingContexts", NULL };
 	char		*attr	 = NULL;
 	char		**valRes = NULL;
@@ -82,6 +83,14 @@ static int	check_ldap(const char *host, unsigned short port, int *value_int)
 		}
 	}
 #endif
+	tm.tv_sec = timeout;
+	tm.tv_usec = 0;
+
+	if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_NETWORK_TIMEOUT, &tm)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - failed to set network timeout [%s]", ldap_err2string(ldapErr));
+		goto lbl_ret;
+	}
 
 	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
 	{
@@ -370,7 +379,7 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 #ifdef HAVE_LDAP
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_LDAP_PORT;
-			ret = check_ldap(ip, port, &value_int);
+			ret = check_ldap(ip, port, sysinfo_get_config_timeout(), &value_int);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for LDAP check was not compiled in."));
 #endif
