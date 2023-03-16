@@ -162,17 +162,33 @@ func TestMetric_EvalParams(t *testing.T) {
 			wantPanic: false,
 		},
 		{
-			name: "Must fail if missing session only parameters with strict required",
-			m:    metricSet["metric.bar.strict"],
+			name: "Must pass if a connection parameter passed along with a session",
+			m:    metricSet["metric.foo"],
 			args: args{
-				rawParams: []string{"Session1", "", "queryParam1"},
+				rawParams: []string{"Session1", "", "password"},
 				sessions: map[string]conf.Session{
-					"Session1": {URI: "localhost", User: "user"},
+					"Session1": {URI: "localhost", User: "user", Password: "password"},
 				},
 			},
-			want:      nil,
-			wantExtra: nil,
-			wantErr:   true,
+			want: map[string]string{
+				"Param1": "60", "Password": "password", "URI": "localhost", "User": "user", "sessionName": "Session1",
+			},
+			wantErr:   false,
+			wantPanic: false,
+		},
+		{
+			name: "Must pass if a connection parameter overwritten from key",
+			m:    metricSet["metric.foo"],
+			args: args{
+				rawParams: []string{"Session1", "", "new_password"},
+				sessions: map[string]conf.Session{
+					"Session1": {URI: "localhost", User: "user", Password: "password"},
+				},
+			},
+			want: map[string]string{
+				"Param1": "60", "Password": "new_password", "URI": "localhost", "User": "user", "sessionName": "Session1",
+			},
+			wantErr:   false,
 			wantPanic: false,
 		},
 		{
@@ -216,19 +232,6 @@ func TestMetric_EvalParams(t *testing.T) {
 				rawParams: []string{"Session1"},
 				sessions: map[string]conf.Session{
 					"Session1": {URI: "localhost", User: "bob", Password: "password"},
-				},
-			},
-			want:      nil,
-			wantErr:   true,
-			wantPanic: false,
-		},
-		{
-			name: "Must fail if a connection parameter passed along with a session",
-			m:    metricSet["metric.foo"],
-			args: args{
-				rawParams: []string{"Session1", "", "password"},
-				sessions: map[string]conf.Session{
-					"Session1": {URI: "localhost", User: "user", Password: "password"},
 				},
 			},
 			want:      nil,

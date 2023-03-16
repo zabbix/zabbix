@@ -316,7 +316,9 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 			}
 		}
 
-		out[p.name] = val
+		if out[p.name] == "" {
+			out[p.name] = val
+		}
 	}
 
 	return nil
@@ -383,12 +385,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 		}
 
 		if kind == kindConn {
-			if session == nil {
-				params[p.name] = *val
-			} else {
-				return nil, nil, zbxerr.ErrorInvalidParams.Wrap(
-					fmt.Errorf("%s parameter %q cannot be passed along with session", ordNum, p.name))
-			}
+			params[p.name] = *val
 		}
 
 		if kind == kindGeneral {
