@@ -8,4 +8,8 @@ libzbxcrypto_a_SOURCES = \
 	aes.c \
 	aes.h \
 	endian.c \
-	hmac.c
+	hmac.c \
+	rsa.c
+
+libzbxcrypto_a_CFLAGS = \
+	$(TLS_CFLAGS)

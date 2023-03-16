@@ -1509,6 +1509,10 @@ form {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+
+			.icon-info {
+				margin-left: 5px;
+			}
 		}
 	}
 
@@ -1545,6 +1549,10 @@ form {
 
 			&:last-child {
 				padding-right: 0;
+			}
+
+			.icon-info {
+				margin-left: 5px;
 			}
 		}
 
@@ -3187,7 +3195,7 @@ $form-icon-btn: (
 	display: table;
 	position: absolute;
 	z-index: 1000;
-	padding: 13px 10px 10px;
+	padding: 17px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
@@ -3213,6 +3221,7 @@ $form-icon-btn: (
 		position: fixed;
 		overflow: hidden;
 		margin: 0 10px;
+		padding: 13px 10px 10px;
 
 		.dashboard-widget-head {
 			margin-bottom: 12px;

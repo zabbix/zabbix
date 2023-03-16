@@ -579,7 +579,7 @@ char	*zbx_db_dyn_escape_string(const char *src)
 	return zbx_db_dyn_escape_string_basic(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
 }
 
-static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx_escape_sequence_t flag)
+static char	*DBdyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag)
 {
 	size_t	length;
 
@@ -599,8 +599,8 @@ static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx
 
 char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src)
 {
-	const ZBX_TABLE	*table;
-	const ZBX_FIELD	*field;
+	const zbx_db_table_t	*table;
+	const zbx_db_field_t	*field;
 
 	if (NULL == (table = zbx_db_get_table(table_name)) || NULL == (field = zbx_db_get_field(table, field_name)))
 	{
@@ -616,7 +616,7 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 	return zbx_db_dyn_escape_like_pattern_basic(src);
 }
 
-const ZBX_TABLE	*zbx_db_get_table(const char *tablename)
+const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
 {
 	int	t;
 
@@ -629,7 +629,7 @@ const ZBX_TABLE	*zbx_db_get_table(const char *tablename)
 	return NULL;
 }
 
-const ZBX_FIELD	*zbx_db_get_field(const ZBX_TABLE *table, const char *fieldname)
+const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname)
 {
 	int	f;
 
@@ -654,12 +654,12 @@ const ZBX_FIELD	*zbx_db_get_field(const ZBX_TABLE *table, const char *fieldname)
  ******************************************************************************/
 static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	zbx_uint64_t	ret1, ret2;
-	zbx_uint64_t	min = 0, max = ZBX_DB_MAX_ID;
-	int		found = FAIL, dbres;
-	const ZBX_TABLE	*table;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_uint64_t		ret1, ret2;
+	zbx_uint64_t		min = 0, max = ZBX_DB_MAX_ID;
+	int			found = FAIL, dbres;
+	const zbx_db_table_t	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __func__, tablename);
 
@@ -2715,7 +2715,7 @@ out:
  *           freed by the caller later.                                       *
  *                                                                            *
  ******************************************************************************/
-static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t *values, int values_num)
+static char	*zbx_db_format_values(zbx_db_field_t **fields, const zbx_db_value_t *values, int values_num)
 {
 	int	i;
 	char	*str = NULL;
@@ -2723,7 +2723,7 @@ static char	*zbx_db_format_values(ZBX_FIELD **fields, const zbx_db_value_t *valu
 
 	for (i = 0; i < values_num; i++)
 	{
-		ZBX_FIELD		*field = fields[i];
+		zbx_db_field_t		*field = fields[i];
 		const zbx_db_value_t	*value = &values[i];
 
 		if (0 < i)
@@ -2775,7 +2775,7 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			ZBX_FIELD	*field = (ZBX_FIELD *)self->fields.values[j];
+			zbx_db_field_t	*field = (zbx_db_field_t *)self->fields.values[j];
 
 			switch (field->type)
 			{
@@ -2819,7 +2819,8 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
  *             zbx_db_insert_clean(&ins);                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields, int fields_num)
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
+		int fields_num)
 {
 	int	i;
 
@@ -2837,7 +2838,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, co
 	self->table = table;
 
 	for (i = 0; i < fields_num; i++)
-		zbx_vector_ptr_append(&self->fields, (ZBX_FIELD *)fields[i]);
+		zbx_vector_ptr_append(&self->fields, (zbx_db_field_t *)fields[i]);
 }
 
 /******************************************************************************
@@ -2858,8 +2859,8 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 	zbx_vector_ptr_t	fields;
 	va_list			args;
 	char			*field;
-	const ZBX_TABLE		*ptable;
-	const ZBX_FIELD		*pfield;
+	const zbx_db_table_t	*ptable;
+	const zbx_db_field_t	*pfield;
 
 	/* find the table and fields in database schema */
 	if (NULL == (ptable = zbx_db_get_table(table)))
@@ -2881,12 +2882,12 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
-		zbx_vector_ptr_append(&fields, (ZBX_FIELD *)pfield);
+		zbx_vector_ptr_append(&fields, (zbx_db_field_t *)pfield);
 	}
 
 	va_end(args);
 
-	zbx_db_insert_prepare_dyn(self, ptable, (const ZBX_FIELD **)fields.values, fields.values_num);
+	zbx_db_insert_prepare_dyn(self, ptable, (const zbx_db_field_t **)fields.values, fields.values_num);
 
 	zbx_vector_ptr_destroy(&fields);
 }
@@ -2918,7 +2919,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		ZBX_FIELD		*field = (ZBX_FIELD *)self->fields.values[i];
+		zbx_db_field_t		*field = (zbx_db_field_t *)self->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
 
 		switch (field->type)
@@ -2961,7 +2962,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 	zbx_vector_ptr_t	values;
 	va_list			args;
 	int			i;
-	ZBX_FIELD		*field;
+	zbx_db_field_t		*field;
 	zbx_db_value_t		*value;
 
 	va_start(args, self);
@@ -2970,7 +2971,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		field = (ZBX_FIELD *)self->fields.values[i];
+		field = (zbx_db_field_t *)self->fields.values[i];
 
 		value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
 
@@ -3021,10 +3022,10 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
  ******************************************************************************/
 int	zbx_db_insert_execute(zbx_db_insert_t *self)
 {
-	int		ret = FAIL, i, j;
-	const ZBX_FIELD	*field;
-	char		*sql_command, delim[2] = {',', '('};
-	size_t		sql_command_alloc = 512, sql_command_offset = 0;
+	int			ret = FAIL, i, j;
+	const zbx_db_field_t	*field;
+	char			*sql_command, delim[2] = {',', '('};
+	size_t			sql_command_alloc = 512, sql_command_offset = 0;
 
 #ifndef HAVE_ORACLE
 	char		*sql;
@@ -3070,14 +3071,14 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		field = (ZBX_FIELD *)self->fields.values[i];
+		field = (zbx_db_field_t *)self->fields.values[i];
 
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
 		zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
 	}
 #ifdef HAVE_MYSQL
 	/* MySQL workaround - explicitly add missing text fields with '' default value */
-	for (field = (const ZBX_FIELD *)self->table->fields; NULL != field->name; field++)
+	for (field = (const zbx_db_field_t *)self->table->fields; NULL != field->name; field++)
 	{
 		switch (field->type)
 		{
@@ -3116,7 +3117,7 @@ retry_oracle:
 
 	for (j = 0; j < self->fields.values_num; j++)
 	{
-		field = (ZBX_FIELD *)self->fields.values[j];
+		field = (zbx_db_field_t *)self->fields.values[j];
 
 		if (ZBX_DB_OK > zbx_db_bind_parameter_dyn(&contexts[j], j, field->type,
 				(zbx_db_value_t **)self->rows.values, self->rows.values_num))
@@ -3135,7 +3136,8 @@ retry_oracle:
 			zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
 			char	*str;
 
-			str = zbx_db_format_values((ZBX_FIELD **)self->fields.values, values, self->fields.values_num);
+			str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
+					self->fields.values_num);
 			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
 			zbx_free(str);
 		}
@@ -3180,7 +3182,7 @@ retry_oracle:
 		{
 			const zbx_db_value_t	*value = &values[j];
 
-			field = (const ZBX_FIELD *)self->fields.values[j];
+			field = (const zbx_db_field_t *)self->fields.values[j];
 
 			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, delim[0 == j]);
 
@@ -3269,7 +3271,7 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 
 	for (i = 0; i < self->fields.values_num; i++)
 	{
-		ZBX_FIELD	*field = (ZBX_FIELD *)self->fields.values[i];
+		zbx_db_field_t	*field = (zbx_db_field_t *)self->fields.values[i];
 
 		if (ZBX_TYPE_ID == field->type && 0 == strcmp(field_name, field->name))
 		{
@@ -3356,9 +3358,9 @@ out:
  ******************************************************************************/
 int	zbx_db_lock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id)
 {
-	zbx_db_result_t	result;
-	const ZBX_TABLE	*t;
-	int		ret;
+	zbx_db_result_t		result;
+	const zbx_db_table_t	*t;
+	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3404,11 +3406,11 @@ int	zbx_db_lock_record(const char *table, zbx_uint64_t id, const char *add_field
  ******************************************************************************/
 int	zbx_db_lock_records(const char *table, const zbx_vector_uint64_t *ids)
 {
-	zbx_db_result_t	result;
-	const ZBX_TABLE	*t;
-	int		ret;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_db_result_t		result;
+	const zbx_db_table_t	*t;
+	int			ret;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3675,3 +3677,42 @@ char	*zbx_db_get_schema_esc(void)
 	return name;
 }
 #endif
+
+void	zbx_recalc_time_period(int *ts_from, int table_group)
+{
+#define HK_CFG_UPDATE_INTERVAL	5
+	int			least_ts, now;
+	zbx_config_t		cfg;
+	static int		last_cfg_retrieval = 0;
+	static zbx_config_hk_t	hk;
+
+	now = (int)time(NULL);
+
+	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
+	{
+		last_cfg_retrieval = now;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk = cfg.hk;
+	}
+
+	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
+	{
+		if (1 != hk.history_global)
+			return;
+
+		least_ts = now - hk.history;
+	}
+	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
+	{
+		if (1 != hk.trends_global)
+			return;
+
+		least_ts = now - hk.trends + 1;
+	}
+
+
+	if (least_ts > *ts_from)
+		*ts_from = least_ts;
+#undef HK_CFG_UPDATE_INTERVAL
+}

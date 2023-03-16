@@ -18,7 +18,6 @@
 **/
 
 #include "ha.h"
-#include "zbxha.h"
 
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
@@ -33,14 +32,29 @@
 #include "zbxip.h"
 #include "zbxcomms.h"
 #include "../rtc/rtc_server.h"
+#include "zbxstr.h"
+#include "zbxrtc.h"
+#include "zbxjson.h"
+#include "zbxdb.h"
+#include "zbxalgo.h"
+#include "log.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
 #define ZBX_HA_NODE_LOCK	1
 
-static pid_t			ha_pid = ZBX_THREAD_ERROR;
+#define zbx_cuid_empty(a)	('\0' == *(a).str ? SUCCEED : FAIL)
+#define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
+#define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
 
-extern zbx_cuid_t	ha_sessionid;
+typedef struct
+{
+	char	str[CUID_LEN];
+}
+zbx_cuid_t;
+
+static pid_t		ha_pid = ZBX_THREAD_ERROR;
+static zbx_cuid_t	ha_sessionid;
 
 typedef struct
 {
@@ -113,16 +127,15 @@ static int is_ha_cluster(const char *ha_node_name)
  *                                                                            *
  * Purpose: connect, send message and receive response in a given timeout     *
  *                                                                            *
- * Parameters: service_name - [IN] the IPC service name                       *
- *             code         - [IN] the message code                           *
- *             timeout      - [IN] time allowed to be spent on receive, note  *
+ * Parameters: code         - [IN] message code                               *
+ *             timeout      - [IN] time allowed to be spent on receive. Note  *
  *                                 that this does not include open, send and  *
- *                                 flush that have their own timeouts         *
- *             data         - [IN] the data                                   *
- *             size         - [IN] the data size                              *
- *             out          - [OUT] the received message or NULL on error     *
- *                                  The message must be freed by zbx_free()   *
- *             error        - [OUT] the error message                         *
+ *                                 flush that have their own timeouts.        *
+ *             data         - [IN] data                                       *
+ *             size         - [IN] data size                                  *
+ *             out          - [OUT] received message or NULL on error.        *
+ *                                  The message must be freed by zbx_free().  *
+ *             error        - [OUT]                                           *
  *                                                                            *
  * Return value: SUCCEED - successfully sent message and received response    *
  *                         or timeout occurred while waiting for response     *
@@ -360,7 +373,6 @@ static zbx_db_result_t	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
  *          connection status                                                 *
  *                                                                            *
  ******************************************************************************/
-
 static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
 {
 	va_list	args;
@@ -546,9 +558,7 @@ static int	ha_is_available(const zbx_ha_info_t *info, int lastaccess, int db_tim
  ******************************************************************************/
 static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
 {
-	int	i;
-
-	for (i = 0; i < nodes->values_num; i++)
+	for (int i = 0; i < nodes->values_num; i++)
 	{
 		if ('\0' == *nodes->values[i]->name)
 			continue;
@@ -569,9 +579,9 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
  *                                                                            *
  * Purpose: check if server can be started in cluster configuration           *
  *                                                                            *
- * Parameters: info     - [IN] - the HA node information                      *
- *             nodes    - [IN] - the cluster nodes                            *
- *             db_time  - [IN] - the current database timestamp               *
+ * Parameters: info     - [IN] HA node information                            *
+ *             nodes    - [IN] cluster nodes                                  *
+ *             db_time  - [IN] current database timestamp                     *
  *             activate - [OUT] SUCCEED - start in active mode                *
  *                              FAIL    - start in standby mode               *
  *                                                                            *
@@ -583,11 +593,9 @@ static int	ha_check_standalone_config(zbx_ha_info_t *info, zbx_vector_ha_node_t 
  ******************************************************************************/
 static int	ha_check_cluster_config(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time, int *activate)
 {
-	int	i;
-
 	*activate = SUCCEED;
 
-	for (i = 0; i < nodes->values_num; i++)
+	for (int i = 0; i < nodes->values_num; i++)
 	{
 		if (ZBX_NODE_STATUS_STOPPED == nodes->values[i]->status ||
 				SUCCEED != ha_is_available(info, nodes->values[i]->lastaccess, db_time))
@@ -758,13 +766,12 @@ finish:
  ******************************************************************************/
 static int	ha_db_check_unavailable_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
 {
-	int	i, ret = SUCCEED;
-
+	int			ret = SUCCEED;
 	zbx_vector_str_t	unavailable_nodes;
 
 	zbx_vector_str_create(&unavailable_nodes);
 
-	for (i = 0; i < nodes->values_num; i++)
+	for (int i = 0; i < nodes->values_num; i++)
 	{
 		if (SUCCEED == zbx_cuid_compare(nodes->values[i]->ha_nodeid, info->ha_nodeid))
 			continue;
@@ -1156,7 +1163,7 @@ out:
 static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **error, zbx_ha_config_t *ha_config)
 {
 	zbx_vector_ha_node_t	nodes;
-	int			i, db_time, ret = FAIL;
+	int			db_time, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1183,7 +1190,7 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 
 		zbx_json_initarray(&j, 1024);
 
-		for (i = 0; i < nodes.values_num; i++)
+		for (int i = 0; i < nodes.values_num; i++)
 		{
 			zbx_snprintf(address, sizeof(address), "%s:%hu", nodes.values[i]->address,
 					nodes.values[i]->port);
@@ -1489,7 +1496,8 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 	{
 		zbx_audit_init(info->auditlog);
 		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
-		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, info->ha_status, ZBX_NODE_STATUS_STOPPED);
+		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, info->ha_status,
+				ZBX_NODE_STATUS_STOPPED);
 		ha_flush_audit(info);
 	}
 out:
@@ -1499,6 +1507,11 @@ out:
 /*
  * public API
  */
+
+void	zbx_init_library_ha(void)
+{
+	zbx_new_cuid(ha_sessionid.str);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1591,7 +1604,6 @@ int	zbx_ha_dispatch_message(const char *ha_node_name, zbx_ipc_message_t *message
 				/* reset heartbeat on status change */
 				if (ha_status_old != *ha_status)
 					last_hb = now;
-
 				break;
 			case ZBX_IPC_SERVICE_HA_HEARTBEAT:
 				last_hb = now;
@@ -1772,16 +1784,6 @@ void	zbx_ha_kill(void)
 		zbx_thread_wait(ha_pid);
 		ha_pid = ZBX_THREAD_ERROR;
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the pid is HA manager pid                                *
- *                                                                            *
- ******************************************************************************/
-int	zbx_ha_check_pid(pid_t pid)
-{
-	return pid == ha_pid ? SUCCEED : FAIL;
 }
 
 /*
