@@ -24,6 +24,7 @@
 #include "zbxcomms.h"
 #include "log.h"
 #include "zbxnum.h"
+#include "zbxfile.h"
 
 #if !defined(HAVE_LIBSSH2_METHOD_KEX) && !defined(HAVE_LIBSSH2_METHOD_HOSTKEY) && \
 		!defined(HAVE_LIBSSH2_METHOD_CRYPT_CS) && !defined(HAVE_LIBSSH2_METHOD_CRYPT_SC) && \
