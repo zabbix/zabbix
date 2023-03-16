@@ -179,8 +179,8 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs
 		unsigned char graphtype, unsigned char show_legend, unsigned char show_3d, double percent_left,
 		double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -287,8 +287,8 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 	int			i;
 	zbx_lld_graph_t		*graph;
 	zbx_vector_uint64_t	graphids;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 
@@ -392,8 +392,8 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *gitems
 static void	lld_items_get(const zbx_vector_ptr_t *gitems_proto, zbx_uint64_t ymin_itemid_proto,
 		zbx_uint64_t ymax_itemid_proto, zbx_vector_ptr_t *items)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	itemids;
 	int			i;
 
@@ -897,8 +897,8 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 
 	if (0 != names.values_num)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
 		char		*sql = NULL;
 		size_t		sql_alloc = 256, sql_offset = 0;
 
@@ -1464,8 +1464,8 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	int			ret = SUCCEED;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_ptr_t	graphs;
 	zbx_vector_ptr_t	gitems_proto;
 	zbx_vector_ptr_t	items;

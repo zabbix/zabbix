@@ -3,13 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 It is an official HP-UX template. It requires Zabbix agent 4.0 or newer.
 
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Install Zabbix agent on the HP-UX OS according to Zabbix documentation.
 

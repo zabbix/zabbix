@@ -120,6 +120,10 @@ class CControllerConnectorUpdate extends CController {
 			}
 
 			if ($tag['operator'] == CONDITION_OPERATOR_EXISTS || $tag['operator'] == CONDITION_OPERATOR_NOT_EXISTS) {
+				if ($tag['tag'] === '') {
+					continue;
+				}
+
 				unset($tag['value']);
 			}
 

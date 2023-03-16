@@ -21,10 +21,13 @@ libzbxpreproc_a_SOURCES = \
 	pp_manager.h \
 	pp_queue.c \
 	pp_queue.h \
+	pp_stats.c \
 	pp_task.c \
 	pp_task.h \
 	pp_worker.c \
-	pp_worker.h
+	pp_worker.h \
+	pp_protocol.c \
+	pp_protocol.h
 
 libzbxpreproc_a_CFLAGS = \
 	 $(LIBXML2_CFLAGS)

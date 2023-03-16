@@ -101,6 +101,12 @@ void	__wrap_zbx_clean_events(void)
 {
 }
 
+void	__wrap_zbx_config_get(void *cfg, int flags)
+{
+	ZBX_UNUSED(cfg);
+	ZBX_UNUSED(flags);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: dumps history record vector contents to standard output           *
