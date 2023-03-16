@@ -35,7 +35,6 @@
 
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "preproc.h"
 #include "zbxrtc.h"
 #include "zbxcrypto.h"
 #include "zbxjson.h"

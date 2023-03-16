@@ -123,6 +123,22 @@ function is_array(obj) {
 	return (obj != null) && (typeof obj == 'object') && ('splice' in obj) && ('join' in obj);
 }
 
+/**
+ * Get elements existing exclusively in one of both arrays.
+ * @deprecated
+ *
+ * @param {Array} arr
+ *
+ * @returns {Array}
+ */
+Array.prototype.xor = function(arr) {
+	var merged_arr = this.concat(arr);
+
+	return merged_arr.filter(function(e) {
+		return (merged_arr.indexOf(e) === merged_arr.lastIndexOf(e));
+	});
+};
+
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
 	element = $(element)[0];
@@ -941,25 +957,6 @@ function basename(path, suffix) {
  */
 function appendZero(val) {
 	return val < 10 ? '0' + val : val;
-}
-
-/**
- * Function converts unix timestamp to human readable time in format 'Y-m-d H:i:s'.
- *
- * @param {type} time   Unix timestamp to convert.
- *
- * @returns {string}
- */
-function time2str(time) {
-	var dt = new Date(time * 1000),
-		Y = dt.getFullYear(),
-		m = appendZero(dt.getMonth()+1),
-		d = appendZero(dt.getDate()),
-		H = appendZero(dt.getHours()),
-		i = appendZero(dt.getMinutes()),
-		s = appendZero(dt.getSeconds());
-
-	return Y + '-' + m + '-' + d + ' ' + H + ':' + i + ':' + s;
 }
 
 /**

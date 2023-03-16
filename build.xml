@@ -88,6 +88,19 @@
 		<chmod file="${SIMPLESAMLPHP_CFG_FILE}" perm="go+r"/>
 	</target>
 
+	<target name="create-ldap-configs">
+		<property name="phpunit_ldap_host" value="${PHPUNIT_LDAP_HOST}"/>
+		<property name="phpunit_ldap_bind_password" value="${PHPUNIT_LDAP_BIND_PASSWORD}"/>
+		<property name="phpunit_ldap_username" value="${PHPUNIT_LDAP_USERNAME}"/>
+		<property name="phpunit_ldap_user_password" value="${PHPUNIT_LDAP_USER_PASSWORD}"/>
+
+		<!-- LDAP settings -->
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_HOST}" value="${phpunit_ldap_host}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_BIND_PASSWORD}" value="${phpunit_ldap_bind_password}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_USERNAME}" value="${phpunit_ldap_username}"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_LDAP_USER_PASSWORD}" value="${phpunit_ldap_user_password}"/>
+	</target>
+
 	<target name="init-integration">
 		<!-- Copy agent2 configuration file -->
 		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
@@ -257,7 +270,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,create-saml-configs,make-dbschema,make-gettext,create-db-postgresql,init-frontend-modules">
+	<target name="init-frontend-postgresql" depends="create-configs,create-saml-configs,create-ldap-configs,make-dbschema,make-gettext,create-db-postgresql,init-frontend-modules">
 		<exec executable="psql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -394,7 +407,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,make-dbschema,make-gettext,create-db-mysql,init-frontend-modules">
+	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,create-ldap-configs,make-dbschema,make-gettext,create-db-mysql,init-frontend-modules">
 		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>

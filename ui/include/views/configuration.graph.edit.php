@@ -63,40 +63,23 @@ if ($data['graphid'] != 0) {
 // Create form list.
 $graphFormList = new CFormList('graphFormList');
 
-if (array_key_exists('parent_graph', $data)) {
-	if ($data['parent_graph']['editable']) {
-		$url = (new CUrl('graphs.php'))
-			->setArgument('form', 'update')
-			->setArgument('context', 'template')
-			->setArgument('graphid', $data['templateid']);
-
-		if ($data['parent_discoveryid'] === null) {
-			$url->setArgument('hostid', $data['parent_graph']['templateid']);
-		}
-		else {
-			$url->setArgument('parent_discoveryid', $data['parent_graph']['ruleid']);
-		}
-
-		$parent_template_name = new CLink(CHtml::encode($data['parent_graph']['template_name']), $url);
-	}
-	else {
-		$parent_template_name = (new CSpan(CHtml::encode($data['parent_graph']['template_name'])))
-			->addClass(ZBX_STYLE_GREY);
-	}
-
-	if ($data['parent_discoveryid'] === null) {
-		$graphFormList->addRow(_('Parent graph'), $parent_template_name);
-	}
-	else {
-		$graphFormList->addRow(_('Parent graph prototype'), $parent_template_name);
-	}
+$is_templated = (bool) $data['templates'];
+if ($is_templated) {
+	$graphFormList->addRow(_('Parent graphs'), $data['templates']);
 }
 
-if ($data['readonly']) {
+$discovered_graph = false;
+if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	$discovered_graph = true;
+}
+
+$readonly = false;
+if ($is_templated || $discovered_graph) {
+	$readonly = true;
 	$graphForm->addItem((new CVar('readonly', 1))->removeId());
 }
 
-if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+if ($discovered_graph) {
 	$graphFormList->addRow(_('Discovered by'), new CLink($data['discoveryRule']['name'],
 		(new CUrl('graphs.php'))
 			->setArgument('form', 'update')
@@ -109,18 +92,18 @@ if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CRE
 $graphFormList
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], $data['readonly'], DB::getFieldLength('graphs', 'name')))
+		(new CTextBox('name', $data['name'], $readonly, DB::getFieldLength('graphs', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow((new CLabel(_('Width'), 'width'))->setAsteriskMark(),
-		(new CNumericBox('width', $data['width'], 5, $data['readonly']))
+		(new CNumericBox('width', $data['width'], 5, $readonly))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Height'), 'height'))->setAsteriskMark(),
-		(new CNumericBox('height', $data['height'], 5, $data['readonly']))
+		(new CNumericBox('height', $data['height'], 5, $readonly))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
@@ -130,12 +113,12 @@ $graphFormList
 			->setFocusableElementId('label-graphtype')
 			->setValue($data['graphtype'])
 			->addOptions(CSelect::createOptionsFromArray(graphType()))
-			->setDisabled($data['readonly'])
+			->setReadonly($readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
 			->setChecked($data['show_legend'] == 1)
-			->setEnabled(!$data['readonly'])
+			->setEnabled(!$readonly)
 	);
 
 // Append graph types to form list.
@@ -143,22 +126,22 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 	$graphFormList->addRow(_('Show working time'),
 		(new CCheckBox('show_work_period'))
 			->setChecked($data['show_work_period'] == 1)
-			->setEnabled(!$data['readonly'])
+			->setEnabled(!$readonly)
 	);
 	$graphFormList->addRow(_('Show triggers'),
 		(new CCheckbox('show_triggers'))
 			->setchecked($data['show_triggers'] == 1)
-			->setEnabled(!$data['readonly'])
+			->setEnabled(!$readonly)
 	);
 
 	if ($data['graphtype'] == GRAPH_TYPE_NORMAL) {
 		// Percent left.
-		$percentLeftTextBox = (new CTextBox('percent_left', $data['percent_left'], $data['readonly'], 7))
+		$percentLeftTextBox = (new CTextBox('percent_left', $data['percent_left'], $readonly, 7))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
 			->setChecked(true)
 			->onClick('showHideVisible("percent_left");')
-			->setEnabled(!$data['readonly']);
+			->setEnabled(!$readonly);
 
 		if(array_key_exists('visible', $data) && array_key_exists('percent_left', $data['visible'])) {
 			$percentLeftCheckbox->setChecked(true);
@@ -171,12 +154,12 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 		$graphFormList->addRow(_('Percentile line (left)'), [$percentLeftCheckbox, ' ', $percentLeftTextBox]);
 
 		// Percent right.
-		$percentRightTextBox = (new CTextBox('percent_right', $data['percent_right'], $data['readonly'], 7))
+		$percentRightTextBox = (new CTextBox('percent_right', $data['percent_right'], $readonly, 7))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
 			->setChecked(true)
 			->onClick('showHideVisible("percent_right");')
-			->setEnabled(!$data['readonly']);
+			->setEnabled(!$readonly);
 
 		if(array_key_exists('visible', $data) && array_key_exists('percent_right', $data['visible'])) {
 			$percentRightCheckbox->setChecked(true);
@@ -198,12 +181,12 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 		]))
-		->setDisabled($data['readonly'])
+		->setDisabled($readonly)
 		->setFocusableElementId('ymin_type_label');
 
 	if ($data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('yaxismin', $data['yaxismin'], $data['readonly']))
+		$yaxisMinData[] = (new CTextBox('yaxismin', $data['yaxismin'], $readonly))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 	}
 	elseif ($data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
@@ -235,7 +218,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			'object_name' => 'items',
 			'data' => $ymin_axis_ms_data,
 			'multiple' => false,
-			'disabled' => $data['readonly'],
+			'disabled' => $readonly,
 			'styles' => [
 				'display' => 'inline-flex'
 			],
@@ -270,7 +253,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 						numeric: 1
 					}, {dialogue_class: "modal-popup-generic"});
 				')
-				->setEnabled(!$data['readonly']);
+				->setEnabled(!$readonly);
 		}
 	}
 	else {
@@ -293,13 +276,12 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 		]))
-		->setDisabled($data['readonly'])
+		->setDisabled($readonly)
 		->setFocusableElementId('ymax_type_label');
 
 	if ($data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('yaxismax', $data['yaxismax'], $data['readonly']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+		$yaxisMaxData[] = (new CTextBox('yaxismax', $data['yaxismax'], $readonly))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 	}
 	elseif ($data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismax', $data['yaxismax']);
@@ -330,7 +312,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			'object_name' => 'items',
 			'data' => $ymax_axis_ms_data,
 			'multiple' => false,
-			'disabled' => $data['readonly'],
+			'disabled' => $readonly,
 			'styles' => [
 				'display' => 'inline-flex'
 			],
@@ -365,7 +347,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 						numeric: 1
 					}, {dialogue_class: "modal-popup-generic"});
 				')
-				->setEnabled(!$data['readonly']);
+				->setEnabled(!$readonly);
 		}
 	}
 	else {
@@ -383,7 +365,7 @@ else {
 	$graphFormList->addRow(_('3D view'),
 		(new CCheckBox('show_3d'))
 			->setChecked($data['show_3d'] == 1)
-			->setEnabled(!$data['readonly'])
+			->setEnabled(!$readonly)
 	);
 }
 
@@ -414,7 +396,7 @@ $items_table = (new CTable())
 				->addClass('table-col-y-axis-side')
 			: null,
 		(new CTableColumn(_('Color')))->addClass('table-col-colour'),
-		$data['readonly'] ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
+		$readonly ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
 	]);
 
 $parameters_add = [
@@ -452,7 +434,7 @@ if ($data['parent_discoveryid']) {
 
 $items_table->addRow(
 	(new CRow(
-		$data['readonly']
+		$readonly
 			? null
 			: (new CCol(
 				new CHorList([
@@ -521,11 +503,11 @@ if ($data['graphid'] != 0) {
 		CCsrfTokenHelper::get('graphs.php'), 'context'
 	);
 
-	if ($data['readonly']) {
+	if ($readonly && $data['parent_discoveryid'] === null) {
 		$updateButton->setEnabled(false);
 	}
 
-	if (array_key_exists('templateid', $data) && $data['templateid'] != 0) {
+	if ($is_templated) {
 		$deleteButton->setEnabled(false);
 	}
 
@@ -564,7 +546,7 @@ $html_page
 		'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
 		'graphs' => [
 			'graphtype' =>  $data['graphtype'],
-			'readonly' => $data['readonly'],
+			'readonly' => $readonly,
 			'hostid' => $data['hostid'],
 			'is_template' => $data['is_template'],
 			'normal_only' => $data['normal_only'],

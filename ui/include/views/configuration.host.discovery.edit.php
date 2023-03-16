@@ -51,21 +51,11 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (array_key_exists('parent_item', $data)) {
-	if ($data['parent_item']['editable']) {
-		$parent_template_name = new CLink(CHtml::encode($data['parent_item']['template_name']),
-			(new CUrl('host_discovery.php'))
-				->setArgument('form', 'update')
-				->setArgument('itemid', $data['item']['templateid'])
-				->setArgument('context', 'template')
-		);
-	}
-	else {
-		$parent_template_name = (new CSpan(CHtml::encode($data['parent_item']['template_name'])))
-			->addClass(ZBX_STYLE_GREY);
-	}
-
-	$item_tab->addItem([new CLabel(_('Parent discovery rule')), new CFormField($parent_template_name)]);
+if (!empty($data['templates'])) {
+	$item_tab->addItem([
+		new CLabel(_('Parent discovery rules')),
+		new CFormField($data['templates'])
+	]);
 }
 
 $item_tab
@@ -422,7 +412,7 @@ $item_tab
 		(new CFormField((new CTextBox('http_proxy', $data['http_proxy'], $data['limited'],
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
@@ -1030,7 +1020,9 @@ else {
 	);
 }
 
-$tab->setFooter(new CFormGrid($form_actions));
+$tab->setFooter(
+	(new CFormGrid($form_actions))->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_ACTIONS)
+);
 
 $form->addItem($tab);
 $html_page->addItem($form);

@@ -28,7 +28,6 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
-#include "preproc.h"
 #include "ipmi_protocol.h"
 #include "ipmi.h"
 #include "../poller/poller.h"
@@ -36,6 +35,7 @@
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbxpreproc.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 

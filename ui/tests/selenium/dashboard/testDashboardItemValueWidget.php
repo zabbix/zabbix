@@ -928,9 +928,9 @@ class testDashboardItemValueWidget extends CWebTest {
 					'thresholds' => [
 						['threshold' => '0.9999'],
 						['color' => 'AABBCC', 'threshold' => '1'],
-						['threshold' => '999999999999999'],
-						['threshold' => '1K'],
-						['color' => 'FFEB3B', 'threshold' => '5G']
+						['threshold' => '5K'],
+						['color' => 'FFEB3B', 'threshold' => '1G'],
+						['threshold' => '999999999999999']
 					]
 				]
 			]
@@ -1352,7 +1352,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$rgb = implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
 
 			$this->assertEquals('rgba('.$rgb.', 1)', $dashboard->getWidget($data['fields']['Name'])
-					->query('xpath:.//div[contains(@class, "dashboard-widget-item")]/div')->one()->getCSSValue('background-color')
+					->query('xpath:.//div[contains(@class, "dashboard-widget-item")]/div/div')->one()->getCSSValue('background-color')
 			);
 			$index++;
 		}

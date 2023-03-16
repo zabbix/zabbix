@@ -20,14 +20,15 @@
 #ifndef ZABBIX_PP_TASK_H
 #define ZABBIX_PP_TASK_H
 
-#include "pp_item.h"
+#include "zbxpreproc.h"
 #include "pp_cache.h"
 
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
 #include "zbxipcservice.h"
+
+#define PP_TASK_DATA(x)		(&x->data)
 
 typedef struct
 {
@@ -69,8 +70,6 @@ typedef struct
 	zbx_list_t	tasks;
 }
 zbx_pp_task_sequence_t;
-
-#define PP_TASK_DATA(x)		(&x->data)
 
 void	pp_task_free(zbx_pp_task_t *task);
 

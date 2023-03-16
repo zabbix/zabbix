@@ -100,7 +100,7 @@ static void	dump_item(const zbx_dc_item_t *item)
 	}
 }
 
-static char	*db_string_from_json_dyn(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+static char	*db_string_from_json_dyn(const struct zbx_json_parse *jp, const char *name, const zbx_db_table_t *table,
 		const char *fieldname)
 {
 	char	*string = NULL;
@@ -112,7 +112,7 @@ static char	*db_string_from_json_dyn(const struct zbx_json_parse *jp, const char
 	return zbx_strdup(NULL, zbx_db_get_field(table, fieldname)->default_value);
 }
 
-static void	db_string_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+static void	db_string_from_json(const struct zbx_json_parse *jp, const char *name, const zbx_db_table_t *table,
 		const char *fieldname, char *string, size_t len)
 {
 
@@ -120,7 +120,7 @@ static void	db_string_from_json(const struct zbx_json_parse *jp, const char *nam
 		zbx_strlcpy(string, zbx_db_get_field(table, fieldname)->default_value, len);
 }
 
-static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name, const zbx_db_table_t *table,
 		const char *fieldname, unsigned char *string)
 {
 	char	tmp[ZBX_MAX_UINT64_LEN + 1];
@@ -131,7 +131,7 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 		ZBX_STR2UCHAR(*string, zbx_db_get_field(table, fieldname)->default_value);
 }
 
-static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, const zbx_db_table_t *table,
 		const char *fieldname, int *num)
 {
 	char	tmp[ZBX_MAX_UINT64_LEN + 1];
@@ -145,12 +145,12 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
-	char			tmp[MAX_STRING_LEN + 1], **pvalue;
-	zbx_dc_item_t		item;
-	static const ZBX_TABLE	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
-	struct zbx_json_parse	jp_interface, jp_host, jp_details, jp_script_params;
-	AGENT_RESULT		result;
-	int			errcode, ret = FAIL;
+	char				tmp[MAX_STRING_LEN + 1], **pvalue;
+	zbx_dc_item_t			item;
+	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
+	struct zbx_json_parse		jp_interface, jp_host, jp_details, jp_script_params;
+	AGENT_RESULT			result;
+	int				errcode, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

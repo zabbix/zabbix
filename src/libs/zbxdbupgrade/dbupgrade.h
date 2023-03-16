@@ -22,7 +22,6 @@
 
 #include "zbxcommon.h"
 #include "zbxdbschema.h"
-#include "zbxdb.h"
 
 typedef struct
 {
@@ -54,22 +53,22 @@ zbx_dbpatch_t;
 #define ZBX_FS_SQL_NAME "%s"
 #endif
 
-int	DBcreate_table(const ZBX_TABLE *table);
+int	DBcreate_table(const zbx_db_table_t *table);
 int	DBrename_table(const char *table_name, const char *new_name);
 int	DBdrop_table(const char *table_name);
-int	DBadd_field(const char *table_name, const ZBX_FIELD *field);
-int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIELD *field);
-int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZBX_FIELD *old_field);
-int	DBset_not_null(const char *table_name, const ZBX_FIELD *field);
-int	DBset_default(const char *table_name, const ZBX_FIELD *field);
-int	DBdrop_default(const char *table_name, const ZBX_FIELD *field);
-int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field);
+int	DBadd_field(const char *table_name, const zbx_db_field_t *field);
+int	DBrename_field(const char *table_name, const char *field_name, const zbx_db_field_t *field);
+int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, const zbx_db_field_t *old_field);
+int	DBset_not_null(const char *table_name, const zbx_db_field_t *field);
+int	DBset_default(const char *table_name, const zbx_db_field_t *field);
+int	DBdrop_default(const char *table_name, const zbx_db_field_t *field);
+int	DBdrop_not_null(const char *table_name, const zbx_db_field_t *field);
 int	DBdrop_field(const char *table_name, const char *field_name);
 int	DBcreate_index(const char *table_name, const char *index_name, const char *fields, int unique);
 int	DBdrop_index(const char *table_name, const char *index_name);
 int	DBrename_index(const char *table_name, const char *old_name, const char *new_name, const char *fields,
 		int unique);
-int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field);
+int	DBadd_foreign_key(const char *table_name, int id, const zbx_db_field_t *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
 
 #	ifdef HAVE_ORACLE
@@ -88,11 +87,6 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
-
-char	*zbx_update_template_name(char *old);
-char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param);
-int	zbx_compose_trigger_expression(DB_ROW row, zbx_uint64_t rules, char **composed_expr);
-
 #endif /* !HAVE_SQLITE3 */
 
 unsigned char	DBget_program_type(void);

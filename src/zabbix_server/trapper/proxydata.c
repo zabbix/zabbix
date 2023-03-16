@@ -328,8 +328,8 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 		if (0 != history_lastid)
 		{
 			zbx_uint64_t	history_maxid;
-			DB_RESULT	result;
-			DB_ROW		row;
+			zbx_db_result_t	result;
+			zbx_db_row_t	row;
 
 			result = zbx_db_select("select max(id) from proxy_history");
 

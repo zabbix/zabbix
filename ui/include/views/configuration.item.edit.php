@@ -54,21 +54,11 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (array_key_exists('parent_item', $data)) {
-	if ($data['parent_item']['editable']) {
-		$parent_template_name = new CLink(CHtml::encode($data['parent_item']['template_name']),
-			(new CUrl('items.php'))
-				->setArgument('form', 'update')
-				->setArgument('itemid', $data['item']['templateid'])
-				->setArgument('context', 'template')
-		);
-	}
-	else {
-		$parent_template_name = (new CSpan(CHtml::encode($data['parent_item']['template_name'])))
-			->addClass(ZBX_STYLE_GREY);
-	}
-
-	$item_tab->addItem([new CLabel(_('Parent item')), new CFormField($parent_template_name)]);
+if (!empty($data['templates'])) {
+	$item_tab->addItem([
+		new CLabel(_('Parent items')),
+		new CFormField($data['templates'])
+	]);
 }
 
 $discovered_item = (array_key_exists('item', $data) && $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
@@ -136,7 +126,6 @@ $item_type_options = CSelect::createOptionsFromArray([
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')
-	->addStyle('margin: 5px 0 0 5px;')
 	->addClass(ZBX_STYLE_DISPLAY_NONE);
 
 $item_tab
@@ -146,15 +135,14 @@ $item_tab
 		new CFormField($key_controls)
 	])
 	->addItem([
-		new CLabel(_('Type of information'), 'label-value-type'),
+		new CLabel([_('Type of information'), $type_mismatch_hint], 'label-value-type'),
 		new CFormField([
 			(new CSelect('value_type'))
 				->setFocusableElementId('label-value-type')
 				->setId('value_type')
 				->setValue($data['value_type'])
 				->addOptions($item_type_options)
-				->setReadonly($readonly),
-			$type_mismatch_hint
+				->setReadonly($readonly)
 		])
 	])
 	// Append ITEM_TYPE_HTTPAGENT URL field to form list.
@@ -488,7 +476,7 @@ $item_tab
 		(new CFormField((new CTextBox('http_proxy', $data['http_proxy'], $readonly,
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
@@ -854,17 +842,13 @@ if ($data['config']['hk_history_global']  && ($host['status'] == HOST_STATUS_MON
 				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
-	$keep_history_hint = (new CSpan(makeWarningIcon([
-		' '._x('Overridden by', 'item_form').' ',
-		$link,
+	$keep_history_hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
 		' ('.$data['config']['hk_history'].')'
-	])))
-		->addStyle('margin: 5px 0 0 5px;')
-		->setId('history_mode_hint');
+	])))->setId('history_mode_hint');
 }
 
 $item_tab->addItem([
-	(new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
+	(new CLabel([_('History storage period'), $keep_history_hint], 'history'))->setAsteriskMark(),
 	new CFormField([
 		(new CRadioButtonList('history_mode', (int) $data['history_mode']))
 			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
@@ -874,8 +858,7 @@ $item_tab->addItem([
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('history', $data['history'], $discovered_item))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAriaRequired(),
-		$keep_history_hint
+			->setAriaRequired()
 	])
 ]);
 
@@ -891,18 +874,14 @@ if ($data['config']['hk_trends_global'] && ($host['status'] == HOST_STATUS_MONIT
 				->setTarget('_blank')
 		: _x('global housekeeping settings', 'item_form');
 
-	$keep_trend_hint = (new CSpan(makeWarningIcon([
-		' '._x('Overridden by', 'item_form').' ',
-		$link,
+	$keep_trend_hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
 		' ('.$data['config']['hk_trends'].')'
-	])))
-		->addStyle('margin: 5px 0 0 5px;')
-		->setId('trends_mode_hint');
+	])))->setId('trends_mode_hint');
 }
 
 $item_tab
 	->addItem([
-		(new CLabel(_('Trend storage period'), 'trends'))
+		(new CLabel([_('Trend storage period'), $keep_trend_hint], 'trends'))
 			->setAsteriskMark()
 			->setId('js-item-trends-label'),
 		(new CFormField([
@@ -914,8 +893,7 @@ $item_tab
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('trends', $data['trends'], $discovered_item))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired(),
-			$keep_trend_hint
+				->setAriaRequired()
 		]))->setId('js-item-trends-field')
 	])
 	->addItem([
@@ -1027,7 +1005,7 @@ if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['item
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['hostid'])
 				->setArgument('name', $data['name'])
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		))->setTarget('_blank')))
 	);
 }
@@ -1040,7 +1018,6 @@ $item_tabs = (new CTabView())
 			'source' => 'item',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'context' => $data['context'],
 			'readonly' => $discovered_item,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'
@@ -1130,7 +1107,8 @@ $html_page->show();
 		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'discovered_item' => $discovered_item
 	]).');
 '))->show();
 

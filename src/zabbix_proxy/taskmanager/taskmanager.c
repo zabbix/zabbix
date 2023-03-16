@@ -59,8 +59,8 @@ extern char 				*CONFIG_HOSTNAME;
  ******************************************************************************/
 static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now, int config_timeout)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	parent_taskid, hostid, alertid;
 	zbx_tm_task_t	*task = NULL;
 	int		ret = FAIL;
@@ -170,8 +170,8 @@ finish:
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			processed_num;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -259,8 +259,8 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
 static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	zbx_tm_task_t		*task = NULL;
 	int			ret = FAIL, data_type;
 	char			*info = NULL;
@@ -329,8 +329,8 @@ finish:
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			processed_num = 0, clock, ttl;
 	zbx_uint64_t		taskid;
 	unsigned char		type;

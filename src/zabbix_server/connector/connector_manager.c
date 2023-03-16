@@ -27,6 +27,8 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxcacheconfig.h"
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
 
 #define ZBX_CONNECTOR_MANAGER_DELAY	1
 #define ZBX_CONNECTOR_FLUSH_INTERVAL	1
@@ -142,8 +144,8 @@ static void	connector_destroy_manager(zbx_connector_manager_t *manager)
  *                                                                            *
  * Purpose: registers connector worker                                        *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             client  - [IN] the connected connector worker                   *
+ * Parameters: manager - [IN] manager                                         *
+ *             client  - [IN] connected connector worker                      *
  *             message - [IN] message received by connector manager           *
  *                                                                            *
  ******************************************************************************/

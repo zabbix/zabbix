@@ -19,8 +19,6 @@
 
 #include "checks_http.h"
 #include "zbxhttp.h"
-#include "zbxjson.h"
-#include "log.h"
 #include "zbxcacheconfig.h"
 
 #ifdef HAVE_LIBCURL

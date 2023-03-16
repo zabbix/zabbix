@@ -181,8 +181,8 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
  ******************************************************************************/
 static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const zbx_dc_item_t *item, char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -498,8 +498,8 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 		char **sql, size_t *sql_alloc, const zbx_dc_item_t *item, char **error)
 {
 	size_t		sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	lld_override_t	*override;
 	int		ret = SUCCEED, i;
 
@@ -639,8 +639,8 @@ static void	lld_dump_overrides(const zbx_vector_ptr_t *overrides)
 static int	lld_overrides_load(zbx_vector_ptr_t *overrides, zbx_uint64_t lld_ruleid, const zbx_dc_item_t *item,
 		char **error)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	overrideids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0;
@@ -1119,8 +1119,8 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  ******************************************************************************/
 int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		hostid;
 	char			*discovery_key = NULL, *info = NULL;
 	int			lifetime, ret = SUCCEED, errcode;

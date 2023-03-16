@@ -158,8 +158,8 @@ static void	proxyconfig_remove_unused_templates(void)
 	zbx_vector_uint64_t	hostids, templateids;
 	zbx_hashset_t		templates;
 	int			removed_num;
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

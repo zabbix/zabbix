@@ -839,6 +839,25 @@ zbx_dc_macro_kv_t;
 
 typedef struct
 {
+	zbx_uint64_t	druleid;
+	zbx_uint64_t	proxy_hostid;
+	time_t		nextcheck;
+	int		delay;
+	unsigned char	status;
+	unsigned char	location;
+	zbx_uint64_t	revision;
+}
+zbx_dc_drule_t;
+
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	druleid;
+}
+zbx_dc_dcheck_t;
+
+typedef struct
+{
 	zbx_uint64_t	connectortagid;
 	zbx_uint64_t	connectorid;
 	unsigned char	op;		/* condition operator */

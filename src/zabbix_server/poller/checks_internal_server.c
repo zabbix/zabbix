@@ -21,10 +21,10 @@
 #include "zbxcachevalue.h"
 #include "zbxlld.h"
 #include "zbxcacheconfig.h"
-#include "zbxha.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
 #include "zbxconnector.h"
+#include "../ha/ha.h"
 
 #include "checks_internal.h"
 
