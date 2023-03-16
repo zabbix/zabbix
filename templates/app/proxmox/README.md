@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
+For Zabbix version: 7.0 and higher  
 Proxmox VE uses a REST like API. The concept is described in (Resource Oriented Architecture - ROA).
 
 We choose JSON as primary data format, and the whole API is formally defined using JSON Schema.
