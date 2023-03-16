@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2.
+The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2. It requires Zabbix agent 7.0 or newer.
 ## Tested versions
 
 This template has been tested on:
