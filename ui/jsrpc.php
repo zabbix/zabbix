@@ -416,7 +416,7 @@ switch ($data['method']) {
 				]);
 
 				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {
-					array_unshift($users, ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => '']);
+					$users[] = ['userid' => '0', 'username' => 'System', 'name' => '', 'surname' => ''];
 				}
 
 				if ($users) {
