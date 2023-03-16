@@ -41,7 +41,7 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 	return strcmp(task1->ip, task2->ip);
 }
 
-void	discoverer_task_free(zbx_discoverer_task_t *task)
+void	discoverer_task_clear(zbx_discoverer_task_t *task)
 {
 	if (NULL != task->ips)
 	{
@@ -54,6 +54,11 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);
 
 	zbx_free(task->ip);
+}
+
+void	discoverer_task_free(zbx_discoverer_task_t *task)
+{
+	discoverer_task_clear(task);
 	zbx_free(task);
 }
 

@@ -51,6 +51,7 @@ zbx_discoverer_job_t;
 
 zbx_hash_t		discoverer_task_hash(const void *data);
 int			discoverer_task_compare(const void *d1, const void *d2);
+void			discoverer_task_clear(zbx_discoverer_task_t *task);
 void			discoverer_task_free(zbx_discoverer_task_t *task);
 void			discoverer_job_tasks_free(zbx_discoverer_job_t *job);
 void			discoverer_job_free(zbx_discoverer_job_t *job);

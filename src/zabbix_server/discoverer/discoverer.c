@@ -454,7 +454,7 @@ static void	results_free(zbx_discoverer_results_t *result)
 }
 
 static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dcheck, char *ip,
-		int *need_resolve, zbx_int64_t *queue_capacity, zbx_hashset_t *tasks)
+		int *need_resolve, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
 {
 	const char	*start;
 	zbx_uint64_t	checks_count = 0;
@@ -482,15 +482,8 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 			zbx_discoverer_task_t	task_local, *task;
 			zbx_dc_dcheck_t		*dcheck_ptr;
 
-			(*queue_capacity)--;
-
-			if (0 >= *queue_capacity)
-			{
-				zabbix_log(LOG_LEVEL_WARNING,
-						"discoverer queue is full, skipping discovery rule '%s' network checks",
-						drule->name);
+			if (0 == *queue_capacity)
 				return checks_count;
-			}
 
 			task_local.ip = zbx_strdup(NULL, SVC_ICMPPING == dcheck->type ? "" : ip);
 			task_local.port = (unsigned short)port;
@@ -562,6 +555,7 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 				zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
 			}
 
+			(*queue_capacity)--;
 			checks_count++;
 		}
 
@@ -578,7 +572,7 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 }
 
 static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, int *need_resolve,
-		zbx_int64_t *queue_capacity, zbx_hashset_t *tasks)
+		zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
 {
 	int		i;
 	zbx_uint64_t	checks_count = 0;
@@ -586,6 +580,9 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 	for (i = 0; i < drule->dchecks.values_num; i++)
 	{
 		zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
+
+		if (0 == *queue_capacity)
+			break;
 
 		if (0 != drule->unique_dcheckid &&
 				((1 == unique && drule->unique_dcheckid != dcheck->dcheckid) ||
@@ -595,9 +592,6 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 		}
 
 		checks_count += process_check(drule, dcheck, ip, need_resolve, queue_capacity, tasks);
-
-		if (0 >= *queue_capacity)
-			break;
 	}
 
 	return checks_count;
@@ -639,7 +633,7 @@ static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const cha
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(zbx_dc_drule_t *drule, zbx_int64_t *queue_capacity, zbx_hashset_t *tasks,
+static void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks,
 		zbx_hashset_t *check_counts)
 {
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma;
@@ -705,12 +699,9 @@ static void	process_rule(zbx_dc_drule_t *drule, zbx_int64_t *queue_capacity, zbx
 			if (0 != drule->unique_dcheckid)
 				checks_count = process_checks(drule, ip, 1, &need_resolve, queue_capacity, tasks);
 
-			if (0 >= *queue_capacity)
-				goto out;
-
 			checks_count += process_checks(drule, ip, 0, &need_resolve, queue_capacity, tasks);
 
-			if (0 >= *queue_capacity)
+			if (0 == *queue_capacity)
 				goto out;
 
 			if (0 < checks_count)
@@ -950,29 +941,20 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 	while (ZBX_IS_RUNNING() && NULL != (drule = zbx_dc_drule_next(now, nextcheck)))
 	{
 		zbx_discoverer_job_t	cmp = {.druleid = drule->druleid};
-		zbx_int64_t		queue_capacity;
+		zbx_uint64_t		queue_capacity;
 
 		discoverer_queue_lock(&dmanager.queue);
 		i = zbx_vector_discoverer_jobs_ptr_bsearch(&dmanager.job_refs, &cmp,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - (zbx_int64_t)dmanager.queue.pending_checks_count;
+		queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - dmanager.queue.pending_checks_count;
 		discoverer_queue_unlock(&dmanager.queue);
 
-		if (FAIL != i || 0 >= queue_capacity)
+		if (FAIL != i)
 		{
 			zbx_dc_drule_queue(now, drule->druleid, drule->delay);
-
-			if (0 >= queue_capacity)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "discoverer queue is full, skipping discovery rule '%s'",
-						drule->name);
-			}
-
 			zbx_discovery_drule_free(drule);
 			continue;
 		}
-
-		rule_count++;
 
 		for (i = 0; i < drule->dchecks.values_num; i++)
 		{
@@ -998,33 +980,54 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 		}
 		else
 		{
-			zbx_discoverer_job_t	*job;
-			zbx_discoverer_task_t	*task, *task_out;
-			zbx_hashset_t		tasks;
-			zbx_hashset_iter_t	iter;
+			zbx_discoverer_job_t		*job;
+			zbx_discoverer_task_t		*task, *task_out;
+			zbx_hashset_t			tasks, drule_check_counts;
+			zbx_hashset_iter_t		iter;
+			zbx_discoverer_check_count_t	*count;
 
 			drule->delay = delay;
 
 			zbx_hashset_create(&tasks, 1, discoverer_task_hash, discoverer_task_compare);
+			zbx_hashset_create(&drule_check_counts, 1, discoverer_check_count_hash,
+					discoverer_check_count_compare);
 
-			process_rule(drule, &queue_capacity, &tasks, check_counts);
+			process_rule(drule, &queue_capacity, &tasks, &drule_check_counts);
+			zbx_hashset_iter_reset(&tasks, &iter);
+
+			if (0 == queue_capacity)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "discoverer queue is full, skipping discovery rule '%s'",
+						drule->name);
+
+				while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
+					discoverer_task_clear(task);
+
+				zbx_hashset_destroy(&tasks);
+				zbx_hashset_destroy(&drule_check_counts);
+				goto next;
+			}
 
 			job = discoverer_job_create(drule, config_timeout);
 
-			zbx_hashset_iter_reset(&tasks, &iter);
-
 			while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 			{
-				task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL,
-						sizeof(zbx_discoverer_task_t));
+				task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_task_t));
 				memcpy(task_out, task, sizeof(zbx_discoverer_task_t));
 				zbx_list_append(&job->tasks, task_out, NULL);
 			}
 
 			zbx_hashset_destroy(&tasks);
-			zbx_vector_discoverer_jobs_ptr_append(jobs, job);
-		}
+			zbx_hashset_iter_reset(&drule_check_counts, &iter);
 
+			while (NULL != (count = (zbx_discoverer_check_count_t *)zbx_hashset_iter_next(&iter)))
+				zbx_hashset_insert(check_counts, count, sizeof(zbx_discoverer_check_count_t));
+
+			zbx_hashset_destroy(&drule_check_counts);
+			zbx_vector_discoverer_jobs_ptr_append(jobs, job);
+			rule_count++;
+		}
+next:
 		zbx_dc_drule_queue(now, drule->druleid, delay);
 		zbx_free(delay_str);
 
@@ -1468,7 +1471,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 			goto out;
 		}
 
-		manager->workers[i].worker_id = i;
+		manager->workers[i].worker_id = i + 1;
 	}
 
 	/* wait for threads to start */
