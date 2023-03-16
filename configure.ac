@@ -2034,6 +2034,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
+	src/zabbix_proxy/history/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
@@ -2052,6 +2053,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/discoverer/Makefile
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/ha/Makefile
+	src/zabbix_server/history/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/ipmi/Makefile

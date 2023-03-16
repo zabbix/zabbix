@@ -29,7 +29,8 @@ SUBDIRS = \
 	service \
 	rtc \
 	ha \
-	proxyconfigread
+	proxyconfigread \
+	history
 
 sbin_PROGRAMS = zabbix_server
 
@@ -66,6 +67,7 @@ zabbix_server_LDADD = \
 	discoverer/libzbxdiscoverer.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
+	history/libhistory_server.a \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
 	trapper/libzbxtrapper.a \

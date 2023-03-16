@@ -39,7 +39,6 @@
 #include "zbx_item_constants.h"
 #include "zbxcachehistory.h"
 #include "zbxpreproc.h"
-#include "../zabbix_server/lld/lld_protocol.h"
 
 extern char	*CONFIG_SERVER;
 
@@ -125,6 +124,13 @@ static zbx_history_table_t	areg = {
 		{NULL}
 		}
 };
+
+static zbx_process_item_value_func_t process_item_value_cb = NULL;
+
+void	zbx_init_library_dbwrap(zbx_process_item_value_func_t process_item_value_func)
+{
+	process_item_value_cb = process_item_value_func;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1155,43 +1161,6 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: processes item value depending on proxy/flags settings            *
- *                                                                            *
- * Parameters: item    - [IN] the item to process                             *
- *             result  - [IN] the item result                                 *
- *                                                                            *
- * Comments: Values gathered by server are sent to the preprocessing manager, *
- *           while values received from proxy are already preprocessed and    *
- *           must be either directly stored to history cache or sent to lld   *
- *           manager.                                                         *
- *                                                                            *
- ******************************************************************************/
-static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT *result, zbx_timespec_t *ts,
-		int *h_num, char *error)
-{
-	if (0 == item->host.proxy_hostid)
-	{
-		zbx_preprocess_item_value(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
-				item->state, error);
-		*h_num = 0;
-	}
-	else
-	{
-		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
-		{
-			zbx_lld_process_agent_result(item->itemid, item->host.hostid, result, ts, error);
-			*h_num = 0;
-		}
-		else
-		{
-			dc_add_history(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
-			*h_num = 1;
-		}
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: process single value from incoming history data                   *
  *                                                                            *
  * Parameters: item    - [IN] the item to process                             *
@@ -1231,7 +1200,7 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 				item->key_orig, value->value);
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
-		process_item_value(item, NULL, &value->ts, h_num, value->value);
+		process_item_value_cb(item, NULL, &value->ts, h_num, value->value);
 	}
 	else
 	{
@@ -1280,7 +1249,7 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 		if (0 != ZBX_ISSET_VALUE(&result) || 0 != ZBX_ISSET_META(&result))
 		{
 			item->state = ITEM_STATE_NORMAL;
-			process_item_value(item, &result, &value->ts, h_num, NULL);
+			process_item_value_cb(item, &result, &value->ts, h_num, NULL);
 		}
 
 		zbx_free_agent_result(&result);

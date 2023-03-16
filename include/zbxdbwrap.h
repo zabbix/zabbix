@@ -40,6 +40,11 @@ zbx_host_template_link_type;
 typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_EVALUATE_ITEM *, const char *, const char *,
 		const zbx_timespec_t *, char **);
 
+typedef void (*zbx_process_item_value_func_t)(const zbx_history_recv_item_t *item, AGENT_RESULT *result,
+		zbx_timespec_t *ts, int *h_num, char *error);
+
+void	zbx_init_library_dbwrap(zbx_process_item_value_func_t process_item_value_func);
+
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
 		const zbx_config_tls_t *config_tls, int config_timeout);
 
