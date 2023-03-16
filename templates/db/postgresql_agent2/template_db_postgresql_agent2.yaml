@@ -1516,6 +1516,8 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of data page checksum failures detected in this database'
+              valuemap:
+                name: 'PostgreSQL checksum failure status'
               preprocessing:
                 -
                   type: JSONPATH
