@@ -346,10 +346,8 @@ svg a {
     .sortable .sortable-item:not(.sortable-dragging) {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
-    position: absolute; }
-  .sortable.sortable-opacity .sortable-item.sortable-dragging {
-    opacity: 0.6;
-    z-index: 1; }
+    position: absolute;
+    opacity: 0.6; }
 
 html,
 body {
@@ -1046,6 +1044,8 @@ footer {
     .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span,
     .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
       color: #ffffff; }
+  .dashboard-navigation-tabs .sortable-dragging .sortable-item {
+    opacity: 1; }
 
 .dashboard-navigation-controls {
   display: flex;
@@ -2598,17 +2598,15 @@ div.dashboard-widget-tophosts z-bar-gauge {
       border-color: #bbbbbb;
       background-color: #414141;
       position: relative;
-      z-index: 2; }
+      z-index: 1; }
     .radio-list-control input[type="radio"]:checked + label {
       color: #000000 !important;
       border-color: #dddddd;
       background-color: #dddddd;
-      position: relative;
-      z-index: 1; }
+      position: relative; }
     .radio-list-control input[type="radio"]:checked:focus + label {
       box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
-      position: relative;
-      z-index: 2; }
+      position: relative; }
     .radio-list-control input[type="radio"]:checked[disabled] + label {
       background-color: white !important;
       transition: none; }
