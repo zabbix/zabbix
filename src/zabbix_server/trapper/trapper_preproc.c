@@ -19,9 +19,9 @@
 
 #include "trapper_preproc.h"
 #include "zbxpreproc.h"
-#include "preproc.h"
 #include "trapper_auth.h"
 #include "zbxcommshigh.h"
+#include "zbxdbhigh.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1
 

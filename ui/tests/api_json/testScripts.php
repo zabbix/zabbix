@@ -31,181 +31,68 @@ require_once dirname(__FILE__).'/../../include/translateDefines.inc.php';
 class testScripts extends CAPITest {
 
 	private static $data = [
-		'groupids' => [
-			'rw' => null,
-			'r' => null,
-			'd' => null,
-
-			// Parent group with read-write permissions, child group with read permissions etc.
-			'inherit_a_rw' => null,
-			'inherit_b_r' => null,
-			'inherit_c_rw' => null,
-			'inherit_d_rw' => null
-		],
-		'hostids' => [
-			'plain_rw' => null,
-			'plain_r' => null,
-			'plain_d' => null,
-			'macros_rw_1' => null,
-			'macros_r_2' => null,
-			'macros_rw_3' => null,
-			'interface_rw_1' => null,
-			'interface_rw_2' => null,
-			'inventory_rw_1' => null,
-			'inventory_rw_2' => null,
-
-			// Each host belongs to one of the inherited host groups.
-			'inherit_a_rw' => null,
-			'inherit_b_r' => null,
-			'inherit_c_rw' => null,
-			'inherit_d_rw' => null,
-			'cause_d' => null,
-			'symptom_rw' => null
-		],
-
-		// One item per host with same index. Inherited hosts do not need items. They are only for permission checks.
-		'itemids' => [
-			'plain_rw' => null,
-			'plain_r' => null,
-			'plain_d' => null,
-			'macros_rw_1' => null,
-			'macros_r_2' => null,
-			'macros_rw_3' => null,
-			'interface_rw_1' => null,
-			'interface_rw_2' => null,
-			'inventory_rw_1' => null,
-			'inventory_rw_2' => null,
-			'macros_d_cause' => null,
-			'macros_rw_symptom' => null
-		],
-
-		// Some triggers will have multiple items.
-		'triggerids' => [
-			'plain_rw_single_d' => null,
-			'plain_r_single_d' => null,
-			'plain_d_single_d' => null,
-			'plain_rw_r_dual_d' => null,
-			'macros_rw_single_1_h' => null,
-			'macros_rw_r_dual_1_2_h' => null,
-			'macros_rw_dual_1_3_h' => null,
-			'interface_rw_dual_a' => null,
-			'inventory_rw_dual_a' => null,
-			'macros_d_cause' => null,
-			'macros_rw_symptom' => null
-		],
-
-		// Each trigger will generate one event. Index equal to triggers.
-		'eventids' => [
-			'plain_rw_single_d' => null,
-			'plain_r_single_d' => null,
-			'plain_d_single_d' => null,
-			'plain_rw_r_dual_d' => null,
-			'macros_rw_single_1_h' => null,
-			'macros_rw_r_dual_1_2_h' => null,
-			'macros_rw_dual_1_3_h' => null,
-			'interface_rw_dual_a' => null,
-			'inventory_rw_dual_a' => null,
-			'macros_d_cause' => null,
-			'macros_rw_symptom' => null
-		],
-
-		// One global macro.
+		'groupids' => [],
+		'hostids' => [],
+		'itemids' => [],
+		'triggerids' => [],
+		'eventids' => [],
 		'usermacroid' => null,
-		'usrgrpids' => [
-			'admin' => null,
-			'user' => null
-		],
-		'userids' => [
-			'admin' => null,
-			'user' => null
-		],
-		'scriptids' => [
-			'get_custom_defaults' => null,
-			'get_ipmi_defaults' => null,
-			'get_webhook_filter' => null,
-			'get_url' => null,
-			'get_inherit_a_r' => null,
-			'get_inherit_b_rw' => null,
-			'get_inherit_d_r' => null,
-			'exec_usrgrp_admin' => null,
-			'exec_usrgrp_user' => null,
-			'exec_hstgrp' => null,
-			'exec_url' => null,
-			'delete_single' => null,
-			'delete_multi_1' => null,
-			'delete_multi_2' => null,
-			'delete_action' => null,
-			'update_ipmi' => null,
-			'update_ssh_pwd' => null,
-			'update_ssh_key' => null,
-			'update_telnet' => null,
-			'update_webhook' => null,
-			'update_webhook_params' => null,
-			'update_custom' => null,
-			'update_url' => null,
-			'get_hosts_url' => null,
-			'get_hosts_ipmi' => null,
-			'get_hosts_webhook' => null,
-			'get_events_url' => null,
-			'get_events_ipmi' => null,
-			'get_events_webhook' => null,
-			'get_events_ssh' => null,
-			'get_events_url_cause' => null
-		],
-		'actionids' => [
-			'update' => null,
-			'delete' => null
-		],
+		'usrgrpids' => [],
+		'roleids' => [],
+		'userids' => [],
+		'scriptids' => [],
+		'actionids' => [],
 
 		// Created scripts during script.create test (deleted at the end).
 		'created' => []
 	];
 
 	/**
-	 * Prepare data for tests. Create host groups, hosts, items, triggers, events, user groups, users, global macros,
-	 * scripts and actions.
+	 * Prepare data for tests. Create host groups, hosts, items, triggers, events, user groups, roles, users,
+	 * global macros, scripts and actions.
 	 */
-	public function prepareScriptsData() {
+	public function prepareScriptsData(): void {
 		// Create host groups.
 		$hostgroups_data = [
-			[
+			'rw' => [
 				'name' => 'API test host group, read-write'
 			],
-			[
+			'r' => [
 				'name' => 'API test host group, read'
 			],
-			[
+			'd' => [
 				'name' => 'API test host group, deny'
 			],
-			[
+
+			// Parent group with read-write permissions, child group with read permissions etc.
+			'inherit_a_rw' => [
 				'name' => 'API test host group inherit, A, read-write'
 			],
-			[
+			'inherit_b_r' => [
 				'name' => 'API test host group inherit, A, read-write/API test host group inherit, B, read'
 			],
-			[
+			'inherit_c_rw' => [
 				'name' => 'API test host group inherit, A, read-write/API test host group inherit, B, read/API test host group inherit, C, read-write'
 			],
-			[
+			'inherit_d_rw' => [
 				'name' => 'API test host group inherit, A, read-write/API test host group inherit, B, read/API test host group inherit, C, read-write/API test host group inherit, D, read-write'
 			]
 		];
-		$hostgroups = CDataHelper::call('hostgroup.create', $hostgroups_data);
-		$this->assertArrayHasKey('groupids', $hostgroups, 'prepareScriptsData() failed: Could not create host groups.');
-		self::$data['groupids'] = [
-			'rw' => $hostgroups['groupids'][0],
-			'r' => $hostgroups['groupids'][1],
-			'd' => $hostgroups['groupids'][2],
-			'inherit_a_rw' => $hostgroups['groupids'][3],
-			'inherit_b_r' => $hostgroups['groupids'][4],
-			'inherit_c_rw' => $hostgroups['groupids'][5],
-			'inherit_d_rw' => $hostgroups['groupids'][6]
-		];
+
+		// Try to create host groups. In case of failure, print the exception message.
+		try {
+			$hostgroups = CDataHelper::call('hostgroup.create', array_values($hostgroups_data));
+		}
+		catch (Exception $e) {
+			$this->assertTrue(false, $e->getMessage());
+		}
+
+		self::$data['groupids'] = array_combine(array_keys($hostgroups_data), $hostgroups['groupids']);
 
 		// Create hosts.
 		$hosts_data = [
 			// Host with no macro, no interface and no inventory. User will have read-write permissions.
-			[
+			'plain_rw' => [
 				'host' => 'api_test_host_plain_rw',
 				'name' => 'API test host - plain, read-write',
 				'groups' => [
@@ -216,7 +103,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Host with no macro, no interface and no inventory. User will have read permissions.
-			[
+			'plain_r' => [
 				'host' => 'api_test_host_plain_r',
 				'name' => 'API test host - plain, read',
 				'groups' => [
@@ -227,7 +114,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Host with no macro, no interface and no inventory. User will have deny permissions.
-			[
+			'plain_d' => [
 				'host' => 'api_test_host_plain_d',
 				'name' => 'API test host - plain, deny',
 				'groups' => [
@@ -238,7 +125,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Hosts with macros.
-			[
+			'macros_rw_1' => [
 				'host' => 'api_test_host_macros_rw_1',
 				'name' => 'API test host - macros 1, read-write',
 				'groups' => [
@@ -253,7 +140,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'macros_r_2' => [
 				'host' => 'api_test_host_macros_r_2',
 				'name' => 'API test host - macros 2, read',
 				'groups' => [
@@ -268,7 +155,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'macros_rw_3' => [
 				'host' => 'api_test_host_macros_rw_3',
 				'name' => 'API test host - macros 3, read-write',
 				'groups' => [
@@ -285,7 +172,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Hosts with interfaces to test indexed macro resolving {HOST.IP1}, {HOST.DNS2} etc.
-			[
+			'interface_rw_1' => [
 				'host' => 'api_test_host_interface_rw_1',
 				'name' => 'API test host - interface (read-write) 1',
 				'groups' => [
@@ -304,7 +191,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'interface_rw_2' => [
 				'host' => 'api_test_host_interface_rw_2',
 				'name' => 'API test host - interface (read-write) 2',
 				'groups' => [
@@ -325,7 +212,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Hosts with inventory to test indexed macro resolving {INVENTORY.OS1}, {INVENTORY.ALIAS2} etc.
-			[
+			'inventory_rw_1' => [
 				'host' => 'api_test_host_inventory_rw_1',
 				'name' => 'API test host - inventory (read-write) 1',
 				'groups' => [
@@ -338,7 +225,7 @@ class testScripts extends CAPITest {
 					'os' => 'Windows'
 				]
 			],
-			[
+			'inventory_rw_2' => [
 				'host' => 'api_test_host_inventory_rw_2',
 				'name' => 'API test host - inventory (read-write) 2',
 				'groups' => [
@@ -353,7 +240,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Hosts that belong to inherited groups. Each host belongs to a deeper level of host group.
-			[
+			'inherit_a_rw' => [
 				'host' => 'api_test_host_inherit_a_rw',
 				'name' => 'API test host - inherit, A, read-write',
 				'groups' => [
@@ -362,7 +249,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'inherit_b_r' => [
 				'host' => 'api_test_host_inherit_b_r',
 				'name' => 'API test host - inherit, B, read',
 				'groups' => [
@@ -371,7 +258,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'inherit_c_rw' => [
 				'host' => 'api_test_host_inherit_c_rw',
 				'name' => 'API test host - inherit, C, read-write',
 				'groups' => [
@@ -380,7 +267,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'inherit_d_rw' => [
 				'host' => 'api_test_host_inherit_d_rw',
 				'name' => 'API test host - inherit, D, read-write',
 				'groups' => [
@@ -391,7 +278,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Hosts for cause and symptoms there symptoms is read write, but cause is denied for other users.
-			[
+			'cause_d' => [
 				'host' => 'api_test_host_cause_d',
 				'name' => 'API test host - cause, deny',
 				'groups' => [
@@ -400,7 +287,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'symptom_rw' => [
 				'host' => 'api_test_host_symptom_rw',
 				'name' => 'API test host - symptom, read-write',
 				'groups' => [
@@ -410,107 +297,102 @@ class testScripts extends CAPITest {
 				]
 			]
 		];
-		$hosts = CDataHelper::call('host.create', $hosts_data);
-		$this->assertArrayHasKey('hostids', $hosts, 'prepareScriptsData() failed: Could not create hosts.');
-		self::$data['hostids'] = [
-			'plain_rw' => $hosts['hostids'][0],
-			'plain_r' => $hosts['hostids'][1],
-			'plain_d' => $hosts['hostids'][2],
-			'macros_rw_1' => $hosts['hostids'][3],
-			'macros_r_2' => $hosts['hostids'][4],
-			'macros_rw_3' => $hosts['hostids'][5],
-			'interface_rw_1' => $hosts['hostids'][6],
-			'interface_rw_2' => $hosts['hostids'][7],
-			'inventory_rw_1' => $hosts['hostids'][8],
-			'inventory_rw_2' => $hosts['hostids'][9],
-			'inherit_a_rw' => $hosts['hostids'][10],
-			'inherit_b_r' => $hosts['hostids'][11],
-			'inherit_c_rw' => $hosts['hostids'][12],
-			'inherit_d_rw' => $hosts['hostids'][13],
-			'cause_d' => $hosts['hostids'][14],
-			'symptom_rw' => $hosts['hostids'][15]
-		];
 
-		// Create an item on each host.
+		// Try to create hosts. In case of failure, print the exception message and revert changes.
+		try {
+			$hosts = CDataHelper::call('host.create', array_values($hosts_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
+		self::$data['hostids'] = array_combine(array_keys($hosts_data), $hosts['hostids']);
+
+		/*
+		 * Create one item per host with same index. Inherited hosts do not need items. They are only for
+		 * permission checks.
+		 */
 		$items_data = [
-			[
+			'plain_rw' => [
 				'hostid' => self::$data['hostids']['plain_rw'],
 				'name' => 'API test item - plain, read-write',
 				'key_' => 'api_test_item_plain_rw',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'plain_r' => [
 				'hostid' => self::$data['hostids']['plain_r'],
 				'name' => 'API test item - plain, read',
 				'key_' => 'api_test_item_plain_r',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'plain_d' => [
 				'hostid' => self::$data['hostids']['plain_d'],
 				'name' => 'API test item - plain, deny',
 				'key_' => 'api_test_item_plain_d',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'macros_rw_1' => [
 				'hostid' => self::$data['hostids']['macros_rw_1'],
 				'name' => 'API test item - macros 1, read-write',
 				'key_' => 'api_test_item_macros_rw_1',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'macros_r_2' => [
 				'hostid' => self::$data['hostids']['macros_r_2'],
 				'name' => 'API test item - macros 2, read',
 				'key_' => 'api_test_item_macros_r_2',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'macros_rw_3' => [
 				'hostid' => self::$data['hostids']['macros_rw_3'],
 				'name' => 'API test item - macros 3, read-write',
 				'key_' => 'api_test_item_macros_rw_3',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'interface_rw_1' => [
 				'hostid' => self::$data['hostids']['interface_rw_1'],
 				'name' => 'API test item - interface 1, read-write',
 				'key_' => 'api_test_item_interface_rw_1',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'interface_rw_2' => [
 				'hostid' => self::$data['hostids']['interface_rw_2'],
 				'name' => 'API test item - interface 2, read-write',
 				'key_' => 'api_test_item_interface_rw_2',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'inventory_rw_1' => [
 				'hostid' => self::$data['hostids']['inventory_rw_1'],
 				'name' => 'API test item - inventory 1, read-write',
 				'key_' => 'api_test_item_inventory_rw_1',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'inventory_rw_2' => [
 				'hostid' => self::$data['hostids']['inventory_rw_2'],
 				'name' => 'API test item - inventory 2, read-write',
 				'key_' => 'api_test_item_inventory_rw_2',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'macros_d_cause' => [
 				'hostid' => self::$data['hostids']['cause_d'],
 				'name' => 'API test item - macros cause, deny',
 				'key_' => 'api_test_item_macros_cause_d',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			[
+			'macros_rw_symptom' => [
 				'hostid' => self::$data['hostids']['symptom_rw'],
 				'name' => 'API test item - macros symptom, read-write',
 				'key_' => 'api_test_item_macros_symptom_rw',
@@ -518,56 +400,56 @@ class testScripts extends CAPITest {
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			]
 		];
-		$items = CDataHelper::call('item.create', $items_data);
-		$this->assertArrayHasKey('itemids', $items, 'prepareScriptsData() failed: Could not create items.');
-		self::$data['itemids'] = [
-			'plain_rw' => $items['itemids'][0],
-			'plain_r' => $items['itemids'][1],
-			'plain_d' => $items['itemids'][2],
-			'macros_rw_1' => $items['itemids'][3],
-			'macros_r_2' => $items['itemids'][4],
-			'macros_rw_3' => $items['itemids'][5],
-			'interface_rw_1' => $items['itemids'][6],
-			'interface_rw_2' => $items['itemids'][7],
-			'inventory_rw_1' => $items['itemids'][8],
-			'inventory_rw_2' => $items['itemids'][9],
-			'macros_d_cause' => $items['itemids'][10],
-			'macros_rw_symptom' => $items['itemids'][11]
-		];
 
-		// Create triggers. We already know the host names and item keys. Some belong to multiple hosts.
+		// Try to create items. In case of failure, print the exception message and revert changes.
+		try {
+			$items = CDataHelper::call('item.create', array_values($items_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
+		self::$data['itemids'] = array_combine(array_keys($items_data), $items['itemids']);
+
+		/*
+		 * Create triggers. We already know the host names and item keys. Some belong to multiple hosts. Some triggers
+		 * will have multiple items.
+		 */
 		$triggers_data = [
-			[
+			'plain_rw_single_d' => [
 				'description' => 'API test trigger - plain, single, read-write, disaster',
 				'expression' => 'last(/api_test_host_plain_rw/api_test_item_plain_rw)<>0',
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			],
-			[
+			'plain_r_single_d' => [
 				'description' => 'API test trigger - plain, single, read, disaster',
 				'expression' => 'last(/api_test_host_plain_r/api_test_item_plain_r)<>0',
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			],
-			[
+			'plain_d_single_d' => [
 				'description' => 'API test trigger - plain, single, deny, disaster',
 				'expression' => 'last(/api_test_host_plain_d/api_test_item_plain_d)<>0',
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			],
 
 			// Trigger belongs to multiple hosts.
-			[
+			'plain_rw_r_dual_d' => [
 				'description' => 'API test trigger - plain, dual, read-write & read, disaster',
 				'expression' => 'last(/api_test_host_plain_rw/api_test_item_plain_rw)<>0'.
 					' and last(/api_test_host_plain_r/api_test_item_plain_r)<>0',
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			],
-			[
+			'macros_rw_single_1_h' => [
 				'description' => 'API test trigger - macros, single, read-write, high',
 				'expression' => 'last(/api_test_host_macros_rw_1/api_test_item_macros_rw_1)<>0',
 				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 
 			// Both hosts have same macro name.
-			[
+			'macros_rw_r_dual_1_2_h' => [
 				'description' => 'API test trigger - macros, dual, read-write & read, (1 & 2), high',
 				'expression' => 'last(/api_test_host_macros_rw_1/api_test_item_macros_rw_1)<>0'.
 					' and last(/api_test_host_macros_r_2/api_test_item_macros_r_2)<>0',
@@ -575,7 +457,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Both hosts have different macro names.
-			[
+			'macros_rw_dual_1_3_h' => [
 				'description' => 'API test trigger - macros, dual, read-write, (1 & 3), high',
 				'expression' => 'last(/api_test_host_macros_rw_1/api_test_item_macros_rw_1)<>0'.
 					' and last(/api_test_host_macros_rw_3/api_test_item_macros_rw_3)<>0',
@@ -583,7 +465,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Hosts contain interfaces.
-			[
+			'interface_rw_dual_a' => [
 				'description' => 'API test trigger - interface, dual, average',
 				'expression' => 'last(/api_test_host_interface_rw_1/api_test_item_interface_rw_1)<>0'.
 					' and last(/api_test_host_interface_rw_2/api_test_item_interface_rw_2)<>0',
@@ -591,7 +473,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Hosts contain inventory.
-			[
+			'inventory_rw_dual_a' => [
 				'description' => 'API test trigger - inventory, dual, average',
 				'expression' => 'last(/api_test_host_inventory_rw_1/api_test_item_inventory_rw_1)<>0'.
 					' and last(/api_test_host_inventory_rw_2/api_test_item_inventory_rw_2)<>0',
@@ -599,48 +481,35 @@ class testScripts extends CAPITest {
 			],
 
 			// Cause and symptom triggers for different hosts.
-			[
+			'macros_d_cause' => [
 				'description' => 'API test trigger - macros, cause, disaster',
 				'expression' => 'last(/api_test_host_cause_d/api_test_item_macros_cause_d)<>0',
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			],
-			[
+			'macros_rw_symptom' => [
 				'description' => 'API test trigger - macros, symptom, high',
 				'expression' => 'last(/api_test_host_symptom_rw/api_test_item_macros_symptom_rw)<>0',
 				'priority' => TRIGGER_SEVERITY_HIGH
 			]
 		];
-		$triggers = CDataHelper::call('trigger.create', $triggers_data);
-		$this->assertArrayHasKey('triggerids', $triggers, 'prepareScriptsData() failed: Could not create triggers.');
-		self::$data['triggerids'] = [
-			'plain_rw_single_d' => $triggers['triggerids'][0],
-			'plain_r_single_d' => $triggers['triggerids'][1],
-			'plain_d_single_d' => $triggers['triggerids'][2],
-			'plain_rw_r_dual_d' => $triggers['triggerids'][3],
-			'macros_rw_single_1_h' => $triggers['triggerids'][4],
-			'macros_rw_r_dual_1_2_h' => $triggers['triggerids'][5],
-			'macros_rw_dual_1_3_h' => $triggers['triggerids'][6],
-			'interface_rw_dual_a' => $triggers['triggerids'][7],
-			'inventory_rw_dual_a' => $triggers['triggerids'][8],
-			'macros_d_cause' => $triggers['triggerids'][9],
-			'macros_rw_symptom' => $triggers['triggerids'][10]
-		];
 
-		// Generate events for all triggers. History is not used. Problems table is also not required.
-		$nextid = CDBHelper::getAll(
-			'SELECT i.nextid'.
-			' FROM ids i'.
-			' WHERE i.table_name='.zbx_dbstr('events').
-				' AND i.field_name='.zbx_dbstr('eventid').
-			' FOR UPDATE'
-		);
-
-		if ($nextid) {
-			$nextid = bcadd($nextid[0]['nextid'], 1, 0);
+		// Try to create triggers. In case of failure, print the exception message and revert changes.
+		try {
+			$triggers = CDataHelper::call('trigger.create', array_values($triggers_data));
 		}
-		else {
-			DB::refreshIds('events', 0);
+		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
+			$this->assertTrue(false, $e->getMessage());
+		}
+
+		self::$data['triggerids'] = array_combine(array_keys($triggers_data), $triggers['triggerids']);
+
+		// Try to create events. In case of failure, print the exception message and revert changes.
+		try {
+			// Generate events for all triggers. History is not used. Problems table is also not required.
 			$nextid = CDBHelper::getAll(
 				'SELECT i.nextid'.
 				' FROM ids i'.
@@ -649,41 +518,55 @@ class testScripts extends CAPITest {
 				' FOR UPDATE'
 			);
 
-			$nextid = bcadd($nextid[0]['nextid'], 1, 0);
+			if ($nextid) {
+				$nextid = bcadd($nextid[0]['nextid'], 1, 0);
+			}
+			else {
+				DB::refreshIds('events', 0);
+
+				$nextid = CDBHelper::getAll(
+					'SELECT i.nextid'.
+					' FROM ids i'.
+					' WHERE i.table_name='.zbx_dbstr('events').
+						' AND i.field_name='.zbx_dbstr('eventid').
+					' FOR UPDATE'
+				);
+
+				$nextid = bcadd($nextid[0]['nextid'], 1, 0);
+			}
+
+			// Remember that order of $triggers_data is important here.
+			$events_data = [];
+			$num = 0;
+
+			foreach (self::$data['triggerids'] as $triggerid) {
+				$events_data[] = [
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'objectid' => $triggerid,
+					'clock' => time(),
+					'value' => TRIGGER_VALUE_TRUE,
+					'acknowledged' => EVENT_NOT_ACKNOWLEDGED,
+					'ns' => 0,
+					'name' => array_values($triggers_data)[$num]['description'],
+					'severity' => array_values($triggers_data)[$num]['priority']
+				];
+				$num++;
+			}
+
+			$eventids = DB::insertBatch('events', $events_data);
+		}
+		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
 		}
 
-		$events_data = [];
-		$num = 0;
-		foreach (self::$data['triggerids'] as $triggerid) {
-			$events_data[] = [
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'objectid' => $triggerid,
-				'clock' => time(),
-				'value' => TRIGGER_VALUE_TRUE,
-				'acknowledged' => EVENT_NOT_ACKNOWLEDGED,
-				'ns' => 0,
-				'name' => $triggers_data[$num]['description'],
-				'severity' => $triggers_data[$num]['priority']
-			];
-			$num++;
-		}
-		$eventids = DB::insertBatch('events', $events_data);
-		$newids = array_fill($nextid, count($events_data), true);
-		$this->assertEquals(array_keys($newids), $eventids, 'prepareScriptsData() failed: Could not create events.');
-		self::$data['eventids'] = [
-			'plain_rw_single_d' => $eventids[0],
-			'plain_r_single_d' => $eventids[1],
-			'plain_d_single_d' => $eventids[2],
-			'plain_rw_r_dual_d' => $eventids[3],
-			'macros_rw_single_1_h' => $eventids[4],
-			'macros_rw_r_dual_1_2_h' => $eventids[5],
-			'macros_rw_dual_1_3_h' => $eventids[6],
-			'interface_rw_dual_a' => $eventids[7],
-			'inventory_rw_dual_a' => $eventids[8],
-			'macros_d_cause' => $eventids[9],
-			'macros_rw_symptom' => $eventids[10]
-		];
+		// Each trigger will generate one event so event ID array key is equal to trigger array key.
+		self::$data['eventids'] = array_combine(array_keys($triggers_data), $eventids);
 
 		/*
 		 * Simulate server creating hierarchy of cause and symptoms. Skip making acknowledges, since those are not
@@ -693,7 +576,20 @@ class testScripts extends CAPITest {
 			'eventid' => self::$data['eventids']['macros_rw_symptom'],
 			'cause_eventid' => self::$data['eventids']['macros_d_cause']
 		]];
-		DB::insertBatch('event_symptom', $event_symptom_data, false);
+
+		// Try to create symptom events. In case of failure, print the exception message and revert changes.
+		try {
+			DB::insertBatch('event_symptom', $event_symptom_data, false);
+		}
+		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
 
 		// Create global macro to later use it in scripts.
 		$usermacros_data = [
@@ -702,10 +598,25 @@ class testScripts extends CAPITest {
 				'value' => 'Global Macro Value'
 			]
 		];
-		$usermacros = CDataHelper::call('usermacro.createglobal', $usermacros_data);
-		$this->assertArrayHasKey('globalmacroids', $usermacros,
-			'prepareScriptsData() failed: Could not create global macros.'
-		);
+
+		/*
+		 * Try to create global macros. In case of failure, print the exception message and revert changes. Since
+		 * global macro (only one) was not created, there is nothing to revert in that table.
+		 */
+		try {
+			$usermacros = CDataHelper::call('usermacro.createglobal', array_values($usermacros_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
 		self::$data['usermacroid'] = $usermacros['globalmacroids'][0];
 
 		/*
@@ -713,7 +624,7 @@ class testScripts extends CAPITest {
 		 * some will use regular admin.
 		 */
 		$usergroups_data = [
-			[
+			'admin' => [
 				'name' => 'API test user group - admins',
 				'hostgroup_rights' => [
 					[
@@ -746,7 +657,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'user' => [
 				'name' => 'API test user group - users',
 				'hostgroup_rights' => [
 					[
@@ -780,45 +691,76 @@ class testScripts extends CAPITest {
 				]
 			]
 		];
-		$usergroups = CDataHelper::call('usergroup.create', $usergroups_data);
-		$this->assertArrayHasKey('usrgrpids', $usergroups,
-			'prepareScriptsData() failed: Could not create user groups.'
-		);
-		self::$data['usrgrpids']['admin'] = $usergroups['usrgrpids'][0];
-		self::$data['usrgrpids']['user'] = $usergroups['usrgrpids'][1];
 
-		// Get first available role one for each type that should exist on new install and create users.
-		$admin_roleid = CDBHelper::getAll(
-			'SELECT r.roleid'.
-			' FROM role r'.
-			' WHERE '.dbConditionInt('r.type', [USER_TYPE_ZABBIX_ADMIN])
-		)[0]['roleid'];
+		// Try to create user groups. In case of failure, print the exception message and revert changes.
+		try {
+			$usergroups = CDataHelper::call('usergroup.create', array_values($usergroups_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
-		$user_roleid = CDBHelper::getAll(
-			'SELECT r.roleid'.
-			' FROM role r'.
-			' WHERE '.dbConditionInt('r.type', [USER_TYPE_ZABBIX_USER])
-		)[0]['roleid'];
+			$this->assertTrue(false, $e->getMessage());
+		}
 
+		self::$data['usrgrpids'] = array_combine(array_keys($usergroups_data), $usergroups['usrgrpids']);
+
+		// Create user roles with defaults.
+		$roles_data = [
+			'admin' => [
+				'name' => 'API test role admin',
+				'type' => USER_TYPE_ZABBIX_ADMIN
+			],
+			'user' => [
+				'name' => 'API test role user',
+				'type' => USER_TYPE_ZABBIX_USER
+			]
+		];
+
+		// Try to create user roles. In case of failure, print the exception message and revert changes.
+		try {
+			$roles = CDataHelper::call('role.create', array_values($roles_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
+		self::$data['roleids'] = array_combine(array_keys($roles_data), $roles['roleids']);
+
+		// Create users.
 		$users_data = [
-			[
+			'admin' => [
 				'username' => 'api_test_admin',
 				'name' => 'API One',
 				'surname' => 'Tester One',
 				'passwd' => '4P1T3$tEr',
-				'roleid' => $admin_roleid,
+				'roleid' => self::$data['roleids']['admin'],
 				'usrgrps' => [
 					[
 						'usrgrpid' => self::$data['usrgrpids']['admin']
 					]
 				]
 			],
-			[
+			'user' => [
 				'username' => 'api_test_user',
 				'name' => 'API Two',
 				'surname' => 'Tester Two',
 				'passwd' => '4P1T3$tEr',
-				'roleid' => $user_roleid,
+				'roleid' => self::$data['roleids']['user'],
 				'usrgrps' => [
 					[
 						'usrgrpid' => self::$data['usrgrpids']['user']
@@ -826,29 +768,45 @@ class testScripts extends CAPITest {
 				]
 			]
 		];
-		$users = CDataHelper::call('user.create', $users_data);
-		$this->assertArrayHasKey('userids', $users, 'prepareScriptsData() failed: Could not create users.');
-		self::$data['userids']['admin'] = $users['userids'][0];
-		self::$data['userids']['user'] = $users['userids'][1];
+
+		// Try to create users. In case of failure, print the exception message and revert changes.
+		try {
+			$users = CDataHelper::call('user.create', array_values($users_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+			CDataHelper::call('role.delete', self::$data['roleids']);
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
+		self::$data['userids'] = array_combine(array_keys($users_data), $users['userids']);
 
 		// Create scripts.
 		$scripts_data = [
 			// script.get
-			[
+			'get_custom_defaults' => [
 				// Custom script with defaults.
 				'name' => 'API test script.get custom script',
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'command' => 'reboot server'
 			],
-			[
+			'get_ipmi_defaults' => [
 				// IPMI type script with defaults.
 				'name' => 'API test script.get for filter IPMI',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'command' => 'reboot server'
 			],
-			[
+			'get_webhook_filter' => [
 				// WEBHOOK type script with custom parameters.
 				'name' => 'API test script.get for filter webhooks and parameters',
 				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
@@ -872,7 +830,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'get_url' => [
 				// URL type script with non-default values.
 				'name' => 'API test script.get URL',
 				'type' => ZBX_SCRIPT_TYPE_URL,
@@ -881,7 +839,7 @@ class testScripts extends CAPITest {
 				'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO,
 				'confirmation' => 'Confirmation macros: {$HOST_MACRO}, {$GLOBAL_MACRO}, {$DOESNOTEXIST}'
 			],
-			[
+			'get_inherit_a_r' => [
 				// User has read-write permissions to top level host group, but requirement is read.
 				'name' => 'API test script.get with inherited group, A, required host access - read',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -890,7 +848,7 @@ class testScripts extends CAPITest {
 				'groupid' => self::$data['groupids']['inherit_a_rw'],
 				'host_access' => PERM_READ
 			],
-			[
+			'get_inherit_b_rw' => [
 				// User has read permissions to second level host group, but requirement is read-write.
 				'name' => 'API test script.get with inherited group, B, required host access - read-write',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -899,7 +857,7 @@ class testScripts extends CAPITest {
 				'groupid' => self::$data['groupids']['inherit_b_r'],
 				'host_access' => PERM_READ_WRITE
 			],
-			[
+			'get_inherit_d_r' => [
 				// User has read-write permissions to last level host group, but requirement is read. "C" is skipped.
 				'name' => 'API test script.get with inherited group, D, required host access - read',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -910,7 +868,7 @@ class testScripts extends CAPITest {
 			],
 
 			// script.execute
-			[
+			'exec_usrgrp_admin' => [
 				// Only this user group has permissions, the other one does not.
 				'name' => 'API test script.execute with user group (admin)',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -918,7 +876,7 @@ class testScripts extends CAPITest {
 				'command' => 'reboot server',
 				'usrgrpid' => self::$data['usrgrpids']['admin']
 			],
-			[
+			'exec_usrgrp_user' => [
 				// Only this user group has permissions, the other one does not.
 				'name' => 'API test script.execute with user group (user)',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -926,7 +884,7 @@ class testScripts extends CAPITest {
 				'command' => 'reboot server',
 				'usrgrpid' => self::$data['usrgrpids']['user']
 			],
-			[
+			'exec_hstgrp' => [
 				// Execute allowed for specific host group.
 				'name' => 'API test script.execute with host group',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -934,7 +892,7 @@ class testScripts extends CAPITest {
 				'command' => 'reboot server',
 				'groupid' => self::$data['groupids']['rw']
 			],
-			[
+			'exec_url' => [
 				// Execute will not work for URL type scripts.
 				'name' => 'API test script.execute with type URL',
 				'type' => ZBX_SCRIPT_TYPE_URL,
@@ -943,20 +901,20 @@ class testScripts extends CAPITest {
 			],
 
 			// script.delete
-			[
+			'delete_single' => [
 				// IPMI type script with action scope that does not have action.
 				'name' => 'API test script.delete - single allowed',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => 'reboot server'
 			],
-			[
+			'delete_multi_1' => [
 				'name' => 'API test script.delete - multiple allowed 1',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'command' => 'reboot server'
 			],
-			[
+			'delete_multi_2' => [
 				'name' => 'API test script.delete - multiple allowed 2',
 				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
@@ -976,7 +934,7 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'delete_action' => [
 				// IPMI type script with action scope that has action attached.
 				'name' => 'API test script.delete - not allowed due to action',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -984,27 +942,27 @@ class testScripts extends CAPITest {
 				'command' => 'reboot server'
 			],
 
-			// script.update to test type change, scope change, name and params change.
-			[
+			// script.update to test type, scope, name, menu_path and params changes.
+			'update_ipmi' => [
 				'name' => 'API test script.update - IPMI',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => 'reboot server'
 			],
-			[
+			'update_ipmi_host' => [
 				'name' => 'API test script.update - IPMI (host)',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'command' => 'reboot server'
 			],
-			[
+			'update_ssh_pwd' => [
 				'name' => 'API test script.update - SSH password',
 				'type' => ZBX_SCRIPT_TYPE_SSH,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => 'reboot server',
 				'username' => 'John'
 			],
-			[
+			'update_ssh_key' => [
 				'name' => 'API test script.update - SSH public key',
 				'type' => ZBX_SCRIPT_TYPE_SSH,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
@@ -1014,20 +972,20 @@ class testScripts extends CAPITest {
 				'publickey' => 'pub-k',
 				'privatekey' => 'priv-k'
 			],
-			[
+			'update_telnet' => [
 				'name' => 'API test script.update - Telnet',
 				'type' => ZBX_SCRIPT_TYPE_TELNET,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => 'reboot server',
 				'username' => 'Jill'
 			],
-			[
+			'update_webhook' => [
 				'name' => 'API test script.update - Webhook no params',
 				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => 'reboot server'
 			],
-			[
+			'update_webhook_params' => [
 				'name' => 'API test script.update - Webhook with params',
 				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
@@ -1047,27 +1005,107 @@ class testScripts extends CAPITest {
 					]
 				]
 			],
-			[
+			'update_custom' => [
 				'name' => 'API test script.update - custom script',
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => 'reboot server'
 			],
-			[
+			'update_url' => [
 				'name' => 'API test script.update - URL',
 				'type' => ZBX_SCRIPT_TYPE_URL,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'url' => 'http://localhost/'
 			],
-			[
+			'update_action' => [
 				'name' => 'API test script.update action',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => 'reboot server'
 			],
+			'update_existing_name_one_fail' => [
+				'name' => 'API test script.update name - A, default path (fail)',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server'
+			],
+			'update_existing_name_two_fail' => [
+				'name' => 'API test script.update name - B, default path (fail)',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_menu_path_one_fail' => [
+				'name' => 'API test script.update menu_path, custom path (fail)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_menu_path_two_fail' => [
+				'name' => 'API test script.update menu_path, custom path (fail)',
+				'menu_path' => 'folder3/folder4',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_both_one_fail' => [
+				'name' => 'API test script.update both - A, custom path (fail)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_both_two_fail' => [
+				'name' => 'API test script.update both - B, custom path (fail)',
+				'menu_path' => 'folder3/folder4',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_both_one_success' => [
+				'name' => 'API test script.update both - C, custom path (success)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_both_two_success' => [
+				'name' => 'API test script.update both - D, custom path (success)',
+				'menu_path' => 'folder3/folder4',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_scope_one_fail' => [
+				'name' => 'API test script.update scope (fail)',
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_scope_two_fail' => [
+				'name' => 'API test script.update scope (fail)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_scope_one_success' => [
+				'name' => 'API test script.update scope - A (success)',
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
+			'update_existing_scope_two_success' => [
+				'name' => 'API test script.update scope - B (success)',
+				'menu_path' => 'folder1/folder2',
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'command' => 'reboot server'
+			],
 
 			// script.getScriptsByHosts
-			[
+			'get_hosts_url' => [
 				'name' => 'API test script.getScriptsByHosts - URL',
 				'type' => ZBX_SCRIPT_TYPE_URL,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
@@ -1076,7 +1114,7 @@ class testScripts extends CAPITest {
 					' {$DOESNOTEXIST}, {HOST.ID}, {HOST.HOST}, {HOST.NAME}, {HOST.CONN}, {HOST.DNS}, {HOST.PORT},'.
 					' {HOST.NAME1}, {HOST.NAME2}, {EVENT.ID}, {EVENT.NAME}, {EVENT.NSEVERITY}, {EVENT.SEVERITY}'
 			],
-			[
+			'get_hosts_ipmi' => [
 				'name' => 'API test script.getScriptsByHosts - IPMI',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
@@ -1086,7 +1124,7 @@ class testScripts extends CAPITest {
 					' {INVENTORY.OS2}, {HOSTGROUP.ID}',
 				'usrgrpid' => self::$data['usrgrpids']['admin']
 			],
-			[
+			'get_hosts_webhook' => [
 				'name' => 'API test script.getScriptsByHosts - Webhook',
 				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
@@ -1095,7 +1133,7 @@ class testScripts extends CAPITest {
 					' {HOST.IP}, {HOST.DNS}, {HOST.PORT}',
 				'usrgrpid' => self::$data['usrgrpids']['user']
 			],
-			[
+			'get_hosts_ssh' => [
 				'name' => 'API test script.getScriptsByHosts - SSH password',
 				'type' => ZBX_SCRIPT_TYPE_SSH,
 				'scope' => ZBX_SCRIPT_SCOPE_HOST,
@@ -1107,7 +1145,7 @@ class testScripts extends CAPITest {
 			],
 
 			// script.getScriptsByEvents
-			[
+			'get_events_url' => [
 				'name' => 'API test script.getScriptsByEvents - URL',
 				'type' => ZBX_SCRIPT_TYPE_URL,
 				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
@@ -1116,7 +1154,7 @@ class testScripts extends CAPITest {
 					' {$DOESNOTEXIST}, {HOST.ID}, {HOST.HOST}, {HOST.NAME}, {HOST.CONN}, {HOST.DNS}, {HOST.PORT},'.
 					' {HOST.NAME1}, {HOST.NAME2}, {EVENT.ID}, {EVENT.NAME}, {EVENT.NSEVERITY}, {EVENT.SEVERITY}'
 			],
-			[
+			'get_events_ipmi' => [
 				'name' => 'API test script.getScriptsByEvents - IPMI',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
@@ -1126,7 +1164,7 @@ class testScripts extends CAPITest {
 					' {INVENTORY.OS2}, {EVENT.STATUS}, {EVENT.VALUE}, {HOSTGROUP.ID}',
 				'usrgrpid' => self::$data['usrgrpids']['admin']
 			],
-			[
+			'get_events_webhook' => [
 				'name' => 'API test script.getScriptsByEvents - Webhook',
 				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
 				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
@@ -1135,7 +1173,7 @@ class testScripts extends CAPITest {
 					' {HOST.IP}, {HOST.DNS}, {HOST.PORT}',
 				'usrgrpid' => self::$data['usrgrpids']['user']
 			],
-			[
+			'get_events_ssh' => [
 				'name' => 'API test script.getScriptsByEvents - SSH password',
 				'type' => ZBX_SCRIPT_TYPE_SSH,
 				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
@@ -1145,76 +1183,62 @@ class testScripts extends CAPITest {
 				'confirmation' => 'Confirmation macros: {$GLOBAL_MACRO}, {HOST.HOST}, {USER.FULLNAME}, {HOST.CONN},'.
 					' {HOST.IP}, {HOST.DNS}, {HOST.PORT}, {INVENTORY.ALIAS}, {INVENTORY.OS}, {INVENTORY.TYPE}'
 			],
-			[
+			'get_events_url_cause'=> [
 				'name' => 'API test script.getScriptsByEvents - URL cause',
 				'type' => ZBX_SCRIPT_TYPE_URL,
 				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 				'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 				'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME}, {EVENT.CAUSE.NSEVERITY},'.
 					' {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS}, {EVENT.CAUSE.VALUE}'
+			],
+
+			// script.create - to check existing names and menu paths.
+			'create_existing_default_fail' => [
+				'name' => 'API test script.create - A, default path (fail)',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server'
+			],
+			'create_existing_custom_fail' => [
+				'name' => 'API test script.create - B, custom path (fail)',
+				'menu_path' => 'folder1/folder2',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server'
+			],
+			'create_existing_custom_success' => [
+				'name' => 'API test script.create - C, custom path (success)',
+				'menu_path' => 'folder1/folder2',
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'command' => 'reboot server'
 			]
 		];
-		$scripts = CDataHelper::call('script.create', $scripts_data);
-		$this->assertArrayHasKey('scriptids', $scripts, 'prepareScriptsData() failed: Could not create scripts.');
-		self::$data['scriptids']['get_custom_defaults'] = $scripts['scriptids'][0];
-		self::$data['scriptids']['get_ipmi_defaults'] = $scripts['scriptids'][1];
-		self::$data['scriptids']['get_webhook_filter'] = $scripts['scriptids'][2];
-		self::$data['scriptids']['get_url'] = $scripts['scriptids'][3];
-		self::$data['scriptids']['get_inherit_a_r'] = $scripts['scriptids'][4];
-		self::$data['scriptids']['get_inherit_b_rw'] = $scripts['scriptids'][5];
-		self::$data['scriptids']['get_inherit_d_r'] = $scripts['scriptids'][6];
-		self::$data['scriptids']['exec_usrgrp_admin'] = $scripts['scriptids'][7];
-		self::$data['scriptids']['exec_usrgrp_user'] = $scripts['scriptids'][8];
-		self::$data['scriptids']['exec_hstgrp'] = $scripts['scriptids'][9];
-		self::$data['scriptids']['exec_url'] = $scripts['scriptids'][10];
-		self::$data['scriptids']['delete_single'] = $scripts['scriptids'][11];
-		self::$data['scriptids']['delete_multi_1'] = $scripts['scriptids'][12];
-		self::$data['scriptids']['delete_multi_2'] = $scripts['scriptids'][13];
-		self::$data['scriptids']['delete_action'] = $scripts['scriptids'][14];
-		self::$data['scriptids']['update_ipmi'] = $scripts['scriptids'][15];
-		self::$data['scriptids']['update_ipmi_host'] = $scripts['scriptids'][16];
-		self::$data['scriptids']['update_ssh_pwd'] = $scripts['scriptids'][17];
-		self::$data['scriptids']['update_ssh_key'] = $scripts['scriptids'][18];
-		self::$data['scriptids']['update_telnet'] = $scripts['scriptids'][19];
-		self::$data['scriptids']['update_webhook'] = $scripts['scriptids'][20];
-		self::$data['scriptids']['update_webhook_params'] = $scripts['scriptids'][21];
-		self::$data['scriptids']['update_custom'] = $scripts['scriptids'][22];
-		self::$data['scriptids']['update_url'] = $scripts['scriptids'][23];
-		self::$data['scriptids']['update_action'] = $scripts['scriptids'][24];
-		self::$data['scriptids']['get_hosts_url'] = $scripts['scriptids'][25];
-		self::$data['scriptids']['get_hosts_ipmi'] = $scripts['scriptids'][26];
-		self::$data['scriptids']['get_hosts_webhook'] = $scripts['scriptids'][27];
-		self::$data['scriptids']['get_hosts_ssh'] = $scripts['scriptids'][28];
-		self::$data['scriptids']['get_events_url'] = $scripts['scriptids'][29];
-		self::$data['scriptids']['get_events_ipmi'] = $scripts['scriptids'][30];
-		self::$data['scriptids']['get_events_webhook'] = $scripts['scriptids'][31];
-		self::$data['scriptids']['get_events_ssh'] = $scripts['scriptids'][32];
-		self::$data['scriptids']['get_events_url_cause'] = $scripts['scriptids'][33];
+
+		// Try to create scripts. In case of failure, print the exception message and revert changes.
+		try {
+			$scripts = CDataHelper::call('script.create', array_values($scripts_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('user.delete', self::$data['userids']);
+			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+			CDataHelper::call('role.delete', self::$data['roleids']);
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
+		self::$data['scriptids'] = array_combine(array_keys($scripts_data), $scripts['scriptids']);
 
 		// Create actions that use scripts to test script.delete.
 		$actions_data = [
-			[
-				'name' => 'API test script.delete action',
-				'eventsource' => EVENT_SOURCE_TRIGGERS,
-				'operations' => [
-					[
-						'operationtype' => OPERATION_TYPE_COMMAND,
-						'esc_period' => '0s',
-						'esc_step_from' => 1,
-						'esc_step_to' => 2,
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'opcommand_grp' => [
-							[
-								'groupid' => self::$data['groupids']['rw']
-							]
-						],
-						'opcommand' => [
-							'scriptid' => self::$data['scriptids']['delete_action']
-						]
-					]
-				]
-			],
-			[
+			'update' => [
 				'name' => 'API test script.update action',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'operations' => [
@@ -1234,12 +1258,51 @@ class testScripts extends CAPITest {
 						]
 					]
 				]
+			],
+			'delete' => [
+				'name' => 'API test script.delete action',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_COMMAND,
+						'esc_period' => '0s',
+						'esc_step_from' => 1,
+						'esc_step_to' => 2,
+						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+						'opcommand_grp' => [
+							[
+								'groupid' => self::$data['groupids']['rw']
+							]
+						],
+						'opcommand' => [
+							'scriptid' => self::$data['scriptids']['delete_action']
+						]
+					]
+				]
 			]
 		];
-		$actions = CDataHelper::call('action.create', $actions_data);
-		$this->assertArrayHasKey('actionids', $actions, 'prepareScriptsData() failed: Could not create actions.');
-		self::$data['actionids']['update'] = $actions['actionids'][0];
-		self::$data['actionids']['delete'] = $actions['actionids'][1];
+
+		// Try to create actions. In case of failure, print the exception message and revert changes.
+		try {
+			$actions = CDataHelper::call('action.create', array_values($actions_data));
+		}
+		catch (Exception $e) {
+			CDataHelper::call('script.delete', self::$data['scriptids']);
+			CDataHelper::call('user.delete', self::$data['userids']);
+			CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
+			CDataHelper::call('role.delete', self::$data['roleids']);
+			CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
+			CDataHelper::call('host.delete', self::$data['hostids']);
+			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+			$this->assertTrue(false, $e->getMessage());
+		}
+
+		self::$data['actionids'] = array_combine(array_keys($actions_data), $actions['actionids']);
 	}
 
 	/**
@@ -1247,7 +1310,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptCreateDataInvalid() {
+	public static function getScriptCreateInvalid(): array {
 		return [
 			'Test script.create missing fields' => [
 				'script' => [],
@@ -1522,31 +1585,151 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			'Test script.create existing name' => [
+
+			// Check existing names in DB.
+			'Test script.create existing name in default menu_path' => [
 				'script' => [
-					'name' => 'Ping',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+					'name' => 'API test script.create - A, default path (fail)',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
 					'command' => 'reboot server'
 				],
-				'expected_error' => 'Script "Ping" already exists.'
+				'expected_error' => 'Script "API test script.create - A, default path (fail)" already exists.'
 			],
-			'Test script.create duplicate name' => [
+			'Test script.create existing name in identical menu_path (fail)' => [
+				'script' => [
+					'name' => 'API test script.create - B, custom path (fail)',
+					'menu_path' => 'folder1/folder2',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API test script.create - B, custom path (fail)" already exists.'
+			],
+			'Test script.create existing name in custom menu_path with leading slash' => [
+				'script' => [
+					'name' => 'API test script.create - B, custom path (fail)',
+					'menu_path' => '/folder1/folder2',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API test script.create - B, custom path (fail)" already exists.'
+			],
+			'Test script.create existing name in custom menu_path with trailing slash' => [
+				'script' => [
+					'name' => 'API test script.create - B, custom path (fail)',
+					'menu_path' => 'folder1/folder2/',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API test script.create - B, custom path (fail)" already exists.'
+			],
+			'Test script.create existing name in custom menu_path with both leading and trailing slashes' => [
+				'script' => [
+					'name' => 'API test script.create - B, custom path (fail)',
+					'menu_path' => '/folder1/folder2/',
+					'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API test script.create - B, custom path (fail)" already exists.'
+			],
+
+			// Check duplicate names in input.
+			'Test script.create duplicate name with default menu_path in input' => [
 				'script' => [
 					[
-						'name' => 'Scripts with the same name',
+						'name' => 'Script with same name',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 						'command' => 'reboot server'
 					],
 					[
-						'name' => 'Scripts with the same name',
+						'name' => 'Script with same name',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 						'command' => 'reboot server'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, ) already exists.'
+			],
+			'Test script.create duplicate name with custom identical menu_path in input' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.create duplicate name with custom same menu_path in input with leading slash' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'menu_path' => '/folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.create duplicate name with custom same menu_path in input with trailing slash' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2/',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.create duplicate name with custom same menu_path in input with both leading and trailing slashes' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'menu_path' => 'folder1/folder2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'menu_path' => '/folder1/folder2/',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
 			],
 
 			// Check script menu path.
@@ -2697,7 +2880,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptCreateDataValid() {
+	public static function getScriptCreateValid(): array {
 		return [
 			'Test script.create successful UTF-8 name' => [
 				'script' => [
@@ -2937,6 +3120,20 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+
+			// Check name and menu_path create.
+			'Test script.create successful script with existing name in different menu_path' => [
+				'script' => [
+					[
+						'name' => 'API test script.create - C, custom path (success)',
+						'menu_path' => 'folder3/folder4',
+						'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -2944,10 +3141,10 @@ class testScripts extends CAPITest {
 	/**
 	 * Test script.create with errors like missing fields, optional invalid fields and valid fields.
 	 *
-	 * @dataProvider getScriptCreateDataInvalid
-	 * @dataProvider getScriptCreateDataValid
+	 * @dataProvider getScriptCreateInvalid
+	 * @dataProvider getScriptCreateValid
 	 */
-	public function testScript_Create($scripts, $expected_error) {
+	public function testScript_Create($scripts, $expected_error): void {
 		// Accept single and multiple scripts just like API method. Work with multi-dimensional array in result.
 		if (!array_key_exists(0, $scripts)) {
 			$scripts = zbx_toArray($scripts);
@@ -3249,7 +3446,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptGetInheritance() {
+	public static function getScriptGetInheritance(): array {
 		return [
 			// This is a top group, nothing to inherit from.
 			'Test script.get top level group' => [
@@ -3444,7 +3641,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @dataProvider getScriptGetInheritance
 	 */
-	public function testScripts_GetInheritance($request, $expected_result) {
+	public function testScripts_GetInheritance($request, $expected_result): void {
 		if (array_key_exists('login', $request)) {
 			$this->authorize($request['login']['user'], $request['login']['password']);
 			unset($request['login']);
@@ -3527,7 +3724,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptGetInvalid() {
+	public static function getScriptGetInvalid(): array {
 		return [
 			// Check expected params.
 			'Test script.get unexpected field' => [
@@ -3911,7 +4108,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptGetValid() {
+	public static function getScriptGetValid(): array {
 		return [
 			// Check validity if "scriptids" without getting any results.
 			'Test script.get empty "scriptids" parameter' => [
@@ -4238,7 +4435,7 @@ class testScripts extends CAPITest {
 	 * @dataProvider getScriptGetInvalid
 	 * @dataProvider getScriptGetValid
 	 */
-	public function testScripts_Get($request, $expected_results, $expected_error) {
+	public function testScripts_Get($request, $expected_results, $expected_error): void {
 		// Replace ID placeholders with real IDs.
 		$request = self::resolveIds($request);
 
@@ -4273,7 +4470,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptUpdateInvalid() {
+	public static function getScriptUpdateInvalid(): array {
 		return [
 			// Check script ID.
 			'Test script.update empty request' => [
@@ -4312,28 +4509,156 @@ class testScripts extends CAPITest {
 				]],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			'Test script.update existing name' => [
+
+			// Check existing names in DB.
+			'Test script.update existing name in default menu_path' => [
 				'script' => [[
-					'scriptid' => 'update_telnet',
-					'name' => 'API test script.update - IPMI',
-					'type' => ZBX_SCRIPT_TYPE_IPMI,
-					'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-					'command' => 'reboot server'
+					'scriptid' => 'update_existing_name_two_fail',
+					'name' => 'API test script.update name - A, default path (fail)'
 				]],
-				'expected_error' => 'Script "API test script.update - IPMI" already exists.'
+				'expected_error' => 'Script "API test script.update name - A, default path (fail)" already exists.'
 			],
-			'Test script.update same name' => [
+			'Test script.update existing name in identical menu_path' => [
+				'script' => [
+					'scriptid' => 'update_existing_menu_path_two_fail',
+					'menu_path' => 'folder1/folder2'
+				],
+				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name in custom menu_path with leading slash' => [
+				'script' => [
+					'scriptid' => 'update_existing_menu_path_two_fail',
+					'menu_path' => '/folder1/folder2'
+				],
+				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name in custom menu_path with trailing slash' => [
+				'script' => [
+					'scriptid' => 'update_existing_menu_path_two_fail',
+					'menu_path' => 'folder1/folder2/'
+				],
+				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name in custom menu_path with both leading and trailing slashes' => [
+				'script' => [
+					'scriptid' => 'update_existing_menu_path_two_fail',
+					'menu_path' => '/folder1/folder2/'
+				],
+				'expected_error' => 'Script "API test script.update menu_path, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name and menu_path' => [
+				'script' => [
+					'scriptid' => 'update_existing_both_two_fail',
+					'name' => 'API test script.update both - A, custom path (fail)',
+					'menu_path' => 'folder1/folder2'
+				],
+				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name and menu_path with leading slash' => [
+				'script' => [
+					'scriptid' => 'update_existing_both_two_fail',
+					'name' => 'API test script.update both - A, custom path (fail)',
+					'menu_path' => '/folder1/folder2'
+				],
+				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name and menu_path with trailing slash' => [
+				'script' => [
+					'scriptid' => 'update_existing_both_two_fail',
+					'name' => 'API test script.update both - A, custom path (fail)',
+					'menu_path' => 'folder1/folder2/'
+				],
+				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
+			],
+			'Test script.update existing name and menu_path with both leading and traling slashes' => [
+				'script' => [
+					'scriptid' => 'update_existing_both_two_fail',
+					'name' => 'API test script.update both - A, custom path (fail)',
+					'menu_path' => '/folder1/folder2/'
+				],
+				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
+			],
+			'Test script.update existing scope change' => [
+				'script' => [
+					'scriptid' => 'update_existing_scope_two_fail',
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION
+				],
+				'expected_error' => 'Script "API test script.update scope (fail)" already exists.'
+			],
+
+			// Check duplicate names in input.
+			'Test script.update duplicate name with default menu_path in input' => [
 				'script' => [
 					[
 						'scriptid' => 'update_ipmi',
-						'name' => 'Scripts with the same name'
+						'name' => 'Script with same name'
 					],
 					[
 						'scriptid' => 'update_telnet',
-						'name' => 'Scripts with the same name'
+						'name' => 'Script with same name'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, ) already exists.'
+			],
+			'Test script.update duplicate name with custom identical menu_path in input' => [
+				'script' => [
+					[
+						'scriptid' => 'update_ipmi',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					],
+					[
+						'scriptid' => 'update_telnet',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.update duplicate name with custom same menu_path in input with leading slash' => [
+				'script' => [
+					[
+						'scriptid' => 'update_ipmi',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					],
+					[
+						'scriptid' => 'update_telnet',
+						'menu_path' => '/folder1/folder2',
+						'name' => 'Script with same name'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.update duplicate name with custom same menu_path in input with trailing slash' => [
+				'script' => [
+					[
+						'scriptid' => 'update_ipmi',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					],
+					[
+						'scriptid' => 'update_telnet',
+						'menu_path' => 'folder1/folder2/',
+						'name' => 'Script with same name'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
+			],
+			'Test script.update duplicate name with custom same menu_path in input with both leading and trailing slashes' => [
+				'script' => [
+					[
+						'scriptid' => 'update_ipmi',
+						'menu_path' => 'folder1/folder2',
+						'name' => 'Script with same name'
+					],
+					[
+						'scriptid' => 'update_telnet',
+						'menu_path' => '/folder1/folder2/',
+						'name' => 'Script with same name'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, folder1/folder2) already exists.'
 			],
 
 			// Check script command.
@@ -5174,7 +5499,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptUpdateValid() {
+	public static function getScriptUpdateValid(): array {
 		return [
 			'Test script.update successful custom script update without changes' => [
 				'script' => [
@@ -6034,6 +6359,27 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+
+			// Check name, menu_path and scope update.
+			'Test script.update successful script with existing name in different menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 'update_existing_both_two_success',
+						'name' => 'API test script.update both - C, custom path (success)',
+						'menu_path' => 'folder5/folder6'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test script.update successful script scope change' => [
+				'script' => [
+					[
+						'scriptid' => 'update_existing_scope_two_success',
+						'scope' => ZBX_SCRIPT_SCOPE_ACTION
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -6044,7 +6390,7 @@ class testScripts extends CAPITest {
 	 * @dataProvider getScriptUpdateInvalid
 	 * @dataProvider getScriptUpdateValid
 	 */
-	public function testScript_Update($scripts, $expected_error) {
+	public function testScript_Update($scripts, $expected_error): void {
 		// Accept single and multiple scripts just like API method. Work with multi-dimensional array in result.
 		if (!array_key_exists(0, $scripts)) {
 			$scripts = zbx_toArray($scripts);
@@ -6660,7 +7006,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptDeleteInvalid() {
+	public static function getScriptDeleteInvalid(): array {
 		return [
 			// Check script IDs.
 			'Test script.delete with empty ID' => [
@@ -6689,7 +7035,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptDeleteValid() {
+	public static function getScriptDeleteValid(): array {
 		return [
 			// Successfully delete scripts.
 			'Test script.delete' => [
@@ -6713,7 +7059,7 @@ class testScripts extends CAPITest {
 	 * @dataProvider getScriptDeleteInvalid
 	 * @dataProvider getScriptDeleteValid
 	 */
-	public function testScript_Delete($scriptids, $expected_error) {
+	public function testScript_Delete($scriptids, $expected_error): void {
 		// Replace ID placeholders with real IDs.
 		foreach ($scriptids as &$scriptid) {
 			if ($scriptid != '0' && $scriptid !== '' && $scriptid !== null && $scriptid != 999999
@@ -6761,7 +7107,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptExecuteInvalid() {
+	public static function getScriptExecuteInvalid(): array {
 		return [
 			// Check unexpected parameters.
 			'Test script.execute unexpected parameter "value"' => [
@@ -6866,7 +7212,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @dataProvider getScriptExecuteInvalid
 	 */
-	public function testScripts_Execute($script, $expected_error) {
+	public function testScripts_Execute($script, $expected_error): void {
 		// Replace ID placeholders with real IDs.
 		$script = self::resolveIds($script);
 
@@ -6878,7 +7224,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptPermissions() {
+	public static function getScriptPermissions(): array {
 		return [
 			// User has permissions to host, but not to script (script can execute only specific user group).
 			'Test script.execute script permissions' => [
@@ -6972,7 +7318,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @dataProvider getScriptPermissions
 	 */
-	public function testScripts_Permissions($method, $login, $script, $expected_error) {
+	public function testScripts_Permissions($method, $login, $script, $expected_error): void {
 		// Replace ID placeholders with real IDs.
 		$script = self::resolveIds($script);
 
@@ -6985,7 +7331,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptsByHostsDataInvalid() {
+	public static function getScriptsByHostsInvalid(): array {
 		return [
 			'Test script.getScriptsByHosts invalid fields' => [
 				'request' => [
@@ -7011,7 +7357,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptsByHostsDataValid() {
+	public static function getScriptsByHostsValid(): array {
 		return [
 			'Test script.getScriptsByHosts with superadmin' => [
 				'request' => [
@@ -8135,10 +8481,10 @@ class testScripts extends CAPITest {
 	 * Test script.getScriptsByHosts with various users. Checks if result has host IDs keys, script IDs, resolves macros
 	 * for script and compares results.
 	 *
-	 * @dataProvider getScriptsByHostsDataInvalid
-	 * @dataProvider getScriptsByHostsDataValid
+	 * @dataProvider getScriptsByHostsInvalid
+	 * @dataProvider getScriptsByHostsValid
 	 */
-	public function testScripts_GetScriptsByHosts($request, $expected_result, $expected_error) {
+	public function testScripts_GetScriptsByHosts($request, $expected_result, $expected_error): void {
 		if (array_key_exists('login', $request)) {
 			$this->authorize($request['login']['user'], $request['login']['password']);
 		}
@@ -8199,7 +8545,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptsByEventsDataInvalid() {
+	public static function getScriptsByEventsInvalid(): array {
 		return [
 			'Test script.getScriptsByEvents invalid fields' => [
 				'request' => [
@@ -8225,7 +8571,7 @@ class testScripts extends CAPITest {
 	 *
 	 * @return array
 	 */
-	public static function getScriptsByEventsDataValid() {
+	public static function getScriptsByEventsValid(): array {
 		return [
 			'Test script.getScriptsByEvents with superadmin' => [
 				'request' => [
@@ -9847,10 +10193,10 @@ class testScripts extends CAPITest {
 	 * Test script.getScriptsByHEvents with various users. Checks if result has host IDs keys, script IDs, resolves
 	 * macros for script and compares results.
 	 *
-	 * @dataProvider getScriptsByEventsDataInvalid
-	 * @dataProvider getScriptsByEventsDataValid
+	 * @dataProvider getScriptsByEventsInvalid
+	 * @dataProvider getScriptsByEventsValid
 	 */
-	public function testScripts_GetScriptsByEvents($request, $expected_result, $expected_error) {
+	public function testScripts_GetScriptsByEvents($request, $expected_result, $expected_error): void {
 		if (array_key_exists('login', $request)) {
 			$this->authorize($request['login']['user'], $request['login']['password']);
 		}
@@ -9992,7 +10338,7 @@ class testScripts extends CAPITest {
 	/**
 	 * Delete all created data after test.
 	 */
-	public static function clearData() {
+	public static function clearData(): void {
 		// Delete actions.
 		CDataHelper::call('action.delete', self::$data['actionids']);
 
@@ -10007,15 +10353,23 @@ class testScripts extends CAPITest {
 		// Delete user groups.
 		CDataHelper::call('usergroup.delete', self::$data['usrgrpids']);
 
+		// Delete user roles.
+		CDataHelper::call('role.delete', self::$data['roleids']);
+
 		// Delete global macro.
 		CDataHelper::call('usermacro.deleteglobal', [self::$data['usermacroid']]);
 
 		// Delete hosts (items, triggers are deleted as well).
 		CDataHelper::call('host.delete', self::$data['hostids']);
 
-		// All events have to be deleted manually.
+		/*
+		 * All events and newly insterted housekeepter data (created by trigger.delete and item.delete) have to be
+		 * deleted manually.
+		 */
 		DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 		DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
+		DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
+		DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
 
 		// Delete hosts groups.
 		CDataHelper::call('hostgroup.delete', self::$data['groupids']);
