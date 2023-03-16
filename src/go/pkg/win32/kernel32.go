@@ -210,16 +210,15 @@ func GetNativeSystemInfo() (sysInfo SystemInfo) {
 }
 
 func GetComputerNameExA(name_type int) (name string, err error) {
+	var ret uintptr
 	size := uint32(0)
-	_, _, err = syscall.Syscall(getComputerNameExA, 3, 0, 0, uintptr(unsafe.Pointer(&size)))
-	if err != nil {
-		return "", err 
-	}
+
+	syscall.Syscall(getComputerNameExA, 3, uintptr(name_type), 0, uintptr(unsafe.Pointer(&size)))
 
 	buffer := make([]byte, size)
-	_, _, err = syscall.Syscall(getComputerNameExA, 3, 0, uintptr(unsafe.Pointer(&buffer[0])), uintptr(unsafe.Pointer(&size)))
-	if err != nil {
-		return "", err 
+	ret, _, err = syscall.Syscall(getComputerNameExA, 3, uintptr(name_type), uintptr(unsafe.Pointer(&buffer[0])), uintptr(unsafe.Pointer(&size)))
+	if ret == 0 && err != nil {
+		return "", err
 	}
 
 	return string(buffer[:size]), nil

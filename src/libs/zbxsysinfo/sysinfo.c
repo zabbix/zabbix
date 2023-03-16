@@ -2037,7 +2037,30 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname, const char *fqdn_command)
+void	get_fqdn(char **hostname)
+{
+	char*			buffer[MAX_STRING_LEN];
+	struct addrinfo		hints = {0};
+	struct addrinfo*	res = NULL;
+
+	buffer[MAX_STRING_LEN - 1] = '\0';
+
+	/* check for successful call to the gethostname and check that data fits in the buffer */
+	if (0 == gethostname((char *)buffer ,MAX_STRING_LEN - 1) && MAX_STRING_LEN -2 > strlen((char *)buffer))
+	{
+		*hostname = zbx_strdup(*hostname, (char *)buffer);
+	}
+
+	hints.ai_family=AF_UNSPEC;
+	hints.ai_flags=AI_CANONNAME;
+
+	if (0 == getaddrinfo(*hostname, 0, &hints, &res)) {
+		*hostname = zbx_strdup(*hostname, res->ai_canonname);
+		freeaddrinfo(res);
+	}
+}
+
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
 {
 	char	*type, *transform;
 
@@ -2055,23 +2078,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		}
 		else if (0 == strcmp(type, "fqdn"))
 		{
-			FILE	*f;
-			char	tmp[MAX_STRING_LEN];
-
-			if (NULL == (f = popen(fqdn_command, "r")))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot get the FQDN."));
-				return FAIL;
-			}
-
-			if (NULL != zbx_fgets(tmp, sizeof(tmp), f))
-			{
-				zbx_rtrim(tmp, " \r\n.");
-				hostname = zbx_strdup(hostname, tmp);
-			}
-
-			if (0 != f)
-				pclose(f);
+			get_fqdn(&hostname);
 		}
 		else if (0 == strcmp(type, "netbios"))
 		{
