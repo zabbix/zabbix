@@ -114,9 +114,16 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 
 	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
-	request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1);
-	if (NULL != request)
+
+	if (NULL != (request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1)))
 	{
+		zbx_es_env_t	*env;
+
+		if (NULL == (env = zbx_es_get_env(ctx)))
+			return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+		env->http_req_objects--;
+
 		if (NULL != request->headers)
 			curl_slist_free_all(request->headers);
 		if (NULL != request->handle)
