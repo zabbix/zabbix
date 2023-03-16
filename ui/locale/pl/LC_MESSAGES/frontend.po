@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-11-14 19:06+0000\n"
-"Last-Translator: Maksym <maksym.paruzel@gmail.com>\n"
+"PO-Revision-Date: 2023-03-08 23:14+0000\n"
+"Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -3211,6 +3211,11 @@ msgstr "Nie można zaktualizować wykrytego wykresu."
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Nie można zaktualizować wykrytej grupy hostów \"%1$s\"."
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "Nie można zaktualizować wykresu pochodzącego z szablonu \"%1$s\"."
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -4107,6 +4112,10 @@ msgstr "Zaktualizowano konfigurację"
 msgid "Configure DB connection"
 msgstr "Konfiguruj połączenie DB"
 
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr "Potwierdź zmiany"
+
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
 msgstr "Tekst potwierdzenia"
@@ -4444,7 +4453,7 @@ msgstr "Utwórz pulpit"
 
 #: jsLoader.php:359
 msgid "Create dependent discovery rule"
-msgstr "Tworzenie niezależnej reguły wykrywania"
+msgstr "Utwórz zależną regułę wykrywania"
 
 #: jsLoader.php:358
 msgid "Create dependent item"
@@ -6354,6 +6363,10 @@ msgstr "Włącz"
 msgid "Enable HTTP authentication"
 msgstr "Włącz autentykację HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr "Włącz uwierzytelnienie HTTP dla wszystkich użytkowników."
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Włącz autentykację LDAP"
@@ -7067,6 +7080,11 @@ msgstr "Brak wartości w polu \"%1$s\" dla mapy \"%2$s\"."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Pole \"%1$s\" jest niewłaściwe: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr "Pole \"%1$s\" jest niewłaściwe: %2$s."
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8577,6 +8595,10 @@ msgstr "Ta sama przestrzeń nazw (%1$s) jest używane przez moduły zlokalizowan
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Identyfikacja systemu. Zwraca ciąg znaków"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr "jeśli uwierzytelnianie HTTP zostanie włączone, wszyscy użytkownicy będą uwierzytelniani przez serwer web, a nie przez Zabbix (dotyczy również użytkowników z ustawionym dostępem do frontendu przez LDAP/wewnętrzny)."
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -16338,6 +16360,10 @@ msgstr "Usługi tworzą cykliczną zależność."
 msgid "Services updated"
 msgstr "Zaktualizowano usługi"
 
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr "Oczekiwany jest ID sesji lub token."
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -20948,7 +20974,7 @@ msgstr "migotanie"
 
 #: include/classes/api/services/CItemGeneral.php:488
 msgid "both username and password should be either present or empty"
-msgstr "zarówna nazwa użytkownika i hasło powinny być obecne lub puste"
+msgstr "zarówno nazwa użytkownika i hasło powinny być obecne lub puste"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"
@@ -21530,6 +21556,10 @@ msgstr "niewłaściwa metoda agregacji"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "niepoprawna sekwencja bajtów w UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr "niewłaściwy typ danych"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"

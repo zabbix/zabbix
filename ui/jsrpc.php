@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -414,6 +414,10 @@ switch ($data['method']) {
 					'searchByAny' => true,
 					'limit' => $limit
 				]);
+
+				if (array_key_exists('context', $data) && strpos('system', $data['search']) !== false) {
+					array_unshift($users, ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => '']);
+				}
 
 				if ($users) {
 					CArrayHelper::sort($users, [

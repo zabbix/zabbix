@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3096,7 +3096,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 	get_escalation_events(events, esc_events);
 
@@ -3318,7 +3318,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 
 	if (0 == actions.values_num)

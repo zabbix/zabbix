@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ $url = (new CUrl('graphs.php'))
 
 // Create form.
 $graphForm = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('graphForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -88,7 +89,7 @@ if ($discovered_graph) {
 $graphFormList
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], $readonly))
+		(new CTextBox('name', $data['name'], $readonly, DB::getFieldLength('graphs', 'name')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -109,7 +110,7 @@ $graphFormList
 			->setFocusableElementId('label-graphtype')
 			->setValue($data['graphtype'])
 			->addOptions(CSelect::createOptionsFromArray(graphType()))
-			->setDisabled($readonly)
+			->setReadonly($readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -473,7 +474,7 @@ if ($data['parent_discoveryid']) {
 $graphTab = (new CTabView())
 	->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'), $graphFormList);
 
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$graphTab->setSelected(0);
 }
 
@@ -497,7 +498,7 @@ if ($data['graphid'] != 0) {
 		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
 	);
 
-	if ($readonly) {
+	if ($readonly && $data['parent_discoveryid'] === null) {
 		$updateButton->setEnabled(false);
 	}
 

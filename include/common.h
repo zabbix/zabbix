@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "module.h"
 #include "version.h"
 #include "md5.h"
+#include "zbxprof.h"
 
 #if defined(__MINGW32__)
 #	define __try
@@ -453,6 +454,8 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HA_REMOVE_NODE		"ha_remove_node"
 #define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
 #define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
+#define ZBX_PROF_ENABLE			"prof_enable"
+#define ZBX_PROF_DISABLE		"prof_disable"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -999,6 +1002,8 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+#define ZBX_RTC_PROF_ENABLE			18
+#define ZBX_RTC_PROF_DISABLE			19
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -1207,6 +1212,9 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
 
+#define ZBX_STRQUOTE_DEFAULT		1
+#define ZBX_STRQUOTE_SKIP_BACKSLASH	0
+
 double		zbx_time(void);
 void		zbx_timespec(zbx_timespec_t *ts);
 double		zbx_current_time(void);
@@ -1231,7 +1239,7 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str);
+void	zbx_strquote_alloc_opt(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str, int option);
 
 void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
 
@@ -1363,12 +1371,10 @@ double	str2double(const char *str);
 #define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
 zbx_uint64_t	suffix2factor(char c);
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
 int	__zbx_open(const char *pathname, int flags);
-#elif defined(__MINGW32__)
-typedef struct _stat64	zbx_stat_t;
 #else
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
@@ -1687,7 +1693,28 @@ zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
 int	zbx_validate_value_dbl(double value, int dbl_precision);
 
-void	zbx_update_env(double time_now);
+void	__zbx_update_env(double time_now);
+
+#ifdef _WINDOWS
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	ZBX_UNUSED(info);				\
+}							\
+while (0)
+#else
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	zbx_prof_update(info, time_now);		\
+}							\
+while (0)
+#endif
+
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
 		int *nextcheck, int *scheduling, char **error);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
@@ -1773,6 +1800,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 /* */
 char	*zbx_substr(const char *src, size_t left, size_t right);
 char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
+char	*zbx_substr_unquote_opt(const char *src, size_t left, size_t right, int option);
 
 /* UTF-8 trimming */
 void	zbx_ltrim_utf8(char *str, const char *charlist);
@@ -1801,5 +1829,4 @@ typedef enum
 zbx_err_codes_t;
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
-int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ final class CItemData {
 			'system.stat[resource,<type>]',
 			'system.sw.arch',
 			'system.sw.os[<info>]',
-			'system.sw.packages[<package>,<manager>,<format>]',
+			'system.sw.packages[<regexp>,<manager>,<format>]',
 			'system.swap.in[<device>,<type>]',
 			'system.swap.out[<device>,<type>]',
 			'system.swap.size[<device>,<type>]',
@@ -113,8 +113,8 @@ final class CItemData {
 			'web.page.get[host,<path>,<port>]',
 			'web.page.perf[host,<path>,<port>]',
 			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
-			'wmi.get[<namespace>,<query>]',
-			'wmi.getall[<namespace>,<query>]',
+			'wmi.get[namespace,query]',
+			'wmi.getall[namespace,query]',
 			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
 			'zabbix.stats[<ip>,<port>]'
 		],
@@ -179,7 +179,7 @@ final class CItemData {
 			'system.stat[resource,<type>]',
 			'system.sw.arch',
 			'system.sw.os[<info>]',
-			'system.sw.packages[<package>,<manager>,<format>]',
+			'system.sw.packages[<regexp>,<manager>,<format>]',
 			'system.swap.in[<device>,<type>]',
 			'system.swap.out[<device>,<type>]',
 			'system.swap.size[<device>,<type>]',
@@ -212,7 +212,7 @@ final class CItemData {
 			'web.page.get[host,<path>,<port>]',
 			'web.page.perf[host,<path>,<port>]',
 			'web.page.regexp[host,<path>,<port>,regexp,<length>,<output>]',
-			'wmi.get[<namespace>,<query>]',
+			'wmi.get[namespace,query]',
 			'zabbix.stats[<ip>,<port>,queue,<from>,<to>]',
 			'zabbix.stats[<ip>,<port>]'
 		],
@@ -1114,7 +1114,7 @@ final class CItemData {
 				'description' => _('Operating system information. Returns string'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
-			'system.sw.packages[<package>,<manager>,<format>]' => [
+			'system.sw.packages[<regexp>,<manager>,<format>]' => [
 				'description' => _('Listing of installed packages. Returns text'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
@@ -1598,11 +1598,11 @@ final class CItemData {
 				'description' => _('Find string on a web page. Returns the matched string, or as specified by the optional output parameter'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
-			'wmi.get[<namespace>,<query>]' => [
+			'wmi.get[namespace,query]' => [
 				'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)'),
 				'value_type' => null
 			],
-			'wmi.getall[<namespace>,<query>]' => [
+			'wmi.getall[namespace,query]' => [
 				'description' => _('Execute WMI query and return the JSON document with all selected objects'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],

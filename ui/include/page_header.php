@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,12 +149,14 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$pageHeader->addCssFile('imgstore.php?css=1&output=css');
 	}
 
+	$tz_offsets = array_column((new DateTime())->getTimezone()->getTransitions(0, ZBX_MAX_DATE), 'offset', 'ts');
+
 	$pageHeader
 		->addJsFile((new CUrl('js/browsers.js'))->getUrl())
-		->addJsBeforeScripts(
-			'var PHP_TZ_OFFSET = '.date('Z').','.
-				'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
-		);
+		->addJsBeforeScripts('
+			const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
+			const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
+		');
 
 	// Show GUI messages in pages with menus and in fullscreen mode.
 	if (!defined('ZBX_PAGE_NO_JSLOADER')) {
@@ -186,7 +188,7 @@ if ($page['type'] != PAGE_TYPE_HTML || defined('ZBX_PAGE_NO_HEADER')) {
 	return null;
 }
 
-if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] == ZBX_LAYOUT_NORMAL) {
+if (!defined('ZBX_PAGE_NO_MENU') && $page['web_layout_mode'] == ZBX_LAYOUT_NORMAL && CWebUser::isLoggedIn()) {
 	echo (new CPartial('layout.htmlpage.aside', [
 		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : ''
 	]))->getOutput();

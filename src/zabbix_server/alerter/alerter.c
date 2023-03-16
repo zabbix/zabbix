@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -348,7 +348,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
-		zbx_update_env(time_read);
+		zbx_update_env(get_process_type_string(process_type), time_read);
 
 		switch (message.code)
 		{

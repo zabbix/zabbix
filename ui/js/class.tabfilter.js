@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -620,14 +620,14 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Update' button press.
 			 */
 			buttonUpdateAction: () => {
-				var params = this._active_item.getFilterParams();
+				var params = this._active_item.getFilterParams(false);
 
 				this.profileUpdate('properties', {
 					idx2: this._active_item._index,
 					value_str: params.toString()
 				})
 				.then(() => {
-					this._active_item.updateApplyUrl();
+					this._active_item.updateApplyUrl(false);
 					this._active_item.setBrowserLocation(params);
 					this._active_item.resetUnsavedState();
 				});
@@ -650,8 +650,8 @@ class CTabFilter extends CBaseComponent {
 			buttonApplyAction: () => {
 				this._active_item.unsetExpandedSubfilters();
 				this._active_item.emptySubfilter();
-				this._active_item.updateUnsavedState();
-				this._active_item.updateApplyUrl();
+				this._active_item.updateUnsavedState(false);
+				this._active_item.updateApplyUrl(false);
 				this._active_item.setBrowserLocationToApplyUrl();
 			},
 
@@ -731,6 +731,8 @@ class CTabFilter extends CBaseComponent {
 			stop: (_, ui) => {
 				const $item = ui.item;
 
+				ui.item[0].classList.remove(TABFILTERITEM_STYLE_FOCUSED);
+
 				/**
 				 * Remove inline style position, left and top that stay after sortable.
 				 * This styles broken tabs layout.
@@ -744,7 +746,8 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 			axis: 'x',
-			containment: 'parent'
+			containment: 'parent',
+			helper : 'clone'
 		});
 
 		const container = this._target.querySelector('.ui-sortable-container').parentNode;
