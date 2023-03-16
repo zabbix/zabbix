@@ -63,7 +63,7 @@ class CControllerModuleUpdate extends CController {
 
 		$module = API::Module()->get([
 			'output' => [],
-			'moduleids' => [$moduleid],
+			'moduleids' => $moduleid,
 			'preservekeys' => true
 		]);
 

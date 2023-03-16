@@ -58,16 +58,16 @@ class CControllerModuleEdit extends CController {
 			return false;
 		}
 
-		$modules = API::Module()->get([
+		$module = API::Module()->get([
 			'output' => ['relative_path', 'status'],
-			'moduleids' => [$this->getInput('moduleid')]
+			'moduleids' => $this->getInput('moduleid')
 		]);
 
-		if (!$modules) {
+		if (!$module) {
 			return false;
 		}
 
-		$this->module = $modules[0];
+		$this->module = $module[0];
 
 		return true;
 	}
