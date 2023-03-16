@@ -57,10 +57,7 @@ class CControllerWidgetMapView extends CControllerWidget {
 			}
 		}
 
-		if ($this->hasInput('current_sysmapid')) {
-			$sysmapid = $this->getInput('current_sysmapid');
-		}
-		elseif (array_key_exists('sysmapid', $fields)) {
+		if (array_key_exists('sysmapid', $fields)) {
 			$sysmapid =  $fields['sysmapid'];
 		}
 
