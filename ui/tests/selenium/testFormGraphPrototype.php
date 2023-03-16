@@ -406,7 +406,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'disabled');
+			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'readonly');
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='graphtype'][@disabled]");
@@ -693,13 +693,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		$this->zbxTestTabSwitch('Preview');
-
-		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//button[@id='update']", 'disabled');
-		}
-		else {
-			$this->zbxTestAssertElementNotPresentXpath("//button[@id='update'][@disabled]");
-		}
+		$this->zbxTestAssertElementNotPresentXpath("//button[@id='update'][@disabled]");
 
 		$this->zbxTestAssertVisibleId('cancel');
 		$this->zbxTestAssertElementText("//button[@id='cancel']", 'Cancel');

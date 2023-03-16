@@ -1,9 +1,28 @@
-Changes for 5.0.32rc1
+Changes for 5.0.33rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32
+
+5.0.32rc2 was released as 5.0.32 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32rc2
+
+Bug fixes:
+........S. [ZBX-22240] fixed invalid memory access during retrieval of historical data (dgoloscapov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32rc1
+
+Bug fixes:
+........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
+A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 .......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31
