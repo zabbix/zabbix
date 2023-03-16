@@ -90,15 +90,18 @@ typedef void (*zbx_clean_func_t)(void *data);
 	if ((a) > (b))			\
 		return +1
 
-#define ZBX_RETURN_IF_DBL_NOT_EQUAL(a, b)	\
-						\
-	if (FAIL == zbx_double_compare(a, b))	\
-	{					\
-		if ((a) < (b))			\
-			return -1;		\
-		else				\
-			return +1;		\
-	}
+#define ZBX_RETURN_IF_DBL_NOT_EQUAL(a, b)		\
+	do						\
+	{						\
+		if (FAIL == zbx_double_compare(a, b))	\
+		{					\
+			if ((a) < (b))			\
+				return -1;		\
+			else				\
+				return +1;		\
+		}					\
+	}						\
+	while(0)
 
 /* pair */
 

@@ -197,7 +197,7 @@ static int	get_swap_pages(swap_stat_t *result)
 #endif
 			ret = SYSINFO_RET_OK;
 			break;
-		};
+		}
 
 		zbx_fclose(f);
 	}

@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.0'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,10 +14,10 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/435429-discussion-thread-for-official-zabbix-template-docker
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Applications
@@ -991,7 +991,7 @@ zabbix_export:
               name: 'Docker: Version has changed'
               event_name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Docker version has changed. Ack to close.'
+              description: 'The Docker version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -

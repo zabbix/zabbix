@@ -354,16 +354,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->setEnabled(!$data['readonly']);
 		}
 		else {
-			$media_name = new CDiv([
-				$media['name'],
-				(new CSpan([
-					' ',
-					makeWarningIcon(
-						_('Media type disabled by Administration.')
-					)
-				]))
-			]);
-
+			$media_name = new CDiv([$media['name'], makeWarningIcon(_('Media type disabled by Administration.'))]);
 			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);
 		}
 

@@ -141,8 +141,8 @@ lld_override_codition_t;
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	unsigned char	type;
 
 	result = zbx_db_select(
@@ -179,8 +179,8 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  ******************************************************************************/
 static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *items)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0, i;
 	unsigned char		interface_type;
@@ -409,19 +409,20 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	}				\
 }
 
-#define SET_FLAG_UINT64(r, i, f)			\
-							\
-{							\
-	if (SUCCEED == zbx_db_is_null(r))		\
-		uint64_orig = 0;			\
-	else						\
-		ZBX_STR2UINT64(uint64_orig, (r));	\
-	if (uint64_orig != (i))				\
-	{						\
-		item->upd_flags |= f;			\
-		i##_orig = uint64_orig;			\
-	}						\
-}
+#define SET_FLAG_UINT64(r, i, f)				\
+	do							\
+	{							\
+		if (SUCCEED == zbx_db_is_null(r))		\
+			uint64_orig = 0;			\
+		else						\
+			ZBX_STR2UINT64(uint64_orig, (r));	\
+		if (uint64_orig != (i))				\
+		{						\
+			item->upd_flags |= f;			\
+			i##_orig = uint64_orig;			\
+		}						\
+	}							\
+	while(0)
 			item->key = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
 
@@ -513,8 +514,8 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 	zbx_lld_rule_condition_t	*condition;
 	int				i, index;
 	zbx_vector_uint64_t		itemids;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid, item_conditionid;
@@ -1232,8 +1233,8 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 	}
 	zbx_proto_t;
 
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
@@ -2144,8 +2145,8 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 		char **sql, size_t *sql_alloc)
 {
 	size_t			sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		overrideid;
 	int			i;
 	lld_override_t		*override;
@@ -2489,8 +2490,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	lld_override_t		*override;
 	zbx_vector_ptr_t	overrides;
 	zbx_vector_uint64_t	overrideids;
@@ -2672,8 +2673,8 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2850,8 +2851,8 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2957,8 +2958,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3065,8 +3066,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 	zbx_uint64_t			itemid;
 	zbx_template_lld_macro_t	*plmpsrc, *plmpdst;
 	zbx_template_item_t		*item;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
