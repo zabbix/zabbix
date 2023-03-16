@@ -24,6 +24,31 @@
  */
 class CControllerNotificationsGet extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $notifications = [];
+
+	/**
+	 * @var array
+	 */
+	private $settings = [];
+
+	/**
+	 * @var int
+	 */
+	private $timeout_time = 0;
+
+	/**
+	 * @var int
+	 */
+	private $time_from = 0;
+
+	/**
+	 * @var array
+	 */
+	private $known_eventids = [];
+
 	protected function init() {
 		parent::init();
 
@@ -188,13 +213,13 @@ class CControllerNotificationsGet extends CController {
 
 				$url_problems = (new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
+					->setArgument('filter_set', '1')
 					->setArgument('hostids[]', $trigger['hosts'][0]['hostid'])
 					->getUrl();
 
 				$url_events = (new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
+					->setArgument('filter_set', '1')
 					->setArgument('triggerids[]', $triggerid)
 					->getUrl();
 

@@ -386,6 +386,15 @@ static void	eval_parse_greater_character_token(zbx_eval_context_t *ctx, size_t p
 		eval_parse_character_token(pos, ZBX_EVAL_TOKEN_OP_GT, token);
 }
 
+static zbx_eval_token_t	*eval_get_last_function_token(zbx_eval_context_t *ctx)
+{
+	for(int i = ctx->ops.values_num - 1; i >= 0; i --)
+		if (0 != (ctx->ops.values[i].type & ZBX_EVAL_CLASS_FUNCTION))
+			return &ctx->ops.values[i];
+
+	return NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parse string variable token                                       *
@@ -403,7 +412,14 @@ static void	eval_parse_greater_character_token(zbx_eval_context_t *ctx, size_t p
  ******************************************************************************/
 static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
-	const char	*ptr = ctx->expression + pos + 1;
+	const char		*ptr = ctx->expression + pos + 1;
+	int			is_history_function;
+	zbx_eval_token_t	*func_token;
+	char			*value = NULL;
+
+	/* workaround for calculated items is required due to present bug */
+	func_token = eval_get_last_function_token(ctx);
+	is_history_function = NULL != func_token && ZBX_EVAL_TOKEN_HIST_FUNCTION == func_token->type;
 
 	for (; '\0' != *ptr; ptr++)
 	{
@@ -413,22 +429,40 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 			token->loc.l = pos;
 			token->loc.r = ptr - ctx->expression;
 			eval_update_const_variable(ctx, token);
+
+			if (0 != is_history_function)
+			{
+				value = zbx_substr_unquote_opt(ctx->expression,
+						token->loc.l, token->loc.r, ZBX_STRQUOTE_SKIP_BACKSLASH);
+
+				if (NULL != value)
+					zbx_variant_set_str(&token->value, value);
+			}
+
 			return SUCCEED;
 		}
 
 		if ('\\' == *ptr)
 		{
-			if ('"' != ptr[1] && '\\' != ptr[1] )
+			if (0 != is_history_function)
 			{
-				*error = zbx_dsprintf(*error, "invalid escape sequence in string starting with \"%s\"",
-						ptr);
+				if ('"' == ptr[1])
+					ptr++;
+				continue;
+			}
+
+			if ('"' != ptr[1] && '\\' != ptr[1])
+			{
+				*error = zbx_dsprintf(*error,
+						"invalid escape sequence in string starting with \"%s\"", ptr);
+
 				return FAIL;
 			}
 			ptr++;
 		}
 	}
-
 	*error = zbx_dsprintf(*error, "unterminated string at \"%s\"", ctx->expression + pos);
+
 	return FAIL;
 }
 
