@@ -752,6 +752,8 @@ zabbix_export:
               type: MATCHES_REGEX
               parameters:
                 - '^\d*$'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '-2'
             -
               type: CHANGE_PER_SECOND
               parameters:
