@@ -243,9 +243,6 @@ $(OUTPUTDIR)\logfiles.o: $(TOPDIR)\src\zabbix_agent\logfiles\logfiles.c
 $(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -I$(TOPDIR)\go\win64 -o $@
 
-$(OUTPUTDIR)\symbols.o: $(TOPDIR)\src\libs\zbxsymbols\symbols.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
 $(TARGETDIR)\resource.syso: $(TOPDIR)\build\win32\project\resource.rc
 	$(WINDRES) $^ $(RFLAGS) -D _WINDOWS -D ZABBIX_AGENT2 -o $@
 
