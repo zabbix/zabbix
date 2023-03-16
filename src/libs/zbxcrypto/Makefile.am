@@ -15,6 +15,7 @@ libzbxcrypto_a_SOURCES = \
 	tls_tcp.h \
 	tls_tcp_active.h \
 	tls_version.c \
-	hmac.c
+	hmac.c \
+	rsa.c
 
 libzbxcrypto_a_CFLAGS = $(TLS_CFLAGS)

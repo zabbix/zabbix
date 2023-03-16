@@ -415,6 +415,10 @@ switch ($data['method']) {
 					'limit' => $limit
 				]);
 
+				if (array_key_exists('context', $data) && strpos('system', $data['search']) !== false) {
+					array_unshift($users, ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => '']);
+				}
+
 				if ($users) {
 					CArrayHelper::sort($users, [
 						['field' => 'username', 'order' => ZBX_SORT_UP]

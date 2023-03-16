@@ -146,14 +146,14 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['host']['hostid'])
 				->setArgument('show_details', '1')
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 			)
 			: _('Latest data'),
 		$data['allowed_ui_problems']
 			? new CLink(_('Problems'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_name', '')
 				->setArgument('hostids', [$data['host']['hostid']])
+				->setArgument('filter_set', '1')
 			)
 			: _('Problems'),
 		$data['allowed_ui_hosts']

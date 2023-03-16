@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:31Z'
+  date: '2023-02-07T06:19:29Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -272,13 +272,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].act.first()'
+                    - $.act
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -298,13 +298,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].bck.first()'
+                    - $.bck
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -326,7 +326,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].bin.first()'
+                    - $.bin
                 -
                   type: MULTIPLIER
                   parameters:
@@ -336,7 +336,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -358,7 +358,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].bout.first()'
+                    - $.bout
                 -
                   type: MULTIPLIER
                   parameters:
@@ -368,7 +368,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -389,13 +389,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].dresp.first()'
+                    - $.dresp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -416,13 +416,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].econ.first()'
+                    - $.econ
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -443,13 +443,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].eresp.first()'
+                    - $.eresp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -482,13 +482,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_1xx.first()'
+                    - $.hrsp_1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -509,13 +509,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_2xx.first()'
+                    - $.hrsp_2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -536,13 +536,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_3xx.first()'
+                    - $.hrsp_3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -563,13 +563,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_4xx.first()'
+                    - $.hrsp_4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -590,13 +590,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_5xx.first()'
+                    - $.hrsp_5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -616,9 +616,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qcur.first()'
+                    - $.qcur
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -652,13 +652,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qtime.first()'
+                    - $.qtime
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -679,6 +679,30 @@ zabbix_export:
                       tag: scope
                       value: performance
             -
+              uuid: 8446abe2825848c7a11fb7d567f9e3a1
+              name: 'HAProxy Backend {#PXNAME}: Raw data'
+              type: DEPENDENT
+              key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the Backend with the name `{#PXNAME}`'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
+              master_item:
+                key: haproxy.get
+              tags:
+                -
+                  tag: backend
+                  value: '{#PXNAME}'
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: 5ddd3cd8af904faaa69f34df442c9717
               name: 'HAProxy Backend {#PXNAME}: Responses time'
               type: DEPENDENT
@@ -692,13 +716,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].rtime.first()'
+                    - $.rtime
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -735,19 +759,17 @@ zabbix_export:
                 MAINT - The server has been disabled or put into maintenance mode.
                 DRAIN - The server has been put into drain mode.
                 no check - Health checks are not enabled for this server.
-              valuemap:
-                name: 'Service state'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -780,13 +802,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].stot.first()'
+                    - $.stot
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -806,13 +828,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].weight.first()'
+                    - $.weight
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -833,13 +855,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].wredis.first()'
+                    - $.wredis
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -860,13 +882,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].wretr.first()'
+                    - $.wretr
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: backend
@@ -945,14 +967,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
+              lld_macro: '{#MODE}'
+              path: $.mode
+            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
-            -
-              lld_macro: '{#MODE}'
-              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'
@@ -1003,7 +1025,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].bin.first()'
+                    - $.bin
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1013,7 +1035,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1035,7 +1057,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].bout.first()'
+                    - $.bout
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1045,7 +1067,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1066,13 +1088,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].dreq.first()'
+                    - $.dreq
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1105,13 +1127,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].ereq.first()'
+                    - $.ereq
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1144,13 +1166,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_1xx.first()'
+                    - $.hrsp_1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1171,13 +1193,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_2xx.first()'
+                    - $.hrsp_2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1198,13 +1220,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_3xx.first()'
+                    - $.hrsp_3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1225,13 +1247,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_4xx.first()'
+                    - $.hrsp_4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1252,13 +1274,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_5xx.first()'
+                    - $.hrsp_5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1278,13 +1300,37 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].rate.first()'
+                    - $.rate
+              master_item:
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
+              tags:
+                -
+                  tag: component
+                  value: sessions
+                -
+                  tag: frontend
+                  value: '{#PXNAME}'
+            -
+              uuid: e0a67c04834645e4b59cf6bab5353f84
+              name: 'HAProxy Frontend {#PXNAME}: Raw data'
+              type: DEPENDENT
+              key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the Frontend with the name `{#PXNAME}`'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
               master_item:
                 key: haproxy.get
               tags:
                 -
                   tag: component
-                  value: sessions
+                  value: raw
                 -
                   tag: frontend
                   value: '{#PXNAME}'
@@ -1300,9 +1346,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].req_rate.first()'
+                    - $.req_rate
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1322,9 +1368,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].scur.first()'
+                    - $.scur
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1344,13 +1390,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].slim.first()'
+                    - $.slim
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1374,13 +1420,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: haproxy.get
+                key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1503,14 +1549,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
+              lld_macro: '{#MODE}'
+              path: $.mode
+            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
-            -
-              lld_macro: '{#MODE}'
-              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'
@@ -1562,13 +1608,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].act.first()'
+                    - $.act
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1593,13 +1639,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].bck.first()'
+                    - $.bck
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1624,7 +1670,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].bin.first()'
+                    - $.bin
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1634,7 +1680,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1659,7 +1705,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].bout.first()'
+                    - $.bout
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1669,7 +1715,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1710,13 +1756,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].check_status.first()'
+                    - $.check_status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1756,13 +1802,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].dresp.first()'
+                    - $.dresp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1786,13 +1832,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].econ.first()'
+                    - $.econ
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1816,13 +1862,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].eresp.first()'
+                    - $.eresp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1858,13 +1904,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_1xx.first()'
+                    - $.hrsp_1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1888,13 +1934,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_2xx.first()'
+                    - $.hrsp_2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1918,13 +1964,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_3xx.first()'
+                    - $.hrsp_3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1948,13 +1994,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_4xx.first()'
+                    - $.hrsp_4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -1978,13 +2024,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].hrsp_5xx.first()'
+                    - $.hrsp_5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2008,13 +2054,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].lbtot.first()'
+                    - $.lbtot
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2037,9 +2083,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qcur.first()'
+                    - $.qcur
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2074,7 +2120,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qlimit.first()'
+                    - $.qlimit
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2086,7 +2132,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2111,13 +2157,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].qtime.first()'
+                    - $.qtime
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2141,6 +2187,33 @@ zabbix_export:
                       tag: scope
                       value: performance
             -
+              uuid: a0cd94ee26f141f9ab02d902ef0fe30c
+              name: 'HAProxy Server {#PXNAME} {#SVNAME}: Raw data'
+              type: DEPENDENT
+              key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the Server named `{#SVNAME}` and the proxy with the name `{#PXNAME}`'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
+              master_item:
+                key: haproxy.get
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: server
+                  value: '{#PXNAME}'
+                -
+                  tag: service
+                  value: '{#SVNAME}'
+            -
               uuid: f790d237b494452a9b77b4f002a7ca46
               name: 'HAProxy {#PXNAME} {#SVNAME}: Responses time'
               type: DEPENDENT
@@ -2154,13 +2227,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].rtime.first()'
+                    - $.rtime
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2192,19 +2265,17 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              valuemap:
-                name: 'Service state'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2240,13 +2311,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].stot.first()'
+                    - $.stot
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2269,13 +2340,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].weight.first()'
+                    - $.weight
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2299,13 +2370,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].wredis.first()'
+                    - $.wredis
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2329,13 +2400,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].wretr.first()'
+                    - $.wretr
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: haproxy.get
+                key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               tags:
                 -
                   tag: component
@@ -2417,14 +2488,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
+              lld_macro: '{#MODE}'
+              path: $.mode
+            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
-            -
-              lld_macro: '{#MODE}'
-              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'
@@ -2544,8 +2615,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2568,8 +2639,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Backend {#PXNAME} Responses by HTTP code'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: Backend {#PXNAME} Responses by HTTP code'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2592,8 +2663,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Backend {#PXNAME} In/Out traffic'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: Backend {#PXNAME} In/Out traffic'
         -
           uuid: d6ba5079de1c49bb9e0e5c47112b3ff9
           name: 'HAProxy Frontend performance'
@@ -2621,8 +2692,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2645,8 +2716,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2669,8 +2740,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -2693,8 +2764,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
         -
           uuid: f41c3a3976dc483d98a386273ab5678f
           name: 'HAProxy Server performance'
@@ -2722,8 +2793,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2746,8 +2817,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: {#PXNAME} {#SVNAME} Responses by HTTP code'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: {#PXNAME} {#SVNAME} Responses by HTTP code'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2770,8 +2841,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: {#PXNAME} {#SVNAME} In/Out traffic'
                         host: 'HAProxy by HTTP'
+                        name: 'HAProxy: {#PXNAME} {#SVNAME} In/Out traffic'
       valuemaps:
         -
           uuid: 450c1b2c6d58432b8a5b34dd3b5e8870
