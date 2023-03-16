@@ -417,6 +417,7 @@ abstract class CControllerLatest extends CController {
 
 	/**
 	 * Collect available options of subfilter from existing items and hosts selected by primary filter.
+	 * All currently selected options will be included as well, regardless their presence in the retrieved data.
 	 *
 	 * @param array $data
 	 * @param array $data['hosts']                         Hosts selected by primary filter.
@@ -440,6 +441,48 @@ abstract class CControllerLatest extends CController {
 			'tags' => []
 		];
 
+		// First, add currently selected options, regardless their presence in the retrieved data.
+
+		$missing_hostids = array_diff_key($subfilter['hostids'], $data['hosts']);
+
+		if ($missing_hostids) {
+			$missing_hosts = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => array_keys($missing_hostids),
+				'preservekeys' => true
+			]);
+
+			foreach ($missing_hosts as $hostid => $host) {
+				$subfilter_options['hostids'][$hostid] = [
+					'name' => $host['name'],
+					'selected' => true,
+					'count' => 0
+				];
+			}
+		}
+
+		foreach (array_keys($subfilter['tagnames']) as $tagname) {
+			$subfilter_options['tagnames'][$tagname] = [
+				'name' => $tagname,
+				'selected' => true,
+				'items' => [],
+				'count' => 0
+			];
+		}
+
+		foreach ($subfilter['tags'] as $tag => $values) {
+			foreach (array_keys($values) as $value) {
+				$subfilter_options['tags'][$tag][$value] = [
+					'name' => $value,
+					'selected' => true,
+					'items' => [],
+					'count' => 0
+				];
+			}
+		}
+
+		// Second, add options represented by the selected data.
+
 		foreach ($data['hosts'] as $hostid => $host) {
 			$subfilter_options['hostids'][$hostid] = [
 				'name' => $host['name'],
@@ -457,8 +500,6 @@ abstract class CControllerLatest extends CController {
 						'items' => [],
 						'count' => 0
 					];
-
-					$subfilter_options['tags'][$tag['tag']] = [];
 				}
 
 				$subfilter_options['tags'][$tag['tag']][$tag['value']] = [

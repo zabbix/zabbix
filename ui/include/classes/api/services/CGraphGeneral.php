@@ -59,8 +59,7 @@ abstract class CGraphGeneral extends CApiService {
 			],
 			'graphids' => $graphids,
 			'editable' => true,
-			'preservekeys' => true,
-			'inherited' => false
+			'preservekeys' => true
 		]);
 
 		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
@@ -72,14 +71,34 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($db_graph);
 
-		foreach ($graphs as &$graph) {
+		foreach ($graphs as $key => &$graph) {
 			// check permissions
 			if (!array_key_exists($graph['graphid'], $db_graphs)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
+			if ($db_graphs[$graph['graphid']]['templateid'] != 0
+					&& $db_graphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update a templated graph "%1$s".',
+					$graph['name']
+				));
+			}
+
 			// cannot update discovered graphs
 			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $db_graphs[$graph['graphid']]);
+
+			// Allow for template inherited graphs to update discover parameter.
+			if ($db_graphs[$graph['graphid']]['templateid'] != 0) {
+				if ($db_graphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+						&& array_key_exists('discover', $graph)) {
+					$graph = ['discover' => $graph['discover']] + $db_graphs[$graph['graphid']];
+					unset($graph['templateid'], $graph['flags'], $graph['uuid']);
+				}
+				else {
+					unset($graphs[$key]);
+				}
+				continue;
+			}
 
 			// validate items on set or pass existing items from DB
 			if (array_key_exists('gitems', $graph)) {
@@ -102,7 +121,9 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $db_graphs);
+		if ($graphs) {
+			$this->validateUpdate($graphs, $db_graphs);
+		}
 
 		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
@@ -131,8 +152,10 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->updateReal($graphs);
-		$this->inherit($graphs);
+		if ($graphs) {
+			$this->updateReal($graphs);
+			$this->inherit($graphs);
+		}
 
 		$resource = ($this instanceof CGraph) ? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $graphs, $db_graphs);
@@ -576,22 +599,19 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateCreate(array &$graphs) {
 		$colorValidator = new CColorValidator();
 
+		$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
+			'uuid' => ['type' => API_UUID],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+		]];
+
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-					'uuid' =>		['type' => API_UUID],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
-				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-					'uuid' =>		['type' => API_UUID],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')],
-					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
-				]];
+				$api_input_rules['fields'] += ['discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]];
 				break;
 
 			default:
@@ -767,27 +787,25 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
 
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'uuid' => ['type' => API_UUID],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+		]];
+
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
-				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')],
-					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
-				]];
+				$api_input_rules['fields'] += ['discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]];
 				break;
 
 			default:
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
-		$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
 		$read_only_fields = ['templateid', 'flags'];
 
 		foreach ($graphs as $key => $graph) {
@@ -978,7 +996,7 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates the children of the graph on the given hosts.
+	 * Updates the children of the graph on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @param array      $graphs   An array of graphs to inherit. Each graph must contain all graph properties including
 	 *                             "gitems" property.
@@ -1305,6 +1323,8 @@ abstract class CGraphGeneral extends CApiService {
 		if ($upd_graphs) {
 			$this->updateReal($upd_graphs);
 		}
+
+		$this->inherit(array_merge($ins_graphs + $upd_graphs));
 	}
 
 	/**

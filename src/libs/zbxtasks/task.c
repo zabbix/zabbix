@@ -1191,8 +1191,8 @@ static zbx_uint64_t	zbx_create_task_data(const char *data, size_t len, zbx_uint6
  ******************************************************************************/
 static int	zbx_tm_task_result_wait(zbx_uint64_t taskid, char **info)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret, time_start;
 
 	for (time_start = time(NULL); ZBX_DATA_TTL > time(NULL) - time_start; sleep(1))

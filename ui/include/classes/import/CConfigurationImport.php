@@ -72,7 +72,6 @@ class CConfigurationImport {
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'templateLinkage' => ['createMissing' => false, 'deleteMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -80,7 +79,8 @@ class CConfigurationImport {
 			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
-			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false]
+			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
 		];
 
 		$options += $default_options;
@@ -88,25 +88,31 @@ class CConfigurationImport {
 			$options[$entity] += $rules;
 		}
 
-		$options['process_templates'] = !$options['templates']['updateExisting']
-			&& (array_filter($options['valueMaps'])
-				|| array_filter($options['items'])
-				|| array_filter($options['discoveryRules'])
-				|| $options['triggers']['deleteMissing']
-				|| $options['graphs']['deleteMissing']
-				|| array_filter($options['httptests'])
-				|| array_filter($options['templateDashboards'])
-			);
+		$object_options = (
+			$options['templateLinkage']['createMissing']
+			|| $options['templateLinkage']['deleteMissing']
+			|| $options['items']['updateExisting']
+			|| $options['items']['createMissing']
+			|| $options['items']['deleteMissing']
+			|| $options['discoveryRules']['updateExisting']
+			|| $options['discoveryRules']['createMissing']
+			|| $options['discoveryRules']['deleteMissing']
+			|| $options['triggers']['deleteMissing']
+			|| $options['graphs']['deleteMissing']
+			|| $options['httptests']['updateExisting']
+			|| $options['httptests']['createMissing']
+			|| $options['httptests']['deleteMissing']
+		);
 
-		$options['process_hosts'] = !$options['hosts']['updateExisting']
-			&& (array_filter($options['templateLinkage'])
-				|| array_filter($options['valueMaps'])
-				|| array_filter($options['items'])
-				|| array_filter($options['discoveryRules'])
-				|| $options['triggers']['deleteMissing']
-				|| $options['graphs']['deleteMissing']
-				|| array_filter($options['httptests'])
-			);
+		$options['process_templates'] = (
+			!$options['templates']['updateExisting']
+			&& ($object_options
+				|| $options['templateDashboards']['updateExisting']
+				|| $options['templateDashboards']['createMissing']
+				|| $options['templateDashboards']['deleteMissing']
+			)
+		);
+		$options['process_hosts'] = (!$options['hosts']['updateExisting'] && $object_options);
 
 		$this->options = $options;
 		$this->referencer = $referencer;
@@ -140,11 +146,9 @@ class CConfigurationImport {
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
 		$this->deleteMissingItems();
-		$this->deleteMissingValueMaps();
 
 		// Import objects.
 		$this->processHttpTests();
-		$this->processValueMaps();
 		$this->processItems();
 		$this->processTriggers();
 		$this->processDiscoveryRules();
@@ -201,6 +205,12 @@ class CConfigurationImport {
 					$template_macros_refs[$template['uuid']][] = $macro['macro'];
 				}
 			}
+
+			if ($template['templates']) {
+				foreach ($template['templates'] as $linked_template) {
+					$templates_refs += [$linked_template['name'] => []];
+				}
+			}
 		}
 
 		foreach ($this->getFormattedHostGroups() as $group) {
@@ -231,14 +241,6 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedValueMaps() as $host => $valuemaps) {
-			foreach ($valuemaps as $valuemap) {
-				$valuemaps_refs[$host][$valuemap['name']] = array_key_exists('uuid', $valuemap)
-					? ['uuid' => $valuemap['uuid']]
-					: [];
-			}
-		}
-
 		foreach ($this->getFormattedItems() as $host => $items) {
 			foreach ($items as $item) {
 				$items_refs[$host][$item['key_']] = array_key_exists('uuid', $item)
@@ -246,11 +248,7 @@ class CConfigurationImport {
 					: [];
 
 				if ($item['valuemap']) {
-					if (!array_key_exists($host, $valuemaps_refs)) {
-						$valuemaps_refs[$host] = [];
-					}
-
-					$valuemaps_refs[$host] += [$item['valuemap']['name'] => []];
+					$valuemaps_refs[$host][$item['valuemap']['name']] = [];
 				}
 			}
 		}
@@ -266,12 +264,8 @@ class CConfigurationImport {
 						? ['uuid' => $item_prototype['uuid']]
 						: [];
 
-					if ($item_prototype['valuemap']) {
-						if (!array_key_exists($host, $valuemaps_refs)) {
-							$valuemaps_refs[$host] = [];
-						}
-
-						$valuemaps_refs[$host] += [$item_prototype['valuemap']['name'] => []];
+					if (!empty($item_prototype['valuemap'])) {
+						$valuemaps_refs[$host][$item_prototype['valuemap']['name']] = [];
 					}
 				}
 
@@ -699,13 +693,18 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processTemplates(): void {
-		if ($this->options['templates']['createMissing'] || $this->options['templates']['updateExisting']
+		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']
 				|| $this->options['process_templates']) {
 			$templates = $this->getFormattedTemplates();
 
 			if ($templates) {
-				$templateids = (new CTemplateImporter($this->options, $this->referencer))->import($templates);
+				$template_importer = new CTemplateImporter($this->options, $this->referencer,
+					$this->importedObjectContainer
+				);
+				$template_importer->import($templates);
 
+				// Get list of imported template IDs and add them processed template ID list.
+				$templateids = $template_importer->getProcessedTemplateids();
 				$this->importedObjectContainer->addTemplateIds($templateids);
 			}
 		}
@@ -717,75 +716,17 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processHosts(): void {
-		if ($this->options['hosts']['createMissing'] || $this->options['hosts']['updateExisting']
+		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']
 				|| $this->options['process_hosts']) {
 			$hosts = $this->getFormattedHosts();
 
 			if ($hosts) {
-				$hostids = (new CHostImporter($this->options, $this->referencer))->import($hosts);
+				$host_importer = new CHostImporter($this->options, $this->referencer, $this->importedObjectContainer);
+				$host_importer->import($hosts);
 
+				// Get list of imported host IDs and add them processed host ID list.
+				$hostids = $host_importer->getProcessedHostIds();
 				$this->importedObjectContainer->addHostIds($hostids);
-			}
-		}
-	}
-
-	/**
-	 * Import value maps.
-	 *
-	 * @throws Exception
-	 */
-	protected function processValueMaps(): void {
-		if (!$this->options['valueMaps']['createMissing'] && !$this->options['valueMaps']['updateExisting']) {
-			return;
-		}
-
-		$upd_valuemaps = [];
-		$ins_valuemaps = [];
-
-		foreach ($this->getFormattedValueMaps() as $host => $valuemaps) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
-
-			if ($hostid === null
-					|| (!$this->importedObjectContainer->isHostProcessed($hostid)
-						&& !$this->importedObjectContainer->isTemplateProcessed($hostid))) {
-				continue;
-			}
-
-			foreach ($valuemaps as $valuemap) {
-				$valuemapid = null;
-
-				if (array_key_exists('uuid', $valuemap)) {
-					$valuemapid = $this->referencer->findValuemapidByUuid($valuemap['uuid']);
-				}
-
-				if ($valuemapid === null) {
-					$valuemapid = $this->referencer->findValuemapidByName($hostid, $valuemap['name']);
-				}
-
-				if ($valuemapid !== null) {
-					if ($this->options['valueMaps']['updateExisting']) {
-						$upd_valuemaps[] = ['valuemapid' => $valuemapid] + $valuemap;
-						$this->referencer->setDbValueMap($valuemapid, ['hostid' => $hostid] + $valuemap);
-					}
-				}
-				else {
-					if ($this->options['valueMaps']['createMissing']) {
-						$ins_valuemaps[] = ['hostid' => $hostid] + $valuemap;
-					}
-				}
-			}
-		}
-
-		if ($upd_valuemaps) {
-			API::ValueMap()->update($upd_valuemaps);
-		}
-
-		if ($ins_valuemaps) {
-			$ins_valuemapids = API::ValueMap()->create($ins_valuemaps)['valuemapids'];
-
-			foreach ($ins_valuemaps as $valuemap) {
-				$valuemapid = array_shift($ins_valuemapids);
-				$this->referencer->setDbValueMap($valuemapid, $valuemap);
 			}
 		}
 	}
@@ -1054,6 +995,51 @@ class CConfigurationImport {
 
 		$discovery_rules_to_create = [];
 		$discovery_rules_to_update = [];
+
+		/*
+		 * It's possible that some LLD rules use master items which are web items. They don't reside in item
+		 * references at this point. For items and item prototypes web items are found while processing the order of
+		 * them, but for LLD rules there is no ordering, so this is done independently. So due to the nature of constant
+		 * item refreshing after each entity type is processed, it's safer to collect web items once more here where it
+		 * is necessary. Collect host IDs and master item keys that cannot be resolved and then find web items and add
+		 * references to item list.
+		 */
+		$unresolved_master_items = [];
+		$hostids = [];
+
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+			$hostids[$hostid] = true;
+
+			foreach ($discovery_rules as $discovery_rule) {
+				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
+						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
+					// if key cannot be resolved
+					if ($this->referencer->findItemidByKey($hostid,
+							$discovery_rule[$master_item_key]['key']) === null) {
+						$unresolved_master_items[$discovery_rule[$master_item_key]['key']] = true;
+					}
+				}
+			}
+		}
+
+		if ($unresolved_master_items) {
+			$items = API::Item()->get([
+				'output' => ['hostid', 'itemid', 'key_'],
+				'hostids' => array_keys($hostids),
+				'filter' => ['key_' => array_keys($unresolved_master_items)],
+				'webitems' => true
+			]);
+
+			foreach ($items as $item) {
+				$this->referencer->setDbItem($item['itemid'], $item);
+			}
+		}
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
@@ -2116,62 +2102,6 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes value maps from DB that are missing in import file.
-	 */
-	private function deleteMissingValueMaps(): void {
-		if (!$this->options['valueMaps']['deleteMissing']) {
-			return;
-		}
-
-		$processed_hostids = array_merge(
-			$this->importedObjectContainer->getHostids(),
-			$this->importedObjectContainer->getTemplateids()
-		);
-
-		if (!$processed_hostids) {
-			return;
-		}
-
-		$valuemapids = [];
-
-		foreach ($this->getFormattedValueMaps() as $host => $valuemaps) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
-
-			if ($hostid === null) {
-				continue;
-			}
-
-			foreach ($valuemaps as $valuemap) {
-				$valuemapid = null;
-
-				if (array_key_exists('uuid', $valuemap)) {
-					$valuemapid = $this->referencer->findValuemapidByUuid($valuemap['uuid']);
-				}
-
-				if ($valuemapid === null) {
-					$valuemapid = $this->referencer->findValuemapidByName($hostid, $valuemap['name']);
-				}
-
-				if ($valuemapid !== null) {
-					$valuemapids[$valuemapid] = true;
-				}
-			}
-		}
-
-		$db_valuemapids = API::ValueMap()->get([
-			'output' => [],
-			'hostids' => $processed_hostids,
-			'preservekeys' => true
-		]);
-
-		$del_valuemapids = array_diff_key($db_valuemapids, $valuemapids);
-
-		if ($del_valuemapids) {
-			API::ValueMap()->delete(array_keys($del_valuemapids));
-		}
-	}
-
-	/**
 	 * Deletes items from DB that are missing in import file.
 	 */
 	protected function deleteMissingItems(): void {
@@ -2741,19 +2671,6 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['hosts'];
-	}
-
-	/**
-	 * Get formatted value maps.
-	 *
-	 * @return array
-	 */
-	protected function getFormattedValueMaps(): array {
-		if (!array_key_exists('value_maps', $this->formattedData)) {
-			$this->formattedData['value_maps'] = $this->adapter->getValueMaps();
-		}
-
-		return $this->formattedData['value_maps'];
 	}
 
 	/**

@@ -18,8 +18,9 @@
 **/
 
 #include "pp_item.h"
+
 #include "pp_history.h"
-#include "zbxvariant.h"
+#include "zbxalgo.h"
 
 ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
 
@@ -27,9 +28,9 @@ ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
  *                                                                            *
  * Purpose: create item preprocessing data                                    *
  *                                                                            *
- * Parameters: type       - [IN] the item type                                *
- *             value_type - [IN] the item value type                          *
- *             flags      - [IN] the item flags                               *
+ * Parameters: type       - [IN] item type                                    *
+ *             value_type - [IN] item value type                              *
+ *             flags      - [IN] item flags                                   *
  *                                                                            *
  * Return value: The created item preprocessing data.                         *
  *                                                                            *
@@ -67,14 +68,10 @@ void	zbx_pp_step_free(zbx_pp_step_t *step)
  *                                                                            *
  * Purpose: free item preprocessing data                                      *
  *                                                                            *
- * Parameters: preproc - [IN] the item preprocessing data                     *
- *                                                                            *
  ******************************************************************************/
 static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
 {
-	int	i;
-
-	for (i = 0; i < preproc->steps_num; i++)
+	for (int i = 0; i < preproc->steps_num; i++)
 	{
 		zbx_free(preproc->steps[i].params);
 		zbx_free(preproc->steps[i].error_handler_params);
@@ -93,7 +90,7 @@ static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
  *                                                                            *
  * Purpose: copy item preprocessing data                                      *
  *                                                                            *
- * Parameters: preproc - [IN] the item preprocessing data                     *
+ * Parameters: preproc - [IN] item preprocessing data                         *
  *                                                                            *
  * Return value: The copied preprocessing data.                               *
  *                                                                            *
@@ -112,7 +109,7 @@ zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc)
  *                                                                            *
  * Purpose: release item preprocessing data                                   *
  *                                                                            *
- * Parameters: preproc - [IN] the item preprocessing data                     *
+ * Parameters: preproc - [IN] item preprocessing data                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc)
@@ -127,7 +124,7 @@ void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc)
  *                                                                            *
  * Purpose: check if preprocessing step requires history                      *
  *                                                                            *
- * Parameters: preproc - [IN] the item preprocessing data                     *
+ * Parameters: preproc - [IN] item preprocessing data                         *
  *                                                                            *
  * Return value: SUCCEED - the step requires history                          *
  *               FAIL    - otherwise                                          *
