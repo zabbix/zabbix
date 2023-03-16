@@ -34,7 +34,7 @@ For Zabbix version: 6.0 and higher.
 1. Create a user to monitor the service or use an existing read-only account.
 > See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 
 2. Link the template to a host.
-3. Configure macros `{$VEEAM.API.URL}`, `{$VEEAM.USER}`, and `{$VEEAM.PASSWORD}`.
+3. Configure the following macros: `{$VEEAM.API.URL}`, `{$VEEAM.USER}`, and `{$VEEAM.PASSWORD}`.
 
 ## Configuration
 
