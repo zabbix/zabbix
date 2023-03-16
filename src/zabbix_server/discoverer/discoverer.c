@@ -1814,8 +1814,8 @@ out:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	discoverer_manager_free(&dmanager);
+	zbx_ipc_service_close(&ipc_service);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
