@@ -1701,6 +1701,9 @@ class testMassUpdateItems extends CWebTest{
 			// Take a screenshot to test draggable object position of preprocessing steps in mass update.
 			if (array_key_exists('Screenshot', $data)) {
 				$this->page->removeFocus();
+
+				// It is necessary because of unexpected viewport shift.
+				$this->page->updateViewport();
 				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(), 'Item mass update preprocessing'.$prototypes);
 			}
 
