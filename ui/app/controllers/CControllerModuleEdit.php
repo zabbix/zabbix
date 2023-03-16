@@ -35,7 +35,7 @@ class CControllerModuleEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleid' =>   'required|db module.moduleid',
+			'moduleid' => 'required|db module.moduleid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -98,8 +98,7 @@ class CControllerModuleEdit extends CController {
 		else {
 			$response = (new CControllerResponseData(['main_block' => json_encode([
 				'error' => [
-					'title' => _s('Cannot load module at: %1$s.', $this->module['relative_path']),
-					'messages' => array_column(get_and_clear_messages(), 'message')
+					'title' => _s('Cannot load module at: %1$s.', $this->module['relative_path'])
 				]
 			])]))->disableView();
 		}

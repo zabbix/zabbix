@@ -35,7 +35,7 @@ class CControllerModuleDisable extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleids' => 'required|array_db module.moduleid',
+			'moduleids' => 'required|array_db module.moduleid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -94,8 +94,6 @@ class CControllerModuleDisable extends CController {
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
-
-		$output['keepids'] = array_keys($this->modules);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}

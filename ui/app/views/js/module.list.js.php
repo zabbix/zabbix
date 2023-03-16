@@ -61,6 +61,8 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
+				uncheckTableRows('modules');
+
 				location.href = location.href;
 			});
 		}

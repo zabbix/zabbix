@@ -35,8 +35,8 @@ class CControllerModuleUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleid' =>   'required|db module.moduleid',
-			'status' =>     'in 1'
+			'moduleid' =>	'required|db module.moduleid',
+			'status' =>		'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -85,7 +85,6 @@ class CControllerModuleUpdate extends CController {
 			'preservekeys' => true
 		]);
 
-		$module_manager = new CModuleManager(APP::getRootDir());
 		$module_manager_enabled = new CModuleManager(APP::getRootDir());
 
 		foreach ($db_modules as $moduleid => $db_module) {
@@ -93,9 +92,6 @@ class CControllerModuleUpdate extends CController {
 
 			if ($new_status == MODULE_STATUS_ENABLED) {
 				$module_manager_enabled->addModule($db_module['relative_path']);
-			}
-			else {
-				$module_manager->addModule($db_module['relative_path']);
 			}
 		}
 
