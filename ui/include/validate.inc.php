@@ -210,23 +210,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 		$value = $number_parser->calcValue();
 
-		if ($DB['DOUBLE_IEEE754']) {
-			if (abs($value) > ZBX_FLOAT_MAX) {
-				$error = true;
-				$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));
-			}
-		}
-		else {
-			if (abs($value) >= 1E+16) {
-				$error = true;
-				$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));
-			}
-			elseif ($value != round($value, 4)) {
-				$error = true;
-				$message = _s('Field "%1$s" is not correct: %2$s', $caption,
-					_('a number has too many fractional digits')
-				);
-			}
+		if (abs($value) > ZBX_FLOAT_MAX) {
+			$error = true;
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));
 		}
 	}
 	elseif ($type == T_ZBX_STR) {

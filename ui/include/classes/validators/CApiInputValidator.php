@@ -1365,7 +1365,7 @@ class CApiInputValidator {
 		/**
 		 * @deprecated  As of version 3.4, use boolean flags only.
 		 */
-		trigger_error(_('Non-boolean flags are deprecated.'), E_USER_NOTICE);
+		trigger_error(_('Non-boolean flags are deprecated.'), E_USER_DEPRECATED);
 
 		$data = !is_null($data);
 
@@ -1877,24 +1877,10 @@ class CApiInputValidator {
 
 		$value = $number_parser->calcValue();
 
-		if ($DB['DOUBLE_IEEE754']) {
-			if (abs($value) > ZBX_FLOAT_MAX) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+		if (abs($value) > ZBX_FLOAT_MAX) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 
-				return false;
-			}
-		}
-		else {
-			if (abs($value) >= 1E+16) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
-
-				return false;
-			}
-			elseif ($value != round($value, 4)) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number has too many fractional digits'));
-
-				return false;
-			}
+			return false;
 		}
 
 		// Remove leading zeros.
