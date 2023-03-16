@@ -1147,11 +1147,9 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$tags_table->checkValue($this->prepareAllTags($data['tags'], array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS)));
 
-		$parent = ($object === 'trigger' || $object === 'trigger prototype') ? 'Parent templates' : 'Parent template';
-
-		// Check empty column "Parent template" except for inherited unique template tags.
+		// Check empty column "Parent templates" except for inherited unique template tags.
 		foreach ($tags_table->getRows() as $row) {
-			$parent_template = $row->getColumn($parent)->getText();
+			$parent_template = $row->getColumn('Parent templates')->getText();
 			$current_tag = [];
 			$current_tag['tag'] = $row->getColumn('Name')->getText();
 			$current_tag['value'] = $row->getColumn('Value')->getText();

@@ -28,7 +28,6 @@ DIST_SUBDIRS = \
 	zbxexpr \
 	zbxfile \
 	zbxgetopt \
-	zbxha \
 	zbxhash \
 	zbxhistory \
 	zbxhttp \
@@ -87,7 +86,6 @@ SERVER_SUBDIRS = \
 	zbxeval \
 	zbxexport \
 	zbxexpr \
-	zbxha \
 	zbxhistory \
 	zbxhttp \
 	zbxicmpping \

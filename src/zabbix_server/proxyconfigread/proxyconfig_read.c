@@ -132,7 +132,7 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
  *             recids - [OUT] the record identifiers (optional)               *
  *                                                                            *
  ******************************************************************************/
-static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_TABLE *table,
+static void	proxyconfig_add_row(struct zbx_json *j, const zbx_db_row_t row, const zbx_db_table_t *table,
 		zbx_vector_uint64_t *recids)
 {
 	int	fld = 0, i;
@@ -181,7 +181,7 @@ static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_
  *             j          - [OUT] the output json                             *
  *                                                                            *
  ******************************************************************************/
-static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table,
+static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_db_table_t *table,
 		struct zbx_json *j)
 {
 	int	i;
@@ -228,12 +228,12 @@ static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_of
 static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vector_uint64_t *hostids,
 		const char *config_vault_db_path, zbx_vector_ptr_t *keys_paths, struct zbx_json *j, char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	char		*sql;
-	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i, ret = FAIL, offset;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	const zbx_db_table_t	*table;
+	char			*sql;
+	size_t			sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			i, ret = FAIL, offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -368,12 +368,12 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 		const zbx_vector_uint64_t *key_ids, const char *filter, zbx_vector_uint64_t *recids, struct zbx_json *j,
 		char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	char		*sql = NULL;
-	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		ret = FAIL;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	const zbx_db_table_t	*table;
+	char			*sql = NULL;
+	size_t			sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -447,7 +447,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	master_itemid;
-	DB_ROW		row;
+	zbx_db_row_t	row;
 	int		cols_num;
 }
 zbx_proxyconfig_dep_item_t;
@@ -467,7 +467,7 @@ static void	proxyconfig_dep_item_free(zbx_proxyconfig_dep_item_t *item)
 }
 
 static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t itemid, zbx_uint64_t master_itemid,
-		const DB_ROW row, int cols_num)
+		const zbx_db_row_t row, int cols_num)
 {
 	zbx_proxyconfig_dep_item_t	*item;
 	int				i;
@@ -476,7 +476,7 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
 	item->itemid = itemid;
 	item->master_itemid = master_itemid;
 	item->cols_num = cols_num;
-	item->row = (DB_ROW)zbx_malloc(NULL, sizeof(char *) * (size_t)cols_num);
+	item->row = (zbx_db_row_t)zbx_malloc(NULL, sizeof(char *) * (size_t)cols_num);
 
 	for (i = 0; i < cols_num; i++)
 	{
@@ -505,13 +505,13 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
 static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vector_uint64_t *itemids,
 		struct zbx_json *j, char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	char		*sql;
-	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
-	zbx_uint64_t	itemid, master_itemid;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	const zbx_db_table_t	*table;
+	char			*sql;
+	size_t			sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
+	zbx_uint64_t		itemid, master_itemid;
 
 	zbx_vector_proxyconfig_dep_item_ptr_t	dep_items;
 	zbx_hashset_t				items;
