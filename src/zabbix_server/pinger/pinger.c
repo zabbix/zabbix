@@ -192,7 +192,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 
 	if (SUCCEED != zbx_parse_item_key(key, &request))
 	{
-		zbx_snprintf(error, max_error_len, "Invalid item key format.");
+		zbx_snprintf(error, (size_t)max_error_len, "Invalid item key format.");
 		goto out;
 	}
 
@@ -210,13 +210,13 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "Unsupported pinger key.");
+		zbx_snprintf(error, (size_t)max_error_len, "Unsupported pinger key.");
 		goto out;
 	}
 
 	if (7 < get_rparams_num(&request) || (ICMPPINGSEC != *icmpping && 6 < get_rparams_num(&request)))
 	{
-		zbx_snprintf(error, max_error_len, "Too many arguments.");
+		zbx_snprintf(error, (size_t)max_error_len, "Too many arguments.");
 		goto out;
 	}
 
@@ -226,7 +226,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else if (FAIL == zbx_is_uint31(tmp, count) || MIN_COUNT > *count || *count > MAX_COUNT)
 	{
-		zbx_snprintf(error, max_error_len, "Number of packets \"%s\" is not between %d and %d.",
+		zbx_snprintf(error, (size_t)max_error_len, "Number of packets \"%s\" is not between %d and %d.",
 				tmp, MIN_COUNT, MAX_COUNT);
 		goto out;
 	}
@@ -237,7 +237,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else if (FAIL == zbx_is_uint31(tmp, interval) || MIN_INTERVAL > *interval)
 	{
-		zbx_snprintf(error, max_error_len, "Interval \"%s\" should be at least %d.", tmp, MIN_INTERVAL);
+		zbx_snprintf(error, (size_t)max_error_len, "Interval \"%s\" should be at least %d.", tmp, MIN_INTERVAL);
 		goto out;
 	}
 
@@ -247,7 +247,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else if (FAIL == zbx_is_uint31(tmp, size) || MIN_SIZE > *size || *size > MAX_SIZE)
 	{
-		zbx_snprintf(error, max_error_len, "Packet size \"%s\" is not between %d and %d.",
+		zbx_snprintf(error, (size_t)max_error_len, "Packet size \"%s\" is not between %d and %d.",
 				tmp, MIN_SIZE, MAX_SIZE);
 		goto out;
 	}
@@ -258,7 +258,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else if (FAIL == zbx_is_uint31(tmp, timeout) || MIN_TIMEOUT > *timeout)
 	{
-		zbx_snprintf(error, max_error_len, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT);
+		zbx_snprintf(error, (size_t)max_error_len, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT);
 		goto out;
 	}
 
@@ -284,7 +284,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 			}
 			else
 			{
-				zbx_snprintf(error, max_error_len, "Mode \"%s\" is not supported.", tmp);
+				zbx_snprintf(error, (size_t)max_error_len, "Mode \"%s\" is not supported.", tmp);
 				goto out;
 			}
 		}
@@ -300,7 +300,8 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "\"%s\" is not supported as the \"options\" parameter value.", tmp);
+		zbx_snprintf(error, (size_t)max_error_len, "\"%s\" is not supported as the \"options\" parameter value"
+				".", tmp);
 		goto out;
 	}
 
