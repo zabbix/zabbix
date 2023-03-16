@@ -1740,9 +1740,15 @@ class CUser extends CApiService {
 		$db_user = $this->addExtraFields($db_user, $permissions);
 		$this->setTimezone($db_user['timezone']);
 
+		if (!$db_user['deprovisioned'] && CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
+				&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
+				&& !$this->provisionLdapUser($db_user)) {
+			$db_user['deprovisioned'] = true;
+		}
+
 		if ($token !== null) {
 			// Check permissions.
-			if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
+			if ($permissions['users_status'] == GROUP_STATUS_DISABLED || $db_user['deprovisioned']) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 
@@ -1755,12 +1761,6 @@ class CUser extends CApiService {
 			$db_user['sessionid'] = $sessionid;
 			$db_user['secret'] = $db_session['secret'];
 			$autologout = timeUnitToSeconds($db_user['autologout']);
-
-			if (!$db_user['deprovisioned'] && CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
-					&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
-					&& !$this->provisionLdapUser($db_user)) {
-				$db_user['deprovisioned'] = true;
-			}
 
 			// Check system permissions.
 			if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
