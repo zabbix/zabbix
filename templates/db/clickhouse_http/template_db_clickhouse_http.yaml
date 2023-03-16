@@ -125,6 +125,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get information about databases.'
           preprocessing:
             -
               type: JSONPATH
@@ -157,6 +158,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get information about dictionaries.'
           preprocessing:
             -
               type: JSONPATH
@@ -207,9 +209,7 @@ zabbix_export:
               name: 'ClickHouse: Too many distributed files to insert'
               event_name: 'ClickHouse: Too many distributed files to insert (over {$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN} for 5 min)'
               priority: WARNING
-              description: |
-                "Clickhouse servers and <remote_servers> in config.xml
-                https://clickhouse.tech/docs/en/operations/table_engines/distributed/"
+              description: 'Clickhouse servers and <remote_servers> in config.xml (https://clickhouse.tech/docs/en/operations/table_engines/distributed/)'
               manual_close: 'YES'
               tags:
                 -
@@ -223,7 +223,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: '"Connection failures after all retries in replicated DB connection pool"'
+          description: 'Connection failures after all retries in replicated DB connection pool'
           preprocessing:
             -
               type: JSONPATH
@@ -275,7 +275,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: '"Number of INSERT queries that are throttled due to high number of active data parts for partition in a MergeTree table."'
+          description: 'Number of INSERT queries that are throttled due to high number of active data parts for partition in a MergeTree table.'
           preprocessing:
             -
               type: JSONPATH
@@ -387,7 +387,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: '"Total number of bytes allocated by the application."'
+          description: 'Total number of bytes allocated by the application.'
           preprocessing:
             -
               type: JSONPATH
@@ -407,7 +407,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: '"Total number of bytes in active extents mapped by the allocator."'
+          description: 'Total number of bytes in active extents mapped by the allocator.'
           preprocessing:
             -
               type: JSONPATH
@@ -449,9 +449,7 @@ zabbix_export:
           key: clickhouse.max.part.count.for.partition
           delay: '0'
           history: 7d
-          description: |
-            Clickhouse MergeTree table engine split each INSERT query to partitions (PARTITION BY expression) and add one or more PARTS per INSERT inside each partition,
-            after that background merge process run.
+          description: 'Clickhouse MergeTree table engine split each INSERT query to partitions (PARTITION BY expression) and add one or more PARTS per INSERT inside each partition, after that background merge process run.'
           preprocessing:
             -
               type: JSONPATH
@@ -490,7 +488,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: '"Total amount of memory (bytes) allocated in currently executing queries."'
+          description: 'Total amount of memory (bytes) allocated in currently executing queries.'
           preprocessing:
             -
               type: JSONPATH
@@ -512,8 +510,8 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: |
-            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background merges, mutations and fetches).
-             Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa. This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."
+            Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background merges, mutations and fetches).
+             Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa. This happens naturally due to caches for tables indexes and doesn't indicate memory leaks.
           preprocessing:
             -
               type: JSONPATH
@@ -537,8 +535,8 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: |
-            "Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.
-             This happens naturally due to caches for tables indexes and doesn't indicate memory leaks."
+            Total amount of memory (bytes) allocated in background processing pool (that is dedicated for background moves). Note that this value may include a drift when the memory was allocated in a context of background processing pool and freed in other context or vice-versa.
+             This happens naturally due to caches for tables indexes and doesn't indicate memory leaks.
           preprocessing:
             -
               type: JSONPATH
@@ -586,7 +584,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: '"Total amount of memory (bytes) allocated in background schedule pool (that is dedicated for bookkeeping tasks of Replicated tables)."'
+          description: 'Total amount of memory (bytes) allocated in background schedule pool (that is dedicated for bookkeeping tasks of Replicated tables).'
           preprocessing:
             -
               type: JSONPATH
@@ -731,6 +729,7 @@ zabbix_export:
               parameters:
                 - 10m
           url: '{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/ping'
+          status_codes: ''
           tags:
             -
               tag: component
@@ -848,7 +847,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: '"Number of bytes (the number of bytes before decompression) read from compressed sources (files, network)."'
+          description: 'Number of bytes (the number of bytes before decompression) read from compressed sources (files, network).'
           preprocessing:
             -
               type: JSONPATH
@@ -874,6 +873,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get information about replicas.'
           preprocessing:
             -
               type: JSONPATH
@@ -940,10 +940,7 @@ zabbix_export:
           key: clickhouse.replicas.readonly.total
           delay: '0'
           history: 7d
-          description: |
-            Number of Replicated tables that are currently in readonly state
-            due to re-initialization after ZooKeeper session loss
-            or due to startup without ZooKeeper configured.
+          description: 'Number of Replicated tables that are currently in readonly state due to re-initialization after ZooKeeper session loss or due to startup without ZooKeeper configured.'
           preprocessing:
             -
               type: JSONPATH
@@ -962,6 +959,7 @@ zabbix_export:
           key: clickhouse.replicas.sum.queue.size
           delay: '0'
           history: 7d
+          description: 'Number of replication tasks in queue'
           preprocessing:
             -
               type: JSONPATH
@@ -1175,6 +1173,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
+          description: 'Get information about tables.'
           preprocessing:
             -
               type: JSONPATH
@@ -2428,6 +2427,260 @@ zabbix_export:
         -
           macro: '{$CLICKHOUSE.USER}'
           value: zabbix
+      dashboards:
+        -
+          uuid: c642000e289649e8913e0d644b914ecb
+          name: 'ClickHouse: Overview'
+          pages:
+            -
+              name: Main
+              widgets:
+                -
+                  type: graph
+                  'y': '2'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Memory Usage'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '2'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Memory Utilization'
+                -
+                  type: graph
+                  'y': '7'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Insert/Merge bytes rate'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '7'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Insert/Merge rows rate'
+                -
+                  type: graph
+                  'y': '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Current activity'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Current connections'
+                -
+                  type: graph
+                  'y': '17'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Distributed'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '17'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Queries rate'
+                -
+                  type: graph
+                  'y': '22'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Syscalls in fly'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '22'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: Zookeeper exceptions rate'
+                -
+                  type: item
+                  name: 'Port available'
+                  x: '4'
+                  width: '4'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '4'
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        key: 'net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]'
+                -
+                  type: item
+                  name: 'Service available'
+                  width: '4'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '4'
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        key: clickhouse.ping
+                -
+                  type: item
+                  name: Uptime
+                  x: '8'
+                  width: '4'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '4'
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        key: clickhouse.uptime
+                -
+                  type: item
+                  name: Version
+                  x: '12'
+                  width: '4'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '4'
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        key: clickhouse.version
+            -
+              name: Replicas
+              widgets:
+                -
+                  type: graphprototype
+                  width: '12'
+                  height: '15'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: {#DB}.{#TABLE}: Replica queues'
+                -
+                  type: graphprototype
+                  x: '12'
+                  width: '12'
+                  height: '15'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '3'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'ClickHouse by HTTP'
+                        name: 'ClickHouse: {#DB}.{#TABLE}: Replica log activity'
       valuemaps:
         -
           uuid: 4d926c30529447b3816cec3f1440b47a
