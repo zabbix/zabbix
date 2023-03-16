@@ -236,6 +236,11 @@ class User extends ScimApiService {
 	 * @return array          Returns SCIM data that is necessary for PUT request response.
 	 */
 	public function put(array $options): array {
+		// In order to comply with Azure SCIM without flag, attribute active value is transformed to boolean.
+		if (array_key_exists('active', $options) && !is_bool($options['active'])) {
+			$options['active'] = strtolower($options['active']) === 'true' ? true : false;
+		}
+
 		$db_user = $this->validatePut($options);
 		$user_group_names = [];
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
@@ -346,6 +351,14 @@ class User extends ScimApiService {
 	 * @throws APIException
 	 */
 	public function patch(array $options): array {
+		// In order to comply with Azure SCIM without flag, attribute active value is transformed to boolean.
+		foreach ($options['Operations'] as &$operation) {
+			if ($operation['path'] === 'active') {
+				$operation['value'] = strtolower($operation['value']) === 'true' ? true : false;
+			}
+		}
+		unset($operation);
+
 		$this->validatePatch($options, $db_user);
 
 		$user_idp_data = [];
