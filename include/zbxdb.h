@@ -31,8 +31,8 @@
 #define ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT	"verify_ca"
 #define ZBX_DB_TLS_CONNECT_VERIFY_FULL_TXT	"verify_full"
 
-typedef char	**DB_ROW;
-typedef struct zbx_db_result	*DB_RESULT;
+typedef char	**zbx_db_row_t;
+typedef struct zbx_db_result	*zbx_db_result_t;
 
 /* database field value */
 typedef union
@@ -80,7 +80,7 @@ void	zbx_db_deinit_basic(void);
 
 void	zbx_db_init_autoincrement_options_basic(void);
 
-int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh);
+int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg);
 void	zbx_db_close_basic(void);
 
 int	zbx_db_begin_basic(void);
@@ -143,11 +143,11 @@ void	zbx_postgresql_escape_bin(char* src, char **dst, size_t size);
 #endif
 
 int		zbx_db_vexecute(const char *fmt, va_list args);
-DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
-DB_RESULT	zbx_db_select_n_basic(const char *query, int n);
+zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args);
+zbx_db_result_t	zbx_db_select_n_basic(const char *query, int n);
 
-DB_ROW		zbx_db_fetch_basic(DB_RESULT result);
-void		zbx_db_free_result(DB_RESULT result);
+zbx_db_row_t		zbx_db_fetch_basic(zbx_db_result_t result);
+void		zbx_db_free_result(zbx_db_result_t result);
 int		zbx_db_is_null_basic(const char *field);
 
 typedef enum

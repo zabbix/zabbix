@@ -21,7 +21,9 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
@@ -74,6 +76,7 @@ $html_page = (new CHtmlPage())
 								'srcfld1' => 'userid',
 								'srcfld2' => 'fullname',
 								'dstfrm' => 'zbx_filter',
+								'context' => 'audit',
 								'dstfld1' => 'filter_userids_'
 							]
 						]

@@ -436,8 +436,8 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 	ZBX_DC_TREND	*trend;
 	zbx_uint64_t	itemid;
 	size_t		sql_offset;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		clocks[] = {SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, SEC_PER_YEAR, INT_MAX};
 
 	now = time(NULL);
@@ -497,7 +497,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
  * Purpose: helper function for DCflush trends                                *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, size_t *sql_offset)
+static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int num, size_t *sql_offset)
 {
 	zbx_history_value_t	value_min, value_avg, value_max;
 
@@ -528,7 +528,7 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
  * Purpose: helper function for DCflush trends                                *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trends_update_uint(ZBX_DC_TREND *trend, DB_ROW row, int num, size_t *sql_offset)
+static void	dc_trends_update_uint(ZBX_DC_TREND *trend, zbx_db_row_t row, int num, size_t *sql_offset)
 {
 	zbx_history_value_t	value_min, value_avg, value_max;
 	zbx_uint128_t		avg;
@@ -572,8 +572,8 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 {
 
 	int		i, num;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	itemid;
 	ZBX_DC_TREND	*trend;
 	size_t		sql_offset;
@@ -1001,8 +1001,8 @@ static void	db_get_hosts_info_by_hostid(zbx_hashset_t *hosts_info, const zbx_vec
 {
 	int		i;
 	size_t		sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	for (i = 0; i < hostids->values_num; i++)
 	{
@@ -1060,8 +1060,8 @@ zbx_item_info_t;
 static void	db_get_item_names_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
 {
 	size_t		sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,name from items where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
@@ -1098,8 +1098,8 @@ static void	db_get_item_names_by_itemid(zbx_hashset_t *items_info, const zbx_vec
 static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vector_uint64_t *itemids)
 {
 	size_t		sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_item_info_t	*item_info = NULL;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,tag,value from item_tag where");
@@ -2451,8 +2451,8 @@ static void	vc_flag_duplicates(zbx_vector_ptr_t *history_index, zbx_vector_ptr_t
 static void	db_fetch_duplicates(zbx_history_dupl_select_t *query, unsigned char value_type,
 		zbx_vector_ptr_t *duplicates)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (NULL == query->sql)
 		return;
@@ -5238,12 +5238,12 @@ void	free_database_cache(int sync)
  ******************************************************************************/
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 {
-	int		i;
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	ZBX_DC_ID	*id;
-	zbx_uint64_t	min = 0, max = ZBX_DB_MAX_ID, nextid, lastid;
+	int			i;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	const zbx_db_table_t	*table;
+	ZBX_DC_ID		*id;
+	zbx_uint64_t		min = 0, max = ZBX_DB_MAX_ID, nextid, lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d", __func__, table_name, num);
 

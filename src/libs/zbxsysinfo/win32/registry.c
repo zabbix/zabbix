@@ -21,7 +21,7 @@
 #include "../sysinfo.h"
 
 #include "zbxstr.h"
-#include "base64.h"
+#include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
@@ -100,7 +100,7 @@ static int	convert_value(DWORD type, const char *value, DWORD value_len, char **
 
 	switch (type) {
 		case REG_BINARY:
-			str_base64_encode_dyn(value, out, (int)value_len);
+			zbx_base64_encode_dyn(value, out, (int)value_len);
 			return SUCCEED;
 		case REG_DWORD:
 			*out = zbx_dsprintf(NULL, "%u", *(DWORD *)value);

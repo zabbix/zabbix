@@ -30,7 +30,7 @@
 
 static int	DBpatch_6050000(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 		{"history_bin", "itemid,clock,ns", 0,
 			{
 				{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},

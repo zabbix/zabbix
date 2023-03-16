@@ -132,8 +132,8 @@ function getMenuPopupHost(options, trigger_element) {
 		if (options.allowed_ui_problems) {
 			url = new Curl('zabbix.php');
 			url.setArgument('action', 'problem.view');
-			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
 
 			if ('severities' in options) {
 				url.setArgument('severities[]', options.severities);
@@ -165,8 +165,8 @@ function getMenuPopupHost(options, trigger_element) {
 				url.setArgument('evaltype', options.evaltype);
 			}
 
-			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
 
 			items.push({
 				label: t('Latest data'),
@@ -409,7 +409,7 @@ function getMenuPopupMapElementGroup(options) {
 		problems_url = new Curl('zabbix.php');
 
 	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_name', '');
+	problems_url.setArgument('filter_set', '1');
 	problems_url.setArgument('groupids[]', options.groupid);
 	if (typeof options.severities !== 'undefined') {
 		problems_url.setArgument('severities[]', options.severities);
@@ -461,7 +461,7 @@ function getMenuPopupMapElementTrigger(options) {
 	if (options.allowed_ui_problems) {
 		url = new Curl('zabbix.php');
 		url.setArgument('action', 'problem.view');
-		url.setArgument('filter_name', '');
+		url.setArgument('filter_set', '1');
 		url.setArgument('triggerids', options.triggers.map((value) => value.triggerid));
 
 		if ('severities' in options) {
@@ -726,7 +726,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		// events
 		url = new Curl('zabbix.php');
 		url.setArgument('action', 'problem.view');
-		url.setArgument('filter_name', '');
+		url.setArgument('filter_set', '1');
 		url.setArgument('triggerids[]', options.triggerid);
 
 		items.push({
@@ -980,7 +980,7 @@ function getMenuPopupItem(options) {
 		url.setArgument('action', 'latest.view');
 		url.setArgument('hostids[]', options.hostid);
 		url.setArgument('name', options.name);
-		url.setArgument('filter_name', '');
+		url.setArgument('filter_set', '1');
 
 		items.push({
 			label: t('Latest data'),

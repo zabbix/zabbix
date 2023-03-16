@@ -24,7 +24,6 @@
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
 #include "zbxself.h"
-#include "preproc.h"
 
 static zbx_get_program_type_f			get_program_type_cb;
 static zbx_vector_stats_ext_func_t		stats_ext_funcs;

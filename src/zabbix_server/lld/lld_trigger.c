@@ -291,8 +291,8 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
  ******************************************************************************/
 static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *trigger_prototypes, char **error)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	char				*errmsg = NULL;
 
@@ -378,8 +378,8 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
  ******************************************************************************/
 static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	parent_triggerids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
@@ -546,8 +546,8 @@ static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
 
 	if (0 != triggerids.values_num)
 	{
-		DB_RESULT		result;
-		DB_ROW			row;
+		zbx_db_result_t		result;
+		zbx_db_row_t		row;
 		zbx_lld_function_t	*function;
 		zbx_uint64_t		triggerid;
 		char			*sql = NULL;
@@ -636,8 +636,8 @@ static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
  ******************************************************************************/
 static void	lld_dependencies_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_lld_trigger_t		*trigger;
 	zbx_lld_dependency_t		*dependency;
@@ -738,8 +738,8 @@ static void	lld_dependencies_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vecto
  ******************************************************************************/
 static void	lld_tags_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_vector_uint64_t		triggerids;
 	int				i;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
@@ -827,8 +827,8 @@ static void	lld_tags_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_
  ******************************************************************************/
 static void	lld_items_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *items)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_lld_item_t		*item;
 	zbx_vector_uint64_t	parent_triggerids;
 	char			*sql = NULL;
@@ -2140,8 +2140,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 	{
 		char			*sql = NULL;
 		size_t			sql_alloc = 256, sql_offset = 0;
-		DB_RESULT		result;
-		DB_ROW			row;
+		zbx_db_result_t		result;
+		zbx_db_row_t		row;
 		zbx_vector_ptr_t	db_triggers;
 		zbx_lld_trigger_t	*db_trigger;
 
@@ -3173,8 +3173,8 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 	int			i, j;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_lld_trigger_ref_t	*trigger_ref;
 	zbx_lld_trigger_node_t	*trigger_node, trigger_node_local;
 

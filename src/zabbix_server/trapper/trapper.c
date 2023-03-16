@@ -36,7 +36,7 @@
 #include "trapper_request.h"
 #include "zbxavailability.h"
 #include "zbxxml.h"
-#include "base64.h"
+#include "zbxcrypto.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
 #include "zbx_rtc_constants.h"
@@ -451,8 +451,8 @@ out:
 
 static int	DBget_template_count(zbx_uint64_t *count)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		ret = FAIL;
 
 	if (NULL == (result = zbx_db_select("select count(*) from hosts where status=%d", HOST_STATUS_TEMPLATE)))
@@ -470,8 +470,8 @@ out:
 
 static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offline)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	users_offline, users_online = 0;
 	int		now, ret = FAIL;
 
@@ -997,7 +997,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "host", &data_b64))
 	{
-		str_base64_decode(data_b64, host, host_len - 1, &i);
+		zbx_base64_decode(data_b64, host, host_len - 1, &i);
 		host[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1009,7 +1009,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "key", &data_b64))
 	{
-		str_base64_decode(data_b64, key, key_len - 1, &i);
+		zbx_base64_decode(data_b64, key, key_len - 1, &i);
 		key[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1021,7 +1021,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "data", &data_b64))
 	{
-		str_base64_decode(data_b64, data, data_len - 1, &i);
+		zbx_base64_decode(data_b64, data, data_len - 1, &i);
 		data[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1033,7 +1033,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "lastlogsize", &data_b64))
 	{
-		str_base64_decode(data_b64, lastlogsize, lastlogsize_len - 1, &i);
+		zbx_base64_decode(data_b64, lastlogsize, lastlogsize_len - 1, &i);
 		lastlogsize[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1042,7 +1042,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "timestamp", &data_b64))
 	{
-		str_base64_decode(data_b64, timestamp, timestamp_len - 1, &i);
+		zbx_base64_decode(data_b64, timestamp, timestamp_len - 1, &i);
 		timestamp[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1051,7 +1051,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "source", &data_b64))
 	{
-		str_base64_decode(data_b64, source, source_len - 1, &i);
+		zbx_base64_decode(data_b64, source, source_len - 1, &i);
 		source[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1060,7 +1060,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "severity", &data_b64))
 	{
-		str_base64_decode(data_b64, severity, severity_len - 1, &i);
+		zbx_base64_decode(data_b64, severity, severity_len - 1, &i);
 		severity[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
