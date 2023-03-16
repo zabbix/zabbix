@@ -6,10 +6,6 @@
 This template is designed to monitor Veeam Backup Enterprise Manager.
 It works without any external scripts and uses the script item. 
 
-This template has been tested on:
-
-- Veeam Backup and Replication, version 11.0
-
 ***NOTE:*** Veeam Backup Enterprise Manager REST API may not be available for some editions, the template will only work with the following editions of Veeam Backup and Replication:
 
 1. Veeam Universal License (VUL) editions:
@@ -22,6 +18,11 @@ This template has been tested on:
 * Enterprise Plus Socket 
 
 > See [Veeam Data Platform Feature Comparison](https://www.veeam.com/licensing-pricing.html) for more details.
+## Tested versions
+
+This template has been tested on:
+
+- Veeam Backup and Replication, version 11.0
 
 ## Requirements
 
