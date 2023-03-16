@@ -580,11 +580,10 @@ class CDRule extends CApiService {
 					}
 					break;
 				case SVC_ICMPPING:
-					if ($dcheck['allow_redirect'] != 1 && $dcheck['allow_redirect'] != 0) {
+					if (array_key_exists('allow_redirect', $dcheck)
+							&& $dcheck['allow_redirect'] != 1 && $dcheck['allow_redirect'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value "%1$s" for "%2$s" field.',
-								$dcheck['allow_redirect'], 'allow_redirect'
-							)
+							_s('Incorrect value "%1$s" for "%2$s" field.', $dcheck['allow_redirect'], 'allow_redirect')
 						);
 					}
 					break;
