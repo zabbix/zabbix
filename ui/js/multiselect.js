@@ -860,8 +860,11 @@
 				$(this).remove();
 			}
 		});
-		$('input', $obj).each(function(){
-			if (parseInt($(this).val()) === parseInt(id)) {
+		$('input', $obj).each(function() {
+			if (is_number(id) && parseInt($(this).val()) === parseInt(id)) {
+				$(this).remove();
+			}
+			else if (!is_number(id) && $(this).val() == id) {
 				$(this).remove();
 			}
 		});
