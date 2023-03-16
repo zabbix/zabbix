@@ -327,7 +327,7 @@ class CControllerPopupImportCompare extends CController {
 		return $yaml_key;
 	}
 
-	private function objectToRows(array $before, array $after, int $depth, string $id): array {
+	private function objectToRows(array $before, array $after, int $depth, int $id): array {
 		if ($before && $after) {
 			$outer_change_type = self::CHANGE_NONE;
 		}
