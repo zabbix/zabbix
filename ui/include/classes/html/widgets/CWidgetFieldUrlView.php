@@ -23,14 +23,12 @@ use Zabbix\Widgets\Fields\CWidgetFieldUrl;
 
 class CWidgetFieldUrlView extends CWidgetFieldView {
 
-	private const MAX_LENGTH = 2048;
-
 	public function __construct(CWidgetFieldUrl $field) {
 		$this->field = $field;
 	}
 
 	public function getView(): CTextBox {
-		return (new CTextBox($this->field->getName(), $this->field->getValue(), false, self::MAX_LENGTH))
+		return (new CTextBox($this->field->getName(), $this->field->getValue(), false, CWidgetFieldUrl::MAX_LENGTH))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($this->isRequired());
 	}
