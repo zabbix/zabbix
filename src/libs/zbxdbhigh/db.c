@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbx_dbversion_constants.h"
 #include "zbxdbhigh.h"
 
 #include "log.h"
@@ -28,6 +27,7 @@
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
+#include "zbx_dbversion_constants.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 

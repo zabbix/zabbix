@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbx_dbversion_constants.h"
-
 #include "zbxhistory.h"
 #include "history.h"
 
@@ -28,6 +26,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxvariant.h"
+#include "zbx_dbversion_constants.h"
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
 #if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00

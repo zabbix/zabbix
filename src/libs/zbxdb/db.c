@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbx_dbversion_constants.h"
 #include "zbxdb.h"
 
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "log.h"
+#include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
