@@ -39,7 +39,6 @@ $web_layout_mode = $this->getLayoutMode();
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
-			->cleanItems()
 			->setName('map.view')
 			->addVar('action', 'map.view')
 			->addVar('sysmapid', $data['map']['sysmapid'])

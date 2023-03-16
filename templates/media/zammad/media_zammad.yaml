@@ -1,6 +1,5 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-12-14T12:07:56Z'
+  version: '6.4'
   media_types:
     -
       name: Zammad

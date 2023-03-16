@@ -51,6 +51,7 @@ typedef struct
 	size_t			headers_in_alloc;
 	size_t			headers_in_offset;
 	unsigned char		custom_header;
+	size_t			headers_sz;
 }
 zbx_es_httprequest_t;
 
@@ -113,9 +114,16 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 
 	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
-	request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1);
-	if (NULL != request)
+
+	if (NULL != (request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1)))
 	{
+		zbx_es_env_t	*env;
+
+		if (NULL == (env = zbx_es_get_env(ctx)))
+			return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+		env->http_req_objects--;
+
 		if (NULL != request->headers)
 			curl_slist_free_all(request->headers);
 		if (NULL != request->handle)
@@ -138,12 +146,20 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 {
+#define MAX_HTTPREQUEST_OBJECT_COUNT	10
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
+	zbx_es_env_t		*env;
 	int			err_index = -1;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	if (MAX_HTTPREQUEST_OBJECT_COUNT == env->http_req_objects)
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "maximum count of HttpRequest objects was reached");
 
 	duk_push_this(ctx);
 
@@ -182,7 +198,10 @@ out:
 		return duk_throw(ctx);
 	}
 
+	env->http_req_objects++;
+
 	return 0;
+#undef MAX_HTTPREQUEST_OBJECT_COUNT
 }
 
 /******************************************************************************
@@ -192,10 +211,12 @@ out:
  ******************************************************************************/
 static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 {
+#define ZBX_ES_MAX_HEADERS_SIZE	ZBX_KIBIBYTE * 128
 	zbx_es_httprequest_t	*request;
 	CURLcode		err;
 	char			*utf8 = NULL;
 	int			err_index = -1;
+	size_t			header_sz;
 
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
@@ -206,9 +227,20 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 		goto out;
 	}
 
+	header_sz = strlen(utf8);
+
+	if (ZBX_ES_MAX_HEADERS_SIZE < request->headers_sz + header_sz)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "headers exceeded maximum size of "
+				ZBX_FS_UI64 " bytes.", ZBX_ES_MAX_HEADERS_SIZE);
+
+		goto out;
+	}
+
 	request->headers = curl_slist_append(request->headers, utf8);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	request->custom_header = 1;
+	request->headers_sz += header_sz + 1;
 out:
 	zbx_free(utf8);
 
@@ -216,6 +248,7 @@ out:
 		return duk_throw(ctx);
 
 	return 0;
+#undef ZBX_ES_MAX_HEADERS_SIZE
 }
 
 /******************************************************************************
@@ -233,6 +266,7 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 	curl_slist_free_all(request->headers);
 	request->headers = NULL;
 	request->custom_header = 0;
+	request->headers_sz = 0;
 
 	return 0;
 }
@@ -298,6 +332,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 		{
 			curl_slist_free_all(request->headers);
 			request->headers = NULL;
+			request->headers_sz = 0;
 		}
 
 		if (NULL != contents)
@@ -314,6 +349,10 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
 	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS, err);
+#endif
 
 	request->data_offset = 0;
 	request->headers_in_offset = 0;

@@ -1,6 +1,5 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-06-07T19:33:39Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +17,10 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.43
+      vendor:
+        name: Zabbix
+        version: 6.4-0
       groups:
         -
           name: Templates/Applications
@@ -649,7 +651,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -665,7 +666,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
         -
           uuid: 8cfc88eb0f6b4ae09d93bd9fc275659d
@@ -837,7 +837,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -853,7 +852,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
         -
           uuid: 5d4a17f09a7e4ad3b4ac72c30bac5e7d
@@ -1025,7 +1023,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -1041,7 +1038,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
       tags:
         -

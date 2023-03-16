@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('service')))->removeId())
 	->setId('service-form')
 	->setName('service_form')
 	->addItem(getMessages());
@@ -115,12 +116,11 @@ $service_tab = (new CFormGrid())
 	->addItem([
 		new CLabel([
 			_('Status calculation rule'),
-			(new CSpan([
-				' ',
+			(new CSpan(
 				makeWarningIcon(
 					_('Status calculation rule and additional rules are only applicable if child services exist.')
 				)
-			]))
+			))
 				->setId('algorithm-not-applicable-warning')
 				->addStyle($data['form']['children'] ? 'display: none' : '')
 		], 'algorithm_focusable'),

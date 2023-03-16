@@ -29,7 +29,6 @@ $form_action = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $form = (new CForm('post', $form_action))
-	->cleanItems()
 	->setId('media-type-mapping-edit-form')
 	->setName('media-type-mapping-edit-form')
 	->addItem(
@@ -48,9 +47,11 @@ $form
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'media-type-mapping-name'))->setAsteriskMark(),
-			new CFormField((new CTextBox('name', $data['name']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setId('media-type-mapping-name'))
+			new CFormField(
+				(new CTextBox('name', $data['name'], false, DB::getFieldLength('userdirectory_media', 'name')))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setId('media-type-mapping-name')
+			)
 		])
 		->addItem([
 			(new CLabel(_('Media type'), $media_type_select->getFocusableElementId()))->setAsteriskMark(),
@@ -58,9 +59,12 @@ $form
 		])
 		->addItem([
 			(new CLabel(_('Attribute'), 'attribute'))->setAsteriskMark(),
-			new CFormField((new CTextBox('attribute', $data['attribute']))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setId('attribute')
+			new CFormField(
+				(new CTextBox('attribute', $data['attribute'], false,
+					DB::getFieldLength('userdirectory_media', 'attribute')
+				))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setId('attribute')
 			)
 		])
 	)

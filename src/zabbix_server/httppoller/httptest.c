@@ -678,6 +678,15 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay
 		goto clean;
 	}
 
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+		goto clean;
+	}
+#endif
+
 	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, httptest->httptest.ssl_cert_file,
 			httptest->httptest.ssl_key_file, httptest->httptest.ssl_key_password,
 			httptest->httptest.verify_peer, httptest->httptest.verify_host, &err_str))
@@ -842,7 +851,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay
 		}
 
 		if (SUCCEED != zbx_http_prepare_auth(easyhandle, httptest->httptest.authentication,
-				httptest->httptest.http_user, httptest->httptest.http_password, &err_str))
+				httptest->httptest.http_user, httptest->httptest.http_password, NULL, &err_str))
 		{
 			goto httpstep_error;
 		}

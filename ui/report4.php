@@ -122,7 +122,6 @@ if ($media_types) {
 	}
 
 	$html_page->setControls((new CForm('get'))
-		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem($controls)
 		->setName('report4')

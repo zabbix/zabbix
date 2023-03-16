@@ -157,7 +157,6 @@ class CWidgetFormView {
 			'header' => $this->data['unique_id'] !== null ? _('Edit widget') : _('Add widget'),
 			'body' => implode('', [
 				(new CForm())
-					->cleanItems()
 					->setId('widget-dialogue-form')
 					->setName($this->name)
 					->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FORM)
@@ -236,11 +235,16 @@ class CWidgetFormView {
 
 		$this->form_grid = (new CFormGrid())
 			->addItem([
-				new CLabel(_('Type'), 'label-type'),
-				new CFormField(array_key_exists($this->data['type'], $this->data['deprecated_types'])
-					? [$types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))]
-					: $types_select
-				)
+				new CLabel(
+					[
+						_('Type'),
+						array_key_exists($this->data['type'], $this->data['deprecated_types'])
+							? makeWarningIcon(_('Widget is deprecated.'))
+							: null
+					],
+					'label-type'
+				),
+				new CFormField($types_select)
 			])
 			->addItem(
 				(new CFormField(

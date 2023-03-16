@@ -552,8 +552,9 @@ function overlayDialogue(params, trigger_elmnt) {
  * @param {Node} trigger_element	UI element that was clicked to open overlay dialogue.
  * @param string hostid				Host ID.
  * @param string eventid			Event ID.
+ * @param string csrf_token			CSRF token.
  */
-function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null) {
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token) {
 	var execute = function() {
 		var popup_options = {scriptid: scriptid};
 
@@ -566,6 +567,8 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 		}
 
 		if (Object.keys(popup_options).length === 2) {
+			popup_options._csrf_token = csrf_token;
+
 			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
 		}
 	};
@@ -809,7 +812,7 @@ function downloadSvgImage(svg, file_name) {
 		canvas = document.createElement('canvas'),
 		labels = $dom_node.next('.svg-graph-legend'),
 		$clone = $dom_node.clone(),
-		$container = $dom_node.closest('.dashboard-grid-widget-content'),
+		$container = $dom_node.closest('.dashboard-grid-widget-contents'),
 		image = new Image,
 		a = document.createElement('a'),
 		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),

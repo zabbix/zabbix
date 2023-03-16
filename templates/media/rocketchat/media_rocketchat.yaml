@@ -1,6 +1,5 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-01-14T12:31:14Z'
+  version: '6.4'
   media_types:
     -
       name: Rocket.Chat

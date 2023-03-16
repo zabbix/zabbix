@@ -34,6 +34,7 @@ $html_page = new CHtmlPage();
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
 	$doc_url = CDocHelper::USERS_USER_EDIT;
+	$csrf_token = CCsrfTokenHelper::get('user');
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -42,6 +43,7 @@ else {
 		: $data['username'];
 	$html_page->setTitleSubmenu(getUserSettingsSubmenu());
 	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
+	$csrf_token = CCsrfTokenHelper::get('userprofile');
 }
 
 $html_page
@@ -64,6 +66,7 @@ if ($data['readonly'] == true) {
 // Create form.
 $user_form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-form')
 	->setName('user_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -351,16 +354,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->setEnabled(!$data['readonly']);
 		}
 		else {
-			$media_name = new CDiv([
-				$media['name'],
-				(new CSpan([
-					' ',
-					makeWarningIcon(
-						_('Media type disabled by Administration.')
-					)
-				]))
-			]);
-
+			$media_name = new CDiv([$media['name'], makeWarningIcon(_('Media type disabled by Administration.'))]);
 			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);
 		}
 
@@ -835,8 +829,10 @@ if ($data['action'] === 'user.edit') {
 		$tabs->setFooter(makeFormFooter(
 			(new CSubmitButton(_('Update'), 'action', 'user.update'))->setId('update'),
 			[
-				(new CRedirectButton(_('Delete'),
-					'zabbix.php?action=user.delete&sid='.$data['sid'].'&userids[]='.$data['userid'],
+				(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'user.delete')
+					->setArgument('userids', [$data['userid']])
+					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 					_('Delete selected user?')
 				))
 					->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)

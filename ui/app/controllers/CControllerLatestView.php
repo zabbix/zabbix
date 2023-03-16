@@ -25,7 +25,7 @@
 class CControllerLatestView extends CControllerLatest {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -51,6 +51,7 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
+			'filter_set' =>				'in 1',
 			'filter_reset' =>			'in 1',
 			'counter_index' =>			'ge 0',
 			'subfilter_hostids' =>		'array',
@@ -124,6 +125,10 @@ class CControllerLatestView extends CControllerLatest {
 		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
 		}
+		elseif ($this->hasInput('filter_set')) {
+			$profile->setTabFilter(0, ['filter_name' => ''] + $this->cleanInput($this->getInputAll()));
+			$profile->update();
+		}
 		else {
 			$profile->setInput($this->cleanInput($this->getInputAll()));
 		}
@@ -192,7 +197,8 @@ class CControllerLatestView extends CControllerLatest {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page']
+				'page' => $filter['page'],
+				'csrf_token' => CCsrfTokenHelper::get('tabfilter')
 			],
 			'filter' => $filter,
 			'subfilters' => $subfilters,

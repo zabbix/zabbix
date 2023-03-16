@@ -35,7 +35,7 @@ const DASHBOARD_EVENT_EDIT = 'dashboard-edit';
 const DASHBOARD_EVENT_APPLY_PROPERTIES = 'dashboard-apply-properties';
 const DASHBOARD_EVENT_CONFIGURATION_OUTDATED = 'dashboard-configuration-outdated';
 
-class CDashboard extends CBaseComponent {
+class CDashboard {
 
 	constructor(target, {
 		containers,
@@ -56,9 +56,10 @@ class CDashboard extends CBaseComponent {
 		can_edit_dashboards,
 		is_kiosk_mode,
 		time_period,
-		dynamic_hostid
+		dynamic_hostid,
+		csrf_token = null
 	}) {
-		super(target);
+		this._target = target;
 
 		this._containers = {
 			grid: containers.grid,
@@ -97,6 +98,7 @@ class CDashboard extends CBaseComponent {
 		this._is_kiosk_mode = is_kiosk_mode;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
+		this._csrf_token = csrf_token;
 
 		this._init();
 		this._registerEvents();
@@ -526,6 +528,7 @@ class CDashboard extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
+			csrf_token: this._csrf_token,
 			unique_id: this._createUniqueId()
 		});
 
@@ -2178,5 +2181,48 @@ class CDashboard extends CBaseComponent {
 		if (this._time_period !== null) {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
 		}
+	}
+
+	/**
+	 * Attach event listener to dashboard events.
+	 *
+	 * @param {string}			type
+	 * @param {function}		listener
+	 * @param {Object|false}	options
+	 *
+	 * @returns {CDashboard}
+	 */
+	on(type, listener, options = false) {
+		this._target.addEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Detach event listener from dashboard events.
+	 *
+	 * @param {string}			type
+	 * @param {function}		listener
+	 * @param {Object|false}	options
+	 *
+	 * @returns {CDashboard}
+	 */
+	off(type, listener, options = false) {
+		this._target.removeEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Dispatch dashboard event.
+	 *
+	 * @param {string}	type
+	 * @param {Object}	detail
+	 * @param {Object}	options
+	 *
+	 * @returns {boolean}
+	 */
+	fire(type, detail = {}, options = {}) {
+		return this._target.dispatchEvent(new CustomEvent(type, {...options, detail: {target: this, ...detail}}));
 	}
 }

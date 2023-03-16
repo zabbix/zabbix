@@ -296,12 +296,16 @@ abstract class CItemGeneralOld extends CApiService {
 					$item['name']
 				);
 
-				// apply rules
-				foreach ($this->fieldRules as $field => $rules) {
-					if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
-						$rules['template'] = 1;
-					}
+				$field_rules = $this->fieldRules;
 
+				if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
+					$field_rules = [
+						'params' => ['template' => 1]
+					] + $this->fieldRules;
+				}
+
+				// apply rules
+				foreach ($field_rules as $field => $rules) {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
 
@@ -1708,9 +1712,8 @@ abstract class CItemGeneralOld extends CApiService {
 							));
 						}
 
-						if (!in_array($params[1], [ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED,
-									ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, ZBX_PREPROC_SNMP_WALK_TREAT_MAC
-								])) {
+						if (!in_array($params[1], [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX,
+								ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('incorrect value'))
 							);
@@ -1745,9 +1748,8 @@ abstract class CItemGeneralOld extends CApiService {
 
 							// Field "Treat as" every 3rd value. Check that field is correct.
 							if ($n % 3 === 0) {
-								if (!in_array($param, [ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED,
-											ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, ZBX_PREPROC_SNMP_WALK_TREAT_MAC
-										])) {
+								if (!in_array($param, [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX,
+										ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
 										_s('Incorrect value for field "%1$s": %2$s.', 'params', _('incorrect value'))
 									);
@@ -2630,17 +2632,17 @@ abstract class CItemGeneralOld extends CApiService {
 			],
 			'verify_peer' => [
 				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])
+				'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])
 			],
 			'verify_host' => [
 				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])
+				'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])
 			],
 			'authtype' => [
 				'type' => API_INT32,
 				'in' => implode(',', [
-					HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-					HTTPTEST_AUTH_DIGEST
+					ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+					ZBX_HTTP_AUTH_DIGEST
 				])
 			]
 		];
@@ -2648,8 +2650,8 @@ abstract class CItemGeneralOld extends CApiService {
 		$data = $item + $db_item;
 
 		if (array_key_exists('authtype', $data)
-				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM
-					|| $data['authtype'] == HTTPTEST_AUTH_KERBEROS || $data['authtype'] == HTTPTEST_AUTH_DIGEST)) {
+				&& ($data['authtype'] == ZBX_HTTP_AUTH_BASIC || $data['authtype'] == ZBX_HTTP_AUTH_NTLM
+					|| $data['authtype'] == ZBX_HTTP_AUTH_KERBEROS || $data['authtype'] == ZBX_HTTP_AUTH_DIGEST)) {
 			$rules += [
 				'username' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 				'password' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')]

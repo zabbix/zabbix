@@ -21,6 +21,10 @@
 
 class CControllerAuditLogList extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'page' =>					'ge 1',
@@ -49,10 +53,10 @@ class CControllerAuditLogList extends CController {
 	}
 
 	protected function doAction(): void {
-		if ($this->getInput('filter_set', 0)) {
+		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}
-		elseif ($this->getInput('filter_rst', 0)) {
+		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfiles();
 		}
 
@@ -80,7 +84,7 @@ class CControllerAuditLogList extends CController {
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
 		$users = [];
-		$non_existent_userids = [];
+		$non_existent_userids = [0];
 
 		$filter = [
 			'action' => $data['auditlog_actions']
@@ -123,21 +127,22 @@ class CControllerAuditLogList extends CController {
 				'preservekeys' => true
 			]);
 
+			if (in_array('0', $data['userids'])) {
+				$users[0] = ['userid' => '0', 'username' => 'System', 'name' => '', 'surname' => ''];
+			}
+
 			$data['userids'] = $this->sanitizeUsersForMultiselect($users);
 
 			if ($users) {
 				$params['userids'] = array_column($users, 'userid');
-				$data['auditlogs'] = API::AuditLog()->get($params);
 			}
 
 			$users = array_map(function(array $value): string {
 				return $value['username'];
 			}, $users);
 		}
-		else {
-			$data['auditlogs'] = API::AuditLog()->get($params);
-		}
 
+		$data['auditlogs'] = API::AuditLog()->get($params);
 		$data['paging'] = CPagerHelper::paginate($data['page'], $data['auditlogs'], ZBX_SORT_UP,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
@@ -175,10 +180,6 @@ class CControllerAuditLogList extends CController {
 		$this->setResponse($response);
 	}
 
-	protected function init(): void {
-		$this->disableSIDValidation();
-	}
-
 	/**
 	 * Return associated list of available actions and labels.
 	 *
@@ -209,6 +210,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_AUTH_TOKEN => _('API token'),
 			CAudit::RESOURCE_AUTHENTICATION => _('Authentication'),
 			CAudit::RESOURCE_AUTOREGISTRATION  => _('Autoregistration'),
+			CAudit::RESOURCE_CONNECTOR => _('Connector'),
 			CAudit::RESOURCE_CORRELATION => _('Event correlation'),
 			CAudit::RESOURCE_DASHBOARD => _('Dashboard'),
 			CAudit::RESOURCE_DISCOVERY_RULE => _('Discovery rule'),

@@ -182,8 +182,8 @@ class CConfigurationImportcompare {
 	 * Compare two entities and separate all their keys into added/removed/updated.
 	 * First entities gets compared by uuid then by its unique field values.
 	 *
-	 * @param array $before
-	 * @param array $after
+	 * @param array  $before
+	 * @param array  $after
 	 * @param string $type
 	 *
 	 * @return array
@@ -213,7 +213,6 @@ class CConfigurationImportcompare {
 				if ($before_entity['uuid'] == $after_entity['uuid']
 						|| $before_entity['uniqueness'] == $after_entity['uniqueness']) {
 					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
-
 					$before_entity['uuid'] = $after_entity['uuid'];
 
 					$same_entities[$b_key]['before'] = $before_entity;
@@ -227,6 +226,7 @@ class CConfigurationImportcompare {
 
 		$removed_entities = $before;
 		$added_entities = $after;
+
 		foreach ($added_entities as $entity) {
 			unset($entity['uniqueness']);
 
@@ -281,8 +281,8 @@ class CConfigurationImportcompare {
 	/**
 	 * Get entity field values by giving field key path constructed.
 	 *
-	 * @param array        $entity    entity
-	 * @param string|array $field_key
+	 * @param array        $entity    Entity.
+	 * @param string|array $field_key Field key or field key path given.
 	 */
 	private function getUniqueValuesByFieldPath(array $entity, $field_key_path) {
 		if (is_array($field_key_path)) {

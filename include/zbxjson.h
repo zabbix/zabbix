@@ -300,6 +300,7 @@ void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value
 void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value);
 void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data);
 void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value);
+void	zbx_json_adddouble(struct zbx_json *j, const char *name, double value);
 int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);
@@ -364,7 +365,9 @@ struct zbx_jsonobj
 {
 	zbx_json_type_t		type;
 	zbx_jsonobj_data_t	data;
+
 	zbx_jsonobj_index_t	*index;
+	int			index_num;	/* used by root object - number of indexed children */
 };
 
 typedef struct
@@ -382,5 +385,7 @@ int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj);
 void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);
 int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output);
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj);
+
+void	zbx_jsonobj_disable_indexing(zbx_jsonobj_t *obj);
 
 #endif /* ZABBIX_ZJSON_H */

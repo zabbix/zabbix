@@ -384,8 +384,8 @@ class C44ImportConverterTest extends CImportConverterTest {
 								[
 									'interface_ref' => 'if1',
 									'name' => 'test',
-									'type' => 0,
-									'key' => 'vfs.file.contents[/tmp/discovery2.txt]</',
+									'type' => 'SNMPV1',
+									'key' => 'vfs.file.contents[/tmp/discovery2.txt]',
 									'item_prototypes' => [
 										[
 											'name' => 'snmp empty port',
@@ -441,7 +441,7 @@ class C44ImportConverterTest extends CImportConverterTest {
 									'interface_ref' => 'if1',
 									'name' => 'test',
 									'type' => 'SNMP_AGENT',
-									'key' => 'vfs.file.contents[/tmp/discovery2.txt]</',
+									'key' => 'vfs.file.contents[/tmp/discovery2.txt]',
 									'item_prototypes' => [
 										[
 											'name' => 'snmp empty port',

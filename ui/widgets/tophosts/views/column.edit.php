@@ -27,7 +27,6 @@
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('tophosts_column')
 	->addStyle('display: none;')
 	->addVar('action', $data['action'])
@@ -116,17 +115,19 @@ $form_grid->addItem([
 	)
 ]);
 
-$numeric_only_warning = new CSpan([
-	'&nbsp;',
+$numeric_only_warning = new CSpan(
 	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
-]);
+);
 
 // Aggregation function.
 $form_grid->addItem([
-	new CLabel([
-		_('Aggregation function'),
-		$numeric_only_warning->setId('tophosts-column-aggregate-function-warning')
-	], 'aggregate_function'),
+	new CLabel(
+		[
+			_('Aggregation function'),
+			$numeric_only_warning->setId('tophosts-column-aggregate-function-warning')
+		],
+		'aggregate_function'
+	),
 	new CFormField(
 		(new CSelect('aggregate_function'))
 			->setValue($data['aggregate_function'])
@@ -153,10 +154,13 @@ $form_grid->addItem([
 
 // Display.
 $form_grid->addItem([
-	new CLabel([
-		_('Display'),
-		$numeric_only_warning->setId('tophosts-column-display-warning')
-	], 'display'),
+	new CLabel(
+		[
+			_('Display'),
+			$numeric_only_warning->setId('tophosts-column-display-warning')
+		],
+		'display'
+	),
 	new CFormField(
 		(new CRadioButtonList('display', (int) $data['display']))
 			->addValue(_('As is'), CWidgetFieldColumnsList::DISPLAY_AS_IS)
@@ -168,12 +172,17 @@ $form_grid->addItem([
 
 // History data.
 $form_grid->addItem([
-	new CLabel([
-		_('History data'),
-		makeHelpIcon(
-			_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
-		)
-	], 'history'),
+	new CLabel(
+		[
+			_('History data'),
+			(new CSpan(
+				makeWarningIcon(
+					_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
+				)
+			))->setId('tophosts-column-history-data-warning')
+		],
+		'history'
+	),
 	new CFormField(
 		(new CRadioButtonList('history', (int) $data['history']))
 			->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
@@ -207,6 +216,14 @@ $form_grid->addItem([
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('calculated'))
 	)
+]);
+
+// Decimal places.
+$form_grid->addItem([
+	new CLabel(_('Decimal places'), 'decimal_places'),
+	(new CFormField(
+		(new CNumericBox('decimal_places', $data['decimal_places'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	))
 ]);
 
 // Thresholds table.
