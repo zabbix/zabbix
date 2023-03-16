@@ -49,7 +49,7 @@ GRANT SELECT ON DBA_TABLESPACES TO c##zabbix_mon;
 GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO c##zabbix_mon;
 GRANT SELECT ON DBA_USERS TO c##zabbix_mon;
 ```
-This is needed because template uses ```CDB_*``` views to monitor tablespaces from CDB and different PDBs therefore the monitoring user needs access to container data objects on all PDBs.
+This is needed because the template uses ```CDB_*``` views to monitor tablespaces from CDB and different PDBs, and, therefore, the monitoring user needs access to the container data objects on all PDBs.
 
 However, if you wish to monitor only a single PDB or non-CDB instance, a local user is sufficient:
  
