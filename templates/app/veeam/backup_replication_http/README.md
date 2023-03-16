@@ -17,7 +17,6 @@ It works without any external scripts and uses the script item.
 * Enterprise Plus Socket  
 
 > See [Veeam Data Platform Feature Comparison](https://www.veeam.com/licensing-pricing.html) for more details.   
-         
 ## Tested versions
 
 This template has been tested on:
