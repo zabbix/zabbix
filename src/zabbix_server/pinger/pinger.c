@@ -24,12 +24,12 @@
 #include "zbxicmpping.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "preproc.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxpreproc.h"
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1

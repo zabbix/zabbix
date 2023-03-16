@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 https://kb.netgear.com/24352/MIBs-for-Smart-switches
 
 This template was tested on:
