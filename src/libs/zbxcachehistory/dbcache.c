@@ -4007,9 +4007,9 @@ static void	dc_local_add_history_uint(zbx_uint64_t itemid, unsigned char item_va
 }
 
 
-static void	dc_local_add_history_text_bin_helper(int value_type, zbx_uint64_t itemid, unsigned char item_value_type,
-		const zbx_timespec_t *ts, const char *value_orig, zbx_uint64_t lastlogsize, int mtime,
-		unsigned char flags)
+static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_uint64_t itemid,
+		unsigned char item_value_type, const zbx_timespec_t *ts, const char *value_orig,
+		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
 	dc_item_value_t	*item_value = dc_local_get_history_slot();
 
