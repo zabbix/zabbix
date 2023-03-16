@@ -248,6 +248,21 @@ class Group extends ScimApiService {
 		}
 		$db_scim_group = $db_scim_groups[0];
 
+		if ($options['displayName'] !== $db_scim_group['name']) {
+			$scim_groupid = DB::update('scim_group', [
+				'values' => ['name' => $options['displayName']],
+				'where' => ['scim_groupid' => $options['id']]
+			]);
+
+			if (!$scim_groupid) {
+				self::exception(self::SCIM_INTERNAL_ERROR,
+					'Cannot update group '.$db_scim_group['name'].' to group '.$options['displayName'].'.'
+				);
+			}
+
+			$db_scim_group['name'] = $options['displayName'];
+		}
+
 		$scim_group_members = array_column($options['members'], 'value');
 
 		$db_scim_group_members = DB::select('user_scim_group', [
@@ -356,60 +371,78 @@ class Group extends ScimApiService {
 		}
 
 		foreach ($operations as $operation) {
-			$db_users = [];
-			$scim_users = [];
-			switch ($operation['op']) {
-				case 'add':
-					$scim_users = array_column($operation['value'], 'value') ?: [];
-					$db_users = $this->verifyUserids($scim_users, $userdirectoryid);
+			if ($operation['path'] === 'displayName') {
+				$scim_groupid = DB::update('scim_group', [
+					'values' => ['name' => $operation['value']],
+					'where' => ['scim_groupid' => $options['id']]
+				]);
 
-					$db_scim_group_members = DB::select('user_scim_group', [
-						'output' => ['userid'],
-						'filter' => ['scim_groupid' => $options['id'], 'userid' => $scim_users]
-					]);
-					$db_scim_group_members = array_column($db_scim_group_members, 'userid');
-					$new_scim_group_members = array_diff($scim_users, $db_scim_group_members);
+				if (!$scim_groupid) {
+					self::exception(self::SCIM_INTERNAL_ERROR,
+						'Cannot update group '.$db_scim_groups[0]['name'].' to group '.$operation['value'].'.'
+					);
+				}
 
-					$this->patchAddUserToGroup($options['id'], $new_scim_group_members);
-
-					break;
-
-				case 'replace':
-					$db_scim_group_members = DB::select('user_scim_group', [
-						'output' => ['userid'],
-						'filter' => ['scim_groupid' => $options['id']]
-					]);
-					$db_scim_group_members = array_column($db_scim_group_members, 'userid');
-
-					DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
-
-					$scim_users = array_column($operation['value'], 'value');
-					$db_users = $this->verifyUserids($scim_users, $userdirectoryid);
-
-					$this->patchAddUserToGroup($options['id'], $scim_users);
-
-					$scim_users = array_unique(array_merge($db_scim_group_members, $scim_users));
-
-					break;
-
-				case 'remove':
-					$db_users = [];
-					if (!array_key_exists('value', $operation)) {
-						DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
-					}
-					else {
-						$scim_users = array_column($operation['value'], 'value');
-
-						$this->verifyUserids($scim_users, $userdirectoryid);
-
-						DB::delete('user_scim_group', ['userid' => $scim_users, 'scim_groupid' => $options['id']]);
-					}
-
-					break;
+				$db_scim_groups[0]['name'] = $operation['value'];
 			}
 
-			foreach ($scim_users as $scim_user) {
-				$this->updateProvisionedUserGroups($scim_user, $userdirectoryid);
+			if ($operation['path'] === 'members') {
+				$db_users = [];
+				$scim_users = [];
+
+				switch ($operation['op']) {
+					case 'add':
+						$scim_users = array_column($operation['value'], 'value') ?: [];
+						$db_users = $this->verifyUserids($scim_users, $userdirectoryid);
+
+						$db_scim_group_members = DB::select('user_scim_group', [
+							'output' => ['userid'],
+							'filter' => ['scim_groupid' => $options['id'], 'userid' => $scim_users]
+						]);
+						$db_scim_group_members = array_column($db_scim_group_members, 'userid');
+						$new_scim_group_members = array_diff($scim_users, $db_scim_group_members);
+
+						$this->patchAddUserToGroup($options['id'], $new_scim_group_members);
+
+						break;
+
+					case 'replace':
+						$db_scim_group_members = DB::select('user_scim_group', [
+							'output' => ['userid'],
+							'filter' => ['scim_groupid' => $options['id']]
+						]);
+						$db_scim_group_members = array_column($db_scim_group_members, 'userid');
+
+						DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
+
+						$scim_users = array_column($operation['value'], 'value');
+						$db_users = $this->verifyUserids($scim_users, $userdirectoryid);
+
+						$this->patchAddUserToGroup($options['id'], $scim_users);
+
+						$scim_users = array_unique(array_merge($db_scim_group_members, $scim_users));
+
+						break;
+
+					case 'remove':
+						$db_users = [];
+						if (!array_key_exists('value', $operation)) {
+							DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
+						}
+						else {
+							$scim_users = array_column($operation['value'], 'value');
+
+							$this->verifyUserids($scim_users, $userdirectoryid);
+
+							DB::delete('user_scim_group', ['userid' => $scim_users, 'scim_groupid' => $options['id']]);
+						}
+
+						break;
+				}
+
+				foreach ($scim_users as $scim_user) {
+					$this->updateProvisionedUserGroups($scim_user, $userdirectoryid);
+				}
 			}
 
 			$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
@@ -428,8 +461,12 @@ class Group extends ScimApiService {
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
-				'op' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'])],
-				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId'])],
+				'op' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'path', 'in' => 'displayName'], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['replace', 'Replace'])],
+									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'])]
+				]],
+				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId', 'displayName'])],
+
 				'value' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'path', 'in' => 'members'], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 										'value' =>		['type' => API_ID]
@@ -504,7 +541,7 @@ class Group extends ScimApiService {
 	 *
 	 * @return void
 	 */
-	private function setData(string $scim_groupid, string $scim_group_name, array $users): void {
+	private function setData(string $scim_groupid, string $scim_group_name, array $users = null): void {
 		$this->data += $this->prepareData($scim_groupid, $scim_group_name, $users);
 	}
 
@@ -524,20 +561,25 @@ class Group extends ScimApiService {
 	 *         ['members'][]['value']
 	 *         ['members'][]['display']
 	 */
-	private function prepareData(string $scim_groupid, string $scim_group_name, array $users): array {
-		$members = [];
-		foreach ($users as $user) {
-			$members[] = [
-				'value' => $user['userid'],
-				'display' => $user['username']
-			];
-		}
-
-		return [
+	private function prepareData(string $scim_groupid, string $scim_group_name, array $users = null): array {
+		$data = [
 			'id' => $scim_groupid,
 			'displayName' => $scim_group_name,
-			'members' => $members
 		];
+
+		if ($users !== null) {
+			$members = [];
+			foreach ($users as $user) {
+				$members[] = [
+					'value' => $user['userid'],
+					'display' => $user['username']
+				];
+			}
+
+			$data['members'] = $members;
+		}
+
+		return $data;
 	}
 
 	/**
