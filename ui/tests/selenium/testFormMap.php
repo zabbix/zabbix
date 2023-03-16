@@ -160,6 +160,7 @@ class testFormMap extends CLegacyWebTest {
 		$form->query('button:Add')->one()->click();
 
 		// Take a screenshot to test draggable object position for triggers of trigger type map element.
+		// TODO: screenshot should be changed after fix ZBX-22528
 		$this->page->removeFocus();
 		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
 	}
