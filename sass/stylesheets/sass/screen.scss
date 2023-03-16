@@ -1404,6 +1404,16 @@ form {
 			padding-top: 0;
 		}
 
+		.na-bg,
+		.normal-bg,
+		.info-bg,
+		.average-bg,
+		.warning-bg,
+		.high-bg,
+		.disaster-bg {
+			padding-left: 5px;
+		}
+
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
@@ -3188,14 +3198,6 @@ $form-icon-btn: (
 	.list-table {
 		white-space: normal;
 		border: 0;
-
-		th {
-			@extend %dashboard-widget-td;
-		}
-
-		td {
-			@extend %dashboard-widget-td;
-		}
 	}
 
 	.table-paging {

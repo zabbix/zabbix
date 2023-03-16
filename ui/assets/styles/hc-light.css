@@ -1406,9 +1406,9 @@ footer {
   .dashboard-widget.dashboard-widget-fluid {
     margin-right: 0; }
 
-.dashboard-grid-widget-content .list-table th:first-child, .dashboard-grid-widget-content .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
+.dashboard-grid-widget-content .list-table th:first-child, .dashboard-grid-widget-content .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child {
   padding-left: 10px; }
-.dashboard-grid-widget-content .list-table th:last-child, .dashboard-grid-widget-content .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+.dashboard-grid-widget-content .list-table th:last-child, .dashboard-grid-widget-content .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child {
   padding-right: 10px; }
 
 .dashboard-widget-head {
@@ -3489,6 +3489,14 @@ form.is-loading {
     position: relative; }
     .table-forms .table-forms-td-right.has-before {
       padding-top: 0; }
+    .table-forms .table-forms-td-right .na-bg,
+    .table-forms .table-forms-td-right .normal-bg,
+    .table-forms .table-forms-td-right .info-bg,
+    .table-forms .table-forms-td-right .average-bg,
+    .table-forms .table-forms-td-right .warning-bg,
+    .table-forms .table-forms-td-right .high-bg,
+    .table-forms .table-forms-td-right .disaster-bg {
+      padding-left: 5px; }
     .table-forms .table-forms-td-right td {
       padding: 5px 5px 5px 0;
       position: relative; }
@@ -7311,11 +7319,6 @@ z-select button.focusable:focus,
     background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -318px -624px; }
   .list-table.compact-view td .icon-wizard-action {
     background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -165px -624px; }
-
-.overlay-dialogue .list-table th:first-child {
-  padding-left: 0px; }
-.overlay-dialogue .list-table td:first-child {
-  padding-left: 42px; }
 
 .filter-highlight-row-cb {
   display: none; }
