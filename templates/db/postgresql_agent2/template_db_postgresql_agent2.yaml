@@ -15,7 +15,7 @@ zabbix_export:
         Template tooling version used: 0.42
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Databases
