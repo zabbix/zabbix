@@ -226,8 +226,9 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 					break;
 					break;
 				default:
-					*err_msg = zbx_strdcatf(*err_msg, "Cannot accurately apply filter: invalid regular "
-							"expression \"%s\".\n", condition->regexp);
+					*err_msg = zbx_strdcatf(*err_msg,
+						"Cannot accurately apply filter: invalid regular expression \"%s\".\n",
+						condition->regexp);
 					ret = FAIL;
 			}
 		}
@@ -243,8 +244,9 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 				*result = 0;
 				break;
 			default:
-				*err_msg = zbx_strdcatf(*err_msg, "Cannot accurately apply filter: no value received for "
-						"macro \"%s\".\n", condition->macro);
+				*err_msg = zbx_strdcatf(*err_msg,
+						"Cannot accurately apply filter: no value received for macro \"%s\".\n",
+						condition->macro);
 				ret = FAIL;
 		}
 	}

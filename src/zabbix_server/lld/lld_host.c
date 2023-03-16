@@ -3010,7 +3010,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			if (host->inventory_mode_orig != host->inventory_mode &&
 					HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
 			{
-				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid,
+						(int)host->inventory_mode);
 			}
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
@@ -3464,8 +3465,8 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->lnk_templateids.values_num)
 		{
-			if (SUCCEED != zbx_db_copy_template_elements(host->hostid, &host->lnk_templateids, ZBX_TEMPLATE_LINK_LLD,
-					&err))
+			if (SUCCEED != zbx_db_copy_template_elements(host->hostid, &host->lnk_templateids,
+					ZBX_TEMPLATE_LINK_LLD, &err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);
 				zbx_free(err);
@@ -4205,7 +4206,8 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 					" left join interface_snmp s"
 						" on hi.interfaceid=s.interfaceid"
 				" where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.hostid", hostids.values, hostids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.hostid", hostids.values,
+				hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hi.hostid");
 
 		result = zbx_db_select("%s", sql);

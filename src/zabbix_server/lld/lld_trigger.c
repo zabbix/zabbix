@@ -2609,8 +2609,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		{
 			zbx_db_insert_add_values(&db_insert, triggerid, trigger->description, trigger->expression,
 					(int)trigger->priority, (int)trigger->status,
-					trigger->comments, trigger->url, trigger->url_name, (int)trigger_prototype->type,
-					(int)TRIGGER_VALUE_OK, (int)TRIGGER_STATE_NORMAL,
+					trigger->comments, trigger->url, trigger->url_name,
+					(int)trigger_prototype->type, (int)TRIGGER_VALUE_OK, (int)TRIGGER_STATE_NORMAL,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger_prototype->recovery_mode,
 					trigger->recovery_expression, (int)trigger_prototype->correlation_mode,
 					trigger->correlation_tag, (int)trigger_prototype->manual_close,
@@ -2802,7 +2802,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_EVENT_NAME))
 			{
 				event_name_esc = zbx_db_dyn_escape_string(trigger->event_name);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sevent_name='%s'", d, event_name_esc);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sevent_name='%s'", d,
+						event_name_esc);
 				zbx_free(event_name_esc);
 
 				zbx_audit_trigger_update_json_update_event_name(trigger->triggerid,
@@ -3309,8 +3310,8 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 							" on t.triggerid=td.triggerid_down"
 					" where t.flags<>%d"
 						" and", ZBX_FLAG_DISCOVERY_PROTOTYPE);
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_up", triggerids_up.values,
-					triggerids_up.values_num);
+			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "td.triggerid_up",
+					triggerids_up.values, triggerids_up.values_num);
 
 			zbx_vector_uint64_clear(&triggerids_up);
 
