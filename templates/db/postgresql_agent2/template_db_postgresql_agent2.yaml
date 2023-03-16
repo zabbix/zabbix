@@ -741,6 +741,8 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12'
+          valuemap:
+            name: 'PostgreSQL checksum failure status'
           preprocessing:
             -
               type: JSONPATH
