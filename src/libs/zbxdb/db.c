@@ -28,7 +28,7 @@
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #elif defined(HAVE_ORACLE)
-#	include "base64.h"
+#	include "zbxcrypto.h"
 #	include "zbxdbschema.h"
 #	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
@@ -1361,7 +1361,7 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 
 				src_len = strlen(rows[i][position].str) * 3 / 4 + 1;
 				dst = (char*)zbx_malloc(NULL, src_len);
-				str_base64_decode(rows[i][position].str, (char *)dst, src_len, &dst_len);
+				zbx_base64_decode(rows[i][position].str, (char *)dst, src_len, &dst_len);
 				sizes[i] = dst_len;
 				zbx_free(rows[i][position].str);
 				rows[i][position].str = dst;
