@@ -31,6 +31,7 @@
 
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
+#include "lld_audit.h"
 
 #define	ZBX_DEPENDENT_ITEM_MAX_COUNT	29999
 #define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3

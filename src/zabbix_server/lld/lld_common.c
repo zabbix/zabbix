@@ -19,6 +19,7 @@
 
 #include "log.h"
 #include "zbxdbhigh.h"
+#include "lld.h"
 
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
