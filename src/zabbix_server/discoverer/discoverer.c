@@ -520,21 +520,27 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 
 			if (NULL != (task = zbx_hashset_search(tasks, &task_local)))
 			{
-				zbx_free(task_local.ip);
-
-				if (SVC_ICMPPING == dcheck->type)
+				if ('\0' == *task_local.ip && 0 != task->dchecks.values_num &&
+						task->dchecks.values[0]->dcheckid == dcheck->dcheckid)
 				{
 					zbx_vector_str_append(task->ips, zbx_strdup(NULL, ip));
 					zbx_discovery_dcheck_free(dcheck_ptr);
 				}
-				else
+				else if ('\0' != *task_local.ip || FAIL == zbx_vector_dc_dcheck_ptr_search(
+						&task->dchecks, dcheck_ptr, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+				{
 					zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck_ptr);
+				}
+				else
+					zbx_discovery_dcheck_free(dcheck_ptr);
+
+				zbx_free(task_local.ip);
 			}
 			else
 			{
 				task_local.unique_dcheckid = drule->unique_dcheckid;
 
-				if (SVC_ICMPPING == dcheck->type)
+				if ('\0' == *task_local.ip)
 				{
 					task_local.resolve_dns = 0;
 					task_local.ips = (zbx_vector_str_t *)zbx_malloc(NULL, sizeof(zbx_vector_str_t));
@@ -1202,16 +1208,15 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_
 
 static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max)
 {
-	zbx_dc_dcheck_t				*dcheck;
 	zbx_vector_discoverer_results_ptr_t	results;
-
-	if (0 == task->dchecks.values_num)
-		return;
-
-	dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[0];
+	int					i;
 
 	zbx_vector_discoverer_results_ptr_create(&results);
-	discover_icmp(druleid, task, dcheck, &results, worker_max);
+
+	for (i = 0; i < task->dchecks.values_num; i++)
+	{
+		discover_icmp(druleid, task, task->dchecks.values[i], &results, worker_max);
+	}
 
 	pthread_mutex_lock(&dmanager.results_lock);
 	discover_results_merge(&dmanager.results, &results);
