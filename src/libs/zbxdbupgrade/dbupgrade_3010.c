@@ -620,7 +620,7 @@ static int	DBpatch_3010024(void)
 
 		if (0 != actionids_disable.values_num)
 		{
-			/* status: 1 - ACTION_STATUS_DISABLED */
+			/* status: 1 - ZBX_ACTION_STATUS_DISABLED */
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update actions set status=1 where");
 			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids_disable.values,

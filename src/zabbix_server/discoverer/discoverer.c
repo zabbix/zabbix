@@ -181,7 +181,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 		char		**pvalue;
 		size_t		value_offset = 0;
 		ZBX_FPING_HOST	host;
-		DC_ITEM		item;
+		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
 
 		zbx_alarm_on(config_timeout);
@@ -213,7 +213,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
-				memset(&item, 0, sizeof(DC_ITEM));
+				memset(&item, 0, sizeof(zbx_dc_item_t));
 
 				zbx_strscpy(item.key_orig, dcheck->key_);
 				item.key = item.key_orig;

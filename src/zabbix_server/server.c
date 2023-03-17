@@ -1112,10 +1112,10 @@ static void	zbx_on_exit(int ret)
 		zbx_ipc_service_free_env();
 
 		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		free_database_cache(ZBX_SYNC_ALL);
+		zbx_free_database_cache(ZBX_SYNC_ALL);
 		zbx_db_close();
 
-		free_configuration_cache();
+		zbx_free_configuration_cache();
 
 		/* free history value cache */
 		zbx_vc_destroy();
@@ -1414,14 +1414,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 
-	if (SUCCEED != init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
 		return FAIL;
 	}
 
-	if (SUCCEED != init_configuration_cache(&error))
+	if (SUCCEED != zbx_init_configuration_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1758,8 +1758,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
 	zbx_free_selfmon_collector();
-	free_configuration_cache();
-	free_database_cache(ZBX_SYNC_NONE);
+	zbx_free_configuration_cache();
+	zbx_free_database_cache(ZBX_SYNC_NONE);
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
@@ -1971,7 +1971,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_db_init(DCget_nextid, program_type, &error))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -1991,7 +1991,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);

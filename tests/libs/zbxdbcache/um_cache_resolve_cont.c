@@ -186,7 +186,7 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		if (FAIL == zbx_json_open(vault, &jp))
 			fail_msg("invalid vault json");
 
-		DCsync_kvs_paths(&jp, &config_vault);
+		zbx_dc_sync_kvs_paths(&jp, &config_vault);
 		step->cache->refcount++;
 
 		zbx_free(vault);
