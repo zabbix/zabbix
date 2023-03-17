@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -662,6 +662,12 @@ class testFormGraphs extends CWebTest {
 					$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->fill($item['color']);
 				}
 			}
+		}
+
+		// Take a screenshot to test draggable object position of items list.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:itemsTable')->one(), 'Graph'.CTestArrayHelper::get($data['items'][0], 'prototype'));
 		}
 
 		$form->submit();

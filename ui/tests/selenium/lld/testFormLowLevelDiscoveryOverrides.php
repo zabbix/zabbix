@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -640,7 +640,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								]
 							]
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			]
 		];
@@ -691,6 +692,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						$override_container->getRow($i)->getColumn('Stop processing')->getText()
 				);
 			}
+		}
+
+		// Take a screenshot to test draggable object position for overrides.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('class:lld-overrides-table')->one(), 'LLD override');
 		}
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {

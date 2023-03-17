@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,6 +100,11 @@ class CControllerPopupGeneric extends CController {
 	 * @var array
 	 */
 	protected $disableids = [];
+
+	/**
+	 * @var array
+	 */
+	private $page_options = [];
 
 	protected function init() {
 		$this->disableSIDvalidation();
@@ -439,7 +444,7 @@ class CControllerPopupGeneric extends CController {
 			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
-			'context' =>							'string|in host,template',
+			'context' =>							'string|in host,template,audit',
 			'enabled_only' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
@@ -965,6 +970,11 @@ class CControllerPopupGeneric extends CController {
 				];
 
 				$records = API::User()->get($options);
+
+				if ($this->hasInput('context')) {
+					$records[0] = ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => ''];
+				}
+
 				CArrayHelper::sort($records, ['username']);
 				break;
 

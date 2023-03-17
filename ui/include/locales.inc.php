@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ function getLocales(): array {
 		'en_GB' => ['name' => _('English (en_GB)'),	'display' => true],
 		'en_US' => ['name' => _('English (en_US)'),	'display' => true],
 		'bg_BG' => ['name' => _('Bulgarian (bg_BG)'),	'display' => false],
-		'ca_ES' => ['name' => _('Catalan (ca_ES)'),	'display' => false],
+		'ca_ES' => ['name' => _('Catalan (ca_ES)'),	'display' => true],
 		'zh_CN' => ['name' => _('Chinese (zh_CN)'),	'display' => true],
 		'zh_TW' => ['name' => _('Chinese (zh_TW)'),	'display' => false],
 		'cs_CZ' => ['name' => _('Czech (cs_CZ)'),	'display' => true],
@@ -56,7 +56,7 @@ function getLocales(): array {
 		'pl_PL' => ['name' => _('Polish (pl_PL)'),	'display' => true],
 		'pt_BR' => ['name' => _('Portuguese (pt_BR)'),	'display' => true],
 		'pt_PT' => ['name' => _('Portuguese (pt_PT)'),	'display' => true],
-		'ro_RO' => ['name' => _('Romanian (ro_RO)'),	'display' => false],
+		'ro_RO' => ['name' => _('Romanian (ro_RO)'),	'display' => true],
 		'ru_RU' => ['name' => _('Russian (ru_RU)'),	'display' => true],
 		'sk_SK' => ['name' => _('Slovak (sk_SK)'),	'display' => true],
 		'es_ES' => ['name' => _('Spanish (es_ES)'),	'display' => false],

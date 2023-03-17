@@ -1,0 +1,1 @@
+.......PS. [ZBX-22490] fixed HttpRequest limit in javascript being reached even if all objects are destroyed (vso)

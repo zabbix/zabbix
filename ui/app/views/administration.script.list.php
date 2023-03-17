@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -176,11 +176,14 @@ foreach ($data['scripts'] as $script) {
 		$execute_on = '';
 	}
 
+	$link = new CLink($script['name'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'script.edit')
+		->setArgument('scriptid', $script['scriptid'])
+	);
+
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol(
-			new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid'])
-		))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))->addClass(ZBX_STYLE_NOWRAP),
 		$scope,
 		$actions,
 		$type,
