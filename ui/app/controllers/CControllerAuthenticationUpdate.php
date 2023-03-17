@@ -454,6 +454,10 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function processSamlConfiguration(): bool {
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) != ZBX_AUTH_SAML_ENABLED) {
+			return true;
+		}
+
 		$saml_data = [
 			'idp_entityid' => '',
 			'sso_url' => '',
@@ -472,15 +476,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED
 		];
 		$this->getInputs($saml_data, array_keys($saml_data));
-
-		$db_saml = API::UserDirectory()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => ['idp_type' => IDP_TYPE_SAML]
-		]);
-
-		if ($this->getInput('saml_auth_enabled') == ZBX_AUTH_SAML_DISABLED && $db_saml) {
-			$saml_data = array_replace($saml_data, $db_saml[0]);
-		}
 
 		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$provisioning_fields = [
@@ -503,13 +498,16 @@ class CControllerAuthenticationUpdate extends CController {
 			$saml_data = array_merge($saml_data, $provisioning_fields);
 		}
 
-		$saml_data['idp_type'] = IDP_TYPE_SAML;
+		$db_saml = API::UserDirectory()->get([
+			'output' => ['userdirectoryid'],
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
+		]);
 
 		if ($db_saml) {
 			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
 		}
 		else {
-			$result = API::UserDirectory()->create($saml_data);
+			$result = API::UserDirectory()->create($saml_data + ['idp_type' => IDP_TYPE_SAML]);
 		}
 
 		return $result !== false;
