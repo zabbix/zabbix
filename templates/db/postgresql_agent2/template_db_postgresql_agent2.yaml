@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-01T09:59:17Z'
+  date: '2023-03-16T08:23:03Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -739,6 +739,8 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12'
+          valuemap:
+            name: 'PostgreSQL checksum failure status'
           preprocessing:
             -
               type: JSONPATH
@@ -748,6 +750,8 @@ zabbix_export:
               type: MATCHES_REGEX
               parameters:
                 - '^\d*$'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '-2'
             -
               type: CHANGE_PER_SECOND
               parameters:
@@ -1512,6 +1516,8 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of data page checksum failures detected in this database'
+              valuemap:
+                name: 'PostgreSQL checksum failure status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1521,6 +1527,8 @@ zabbix_export:
                   type: MATCHES_REGEX
                   parameters:
                     - '^\d*$'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-2'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2839,6 +2847,13 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Slow queries'
       valuemaps:
+        -
+          uuid: cd2d975b0d7e4f8e89afb1033fce4ce2
+          name: 'PostgreSQL checksum failure status'
+          mappings:
+            -
+              value: '-2'
+              newvalue: 'null'
         -
           uuid: 9f38c01c325248d4b538c0582432b541
           name: 'PostgreSQL recovery role'
