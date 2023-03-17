@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ const ZBX_STYLE_SORTABLE_LIST = 'sortable-list';
 const ZBX_STYLE_SORTABLE_ITEM = 'sortable-item';
 const ZBX_STYLE_SORTABLE_DRAG_HANDLE = 'sortable-drag-handle';
 const ZBX_STYLE_SORTABLE_DRAGGING = 'sortable-dragging';
+const ZBX_STYLE_SORTABLE_OPACITY = 'sortable-opacity';
 
 const SORTABLE_EVENT_DRAG_START = 'drag_start';
 const SORTABLE_EVENT_DRAG_END = 'drag_end';
@@ -43,7 +44,8 @@ class CSortable extends CBaseComponent {
 		drag_scroll_delay_long = 400,
 		wheel_step = 100,
 		show_grabbing_cursor = true,
-		do_activate = true
+		do_activate = true,
+		with_opacity = false
 	}) {
 		super(target);
 
@@ -53,6 +55,7 @@ class CSortable extends CBaseComponent {
 		this._drag_scroll_delay_long = drag_scroll_delay_long;
 		this._wheel_step = wheel_step;
 		this._show_grabbing_cursor = show_grabbing_cursor;
+		this._with_opacity = with_opacity;
 
 		this._init();
 		this._registerEvents();
@@ -196,6 +199,10 @@ class CSortable extends CBaseComponent {
 	 */
 	_init() {
 		this._target.classList.add(ZBX_STYLE_SORTABLE);
+
+		if (this._with_opacity) {
+			this._target.classList.add(ZBX_STYLE_SORTABLE_OPACITY);
+		}
 
 		this._list = this._target.querySelector(`.${ZBX_STYLE_SORTABLE_LIST}`);
 

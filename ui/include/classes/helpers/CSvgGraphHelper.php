@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -540,7 +540,8 @@ class CSvgGraphHelper {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
-				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+				$name = graph_item_aggr_fnc2str($metric['options']['aggregate_function']).
+					'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
 			}
 			else {
 				$name = $data_sets[$dataset_num]['data_set_label'] !== ''
@@ -556,7 +557,7 @@ class CSvgGraphHelper {
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
 				$metric = array_merge($metric, [
-					'name' => graph_item_aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')',
+					'name' => $name,
 					'items' => [],
 					'points' => []
 				]);

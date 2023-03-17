@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ const DASHBOARD_PAGE_EVENT_WIDGET_PASTE = 'dashboard-page-widget-paste';
 const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'dashboard-page-announce-widgets';
 const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'dashboard-page-reserve-header-lines';
 
-class CDashboardPage extends CBaseComponent {
+class CDashboardPage {
 
 	constructor(target, {
 		data,
@@ -52,9 +52,10 @@ class CDashboardPage extends CBaseComponent {
 		can_edit_dashboards,
 		time_period,
 		dynamic_hostid,
+		csrf_token = null,
 		unique_id
 	}) {
-		super(document.createElement('div'));
+		this._target = document.createElement('div');
 
 		this._dashboard_grid = target;
 
@@ -81,10 +82,10 @@ class CDashboardPage extends CBaseComponent {
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
+		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
 		this._init();
-		this._registerEvents();
 	}
 
 	_init() {
@@ -118,6 +119,8 @@ class CDashboardPage extends CBaseComponent {
 
 	start() {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
+
+		this._registerEvents();
 
 		for (const widget of this._widgets.keys()) {
 			widget.start();
@@ -439,6 +442,7 @@ class CDashboardPage extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
+			csrf_token: this._csrf_token,
 			unique_id
 		});
 	}
@@ -1284,7 +1288,7 @@ class CDashboardPage extends CBaseComponent {
 				for (const widget of this._widgets.keys()) {
 					const widget_view = widget.getView();
 
-					if (widget_view.querySelector(`.${widget.getCssClass('head')}`).contains(e.target)
+					if (widget_view.querySelector(`.${widget.getCssClass('header')}`).contains(e.target)
 							&& !widget_view.querySelector(`.${widget.getCssClass('actions')}`).contains(e.target)) {
 						drag_widget = widget;
 						break;
@@ -1322,7 +1326,7 @@ class CDashboardPage extends CBaseComponent {
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
 			},
 
-			mouseUp: (e) => {
+			mouseUp: () => {
 				if (move_animation_frame !== null) {
 					cancelAnimationFrame(move_animation_frame);
 				}
@@ -1860,7 +1864,7 @@ class CDashboardPage extends CBaseComponent {
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
 			},
 
-			mouseUp: (e) => {
+			mouseUp: () => {
 				if (move_animation_frame !== null) {
 					cancelAnimationFrame(move_animation_frame);
 				}
@@ -2063,5 +2067,48 @@ class CDashboardPage extends CBaseComponent {
 		if (this._events_data.dashboard_grid_resize_timeout_id != null) {
 			clearTimeout(this._events_data.dashboard_grid_resize_timeout_id);
 		}
+	}
+
+	/**
+	 * Attach event listener to dashboard page events.
+	 *
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
+	 *
+	 * @returns {CDashboardPage}
+	 */
+	on(type, listener, options = false) {
+		this._target.addEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Detach event listener from dashboard page events.
+	 *
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
+	 *
+	 * @returns {CDashboardPage}
+	 */
+	off(type, listener, options = false) {
+		this._target.removeEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Dispatch dashboard page event.
+	 *
+	 * @param {string} type
+	 * @param {Object} detail
+	 * @param {Object} options
+	 *
+	 * @returns {boolean}
+	 */
+	fire(type, detail = {}, options = {}) {
+		return this._target.dispatchEvent(new CustomEvent(type, {...options, detail: {target: this, ...detail}}));
 	}
 }

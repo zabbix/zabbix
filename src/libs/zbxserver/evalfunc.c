@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -525,8 +525,8 @@ map_value:
 static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid, unsigned char value_type)
 {
 	int				ret = FAIL;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_valuemaps_t			*valuemap;
 	zbx_vector_valuemaps_ptr_t	valuemaps;
 
@@ -537,14 +537,14 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	zbx_vector_valuemaps_ptr_create(&valuemaps);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select value,newvalue,type"
 			" from valuemap_mapping"
 			" where valuemapid=" ZBX_FS_UI64
 			" order by sortorder asc",
 			valuemapid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_del_zeros(row[1]);
 
@@ -555,7 +555,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 		zbx_vector_valuemaps_ptr_append(&valuemaps, valuemap);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	ret = evaluate_value_by_map(value, max_len, &valuemaps, value_type);
 
@@ -1753,11 +1753,15 @@ static int	evaluate_LAST(zbx_variant_t *value, const DC_EVALUATE_ITEM *item, con
 #define EVALUATE_MAX	1
 
 #define LOOP_FIND_MIN_OR_MAX(type, mode_op)							\
-	for (i = 1; i < values.values_num; i++)							\
+	do											\
 	{											\
-		if (values.values[i].value.type mode_op values.values[index].value.type)	\
-			index = i;								\
-	}											\
+		for (i = 1; i < values.values_num; i++)							\
+		{											\
+			if (values.values[i].value.type mode_op values.values[index].value.type)	\
+				index = i;								\
+		}											\
+	}												\
+	while(0)
 
 /******************************************************************************
  *                                                                            *
@@ -2991,22 +2995,26 @@ out:
 #define MONOINC		0
 #define MONODEC		1
 
-#define CHECK_MONOTONICITY(type, mode_op, epsi_op)					\
-	for (i = 0; i < values.values_num - 1; i++)					\
-	{										\
-		if (0 == strict && values.values[i + 1].value.type mode_op		\
-				(epsi_op + values.values[i].value.type))		\
-		{									\
-			res = 0;							\
-			break;								\
-		}									\
-		else if (1 == strict && values.values[i + 1].value.type mode_op##=	\
-				(epsi_op + values.values[i].value.type ) )		\
-		{									\
-			res = 0;							\
-			break;								\
-		}									\
-	}										\
+#define CHECK_MONOTONICITY(type, mode_op, epsi_op)						\
+	do											\
+	{											\
+		for (i = 0; i < values.values_num - 1; i++)					\
+		{										\
+			if (0 == strict && values.values[i + 1].value.type mode_op		\
+					(epsi_op + values.values[i].value.type))		\
+			{									\
+				res = 0;							\
+				break;								\
+			}									\
+			else if (1 == strict && values.values[i + 1].value.type mode_op##=	\
+					(epsi_op + values.values[i].value.type ) )		\
+			{									\
+				res = 0;							\
+				break;								\
+			}									\
+		}										\
+	}											\
+	while(0)
 
 /******************************************************************************
  *                                                                            *
@@ -3314,30 +3322,42 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
 #define PREV(v, type) v.values[i + 1].value.type
 
 #define CHANGECOUNT_DBL(op)										\
-	for (i = 0; i < values.values_num - 1; i++)							\
+	do												\
 	{												\
-		if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)) &&		\
-				PREV(values, dbl) op LAST(values, dbl))					\
+		for (i = 0; i < values.values_num - 1; i++)						\
 		{											\
-			count++;									\
+			if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)) &&	\
+					PREV(values, dbl) op LAST(values, dbl))				\
+			{										\
+				count++;								\
+			}										\
 		}											\
 	}												\
+	while(0)
 
 #define CHANGECOUNT_UI64(op)						\
-	for (i = 0; i < values.values_num - 1; i++)			\
+	do								\
 	{								\
-		if (PREV(values, ui64) op LAST(values, ui64))		\
-			count++;					\
-	}								\
-
-#define CHANGECOUNT_STR(type)						\
-	for (i = 0; i < values.values_num - 1; i++)			\
-	{								\
-		if (0 != strcmp(PREV(values, type), LAST(values, type)))\
+		for (i = 0; i < values.values_num - 1; i++)		\
 		{							\
-			count++;					\
+			if (PREV(values, ui64) op LAST(values, ui64))	\
+				count++;				\
 		}							\
 	}								\
+	while(0)
+
+#define CHANGECOUNT_STR(type)							\
+	do									\
+	{									\
+		for (i = 0; i < values.values_num - 1; i++)			\
+		{								\
+			if (0 != strcmp(PREV(values, type), LAST(values, type)))\
+			{							\
+				count++;					\
+			}							\
+		}								\
+	}									\
+	while(0)
 
 /* flags for evaluate_CHANGECOUNT() */
 #define CHANGE_ALL	0

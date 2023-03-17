@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,9 +54,11 @@ $hintbox_tile_url = makeHelpIcon([
 	]))->addClass(ZBX_STYLE_LIST_DASHED)
 ]);
 
-$hintbox_attribution = makeHelpIcon(
-	_('Tile provider attribution data displayed in a small text box on the map.')
-);
+$warning_attribution = makeWarningIcon([
+	_('Tile provider attribution data displayed in a small text box on the map.'),
+	BR(),
+	_('Make sure the code comes from a reliable source and does not contain malicious scripts.')
+]);
 
 $hintbox_max_zoom = makeHelpIcon(_('Maximum zoom level of the map.'));
 
@@ -85,7 +87,7 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel([_('Attribution'), $hintbox_attribution], 'geomaps_attribution'),
+		new CLabel([_('Attribution HTML'), $warning_attribution], 'geomaps_attribution'),
 		new CFormField(
 			(new CTextArea('geomaps_attribution', $data['geomaps_attribution']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
@@ -107,6 +109,7 @@ $form_grid = (new CFormGrid())
 	]);
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('geomaps')))->removeId())
 	->setId('geomaps-form')
 	->setName('geomaps-form')
 	->setAction(

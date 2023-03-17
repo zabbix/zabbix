@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,19 +188,21 @@ void	zbx_audit_graph_update_json_add_gitems(zbx_uint64_t graphid, int flags, zbx
 
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_);
 #define ADD_STR(r, t, f) zbx_audit_update_json_append_string(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD,	\
-		audit_key_##r, r, t, f);
+		audit_key_##r, r, t, f)
 #define ADD_INT(r, t, f) zbx_audit_update_json_append_int(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD,	\
-		audit_key_##r, r, t, f);
+		audit_key_##r, r, t, f)
 #define ADD_UINT64(r, t, f) zbx_audit_update_json_append_uint64(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_ADD, \
-		audit_key_##r, r, t, f);
+		audit_key_##r, r, t, f)
 #define	AUDIT_TABLE_NAME	"graphs_items"
-	ADD_INT(drawtype, AUDIT_TABLE_NAME, "drawtype")
-	ADD_INT(sortorder, AUDIT_TABLE_NAME, "sortorder")
+
+	ADD_INT(drawtype, AUDIT_TABLE_NAME, "drawtype");
+	ADD_INT(sortorder, AUDIT_TABLE_NAME, "sortorder");
 	ADD_STR(color, AUDIT_TABLE_NAME, "color");
-	ADD_INT(yaxisside, AUDIT_TABLE_NAME, "yaxisside")
-	ADD_INT(calc_fnc, AUDIT_TABLE_NAME, "calc_fnc")
-	ADD_INT(type, AUDIT_TABLE_NAME, "type")
-	ADD_UINT64(itemid, AUDIT_TABLE_NAME, "itemid")
+	ADD_INT(yaxisside, AUDIT_TABLE_NAME, "yaxisside");
+	ADD_INT(calc_fnc, AUDIT_TABLE_NAME, "calc_fnc");
+	ADD_INT(type, AUDIT_TABLE_NAME, "type");
+	ADD_UINT64(itemid, AUDIT_TABLE_NAME, "itemid");
+
 #undef ADD_STR
 #undef ADD_INT
 #undef AUDIT_TABLE_NAME
@@ -304,12 +306,12 @@ void	zbx_audit_graph_update_json_delete_gitems(zbx_uint64_t graphid, int flags, 
 
 void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *ids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		int		flags;
 		zbx_uint64_t	id;
@@ -321,7 +323,7 @@ void	zbx_audit_DBselect_delete_for_graph(const char *sql, zbx_vector_uint64_t *i
 		zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_DELETE, id, row[1], flags);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }

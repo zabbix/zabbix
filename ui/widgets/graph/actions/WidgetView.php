@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,16 +41,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'dynamic_hostid' => 'db hosts.hostid',
-			'content_width' => 'int32',
-			'content_height' => 'int32'
+			'contents_width' => 'int32',
+			'contents_height' => 'int32'
 		]);
 	}
 
 	protected function doAction(): void {
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
-		$width = (int) $this->getInput('content_width', 100);
-		$height = (int) $this->getInput('content_height', 100);
+		$width = (int) $this->getInput('contents_width', 100);
+		$height = (int) $this->getInput('contents_height', 100);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 		$resourceid = null;

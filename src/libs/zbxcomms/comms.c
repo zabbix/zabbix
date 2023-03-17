@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "zbxnum.h"
 #include "zbxip.h"
 #include "zbxtime.h"
+#include "zbxcrypto.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,12 +98,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
 		}
 
-		$search_strings = [];
-
-		if ($data['message']) {
-			$search_strings = explode(' ', $data['message']);
-		}
-
+		$search = $data['message'] === '' ? null : $data['message'];
 		$range_time_parser = new CRangeTimeParser();
 
 		$range_time_parser->parse($this->getInput('from'));
@@ -127,8 +122,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'mediatypeids' => $mediatypeids ?: null,
 				'filter' => ['status' => $data['statuses']],
 				'search' => [
-					'subject' => $search_strings,
-					'message' => $search_strings
+					'subject' => $search,
+					'message' => $search
 				],
 				'searchByAny' => true,
 				'time_from' => $time_from - 1,

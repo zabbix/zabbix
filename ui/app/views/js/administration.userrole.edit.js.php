@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,14 +270,15 @@
 				if (view.readonly) {
 					const url = new Curl('zabbix.php');
 					url.setArgument('action', 'userrole.edit');
+					url.setArgument('super_admin_role_clone', 1);
 
 					document
-						.querySelectorAll('#name, #user-type')
+						.querySelectorAll('#name, #type')
 						.forEach((element) => {
 							url.setArgument(element.getAttribute('name'), element.getAttribute('value'));
 						});
 
-					redirect(url.getUrl(), 'post', 'action', undefined, false, true);
+					redirect(url.getUrl(), 'post', 'action', undefined, true);
 				}
 
 				document
@@ -292,6 +293,7 @@
 				update_button.setAttribute('value', 'userrole.create');
 
 				document.getElementById('name').focus();
+				clearMessages();
 			}
 		}
 	}

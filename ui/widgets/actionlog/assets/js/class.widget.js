@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,9 +28,9 @@ class CWidgetActionLog extends CWidget {
 		}
 	}
 
-	_getUpdateRequestData() {
+	getUpdateRequestData() {
 		return {
-			...super._getUpdateRequestData(),
+			...super.getUpdateRequestData(),
 			from: this._time_period.from,
 			to: this._time_period.to
 		};

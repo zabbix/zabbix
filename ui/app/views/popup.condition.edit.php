@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 $inline_js = getPagePostJs().$this->readJsFile('popup.condition.edit.js.php');
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('popup.condition')
 	->setName('popup.condition')
 	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
