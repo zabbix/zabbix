@@ -4,6 +4,3 @@ noinst_LIBRARIES = libzbxfile.a
 
 libzbxfile_a_SOURCES = \
 	file.c
-
-EXTRA_DIST = \
-	win32

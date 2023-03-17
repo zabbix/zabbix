@@ -24,6 +24,10 @@
 #include "zbxip.h"
 #include "zbxfile.h"
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	include "zbxwin32.h"
+#endif
+
 static const char	*program_type_str = NULL;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,

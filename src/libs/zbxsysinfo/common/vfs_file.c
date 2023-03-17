@@ -32,6 +32,7 @@
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
 #include "sddl.h"
+#include "zbxwin32.h"
 #endif
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */

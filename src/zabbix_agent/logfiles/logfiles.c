@@ -31,6 +31,7 @@
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxtypes.h"	/* ssize_t */
+#	include "zbxwin32.h"
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */

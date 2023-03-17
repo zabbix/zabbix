@@ -86,6 +86,8 @@ typedef struct perf_counter_data
 }
 zbx_perf_counter_data_t;
 
+void		zbx_init_library_win32(zbx_get_progname_f get_progname);
+
 zbx_uint64_t	zbx_get_cluster_size(const char *path, char **error);
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath);
@@ -107,6 +109,44 @@ wchar_t		*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
 int		zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
 
-void		zbx_init_library_win32(zbx_get_progname_f get_progname);
+/* files and symbols */
+
+#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
+#	define PATH_SEPARATOR	'\\'
+
+int	__zbx_open(const char *pathname, int flags);
+
+/* some definitions which are not available on older MS Windows versions */
+typedef enum {
+	/* we only use below values, the rest of enumerated values are omitted here */
+	zbx_FileBasicInfo	= 0,
+	zbx_FileIdInfo		= 18
+} ZBX_FILE_INFO_BY_HANDLE_CLASS;
+
+typedef struct {
+	LARGE_INTEGER	CreationTime;
+	LARGE_INTEGER	LastAccessTime;
+	LARGE_INTEGER	LastWriteTime;
+	LARGE_INTEGER	ChangeTime;
+	DWORD		FileAttributes;
+} ZBX_FILE_BASIC_INFO;
+
+typedef struct {
+	ULONGLONG	LowPart;
+	ULONGLONG	HighPart;
+} ZBX_EXT_FILE_ID_128;
+
+typedef struct {
+	ULONGLONG		VolumeSerialNumber;
+	ZBX_EXT_FILE_ID_128	FileId;
+} ZBX_FILE_ID_INFO;
+
+extern DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD);
+extern BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
+extern BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
+extern BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
+extern BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, ZBX_FILE_INFO_BY_HANDLE_CLASS, LPVOID, DWORD);
+
+void	zbx_import_symbols(void);
 
 #endif /* ZABBIX_WIN32_H */
