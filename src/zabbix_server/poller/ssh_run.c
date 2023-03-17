@@ -148,7 +148,7 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 #undef HAVE_NO_SSH_OPTIONS
 
 /* example ssh.run["ls /"] */
-int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
 {
 	ssh_session	session;
 	ssh_channel	channel;

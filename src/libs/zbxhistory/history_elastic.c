@@ -120,7 +120,7 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 	return value;
 }
 
-static const char	*history_value2str(const ZBX_DC_HISTORY *h)
+static const char	*history_value2str(const zbx_dc_history_t *h)
 {
 	static char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -885,7 +885,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 {
 	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	int			i, num = 0;
-	ZBX_DC_HISTORY		*h;
+	zbx_dc_history_t	*h;
 	struct zbx_json		json_idx, json;
 	size_t			buf_alloc = 0, buf_offset = 0;
 	char			pipeline[14]; /* index name length + suffix "-pipeline" */
@@ -908,7 +908,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (ZBX_DC_HISTORY *)history->values[i];
+		h = (zbx_dc_history_t *)history->values[i];
 
 		if (hist->value_type != h->value_type)
 			continue;
