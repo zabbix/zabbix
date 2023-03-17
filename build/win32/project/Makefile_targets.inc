@@ -31,9 +31,6 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxfile}.c{..\..\..\src\libs\zbxfile}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
-{..\..\..\src\libs\zbxfile\win32}.c{..\..\..\src\libs\zbxfile\win32}.o:
-	$(CC) $? /Fo"$@" $(CFLAGS)
-
 {..\..\..\src\libs\zbxparam}.c{..\..\..\src\libs\zbxparam}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
