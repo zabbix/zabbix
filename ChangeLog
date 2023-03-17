@@ -347,8 +347,14 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.9rc1
 
 New features:
+........S. [ZBXNEXT-8312] increased TimescaleDB maximum supported version to 2.10 (mprihodko)
+.......PS. [ZBXNEXT-8317] increased MariaDB maximum supported version to 10.11 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-22407] fixed crash when testing item with aggregated function count containing invalid argument (dgoloscapov)
+...G...... [ZBX-22434] fixed race condition when starting Zabbix agent 2 with loadable plugins (esneiders)
+A.F....... [ZBX-19466] changed global script name validation to include menu path in its scope of uniqueness check (Ivo)
+.......PS. [ZBX-22490] fixed HttpRequest limit in javascript being reached even if all objects are destroyed (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.8
