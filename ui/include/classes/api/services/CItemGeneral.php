@@ -1821,9 +1821,6 @@ abstract class CItemGeneral extends CApiService {
 									$del_links[$item['itemid']] = $db_items[$item['itemid']]['master_itemid'];
 								}
 							}
-							else {
-								$check = $item['value_type'] != $db_items[$item['itemid']]['value_type'];
-							}
 						}
 						else {
 							$error = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
@@ -1909,7 +1906,7 @@ abstract class CItemGeneral extends CApiService {
 
 		if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_master_items = DBfetchArrayAssoc(DBselect(
-				'SELECT i.itemid,i.type,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
+				'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
 				' FROM items i'.
 				' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 				' WHERE '.dbConditionId('i.itemid', $master_itemids).
@@ -1918,7 +1915,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 		else {
 			$db_master_items = DB::select('items', [
-				'output' => ['itemid', 'type', 'hostid', 'master_itemid'],
+				'output' => ['itemid', 'hostid', 'master_itemid'],
 				'itemids' => $master_itemids,
 				'filter' => [
 					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
@@ -1960,12 +1957,6 @@ abstract class CItemGeneral extends CApiService {
 						'/'.($i + 1).'/master_itemid', _('cannot be an item prototype ID from another LLD rule')
 					));
 				}
-			}
-
-			if ($db_master_item['type'] == ITEM_TYPE_DEPENDENT && $item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i + 1).'/master_itemid', _('cannot be a dependent item/item prototype for this value type')
-				));
 			}
 		}
 	}
