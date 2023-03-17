@@ -371,6 +371,9 @@ class Group extends ScimApiService {
 		}
 
 		$db_users = [];
+		$new_userids = [];
+		$del_userids = [];
+		$do_replace = false;
 
 		foreach ($operations as $operation) {
 			if ($operation['path'] === 'displayName') {
@@ -387,63 +390,61 @@ class Group extends ScimApiService {
 
 				$db_scim_groups[0]['name'] = $operation['value'];
 			}
-
-			if ($operation['path'] === 'members') {
-				$scim_users = [];
-
+			else if ($operation['path'] === 'members') {
 				switch ($operation['op']) {
 					case 'add':
-						$scim_users = array_column($operation['value'], 'value') ?: [];
-						$db_users += $this->verifyUserids($scim_users, $userdirectoryid);
-
-						$db_scim_group_members = DB::select('user_scim_group', [
-							'output' => ['userid'],
-							'filter' => ['scim_groupid' => $options['id'], 'userid' => $scim_users]
-						]);
-						$db_scim_group_members = array_column($db_scim_group_members, 'userid');
-						$new_scim_group_members = array_diff($scim_users, $db_scim_group_members);
-
-						$this->patchAddUserToGroup($options['id'], $new_scim_group_members);
-
-						break;
-
-					case 'replace':
-						$db_scim_group_members = DB::select('user_scim_group', [
-							'output' => ['userid'],
-							'filter' => ['scim_groupid' => $options['id']]
-						]);
-						$db_scim_group_members = array_column($db_scim_group_members, 'userid');
-
-						DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
-
-						$scim_users = array_column($operation['value'], 'value');
-						$db_users += $this->verifyUserids($scim_users, $userdirectoryid);
-
-						$this->patchAddUserToGroup($options['id'], $scim_users);
-
-						$scim_users = array_unique(array_merge($db_scim_group_members, $scim_users));
+						$new_userids = array_merge($new_userids, array_column($operation['value'], 'value'));
 
 						break;
 
 					case 'remove':
-						if (!array_key_exists('value', $operation)) {
-							DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
-						}
-						else {
-							$scim_users = array_column($operation['value'], 'value');
+						if (!$do_replace) {
+							$del_userids = array_merge($del_userids, array_column($operation['value'], 'value'));
 
-							$this->verifyUserids($scim_users, $userdirectoryid);
-
-							DB::delete('user_scim_group', ['userid' => $scim_users, 'scim_groupid' => $options['id']]);
+							if (!$del_userids) {
+								// Empty 'value' array for 'remove' operation should act as 'replace' operation.
+								$do_replace = true;
+							}
 						}
 
 						break;
-				}
 
-				foreach ($scim_users as $scim_user) {
-					$this->updateProvisionedUserGroups($scim_user, $userdirectoryid);
+					case 'replace':
+						$new_userids = array_merge($new_userids, array_column($operation['value'], 'value'));
+						$do_replace = true;
+
+						break;
 				}
 			}
+		}
+
+		if ($new_userids || $del_userids) {
+			$new_userids = array_diff($new_userids, $del_userids);
+			$db_users = $this->verifyUserids(array_merge($new_userids, $del_userids), $userdirectoryid);
+		}
+
+		if ($do_replace) {
+			DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
+		}
+		else if ($del_userids) {
+			DB::delete('user_scim_group', ['userid' => $del_userids, 'scim_groupid' => $options['id']]);
+		}
+
+		if ($new_userids) {
+			$values = [];
+
+			foreach ($new_userids as $userid) {
+				$values[] = [
+					'userid' => $userid,
+					'scim_groupid' => $options['id']
+				];
+			}
+
+			DB::insertBatch('user_scim_group', $values);
+		}
+
+		foreach (array_column($db_users, 'userid') as $db_userid) {
+			$this->updateProvisionedUserGroups($db_userid, $userdirectoryid);
 		}
 
 		$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
