@@ -1276,7 +1276,6 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	zbx_variant_t			value;
 	char				*error;
 	zbx_vector_ptr_t		history;
-	zbx_preproc_history_t		*vault;
 	zbx_list_item_t			*node;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1288,40 +1287,18 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	zbx_vector_ptr_create(&history);
 	zbx_preprocessor_unpack_result(&value, &history, &error, message->data);
 
-	if (NULL != (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache,
-			&request->value.itemid)))
+	if (FAIL == preprocessor_set_variant_result(request, &value, error))
 	{
-		zbx_vector_ptr_clear_ext(&vault->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
-	}
-
-	if (0 != history.values_num)
-	{
-		if (NULL == vault)
-		{
-			zbx_preproc_history_t	history_local;
-
-			history_local.itemid = request->value.itemid;
-			vault = (zbx_preproc_history_t *)zbx_hashset_insert(&manager->history_cache, &history_local,
-					sizeof(history_local));
-			zbx_vector_ptr_create(&vault->history);
-		}
-
-		zbx_vector_ptr_append_array(&vault->history, history.values, history.values_num);
-		zbx_vector_ptr_clear(&history);
+		preprocessor_update_history(manager, request->value.itemid, NULL);
+		zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	}
 	else
 	{
-		if (NULL != vault)
-		{
-			zbx_vector_ptr_destroy(&vault->history);
-			zbx_hashset_remove_direct(&manager->history_cache, vault);
-		}
+		preprocessor_enqueue_dependent_value(manager, &request->value);
+		preprocessor_update_history(manager, request->value.itemid, &history);
 	}
 
 	preprocessor_set_request_state_done(manager, (zbx_preprocessing_request_base_t *)request, worker->task);
-
-	if (FAIL != preprocessor_set_variant_result(request, &value, error))
-		preprocessor_enqueue_dependent_value(manager, &request->value);
 
 	worker->task = NULL;
 	zbx_variant_clear(&value);
@@ -1350,13 +1327,20 @@ static void	preprocessor_update_history(zbx_preprocessing_manager_t *manager, zb
 {
 	zbx_preproc_history_t	*vault;
 
-	if (NULL != (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache,
-			&itemid)))
+	if (NULL != (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache, &itemid)))
 	{
 		zbx_vector_ptr_clear_ext(&vault->history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	}
 
-	if (0 != history->values_num)
+	if (NULL == history || 0 == history->values_num)
+	{
+		if (NULL != vault)
+		{
+			zbx_vector_ptr_destroy(&vault->history);
+			zbx_hashset_remove_direct(&manager->history_cache, vault);
+		}
+	}
+	else
 	{
 		if (NULL == vault)
 		{
@@ -1370,14 +1354,6 @@ static void	preprocessor_update_history(zbx_preprocessing_manager_t *manager, zb
 
 		zbx_vector_ptr_append_array(&vault->history, history->values, history->values_num);
 		zbx_vector_ptr_clear(history);
-	}
-	else
-	{
-		if (NULL != vault)
-		{
-			zbx_vector_ptr_destroy(&vault->history);
-			zbx_hashset_remove_direct(&manager->history_cache, vault);
-		}
 	}
 }
 
@@ -1398,7 +1374,10 @@ static void	preprocessor_finalize_dep_results(zbx_preprocessing_manager_t *manag
 			preprocessor_enqueue_dependent(manager, request->hostid, request->results[i].itemid,
 					&request->results[i].value, request->results[i].value_type, &request->ts);
 		}
-
+		else
+		{
+			preprocessor_update_history(manager, request->results[i].itemid, NULL);
+		}
 	}
 
 	preprocessor_set_request_state_done(manager, (zbx_preprocessing_request_base_t *)request,
