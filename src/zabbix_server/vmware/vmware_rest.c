@@ -302,7 +302,8 @@ static int	vmware_curl_init(const char *url, unsigned char is_new_api, CURL **ea
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_HEADERFUNCTION,
 			curl_header_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)) ||
+			(NULL != CONFIG_SOURCE_IP && CURLE_OK != (err = curl_easy_setopt(*easyhandle,
+			opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP))) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_TIMEOUT,
 			(long)CONFIG_VMWARE_TIMEOUT)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
