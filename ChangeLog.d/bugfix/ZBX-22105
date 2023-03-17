@@ -1,0 +1,1 @@
+A......... [ZBX-22105] returned the assignment of the host interface for Simple check, External check, SSH agent, TELNET agent, and HTTP agent items and item prototypes that are inherited from the template to the host (vmaksimovs)
