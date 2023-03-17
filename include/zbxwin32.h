@@ -103,8 +103,8 @@ PDH_STATUS	zbx_calculate_counter_value(const char *function, const char *counter
 wchar_t		*zbx_get_counter_name(DWORD pdhIndex);
 int		zbx_check_counter_path(char *counterPath, int convert_from_numeric);
 int		zbx_init_builtin_counter_indexes(void);
-DWORD 		zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
-DWORD 		zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
+DWORD		zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
+DWORD		zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
 wchar_t		*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
 int		zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);

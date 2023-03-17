@@ -20,7 +20,6 @@ OBJS = \
 	$(OUTPUTDIR)\common_str.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\libc_wrappers.o \
-	$(OUTPUTDIR)\file.o \
 	$(OUTPUTDIR)\param.o \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
@@ -40,6 +39,7 @@ OBJS = \
 	$(OUTPUTDIR)\zbxregexp.o \
 	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
+	$(OUTPUTDIR)\file.o \
 	$(OUTPUTDIR)\algodefs.o \
 	$(OUTPUTDIR)\json.o \
 	$(OUTPUTDIR)\json_parser.o \

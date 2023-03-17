@@ -37,6 +37,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/libc_wrappers.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/symbols.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/win32_file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/expr.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/function.o

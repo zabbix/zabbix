@@ -63,7 +63,8 @@ int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time)
 			return get_file_time_stat(path, time); /* fall back to stat() */
 
 		if (-1 == (h = _get_osfhandle(f)) ||
-				0 == zbx_GetFileInformationByHandleEx((HANDLE)h, zbx_FileBasicInfo, &info, sizeof(info)))
+				0 == zbx_GetFileInformationByHandleEx((HANDLE)h, zbx_FileBasicInfo, &info,
+				sizeof(info)))
 		{
 			ret = FAIL;
 			goto out;
