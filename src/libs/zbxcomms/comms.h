@@ -23,6 +23,9 @@
 #include "config.h"
 #include "zbxtime.h"
 
+/* socket polling timeout in milliseconds */
+#define ZBX_SOCKET_POLL_TIMEOUT	1000
+
 #ifdef _WINDOWS
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)		((ssize_t)recv((s), (b), (int)(bl), 0))
@@ -40,7 +43,7 @@ typedef struct
 }
 zbx_pollfd_t;
 
-int	tcp_poll(zbx_pollfd_t* fds, int fds_num, int timeout);
+int	socket_poll(zbx_pollfd_t* fds, int fds_num, int timeout);
 
 #else
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)write((s), (b), (bl)))
@@ -48,15 +51,12 @@ int	tcp_poll(zbx_pollfd_t* fds, int fds_num, int timeout);
 #	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) close(s)
 #	define zbx_bind(s, a, l)		(bind((s), (a), (l)))
 #	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (n), (f), (a), (l)))
-#	define ZBX_PROTO_AGAIN		EINTR
-#	define ZBX_SOCKET_ERROR		-1
-#	define tcp_poll(x, y, z)	poll(x, y, z)
+#	define ZBX_PROTO_AGAIN			EINTR
+#	define ZBX_SOCKET_ERROR			-1
+#	define socket_poll(x, y, z)		poll(x, y, z)
 
 typedef struct pollfd zbx_pollfd_t;
 
 #endif
-
-void	tcp_get_deadline(zbx_timespec_t *ts, int sec);
-int	tcp_check_deadline(const zbx_timespec_t *deadline);
 
 #endif /* ZABBIX_COMMS_H */

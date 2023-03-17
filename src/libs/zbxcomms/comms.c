@@ -47,8 +47,6 @@
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
 #endif
 
-#define ZBX_TCP_POLL_TIMEOUT	1000
-
 #ifdef HAVE_OPENSSL
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
@@ -56,8 +54,8 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
 static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
-static int	tcp_set_nonblocking(ZBX_SOCKET s);
-static int	tcp_is_nonblocking_error();
+static int	socket_set_nonblocking(ZBX_SOCKET s);
+static int	socket_had_nonblocking_error();
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 
 zbx_config_tls_t	*zbx_config_tls_new(void)
@@ -360,54 +358,6 @@ static void	zbx_socket_free(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set timeout for socket operations                                 *
- *                                                                            *
- * Parameters: s       - [IN] socket descriptor                               *
- *             timeout - [IN] timeout, in seconds                             *
- *                                                                            *
- ******************************************************************************/
-void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout)
-{
-	s->timeout = timeout;
-#ifdef _WINDOWS
-	timeout *= 1000;
-
-	if (ZBX_PROTO_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "setsockopt() failed for SO_RCVTIMEO: %s",
-				strerror_from_system(zbx_socket_last_error()));
-	}
-
-	if (ZBX_PROTO_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "setsockopt() failed for SO_SNDTIMEO: %s",
-				strerror_from_system(zbx_socket_last_error()));
-	}
-#else
-	zbx_alarm_on(timeout);
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: clean up timeout for socket operations                            *
- *                                                                            *
- * Parameters: s - [OUT] socket descriptor                                    *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_socket_timeout_cleanup(zbx_socket_t *s)
-{
-#ifndef _WINDOWS
-	if (0 != s->timeout)
-	{
-		zbx_alarm_off();
-		s->timeout = 0;
-	}
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: connect to the specified address with an optional timeout value   *
  *                                                                            *
  * Parameters: s       - [IN] socket descriptor                               *
@@ -433,9 +383,9 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	zbx_timespec_t	deadline;
 
 	if (0 != timeout)
-		tcp_get_deadline(&deadline, timeout);
+		zbx_ts_get_deadline(&deadline, timeout);
 
-	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen) && SUCCEED != tcp_is_nonblocking_error())
+	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen) && SUCCEED != socket_had_nonblocking_error())
 	{
 		*error = zbx_dsprintf(*error, "cannot connect to address: %s",
 				strerror_from_system(zbx_socket_last_error()));
@@ -447,9 +397,9 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 
 	do
 	{
-		if (-1 == (rc = tcp_poll(&pd, 1, 1000)))
+		if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 		{
-			if (SUCCEED != tcp_is_nonblocking_error())
+			if (SUCCEED != socket_had_nonblocking_error())
 			{
 				*error = zbx_strdup(NULL, "cannot wait for connection");
 				return FAIL;
@@ -458,7 +408,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 			continue;
 		}
 
-		if (0 == rc && 0 != timeout && SUCCEED != tcp_check_deadline(&deadline))
+		if (0 == rc && 0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
 		{
 			*error = zbx_strdup(NULL, "connection timed out");
 			return FAIL;
@@ -564,7 +514,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		}
 	}
 
-	if (SUCCEED != tcp_set_nonblocking(s->socket))
+	if (SUCCEED != socket_set_nonblocking(s->socket))
 	{
 		zbx_set_socket_strerror("setting non-blocking mode for [[%s]:%hu] failed: %s",
 				NULL != ip ? ip : "-", port,
@@ -625,51 +575,81 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
 }
 
-static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
+static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, int timeout)
 {
-	ssize_t	res;
-	int	err;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	char	*error = NULL;
-#endif
-#ifdef _WINDOWS
-	double	sec;
-#endif
+	zbx_pollfd_t	pd;
+	ssize_t		n, offset = 0;
+	zbx_timespec_t	deadline;
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
-		if (ZBX_PROTO_ERROR == (res = zbx_tls_write(s, buf, len, &error)))
+		char	*error = NULL;
+
+		if (ZBX_PROTO_ERROR == (n = zbx_tls_write(s, buf, len, timeout, &error)))
 		{
 			zbx_set_socket_strerror("%s", error);
 			zbx_free(error);
 		}
 
-		return res;
+		return n;
 	}
 #endif
-#ifdef _WINDOWS
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
-	do
+
+	if (0 == (n = ZBX_TCP_WRITE(s->socket, buf, len)) || (size_t)n == len)
+		return n;
+
+	if (0 != timeout)
+		zbx_ts_get_deadline(&deadline, timeout);
+
+	pd.fd = s->socket;
+	pd.events = POLLOUT;
+
+	for (; 0 != n; n = ZBX_TCP_WRITE(s->socket, buf + offset, len - offset))
 	{
-		res = ZBX_TCP_WRITE(s->socket, buf, len);
-#ifdef _WINDOWS
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
-		if (SUCCEED == zbx_alarm_timed_out())
+		if (0 > n)
 		{
-			zbx_set_socket_strerror("ZBX_TCP_WRITE() timed out");
+			int	rc;
+
+			if (SUCCEED != socket_had_nonblocking_error())
+			{
+				zbx_set_socket_strerror("cannot write data: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				return n;
+			}
+
+			if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+			{
+				if (SUCCEED == socket_had_nonblocking_error())
+					continue;
+
+				zbx_set_socket_strerror("cannot wait for socket: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				return ZBX_PROTO_ERROR;
+			}
+
+			if (0 != rc && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+			{
+				zbx_set_socket_strerror("connection error");
+				return ZBX_PROTO_ERROR;
+			}
+		}
+		else
+		{
+			offset += n;
+
+			if (offset == (ssize_t)len)
+				break;
+		}
+
+		if (0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+		{
+			zbx_set_socket_strerror("write timeout");
 			return ZBX_PROTO_ERROR;
 		}
 	}
-	while (ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
 
-	if (ZBX_PROTO_ERROR == res)
-		zbx_set_socket_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(err));
-
-	return res;
+	return offset;
 }
 
 /******************************************************************************
@@ -704,9 +684,6 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 	int			ret = SUCCEED;
 	char			*compressed_data = NULL;
 	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)0;
-
-	if (0 != timeout)
-		zbx_socket_timeout_set(s, timeout);
 
 	if (0 != (flags & ZBX_TCP_PROTOCOL))
 	{
@@ -790,7 +767,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 		while (written < (ssize_t)send_bytes)
 		{
 			if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, header_buf + written,
-					send_bytes - (size_t)written)))
+					send_bytes - (size_t)written, timeout)))
 			{
 				ret = FAIL;
 				goto cleanup;
@@ -808,7 +785,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 		else
 			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, send_len - (size_t)written);
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, data + written, send_bytes)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, data + written, send_bytes, timeout)))
 		{
 			ret = FAIL;
 			goto cleanup;
@@ -817,9 +794,6 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 	}
 cleanup:
 	zbx_free(compressed_data);
-
-	if (0 != timeout)
-		zbx_socket_timeout_cleanup(s);
 
 	return ret;
 
@@ -834,8 +808,6 @@ cleanup:
 void	zbx_tcp_close(zbx_socket_t *s)
 {
 	zbx_tcp_unaccept(s);
-
-	zbx_socket_timeout_cleanup(s);
 
 	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
@@ -927,7 +899,7 @@ static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags)
  * Purpose: set non-blocking socket operation                                 *
  *                                                                            *
  ******************************************************************************/
-static int	tcp_set_nonblocking(ZBX_SOCKET s)
+static int	socket_set_nonblocking(ZBX_SOCKET s)
 {
 #if defined(_WINDOWS)
 	u_long	value = 1;
@@ -946,7 +918,7 @@ static int	tcp_set_nonblocking(ZBX_SOCKET s)
  * Purpose: check if the last socket error was because of non-blocking socket *
  *                                                                            *
  ******************************************************************************/
-static int	tcp_is_nonblocking_error()
+static int	socket_had_nonblocking_error()
 {
 #ifndef _WINDOWS
 	switch (errno)
@@ -971,34 +943,6 @@ static int	tcp_is_nonblocking_error()
 #endif
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: get deadline for socket operation                                 *
- *                                                                            *
- ******************************************************************************/
-void	tcp_get_deadline(zbx_timespec_t *ts, int sec)
-{
-	zbx_timespec(ts);
-	ts->sec += sec;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if socket operation has reached deadline                    *
- *                                                                            *
- ******************************************************************************/
-int	tcp_check_deadline(const zbx_timespec_t *deadline)
-{
-	zbx_timespec_t	ts;
-
-	zbx_timespec(&ts);
-
-	if (0 < zbx_timespec_compare(&ts, deadline))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 #if defined(_WINDOWS)
 
 /******************************************************************************
@@ -1009,7 +953,7 @@ int	tcp_check_deadline(const zbx_timespec_t *deadline)
  *           supported on older (xp64/server2003) systems                     *
  *                                                                            *
  ******************************************************************************/
-int	tcp_poll(zbx_pollfd_t* fds, int fds_num, int timeout)
+int	socket_poll(zbx_pollfd_t* fds, int fds_num, int timeout)
 {
 	fd_set		fds_read;
 	fd_set		fds_write;
@@ -1087,13 +1031,13 @@ static int	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
 	if (0 <= (n = recv(s, buffer, size, MSG_PEEK)))
 		return n;
 
-	if (SUCCEED != tcp_is_nonblocking_error())
+	if (SUCCEED != socket_had_nonblocking_error())
 		return FAIL;
 
 	if (0 < timeout)
 	{
-		tcp_get_deadline(&deadline, timeout);
-		poll_timeout = 1000;
+		zbx_ts_get_deadline(&deadline, timeout);
+		poll_timeout = ZBX_SOCKET_POLL_TIMEOUT;
 	}
 	else if (0 == timeout)
 		return TIMEOUT_ERROR;
@@ -1107,9 +1051,9 @@ static int	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
 	{
 		int	rc;
 
-		while (-1 == (rc = tcp_poll(&pd, 1, poll_timeout)))
+		while (-1 == (rc = socket_poll(&pd, 1, poll_timeout)))
 		{
-			if (SUCCEED == tcp_is_nonblocking_error())
+			if (SUCCEED == socket_had_nonblocking_error())
 				continue;
 
 			return FAIL;
@@ -1117,7 +1061,7 @@ static int	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
 
 		if (0 == rc)
 		{
-			if (0 < timeout && SUCCEED != tcp_check_deadline(&deadline))
+			if (0 < timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
 				return TIMEOUT_ERROR;
 
 			continue;
@@ -1129,8 +1073,75 @@ static int	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
 		if (0 <= (n = recv(s, buffer, size, MSG_PEEK)))
 			break;
 
-		if (SUCCEED != tcp_is_nonblocking_error())
+		if (SUCCEED != socket_had_nonblocking_error())
 			return FAIL;
+	}
+
+	return n;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: read data from socket                                             *
+ *                                                                            *
+ ******************************************************************************/
+ssize_t	tcp_read(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
+{
+	ssize_t		n;
+	zbx_pollfd_t	pd;
+	zbx_timespec_t	deadline;
+
+	if (0 <= (n = ZBX_TCP_READ(s, buffer, size)))
+		return n;
+
+	if (SUCCEED != socket_had_nonblocking_error())
+	{
+		zbx_set_socket_strerror("cannot read from socket: %s",
+				strerror_from_system(zbx_socket_last_error()));
+		return ZBX_PROTO_ERROR;
+	}
+
+	if (0 != timeout)
+		zbx_ts_get_deadline(&deadline, timeout);
+
+	pd.fd = s;
+	pd.events = POLLIN;
+
+	while (1)
+	{
+		int	rc;
+
+		while (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+		{
+			if (SUCCEED == socket_had_nonblocking_error())
+				continue;
+
+			zbx_set_socket_strerror("cannot wait for socket: %s",
+					strerror_from_system(zbx_socket_last_error()));
+			return ZBX_PROTO_ERROR;
+		}
+
+		if (0 == rc && 0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+		{
+			zbx_set_socket_strerror("read timeout");
+			return ZBX_PROTO_ERROR;
+		}
+
+		if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+		{
+			zbx_set_socket_strerror("connection error");
+			return ZBX_PROTO_ERROR;
+		}
+
+		if (0 <= (n = ZBX_TCP_READ(s, buffer, size)))
+			break;
+
+		if (SUCCEED != socket_had_nonblocking_error())
+		{
+			zbx_set_socket_strerror("cannot read from socket: %s",
+					strerror_from_system(zbx_socket_last_error()));
+			return ZBX_PROTO_ERROR;
+		}
 	}
 
 	return n;
@@ -1318,7 +1329,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 				goto out;
 			}
 
-			if (SUCCEED != tcp_set_nonblocking(s->sockets[s->num_socks]))
+			if (SUCCEED != socket_set_nonblocking(s->sockets[s->num_socks]))
 			{
 				zbx_set_socket_strerror("setting non-blocking mode for [[%s]:%s] failed: %s",
 						NULL != ip ? ip : "-", port,
@@ -1411,7 +1422,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, i
 		pds[i].events = POLLIN;
 	}
 
-	if (ZBX_PROTO_ERROR == (ret = tcp_poll(pds, s->num_socks, poll_timeout * 1000)))
+	if (ZBX_PROTO_ERROR == (ret = socket_poll(pds, s->num_socks, poll_timeout * 1000)))
 	{
 		zbx_set_socket_strerror("poll() failed: %s", strerror_from_system(zbx_socket_last_error()));
 		return ret;
@@ -1436,7 +1447,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, i
 		return ret;
 	}
 
-	if (SUCCEED != tcp_set_nonblocking(accepted_socket))
+	if (SUCCEED != socket_set_nonblocking(accepted_socket))
 	{
 		zbx_set_socket_strerror("failed to set socket non-blocking mode: %s",
 				strerror_from_system(zbx_socket_last_error()));
@@ -1607,7 +1618,7 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 	s->buffer = s->buf_stat;
 
 	/* read more data into static buffer */
-	if (ZBX_PROTO_ERROR == (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat + left, ZBX_STAT_BUF_LEN - left - 1)))
+	if (ZBX_PROTO_ERROR == (nbytes = tcp_read(s->socket, s->buf_stat + left, ZBX_STAT_BUF_LEN - left - 1, 0)))
 		goto out;
 
 	s->buf_stat[left + nbytes] = '\0';
@@ -1638,7 +1649,7 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 	/* Lines larger than ZBX_TCP_LINE_LEN bytes will be truncated. */
 	do
 	{
-		if (ZBX_PROTO_ERROR == (nbytes = ZBX_TCP_READ(s->socket, buffer, ZBX_STAT_BUF_LEN - 1)))
+		if (ZBX_PROTO_ERROR == (nbytes = tcp_read(s->socket, buffer, ZBX_STAT_BUF_LEN - 1, 0)))
 			goto out;
 
 		if (0 == nbytes)
@@ -1687,19 +1698,16 @@ out:
 	return line;
 }
 
-static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
+static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, int timeout)
 {
 	ssize_t	res;
-	int	err;
-#ifdef _WINDOWS
-	double	sec;
-#endif
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
 		char	*error = NULL;
 
-		if (ZBX_PROTO_ERROR == (res = zbx_tls_read(s, buf, len, &error)))
+		if (ZBX_PROTO_ERROR == (res = zbx_tls_read(s, buf, len, timeout, &error)))
 		{
 			zbx_set_socket_strerror("%s", error);
 			zbx_free(error);
@@ -1708,29 +1716,7 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 		return res;
 	}
 #endif
-#ifdef _WINDOWS
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
-	do
-	{
-		res = ZBX_TCP_READ(s->socket, buf, len);
-#ifdef _WINDOWS
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
-		if (SUCCEED == zbx_alarm_timed_out())
-		{
-			zbx_set_socket_strerror("ZBX_TCP_READ() timed out");
-			return ZBX_PROTO_ERROR;
-		}
-	}
-	while (ZBX_PROTO_ERROR == res && ZBX_PROTO_AGAIN == (err = zbx_socket_last_error()));
-
-	if (ZBX_PROTO_ERROR == res)
-		zbx_set_socket_strerror("ZBX_TCP_READ() failed: %s", strerror_from_system(err));
-
-	return res;
+	return tcp_read(s->socket, buf, len, timeout);
 }
 
 /******************************************************************************
@@ -1759,16 +1745,13 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 #else
 	max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
 #endif
-
-	if (0 != timeout)
-		zbx_socket_timeout_set(s, timeout);
-
 	zbx_socket_free(s);
 
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 	s->buffer = s->buf_stat;
 
-	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes)))
+	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes,
+			timeout)))
 	{
 		if (ZBX_PROTO_ERROR == nbytes)
 			goto out;
@@ -1986,9 +1969,6 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 		s->buffer[s->read_bytes] = '\0';
 	}
 out:
-	if (0 != timeout)
-		zbx_socket_timeout_cleanup(s);
-
 	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes + offset));
 
 #undef ZBX_TCP_EXPECT_HEADER
@@ -2010,15 +1990,13 @@ ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0;
 	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE;
 
-	if (0 != timeout)
-		zbx_socket_timeout_set(s, timeout);
-
 	zbx_socket_free(s);
 
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 	s->buffer = s->buf_stat;
 
-	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes)))
+	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes,
+			timeout)))
 	{
 		if (ZBX_PROTO_ERROR == nbytes)
 			goto out;
@@ -2062,9 +2040,6 @@ ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 	s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
 	s->buffer[s->read_bytes] = '\0';
 out:
-	if (0 != timeout)
-		zbx_socket_timeout_cleanup(s);
-
 	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes));
 }
 
@@ -2363,43 +2338,112 @@ int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 
 int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout)
 {
-	int	ret = SUCCEED;
+	zbx_timespec_t	deadline;
+	ssize_t		offset = 0, n;
+	zbx_pollfd_t	pd;
 
 	if (0 != timeout)
-		zbx_socket_timeout_set(s, timeout);
+		zbx_ts_get_deadline(&deadline, timeout);
 
-	if (ZBX_PROTO_ERROR == zbx_sendto(s->socket, data, data_len, 0, NULL, 0))
+	pd.fd = s->socket;
+	pd.events = POLLOUT;
+
+	while (offset < (ssize_t)data_len)
 	{
-		zbx_set_socket_strerror("sendto() failed: %s", strerror_from_system(zbx_socket_last_error()));
-		ret = FAIL;
+		if (ZBX_PROTO_ERROR == (n = zbx_sendto(s->socket, data + offset, data_len - offset, 0, NULL, 0)))
+		{
+			int	rc;
+
+			if (SUCCEED != socket_had_nonblocking_error())
+			{
+				zbx_set_socket_strerror("sendto() failed: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				return FAIL;
+			}
+
+			if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+			{
+				if (SUCCEED == socket_had_nonblocking_error())
+					continue;
+
+				zbx_set_socket_strerror("cannot wait for socket: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				return FAIL;
+			}
+
+			if (0 != rc && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+			{
+				zbx_set_socket_strerror("connection error");
+				return FAIL;
+			}
+		}
+		else
+			offset += n;
+
+		if (0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+		{
+			zbx_set_socket_strerror("send timeout");
+			return FAIL;
+		}
 	}
 
-	if (0 != timeout)
-		zbx_socket_timeout_cleanup(s);
-
-	return ret;
+	return SUCCEED;
 }
 
 int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 {
 	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
-	ssize_t	read_bytes;
+
+	zbx_timespec_t	deadline;
+	ssize_t		n = 0;
+	zbx_pollfd_t	pd;
+
+	if (0 != timeout)
+		zbx_ts_get_deadline(&deadline, timeout);
+
+	pd.fd = s->socket;
+	pd.events = POLLOUT;
 
 	zbx_socket_free(s);
 
-	if (0 != timeout)
-		zbx_socket_timeout_set(s, timeout);
+	while (0 >= n)
+	{
+		if (0 == (n = recvfrom(s->socket, buffer, sizeof(buffer) - 1, 0, NULL, NULL)))
+		{
+			zbx_set_socket_strerror("connection shutdown");
+			return FAIL;
+		}
 
-	if (ZBX_PROTO_ERROR == (read_bytes = recvfrom(s->socket, buffer, sizeof(buffer) - 1, 0, NULL, NULL)))
-		zbx_set_socket_strerror("recvfrom() failed: %s", strerror_from_system(zbx_socket_last_error()));
+		if (ZBX_PROTO_ERROR == n)
+		{
+			int	rc;
 
-	if (0 != timeout)
-		zbx_socket_timeout_cleanup(s);
+			if (SUCCEED != socket_had_nonblocking_error())
+			{
+				zbx_set_socket_strerror("recvfrom() failed: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				return FAIL;
+			}
 
-	if (ZBX_PROTO_ERROR == read_bytes)
-		return FAIL;
+			if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+			{
+				if (SUCCEED == socket_had_nonblocking_error())
+					continue;
 
-	if (sizeof(s->buf_stat) > (size_t)read_bytes)
+				zbx_set_socket_strerror("cannot wait for socket: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				return FAIL;
+			}
+
+			if (0 != rc && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+			{
+				zbx_set_socket_strerror("connection error");
+				return FAIL;
+			}
+		}
+	}
+
+	if (sizeof(s->buf_stat) > (size_t)n)
 	{
 		s->buf_type = ZBX_BUF_TYPE_STAT;
 		s->buffer = s->buf_stat;
@@ -2407,21 +2451,17 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 	else
 	{
 		s->buf_type = ZBX_BUF_TYPE_DYN;
-		s->buffer = (char *)zbx_malloc(s->buffer, read_bytes + 1);
+		s->buffer = (char *)zbx_malloc(s->buffer, n + 1);
 	}
 
-	buffer[read_bytes] = '\0';
-	memcpy(s->buffer, buffer, read_bytes + 1);
-
-	s->read_bytes = (size_t)read_bytes;
+	memcpy(s->buffer, buffer, n);
+	s->buffer[n] = '\0';
 
 	return SUCCEED;
 }
 
 void	zbx_udp_close(zbx_socket_t *s)
 {
-	zbx_socket_timeout_cleanup(s);
-
 	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
 }

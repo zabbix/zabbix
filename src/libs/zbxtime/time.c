@@ -1159,3 +1159,31 @@ int	zbx_iso8601_utc(const char *str, time_t *time)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get time deadline                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_ts_get_deadline(zbx_timespec_t *ts, int sec)
+{
+	zbx_timespec(ts);
+	ts->sec += sec;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if deadline has been reached                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ts_check_deadline(const zbx_timespec_t *deadline)
+{
+	zbx_timespec_t	ts;
+
+	zbx_timespec(&ts);
+
+	if (0 < zbx_timespec_compare(&ts, deadline))
+		return FAIL;
+
+	return SUCCEED;
+}

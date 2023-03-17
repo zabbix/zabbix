@@ -22,6 +22,7 @@
 #include "zbxcommon.h"
 #include "zbxjson.h"
 #include "log.h"
+#include "zbxtime.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "zbxnix.h"
@@ -40,7 +41,11 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		int loglevel)
 {
-	int	ret, i;
+	int		ret, i;
+	zbx_timespec_t	deadline;
+
+	if (0 != timeout)
+		zbx_ts_get_deadline(&deadline, timeout);
 
 	for (i = 0; i < addrs->values_num; i++)
 	{
@@ -51,7 +56,6 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, connect_timeout, tls_connect,
 				tls_arg1, tls_arg2)))
 		{
-			zbx_socket_timeout_set(s, timeout);
 			break;
 		}
 
@@ -61,6 +65,9 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 
 		zbx_vector_ptr_remove(addrs, 0);
 		zbx_vector_ptr_append(addrs, addr);
+
+		if (0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+			break;
 	}
 
 	return ret;
