@@ -887,6 +887,10 @@ abstract class CItemGeneral extends CApiService {
 
 			$interface_type = itemTypeInterface($upd_item['type']);
 
+			if ($interface_type === false) {
+				continue;
+			}
+
 			if ($upd_db_items[$upd_item['itemid']]['interfaceid'] != 0) {
 				$db_interface_type = itemTypeInterface($upd_db_items[$upd_item['itemid']]['type']);
 
@@ -947,6 +951,10 @@ abstract class CItemGeneral extends CApiService {
 
 			$interface_type = itemTypeInterface($ins_item['type']);
 
+			if ($interface_type === false) {
+				continue;
+			}
+
 			$ins_item_indexes[$ins_item['hostid']][$interface_type][] = $i;
 
 			if ($interface_types !== null) {
@@ -983,6 +991,10 @@ abstract class CItemGeneral extends CApiService {
 			$has_opt_type_items = false;
 
 			if (array_key_exists($row['hostid'], $upd_item_indexes)) {
+				if (array_key_exists(INTERFACE_TYPE_OPT, $upd_item_indexes[$row['hostid']])) {
+					$has_opt_type_items = true;
+				}
+
 				if (array_key_exists($row['type'], $upd_item_indexes[$row['hostid']])) {
 					foreach ($upd_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
 						$upd_items[$i]['interfaceid'] = $row['interfaceid'];
@@ -998,13 +1010,13 @@ abstract class CItemGeneral extends CApiService {
 						unset($upd_item_indexes[$row['hostid']]);
 					}
 				}
-
-				if (array_key_exists(INTERFACE_TYPE_OPT, $upd_item_indexes[$row['hostid']])) {
-					$has_opt_type_items = true;
-				}
 			}
 
 			if (array_key_exists($row['hostid'], $ins_item_indexes)) {
+				if (array_key_exists(INTERFACE_TYPE_OPT, $ins_item_indexes[$row['hostid']])) {
+					$has_opt_type_items = true;
+				}
+
 				if (array_key_exists($row['type'], $ins_item_indexes[$row['hostid']])) {
 					foreach ($ins_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
 						$ins_items[$i]['interfaceid'] = $row['interfaceid'];
@@ -1019,10 +1031,6 @@ abstract class CItemGeneral extends CApiService {
 					if (!$ins_item_indexes[$row['hostid']]) {
 						unset($ins_item_indexes[$row['hostid']]);
 					}
-				}
-
-				if (array_key_exists(INTERFACE_TYPE_OPT, $ins_item_indexes[$row['hostid']])) {
-					$has_opt_type_items = true;
 				}
 			}
 
