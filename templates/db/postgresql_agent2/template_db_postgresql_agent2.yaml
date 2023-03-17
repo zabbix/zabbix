@@ -741,6 +741,8 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12'
+          valuemap:
+            name: 'PostgreSQL checksum failure status'
           preprocessing:
             -
               type: JSONPATH
@@ -750,6 +752,8 @@ zabbix_export:
               type: MATCHES_REGEX
               parameters:
                 - '^\d*$'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '-2'
             -
               type: CHANGE_PER_SECOND
               parameters:
@@ -1514,6 +1518,8 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: 'Number of data page checksum failures detected in this database'
+              valuemap:
+                name: 'PostgreSQL checksum failure status'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1523,6 +1529,8 @@ zabbix_export:
                   type: MATCHES_REGEX
                   parameters:
                     - '^\d*$'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-2'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
@@ -2841,6 +2849,13 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Slow queries'
       valuemaps:
+        -
+          uuid: afae16791ae74082baab7c22af2ed9c8
+          name: 'PostgreSQL checksum failure status'
+          mappings:
+            -
+              value: '-2'
+              newvalue: 'null'
         -
           uuid: 9f38c01c325248d4b538c0582432b541
           name: 'PostgreSQL recovery role'
