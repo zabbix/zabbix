@@ -418,6 +418,15 @@ class Group extends ScimApiService {
 
 		if ($new_userids || $del_userids) {
 			$new_userids = array_diff($new_userids, $del_userids);
+
+			if (!$do_replace && $new_userids) {
+				$db_userids = DB::select('user_scim_group', [
+					'output' => ['userid'],
+					'filter' => ['scim_groupid' => $options['id']]
+				]);
+				$new_userids = array_diff($new_userids, array_column($db_userids, 'userid'));
+			}
+
 			$db_users = $this->verifyUserids(array_merge($new_userids, $del_userids), $userdirectoryid);
 		}
 
@@ -647,31 +656,6 @@ class Group extends ScimApiService {
 			'roleid' => $group_rights['roleid'],
 			'usrgrps' => $group_rights['usrgrps'],
 		]);
-	}
-
-	/**
-	 * Helper function fot the PATCH method. Adds a list of users to the 'user_scim_group' table.
-	 *
-	 * @param string $scim_groupid  SCIM groupid, which needs to be updated.
-	 * @param array $userids        Array of userids that need to be added to SCIM group.
-	 *
-	 * @return void
-	 *
-	 * @throws APIException
-	 */
-	private function patchAddUserToGroup(string $scim_groupid, array $userids): void {
-		foreach ($userids as $scim_user) {
-			$scim_user_group = DB::insert('user_scim_group', [[
-				'userid' => $scim_user,
-				'scim_groupid' => $scim_groupid
-			]]);
-
-			if (!$scim_user_group) {
-				self::exception(self::SCIM_INTERNAL_ERROR,
-					'Cannot add user '.$scim_user.' to group '.$scim_groupid.'.'
-				);
-			}
-		}
 	}
 
 	/**
