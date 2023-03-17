@@ -358,9 +358,6 @@ class Group extends ScimApiService {
 	public function patch(array $options): array {
 		$this->validatePatch($options);
 
-		$operations = $options['Operations'];
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-
 		$db_scim_groups = DB::select('scim_group', [
 			'output' => ['name'],
 			'scim_groupids' => $options['id']
@@ -374,8 +371,9 @@ class Group extends ScimApiService {
 		$new_userids = [];
 		$del_userids = [];
 		$do_replace = false;
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 
-		foreach ($operations as $operation) {
+		foreach ($options['Operations'] as $operation) {
 			if ($operation['path'] === 'displayName') {
 				$scim_groupid = DB::update('scim_group', [
 					'values' => ['name' => $operation['value']],
