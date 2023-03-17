@@ -1225,7 +1225,7 @@ static void	proxy_db_init(void)
 	zbx_db_check_character_set();
 	zbx_check_db();
 
-	if (SUCCEED != (version_check = DBcheck_version()))
+	if (SUCCEED != (version_check = DBcheck_version(ZBX_HA_MODE_STANDALONE)))
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
