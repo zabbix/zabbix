@@ -505,7 +505,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$saml_data['idp_type'] = IDP_TYPE_SAML;
 
-		if ($db_saml[0]) {
+		if ($db_saml) {
 			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
 		}
 		else {
