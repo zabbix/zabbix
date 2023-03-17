@@ -392,7 +392,6 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		$data = array_diff_assoc($data, $auth);
-
 		$result = true;
 
 		if ($data) {
