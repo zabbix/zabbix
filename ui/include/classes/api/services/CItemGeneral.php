@@ -1038,7 +1038,7 @@ abstract class CItemGeneral extends CApiService {
 				$priority_index = array_search($row['type'], self::INTERFACE_TYPES_BY_PRIORITY);
 
 				if (!array_key_exists($row['hostid'], $priority_interfaces)
-						|| $priority_index < $priority_interfaces[$row['hostid']]) {
+						|| $priority_index < $priority_interfaces[$row['hostid']]['priority_index']) {
 					$priority_interfaces[$row['hostid']] = [
 						'interfaceid' => $row['interfaceid'],
 						'type' => $row['type'],
