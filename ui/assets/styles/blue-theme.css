@@ -2573,20 +2573,20 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .radio-list-control li {
     position: relative;
     display: inline-block;
-    margin: 0 -1px 0 0;
+    margin-right: -1px;
     padding: 0; }
     .radio-list-control li:first-child {
-      border-radius: 3px 0 0 3px; }
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px; }
       .radio-list-control li:first-child label {
-        border-radius: 2px 0 0 2px; }
+        border-top-left-radius: 2px;
+        border-bottom-left-radius: 2px; }
     .radio-list-control li:last-child {
-      border-radius: 0 3px 3px 0; }
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px; }
       .radio-list-control li:last-child label {
-        border-radius: 0 2px 2px 0; }
-    .radio-list-control li:only-child {
-      border-radius: 3px; }
-      .radio-list-control li:only-child label {
-        border-radius: 2px; }
+        border-top-right-radius: 2px;
+        border-bottom-right-radius: 2px; }
   .radio-list-control label {
     display: inline-block;
     border: 1px solid #acbbc2;
@@ -2609,19 +2609,14 @@ div.dashboard-widget-tophosts z-bar-gauge {
       .radio-list-control input[type="radio"] + label:active {
         border-color: #acbbc2;
         background-color: #e8f5ff; }
-    .radio-list-control input[type="radio"]:focus + label {
-      border-color: #02659f;
-      background-color: #e8f5ff;
-      position: relative;
-      z-index: 1; }
     .radio-list-control input[type="radio"]:checked + label {
       color: #ffffff;
       border-color: #768d99;
       background-color: #768d99;
-      position: relative; }
-    .radio-list-control input[type="radio"]:checked:focus + label {
-      box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
-      position: relative; }
+      position: relative;
+      z-index: 1; }
+    .radio-list-control input[type="radio"]:focus + label {
+      box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
     .radio-list-control input[type="radio"]:checked[disabled] + label {
       background-color: #d6dde1 !important;
       transition: none; }
@@ -4310,8 +4305,6 @@ select {
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #acbbc2 !important; }
   .checkbox-radio:focus + label span {
-    border-color: #02659f; }
-  .checkbox-radio:checked:focus + label span {
     border-color: #02659f; }
   .checkbox-radio:checked[disabled] + label span {
     transition: none; }
