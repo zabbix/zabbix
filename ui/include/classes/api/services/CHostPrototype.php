@@ -2028,7 +2028,7 @@ class CHostPrototype extends CHostBase {
 
 		if ($hosts_to_update) {
 			$_upd_db_hosts = self::getChildObjectsUsingTemplateid($hosts_to_update, $db_hosts, $ruleids);
-			$_upd_hosts = self::getUpdChildObjectsUsingTemplateid($hosts_to_update, $db_hosts, $_upd_db_hosts);
+			$_upd_hosts = self::getUpdChildObjectsUsingTemplateid($hosts_to_update, $_upd_db_hosts);
 
 			self::checkDuplicates($_upd_hosts, $_upd_db_hosts, true);
 
@@ -2221,11 +2221,7 @@ class CHostPrototype extends CHostBase {
 
 		self::addInternalFields($upd_db_hosts);
 
-		$parent_indexes = [];
-
-		foreach ($hosts as $i => $host) {
-			$parent_indexes[$host['hostid']] = $i;
-		}
+		$parent_indexes = array_flip(array_column($hosts, 'itemid'));
 
 		$_upd_hosts = [];
 
@@ -2257,18 +2253,12 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array $hosts
-	 * @param array $db_hosts
 	 * @param array $upd_db_hosts
 	 *
 	 * @return array
 	 */
-	private static function getUpdChildObjectsUsingTemplateid(array $hosts, array $db_hosts,
-			array $upd_db_hosts): array {
-		$parent_indexes = [];
-
-		foreach ($hosts as $i => $host) {
-			$parent_indexes[$host['hostid']] = $i;
-		}
+	private static function getUpdChildObjectsUsingTemplateid(array $hosts, array $upd_db_hosts): array {
+		$parent_indexes = array_flip(array_column($hosts, 'itemid'));
 
 		$upd_hosts = [];
 
