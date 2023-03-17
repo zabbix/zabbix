@@ -1955,6 +1955,9 @@ form.dashboard-widget-svggraph .no-items-message {
   border: none !important;
   top: 0; }
 
+div.dashboard-widget-svggraph {
+  overflow-x: hidden; }
+
 form.dashboard-widget-tophosts #list_columns .text {
   max-width: 250px; }
 form.dashboard-widget-tophosts #column {
@@ -2499,6 +2502,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
     background-color: #503434; }
   .msg-bad::after {
     background-position: -122px -325px; }
+  .msg-bad .msg-details {
+    padding-right: 10px; }
 
 .msg-good {
   border-color: #344e3f; }
@@ -5222,7 +5227,7 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
   display: table;
   position: absolute;
   z-index: 1000;
-  padding: 13px 10px 10px;
+  padding: 17px 10px 10px;
   background-color: #2b2b2b;
   border: 1px solid #383838;
   border-bottom-color: #353535;
