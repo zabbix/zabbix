@@ -88,6 +88,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// Get fields from widget form to compare them with new widget after copying.
 		$fields = $dashboard->getWidget($name)->edit()->getFields();
+
 		// Add tag fields mapping to form for problem widgets.
 		if (stristr($name, 'Problem')) {
 			$fields->set('', $fields->get('')->asMultifieldTable(['mapping' => $mapping]));
