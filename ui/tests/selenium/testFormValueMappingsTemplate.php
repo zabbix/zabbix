@@ -158,4 +158,11 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 	public function testFormValueMappingsTemplate_FullClone() {
 		$this->checkClone('template', 'Full clone');
 	}
+
+	/**
+	 * Scenario for verifying position of draggable element in value mapping of the templates for mass update case.
+	 */
+	public function testFormValueMappingsTemplate_ValuemappingScreenshot() {
+		$this->checkMassValuemappingScreenshot('templates');
+	}
 }
