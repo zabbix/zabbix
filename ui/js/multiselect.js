@@ -860,8 +860,8 @@
 				$(this).remove();
 			}
 		});
-		$('input', $obj).each(function(){
-			if (parseInt($(this).val()) === parseInt(id)) {
+		$('input', $obj).each(function() {
+			if ($(this).val() !== '' && $(this).val() == id) {
 				$(this).remove();
 			}
 		});
