@@ -1359,6 +1359,8 @@ static void	zbx_check_db(void)
 out:
 	if (SUCCEED != result)
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
+				ZABBIX_VERSION, ZABBIX_REVISION);
 		zbx_db_version_info_clear(&db_version_info);
 		exit(EXIT_FAILURE);
 	}
