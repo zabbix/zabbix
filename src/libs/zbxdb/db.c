@@ -21,6 +21,7 @@
 #include "log.h"
 
 #include "zbxdb.h"
+#include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
@@ -2718,13 +2719,13 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	{
 		version_info->database = "MariaDB";
 
-		version_info->min_version = ZBX_MARIA_MIN_VERSION;
-		version_info->max_version = ZBX_MARIA_MAX_VERSION;
-		version_info->min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION;
+		version_info->min_version = ZBX_MARIADB_MIN_VERSION;
+		version_info->max_version = ZBX_MARIADB_MAX_VERSION;
+		version_info->min_supported_version = ZBX_MARIADB_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_FRIENDLY;
-		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_FRIENDLY;
-		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_FRIENDLY;
+		version_info->friendly_min_version = ZBX_MARIADB_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MARIADB_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MARIADB_MIN_SUPPORTED_VERSION_STR;
 	}
 	else
 	{
@@ -2734,9 +2735,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 		version_info->max_version = ZBX_MYSQL_MAX_VERSION;
 		version_info->min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MYSQL_MIN_VERSION_FRIENDLY;
-		version_info->friendly_max_version = ZBX_MYSQL_MAX_VERSION_FRIENDLY;
-		version_info->friendly_min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION_FRIENDLY;
+		version_info->friendly_min_version = ZBX_MYSQL_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MYSQL_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR;
 	}
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
@@ -2768,9 +2769,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 				RIGHT2(ZBX_PG_SVERSION));
 	}
 
-	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
-	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY;
-	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_STR;
+	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_STR;
+	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);
@@ -2856,9 +2857,9 @@ out:
 	version_info->min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION;
 
 	version_info->friendly_current_version = zbx_strdup(NULL, version_friendly);
-	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_FRIENDLY;
-	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_FRIENDLY;
-	version_info->friendly_min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_STR;
+	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_STR;
+	version_info->friendly_min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);
@@ -2894,9 +2895,9 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 	version_info->ext_friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(tsdb_ver/10000),
 			RIGHT2(tsdb_ver/100), RIGHT2(tsdb_ver));
 
-	version_info->ext_friendly_min_version = ZBX_TIMESCALE_MIN_VERSION_FRIENDLY;
-	version_info->ext_friendly_max_version = ZBX_TIMESCALE_MAX_VERSION_FRIENDLY;
-	version_info->ext_friendly_min_supported_version = ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->ext_friendly_min_version = ZBX_TIMESCALE_MIN_VERSION_STR;
+	version_info->ext_friendly_max_version = ZBX_TIMESCALE_MAX_VERSION_STR;
+	version_info->ext_friendly_min_supported_version = ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->ext_flag = zbx_db_version_check(version_info->extension, version_info->ext_current_version,
 			version_info->ext_min_version, version_info->ext_max_version,
