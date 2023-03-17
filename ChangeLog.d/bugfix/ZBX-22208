@@ -1,1 +1,1 @@
-..F....... [ZBX-22208] fixed input for case_sensitive_login field in Users->Authentication LDAP form (esekace)
+..F....... [ZBX-22208] fixed clickable disabled fields in Users->Authentication LDAP and SAML forms (esekace)
