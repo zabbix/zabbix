@@ -370,6 +370,8 @@ class Group extends ScimApiService {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
 		}
 
+		$db_users = [];
+
 		foreach ($operations as $operation) {
 			if ($operation['path'] === 'displayName') {
 				$scim_groupid = DB::update('scim_group', [
@@ -387,13 +389,12 @@ class Group extends ScimApiService {
 			}
 
 			if ($operation['path'] === 'members') {
-				$db_users = [];
 				$scim_users = [];
 
 				switch ($operation['op']) {
 					case 'add':
 						$scim_users = array_column($operation['value'], 'value') ?: [];
-						$db_users = $this->verifyUserids($scim_users, $userdirectoryid);
+						$db_users += $this->verifyUserids($scim_users, $userdirectoryid);
 
 						$db_scim_group_members = DB::select('user_scim_group', [
 							'output' => ['userid'],
@@ -416,7 +417,7 @@ class Group extends ScimApiService {
 						DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
 
 						$scim_users = array_column($operation['value'], 'value');
-						$db_users = $this->verifyUserids($scim_users, $userdirectoryid);
+						$db_users += $this->verifyUserids($scim_users, $userdirectoryid);
 
 						$this->patchAddUserToGroup($options['id'], $scim_users);
 
@@ -425,7 +426,6 @@ class Group extends ScimApiService {
 						break;
 
 					case 'remove':
-						$db_users = [];
 						if (!array_key_exists('value', $operation)) {
 							DB::delete('user_scim_group', ['scim_groupid' => $options['id']]);
 						}
@@ -444,9 +444,9 @@ class Group extends ScimApiService {
 					$this->updateProvisionedUserGroups($scim_user, $userdirectoryid);
 				}
 			}
-
-			$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
 		}
+
+		$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
 
 		return $this->data;
 	}
