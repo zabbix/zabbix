@@ -92,6 +92,12 @@ else {
 				'}'.
 			'}'.
 
+			'if (typeof zbx_graph_widget_set_edit_mode !== typeof(Function)) {'.
+				'function zbx_graph_widget_set_edit_mode(graph_containerid) {'.
+					'jQuery("#" + graph_containerid).attr("href", "javascript:void(0)")'.
+				'}'.
+			'}'.
+
 			'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onResizeEnd", '.
 				'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'"],'.
@@ -108,6 +114,12 @@ else {
 				'"zbx_graph_widget_delete", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'",'.zbx_jsvalue($data['fs_data']).'],'.
 					'trigger_name: "graph_widget_delete_'.$data['widget']['uniqueid'].'"'.
+				'});'.
+
+			'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onEditStart", '.
+				'"zbx_graph_widget_set_edit_mode", "'.$data['graph']['containerid'].'", {'.
+					'parameters: ["'.$data['graph']['containerid'].'"],'.
+					'trigger_name: "zbx_graph_widget_set_edit_mode_'.$data['graph']['containerid'].'"'.
 				'});';
 	}
 

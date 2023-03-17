@@ -763,6 +763,10 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 				(unsigned int)var->val.string[2],
 				(unsigned int)var->val.string[3]));
 	}
+	else if (ASN_NULL == var->type)
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "NULL"));
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
