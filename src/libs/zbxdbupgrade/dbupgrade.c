@@ -22,7 +22,7 @@
 #include "zbxdbschema.h"
 
 #include "log.h"
-#include "zbxha.h"
+#include "../../zabbix_server/ha/ha.h"
 #include "zbxtime.h"
 
 typedef struct
@@ -923,8 +923,8 @@ void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb)
 #ifndef HAVE_SQLITE3
 static int	DBcheck_nodes(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t		row;
 	int		ret = SUCCEED, db_time = 0, failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 
 	zbx_db_begin();
@@ -1109,8 +1109,8 @@ int	DBcheck_version(zbx_ha_mode_t ha_mode)
 		for (i = 0; 0 != patches[i].version; i++)
 		{
 			static sigset_t	orig_mask, mask;
-			DB_RESULT	result;
-			DB_ROW		row;
+			zbx_db_result_t	result;
+			zbx_db_row_t		row;
 
 			if (db_optional >= patches[i].version)
 				continue;
