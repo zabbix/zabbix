@@ -369,6 +369,21 @@ class CControllerAuthenticationUpdate extends CController {
 		$data = $fields + $auth;
 		$this->getInputs($data, array_keys($fields));
 
+		if ($this->getInput('ldap_auth_enabled') == ZBX_AUTH_LDAP_DISABLED) {
+			$data['ldap_jit_status'] = CAuthenticationHelper::get('ldap_jit_status');
+			$data['ldap_case_sensitive'] = CAuthenticationHelper::get('ldap_case_sensitive');
+			$data['jit_provision_interval'] = CAuthenticationHelper::get('jit_provision_interval');
+		}
+
+		if ($this->hasInput('ldap_jit_status') && $this->getInput('ldap_jit_status') == JIT_PROVISIONING_DISABLED) {
+			$data['jit_provision_interval'] = CAuthenticationHelper::get('jit_provision_interval');
+		}
+
+		if ($this->getInput('saml_auth_enabled') == ZBX_AUTH_SAML_DISABLED) {
+			$data['saml_case_sensitive'] = CAuthenticationHelper::get('saml_case_sensitive');
+			$data['saml_jit_status'] = CAuthenticationHelper::get('saml_jit_status');
+		}
+
 		$rules = $data['passwd_check_rules'];
 		$data['passwd_check_rules'] = 0x00;
 
@@ -377,6 +392,7 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		$data = array_diff_assoc($data, $auth);
+
 		$result = true;
 
 		if ($data) {
@@ -460,6 +476,15 @@ class CControllerAuthenticationUpdate extends CController {
 		];
 		$this->getInputs($saml_data, array_keys($saml_data));
 
+		$db_saml = API::UserDirectory()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
+		]);
+
+		if ($this->getInput('saml_auth_enabled') == ZBX_AUTH_SAML_DISABLED && $db_saml) {
+			$saml_data = array_replace($saml_data, $db_saml[0]);
+		}
+
 		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$provisioning_fields = [
 				'saml_provision_status' => JIT_PROVISIONING_ENABLED,
@@ -482,12 +507,8 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		$saml_data['idp_type'] = IDP_TYPE_SAML;
-		$db_saml = API::UserDirectory()->get([
-			'output' => ['userdirectoryid'],
-			'filter' => ['idp_type' => IDP_TYPE_SAML]
-		]);
 
-		if ($db_saml) {
+		if ($db_saml[0]) {
 			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
 		}
 		else {

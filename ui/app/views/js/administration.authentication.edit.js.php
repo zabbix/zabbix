@@ -228,8 +228,6 @@
 		}
 
 		_authFormSubmit() {
-			this._addLdapCaseSensitiveInput();
-
 			const fields_to_trim = ['#http_strip_domains', '#idp_entityid', '#sso_url', '#slo_url',
 				'#username_attribute', '#sp_entityid', '#nameid_format', '#saml_group_name', '#saml_user_username',
 				'#saml_user_lastname'
@@ -503,17 +501,6 @@
 					row.remove();
 				}
 			});
-		}
-
-		_addLdapCaseSensitiveInput() {
-			if (this.form.querySelector('[type="checkbox"][name="ldap_case_sensitive"]').checked
-				&& !this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').checked) {
-				const input = document.createElement('input');
-				input.type = 'hidden';
-				input.name = 'ldap_case_sensitive';
-				input.value = '1';
-				this.form.appendChild(input);
-			}
 		}
 
 		_prepareServerRow(ldap) {
