@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-03-05 11:08+0000\n"
+"PO-Revision-Date: 2023-03-14 20:55+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -324,7 +324,7 @@ msgstr "10 segons"
 
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr "100 activadors més ocupats"
+msgstr "100 triggers més ocupats"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -1413,6 +1413,10 @@ msgstr "Intents"
 msgid "Attribution"
 msgstr "Atribució"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -1905,7 +1909,7 @@ msgstr "No es pot pas afegir la dependència d'un equip a una plantilla."
 #: include/triggers.inc.php:371
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr "No es pot pas afegir la dependència de l'activador \"%1$s:%2$s\" a l'activador no existent \"%3$s:%4$s\"."
+msgstr "No es pot pas afegir la dependència del trigger \"%1$s:%2$s\" al trigger no existent \"%3$s:%4$s\"."
 
 #: host_discovery.php:726
 msgid "Cannot add discovery rule"
@@ -2788,12 +2792,12 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" perqu
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de la dependència de l'activador \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de la dependència del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió de l'activador \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
@@ -3099,7 +3103,7 @@ msgstr "No es pot pas actualitzar \"%1$s\" per a l'element \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1018
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr "No es pot pas actualitzar \"%1$s\" per a l'activador de plantilla \"%2$s\"."
+msgstr "No es pot pas actualitzar \"%1$s\" per al trigger de plantilla \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1029
 #, c-format
@@ -3294,7 +3298,7 @@ msgstr "No es pot pas actualitzar el proxy"
 #: include/classes/api/services/CProxy.php:654
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr "No es pot actualitzar el servidor intermediari per a l'equip descobert \"%1$s\"."
+msgstr "No es pot actualitzar el proxy per a l'equip descobert \"%1$s\"."
 
 #: include/classes/api/services/CRole.php:775
 #, c-format
@@ -5327,7 +5331,7 @@ msgstr "Vols esborrar els tipus de suports triats?"
 
 #: app/views/administration.proxy.list.php:189
 msgid "Delete selected proxies?"
-msgstr "Vols esborrar els servidors intermediaris triats?"
+msgstr "Vols esborrar els proxys triats?"
 
 #: app/views/administration.regex.list.php:81
 msgid "Delete selected regular expressions?"
@@ -5395,11 +5399,11 @@ msgstr "Vols esborrar la plantilla?"
 
 #: include/views/configuration.trigger.prototype.edit.php:660
 msgid "Delete trigger prototype?"
-msgstr "Vols esborrar el prototip d'activador?"
+msgstr "Vols esborrar el prototip d3 trigger?"
 
 #: include/views/configuration.triggers.edit.php:666
 msgid "Delete trigger?"
-msgstr "Vols esborrar l'activador?"
+msgstr "Vols esborrar el trigger?"
 
 #: include/views/configuration.httpconf.edit.php:266
 msgid "Delete web scenario?"
@@ -5589,7 +5593,7 @@ msgstr "Desactivar els equips del grup d'equips escollit?"
 
 #: app/views/administration.proxy.list.php:187
 msgid "Disable hosts monitored by selected proxies?"
-msgstr "Vols desactivar els amfitrions supervisats pels servidors intermediaris triats?"
+msgstr "Vols desactivar els equips supervisats pels proxys triats?"
 
 #: app/views/administration.token.list.php:200
 #: app/views/administration.user.token.list.php:152
@@ -5643,7 +5647,7 @@ msgstr "Vols desactivar els informes programats triats?"
 
 #: include/views/configuration.triggers.list.php:342
 msgid "Disable selected triggers?"
-msgstr "Vols desactivar els activadors triats?"
+msgstr "Vols desactivar els triggers triats?"
 
 #: include/views/configuration.httpconf.list.php:211
 msgid "Disable selected web scenarios?"
@@ -6324,7 +6328,7 @@ msgstr "Activar equips"
 
 #: app/views/administration.proxy.list.php:184
 msgid "Enable hosts monitored by selected proxies?"
-msgstr "Vols habilitar els equips supervisats pels servidors intermediaris triats?"
+msgstr "Vols habilitar els equips supervisats pels proxys triats?"
 
 #: app/views/administration.audit.settings.edit.php:47
 #: app/views/administration.housekeeping.edit.php:43
@@ -6388,7 +6392,7 @@ msgstr "Vols activar els informes programats triats?"
 
 #: include/views/configuration.triggers.list.php:341
 msgid "Enable selected triggers?"
-msgstr "Vols activar els activadors triats?"
+msgstr "Vols activar els triggers triats?"
 
 #: include/views/configuration.httpconf.list.php:210
 msgid "Enable selected web scenarios?"
@@ -8895,7 +8899,7 @@ msgstr "Acció de condició de gravetat del trigger incorrecta."
 
 #: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr "Activador de la condició de trigger incorrecta. El trigger no existeix o no hi teniu pas accés."
+msgstr "Acció de la condició de trigger incorrecta. El trigger no existeix o no hi teniu pas accés."
 
 #: include/classes/validators/CActionCondValidator.php:211
 msgid "Incorrect action condition type."
@@ -9274,7 +9278,7 @@ msgstr "Valor \"%1$s\" incorrecte per al camp \"%2$s\"."
 #: include/validate.inc.php:336
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point."
-msgstr "El valor \"%1$s\" per al camp \"%2$s\" és incorrecte: ha d'ésser entre %3$s i %4$s i no tintre més de %5$s dígits després del punt decimal."
+msgstr "El valor \"%1$s\" per al camp \"%2$s\" és incorrecte: ha d'ésser entre %3$s i %4$s i no tindre més de %5$s dígits després del punt decimal."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:153
 #: include/validate.inc.php:341
@@ -11209,6 +11213,10 @@ msgstr "Manteniment sense recull de dades"
 msgid "Maintenance: %1$s"
 msgstr "Manteniment: %1$s"
 
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
+
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -11845,24 +11853,24 @@ msgstr "Dilluns"
 
 #: app/views/configuration.host.list.php:128
 msgid "Monitored by"
-msgstr "Monitoritzat per"
+msgstr "Monitorat per"
 
 #: app/partials/configuration.host.edit.html.php:269
 #: app/views/popup.massupdate.host.php:128
 #: include/views/configuration.host.prototype.edit.php:279
 msgid "Monitored by proxy"
-msgstr "Monitoritzat per proxy"
+msgstr "Monitorat per proxy"
 
 #: include/classes/screens/CScreenDiscovery.php:119
 msgid "Monitored host"
-msgstr "Equip monitoritzat"
+msgstr "Equip monitorat"
 
 #: app/views/search.php:36 app/views/search.php:192
 #: include/classes/helpers/CMenuHelper.php:69
 #: include/classes/helpers/CRoleHelper.php:305
 #: include/views/inventory.host.view.php:135
 msgid "Monitoring"
-msgstr "Monitoritzant"
+msgstr "Monitorant"
 
 #: include/views/js/monitoring.sysmaps.js.php:70
 msgid "Monospace"
@@ -12793,11 +12801,11 @@ msgstr "No s'han triat pas objectius per a l'script global d'operacions d'acció
 #: include/triggers.inc.php:91
 #, c-format
 msgid "No trigger with trigger ID \"%1$s\"."
-msgstr "No hi ha activador amb l'identificador d'activador \"%1$s\"."
+msgstr "No hi ha trigger amb l'identificador de trigger \"%1$s\"."
 
 #: chart4.php:42
 msgid "No triggers defined."
-msgstr "No s'han definit pas activadors."
+msgstr "No s'han definit pas triggers."
 
 #: app/views/js/popup.itemtestedit.view.js.php:41
 msgid "No value"
@@ -14464,7 +14472,7 @@ msgstr "L'URL donat \"%1$s\" no és vàlid."
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:423
 msgid "Proxies"
-msgstr "Servidors intermediaris"
+msgstr "Proxys"
 
 #: app/controllers/CControllerAuditLogList.php:233
 #: app/views/administration.proxy.edit.php:89
@@ -14478,53 +14486,53 @@ msgstr "Servidors intermediaris"
 #: app/views/popup.condition.common.php:520
 #: app/views/popup.itemtestedit.view.php:237 include/actions.inc.php:62
 msgid "Proxy"
-msgstr "Servidor intermediari"
+msgstr "Proxy"
 
 #: include/classes/api/services/CProxy.php:606
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
-msgstr "El servidor intermediari \"%1$s\" ja existeix."
+msgstr "El proxy \"%1$s\" ja existeix."
 
 #: include/classes/import/importers/CHostImporter.php:313
 #, c-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
-msgstr "El servidor intermediari \"%1$s\" per a l'equip \"%2$s\" no existeix."
+msgstr "El proxy \"%1$s\" per a l'equip \"%2$s\" no existeix."
 
 #: include/classes/api/services/CProxy.php:471
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
-msgstr "El servidor intermediari \"%1$s\" s'empra per l'acció \"%2$s\"."
+msgstr "El proxy \"%1$s\" s'empra per l'acció \"%2$s\"."
 
 #: include/classes/api/services/CProxy.php:428
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr "El servidor intermediari \"%1$s\" s'empra per la regla de descobriment \"%2$s\"."
+msgstr "El proxy \"%1$s\" s'empra per la regla de descobriment \"%2$s\"."
 
 #: app/controllers/CControllerProxyCreate.php:115
 msgid "Proxy added"
-msgstr "S'ha afegit un servidor intermediari"
+msgstr "S'ha afegit un proxy"
 
 #: app/views/administration.proxy.edit.php:81
 msgid "Proxy address"
-msgstr "Adreça del servidor intermediari"
+msgstr "Adreça del proxy"
 
 #: app/controllers/CControllerProxyDelete.php:66
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
-msgstr[0] "S'ha esborrat el servidor intermediari"
-msgstr[1] "S'han esborrat els servidors intermediaris"
+msgstr[0] "S'ha esborrat el proxy"
+msgstr[1] "S'han esborrat els proxys"
 
 #: app/views/administration.proxy.edit.php:70
 msgid "Proxy mode"
-msgstr "Mode del servidor intermediari"
+msgstr "Mode del proxy"
 
 #: app/views/administration.proxy.edit.php:64
 msgid "Proxy name"
-msgstr "Nom del servidor intermediari"
+msgstr "Nom del proxy"
 
 #: app/controllers/CControllerProxyUpdate.php:109
 msgid "Proxy updated"
-msgstr "S'ha actualitzat el servidor intermediari"
+msgstr "S'ha actualitzat el proxy"
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:399
@@ -14592,7 +14600,7 @@ msgstr "Visió general de la cua"
 #: app/views/administration.queue.overview.proxy.php:36
 #: include/classes/helpers/CMenuHelper.php:321
 msgid "Queue overview by proxy"
-msgstr "Visió general de la cua per servidor intermediari"
+msgstr "Visió general de la cua per proxy"
 
 #: app/views/hintbox.eventlist.php:100
 #: app/views/monitoring.widget.problems.view.php:93
@@ -15318,7 +15326,7 @@ msgstr "Retorna una matriu JSON que descriu les interfícies de xarxa de l'equip
 #: include/classes/data/CItemData.php:1601
 #: include/classes/data/CItemData.php:1701
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
-msgstr "Retorna un objecte JSON que conté mètriques internes del servidor Zabbix o del servidor intermediari."
+msgstr "Retorna un objecte JSON que conté mètriques internes del servidor Zabbix o del proxy."
 
 #: include/classes/data/CItemData.php:1641
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -16096,11 +16104,11 @@ msgstr "Setembre"
 
 #: include/hosts.inc.php:134 include/views/inventory.host.list.php:89
 msgid "Serial number A"
-msgstr "Número de sèrie A"
+msgstr "Nombre de sèrie A"
 
 #: include/hosts.inc.php:139
 msgid "Serial number B"
-msgstr "Número de sèrie B"
+msgstr "Nombre de sèrie B"
 
 #: include/views/js/monitoring.sysmaps.js.php:55
 msgid "Serif"
@@ -17385,7 +17393,7 @@ msgstr "Nom de la plantilla"
 
 #: report2.php:394
 msgid "Template trigger"
-msgstr "Activador de la plantilla"
+msgstr "Trigger de la plantilla"
 
 #: templates.php:208
 msgid "Template updated"
@@ -17681,11 +17689,11 @@ msgstr "El token ha caducat. Actualitzeu la data de caducitat per emprar el toke
 #: include/html.inc.php:718
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "L'activador ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
+msgstr "El trigger ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
 
 #: include/html.inc.php:713
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "L'activador ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
+msgstr "El trigger ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
 
 #: app/views/administration.user.edit.php:251
 msgid "Theme"
@@ -18070,7 +18078,7 @@ msgstr "El trigger \"%1$s\" no pot pas dependre del trigger \"%2$s\", doncs es p
 #: include/classes/api/services/CTriggerGeneral.php:2349
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr "El trigger \"%1$s\" no pot dependre pas de l'activador \"%2$s\", doncs es produiria un enllaç circular (%3$s) per a la plantilla \"%4$s\"."
+msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs es produiria un enllaç circular (%3$s) per a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2365
 #, c-format
@@ -18080,7 +18088,7 @@ msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs es p
 #: include/classes/api/services/CTriggerGeneral.php:2472
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs no es permeten les dependències dels activadors de l'equip a les plantilles de triggers."
+msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs no es permeten les dependències dels triggers de l'equip a les plantilles de triggers."
 
 #: include/classes/api/services/CTriggerGeneral.php:2857
 #, c-format
@@ -18307,7 +18315,7 @@ msgstr "Actualitzats els prototips de triggers"
 
 #: app/views/administration.user.edit.php:739 include/actions.inc.php:45
 msgid "Trigger severity"
-msgstr "Gravitat del trigger"
+msgstr "Gravetat del trigger"
 
 #: jsLoader.php:367
 msgid "Trigger status \"OK\""
@@ -19914,7 +19922,7 @@ msgstr "Web"
 #: include/views/configuration.httpconf.edit.php:26
 #: include/views/configuration.httpconf.list.php:92
 msgid "Web monitoring"
-msgstr "Monitorització web"
+msgstr "Monitoratge web"
 
 #: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
@@ -22343,11 +22351,11 @@ msgstr "l'expressió del trigger ha de contindre almenys una referència a /host
 
 #: include/classes/api/services/CTriggerGeneral.php:1723
 msgid "trigger prototype cannot be moved to another template or host"
-msgstr "el prototip del disparador no es pot pas moure a una altra plantilla o equip"
+msgstr "el prototip del trigger no es pot pas moure a una altra plantilla o equip"
 
 #: include/classes/api/services/CTriggerGeneral.php:1889
 msgid "trigger with linkages cannot be moved to another template or host"
-msgstr "l'activador amb enllaços no es pot pas moure a una altra plantilla o equip"
+msgstr "el trigger amb enllaços no es pot pas moure a una altra plantilla o equip"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -22467,7 +22475,7 @@ msgstr "sufix de temps no compatible"
 
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"
-msgstr "número de versió no compatible"
+msgstr "nombre de versió no compatible"
 
 #: include/classes/validators/CApiInputValidator.php:509
 msgid "uppercase identifier expected"
