@@ -1526,6 +1526,8 @@ form.is-loading {
 .cell {
   display: table-cell;
   vertical-align: top; }
+  .cell.expression-cell {
+    line-height: 24px; }
   .cell:last-child .dashbrd-widget {
     margin: 0 0 10px; }
 
