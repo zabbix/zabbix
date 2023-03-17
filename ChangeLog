@@ -6122,6 +6122,8 @@ Changes for 4.0.45rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-22520] fixed versions of integrations (aiantsen)
+.......PS. [ZBX-22026] fixed SNMP agent item going to unsupported state on NULL result (vso)
 ..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
