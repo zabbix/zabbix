@@ -5620,8 +5620,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 		if (ITEM_VALUE_TYPE_BIN == item->value_type)
 		{
 			zbx_free(func->error);
-			func->error = zbx_eval_format_function_error(func->function, NULL, NULL, func->parameter,
-					"items with binary type are unsupported in functions");
+			func->error = zbx_eval_format_function_error(func->function, item->host.host, item->key_orig,
+					func->parameter, "items with binary type are unsupported in functions");
 			continue;
 		}
 
