@@ -26,11 +26,11 @@ import (
 )
 
 const (
-	ZABBIX_REVDATE          = "2 March 2023"
-	ZABBIX_VERSION_MAJOR    = 6
-	ZABBIX_VERSION_MINOR    = 4
+	ZABBIX_REVDATE          = "6 March 2023"
+	ZABBIX_VERSION_MAJOR    = 7
+	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 0
-	ZABBIX_VERSION_RC       = "rc4"
+	ZABBIX_VERSION_RC       = "alpha1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2023 Zabbix SIA\n" +

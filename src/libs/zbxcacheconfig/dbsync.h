@@ -90,7 +90,7 @@ struct zbx_dbsync
 	zbx_vector_ptr_t		rows;
 
 	/* the database result set for ZBX_DBSYNC_ALL mode */
-	DB_RESULT			dbresult;
+	zbx_db_result_t			dbresult;
 
 	/* the row preprocessing function */
 	zbx_dbsync_preproc_row_func_t	preproc_row_func;

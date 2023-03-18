@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.4'
+  version: '7.0'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -26,7 +26,7 @@ zabbix_export:
         Template tooling version used: 0.41
       vendor:
         name: Zabbix
-        version: 6.4-0
+        version: 7.0-0
       groups:
         -
           name: Templates/Databases

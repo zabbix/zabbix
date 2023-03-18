@@ -29,9 +29,8 @@ window.tophosts_column_edit_form = new class {
 		this._$widget_form = $(`form[name="${form_name}"]`);
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
 
-		$('[name="data"], [name="aggregate_function"], [name="display"]', this._$widget_form).on('change', () => {
-			this._update();
-		});
+		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]', this._$widget_form)
+			.on('change', () => this._update());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -81,6 +80,8 @@ window.tophosts_column_edit_form = new class {
 
 	_update() {
 		const display_as_is = ($('[name="display"]:checked').val() == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>);
+		const history_data_trends = ($('[name="history"]:checked').val() ==
+			<?= CWidgetFieldColumnsList::HISTORY_DATA_TRENDS ?>);
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
 		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= AGGREGATE_NONE ?>;
@@ -100,6 +101,9 @@ window.tophosts_column_edit_form = new class {
 				? 'none'
 				: '';
 			document.getElementById('tophosts-column-display-warning').style.display = display_as_is ? 'none' : '';
+			document.getElementById('tophosts-column-history-data-warning').style.display = history_data_trends
+				? ''
+				: 'none';
 			document.getElementById('tophosts-column-thresholds-warning').style.display =
 				this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
 		}

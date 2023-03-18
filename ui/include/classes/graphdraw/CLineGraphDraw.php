@@ -2035,7 +2035,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'master_itemid', 'delay'],
-				'itemids' => $master_itemids
+				'itemids' => $master_itemids,
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+				]
 			]);
 		} while ($items);
 
