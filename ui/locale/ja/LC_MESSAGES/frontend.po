@@ -1390,6 +1390,10 @@ msgstr "試行回数"
 msgid "Attribution"
 msgstr "帰属表示"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -11105,6 +11109,10 @@ msgstr "データ収集なしのメンテナンス"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "メンテナンス：%1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
