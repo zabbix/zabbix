@@ -632,9 +632,9 @@ class testPageAdministrationScripts extends CWebTest {
 	 */
 	public function testPageAdministrationScripts_ActionLinks() {
 		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('link:'.self::$custom_action)->one()->waitUntilClickable()->click();
+		$this->query('link', self::$custom_action)->one()->waitUntilClickable()->click();
 		$form = $this->query('id:action-form')->asForm()->waitUntilVisible()->one();
-		$this->assertEquals(self::$custom_action, $form->getField('Name')->getValue());
+		$form->checkValue(['Name' => self::$custom_action]);
 		$form->query('button:Cancel')->one()->click();
 		$this->page->assertHeader('Trigger actions');
 	}
