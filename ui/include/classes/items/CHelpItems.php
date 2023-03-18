@@ -373,11 +373,11 @@ class CHelpItems {
 					'description' => _('Find string on a web page. Returns the matched string, or as specified by the optional output parameter')
 				],
 				[
-					'key' => 'wmi.get[<namespace>,<query>]',
+					'key' => 'wmi.get[namespace,query]',
 					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
 				],
 				[
-					'key' => 'wmi.getall[<namespace>,<query>]',
+					'key' => 'wmi.getall[namespace,query]',
 					'description' => _('Execute WMI query and return the JSON document with all selected objects')
 				],
 				[
@@ -723,7 +723,7 @@ class CHelpItems {
 					'description' => _('Find string on a web page. Returns the matched string, or as specified by the optional output parameter')
 				],
 				[
-					'key' => 'wmi.get[<namespace>,<query>]',
+					'key' => 'wmi.get[namespace,query]',
 					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
 				],
 				[

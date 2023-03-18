@@ -345,20 +345,49 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
 
-			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-				$item_graph_url = (new CUrl('zabbix.php'))
-					->setArgument('action', 'charts.view')
-					->setArgument('view_as', HISTORY_GRAPH)
-					->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
-					->setArgument('filter_graphids', [$resourceid])
-					->setArgument('filter_set', '1');
+			if ($edit_mode) {
+				$item_graph_url = null;
 			}
 			else {
-				$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+				if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+					if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid != 0) {
+						$graph = API::Graph()->get([
+							'output'=> ['graphid'],
+							'hostids' => [$dynamic_hostid],
+							'filter' => [
+								'name' => $graph['name']
+							]
+						]);
+						$graph = reset($graph);
+
+						$has_host_graph = (bool) $graph;
+					}
+					else {
+						$has_host_graph = true;
+					}
+
+					if($has_host_graph) {
+						$item_graph_url = (new CUrl('zabbix.php'))
+							->setArgument('action', 'charts.view')
+							->setArgument('view_as', HISTORY_GRAPH)
+							->setArgument('filter_search_type', ZBX_SEARCH_TYPE_STRICT)
+							->setArgument('filter_graphids', [$graph['graphid']])
+							->setArgument('filter_set', '1');
+					}
+					else {
+						$item_graph_url = null;
+					}
+				}
+				else {
+					$item_graph_url = (new CUrl('history.php'))->setArgument('itemids', [$resourceid]);
+				}
+
+				if ($item_graph_url !== null) {
+					$item_graph_url
+						->setArgument('from', $timeline['from'])
+						->setArgument('to', $timeline['to']);
+				}
 			}
-			$item_graph_url
-				->setArgument('from', $timeline['from'])
-				->setArgument('to', $timeline['to']);
 		}
 
 		$response = [
@@ -369,7 +398,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				'timestamp' => time(),
 				'unavailable_object' => $unavailable_object
 			],
-			'item_graph_url' => $unavailable_object ? '' : $item_graph_url,
+			'item_graph_url' => (!$unavailable_object && $item_graph_url !== null) ? $item_graph_url : '',
 			'widget' => [
 				'uniqueid' => $uniqueid,
 				'initial_load' => (int) $this->getInput('initial_load', 0)
