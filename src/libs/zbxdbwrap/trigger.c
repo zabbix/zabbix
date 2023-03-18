@@ -116,7 +116,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const zbx_db_trigger *trigger, 
 			zbx_vector_uint64_create(&cache->hostids);
 			zbx_vector_uint64_create(&functionids);
 			zbx_db_trigger_get_all_functionids(trigger, &functionids);
-			DCget_hostids_by_functionids(&functionids, &cache->hostids);
+			zbx_dc_get_hostids_by_functionids(&functionids, &cache->hostids);
 			zbx_vector_uint64_destroy(&functionids);
 			break;
 		default:
@@ -306,7 +306,7 @@ int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint
 	{
 		zbx_eval_token_t	*token = &cache->eval_ctx.stack.values[i];
 		zbx_uint64_t		functionid;
-		DC_FUNCTION		function;
+		zbx_dc_function_t	function;
 		int			errcode;
 
 		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type || (int)token->opt + 1 != index)
@@ -329,7 +329,7 @@ int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint
 				return FAIL;
 		}
 
-		DCconfig_get_functions_by_functionids(&function, &functionid, &errcode, 1);
+		zbx_dc_config_get_functions_by_functionids(&function, &functionid, &errcode, 1);
 
 		if (SUCCEED == errcode)
 		{
@@ -337,7 +337,7 @@ int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint
 			ret = SUCCEED;
 		}
 
-		DCconfig_clean_functions(&function, &errcode, 1);
+		zbx_dc_config_clean_functions(&function, &errcode, 1);
 		break;
 	}
 
@@ -368,8 +368,8 @@ void	zbx_db_trigger_get_itemids(const zbx_db_trigger *trigger, zbx_vector_uint64
 
 	if (0 != functionids_ordered.values_num)
 	{
-		DC_FUNCTION	*functions;
-		int		i, *errcodes, index;
+		zbx_dc_function_t	*functions;
+		int			i, *errcodes, index;
 
 		zbx_vector_uint64_append_array(&functionids, functionids_ordered.values,
 				functionids_ordered.values_num);
@@ -377,10 +377,10 @@ void	zbx_db_trigger_get_itemids(const zbx_db_trigger *trigger, zbx_vector_uint64
 		zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		functions = (DC_FUNCTION *)zbx_malloc(NULL, sizeof(DC_FUNCTION) * functionids.values_num);
+		functions = (zbx_dc_function_t *)zbx_malloc(NULL, sizeof(zbx_dc_function_t) * functionids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * functionids.values_num);
 
-		DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes,
+		zbx_dc_config_get_functions_by_functionids(functions, functionids.values, errcodes,
 				functionids.values_num);
 
 		for (i = 0; i < functionids_ordered.values_num; i++)
@@ -402,7 +402,7 @@ void	zbx_db_trigger_get_itemids(const zbx_db_trigger *trigger, zbx_vector_uint64
 			}
 		}
 
-		DCconfig_clean_functions(functions, errcodes, functionids.values_num);
+		zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
 		zbx_free(functions);
 		zbx_free(errcodes);
 	}
@@ -478,8 +478,8 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 	{
 		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
 		zbx_uint64_t		functionid;
-		DC_FUNCTION		function;
-		DC_ITEM			item;
+		zbx_dc_function_t	function;
+		zbx_dc_item_t		item;
 		int			err_func, err_item;
 
 		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
@@ -505,11 +505,11 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 				continue;
 		}
 
-		DCconfig_get_functions_by_functionids(&function, &functionid, &err_func, 1);
+		zbx_dc_config_get_functions_by_functionids(&function, &functionid, &err_func, 1);
 
 		if (SUCCEED == err_func)
 		{
-			DCconfig_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
+			zbx_dc_config_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
 
 			if (SUCCEED == err_item)
 			{
@@ -526,7 +526,7 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 
 				zbx_variant_clear(&token->value);
 				zbx_variant_set_str(&token->value, func);
-				DCconfig_clean_items(&item, &err_item, 1);
+				zbx_dc_config_clean_items(&item, &err_item, 1);
 			}
 			else
 			{
@@ -535,7 +535,7 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 						" deleted", function.itemid));
 			}
 
-			DCconfig_clean_functions(&function, &err_func, 1);
+			zbx_dc_config_clean_functions(&function, &err_func, 1);
 		}
 		else
 		{
@@ -588,22 +588,22 @@ void	zbx_db_trigger_get_recovery_expression(const zbx_db_trigger *trigger, char 
 
 static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_trigger_func_t eval_func_cb)
 {
-	DC_ITEM		item;
-	DC_FUNCTION	function;
-	int		err_func, err_item;
+	zbx_dc_item_t		item;
+	zbx_dc_function_t	function;
+	int			err_func, err_item;
 
-	DCconfig_get_functions_by_functionids(&function, &functionid, &err_func, 1);
+	zbx_dc_config_get_functions_by_functionids(&function, &functionid, &err_func, 1);
 
 	if (SUCCEED == err_func)
 	{
-		DCconfig_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
+		zbx_dc_config_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
 
 		if (SUCCEED == err_item)
 		{
 			char			*error = NULL, *parameter = NULL;
 			zbx_variant_t		var;
 			zbx_timespec_t		ts;
-			DC_EVALUATE_ITEM	evaluate_item;
+			zbx_dc_evaluate_item_t	evaluate_item;
 
 			parameter = zbx_dc_expand_user_macros_in_func_params(function.parameter, item.host.hostid);
 			zbx_timespec(&ts);
@@ -624,10 +624,10 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_t
 				zbx_free(error);
 
 			zbx_free(parameter);
-			DCconfig_clean_items(&item, &err_item, 1);
+			zbx_dc_config_clean_items(&item, &err_item, 1);
 		}
 
-		DCconfig_clean_functions(&function, &err_func, 1);
+		zbx_dc_config_clean_functions(&function, &err_func, 1);
 	}
 
 	if (NULL == *value)
