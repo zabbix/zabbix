@@ -20,26 +20,36 @@
 
 class CWidgetSvgGraph extends CWidget {
 
-	onInitialize() {
+	_init() {
+		super._init();
+
 		this._has_contents = false;
 		this._svg_options = {};
 	}
 
-	onActivate() {
+	_doActivate() {
+		super._doActivate();
+
 		this._activateGraph();
 	}
 
-	onDeactivate() {
+	_doDeactivate() {
+		super._doDeactivate();
+
 		this._deactivateGraph();
 	}
 
-	onResize() {
+	resize() {
+		super.resize();
+
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this._startUpdating();
 		}
 	}
 
-	onEdit() {
+	setEditMode() {
+		super.setEditMode();
+
 		this._deactivateGraph();
 	}
 
@@ -51,18 +61,18 @@ class CWidgetSvgGraph extends CWidget {
 		}
 	}
 
-	getUpdateRequestData() {
+	_getUpdateRequestData() {
 		return {
-			...super.getUpdateRequestData(),
+			...super._getUpdateRequestData(),
 			from: this._time_period.from,
 			to: this._time_period.to
 		};
 	}
 
-	processUpdateResponse(response) {
+	_processUpdateResponse(response) {
 		this._destroyGraph();
 
-		super.processUpdateResponse(response);
+		super._processUpdateResponse(response);
 
 		if (response.svg_options !== undefined) {
 			this._has_contents = true;
@@ -83,7 +93,7 @@ class CWidgetSvgGraph extends CWidget {
 
 	_initGraph(options) {
 		this._svg_options = options;
-		this._svg = this._body.querySelector('svg');
+		this._svg = this._content_body.querySelector('svg');
 		jQuery(this._svg).svggraph(this);
 
 		this._activateGraph();
@@ -145,7 +155,7 @@ class CWidgetSvgGraph extends CWidget {
 		return menu;
 	}
 
-	hasPadding() {
+	_hasPadding() {
 		return true;
 	}
 }

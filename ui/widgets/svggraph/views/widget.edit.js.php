@@ -785,8 +785,8 @@ window.widget_svggraph_form = new class {
 		const data = {
 			uniqueid: 0,
 			preview: 1,
-			contents_width: Math.floor($preview.width()),
-			contents_height: Math.floor($preview.height()) - 10
+			content_width: Math.floor($preview.width()),
+			content_height: Math.floor($preview.height()) - 10
 		};
 
 		url.setArgument('action', 'widget.svggraph.view');

@@ -29,7 +29,9 @@ class CWidgetNavTree extends CWidget {
 		return true;
 	}
 
-	onInitialize() {
+	_init() {
+		super._init();
+
 		this._severity_levels = null;
 		this._navtree = [];
 		this._maps = [];
@@ -42,11 +44,11 @@ class CWidgetNavTree extends CWidget {
 		this._last_id = null;
 
 		this._has_contents = false;
-
-		this._registerContentsEvents();
 	}
 
-	onActivate() {
+	_doActivate() {
+		super._doActivate();
+
 		if (this._has_contents) {
 			if (this._target.querySelector('.root') === null) {
 				this._makeTree();
@@ -57,7 +59,9 @@ class CWidgetNavTree extends CWidget {
 		}
 	}
 
-	onDeactivate() {
+	_doDeactivate() {
+		super._doDeactivate();
+
 		this._deactivateContentsEvents();
 	}
 
@@ -87,11 +91,13 @@ class CWidgetNavTree extends CWidget {
 		return super.getDataCopy({is_single_copy});
 	}
 
-	onEdit() {
+	setEditMode() {
 		if (this._has_contents) {
 			this._deactivateContentsEvents();
 			this._removeTree();
 		}
+
+		super.setEditMode();
 
 		if (this._has_contents && this._state === WIDGET_STATE_ACTIVE) {
 			this._makeTree();
@@ -100,7 +106,7 @@ class CWidgetNavTree extends CWidget {
 		}
 	}
 
-	processUpdateResponse(response) {
+	_processUpdateResponse(response) {
 		if (this._has_contents) {
 			this._deactivateContentsEvents();
 			this._removeTree();
@@ -108,7 +114,7 @@ class CWidgetNavTree extends CWidget {
 			this._has_contents = false;
 		}
 
-		super.processUpdateResponse(response);
+		super._processUpdateResponse(response);
 
 		if (response.navtree_data !== undefined) {
 			this._has_contents = true;
@@ -129,7 +135,9 @@ class CWidgetNavTree extends CWidget {
 		}
 	}
 
-	_registerContentsEvents() {
+	_registerEvents() {
+		super._registerEvents();
+
 		this._events = {
 			...this._events,
 
@@ -993,7 +1001,7 @@ class CWidgetNavTree extends CWidget {
 			}
 		}
 
-		jQuery('input[name^="navtree.name."]', jQuery(this._body)).each((index, field) => {
+		jQuery('input[name^="navtree.name."]', jQuery(this._content_body)).each((index, field) => {
 			const id = field.getAttribute('name').substr(13);
 
 			if (id) {

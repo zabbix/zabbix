@@ -399,7 +399,7 @@ $arrow-fill-up-down: #FFFFFF;
 .dashboard-grid-widget {
 	&.dashboard-grid-widget-hidden-header {
 		&.dashboard-grid-widget-focus {
-			.dashboard-grid-widget-header {
+			.dashboard-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}
@@ -408,7 +408,7 @@ $arrow-fill-up-down: #FFFFFF;
 
 .dashboard-grid-iterator {
 	&.dashboard-grid-iterator-focus {
-		.dashboard-grid-iterator-header {
+		.dashboard-grid-iterator-head {
 			box-shadow: 0 -6px 8px -2px #000000;
 		}
 	}
@@ -418,7 +418,7 @@ $arrow-fill-up-down: #FFFFFF;
 	.dashboard-grid-widget {
 		&.ui-draggable-dragging {
 			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-header {
+				.dashboard-grid-widget-head {
 					box-shadow: 0 -6px 8px -2px #000000;
 				}
 			}
@@ -434,7 +434,7 @@ $arrow-fill-up-down: #FFFFFF;
 
 	.dashboard-grid-iterator {
 		&.ui-draggable-dragging {
-			.dashboard-grid-iterator-header {
+			.dashboard-grid-iterator-head {
 				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}

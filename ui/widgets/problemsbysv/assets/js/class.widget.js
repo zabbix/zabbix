@@ -23,7 +23,9 @@ class CWidgetProblemsBySv extends CWidget {
 	static SHOW_GROUPS = 0;
 	static SHOW_TOTALS = 1;
 
-	onStart() {
+	_registerEvents() {
+		super._registerEvents();
+
 		this._events = {
 			...this._events,
 
@@ -34,7 +36,7 @@ class CWidgetProblemsBySv extends CWidget {
 					if (overlay.type === 'hintbox') {
 						const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
 
-						if (this._body.contains(element)) {
+						if (this._content_body.contains(element)) {
 							hintBox.deleteHint(overlay.element);
 						}
 					}
@@ -50,16 +52,20 @@ class CWidgetProblemsBySv extends CWidget {
 		}
 	}
 
-	onActivate() {
+	_activateEvents() {
+		super._activateEvents();
+
 		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	onDeactivate() {
+	_deactivateEvents() {
+		super._deactivateEvents();
+
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	hasPadding() {
-		return this._view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL
+	_hasPadding() {
+		return this._view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL
 			&& this._fields.show_type != CWidgetProblemsBySv.SHOW_TOTALS;
 	}
 }

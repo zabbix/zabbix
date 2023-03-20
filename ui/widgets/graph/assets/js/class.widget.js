@@ -20,23 +20,31 @@
 
 class CWidgetGraph extends CWidget {
 
-	onInitialize() {
+	_init() {
+		super._init();
+
 		this._is_graph_mode = false;
 	}
 
-	onActivate() {
+	_doActivate() {
 		if (this._is_graph_mode) {
 			this._activateGraph();
 		}
+
+		super._doActivate();
 	}
 
-	onDeactivate() {
+	_doDeactivate() {
 		if (this._is_graph_mode) {
 			this._deactivateGraph();
 		}
+
+		super._doDeactivate();
 	}
 
-	onResize() {
+	resize() {
+		super.resize();
+
 		if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
 			const graph_size = this._getGraphSize();
 
@@ -66,7 +74,7 @@ class CWidgetGraph extends CWidget {
 
 	updateProperties({name, view_mode, fields}) {
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating();
+			this._stopUpdating(true);
 		}
 
 		this._is_graph_mode = false;
@@ -74,7 +82,9 @@ class CWidgetGraph extends CWidget {
 		super.updateProperties({name, view_mode, fields});
 	}
 
-	onEdit() {
+	setEditMode() {
+		super.setEditMode();
+
 		if (this._is_graph_mode && this._graph_url !== null) {
 			this._flickerfreescreen_container.href = 'javascript:void(0)';
 			this._flickerfreescreen_container.setAttribute('role', 'button');
@@ -83,7 +93,7 @@ class CWidgetGraph extends CWidget {
 
 	setDynamicHost(dynamic_hostid) {
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating();
+			this._stopUpdating(true);
 		}
 
 		if (this._is_graph_mode) {
@@ -94,25 +104,25 @@ class CWidgetGraph extends CWidget {
 		super.setDynamicHost(dynamic_hostid);
 	}
 
-	promiseUpdate() {
+	_promiseUpdate() {
 		if (this._is_graph_mode) {
 			timeControl.refreshObject('graph_' + this._unique_id);
 
 			return Promise.resolve();
 		}
 
-		return super.promiseUpdate();
+		return super._promiseUpdate();
 	}
 
-	setContents(response) {
-		super.setContents(response);
+	_processUpdateResponse(response) {
+		super._processUpdateResponse(response);
 
 		if (!this._is_graph_mode && response.async_data !== undefined) {
 			this._is_graph_mode = true;
 
 			this._graph_url = response.async_data.graph_url;
 
-			this._flickerfreescreen = this._body.querySelector('.flickerfreescreen');
+			this._flickerfreescreen = this._content_body.querySelector('.flickerfreescreen');
 			this._flickerfreescreen.id = 'flickerfreescreen_graph_' + this._unique_id;
 
 			this._flickerfreescreen_container = this._flickerfreescreen.querySelector('.dashboard-widget-graph-link');
@@ -174,12 +184,12 @@ class CWidgetGraph extends CWidget {
 	}
 
 	_getGraphSize() {
-		const contents = this._contents;
-		const style = getComputedStyle(contents);
+		const content = this._content_body;
+		const style = getComputedStyle(content);
 
 		return {
-			width: Math.floor(contents.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)),
-			height: Math.floor(contents.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
+			width: Math.floor(content.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)),
+			height: Math.floor(content.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
 		};
 	}
 
@@ -213,14 +223,14 @@ class CWidgetGraph extends CWidget {
 			label: t('Download image'),
 			disabled: !this._is_graph_mode,
 			clickCallback: () => {
-				downloadPngImage(this._body.querySelector('img'), 'graph.png');
+				downloadPngImage(this._content_body.querySelector('img'), 'graph.png');
 			}
 		});
 
 		return menu;
 	}
 
-	hasPadding() {
+	_hasPadding() {
 		return true;
 	}
 }

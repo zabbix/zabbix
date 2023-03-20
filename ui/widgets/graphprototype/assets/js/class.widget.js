@@ -24,7 +24,7 @@ class CWidgetGraphPrototype extends CWidgetIterator {
 		widget.resize();
 	}
 
-	hasPadding() {
+	_hasPadding() {
 		return false;
 	}
 }

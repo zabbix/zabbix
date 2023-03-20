@@ -74,147 +74,145 @@ form.dashboard-widget-item {
 // Widget view.
 
 div.dashboard-widget-item {
-	.dashboard-grid-widget-body {
-		$line-height: 1.14;
+	$line-height: 1.14;
+
+	> div {
+		box-sizing: border-box;
+		height: 100%;
+		padding: 10px;
+		overflow-x: hidden;
+
+		@extend %webkit-scrollbar;
+	}
+
+	a {
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		color: inherit;
+
+		&:focus,
+		&:hover,
+		&:visited {
+			border: none;
+		}
 
 		> div {
-			box-sizing: border-box;
-			height: 100%;
-			padding: 10px;
-			overflow-x: hidden;
-
-			@extend %webkit-scrollbar;
-		}
-
-		a {
-			box-sizing: border-box;
 			display: flex;
-			flex-direction: column;
-			height: 100%;
-			color: inherit;
+			flex: 1 1 calc(100% / 3);
+		}
+	}
 
-			&:focus,
-			&:hover,
-			&:visited {
-				border: none;
+	.item-description,
+	.item-value,
+	.item-time {
+		flex: 1 1 auto;
+		max-width: 100%;
+	}
+
+	.item-value {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0 5px;
+
+		> .units {
+			&:first-child,
+			&:last-child {
+				flex: 0 0 100%;
 			}
 
-			> div {
-				display: flex;
-				flex: 1 1 calc(100% / 3);
+			&:first-child {
+				margin-bottom: -0.07em;
+			}
+
+			&:last-child {
+				margin-top: -0.07em;
 			}
 		}
 
-		.item-description,
-		.item-value,
-		.item-time {
-			flex: 1 1 auto;
-			max-width: 100%;
-		}
+		&.type-text {
+			min-width: 0;
 
-		.item-value {
-			display: flex;
-			flex-wrap: wrap;
-			margin: 0 5px;
-
-			> .units {
-				&:first-child,
-				&:last-child {
-					flex: 0 0 100%;
-				}
-
-				&:first-child {
-					margin-bottom: -0.07em;
-				}
-
-				&:last-child {
-					margin-top: -0.07em;
-				}
-			}
-
-			&.type-text {
+			.item-value-content {
 				min-width: 0;
-
-				.item-value-content {
-					min-width: 0;
-				}
 			}
 		}
+	}
 
-		.item-value-content {
-			display: flex;
-			align-items: baseline;
-			overflow: hidden;
+	.item-value-content {
+		display: flex;
+		align-items: baseline;
+		overflow: hidden;
+	}
+
+	.item-description,
+	.item-time,
+	.type-text .value {
+		display: block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.item-description,
+	.value,
+	.decimals,
+	.units,
+	.item-time {
+		font-size: calc(var(--content-height) * var(--widget-item-font) / #{$line-height});
+		line-height: $line-height;
+	}
+
+	.units,
+	.change-indicator {
+		&:not(:last-child) {
+			margin-right: 5px;
 		}
 
-		.item-description,
-		.item-time,
-		.type-text .value {
-			display: block;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+		&:not(:first-child) {
+			margin-left: 5px;
 		}
+	}
 
-		.item-description,
-		.value,
-		.decimals,
-		.units,
-		.item-time {
-			font-size: calc(var(--content-height) * var(--widget-item-font) / #{$line-height});
-			line-height: $line-height;
-		}
+	.svg-arrow {
+		height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / #{$line-height});
+	}
 
-		.units,
-		.change-indicator {
-			&:not(:last-child) {
-				margin-right: 5px;
-			}
+	.item-value-no-data {
+		color: $font-alt-color;
+	}
 
-			&:not(:first-child) {
-				margin-left: 5px;
-			}
-		}
+	.left {
+		justify-content: flex-start;
+		max-width: max-content;
+		margin-right: auto;
+	}
 
-		.svg-arrow {
-			height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / #{$line-height});
-		}
+	.center {
+		justify-content: center;
+	}
 
-		.item-value-no-data {
-			color: $font-alt-color;
-		}
+	.right {
+		justify-content: flex-end;
+		max-width: max-content;
+		margin-left: auto;
+	}
 
-		.left {
-			justify-content: flex-start;
-			max-width: max-content;
-			margin-right: auto;
-		}
+	.top {
+		align-self: flex-start;
+	}
 
-		.center {
-			justify-content: center;
-		}
+	.middle {
+		align-self: center;
+	}
 
-		.right {
-			justify-content: flex-end;
-			max-width: max-content;
-			margin-left: auto;
-		}
+	.bottom {
+		align-self: flex-end;
+	}
 
-		.top {
-			align-self: flex-start;
-		}
-
-		.middle {
-			align-self: center;
-		}
-
-		.bottom {
-			align-self: flex-end;
-		}
-
-		.bold {
-			font-weight: bold;
-		}
+	.bold {
+		font-weight: bold;
 	}
 }
 
