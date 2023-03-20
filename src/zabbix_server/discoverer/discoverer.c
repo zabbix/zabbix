@@ -1333,8 +1333,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 
 			job->workers_used++;
-			queue->pending_checks_count -= (zbx_uint64_t)
-					(NULL != task->ips ? task->ips->values_num : task->dchecks.values_num);
+			queue->pending_checks_count -= (zbx_uint64_t) (NULL != task->ips ? task->ips->values_num *
+					task->dchecks.values_num : task->dchecks.values_num);
 
 			if (0 == job->workers_max || job->workers_used != job->workers_max)
 			{
