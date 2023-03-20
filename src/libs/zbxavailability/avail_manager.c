@@ -180,8 +180,8 @@ static void	process_active_hb(zbx_avail_active_hb_cache_t *cache, zbx_ipc_messag
 
 static void	send_hostdata_response(zbx_avail_active_hb_cache_t *cache, zbx_ipc_client_t *client)
 {
-	unsigned char		*data = NULL;
-	zbx_uint32_t		data_len;
+	unsigned char	*data = NULL;
+	zbx_uint32_t	data_len;
 
 	data_len = zbx_availability_serialize_hostdata(&data, &cache->queue);
 	zbx_ipc_client_send(client, ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, data, data_len);
@@ -195,7 +195,7 @@ static void	send_avail_check_status_response(zbx_avail_active_hb_cache_t *cache,
 	zbx_uint32_t		data_len;
 	zbx_uint64_t		hostid;
 	int			status = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
-	zbx_host_active_avail_t *host;
+	zbx_host_active_avail_t	*host;
 
 	zbx_availability_deserialize_active_status_request(message->data, &hostid);
 

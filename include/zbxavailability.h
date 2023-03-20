@@ -80,11 +80,11 @@ void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_ava
 
 typedef struct
 {
-	zbx_hashset_t		hosts;
-	zbx_hashset_t		queue;
-	zbx_hashset_t		proxy_avail;
-	double			last_status_refresh;
-	double			last_proxy_avail_refresh;
+	zbx_hashset_t	hosts;
+	zbx_hashset_t	queue;
+	zbx_hashset_t	proxy_avail;
+	double		last_status_refresh;
+	double		last_proxy_avail_refresh;
 }
 zbx_avail_active_hb_cache_t;
 
@@ -141,7 +141,7 @@ void	zbx_availability_deserialize_active_status_response(const unsigned char *da
 
 zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx_vector_proxy_hostdata_ptr_t *hosts,
 		zbx_uint64_t proxy_hostid);
-void		zbx_availability_deserialize_proxy_hostdata(const unsigned char *data,
+void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data,
 		zbx_vector_proxy_hostdata_ptr_t *hostdata, zbx_uint64_t *proxy_hostid);
 
 zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids);
