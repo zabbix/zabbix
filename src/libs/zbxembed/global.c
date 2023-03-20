@@ -53,7 +53,7 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 	{
 		case DUK_TYPE_BUFFER:
 		case DUK_TYPE_OBJECT:
-			ptr = duk_get_buffer_data(ctx, index, len);
+			ptr = duk_require_buffer_data(ctx, index, len);
 			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
