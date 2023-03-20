@@ -1923,10 +1923,6 @@ select {
 		border-color: $form-border-focus-color;
 	}
 
-	&:checked:focus + label span {
-		border-color: $form-border-focus-color;
-	}
-
 	&:checked[disabled] + label span {
 		transition: none;
 
