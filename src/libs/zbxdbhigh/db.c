@@ -25,6 +25,7 @@
 #include "dbcache.h"
 #include "cfg.h"
 #include "zbx_dbversion_constants.h"
+#include "common.h"
 
 typedef struct
 {
@@ -661,7 +662,7 @@ char	*DBdyn_escape_like_pattern(const char *src)
 	return zbx_db_dyn_escape_like_pattern(src);
 }
 
-const ZBX_TABLE	*DBget_table(const char *tablename)
+ZBX_TABLE	*DBget_table_modify(const char *tablename)
 {
 	int	t;
 
@@ -674,7 +675,7 @@ const ZBX_TABLE	*DBget_table(const char *tablename)
 	return NULL;
 }
 
-const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
+ZBX_FIELD	*DBget_field_modify(ZBX_TABLE *table, const char *fieldname)
 {
 	int	f;
 
@@ -685,6 +686,16 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	}
 
 	return NULL;
+}
+
+const ZBX_TABLE	*DBget_table(const char *tablename)
+{
+	return DBget_table_modify(tablename);
+}
+
+const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
+{
+	return DBget_field_modify(( ZBX_TABLE *)table, fieldname);
 }
 
 /******************************************************************************
@@ -2328,6 +2339,96 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+#if defined(HAVE_ORACLE)
+void	zbx_dbschema_modify_table(const char *tablename, struct zbx_json *json)
+{
+#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
+	ZBX_TABLE		*table;
+	int			i;
+	zbx_vector_str_t	names;
+
+	zbx_json_addobject(json, tablename);
+	zbx_json_addobject(json, "fields");
+
+	zbx_vector_str_create(&names);
+
+	if (NULL == (table = DBget_table_modify(tablename)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, tablename);
+
+		goto cleanup;
+	}
+
+	for (i = 0; NULL != table->fields[i].name; i++)
+	{
+		switch (table->fields[i].type)
+		{
+			case ZBX_TYPE_TEXT:
+				zbx_vector_str_append(&names, (char *)table->fields[i].name);
+				break;
+			default:
+		}
+	}
+
+	if (0 != names.values_num)
+	{
+		DB_ROW		row;
+		DB_RESULT	result;
+		char		*table_name_esc;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+
+		table_name_esc = DBdyn_escape_string(table->table);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select column_name,data_type,char_length"
+				" from user_tab_columns"
+				" where lower(table_name)='%s'"
+					" and",
+				table_name_esc);
+
+		zbx_free(table_name_esc);
+
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "lower(column_name)",
+				(const char **)names.values, names.values_num);
+
+		result = DBselect("%s", sql);
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_FIELD	*field;
+
+			zbx_strlower(row[0]);
+			if (NULL == (field = DBget_field_modify(table, row[0])))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s(): table '%s', cannot find field '%s'", __func__,
+						table->table, row[0]);
+				continue;
+			}
+
+			zbx_strlower(row[1]);
+			if (0 != strcmp(row[1], ZBX_TYPE_CHAR_STR))
+				continue;
+
+			field->type = ZBX_TYPE_CHAR;
+			field->length = (unsigned short)atoi(row[2]);
+
+			zbx_json_addobject(json, field->name);
+			zbx_json_addstring(json, "type", "char", ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(json, "length", field->length);
+			zbx_json_close(json);
+		}
+		DBfree_result(result);
+
+		zbx_free(sql);
+	}
+cleanup:
+	zbx_vector_str_destroy(&names);
+
+	zbx_json_close(json);
+	zbx_json_close(json);
+#undef ZBX_TYPE_TEXT_STR
+}
+#endif
 
 #ifndef HAVE_SQLITE3
 int	DBtrigger_exists(const char *table_name, const char *trigger_name)

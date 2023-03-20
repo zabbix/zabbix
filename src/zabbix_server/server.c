@@ -1173,6 +1173,14 @@ static void	zbx_check_db(void)
 		if (SUCCEED == result)
 			zbx_history_check_version(&db_version_json, &result);
 
+#ifdef HAVE_ORACLE
+		zbx_json_addobject(&db_version_json, NULL);
+		zbx_json_addobject(&db_version_json, "tables");
+		zbx_dbschema_modify_table("items", &db_version_json);
+		zbx_dbschema_modify_table("item_preproc", &db_version_json);
+		zbx_json_close(&db_version_json);
+#endif
+
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
