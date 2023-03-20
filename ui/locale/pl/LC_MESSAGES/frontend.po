@@ -1593,6 +1593,10 @@ msgstr "Atrybut"
 msgid "Attribution"
 msgstr "Atrybucja"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -3785,6 +3789,11 @@ msgstr "Nie można zaktualizować wykrytego wykresu."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Nie można zaktualizować wykrytej grupy hostów \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -12164,6 +12173,10 @@ msgstr "Pole \"selementid2\" łącza wskazuje na nieistniejące selement o ID \"
 msgid "Link indicators"
 msgstr "Wskaźnik połączenia"
 
+#: include/actions.inc.php:863
+msgid "Link template"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
 #: app/views/popup.massupdate.template.php:78
@@ -12535,6 +12548,10 @@ msgstr "Utrzymanie bez zbierania danych"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Utrzymanie: %1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -18029,6 +18046,10 @@ msgstr "Usługi tworzą cykliczną zależność."
 msgid "Services updated"
 msgstr "Zaktualizowano usługi"
 
+#: include/classes/api/services/CUser.php:1714
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -20740,6 +20761,14 @@ msgstr "Odłącz od szablonu"
 msgid "Unlink from templates"
 msgstr "Odłącz od szablonów"
 
+#: include/actions.inc.php:864
+msgid "Unlink template"
+msgstr ""
+
+#: include/actions.inc.php:681
+msgid "Unlink templates"
+msgstr ""
+
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Włącz głos"
@@ -22726,6 +22755,14 @@ msgstr "[Błędna wartość dla dnia: \"%1$s\" ]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[Błędna wartość dla miesiąca: \"%1$s\" ]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"

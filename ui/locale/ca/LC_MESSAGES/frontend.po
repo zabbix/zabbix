@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-07 09:16+0000\n"
+"PO-Revision-Date: 2023-03-14 19:23+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1567,6 +1567,10 @@ msgstr "Atribut"
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr "Atribució"
+
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3296,12 +3300,12 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" perqu
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de la dependència de l'activador \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de la dependència del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió de l'activador \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
@@ -3662,7 +3666,7 @@ msgstr "No es pot pas actualitzar \"%1$s\" per a l'element \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1018
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr "No es pot pas actualitzar \"%1$s\" per a l'activador de plantilla \"%2$s\"."
+msgstr "No es pot pas actualitzar \"%1$s\" per al trigger de plantilla \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1029
 #, c-format
@@ -3704,6 +3708,11 @@ msgstr "No es pot pas actualitzar un gràfic descobert."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "No es pot pas actualitzar un grup d'equips descobert \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -9959,7 +9968,7 @@ msgstr "Acció de condició de gravetat del trigger incorrecta."
 
 #: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr "Activador de la condició de trigger incorrecta. El trigger no existeix o no hi teniu pas accés."
+msgstr "Trigger de la condició de trigger incorrecta. El trigger no existeix o no hi teniu pas accés."
 
 #: include/classes/validators/CActionCondValidator.php:211
 msgid "Incorrect action condition type."
@@ -12045,6 +12054,10 @@ msgstr "El camp de l'enllaç \"selementid2\" apunta a un ID d'element de mapa in
 msgid "Link indicators"
 msgstr "Indicadors d'enllaç"
 
+#: include/actions.inc.php:863
+msgid "Link template"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
 #: app/views/popup.massupdate.template.php:78
@@ -12415,6 +12428,10 @@ msgstr "Manteniment sense recull de dades"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Manteniment: %1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -13145,18 +13162,18 @@ msgstr "Monitoritzat per"
 #: app/views/popup.massupdate.host.php:128
 #: include/views/configuration.host.prototype.edit.php:280
 msgid "Monitored by proxy"
-msgstr "Monitoritzat per servidor intermediari"
+msgstr "Monitoritzat per proxy"
 
 #: include/classes/screens/CScreenDiscovery.php:119
 msgid "Monitored host"
-msgstr "Equip monitoritzat"
+msgstr "Equip monitorat"
 
 #: app/views/search.php:36 app/views/search.php:192
 #: include/classes/helpers/CMenuHelper.php:69
 #: include/classes/helpers/CRoleHelper.php:305
 #: include/views/inventory.host.view.php:135
 msgid "Monitoring"
-msgstr "Monitoritzant"
+msgstr "Monitorant"
 
 #: include/views/js/monitoring.sysmaps.js.php:70
 msgid "Monospace"
@@ -14150,11 +14167,11 @@ msgstr "No s'han triat pas objectius per a l'script global d'operacions d'acció
 #: include/triggers.inc.php:91
 #, c-format
 msgid "No trigger with trigger ID \"%1$s\"."
-msgstr "No hi ha activador amb l'identificador d'activador \"%1$s\"."
+msgstr "No hi ha trigger amb l'identificador de trigger \"%1$s\"."
 
 #: chart4.php:42
 msgid "No triggers defined."
-msgstr "No s'han definit pas activadors."
+msgstr "No s'han definit pas triggers."
 
 #: app/views/js/popup.itemtestedit.view.js.php:41
 msgid "No value"
@@ -17889,6 +17906,10 @@ msgstr "Els serveis formen una dependència circular."
 msgid "Services updated"
 msgstr "Serveis actualitzats"
 
+#: include/classes/api/services/CUser.php:1714
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -19440,11 +19461,11 @@ msgstr "El token ha caducat. Actualitzeu la data de caducitat per emprar el toke
 #: include/html.inc.php:718
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "L'activador ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
+msgstr "El trigger ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
 
 #: include/html.inc.php:713
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "L'activador ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
+msgstr "El trigger ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
 
 #: app/views/administration.user.edit.php:255
 msgid "Theme"
@@ -19863,7 +19884,7 @@ msgstr "El trigger \"%1$s\" no pot pas dependre del trigger \"%2$s\", doncs es p
 #: include/classes/api/services/CTriggerGeneral.php:2300
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr "El trigger \"%1$s\" no pot dependre pas de l'activador \"%2$s\", doncs es produiria un enllaç circular (%3$s) per a la plantilla \"%4$s\"."
+msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs es produiria un enllaç circular (%3$s) per a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2316
 #, c-format
@@ -19873,7 +19894,7 @@ msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs es p
 #: include/classes/api/services/CTriggerGeneral.php:2423
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs no es permeten les dependències dels activadors de l'equip a les plantilles de triggers."
+msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs no es permeten les dependències dels triggers de l'equip a les plantilles de triggers."
 
 #: include/classes/api/services/CTriggerGeneral.php:2808
 #, c-format
@@ -20100,7 +20121,7 @@ msgstr "Actualitzats els prototips de triggers"
 
 #: app/views/administration.user.edit.php:743 include/actions.inc.php:45
 msgid "Trigger severity"
-msgstr "Gravitat del trigger"
+msgstr "Gravetat del trigger"
 
 #: app/views/popup.condition.common.php:228
 msgid "Trigger source"
@@ -20592,6 +20613,14 @@ msgstr "Desenllaça de la plantilla"
 #: include/actions.inc.php:739
 msgid "Unlink from templates"
 msgstr "Desenllaça de les plantilles"
+
+#: include/actions.inc.php:864
+msgid "Unlink template"
+msgstr ""
+
+#: include/actions.inc.php:681
+msgid "Unlink templates"
+msgstr ""
 
 #: jsLoader.php:296
 msgid "Unmute"
@@ -21976,7 +22005,7 @@ msgstr "Web"
 #: include/views/configuration.httpconf.edit.php:27
 #: include/views/configuration.httpconf.list.php:92
 msgid "Web monitoring"
-msgstr "Monitorització web"
+msgstr "Monitoratge web"
 
 #: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
@@ -22571,6 +22600,14 @@ msgstr "[Valor del dia incorrecte: \"%1$s\" ]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[Valor incorrecte del mes: \"%1$s\" ]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
@@ -24730,7 +24767,7 @@ msgstr "sufix de temps no compatible"
 
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"
-msgstr "número de versió no compatible"
+msgstr "nombre de versió no compatible"
 
 #: include/classes/validators/CApiInputValidator.php:3626
 #, c-format
