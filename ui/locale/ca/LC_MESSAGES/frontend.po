@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-14 19:22+0000\n"
+"PO-Revision-Date: 2023-03-18 10:09+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1570,7 +1570,7 @@ msgstr "Atribució"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
-msgstr ""
+msgstr "Atribucions HTML"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3712,7 +3712,7 @@ msgstr "No es pot pas actualitzar un grup d'equips descobert \"%1$s\"."
 #: include/classes/api/services/CGraphGeneral.php:82
 #, c-format
 msgid "Cannot update a templated graph \"%1$s\"."
-msgstr ""
+msgstr "No es pot pas actualitzar una plantilla de gràfic \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -12427,7 +12427,7 @@ msgstr "Manteniment: %1$s"
 
 #: app/views/administration.geomaps.edit.php:60
 msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
-msgstr ""
+msgstr "Assegureu-vos que el codi prové d'una font fiable o no conté pas scripts maliciosos."
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -17904,7 +17904,7 @@ msgstr "Serveis actualitzats"
 
 #: include/classes/api/services/CUser.php:1709
 msgid "Session ID or token is expected."
-msgstr ""
+msgstr "S'espera un ID o token de sessió."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
@@ -22595,7 +22595,7 @@ msgstr "[Valor incorrecte del mes: \"%1$s\" ]"
 #: include/views/configuration.item.edit.php:479
 #: include/views/configuration.item.prototype.edit.php:456
 msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
-msgstr ""
+msgstr "[protocol://][user[:password]@]proxy.example.com[:port]"
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
