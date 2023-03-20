@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-23 10:27+0000\n"
+"PO-Revision-Date: 2023-03-20 13:00+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -431,7 +431,7 @@ msgstr "ADICIONAR SUBSTITUIÇÃO"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "DESPERTADOR"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -702,7 +702,7 @@ msgstr "Acção actualizada"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "A acção com o ID \"%1$s\" não está disponível."
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -1076,7 +1076,7 @@ msgstr "Etiquetas avançadas"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "Opções avançadas"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1567,6 +1567,10 @@ msgstr ""
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr "Atribuição"
+
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -2351,7 +2355,7 @@ msgstr "Não é possível criar uma dependência circular."
 #: app/controllers/CControllerConnectorCreate.php:89
 #: app/controllers/CControllerConnectorCreate.php:164
 msgid "Cannot create connector"
-msgstr ""
+msgstr "Não é possível criar o conector"
 
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
@@ -2373,7 +2377,7 @@ msgstr "Não foi possível criar o mapa de ícones"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "Não foi criar actualizar o período de manutenção"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2432,8 +2436,8 @@ msgstr "Não é possível eliminar a função de utilizador atribuída \"%1$s\".
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
 msgid_plural "Cannot delete connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível eliminar o conector"
+msgstr[1] "Não foi possível eliminar os conectores"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2562,8 +2566,8 @@ msgstr "Não foi possível eliminar período de manutenção"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível eliminar o período de manutenção"
+msgstr[1] "Não é possível eliminar os períodos de manutenção"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2745,8 +2749,8 @@ msgstr[1] "Não foi possível desactivar as ações"
 #: app/controllers/CControllerConnectorDisable.php:77
 msgid "Cannot disable connector"
 msgid_plural "Cannot disable connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível desavitar o conector"
+msgstr[1] "Não é possível desavitar os conectores"
 
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
@@ -2835,8 +2839,8 @@ msgstr[1] "Não foi possível activar as ações"
 #: app/controllers/CControllerConnectorEnable.php:77
 msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível ativar o conector"
+msgstr[1] "Não é possível ativar os conectores"
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3704,6 +3708,11 @@ msgstr "Não é possível actualizar um gráfico descoberto."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Não é possível atualizar o grupo de servidores descobertos \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -12036,6 +12045,10 @@ msgstr ""
 msgid "Link indicators"
 msgstr "Indicadores de ligação"
 
+#: include/actions.inc.php:863
+msgid "Link template"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
 #: app/views/popup.massupdate.template.php:78
@@ -12406,6 +12419,10 @@ msgstr "Período de manutenção sem recolha de dados"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Manutenção: %1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -17880,6 +17897,10 @@ msgstr "Os serviços formam uma dependência circular."
 msgid "Services updated"
 msgstr ""
 
+#: include/classes/api/services/CUser.php:1714
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -20584,6 +20605,14 @@ msgstr "Desassociar do template"
 msgid "Unlink from templates"
 msgstr "Desassociar dos templates"
 
+#: include/actions.inc.php:864
+msgid "Unlink template"
+msgstr ""
+
+#: include/actions.inc.php:681
+msgid "Unlink templates"
+msgstr ""
+
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Reactivar"
@@ -22555,6 +22584,14 @@ msgstr ""
 #: include/func.inc.php:114
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
+msgstr ""
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346

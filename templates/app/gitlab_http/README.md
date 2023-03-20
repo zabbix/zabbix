@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.  
+For Zabbix version: 7.0 and higher.  
 This template is designed to monitor GitLab by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -18,7 +18,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 This template works with self-hosted GitLab instances. Internal service metrics are collected from the GitLab `/-/metrics` endpoint.
 To access metrics following two methods are available:

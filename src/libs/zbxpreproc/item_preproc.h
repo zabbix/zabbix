@@ -20,15 +20,11 @@
 #ifndef ZABBIX_ITEM_PREPROC_H
 #define ZABBIX_ITEM_PREPROC_H
 
-#include "zbxcacheconfig.h"
-#include "preproc.h"
 #include "zbxembed.h"
-
-#define ZBX_PREPROC_MAX_PACKET_SIZE	(ZBX_MEBIBYTE * 128)
+#include "zbxtime.h"
 
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);
-
 
 int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **errmsg);
 

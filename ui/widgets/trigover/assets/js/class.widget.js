@@ -20,9 +20,7 @@
 
 class CWidgetTrigerOver extends CWidget {
 
-	_registerEvents() {
-		super._registerEvents();
-
+	onStart() {
 		this._events = {
 			...this._events,
 
@@ -33,7 +31,7 @@ class CWidgetTrigerOver extends CWidget {
 					if (overlay.type === 'hintbox') {
 						const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
 
-						if (this._content_body.contains(element)) {
+						if (this._body.contains(element)) {
 							hintBox.deleteHint(overlay.element);
 						}
 					}
@@ -50,15 +48,11 @@ class CWidgetTrigerOver extends CWidget {
 		}
 	}
 
-	_activateEvents() {
-		super._activateEvents();
-
+	onActivate() {
 		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	_deactivateEvents() {
-		super._deactivateEvents();
-
+	onDeactivate() {
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 }
