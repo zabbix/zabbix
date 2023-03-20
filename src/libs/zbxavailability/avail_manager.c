@@ -259,8 +259,9 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigne
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		if (ZBX_DB_OK > zbx_db_execute("update host_rtdata hr set active_available=%i where exists (select null "
-				"from hosts h where h.hostid=hr.hostid and proxy_hostid is null)", INTERFACE_AVAILABLE_UNKNOWN))
+		if (ZBX_DB_OK > zbx_db_execute("update host_rtdata hr set active_available=%i where exists "
+				"(select null from hosts h where h.hostid=hr.hostid and proxy_hostid is null)",
+				INTERFACE_AVAILABLE_UNKNOWN))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to reset availability status for active checks");
 		}
@@ -382,8 +383,8 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 	{
 		if (proxy_avail->lastaccess + ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC <= now)
 		{
-			if (ZBX_DB_OK > zbx_db_execute("update host_rtdata set active_available=%i"
-					" where hostid in (select hostid from hosts where proxy_hostid=" ZBX_FS_UI64 ")",
+			if (ZBX_DB_OK > zbx_db_execute("update host_rtdata set active_available=%i "
+					"where hostid in (select hostid from hosts where proxy_hostid=" ZBX_FS_UI64 ")",
 					INTERFACE_AVAILABLE_UNKNOWN, proxy_avail->hostid))
 			{
 				continue;
@@ -447,7 +448,8 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 	zbx_vector_availability_ptr_create(&interface_availabilities);
 	zbx_hashset_create(&active_hb_cache.queue, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&active_hb_cache.hosts, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_hashset_create(&active_hb_cache.proxy_avail, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&active_hb_cache.proxy_avail, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
+		ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -462,7 +464,8 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 			zbx_setproctitle("%s #%d [queued %d, processed %d values, idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
 					get_process_type_string(process_type), process_num,
-					interface_availabilities.values_num, processed_num, time_idle, time_now - time_stat);
+					interface_availabilities.values_num, processed_num, time_idle,
+					time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
@@ -515,7 +518,8 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		if (ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC < time_now - active_hb_cache.last_status_refresh)
+		if (ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC <
+				time_now - active_hb_cache.last_status_refresh)
 		{
 			active_hb_cache.last_status_refresh = time_now;
 			calculate_cached_active_check_availabilities(&active_hb_cache);
