@@ -38,7 +38,8 @@ $titles = [
 	'graphs' => _('Graphs'),
 	'httptests' => _('Web scenarios'),
 	'maps' => _('Maps'),
-	'images' => _('Images')
+	'images' => _('Images'),
+	'mediaTypes' => _('Media types')
 ];
 
 $col_update = false;
