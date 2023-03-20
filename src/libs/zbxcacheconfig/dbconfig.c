@@ -8762,7 +8762,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->useip = 1;
 		dst_interface->type = INTERFACE_TYPE_UNKNOWN;
 		dst_interface->main = 0;
-		dst_interface->available = INTERFACE_AVAILABLE_UNKNOWN;
+		dst_interface->available = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
 		dst_interface->disable_until = 0;
 		dst_interface->errors_from = 0;
 		*dst_interface->error = '\0';
@@ -11347,7 +11347,7 @@ int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts
 	ZBX_DC_INTERFACE	*dc_interface;
 
 	/* don't try activating interface if there were no errors detected */
-	if (0 == in->errors_from && INTERFACE_AVAILABLE_TRUE == in->available)
+	if (0 == in->errors_from && ZBX_INTERFACE_AVAILABLE_TRUE == in->available)
 		goto out;
 
 	WRLOCK_CACHE;
@@ -11368,7 +11368,7 @@ int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts
 	}
 
 	DCinterface_get_agent_availability(dc_interface, in);
-	zbx_agent_availability_init(out, INTERFACE_AVAILABLE_TRUE, "", 0, 0);
+	zbx_agent_availability_init(out, ZBX_INTERFACE_AVAILABLE_TRUE, "", 0, 0);
 
 	if (SUCCEED == DCinterface_set_agent_availability(dc_interface, ts->sec, out) &&
 			ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
@@ -11463,7 +11463,7 @@ int	zbx_dc_interface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *
 			{
 				/* make host unavailable, schedule next unavailable check */
 				disable_until = ts->sec + unavailable_delay;
-				available = INTERFACE_AVAILABLE_FALSE;
+				available = ZBX_INTERFACE_AVAILABLE_FALSE;
 				error = error_msg;
 			}
 		}
@@ -12074,7 +12074,7 @@ int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 						continue;
 					}
 
-					if (INTERFACE_AVAILABLE_TRUE != dc_interface->available)
+					if (ZBX_INTERFACE_AVAILABLE_TRUE != dc_interface->available)
 						continue;
 					break;
 				case ITEM_TYPE_ZABBIX_ACTIVE:
@@ -13009,8 +13009,8 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 		if (0 == interface->reset_availability)
 			items_num = interface->items_num;
 
-		if (0 == items_num && INTERFACE_AVAILABLE_UNKNOWN != interface->available)
-			zbx_agent_availability_init(&ia->agent, INTERFACE_AVAILABLE_UNKNOWN, "", 0, 0);
+		if (0 == items_num && ZBX_INTERFACE_AVAILABLE_UNKNOWN != interface->available)
+			zbx_agent_availability_init(&ia->agent, ZBX_INTERFACE_AVAILABLE_UNKNOWN, "", 0, 0);
 
 		if (SUCCEED == zbx_interface_availability_is_set(ia))
 		{
@@ -14914,7 +14914,7 @@ void	zbx_get_host_interfaces_availability(zbx_uint64_t hostid, zbx_agent_availab
 	int				i;
 
 	for (i = 0; i < ZBX_AGENT_MAX; i++)
-		zbx_agent_availability_init(&agents[i], INTERFACE_AVAILABLE_UNKNOWN, "", 0, 0);
+		zbx_agent_availability_init(&agents[i], ZBX_INTERFACE_AVAILABLE_UNKNOWN, "", 0, 0);
 
 	RDLOCK_CACHE;
 

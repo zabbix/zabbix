@@ -54,7 +54,7 @@ static void	process_new_active_check_heartbeat(zbx_avail_active_hb_cache_t *cach
 
 	if (NULL == (avail_cached = zbx_hashset_search(&cache->hosts, &avail_new->hostid)))
 	{
-		avail_new->active_status = INTERFACE_AVAILABLE_TRUE;
+		avail_new->active_status = ZBX_INTERFACE_AVAILABLE_TRUE;
 
 		zbx_hashset_insert(&cache->hosts, avail_new, sizeof(zbx_host_active_avail_t));
 
@@ -64,7 +64,7 @@ static void	process_new_active_check_heartbeat(zbx_avail_active_hb_cache_t *cach
 		}
 		else
 		{
-			avail_queued->active_status = INTERFACE_AVAILABLE_TRUE;
+			avail_queued->active_status = ZBX_INTERFACE_AVAILABLE_TRUE;
 		}
 	}
 	else
@@ -91,10 +91,10 @@ static void	calculate_cached_active_check_availabilities(zbx_avail_active_hb_cac
 
 		if (now - host->lastaccess_active <= host->heartbeat_freq * 2)
 		{
-			host->active_status = INTERFACE_AVAILABLE_TRUE;
+			host->active_status = ZBX_INTERFACE_AVAILABLE_TRUE;
 		}
 		else
-			host->active_status = INTERFACE_AVAILABLE_FALSE;
+			host->active_status = ZBX_INTERFACE_AVAILABLE_FALSE;
 
 		if (prev_status != host->active_status)
 		{
@@ -144,21 +144,21 @@ static void	flush_active_hb_queue(zbx_avail_active_hb_cache_t *cache)
 
 	while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (host->active_status == INTERFACE_AVAILABLE_UNKNOWN)
+		if (host->active_status == ZBX_INTERFACE_AVAILABLE_UNKNOWN)
 		{
 			zbx_vector_uint64_append(&status_unknown, host->hostid);
 		}
-		else if (host->active_status == INTERFACE_AVAILABLE_TRUE)
+		else if (host->active_status == ZBX_INTERFACE_AVAILABLE_TRUE)
 		{
 			zbx_vector_uint64_append(&status_available, host->hostid);
 		}
-		else if (host->active_status == INTERFACE_AVAILABLE_FALSE)
+		else if (host->active_status == ZBX_INTERFACE_AVAILABLE_FALSE)
 			zbx_vector_uint64_append(&status_unavailable, host->hostid);
 	}
 
-	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN);
-	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE);
-	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE);
+	db_update_active_check_status(&status_unknown, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
+	db_update_active_check_status(&status_available, ZBX_INTERFACE_AVAILABLE_TRUE);
+	db_update_active_check_status(&status_unavailable, ZBX_INTERFACE_AVAILABLE_FALSE);
 
 	if (ZBX_DB_OK == zbx_db_commit())
 		zbx_hashset_clear(&cache->queue);
@@ -194,7 +194,7 @@ static void	send_avail_check_status_response(zbx_avail_active_hb_cache_t *cache,
 	unsigned char		*data = NULL;
 	zbx_uint32_t		data_len;
 	zbx_uint64_t		hostid;
-	int			status = INTERFACE_AVAILABLE_UNKNOWN;
+	int			status = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
 	zbx_host_active_avail_t *host;
 
 	zbx_availability_deserialize_active_status_request(message->data, &hostid);
@@ -232,13 +232,13 @@ static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_me
 
 		if (NULL != (queued_host = zbx_hashset_search(&cache->queue, &hostid)))
 		{
-			queued_host->active_status = INTERFACE_AVAILABLE_UNKNOWN;
+			queued_host->active_status = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
 		}
 		else
 		{
 			zbx_host_active_avail_t	host_local;
 
-			host_local.active_status = INTERFACE_AVAILABLE_UNKNOWN;
+			host_local.active_status = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
 			host_local.hostid = hostid;
 			host_local.lastaccess_active = 0;
 			host_local.heartbeat_freq = 0;
@@ -256,7 +256,7 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigne
 	{
 		if (ZBX_DB_OK > zbx_db_execute("update host_rtdata hr set active_available=%i where exists "
 				"(select null from hosts h where h.hostid=hr.hostid and proxy_hostid is null)",
-				INTERFACE_AVAILABLE_UNKNOWN))
+				ZBX_INTERFACE_AVAILABLE_UNKNOWN))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to reset availability status for active checks");
 		}
@@ -273,7 +273,7 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigne
 			zbx_host_active_avail_t avail_local;
 
 			ZBX_STR2UINT64(avail_local.hostid, row[0]);
-			avail_local.active_status = INTERFACE_AVAILABLE_UNKNOWN;
+			avail_local.active_status = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
 			avail_local.lastaccess_active = 0;
 			avail_local.heartbeat_freq = 0;
 
@@ -302,23 +302,23 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	{
 		host = hosts.values[i];
 
-		if (host->status == INTERFACE_AVAILABLE_UNKNOWN)
+		if (host->status == ZBX_INTERFACE_AVAILABLE_UNKNOWN)
 		{
 			zbx_vector_uint64_append(&status_unknown, host->hostid);
 		}
-		else if (host->status == INTERFACE_AVAILABLE_TRUE)
+		else if (host->status == ZBX_INTERFACE_AVAILABLE_TRUE)
 		{
 			zbx_vector_uint64_append(&status_available, host->hostid);
 		}
-		else if (host->status == INTERFACE_AVAILABLE_FALSE)
+		else if (host->status == ZBX_INTERFACE_AVAILABLE_FALSE)
 			zbx_vector_uint64_append(&status_unavailable, host->hostid);
 	}
 
 	zbx_db_begin();
 
-	db_update_active_check_status(&status_unknown, INTERFACE_AVAILABLE_UNKNOWN);
-	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE);
-	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE);
+	db_update_active_check_status(&status_unknown, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
+	db_update_active_check_status(&status_available, ZBX_INTERFACE_AVAILABLE_TRUE);
+	db_update_active_check_status(&status_unavailable, ZBX_INTERFACE_AVAILABLE_FALSE);
 
 	if (ZBX_DB_OK == zbx_db_commit())
 		zbx_hashset_clear(&cache->queue);
@@ -379,7 +379,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 		{
 			if (ZBX_DB_OK > zbx_db_execute("update host_rtdata set active_available=%i "
 					"where hostid in (select hostid from hosts where proxy_hostid=" ZBX_FS_UI64 ")",
-					INTERFACE_AVAILABLE_UNKNOWN, proxy_avail->hostid))
+					ZBX_INTERFACE_AVAILABLE_UNKNOWN, proxy_avail->hostid))
 			{
 				continue;
 			}

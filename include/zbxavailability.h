@@ -26,9 +26,9 @@
 #include "zbxthreads.h"
 
 /* interface availability */
-#define INTERFACE_AVAILABLE_UNKNOWN		0
-#define INTERFACE_AVAILABLE_TRUE		1
-#define INTERFACE_AVAILABLE_FALSE		2
+#define ZBX_INTERFACE_AVAILABLE_UNKNOWN		0
+#define ZBX_INTERFACE_AVAILABLE_TRUE		1
+#define ZBX_INTERFACE_AVAILABLE_FALSE		2
 
 #define ZBX_IPC_SERVICE_AVAILABILITY		"availability"
 #define ZBX_IPC_AVAILABILITY_REQUEST		1
@@ -96,8 +96,6 @@ typedef struct
 	int		active_status;
 }
 zbx_host_active_avail_t;
-
-ZBX_PTR_VECTOR_DECL(host_active_avail_ptr, zbx_host_active_avail_t *)
 
 typedef struct
 {

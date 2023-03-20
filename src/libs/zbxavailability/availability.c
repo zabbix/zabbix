@@ -23,7 +23,6 @@
 #include "zbxipcservice.h"
 
 ZBX_PTR_VECTOR_IMPL(proxy_hostdata_ptr, zbx_proxy_hostdata_t *)
-ZBX_PTR_VECTOR_IMPL(host_active_avail_ptr, zbx_host_active_avail_t *)
 
 void	zbx_availability_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response)
 {
@@ -94,7 +93,7 @@ int	zbx_get_active_agent_availability(zbx_uint64_t hostid)
 	zbx_ipc_message_t	response;
 	unsigned char		*data = NULL;
 	zbx_uint32_t		data_len = 0;
-	int			status = INTERFACE_AVAILABLE_UNKNOWN;
+	int			status = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
 
 	zbx_ipc_message_init(&response);
 	data_len = zbx_availability_serialize_active_status_request(&data, hostid);
