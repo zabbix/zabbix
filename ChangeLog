@@ -11,6 +11,7 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+..F....... [ZBX-22205] fixed inability to update a dependent item that is inherited from a template (jfreibergs)
 .......PS. [ZBX-22310] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
 .......PS. [ZBX-22097] fixed exiting process when connection to database is lost (askolmeisters)
 A......... [ZBX-22105] returned the assignment of the host interface for Simple check, External check, SSH agent, TELNET agent, and HTTP agent items and item prototypes that are inherited from the template to the host (vmaksimovs)
