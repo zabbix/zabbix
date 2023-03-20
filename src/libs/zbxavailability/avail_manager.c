@@ -26,11 +26,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 
-#define ZBX_AVAILABILITY_MANAGER_DELAY				1
-#define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC		5
-#define ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC	10
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY	(SEC_PER_MIN * 5)
+#define AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
 
 typedef struct
 {
@@ -381,7 +377,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 
 	while (NULL != (proxy_avail = (zbx_active_avail_proxy_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (proxy_avail->lastaccess + ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC <= now)
+		if (proxy_avail->lastaccess + AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC <= now)
 		{
 			if (ZBX_DB_OK > zbx_db_execute("update host_rtdata set active_available=%i "
 					"where hostid in (select hostid from hosts where proxy_hostid=" ZBX_FS_UI64 ")",
@@ -405,8 +401,17 @@ static void	update_proxy_heartbeat(zbx_avail_active_hb_cache_t *cache, zbx_ipc_m
 		proxy_avail->lastaccess = (int)time(NULL);
 }
 
+
+
 ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 {
+#define AVAILABILITY_MANAGER_DELAY				1
+#define AVAILABILITY_MANAGER_FLUSH_DELAY_SEC			5
+#define AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC		10
+#define AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY	(SEC_PER_MIN * 5)
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
 	zbx_ipc_service_t		service;
 	char				*error = NULL;
 	zbx_ipc_client_t		*client;
@@ -414,15 +419,12 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 	int				ret, processed_num = 0;
 	double				time_stat, time_idle = 0, time_now, time_flush, sec, last_proxy_flush;
 	zbx_vector_availability_ptr_t	interface_availabilities;
-	zbx_timespec_t			timeout = {ZBX_AVAILABILITY_MANAGER_DELAY, 0};
+	zbx_timespec_t			timeout = {AVAILABILITY_MANAGER_DELAY, 0};
 	zbx_avail_active_hb_cache_t	active_hb_cache;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 				server_num, get_process_type_string(process_type), process_num);
@@ -518,14 +520,13 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		if (ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC <
-				time_now - active_hb_cache.last_status_refresh)
+		if (AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC < time_now - active_hb_cache.last_status_refresh)
 		{
 			active_hb_cache.last_status_refresh = time_now;
 			calculate_cached_active_check_availabilities(&active_hb_cache);
 		}
 
-		if (ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC < time_now - time_flush)
+		if (AVAILABILITY_MANAGER_FLUSH_DELAY_SEC < time_now - time_flush)
 		{
 			time_flush = time_now;
 
@@ -550,7 +551,7 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 			}
 		}
 
-		if (ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC < time_now -
+		if (AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC < time_now -
 				active_hb_cache.last_proxy_avail_refresh &&
 				0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
@@ -559,7 +560,7 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 		}
 
 		if (0 != (info->program_type & ZBX_PROGRAM_TYPE_PROXY) &&
-				last_proxy_flush + ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY <= time_now)
+				last_proxy_flush + AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY <= time_now)
 		{
 			flush_all_hosts(&active_hb_cache);
 			last_proxy_flush = time_now;
@@ -577,4 +578,8 @@ ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
+#undef AVAILABILITY_MANAGER_DELAY
+#undef AVAILABILITY_MANAGER_FLUSH_DELAY_SEC
+#undef AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC
+#undef AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY
 }

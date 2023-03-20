@@ -38,7 +38,6 @@
 #define ZBX_IPC_AVAILMAN_CONFSYNC_DIFF		5
 #define ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA	6
 #define ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE	7
-#define ZBX_AVAIL_SERVER_CONN_TIMEOUT		3600
 
 /* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
 typedef struct
@@ -75,8 +74,6 @@ typedef struct
 zbx_interface_availability_t;
 
 ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *)
-
-#define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
 
 void	zbx_availability_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response);
 void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities);
