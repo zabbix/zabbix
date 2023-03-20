@@ -851,9 +851,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	process_results(zbx_discoverer_manager_t *manager)
+static void	process_results(zbx_discoverer_manager_t *manager)
 {
-	int					i, result_count = 0;
+	int					i;
 	zbx_vector_discoverer_results_ptr_t	results;
 	zbx_discoverer_results_t		*result, *result_tmp;
 	zbx_hashset_iter_t			iter;
@@ -919,14 +919,10 @@ static int	process_results(zbx_discoverer_manager_t *manager)
 			proxy_update_host(result->druleid, result->ip, result->dnsname, host_status,
 					result->now);
 		}
-
-		result_count += result->services.values_num;
 	}
 
 	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);
 	zbx_vector_discoverer_results_ptr_destroy(&results);
-
-	return result_count;
 }
 
 static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_discoverer_jobs_ptr_t *jobs,
@@ -1590,10 +1586,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
 	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				rule_count = 0, old_rule_count = 0, result_count = 0, old_result_count = 0;
-	zbx_uint64_t			check_count = 0, old_check_count = 0;
-	double				sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t				last_stat_time, nextcheck = 0;
+	double				sec;
+	time_t				nextcheck = 0;
 	zbx_ipc_service_t		ipc_service;
 	zbx_ipc_client_t		*client;
 	zbx_ipc_message_t		*message;
@@ -1610,15 +1604,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-#define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
-	last_stat_time = time(NULL);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -1643,20 +1632,14 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #endif
 	zbx_vector_uint64_pair_create(&revisions);
 
+	zbx_setproctitle("%s #%d [started]", get_process_type_string(process_type), process_num);
+
 	while (ZBX_IS_RUNNING())
 	{
 		int		i;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
-
-		if (0 != sleeptime.sec)
-		{
-			zbx_setproctitle("%s #%d [processed %d rules, queued " ZBX_FS_UI64 " network checks, processed "
-					"%d check results in " ZBX_FS_DBL " sec,performing discovery]",
-					get_process_type_string(process_type), process_num, old_rule_count,
-					old_check_count, old_result_count, old_total_sec);
-		}
 
 		/* update local drules revisions */
 		zbx_vector_uint64_pair_clear(&revisions);
@@ -1684,13 +1667,15 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		discoverer_queue_unlock(&dmanager.queue);
 
-		result_count += process_results(&dmanager);
+		process_results(&dmanager);
 
 		/* process discovery rules and create net check jobs */
 
+		sec = zbx_time();
+
 		if ((int)sec >= nextcheck)
 		{
-			int					rule_count_current;
+			int					rule_count;
 			zbx_vector_discoverer_jobs_ptr_t	jobs;
 			zbx_hashset_t				check_counts;
 
@@ -1698,15 +1683,13 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			zbx_hashset_create(&check_counts, 1, discoverer_check_count_hash,
 					discoverer_check_count_compare);
 
-			rule_count_current = process_discovery(&nextcheck, discoverer_args_in->config_timeout, &jobs,
+			rule_count = process_discovery(&nextcheck, discoverer_args_in->config_timeout, &jobs,
 					&check_counts);
-			rule_count += rule_count_current;
-			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)
 				nextcheck = time(NULL) + DISCOVERER_DELAY;
 
-			if (0 < rule_count_current)
+			if (0 < rule_count)
 			{
 				zbx_hashset_iter_t		iter;
 				zbx_discoverer_check_count_t	*count;
@@ -1740,8 +1723,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 				discoverer_queue_notify_all(&dmanager.queue);
 				discoverer_queue_unlock(&dmanager.queue);
-
-				check_count += queued;
 			}
 
 			zbx_vector_discoverer_jobs_ptr_destroy(&jobs);
@@ -1751,33 +1732,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		/* update sleeptime and process title */
 
 		sleeptime.sec = zbx_calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
-
-		if (0 != sleeptime.sec || STAT_INTERVAL <= time(NULL) - last_stat_time)
-		{
-			if (0 == sleeptime.sec)
-			{
-				zbx_setproctitle("%s #%d [processed %d rules, queued " ZBX_FS_UI64 " network checks, "
-						"processed %d check results in " ZBX_FS_DBL " sec, performing "
-						"discovery]", get_process_type_string(process_type), process_num,
-						rule_count, check_count, result_count, total_sec);
-			}
-			else
-			{
-				zbx_setproctitle("%s #%d [processed %d rules, queued " ZBX_FS_UI64 " network checks, "
-						"processed %d check results in " ZBX_FS_DBL " sec, idle %d sec]",
-						get_process_type_string(process_type), process_num,
-						rule_count, check_count, result_count, total_sec, sleeptime.sec);
-				old_rule_count = rule_count;
-				old_result_count = result_count;
-				old_check_count = check_count;
-				old_total_sec = total_sec;
-			}
-			rule_count = 0;
-			check_count = 0;
-			result_count = 0;
-			total_sec = 0.0;
-			last_stat_time = time(NULL);
-		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		(void)zbx_ipc_service_recv(&ipc_service, &sleeptime, &client, &message);
@@ -1825,5 +1779,4 @@ out:
 	zbx_ipc_service_close(&ipc_service);
 
 	exit(EXIT_SUCCESS);
-#undef STAT_INTERVAL
 }
