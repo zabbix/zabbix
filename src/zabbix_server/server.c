@@ -50,7 +50,6 @@
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
-#include "availability/avail_manager.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
 #include "zbxconnector.h"
@@ -1649,7 +1648,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
-				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;

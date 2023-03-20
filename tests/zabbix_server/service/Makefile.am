@@ -20,7 +20,6 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
-	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
@@ -76,7 +75,7 @@ SERVICE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_interface_availability_is_set \
 	-Wl,--wrap=zbx_tsdb_recalc_time_period \
 	-Wl,--wrap=zbx_config_get
-	
+
 # service_get_rootcause_eventids
 
 service_get_rootcause_eventids_SOURCES = \

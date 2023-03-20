@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "avail_manager.h"
+#include "zbxavailability.h"
 
 #include "log.h"
 #include "zbxself.h"
-#include "zbxavailability.h"
 #include "zbxipcservice.h"
 #include "zbxnix.h"
 #include "zbxnum.h"
@@ -405,7 +404,7 @@ static void	update_proxy_heartbeat(zbx_avail_active_hb_cache_t *cache, zbx_ipc_m
 		proxy_avail->lastaccess = (int)time(NULL);
 }
 
-ZBX_THREAD_ENTRY(availability_manager_thread, args)
+ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
 	char				*error = NULL;

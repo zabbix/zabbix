@@ -23,6 +23,7 @@
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
+#include "zbxthreads.h"
 
 /* interface availability */
 #define INTERFACE_AVAILABLE_UNKNOWN		0
@@ -153,5 +154,7 @@ void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_
 
 zbx_uint32_t	zbx_availability_serialize_active_proxy_hb_update(unsigned char **data, zbx_uint64_t hostid);
 void	zbx_availability_deserialize_active_proxy_hb_update(const unsigned char *data, zbx_uint64_t *hostid);
+
+ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args);
 
 #endif /* ZABBIX_AVAILABILITY_H */

@@ -52,7 +52,6 @@
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
 #include "rtc/rtc_proxy.h"
-#include "../zabbix_server/availability/avail_manager.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
@@ -1576,7 +1575,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
-				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;
