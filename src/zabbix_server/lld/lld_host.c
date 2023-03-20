@@ -351,8 +351,8 @@ static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
 	zbx_vector_uint64_t	hostids;
 	int			i;
 	zbx_lld_host_t		*host;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		hostid;
@@ -415,8 +415,8 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 		unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
 		const char *tls_subject, const char *tls_psk_identity, const char *tls_psk)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_lld_host_t		*host;
 	zbx_uint64_t		db_proxy_hostid;
 
@@ -558,8 +558,8 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
  ******************************************************************************/
 static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			i, j;
 	zbx_lld_host_t		*host, *host_b;
 	zbx_vector_uint64_t	hostids;
@@ -1042,8 +1042,8 @@ out:
  ******************************************************************************/
 static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_t *groupids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	groupid;
 
 	result = zbx_db_select(
@@ -1078,8 +1078,8 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
 static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
 		const zbx_vector_ptr_t *groups, zbx_vector_uint64_t *del_hostgroupids)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			i, j;
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostgroupid, hostid, groupid;
@@ -1192,8 +1192,8 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
  ******************************************************************************/
 static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *group_prototypes)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_lld_group_prototype_t	*group_prototype;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1231,8 +1231,8 @@ static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_
  ******************************************************************************/
 static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_lld_group_t	*group;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1427,8 +1427,8 @@ static int	lld_validate_group_name(const char *name)
  ******************************************************************************/
 static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			i, j;
 	zbx_lld_group_t		*group, *group_b;
 	zbx_vector_uint64_t	groupids;
@@ -1630,8 +1630,8 @@ static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
 static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 {
 	int			i, j;
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	char			*ptr, *name, *sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0, offset;
 	zbx_lld_group_t		*group;
@@ -1951,8 +1951,8 @@ out:
  ******************************************************************************/
 static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostmacros)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_lld_hostmacro_t	*hostmacro;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2017,8 +2017,8 @@ static int	macro_str_compare_func(const void *d1, const void *d2)
 static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *masterhostmacros,
 		zbx_vector_ptr_t *hostmacros)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_lld_hostmacro_t	*hostmacro;
 	int			i;
 
@@ -2147,8 +2147,8 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
 		const zbx_vector_ptr_t *lld_macros)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			i, j;
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostmacroid, hostid;
@@ -2246,8 +2246,8 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
  ******************************************************************************/
 static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr_t *tags)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_db_tag_t	*tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2279,8 +2279,8 @@ static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr
  ******************************************************************************/
 static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	templateids, hostids;
 	zbx_uint64_t		templateid, hostid;
 	zbx_lld_host_t		*host;
@@ -3710,8 +3710,8 @@ static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int 
  ******************************************************************************/
 static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, unsigned char custom_interfaces)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_lld_interface_t	*interface;
 
 	if (ZBX_HOST_PROT_INTERFACES_INHERIT == custom_interfaces)
@@ -4075,8 +4075,8 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
 static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts,
 		const zbx_vector_ptr_t *lld_macros)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			i, j;
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostid;
@@ -4305,8 +4305,8 @@ static int	another_main_interface_exists(const zbx_vector_ptr_t *interfaces, con
  ******************************************************************************/
 static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			i, j;
 	zbx_vector_uint64_t	interfaceids;
 	zbx_uint64_t		interfaceid;
@@ -4480,8 +4480,8 @@ static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_vector_ptr_t		hosts, group_prototypes, groups, interfaces, masterhostmacros, hostmacros;
 	zbx_vector_db_tag_ptr_t	tags;
 	zbx_vector_uint64_t		groupids;		/* list of host groups which should be added */

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 Cisco UCS® Manager provides unified, embedded management of all software and hardware
  components of the Cisco Unified Computing System™ (Cisco UCS) across multiple chassis
  and rack servers. It enables server, fabric, and storage provisioning as well as,
@@ -15,7 +15,7 @@ You can download UCS MIB files there ftp://ftp.cisco.com/pub/mibs/ucs-mibs/.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 1\. Create a host for Cisco USC Manager IP as SNMPv2 interface.
 

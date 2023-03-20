@@ -69,7 +69,7 @@ static zbx_export_file_t	*get_problems_export(void)
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
 		zbx_uint64_t userid)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, eventid);
 
@@ -98,8 +98,8 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
  ******************************************************************************/
 static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			ret = FAIL;
 	zbx_uint64_t		userid, triggerid, eventid;
 	zbx_vector_uint64_t	triggerids, locked_triggerids;
@@ -132,7 +132,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 		{
 			ZBX_STR2UINT64(triggerid, row[2]);
 			zbx_vector_uint64_append(&triggerids, triggerid);
-			DCconfig_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
+			zbx_dc_config_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
 
 			/* close the problem if source trigger was successfully locked or */
 			/* if the trigger doesn't exist, but event still exists */
@@ -142,11 +142,11 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 				ZBX_STR2UINT64(eventid, row[1]);
 				tm_execute_task_close_problem(taskid, triggerid, eventid, userid);
 
-				DCconfig_unlock_triggers(&locked_triggerids);
+				zbx_dc_config_unlock_triggers(&locked_triggerids);
 
 				ret = SUCCEED;
 			}
-			else if (FAIL == DCconfig_trigger_exists(triggerid))
+			else if (FAIL == zbx_dc_config_trigger_exists(triggerid))
 			{
 				zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
 						taskid);
@@ -171,8 +171,8 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
  ******************************************************************************/
 static void	tm_expire_remote_command(zbx_uint64_t taskid)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	alertid;
 	char		*error;
 
@@ -214,8 +214,8 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
  ******************************************************************************/
 static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	alertid, parent_taskid = 0;
 	int		status, ret = FAIL;
 	char		*error, *sql = NULL;
@@ -283,8 +283,8 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
  ******************************************************************************/
 static void	tm_process_data_result(zbx_uint64_t taskid)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	parent_taskid = 0;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
@@ -583,8 +583,8 @@ static void	notify_service_manager(const zbx_vector_ptr_t *ack_tasks)
  ******************************************************************************/
 static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			processed_num = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -667,8 +667,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			i, processed_num = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1094,8 +1094,8 @@ static void	tm_process_temp_suppression(const char *data)
 	}
 	else if (ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS == action)
 	{
-		DB_ROW		row;
-		DB_RESULT	result;
+		zbx_db_row_t	row;
+		zbx_db_result_t	result;
 
 		if (SUCCEED != zbx_db_lock_record("events", eventid, NULL, 0))
 			return;
@@ -1136,8 +1136,8 @@ static void	tm_process_temp_suppression(const char *data)
  ******************************************************************************/
 static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *taskids)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			processed_num = 0, data_type;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1251,8 +1251,8 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
 
 	if (0 < proxy_hostid)
 	{
-		DB_ROW		row;
-		DB_RESULT	result;
+		zbx_db_row_t	row;
+		zbx_db_result_t	result;
 
 		result = zbx_db_select(
 				"select compatibility"
@@ -1277,8 +1277,8 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
  ******************************************************************************/
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			type, processed_num = 0, expired_num = 0, clock, ttl;
 	zbx_uint64_t		taskid, proxy_hostid;
 	zbx_vector_uint64_t	ack_taskids, check_now_taskids, expire_taskids, data_taskids;
