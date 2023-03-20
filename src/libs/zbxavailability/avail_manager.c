@@ -215,14 +215,13 @@ static void	send_avail_check_status_response(zbx_avail_active_hb_cache_t *cache,
 
 static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
 {
-	int			i;
 	zbx_vector_uint64_t	hostids;
 
 	zbx_vector_uint64_create(&hostids);
 
 	zbx_availability_deserialize_hostids(message->data, &hostids);
 
-	for (i = 0; i < hostids.values_num; i++)
+	for (int i = 0; i < hostids.values_num; i++)
 	{
 		zbx_host_active_avail_t	*queued_host;
 		zbx_uint64_t		hostid;
@@ -285,12 +284,11 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigne
 }
 static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
 {
-	zbx_uint64_t				proxy_hostid;
-	zbx_vector_proxy_hostdata_ptr_t		hosts;
-	zbx_proxy_hostdata_t			*host;
-	zbx_vector_uint64_t			status_unknown, status_available, status_unavailable;
-	zbx_active_avail_proxy_t		*proxy_avail;
-	int					i;
+	zbx_uint64_t			proxy_hostid;
+	zbx_vector_proxy_hostdata_ptr_t	hosts;
+	zbx_proxy_hostdata_t		*host;
+	zbx_vector_uint64_t		status_unknown, status_available, status_unavailable;
+	zbx_active_avail_proxy_t	*proxy_avail;
 
 	zbx_vector_proxy_hostdata_ptr_create(&hosts);
 
@@ -300,7 +298,7 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	zbx_vector_uint64_create(&status_available);
 	zbx_vector_uint64_create(&status_unavailable);
 
-	for (i = 0; i < hosts.values_num; i++)
+	for (int i = 0; i < hosts.values_num; i++)
 	{
 		host = hosts.values[i];
 

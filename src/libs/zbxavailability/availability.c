@@ -58,9 +58,8 @@ void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_ava
 {
 	unsigned char	*data = NULL;
 	size_t		data_alloc = 0, data_offset = 0;
-	int		i;
 
-	for (i = 0; i < interface_availabilities->values_num; i++)
+	for (int i = 0; i < interface_availabilities->values_num; i++)
 	{
 		zbx_availability_serialize_interface(&data, &data_alloc, &data_offset,
 				interface_availabilities->values[i]);
@@ -72,14 +71,12 @@ void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_ava
 
 void	zbx_availability_serialize_json_hostdata(zbx_vector_proxy_hostdata_ptr_t *hostdata, struct zbx_json *j)
 {
-	int	i;
-
 	if (0 == hostdata->values_num)
 		return;
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA);
 
-	for (i = 0; i < hostdata->values_num; i++)
+	for (int i = 0; i < hostdata->values_num; i++)
 	{
 		zbx_proxy_hostdata_t	*hd = hostdata->values[i];
 
@@ -258,7 +255,6 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 	int	txn_error;
 	char	*sql = NULL;
 	size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
-	int	i;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -269,7 +265,7 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 		zbx_db_begin();
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		for (i = 0; i < interface_availabilities->values_num; i++)
+		for (int i = 0; i < interface_availabilities->values_num; i++)
 		{
 			if (SUCCEED != zbx_sql_add_interface_availability(interface_availabilities->values[i], &sql,
 					&sql_alloc, &sql_offset))
