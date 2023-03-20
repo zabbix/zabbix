@@ -224,6 +224,10 @@
 	}
 
 	jQuery(function() {
+		updateForm();
+
+		document.getElementById('concurrency_max_type').addEventListener('change', () => updateForm());
+
 		addDCheck(<?= json_encode(array_values($data['drule']['dchecks'])) ?>);
 
 		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['uniqueness_criteria']) ?>)+']').attr('checked', 'checked');
@@ -448,8 +452,15 @@
 		return false;
 	}
 
+	function updateForm() {
+		const concurrency_max_type = document.querySelector('[name="concurrency_max_type"]:checked').value;
+		document.getElementById('concurrency_max').style.display = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>
+			? ''
+			: 'none';
+	}
+
 	$(() => {
 		const $form = $(document.forms['discoveryForm']);
-		$form.on('submit', () => $form.trimValues(['#name', '#iprange', '#delay']));
+		$form.on('submit', () => $form.trimValues(['#name', '#iprange', '#delay', '#concurrency_max']));
 	});
 </script>

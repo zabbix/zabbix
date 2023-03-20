@@ -23,17 +23,19 @@ class CControllerDiscoveryUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'druleid'             => 'required|db drules.druleid',
-			'name'                => 'required|db drules.name|not_empty',
-			'proxy_hostid'        => 'db drules.proxy_hostid',
-			'iprange'             => 'required|db drules.iprange|not_empty|flags '.P_CRLF,
-			'delay'               => 'required|db drules.delay|not_empty',
-			'status'              => 'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
-			'uniqueness_criteria' => 'string',
-			'host_source'         => 'string',
-			'name_source'         => 'string',
-			'dchecks'             => 'required|array',
-			'form_refresh'        => 'int32'
+			'druleid'				=> 'required|db drules.druleid',
+			'name'					=> 'required|db drules.name|not_empty',
+			'proxy_hostid'			=> 'db drules.proxy_hostid',
+			'iprange'				=> 'required|db drules.iprange|not_empty|flags '.P_CRLF,
+			'delay'					=> 'required|db drules.delay|not_empty',
+			'status'				=> 'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
+			'concurrency_max_type'	=> 'in '.implode(',', [ZBX_DISCOVERY_CHECKS_ONE, ZBX_DISCOVERY_CHECKS_UNLIMITED, ZBX_DISCOVERY_CHECKS_CUSTOM]),
+			'concurrency_max'		=> 'db drules.concurrency_max|ge '.ZBX_DISCOVERY_CHECKS_UNLIMITED.'|le '.ZBX_DISCOVERY_CHECKS_MAX,
+			'uniqueness_criteria'	=> 'string',
+			'host_source'			=> 'string',
+			'name_source'			=> 'string',
+			'dchecks'				=> 'required|array',
+			'form_refresh'			=> 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -83,6 +85,11 @@ class CControllerDiscoveryUpdate extends CController {
 
 			$drule['dchecks'][$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
 		}
+
+		$drule['concurrency_max'] = $this->getInput(
+			'concurrency_max_type', ZBX_DISCOVERY_CHECKS_UNLIMITED) == ZBX_DISCOVERY_CHECKS_CUSTOM
+			? $this->getInput('concurrency_max')
+			: $this->getInput('concurrency_max_type');
 
 		$result = API::DRule()->update($drule);
 

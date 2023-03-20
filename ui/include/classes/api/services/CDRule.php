@@ -245,6 +245,14 @@ class CDRule extends CApiService {
 				);
 			}
 
+			if (array_key_exists('concurrency_max', $drule)
+					&& ($drule['concurrency_max'] < ZBX_DISCOVERY_CHECKS_UNLIMITED
+					|| $drule['concurrency_max'] > ZBX_DISCOVERY_CHECKS_MAX)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['concurrency_max'], 'concurrency_max')
+				);
+			}
+
 			if (array_key_exists('proxy_hostid', $drule)) {
 				if (!zbx_is_int($drule['proxy_hostid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -391,6 +399,14 @@ class CDRule extends CApiService {
 					&& $drule['status'] != DRULE_STATUS_ACTIVE) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['status'], 'status')
+				);
+			}
+
+			if (array_key_exists('concurrency_max', $drule)
+					&& ($drule['concurrency_max'] < ZBX_DISCOVERY_CHECKS_UNLIMITED
+					|| $drule['concurrency_max'] > ZBX_DISCOVERY_CHECKS_MAX)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['concurrency_max'], 'concurrency_max')
 				);
 			}
 
@@ -670,6 +686,7 @@ class CDRule extends CApiService {
 	 *  iprange => string,
 	 *  delay => string,
 	 *  status => int,
+	 * 	concurrency_max => int,
 	 *  dchecks => array(
 	 *  	array(
 	 *  		type => int,
@@ -722,6 +739,7 @@ class CDRule extends CApiService {
 	 *  iprange => string,
 	 *  delay => string,
 	 *  status => int,
+	 *  concurrency_max => int,
 	 *  dchecks => array(
 	 *  	array(
 	 * 			dcheckid => int,
@@ -747,7 +765,7 @@ class CDRule extends CApiService {
 		$this->validateUpdate($drules);
 
 		$db_drules = API::DRule()->get([
-			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status'],
+			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status', 'concurrency_max'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source'

@@ -74,6 +74,22 @@ $discoveryFormList
 		(new CTextBox('delay', $data['drule']['delay']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
+	)
+	->addRow(new CLabel(_('Maximum concurrent checks'), 'concurrency_max_type'),
+		(new CDiv())
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addItem([
+				(new CDiv(
+					(new CRadioButtonList('concurrency_max_type', $data['concurrency_max_type']))
+						->addValue(_('One'), ZBX_DISCOVERY_CHECKS_ONE)
+						->addValue(_('Unlimited'), ZBX_DISCOVERY_CHECKS_UNLIMITED)
+						->addValue(_('Custom'), ZBX_DISCOVERY_CHECKS_CUSTOM)
+						->setModern()
+				))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CNumericBox('concurrency_max', $data['drule']['concurrency_max'], 3, false, false, false))
+					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+					->addStyle('display: none;')
+			])
 	);
 
 $discoveryFormList->addRow(

@@ -973,6 +973,11 @@ define('ZBX_DISCOVERY_DNS',		1);
 define('ZBX_DISCOVERY_IP',		2);
 define('ZBX_DISCOVERY_VALUE',	3);
 
+define('ZBX_DISCOVERY_CHECKS_UNLIMITED',	0);
+define('ZBX_DISCOVERY_CHECKS_ONE',          1);
+define('ZBX_DISCOVERY_CHECKS_CUSTOM',       -1);
+define('ZBX_DISCOVERY_CHECKS_MAX',          999);
+
 define('USER_TYPE_ZABBIX_USER',		1);
 define('USER_TYPE_ZABBIX_ADMIN',	2);
 define('USER_TYPE_SUPER_ADMIN',		3);

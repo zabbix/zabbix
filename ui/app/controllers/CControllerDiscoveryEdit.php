@@ -29,17 +29,18 @@ class CControllerDiscoveryEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'druleid'             => 'db drules.druleid',
-			'name'                => 'db drules.name',
-			'proxy_hostid'        => 'db drules.proxy_hostid',
-			'iprange'             => 'db drules.iprange',
-			'delay'               => 'db drules.delay',
-			'status'              => 'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
-			'uniqueness_criteria' => 'string',
-			'host_source'         => 'string',
-			'name_source'         => 'string',
-			'dchecks'             => 'array',
-			'form_refresh'        => 'int32'
+			'druleid'				=> 'db drules.druleid',
+			'name'					=> 'db drules.name',
+			'proxy_hostid'			=> 'db drules.proxy_hostid',
+			'iprange'				=> 'db drules.iprange',
+			'delay'					=> 'db drules.delay',
+			'status'				=> 'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
+			'concurrency_max'		=> 'db drules.concurrency_max|ge '.ZBX_DISCOVERY_CHECKS_UNLIMITED.'|le '.ZBX_DISCOVERY_CHECKS_MAX,
+			'uniqueness_criteria'	=> 'string',
+			'host_source'			=> 'string',
+			'name_source'			=> 'string',
+			'dchecks'				=> 'array',
+			'form_refresh'			=> 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,7 +59,7 @@ class CControllerDiscoveryEdit extends CController {
 
 		if ($this->hasInput('druleid') && !$this->hasInput('form_refresh')) {
 			$drules = API::DRule()->get([
-				'output' => ['name', 'proxy_hostid', 'iprange', 'delay', 'status'],
+				'output' => ['name', 'proxy_hostid', 'iprange', 'delay', 'status', 'concurrency_max'],
 				'druleids' => $this->getInput('druleid'),
 				'selectDChecks' => [
 					'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
@@ -103,8 +104,8 @@ class CControllerDiscoveryEdit extends CController {
 	}
 
 	protected function doAction() {
-		$this->getInputs($this->drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks',
-			'uniqueness_criteria', 'host_source', 'name_source'
+		$this->getInputs($this->drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status',
+			'concurrency_max', 'dchecks', 'uniqueness_criteria', 'host_source', 'name_source'
 		]);
 
 		$this->drule += [
@@ -113,6 +114,7 @@ class CControllerDiscoveryEdit extends CController {
 			'iprange' => '192.168.0.1-254',
 			'delay' => DB::getDefault('drules', 'delay'),
 			'status' => DB::getDefault('drules', 'status'),
+			'concurrency_max' => DB::getDefault('drules', 'concurrency_max'),
 			'proxy_hostid' => 0,
 			'uniqueness_criteria' => -1,
 			'host_source' => DB::getDefault('dchecks', 'host_source'),
@@ -121,9 +123,15 @@ class CControllerDiscoveryEdit extends CController {
 
 		CArrayHelper::sort($this->drule['dchecks'], ['name']);
 
+		$concurrency_max_type = ($this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_UNLIMITED
+			|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE)
+			? (int) $this->drule['concurrency_max']
+			: ZBX_DISCOVERY_CHECKS_CUSTOM;
+
 		$data = [
 			'druleid' => $this->getInput('druleid', 0),
 			'drule' => $this->drule,
+			'concurrency_max_type' => $concurrency_max_type,
 			'form_refresh' => $this->getInput('form_refresh', 0)
 		];
 
