@@ -220,7 +220,8 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						['action' => 'remove'],
 						['expression' => 'first expression'],
 						['expression' => 'second expression']
-					]
+					],
+					'screenshot' => true
 				]
 			]
 		];
@@ -251,6 +252,13 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		// Input new row for Icon mapping.
 		if (array_key_exists('mappings', $data)) {
 			$this->processExpressionRows($data['mappings']);
+		}
+
+		// Take a screenshot to test draggable object position of icon mappings.
+		if (array_key_exists('screenshot', $data)) {
+			$form = $this->query('id:iconmap')->waitUntilVisible()->one()->asForm();
+			$this->page->removeFocus();
+			$this->assertScreenshot($form->query('id:iconmap_list')->waitUntilPresent()->one(), 'Icon mapping');
 		}
 
 		$this->zbxTestClick('add');
