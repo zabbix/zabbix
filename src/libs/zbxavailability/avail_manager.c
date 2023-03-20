@@ -26,7 +26,11 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 
-static sigset_t				orig_mask;
+#define ZBX_AVAILABILITY_MANAGER_DELAY				1
+#define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC		5
+#define ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC	10
+#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
+#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY	(SEC_PER_MIN * 5)
 
 typedef struct
 {
@@ -35,11 +39,7 @@ typedef struct
 }
 zbx_active_avail_proxy_t;
 
-#define ZBX_AVAILABILITY_MANAGER_DELAY				1
-#define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC		5
-#define ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC	10
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY	(SEC_PER_MIN * 5)
+static sigset_t	orig_mask;
 
 static int	interface_availability_compare(const void *d1, const void *d2)
 {
