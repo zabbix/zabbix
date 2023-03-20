@@ -815,6 +815,7 @@ class CHostPrototype extends CHostBase {
 		$upd_hostids = [];
 
 		$internal_fields = array_flip(['hostid', 'custom_interfaces', 'ruleid']);
+		$inventory_fields = array_flip(['inventory_mode']);
 		$nested_object_fields = array_flip(
 			['interfaces', 'groupLinks', 'groupPrototypes', 'templates', 'tags', 'macros']
 		);
@@ -831,7 +832,9 @@ class CHostPrototype extends CHostBase {
 				$upd_hostids[$i] = $host['hostid'];
 			}
 
-			$host = array_intersect_key($host, $internal_fields + $upd_host + $nested_object_fields);
+			$host = array_intersect_key($host,
+				$internal_fields + $upd_host + $nested_object_fields + $inventory_fields
+			);
 		}
 
 		if ($upd_hosts) {
