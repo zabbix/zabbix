@@ -493,10 +493,10 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-22310] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
-........S. [ZBX-22407] fixed crash when testing item with aggregated function count containing invalid argument (dgoloscapov)
+........S. [ZBX-22407] fixed a crash when testing item with aggregated function count containing invalid argument (dgoloscapov)
 ...G...... [ZBX-22434] fixed race condition when starting Zabbix agent 2 with loadable plugins (esneiders)
 A.F....... [ZBX-19466] changed global script name validation to include menu path in its scope of uniqueness check (Ivo)
-.......PS. [ZBX-22490] fixed HttpRequest limit in javascript being reached even if all objects are destroyed (vso)
+.......PS. [ZBX-22490] fixed HttpRequest limit in JavaScript being reached even if all objects are destroyed (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.8
@@ -3578,14 +3578,14 @@ New features:
 Bug fixes:
 ..F....... [ZBX-22413] fixed autofocus for inherited web scenario edit (dfofanovs)
 .........T [ZBX-22520] fixed versions of integrations (aiantsen)
-.......PS. [ZBX-22490] fixed HttpRequest limit in javascript being reached even if all objects are destroyed (vso)
-.D.G...... [ZBX-21723] removed syslog LogType from config file for Zabbix agent2 on Windows (dgoloscapov)
+.......PS. [ZBX-22490] fixed HttpRequest limit in JavaScript being reached even if all objects are destroyed (vso)
+.D.G...... [ZBX-21723] removed syslog LogType from config file for Zabbix agent 2 on Windows (dgoloscapov)
 ..F....... [ZBX-22068] fixed graphs (dynamic item) links and host displayed (ddauksa)
 .......PS. [ZBX-22026] fixed SNMP agent item going to unsupported state on NULL result (vso)
 ..F....... [ZBX-18288] fixed undefined offset runtime error in Graph prototype preview (esekace)
-..F....... [ZBX-22411] fixed incorrect time in dashboard graph widget hintbox (dfofanovs)
-..F....... [ZBX-22056] fixed "No data found" message style in Monitoring->Problems (esekace)
-A......... [ZBX-19339] fixed import and export of dependent LLD rules if master item is a web item (Ivo)
+..F....... [ZBX-22411] fixed incorrect time in the dashboard Graph widget hintbox (dfofanovs)
+..F....... [ZBX-22056] fixed "No data found" message style in the Monitoring->Problems (esekace)
+A......... [ZBX-19339] fixed import and export of dependent LLD rules if the master item is a web item (Ivo)
 ..F....... [ZBX-22188] changed parameters of wmi.get and wmi.getall keys to mandatory (esekace)
 ...G...... [ZBX-22452] fixed item keys web.page.* in Zabbix agent for Microsoft Windows (akozlovs)
 
@@ -6327,12 +6327,10 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.45rc1
 
-New features:
-
 Bug fixes:
 .........T [ZBX-22520] fixed versions of integrations (aiantsen)
 .......PS. [ZBX-22026] fixed SNMP agent item going to unsupported state on NULL result (vso)
-..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allowing to access Zabbix frontend in maintenance mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44
