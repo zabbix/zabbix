@@ -157,8 +157,8 @@ ZBX_PTR_VECTOR_IMPL(availability_ptr, zbx_interface_availability_t *)
  * Purpose: initializes agent availability with the specified data            *
  *                                                                            *
  * Parameters: agent         - [IN/OUT] agent availability data               *
- *             available     - [IN] the availability data                     *
- *             error         - [IN] the availability error                    *
+ *             available     - [IN] availability data                         *
+ *             error         - [IN] availability error                        *
  *             errors_from   - [IN] error starting timestamp                  *
  *             disable_until - [IN] disable until timestamp                   *
  *                                                                            *
@@ -195,11 +195,11 @@ int	zbx_interface_availability_is_set(const zbx_interface_availability_t *ia)
  *                                                                            *
  * Purpose: adds interface availability update to sql statement               *
  *                                                                            *
- * Parameters: ia           [IN] the interface availability data              *
- *             sql        - [IN/OUT] the sql statement                        *
- *             sql_alloc  - [IN/OUT] the number of bytes allocated for sql    *
+ * Parameters: ia           [IN] interface availability data                  *
+ *             sql        - [IN/OUT] sql statement                            *
+ *             sql_alloc  - [IN/OUT] number of bytes allocated for sql        *
  *                                   statement                                *
- *             sql_offset - [IN/OUT] the number of bytes used in sql          *
+ *             sql_offset - [IN/OUT] number of bytes used in sql              *
  *                                   statement                                *
  *                                                                            *
  * Return value: SUCCEED - sql statement is created                           *
@@ -250,7 +250,7 @@ static int	zbx_sql_add_interface_availability(const zbx_interface_availability_t
  *                                                                            *
  * Purpose: sync interface availabilities updates into database               *
  *                                                                            *
- * Parameters: interface_availabilities [IN] the interface availability data  *
+ * Parameters: interface_availabilities - [IN] interface availability data    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities)
