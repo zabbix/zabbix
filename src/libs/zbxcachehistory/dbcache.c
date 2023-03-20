@@ -2156,6 +2156,10 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, ZBX_DC_HIS
 				logvalue = hdata->value.log->value;
 				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
+			case ITEM_VALUE_TYPE_BIN:
+				/* in history cache binary values are stored as ITEM_VALUE_TYPE_STR */
+				THIS_SHOULD_NEVER_HAPPEN;
+				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
 				{
@@ -2920,12 +2924,12 @@ static void	DBmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  *             item_diff           - [OUT] the changes in item data           *
  *             inventory_values    - [OUT] the inventory values to add        *
  *             compression_age     - [IN] history compression age             *
- *             proxy_subscribtions - [IN] history compression age             *
+ *             proxy_subscriptions - [IN] history compression age             *
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, zbx_history_sync_item_t *items, const int *errcodes,
 		int history_num, zbx_vector_ptr_t *item_diff, zbx_vector_ptr_t *inventory_values, int compression_age,
-		zbx_vector_uint64_pair_t *proxy_subscribtions)
+		zbx_vector_uint64_pair_t *proxy_subscriptions)
 {
 	static time_t	last_history_discard = 0;
 	time_t		now;
@@ -3010,7 +3014,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, zbx_history_sync_ite
 		{
 			zbx_uint64_pair_t	p = {item->host.proxy_hostid, h->ts.sec};
 
-			zbx_vector_uint64_pair_append(proxy_subscribtions, p);
+			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}
 	}
 
@@ -4295,15 +4299,14 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
  *                                                                            *
  * Purpose: add new variant value to the cache                                *
  *                                                                            *
- * Parameters:  itemid          - [IN] the itemid                             *
- *              item_value_type - [IN] the item value type                    *
- *              item_flags      - [IN] the item flags (e. g. lld rule)        *
- *              result          - [IN] agent result containing the value      *
- *                                to add                                      *
- *              ts              - [IN] the value timestamp                    *
- *              state           - [IN] the item state                         *
- *              error           - [IN] the error message in case item state   *
- *                                is ITEM_STATE_NOTSUPPORTED                  *
+ * Parameters:  itemid          - [IN]                                        *
+ *              value_type      - [IN] item value type                        *
+ *              item_flags      - [IN] item flags (e. g. lld rule)            *
+ *              value           - [IN] agent result containing value to add   *
+ *              ts              - [IN] value timestamp                        *
+ *              state           - [IN] item state                             *
+ *              error           - [IN] error message in case item state       *
+ *                                     is ITEM_STATE_NOTSUPPORTED             *
  *                                                                            *
  ******************************************************************************/
 void	dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
@@ -4399,9 +4402,20 @@ void	dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsig
 					value_flags);
 			break;
 		case ZBX_VARIANT_STR:
+			if (ITEM_VALUE_TYPE_BIN == value_type && FAIL == zbx_validate_base64(value->data.str))
+			{
+				dc_local_add_history_notsupported(itemid, &ts,
+						"Binary type requires base 64 encoded string. ", lastlogsize, mtime,
+						value_flags);
+				return;
+			}
 			dc_local_add_history_text(itemid, value_type, &ts, value->data.str, lastlogsize, mtime,
 					value_flags);
 			break;
+		case ZBX_VARIANT_NONE:
+		case ZBX_VARIANT_BIN:
+		case ZBX_VARIANT_DBL_VECTOR:
+		case ZBX_VARIANT_ERR:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}

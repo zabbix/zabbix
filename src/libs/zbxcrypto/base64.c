@@ -22,6 +22,82 @@
 #include <assert.h>
 #include "zbxcommon.h"
 
+static int	base64_block_regex_is_valid(const char c)
+{
+	if (('A' <= c && 'Z' >= c) ||
+		('a' <= c && 'z' >= c) ||
+		('0' <= c && '9' >= c) ||
+		'/' == c || '+' == c)
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/*************************************************************************************************
+ *                                                                                               *
+ * Purpose: Check if the string is a valid based 64 encoded string.                              *
+ *          Check is based on RFC 4648, based on the following regexp:                           *
+ *   "^(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4})$"  *
+ *                                                                                               *
+ *          Note, that pcre regexp matching cannot be used, because it would exceed max          *
+ *          stack frame limit when recursively checking long strings,                            *
+ *          (check compute_recursion_limit() for more details).                                  *
+ *                                                                                               *
+ * Parameters: p_str - [IN] string to validate                                                   *
+ *                                                                                               *
+ * Return value: SUCCEED - the string is a valid base64 encoded string                           *
+ *               FAIL - otherwise                                                                *
+ *                                                                                               *
+ *************************************************************************************************/
+int	zbx_validate_base64(const char* p_str)
+{
+	int	len = strlen(p_str);
+
+	for (int i = 0; i < len; i = i + 4)
+	{
+		/* validate first block: (?:[A-Za-z0-9+\\/]{4}) */
+		if (i + 4 <= len && SUCCEED == base64_block_regex_is_valid(p_str[i]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i + 1]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i + 2]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i + 3]))
+		{
+			continue;
+		}
+		/* validate second block: (?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4}) */
+		else if (i + 4 == len)
+		{
+			if (SUCCEED == base64_block_regex_is_valid(p_str[i]) &&
+					SUCCEED == base64_block_regex_is_valid(p_str[i + 1]) && '=' == p_str[i + 2] &&
+					'=' == p_str[i + 3])
+			{
+				return SUCCEED;
+			}
+			else if (SUCCEED == base64_block_regex_is_valid(p_str[i]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i + 1]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i + 2]) &&
+				'=' == p_str[i+3])
+			{
+				return SUCCEED;
+			}
+			else if (SUCCEED == base64_block_regex_is_valid(p_str[i]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i + 1]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i + 2]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i + 3]))
+			{
+				return SUCCEED;
+			}
+			else
+				return FAIL;
+		}
+		else
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: is the character passed in a base64 character?                    *
