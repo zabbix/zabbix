@@ -490,6 +490,7 @@ New features:
 .......PS. [ZBXNEXT-8317] increased MariaDB maximum supported version to 10.11 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-22310] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
 ........S. [ZBX-22407] fixed crash when testing item with aggregated function count containing invalid argument (dgoloscapov)
 ...G...... [ZBX-22434] fixed race condition when starting Zabbix agent 2 with loadable plugins (esneiders)
 A.F....... [ZBX-19466] changed global script name validation to include menu path in its scope of uniqueness check (Ivo)
