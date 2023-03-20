@@ -1590,6 +1590,10 @@ jQuery(function($) {
 			});
 		}
 
+		link.on('contextmenu', function(e) {
+			e.stopPropagation()
+		});
+
 		item.append(link);
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
