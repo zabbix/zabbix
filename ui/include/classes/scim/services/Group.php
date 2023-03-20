@@ -480,7 +480,7 @@ class Group extends ScimApiService {
 										'value' =>		['type' => API_ID]
 									]],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
-				]],
+				]]
 			]]
 		]];
 
@@ -572,7 +572,7 @@ class Group extends ScimApiService {
 	private function prepareData(string $scim_groupid, string $scim_group_name, array $users = null): array {
 		$data = [
 			'id' => $scim_groupid,
-			'displayName' => $scim_group_name,
+			'displayName' => $scim_group_name
 		];
 
 		if ($users !== null) {
@@ -654,7 +654,7 @@ class Group extends ScimApiService {
 		APIRPC::User()->updateProvisionedUser([
 			'userid' => $userid,
 			'roleid' => $group_rights['roleid'],
-			'usrgrps' => $group_rights['usrgrps'],
+			'usrgrps' => $group_rights['usrgrps']
 		]);
 	}
 
