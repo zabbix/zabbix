@@ -1636,7 +1636,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		int		i;
+		int		processing_rules_num, i;
+		zbx_uint64_t	queue_used;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -1665,7 +1666,14 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			}
 		}
 
+		processing_rules_num = dmanager.job_refs.values_num;
+		queue_used = dmanager.queue.pending_checks_count;
+
 		discoverer_queue_unlock(&dmanager.queue);
+
+		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_DBL "%% of queue used]",
+				get_process_type_string(process_type), process_num, processing_rules_num,
+				100 * ((double)queue_used / DISCOVERER_QUEUE_MAX_SIZE));
 
 		process_results(&dmanager);
 
