@@ -344,7 +344,7 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	zbx_vector_proxy_hostdata_ptr_destroy(&hosts);
 }
 
-static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
+static void	flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_host_active_avail_t	*host;
@@ -400,7 +400,6 @@ static void	update_proxy_heartbeat(zbx_avail_active_hb_cache_t *cache, zbx_ipc_m
 	if (NULL != (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxy_hostid)))
 		proxy_avail->lastaccess = (int)time(NULL);
 }
-
 
 
 ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args)

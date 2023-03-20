@@ -149,7 +149,6 @@ void		zbx_availability_deserialize_proxy_hostdata(const unsigned char *data,
 zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids);
 void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_uint64_t *hostids);
 
-zbx_uint32_t	zbx_availability_serialize_active_proxy_hb_update(unsigned char **data, zbx_uint64_t hostid);
 void	zbx_availability_deserialize_active_proxy_hb_update(const unsigned char *data, zbx_uint64_t *hostid);
 
 ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args);
