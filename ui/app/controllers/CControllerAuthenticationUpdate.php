@@ -137,12 +137,6 @@ class CControllerAuthenticationUpdate extends CController {
 
 				return false;
 			}
-
-			if (!$ldap_servers) {
-				error(_('At least one LDAP server must exist.'));
-
-				return false;
-			}
 		}
 
 		if ($ldap_servers

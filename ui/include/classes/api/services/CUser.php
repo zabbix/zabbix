@@ -324,6 +324,12 @@ class CUser extends CApiService {
 			$user = $this->checkLoginOptions($user);
 
 			if (array_key_exists('passwd', $user)) {
+				if ($user['userdirectoryid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Not allowed to update field "%1$s" for provisioned user.', 'passwd')
+					);
+				}
+
 				$this->checkPassword($user, '/'.($i + 1).'/passwd');
 			}
 
@@ -542,7 +548,6 @@ class CUser extends CApiService {
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 
-		unset($check_roleids[0]);
 		if ($check_roleids) {
 			$this->checkRoles($check_roleids);
 		}
@@ -2002,8 +2007,8 @@ class CUser extends CApiService {
 	 * @param int   $db_userid
 	 * @param array $idp_user_data
 	 * @param array $idp_user_data['userid']
-	 * @param array $idp_user_data['usrgrps']
-	 * @param array $idp_user_data['medias']
+	 * @param array $idp_user_data['usrgrps']  (optional) Array of user matched groups.
+	 * @param array $idp_user_data['medias']   (optional) Array of user matched medias.
 	 *
 	 * @return array
 	 */
@@ -2011,30 +2016,37 @@ class CUser extends CApiService {
 		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid', 'userid']));
 		unset($attrs['passwd']);
 		$user = array_intersect_key($idp_user_data, $attrs);
-		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
-		$user['ts_provisioned'] = time();
-		$users = [$user];
 
-		[$db_user] = DB::select('users', [
+		$userid = $user['userid'];
+		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'name', 'surname', 'roleid', 'userdirectoryid', 'ts_provisioned'],
-			'userids' => [$user['userid']]
+			'userids' => [$userid],
+			'preservekeys' => true
 		]);
-		$db_user['usrgrps'] = DB::select('users_groups', [
-			'output' => ['usrgrpid', 'id'],
-			'filter' => ['userid' => $user['userid']]
-		]);
-		$db_user['medias'] = DB::select('media', [
-			'output' => ['mediatypeid', 'mediaid', 'sendto'],
-			'filter' => ['userid' => $user['userid']]
-		]);
-		$db_users = [$user['userid'] => $db_user];
+		$user['ts_provisioned'] = time();
+		$users = [$userid => $user];
 
-		if (!$idp_user_data['usrgrps']) {
-			$users[0]['usrgrps'] = [[
-				'usrgrpid' => CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID)
-			]];
-			$users[0]['roleid'] = 0;
-			$user = [];
+		if (array_key_exists('medias', $user)) {
+			$users[$userid]['medias'] = $this->sanitizeUserMedia($user['medias']);
+			$db_users[$userid]['medias'] = DB::select('media', [
+				'output' => ['mediatypeid', 'mediaid', 'sendto'],
+				'filter' => ['userid' => $userid]
+			]);
+		}
+
+		if (array_key_exists('usrgrps', $user)) {
+			$db_users[$userid]['usrgrps'] = DB::select('users_groups', [
+				'output' => ['usrgrpid', 'id'],
+				'filter' => ['userid' => $userid]
+			]);
+
+			if (!$user['usrgrps']) {
+				$users[$userid]['usrgrps'] = [[
+					'usrgrpid' => CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID)
+				]];
+				$users[$userid]['roleid'] = 0;
+				$user = [];
+			}
 		}
 
 		$this->updateReal($users, $db_users);
