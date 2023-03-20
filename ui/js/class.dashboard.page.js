@@ -343,7 +343,7 @@ class CDashboardPage extends CBaseComponent {
 			});
 		}
 		else {
-			widget = this._createInaccessibleWidget({name, widgetid, pos, unique_id});
+			widget = this._createInaccessibleWidget({widgetid, pos, unique_id});
 		}
 
 		this._doAddWidget(widget);
@@ -446,7 +446,7 @@ class CDashboardPage extends CBaseComponent {
 		});
 	}
 
-	_createInaccessibleWidget({name, widgetid, pos, unique_id}) {
+	_createInaccessibleWidget({widgetid, pos, unique_id}) {
 		return this._createWidget(CWidgetInaccessible, {
 			type: 'inaccessible',
 			name,
