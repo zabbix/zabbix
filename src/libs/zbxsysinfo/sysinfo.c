@@ -2057,6 +2057,8 @@ static void	get_fqdn(char **hostname)
 
 	if (NULL != res)
 		freeaddrinfo(res);
+
+	zbx_rtrim(*hostname, " .\n\r");
 }
 
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)

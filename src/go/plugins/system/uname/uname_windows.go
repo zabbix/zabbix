@@ -64,7 +64,7 @@ func getHostname(params []string) (uname string, err error) {
 			return "", err
 		}
 
-		uname = strings.Trim(uname, " \r\n.")
+		uname = strings.Trim(uname, " .\n\r")
 	case "shorthost":
 		if uname, err = os.Hostname(); err != nil {
 			return "", err

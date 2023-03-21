@@ -83,7 +83,7 @@ func getHostname(params []string) (hostname string, err error) {
 			hostname = tmp
 		}
 
-		hostname = strings.Trim(hostname, ".")
+		hostname = strings.Trim(hostname, " .\n\r")
 	case "netbios":
 		return "", errors.New("NetBIOS is not supported on the current platform.")
 	default:
