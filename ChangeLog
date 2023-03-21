@@ -91,7 +91,6 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in Azure template (egordymov)
 ........S. [ZBXNEXT-8105] fixed connector diagnostic information reporting in case there are no connectors (vso)
 
-
 Bug fixes:
 ..F....... [ZBX-22205] fixed the inability to update a dependent item that is inherited from a template (jfreibergs)
 .......PS. [ZBX-22310] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
