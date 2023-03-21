@@ -19,6 +19,7 @@
 
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
+#include "zbxdbschema.h"
 
 /*
  * 7.0 development database patches
