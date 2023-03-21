@@ -2344,12 +2344,18 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 void	zbx_dbschema_modify_table(const char *tablename, struct zbx_json *json)
 {
 #	define ZBX_TYPE_CHAR_STR	"nvarchar2"
+#	define ZBX_PROTO_TAG_FIELDS	"fields"
+#	define ZBX_PROTO_TAG_LENGTH	"length"
+#	define ZBX_PROTO_TAG_CHAR	"char"
 	ZBX_TABLE		*table;
 	int			i;
 	zbx_vector_str_t	names;
 
-	zbx_json_addobject(json, tablename);
-	zbx_json_addobject(json, "fields");
+	if (NULL != json)
+	{
+		zbx_json_addobject(json, tablename);
+		zbx_json_addarray(json, ZBX_PROTO_TAG_FIELDS);
+	}
 
 	zbx_vector_str_create(&names);
 
@@ -2412,10 +2418,15 @@ void	zbx_dbschema_modify_table(const char *tablename, struct zbx_json *json)
 			field->type = ZBX_TYPE_CHAR;
 			field->length = (unsigned short)atoi(row[2]);
 
-			zbx_json_addobject(json, field->name);
-			zbx_json_addstring(json, "type", "char", ZBX_JSON_TYPE_STRING);
-			zbx_json_adduint64(json, "length", field->length);
-			zbx_json_close(json);
+			if (NULL != json)
+			{
+				zbx_json_addobject(json, NULL);
+				zbx_json_addobject(json, field->name);
+				zbx_json_addstring(json, ZBX_PROTO_TAG_TYPE, ZBX_PROTO_TAG_CHAR, ZBX_JSON_TYPE_STRING);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_LENGTH, field->length);
+				zbx_json_close(json);
+				zbx_json_close(json);
+			}
 		}
 		DBfree_result(result);
 
@@ -2424,8 +2435,12 @@ void	zbx_dbschema_modify_table(const char *tablename, struct zbx_json *json)
 cleanup:
 	zbx_vector_str_destroy(&names);
 
-	zbx_json_close(json);
-	zbx_json_close(json);
+	if (NULL != json)
+	{
+		zbx_json_close(json);
+		zbx_json_close(json);
+	}
+#undef ZBX_PROTO_TAG_FIELDS
 #undef ZBX_TYPE_TEXT_STR
 }
 #endif

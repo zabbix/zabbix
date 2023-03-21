@@ -1068,6 +1068,10 @@ static void	zbx_check_db(void)
 	}
 
 	zbx_free(db_version_info.friendly_current_version);
+#ifdef HAVE_ORACLE
+	zbx_dbschema_modify_table("items", NULL);
+	zbx_dbschema_modify_table("item_preproc", NULL);
+#endif
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
