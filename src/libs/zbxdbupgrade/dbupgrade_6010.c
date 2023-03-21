@@ -144,8 +144,7 @@ out:
 static int	DBpatch_6010006(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"userdirectory", "userdirectoryid", 0,
+			{"userdirectory", "userdirectoryid", 0,
 				{
 					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -288,8 +287,7 @@ static int	DBpatch_6010020(void)
 static int	DBpatch_6010021(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"host_rtdata", "hostid", 0,
+			{"host_rtdata", "hostid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"active_available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -996,8 +994,7 @@ static int	DBpatch_6010044(void)
 static int	DBpatch_6010045(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"changelog", "changelogid", 0,
+			{"changelog", "changelogid", 0,
 				{
 					{"changelogid", NULL, NULL, NULL, 0, ZBX_TYPE_SERIAL, ZBX_NOTNULL, 0},
 					{"object", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},

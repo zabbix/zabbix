@@ -52,8 +52,7 @@ static int	DBpatch_4030002(void)
 static int	DBpatch_4030003(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"item_rtdata", "itemid", 0,
+			{"item_rtdata", "itemid", 0,
 				{
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"lastlogsize", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0},
@@ -351,8 +350,7 @@ static int	DBpatch_4030023(void)
 static int	DBpatch_4030024(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"config_autoreg_tls", "autoreg_tlsid", 0,
+			{"config_autoreg_tls", "autoreg_tlsid", 0,
 				{
 					{"autoreg_tlsid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -536,8 +534,7 @@ static int	DBpatch_4030038(void)
 	/* Store columns on overflow pages to respect row size limit of 8126 bytes on MariaDB. */
 	/* Columns can only be stored on overflow pages if they are 256 bytes or longer.       */
 	const zbx_db_table_t	table =
-			{
-				"host_inventory", "hostid", 0,
+			{"host_inventory", "hostid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"inventory_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -709,8 +706,7 @@ static int	DBpatch_4030048(void)
 static int	DBpatch_4030049(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"media_type_param", "mediatype_paramid", 0,
+			{"media_type_param", "mediatype_paramid", 0,
 				{
 					{"mediatype_paramid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"mediatypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},

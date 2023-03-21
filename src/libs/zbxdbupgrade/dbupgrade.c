@@ -780,8 +780,7 @@ int	DBdrop_foreign_key(const char *table_name, int id)
 static int	DBcreate_dbversion_table(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"dbversion", "", 0,
+			{"dbversion", "", 0,
 				{
 					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},

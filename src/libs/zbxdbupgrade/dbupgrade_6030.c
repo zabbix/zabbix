@@ -758,8 +758,7 @@ static int	DBpatch_6030083(void)
 static int	DBpatch_6030084(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"scim_group", "scim_groupid", 0,
+			{"scim_group", "scim_groupid", 0,
 				{
 					{"scim_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -779,8 +778,7 @@ static int	DBpatch_6030085(void)
 static int	DBpatch_6030086(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"user_scim_group", "user_scim_groupid", 0,
+			{"user_scim_group", "user_scim_groupid", 0,
 				{
 					{"user_scim_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -822,8 +820,7 @@ static int	DBpatch_6030090(void)
 static int	DBpatch_6030091(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"userdirectory_saml", "userdirectoryid", 0,
+			{"userdirectory_saml", "userdirectoryid", 0,
 				{
 					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"idp_entityid", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -862,8 +859,7 @@ static int	DBpatch_6030092(void)
 static int	DBpatch_6030093(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"userdirectory_ldap", "userdirectoryid", 0,
+			{"userdirectory_ldap", "userdirectoryid", 0,
 				{
 					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"host", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -901,8 +897,7 @@ static int	DBpatch_6030094(void)
 static int	DBpatch_6030095(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"userdirectory_media", "userdirectory_mediaid", 0,
+			{"userdirectory_media", "userdirectory_mediaid", 0,
 				{
 					{"userdirectory_mediaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -946,8 +941,7 @@ static int	DBpatch_6030099(void)
 static int	DBpatch_6030100(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"userdirectory_idpgroup", "userdirectory_idpgroupid", 0,
+			{"userdirectory_idpgroup", "userdirectory_idpgroupid", 0,
 				{
 					{"userdirectory_idpgroupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -990,8 +984,7 @@ static int	DBpatch_6030104(void)
 static int	DBpatch_6030105(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"userdirectory_usrgrp", "userdirectory_usrgrpid", 0,
+			{"userdirectory_usrgrp", "userdirectory_usrgrpid", 0,
 				{
 					{"userdirectory_usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"userdirectory_idpgroupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1404,8 +1397,7 @@ static int	DBpatch_6030150(void)
 static int	DBpatch_6030151(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"event_symptom", "eventid", 0,
+			{"event_symptom", "eventid", 0,
 				{
 					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"cause_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1499,8 +1491,7 @@ static int	DBpatch_6030163(void)
 static int	DBpatch_6030164(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"connector", "connectorid", 0,
+			{"connector", "connectorid", 0,
 				{
 					{"connectorid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -1555,8 +1546,7 @@ static int	DBpatch_6030168(void)
 static int	DBpatch_6030169(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"connector_tag", "connector_tagid", 0,
+			{"connector_tag", "connector_tagid", 0,
 				{
 					{"connector_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"connectorid", NULL, "connector", "connectorid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},

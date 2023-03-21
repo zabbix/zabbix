@@ -229,8 +229,7 @@ static int	DBpatch_3050018(void)
 static int	DBpatch_3050019(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"graph_theme",	"graphthemeid",	0,
+			{"graph_theme",	"graphthemeid",	0,
 				{
 					{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -468,8 +467,7 @@ static int	DBpatch_3050037(void)
 static int	DBpatch_3050038(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"tag_filter", "tag_filterid", 0,
+			{"tag_filter", "tag_filterid", 0,
 				{
 					{"tag_filterid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -501,8 +499,7 @@ static int	DBpatch_3050040(void)
 static int	DBpatch_3050041(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"task_check_now", "taskid", 0,
+			{"task_check_now", "taskid", 0,
 				{
 					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1474,8 +1471,7 @@ static int	DBpatch_3050128(void)
 static int	DBpatch_3050129(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"event_suppress", "event_suppressid",	0,
+			{"event_suppress", "event_suppressid",	0,
 				{
 					{"event_suppressid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1522,8 +1518,7 @@ static int	DBpatch_3050134(void)
 static int	DBpatch_3050135(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"maintenance_tag", "maintenancetagid", 0,
+			{"maintenance_tag", "maintenancetagid", 0,
 				{
 					{"maintenancetagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},

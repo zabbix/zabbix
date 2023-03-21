@@ -385,8 +385,7 @@ static int	DBpatch_5030025(void)
 static int	DBpatch_5030026(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"token", "tokenid", 0,
+			{"token", "tokenid", 0,
 				{
 					{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -458,8 +457,7 @@ static int	DBpatch_5030034(void)
 static int	DBpatch_5030035(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"script_param", "script_paramid", 0,
+			{"script_param", "script_paramid", 0,
 				{
 					{"script_paramid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"scriptid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -495,8 +493,7 @@ static int	DBpatch_5030038(void)
 static int	DBpatch_5030039(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"valuemap", "valuemapid", 0,
+			{"valuemap", "valuemapid", 0,
 				{
 					{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -524,8 +521,7 @@ static int	DBpatch_5030041(void)
 static int	DBpatch_5030042(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"valuemap_mapping", "valuemap_mappingid", 0,
+			{"valuemap_mapping", "valuemap_mappingid", 0,
 				{
 					{"valuemap_mappingid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1661,8 +1657,7 @@ static int	DBpatch_5030082(void)
 static int	DBpatch_5030083(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"dashboard_page", "dashboard_pageid", 0,
+			{"dashboard_page", "dashboard_pageid", 0,
 				{
 					{"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -3647,8 +3642,7 @@ static int	DBpatch_5030109(void)
 static int	DBpatch_5030110(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"item_tag", "itemtagid", 0,
+			{"item_tag", "itemtagid", 0,
 				{
 					{"itemtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -3706,8 +3700,7 @@ static int	DBpatch_5030115(void)
 static int	DBpatch_5030116(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"sysmaps_element_tag", "selementtagid", 0,
+			{"sysmaps_element_tag", "selementtagid", 0,
 				{
 					{"selementtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"selementid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -4326,8 +4319,7 @@ static int	DBpatch_5030144(void)
 static int	DBpatch_5030145(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"report", "reportid", 0,
+			{"report", "reportid", 0,
 				{
 					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -4375,8 +4367,7 @@ static int	DBpatch_5030148(void)
 static int	DBpatch_5030149(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"report_param", "reportparamid", 0,
+			{"report_param", "reportparamid", 0,
 				{
 					{"reportparamid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -4405,8 +4396,7 @@ static int	DBpatch_5030151(void)
 static int	DBpatch_5030152(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"report_user", "reportuserid", 0,
+			{"report_user", "reportuserid", 0,
 				{
 					{"reportuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -4450,8 +4440,7 @@ static int	DBpatch_5030156(void)
 static int	DBpatch_5030157(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"report_usrgrp", "reportusrgrpid", 0,
+			{"report_usrgrp", "reportusrgrpid", 0,
 				{
 					{"reportusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -5569,8 +5558,7 @@ static int	DBpatch_5030171(void)
 static int	DBpatch_5030172(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"trigger_queue", "trigger_queueid", 0,
+			{"trigger_queue", "trigger_queueid", 0,
 				{
 					{"trigger_queueid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},

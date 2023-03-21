@@ -34,8 +34,7 @@
 static int	DBpatch_5050001(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"service_problem_tag", "service_problem_tagid", 0,
+			{"service_problem_tag", "service_problem_tagid", 0,
 				{
 					{"service_problem_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -65,8 +64,7 @@ static int	DBpatch_5050003(void)
 static int	DBpatch_5050004(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"service_problem", "service_problemid", 0,
+			{"service_problem", "service_problemid", 0,
 				{
 					{"service_problemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -227,8 +225,7 @@ static int	DBpatch_5050011(void)
 static int	DBpatch_5050012(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"service_tag", "servicetagid", 0,
+			{"service_tag", "servicetagid", 0,
 				{
 					{"servicetagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -380,8 +377,7 @@ static int	DBpatch_5050043(void)
 static int	DBpatch_5050044(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"service_status_rule", "service_status_ruleid", 0,
+			{"service_status_rule", "service_status_ruleid", 0,
 				{
 					{"service_status_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"serviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -815,8 +811,7 @@ static int	DBpatch_5050078(void)
 static int	DBpatch_5050079(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"ha_node", "ha_nodeid", 0,
+			{"ha_node", "ha_nodeid", 0,
 				{
 					{"ha_nodeid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -851,8 +846,7 @@ static int	DBpatch_5050082(void)
 static int	DBpatch_5050083(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"auditlog", "auditid", 0,
+			{"auditlog", "auditid", 0,
 				{
 					{"auditid", NULL, NULL, NULL, 0, ZBX_TYPE_CUID, ZBX_NOTNULL, 0},
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
@@ -931,8 +925,7 @@ static int	DBpatch_5050092(void)
 static int	DBpatch_5050093(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"dbversion", "dbversionid", 0,
+			{"dbversion", "dbversionid", 0,
 				{
 					{"dbversionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -965,8 +958,7 @@ static int	DBpatch_5050094(void)
 static int	DBpatch_5050095(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"history", "itemid,clock,ns", 0,
+			{"history", "itemid,clock,ns", 0,
 				{
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -994,8 +986,7 @@ static int	DBpatch_5050096(void)
 static int	DBpatch_5050097(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"history_uint", "itemid,clock,ns", 0,
+			{"history_uint", "itemid,clock,ns", 0,
 				{
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -1023,8 +1014,7 @@ static int	DBpatch_5050098(void)
 static int	DBpatch_5050099(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"history_str", "itemid,clock,ns", 0,
+			{"history_str", "itemid,clock,ns", 0,
 				{
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -1052,8 +1042,7 @@ static int	DBpatch_5050100(void)
 static int	DBpatch_5050101(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"history_log", "itemid,clock,ns", 0,
+			{"history_log", "itemid,clock,ns", 0,
 				{
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -1085,8 +1074,7 @@ static int	DBpatch_5050102(void)
 static int	DBpatch_5050103(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"history_text", "itemid,clock,ns", 0,
+			{"history_text", "itemid,clock,ns", 0,
 				{
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -1244,8 +1232,7 @@ static int	DBpatch_5050114(void)
 static int	DBpatch_5050115(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"sla", "slaid", 0,
+			{"sla", "slaid", 0,
 				{
 					{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -1271,8 +1258,7 @@ static int	DBpatch_5050116(void)
 static int	DBpatch_5050117(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"sla_service_tag", "sla_service_tagid", 0,
+			{"sla_service_tag", "sla_service_tagid", 0,
 				{
 					{"sla_service_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1303,8 +1289,7 @@ static int	DBpatch_5050119(void)
 static int	DBpatch_5050120(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"sla_schedule", "sla_scheduleid", 0,
+			{"sla_schedule", "sla_scheduleid", 0,
 				{
 					{"sla_scheduleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1334,8 +1319,7 @@ static int	DBpatch_5050122(void)
 static int	DBpatch_5050123(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"sla_excluded_downtime", "sla_excluded_downtimeid", 0,
+			{"sla_excluded_downtime", "sla_excluded_downtimeid", 0,
 				{
 					{"sla_excluded_downtimeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"slaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},

@@ -63,8 +63,7 @@ static int	DBpatch_4010004(void)
 static int	DBpatch_4010005(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"lld_macro_path", "lld_macro_pathid", 0,
+			{"lld_macro_path", "lld_macro_pathid", 0,
 				{
 					{"lld_macro_pathid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -100,8 +99,7 @@ static int	DBpatch_4010008(void)
 static int	DBpatch_4010009(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"host_tag", "hosttagid", 0,
+			{"host_tag", "hosttagid", 0,
 				{
 					{"hosttagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},

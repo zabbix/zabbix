@@ -1308,8 +1308,7 @@ static int	DBpatch_2010157(void)
 static int	DBpatch_2010158(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"host_discovery", "hostid", 0,
+			{"host_discovery", "hostid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
@@ -1363,8 +1362,7 @@ static int	DBpatch_2010163(void)
 static int	DBpatch_2010164(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"interface_discovery", "interfaceid", 0,
+			{"interface_discovery", "interfaceid", 0,
 				{
 					{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"parent_interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1395,8 +1393,7 @@ static int	DBpatch_2010166(void)
 static int	DBpatch_2010167(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"group_prototype", "group_prototypeid", 0,
+			{"group_prototype", "group_prototypeid", 0,
 				{
 					{"group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1441,8 +1438,7 @@ static int	DBpatch_2010171(void)
 static int	DBpatch_2010172(void)
 {
 	const zbx_db_table_t	table =
-			{
-				"group_discovery", "groupid", 0,
+			{"group_discovery", "groupid", 0,
 				{
 					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"parent_group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
