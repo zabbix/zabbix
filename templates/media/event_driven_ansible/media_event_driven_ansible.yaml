@@ -97,36 +97,23 @@ zabbix_export:
                         'event_source',
                         'event_value',
                         'host_id',
-                        'host_port',
-                        'trigger_id'],
-                    unknown_fields = {
-                        'host_port': '',
-                        'host_ip': ''
-                    }
+                        'trigger_id']
         
                 required_params.forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' 
-                    || params[field] === '' || params[field].match(/^{.*}$/)) {
+                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                         throw 'Required param is not set: "' + field + '".';
                     }
                 });
         
                 Eda.params = params;
         
-                // Check type of fields
-                Object.keys(params)
+                Object.keys(Eda.params)
                     .forEach(function (key) {
-                        if (params[key] == '*UNKNOWN*' && unknown_fields.hasOwnProperty(key) !== -1) {
-                            Eda.params[key] = unknown_fields[key];
-                        } else {
-                            if (integer_fields.indexOf(key) !== -1) {
-                                if (!isNaN(params[key])) {
-                                    Eda.params[key] = parseInt(Eda.params[key]);
-                                }
-                                else {
-                                    throw 'Parameter "' + key + '" must be integer. Given value: ' + params[key];
-                                }
+                        if (integer_fields.indexOf(key) !== -1) {
+                            if (isNaN(Eda.params[key])) {
+                                throw 'Parameter "' + key + '" must be integer. Given value: ' + Eda.params[key];
                             }
+                            Eda.params[key] = parseInt(Eda.params[key]);
                         }
                     });
         
@@ -150,8 +137,8 @@ zabbix_export:
                 // Prepare tags
                 Eda.params.event_tags = params.hasOwnProperty('event_tags') 
                         ? this.transformTags(Eda.params.event_tags): {}
-                // Prepare time
-                Eda.params.event_datetime_timestamp = this.prepareEventTime(
+                // Prepare timestamp
+                Eda.params.event_datetime_timestamp = this.getTimestamp(
                     Eda.params.event_date, Eda.params.event_time)
             },
         
@@ -170,7 +157,7 @@ zabbix_export:
                 return host_groups;
             },
         
-            prepareEventTime: function (strDate, strTime) {
+            getTimestamp: function (strDate, strTime) {
                 var EventDate = strDate.split(".");
                 var EventTime = strTime.split(":");
                 
@@ -237,14 +224,7 @@ zabbix_export:
                 Zabbix.log(4, '[ Event-Driven Ansible webhook ] Response: ' + response);
         
                 if (request.getStatus() !== 200) {
-                    if (typeof response.description === 'string') {
-                        Zabbix.log(3, '[ Event-Driven Ansible webhook ] notification failed: ' + response.description);
-                        throw response.description;
-                    }
-                    else {
-                        Zabbix.log(3, '[ Event-Driven Ansible webhook ] notification failed: ' + response.description);
-                        throw 'Unknown error. Check debug log for more information';
-                    }
+                    throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                 }
             }
         };
@@ -261,10 +241,10 @@ zabbix_export:
         }
         catch (error) {
             Zabbix.log(3, '[ Event-Driven Ansible webhook ] notification failed: ' + error);
-            throw 'Sending failed: ' + error + '.';
+            throw 'Sending failed: ' + error;
         }
       message_templates:
         -
           event_source: TRIGGERS
           operation_mode: PROBLEM
-          subject: 'Event ID: {EVENT.ID}, Host: {HOST.NAME}, Problem: {EVENT.NAME}'
+          subject: 'Event ID: {EVENT.ID}, Host: {HOST.HOST}, Problem: {EVENT.NAME}'
