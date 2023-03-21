@@ -134,6 +134,7 @@ $scenario_tab
 			(new CDiv([
 				(new CTable())
 					->setId('variables')
+					->addClass(ZBX_STYLE_CELL_TOP)
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
@@ -144,30 +145,22 @@ $scenario_tab
 					),
 				(new CTemplateTag('variable-row-tmpl'))->addItem(
 					(new CRow([
-						(new CCol())
-							->addStyle('width: 6px;')
-							->addClass(ZBX_STYLE_TOP),
-						(new CCol(
-							(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
-								->removeId()
-								->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-								->setAttribute('placeholder', _('name'))
-						))->addClass(ZBX_STYLE_TOP),
-						(new CCol('&rArr;'))->addClass(ZBX_STYLE_TOP),
-						(new CCol(
-							(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
-								->removeId()
-								->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
-								->setMaxlength(2000)
-								->setAttribute('placeholder', _('value'))
-						))->addClass(ZBX_STYLE_TOP),
+						(new CCol())->addStyle('width: 6px;'),
+						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+							->removeId()
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+							->setAttribute('placeholder', _('name')),
+						'&rArr;',
+						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+							->removeId()
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+							->setMaxlength(2000)
+							->setAttribute('placeholder', _('value')),
 						(new CCol(
 							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->addClass('element-table-remove')
-						))
-							->addClass(ZBX_STYLE_NOWRAP)
-							->addClass(ZBX_STYLE_TOP)
+						))->addClass(ZBX_STYLE_NOWRAP)
 					]))->addClass('form_row')
 				)
 			]))
@@ -181,6 +174,7 @@ $scenario_tab
 			(new CDiv([
 				(new CTable())
 					->setId('headers')
+					->addClass(ZBX_STYLE_CELL_TOP)
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
@@ -191,30 +185,24 @@ $scenario_tab
 					),
 				(new CTemplateTag('header-row-tmpl'))->addItem(
 					(new CRow([
-						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
-							->addClass(ZBX_STYLE_TD_DRAG_ICON)
-							->addClass(ZBX_STYLE_TOP),
 						(new CCol(
-							(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
-								->removeId()
-								->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-								->setAttribute('placeholder', _('name'))
-						))->addClass(ZBX_STYLE_TOP),
-						(new CCol('&rArr;'))->addClass(ZBX_STYLE_TOP),
-						(new CCol(
-							(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
-								->removeId()
-								->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
-								->setMaxlength(2000)
-								->setAttribute('placeholder', _('value')),
-						))->addClass(ZBX_STYLE_TOP),
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
+							->removeId()
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+							->setAttribute('placeholder', _('name')),
+						'&rArr;',
+						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
+							->removeId()
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+							->setMaxlength(2000)
+							->setAttribute('placeholder', _('value')),
 						(new CCol(
 							(new CSimpleButton(_('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->addClass('element-table-remove')
-						))
-							->addClass(ZBX_STYLE_NOWRAP)
-							->addClass(ZBX_STYLE_TOP)
+						))->addClass(ZBX_STYLE_NOWRAP)
 					]))
 						->addClass('form_row')
 						->addClass('sortable')
