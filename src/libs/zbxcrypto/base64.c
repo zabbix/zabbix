@@ -51,11 +51,11 @@ static int	base64_block_regex_is_valid(const char c)
  *               FAIL - otherwise                                                                *
  *                                                                                               *
  *************************************************************************************************/
-int	zbx_validate_base64(const char* p_str)
+int	zbx_base64_validate(const char* p_str)
 {
-	int	len = strlen(p_str);
+	int	i, len = strlen(p_str);
 
-	for (int i = 0; i < len; i = i + 4)
+	for (i = 0; i < len; i = i + 4)
 	{
 		/* validate first block: (?:[A-Za-z0-9+\\/]{4}) */
 		if (i + 4 <= len && SUCCEED == base64_block_regex_is_valid(p_str[i]) &&

@@ -52,7 +52,7 @@ void	zbx_normalize_pem(char **key, size_t *key_len);
 int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsigned char **output,
 		size_t *output_len, char **error);
 #endif
-int	zbx_validate_base64(const char* p_str);
+int	zbx_base64_validate(const char* p_str);
 void	zbx_base64_encode(const char *p_str, char *p_b64str, int in_size);
 void	zbx_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size);
 void	zbx_base64_decode(const char *p_b64str, char *p_str, size_t maxsize, size_t *p_out_size);

@@ -38,6 +38,7 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 #include "zbxtagfilter.h"
+#include "zbxcrypto.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
@@ -4402,7 +4403,7 @@ void	dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsig
 					value_flags);
 			break;
 		case ZBX_VARIANT_STR:
-			if (ITEM_VALUE_TYPE_BIN == value_type && FAIL == zbx_validate_base64(value->data.str))
+			if (ITEM_VALUE_TYPE_BIN == value_type && FAIL == zbx_base64_validate(value->data.str))
 			{
 				dc_local_add_history_notsupported(itemid, &ts,
 						"Binary type requires base 64 encoded string. ", lastlogsize, mtime,

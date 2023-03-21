@@ -263,16 +263,9 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 			$this->assertEquals($base64_empty, $item['value']);
 		}
 
-		// invalid encoding is interpreted as an empty string
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:BINARY_IMAGE_INVALID'],
-			'history'	=>	ITEM_VALUE_TYPE_BINARY
-		]);
-
-		$base64_invalid = self::base64_invalid;
-		foreach ($active_data['result'] as $item) {
-			$this->assertEquals("", $item['value']);
-		}
+		$this->checkItemState('agent:BINARY_IMAGE', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:BINARY_IMAGE_EMPTY', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:BINARY_IMAGE_INVALID', ITEM_STATE_NOTSUPPORTED);
 	}
 
 	/**
