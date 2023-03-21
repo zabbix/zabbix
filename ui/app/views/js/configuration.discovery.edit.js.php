@@ -454,12 +454,13 @@
 
 	function updateForm() {
 		const concurrency_max_type = document.querySelector('[name="concurrency_max_type"]:checked').value;
+		const concurrency_max = document.getElementById('concurrency_max');
+		const is_custom = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>;
 
-		if (concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>) {
-			document.getElementById('concurrency_max').classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-		}
-		else {
-			document.getElementById('concurrency_max').classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+		concurrency_max.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_custom);
+
+		if (is_custom && concurrency_max.value == <?= ZBX_DISCOVERY_CHECKS_ONE ?>) {
+			concurrency_max.value = <?= ZBX_DISCOVERY_CHECKS_UNLIMITED ?>;
 		}
 	}
 
