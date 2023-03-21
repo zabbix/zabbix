@@ -851,7 +851,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_results(zbx_discoverer_manager_t *manager)
+static void	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids)
 {
 	int					i;
 	zbx_vector_discoverer_results_ptr_t	results;
@@ -869,15 +869,21 @@ static void	process_results(zbx_discoverer_manager_t *manager)
 
 		cmp.druleid = result->druleid;
 		zbx_strlcpy(cmp.ip, result->ip, sizeof(cmp.ip));
+		i = zbx_vector_uint64_bsearch(del_druleids, cmp.druleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		if (NULL != (check_count = zbx_hashset_search(&manager->incomplete_checks_count, &cmp)))
 		{
-			if (0 == check_count->count)
-			{
+			if (0 == check_count->count || FAIL != i)
 				zbx_hashset_remove_direct(&manager->incomplete_checks_count, check_count);
-			}
 			else
 				continue;
+		}
+
+		if (FAIL != i)
+		{
+			results_clear(result);
+			zbx_hashset_iter_remove(&iter);
+			continue;
 		}
 
 		result_tmp = (zbx_discoverer_results_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_results_t));
@@ -1598,6 +1604,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	char				*error;
 	zbx_vector_uint64_pair_t	revisions;
+	zbx_vector_uint64_t		del_druleids;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
@@ -1631,6 +1638,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_init_library_mt_snmp();
 #endif
 	zbx_vector_uint64_pair_create(&revisions);
+	zbx_vector_uint64_create(&del_druleids);
 
 	zbx_setproctitle("%s #%d [started]", get_process_type_string(process_type), process_num);
 
@@ -1641,6 +1649,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
+
+		zbx_vector_uint64_clear(&del_druleids);
 
 		/* update local drules revisions */
 		zbx_vector_uint64_pair_clear(&revisions);
@@ -1662,7 +1672,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				zbx_uint64_pair_t	*rev = (zbx_uint64_pair_t*)&revisions.values[k];
 
 				if (rev->second != job->drule_revision)
+				{
+					zbx_vector_uint64_append(&del_druleids, job->druleid);
 					discoverer_job_tasks_free(job);
+				}
 			}
 		}
 
@@ -1675,7 +1688,9 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				get_process_type_string(process_type), process_num, processing_rules_num,
 				100 * ((double)queue_used / DISCOVERER_QUEUE_MAX_SIZE));
 
-		process_results(&dmanager);
+		zbx_vector_uint64_sort(&del_druleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		process_results(&dmanager, &del_druleids);
 
 		/* process discovery rules and create net check jobs */
 
@@ -1783,6 +1798,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 out:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
+	zbx_vector_uint64_pair_destroy(&revisions);
+	zbx_vector_uint64_destroy(&del_druleids);
 	discoverer_manager_free(&dmanager);
 	zbx_ipc_service_close(&ipc_service);
 
