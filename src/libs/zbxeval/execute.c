@@ -2632,6 +2632,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 	{
 		*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
 				ctx->expression + token->loc.l);
+		return FAIL;
 	}
 
 	zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)arg->data.dbl_vector->values_num);

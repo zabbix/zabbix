@@ -74,7 +74,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $hostid)
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		)
 		: _('Latest data');
 
@@ -84,8 +84,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_name', '')
 				->setArgument('hostids', [$hostid])
+				->setArgument('filter_set', '1')
 		)
 		: _('Problems');
 
@@ -230,7 +230,7 @@ foreach ($data['host_groups'] as $groupid => $group) {
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
 				->setArgument('groupids[]', $groupid)
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		)
 		: _('Latest data');
 
@@ -243,8 +243,8 @@ foreach ($data['host_groups'] as $groupid => $group) {
 			? new CLink(_('Problems'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
 					->setArgument('groupids', [$groupid])
+					->setArgument('filter_set', '1')
 			)
 			: _('Problems'),
 		$data['allowed_ui_hosts']

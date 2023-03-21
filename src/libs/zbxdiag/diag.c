@@ -23,7 +23,6 @@
 #include "zbxalgo.h"
 #include "zbxshmem.h"
 #include "zbxcachehistory.h"
-#include "preproc.h"
 #include "zbxconnector.h"
 #include "log.h"
 #include "zbxmutexs.h"
@@ -710,7 +709,8 @@ static void	diag_get_simple_values(const struct zbx_json_parse *jp, char **msg)
 	{
 		if (FAIL == zbx_json_brackets_open(pnext, &jp_value))
 		{
-			zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, &type);
+			if (NULL == zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, &type))
+				type = ZBX_JSON_TYPE_NULL;
 
 			if (0 != msg_offset)
 				zbx_chrcpy_alloc(msg, &msg_alloc, &msg_offset, ' ');
@@ -1039,8 +1039,8 @@ int	zbx_diag_add_connector_info(const struct zbx_json_parse *jp, struct zbx_json
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"", ZBX_DIAG_CONNECTOR_VALUES},
-					{"values", ZBX_DIAG_CONNECTOR_VALUES},
+					{(char *)"", ZBX_DIAG_CONNECTOR_VALUES},
+					{(char *)"values", ZBX_DIAG_CONNECTOR_VALUES},
 					{NULL, 0}
 					};
 

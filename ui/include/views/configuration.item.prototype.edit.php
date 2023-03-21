@@ -52,22 +52,11 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (array_key_exists('parent_item', $data)) {
-	if ($data['parent_item']['editable']) {
-		$parent_template_name = new CLink(CHtml::encode($data['parent_item']['template_name']),
-			(new CUrl('disc_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('itemid', $data['item']['templateid'])
-				->setArgument('parent_discoveryid',$data['parent_item']['ruleid'])
-				->setArgument('context', 'template')
-		);
-	}
-	else {
-		$parent_template_name = (new CSpan(CHtml::encode($data['parent_item']['template_name'])))
-			->addClass(ZBX_STYLE_GREY);
-	}
-
-	$item_tab->addItem([new CLabel(_('Parent item prototype')), new CFormField($parent_template_name)]);
+if (!empty($data['templates'])) {
+	$item_tab->addItem([
+		new CLabel(_('Parent items')),
+		new CFormField($data['templates'])
+	]);
 }
 
 $readonly = $data['limited'];
@@ -123,7 +112,6 @@ $item_type_options = CSelect::createOptionsFromArray([
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')
-	->addStyle('margin: 5px 0 0 5px;')
 	->addClass(ZBX_STYLE_DISPLAY_NONE);
 
 $item_tab
@@ -133,15 +121,14 @@ $item_tab
 		(new CFormField($key_controls))
 	])
 	->addItem([
-		new CLabel(_('Type of information'), 'label-value-type'),
+		new CLabel([_('Type of information'), $type_mismatch_hint], 'label-value-type'),
 		new CFormField([
 			(new CSelect('value_type'))
 				->setFocusableElementId('label-value-type')
 				->setId('value_type')
 				->setValue($data['value_type'])
 				->addOptions($item_type_options)
-				->setReadonly($readonly),
-			$type_mismatch_hint
+				->setReadonly($readonly)
 		])
 	])
 	// Append ITEM_TYPE_HTTPAGENT URL field to form list.
@@ -466,7 +453,7 @@ $item_tab
 		(new CFormField((new CTextBox('http_proxy', $data['http_proxy'], $readonly,
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
@@ -902,7 +889,6 @@ $item_tabs = (new CTabView())
 			'source' => 'item',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'context' => $data['context'],
 			'readonly' => false,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'

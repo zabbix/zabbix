@@ -19,12 +19,10 @@
 
 #include "checks_http.h"
 #include "zbxhttp.h"
-#include "zbxjson.h"
-#include "log.h"
 #include "zbxcacheconfig.h"
 
 #ifdef HAVE_LIBCURL
-int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_http(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	char	*out = NULL, *error = NULL;
 	int	ret;

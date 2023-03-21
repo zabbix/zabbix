@@ -211,13 +211,13 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Web monitoring');
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestTextPresent('Parent web scenario');
+			$this->zbxTestTextPresent('Parent web scenarios');
 			if (isset($data['hostTemplate'])) {
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Parent web scenario');
+			$this->zbxTestTextNotPresent('Parent web scenarios');
 		}
 
 		if (isset($data['agent'])) {
@@ -932,8 +932,10 @@ class testFormWeb extends CLegacyWebTest {
 						['name' => 'test', 'value' => 'test_value']
 					],
 					'add_step' => [
-						['step' => 'Headers - two different']
-					]
+						['step' => 'Headers - two different'],
+						['step' => 'Headers - one more']
+					],
+					'screenshot' => true
 				]
 			],
 			// Headers - empty value
@@ -1426,6 +1428,12 @@ class testFormWeb extends CLegacyWebTest {
 			}
 		}
 
+		// Take a screenshot to test draggable object position of web headers.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('xpath://table[@data-type="headers"]')->waitUntilPresent()->one(), 'Web Headers fields');
+		}
+
 		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
@@ -1458,6 +1466,12 @@ class testFormWeb extends CLegacyWebTest {
 					$this->zbxTestClickXpathWait('//table[contains(@class, "httpconf-steps-dynamic-row")]//button[contains(@class,"element-table-remove")]');
 				}
 			}
+		}
+
+		// Take a screenshot to test draggable object position of web steps.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('class:httpconf-steps-dynamic-row')->waitUntilPresent()->one(), 'Web steps');
 		}
 
 		$this->zbxTestClickWait('add');
