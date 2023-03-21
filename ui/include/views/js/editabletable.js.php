@@ -27,12 +27,12 @@
 <script type="text/javascript">
 
 	$.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
-		_getParentOffset: function() {
+		_getParentOffset: function () {
 			this.offsetParent = this.helper.offsetParent();
 			const po = this.offsetParent.offset();
 
 			if (this.scrollParent[0] !== this.document[0]
-					&& $.contains(this.scrollParent[ 0 ], this.offsetParent[0])) {
+					&& $.contains(this.scrollParent[0], this.offsetParent[0])) {
 				po.left += this.scrollParent.scrollLeft();
 				po.top += this.scrollParent.scrollTop();
 			}
