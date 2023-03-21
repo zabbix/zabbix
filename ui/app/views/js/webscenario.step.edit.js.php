@@ -295,8 +295,7 @@ window.webscenario_step_edit_popup = new class {
 
 			jQuery(this.post_fields).sortable('disable');
 
-			for (const element of [this.post_fields,
-					...this.post_fields.querySelectorAll('.<?= ZBX_STYLE_DRAG_ICON ?>')]) {
+			for (const element of this.post_fields.querySelectorAll('.<?= ZBX_STYLE_DRAG_ICON ?>')) {
 				element.classList.add('<?= ZBX_STYLE_DISABLED ?>');
 			}
 		}
@@ -304,8 +303,6 @@ window.webscenario_step_edit_popup = new class {
 			for (const element of posts_elements) {
 				element.removeAttribute('disabled');
 			}
-
-			this.post_fields.classList.remove('<?= ZBX_STYLE_DISABLED ?>');
 
 			if (this.post_fields.querySelectorAll('.sortable').length > 1) {
 				jQuery(this.post_fields).sortable('enable');
