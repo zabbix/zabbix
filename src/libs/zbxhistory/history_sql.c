@@ -299,7 +299,7 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 
 	for (int i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_BIN != h->value_type)
 			continue;
