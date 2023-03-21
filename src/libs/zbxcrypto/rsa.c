@@ -141,6 +141,13 @@ int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsig
 		goto out;
 	}
 
+	if (1 != EVP_DigestSignUpdate(mdctx, (const unsigned char *)data, data_len))
+	{
+		*error = zbx_strdup(NULL, "EVP_DigestSignUpdate failed");
+		ret = FAIL;
+		goto out;
+	}
+
 	if (1 != EVP_DigestSignFinal(mdctx, NULL, &sign_len))
 	{
 		*error = zbx_strdup(NULL, "failed to retrieve length of a signature");
@@ -150,8 +157,7 @@ int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsig
 
 	sig = OPENSSL_malloc(sign_len);
 
-	if (1 != EVP_DigestSignUpdate(mdctx, (const unsigned char *)data, data_len) ||
-			1 != EVP_DigestSignFinal(mdctx, sig, &sign_len))
+	if (1 != EVP_DigestSignFinal(mdctx, sig, &sign_len))
 	{
 		*error = zbx_strdup(NULL, "signing failed");
 		ret = FAIL;
