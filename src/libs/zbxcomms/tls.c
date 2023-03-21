@@ -3467,9 +3467,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char *
 	size_t		error_alloc = 0, error_offset = 0;
 	long		verify_result;
 	zbx_timespec_t	deadline;
-#if defined(_WINDOWS)
-	double		sec;
-#endif
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer, or LibreSSL */
 	const unsigned char	session_id_context[] = {'Z', 'b', 'x'};
 #endif
@@ -3607,10 +3604,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char *
 	/* TLS handshake */
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 
 	while (-1 == (res = SSL_accept(s->tls_ctx->ctx)))
 	{
@@ -3886,37 +3879,39 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, int timeout, char *
  ******************************************************************************/
 void	zbx_tls_close(zbx_socket_t *s)
 {
-	int	res;
+	int		res;
+	zbx_timespec_t	deadline;
 
 	if (NULL == s->tls_ctx)
 		return;
+
+	if (0 != s->timeout)
+		zbx_ts_get_deadline(&deadline, s->timeout);
+
 #if defined(HAVE_GNUTLS)
 	if (NULL != s->tls_ctx->ctx)
 	{
-#if defined(_WINDOWS)
-		double	sec;
-
-		zbx_alarm_flag_clear();
-		sec = zbx_time();
-#endif
 		/* shutdown TLS connection */
 		while (GNUTLS_E_SUCCESS != (res = gnutls_bye(s->tls_ctx->ctx, GNUTLS_SHUT_WR)))
 		{
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_alarm_flag_set();
-#endif
-			if (SUCCEED == zbx_alarm_timed_out())
+			int	err;
+
+			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, res);
+			if (SUCCEED != tls_is_nonblocking_error(err))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() with %s returned error code: %d %s",
+						s->peer, res, gnutls_strerror(res));
+
+				if (0 != gnutls_error_is_fatal(res))
+					break;
+			}
+
+			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
+						strerror_from_system(zbx_socket_last_error()));
 				break;
-
-			if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
-				continue;
-
-			zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() with %s returned error code: %d %s",
-					s->peer, res, gnutls_strerror(res));
-
-			if (0 != gnutls_error_is_fatal(res))
-				break;
+			}
 		}
 
 		gnutls_credentials_clear(s->tls_ctx->ctx);
@@ -3935,17 +3930,31 @@ void	zbx_tls_close(zbx_socket_t *s)
 
 		/* After TLS shutdown the TCP connection will be closed. So, there is no need to do a bidirectional */
 		/* TLS shutdown - unidirectional shutdown is ok. */
-		if (0 > (res = SSL_shutdown(s->tls_ctx->ctx)))
+		while (0 > (res = SSL_shutdown(s->tls_ctx->ctx)))
 		{
-			int	result_code;
-			char	*error = NULL;
-			size_t	error_alloc = 0, error_offset = 0;
+			int	err;
 
-			result_code = SSL_get_error(s->tls_ctx->ctx, res);
-			zbx_tls_error_msg(&error, &error_alloc, &error_offset);
-			zabbix_log(LOG_LEVEL_WARNING, "SSL_shutdown() with %s set result code to %d:%s%s",
-					s->peer, result_code, ZBX_NULL2EMPTY_STR(error), info_buf);
-			zbx_free(error);
+			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, res);
+			if (SUCCEED != tls_is_nonblocking_error(err))
+			{
+				int	result_code;
+				char	*error = NULL;
+				size_t	error_alloc = 0, error_offset = 0;
+
+				result_code = SSL_get_error(s->tls_ctx->ctx, res);
+				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
+				zabbix_log(LOG_LEVEL_WARNING, "SSL_shutdown() with %s set result code to %d:%s%s",
+						s->peer, result_code, ZBX_NULL2EMPTY_STR(error), info_buf);
+				zbx_free(error);
+				break;
+			}
+
+			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				break;
+			}
 		}
 
 		SSL_free(s->tls_ctx->ctx);

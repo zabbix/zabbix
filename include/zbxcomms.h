@@ -145,6 +145,7 @@ typedef struct
 	/* TLS connection may be shut down at any time and it will not be possible to get peer IP address anymore. */
 	char				peer[ZBX_MAX_DNSNAME_LEN + 1];
 	int				protocol;
+	int				timeout;
 }
 zbx_socket_t;
 
@@ -186,10 +187,10 @@ void	zbx_tcp_close(zbx_socket_t *s);
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
 #endif
 
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout);
 void	zbx_tcp_unlisten(zbx_socket_t *s);
 
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, int config_timeout);
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout);
 void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01

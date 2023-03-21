@@ -469,6 +469,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #endif
 
 	zbx_socket_clean(s);
+	s->timeout = timeout;
 
 	zbx_snprintf(service, sizeof(service), "%hu", port);
 	tcp_init_hints(&hints, type, 0);
@@ -1164,7 +1165,7 @@ static int	tcp_err_in_use()
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port)
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout)
 {
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[8], *ip, *ips, *delim;
@@ -1184,6 +1185,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 #endif
 
 	zbx_socket_clean(s);
+	s->timeout = timeout;
 
 	tcp_init_hints(&hints, SOCK_STREAM, AI_NUMERICHOST | AI_PASSIVE);
 	zbx_snprintf(port, sizeof(port), "%hu", listen_port);
@@ -1392,17 +1394,15 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  *                                                                            *
  * Parameters: s              - [IN/OUT] socket to listen                     *
  *             tls_accept     - [IN] TLS configuration                        *
- *             poll_timeout     - [IN] milliseconds to wait for connection      *
+ *             poll_timeout     - [IN] milliseconds to wait for connection    *
  *                                  (0 - don't wait, -1 - wait forever        *
- *             config_timeout - [IN] timeout for connection to be established *
- *                                   after detecting incoming connection      *
  *                                                                            *
  * Return value: SUCCEED       - success                                      *
  *               FAIL          - an error occurred                            *
  *               TIMEOUT_ERROR - no connections for the timeout period        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, int config_timeout)
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 {
 	ZBX_SOCKADDR	serv_addr;
 	ZBX_SOCKET	accepted_socket;
@@ -1465,7 +1465,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, i
 		goto out;
 	}
 
-	if (FAIL == (res = tcp_peek(s->socket, &buf, 1, config_timeout)) ||
+	if (FAIL == (res = tcp_peek(s->socket, &buf, 1, s->timeout)) ||
 			TIMEOUT_ERROR == res)
 	{
 		zbx_set_socket_strerror("from %s: reading first byte from connection failed: %s", s->peer,
@@ -1482,7 +1482,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, i
 		{
 			char	*error = NULL;
 
-			if (SUCCEED != zbx_tls_accept(s, tls_accept, config_timeout, &error))
+			if (SUCCEED != zbx_tls_accept(s, tls_accept, s->timeout, &error))
 			{
 				zbx_set_socket_strerror("from %s: %s", s->peer, error);
 				zbx_tcp_unaccept(s);
