@@ -2049,8 +2049,8 @@ static void	get_fqdn(char **hostname)
 	if (0 == gethostname((char *)buffer, MAX_STRING_LEN - 1) && MAX_STRING_LEN - 2 > strlen((char *)buffer))
 		*hostname = zbx_strdup(*hostname, (char *)buffer);
 
-	hints.ai_family=AF_UNSPEC;
-	hints.ai_flags=AI_CANONNAME;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_flags = AI_CANONNAME;
 
 	if (0 == getaddrinfo(*hostname, 0, &hints, &res))
 		*hostname = zbx_strdup(*hostname, res->ai_canonname);
