@@ -226,7 +226,7 @@
 	jQuery(function() {
 		updateForm();
 
-		document.getElementById('concurrency_max_type').addEventListener('change', () => updateForm());
+		document.getElementById('concurrency_max_type').addEventListener('change', updateForm);
 
 		addDCheck(<?= json_encode(array_values($data['drule']['dchecks'])) ?>);
 
@@ -454,9 +454,13 @@
 
 	function updateForm() {
 		const concurrency_max_type = document.querySelector('[name="concurrency_max_type"]:checked').value;
-		document.getElementById('concurrency_max').style.display = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>
-			? ''
-			: 'none';
+
+		if (concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>) {
+			document.getElementById('concurrency_max').classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+		}
+		else {
+			document.getElementById('concurrency_max').classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+		}
 	}
 
 	$(() => {

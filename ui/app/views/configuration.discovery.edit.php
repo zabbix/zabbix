@@ -88,7 +88,8 @@ $discoveryFormList
 				))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CNumericBox('concurrency_max', $data['drule']['concurrency_max'], 3, false, false, false))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-					->addStyle('display: none;')
+					->addClass(ZBX_STYLE_DISPLAY_NONE)
+					->setAriaRequired()
 			])
 	);
 

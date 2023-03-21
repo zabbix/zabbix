@@ -247,7 +247,7 @@ class CDRule extends CApiService {
 
 			if (array_key_exists('concurrency_max', $drule)
 					&& ($drule['concurrency_max'] < ZBX_DISCOVERY_CHECKS_UNLIMITED
-					|| $drule['concurrency_max'] > ZBX_DISCOVERY_CHECKS_MAX)) {
+						|| $drule['concurrency_max'] > ZBX_DISCOVERY_CHECKS_MAX)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['concurrency_max'], 'concurrency_max')
 				);
@@ -404,7 +404,7 @@ class CDRule extends CApiService {
 
 			if (array_key_exists('concurrency_max', $drule)
 					&& ($drule['concurrency_max'] < ZBX_DISCOVERY_CHECKS_UNLIMITED
-					|| $drule['concurrency_max'] > ZBX_DISCOVERY_CHECKS_MAX)) {
+						|| $drule['concurrency_max'] > ZBX_DISCOVERY_CHECKS_MAX)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['concurrency_max'], 'concurrency_max')
 				);

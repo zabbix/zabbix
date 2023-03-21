@@ -86,10 +86,11 @@ class CControllerDiscoveryUpdate extends CController {
 			$drule['dchecks'][$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
 		}
 
-		$drule['concurrency_max'] = $this->getInput(
-			'concurrency_max_type', ZBX_DISCOVERY_CHECKS_UNLIMITED) == ZBX_DISCOVERY_CHECKS_CUSTOM
-			? $this->getInput('concurrency_max')
-			: $this->getInput('concurrency_max_type');
+		$concurrency_max_type = $this->getInput('concurrency_max_type', ZBX_DISCOVERY_CHECKS_UNLIMITED);
+
+		$drule['concurrency_max'] = $concurrency_max_type == ZBX_DISCOVERY_CHECKS_CUSTOM
+			? $this->getInput('concurrency_max', ZBX_DISCOVERY_CHECKS_UNLIMITED)
+			: $concurrency_max_type;
 
 		$result = API::DRule()->update($drule);
 
