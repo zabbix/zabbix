@@ -53,7 +53,7 @@ static int	base64_block_regex_is_valid(const char c)
  *************************************************************************************************/
 int	zbx_base64_validate(const char* p_str)
 {
-	int	i, len = strlen(p_str);
+	size_t	i, len = strlen(p_str);
 
 	for (i = 0; i < len; i = i + 4)
 	{

@@ -223,6 +223,26 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 		];
 	}
 
+	public function checkItemState(string $name, int $state) {
+		$wait_iterations = 5;
+		$wait_iteration_delay = 1;
+
+		for ($r = 0; $r < $wait_iterations; $r++) {
+			$item = $this->call('item.get', [
+			'output' => ['state', 'lastvalue'],
+			'itemids' => self::$itemids[$name]
+			])['result'][0];
+
+			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
+				break;
+			}
+
+			sleep($wait_iteration_delay);
+		}
+
+		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
+	}
+
 	/**
 	 * Test if both active and passive agent checks are processed.
 	 *
