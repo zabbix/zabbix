@@ -33,6 +33,7 @@ sources:
 ```
 ansible-rulebook --rulebook test-rulebook.yml -i inventory.yml --verbose
 ```
+> Note: before starting, make sure that the eda-server is running and you are in the eda-server virtual environment
 
 
 ## Setting up Zabbix Webhook
