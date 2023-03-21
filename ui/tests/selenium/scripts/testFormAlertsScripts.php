@@ -19,15 +19,15 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup scripts
  *
  * @onBefore prepareScriptData
  */
-class testFormAdministrationScripts extends CWebTest {
+class testFormAlertsScripts extends CWebTest {
 
 	/**
 	 * Id of scripts that created for future cloning.
@@ -988,21 +988,21 @@ class testFormAdministrationScripts extends CWebTest {
 	 * @dataProvider getScriptsData
 	 * @backupOnce scripts
 	 */
-	public function testFormAdministrationScripts_Create($data) {
+	public function testFormAlertsScripts_Create($data) {
 		$this->checkScripts($data, false, 'zabbix.php?action=script.edit');
 	}
 
 	/**
 	 * @dataProvider getScriptsData
 	 */
-	public function testFormAdministrationScripts_Update($data) {
+	public function testFormAlertsScripts_Update($data) {
 		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
 	}
 
 	/**
 	 * Function for checking script configuration form.
 	 *
-	 * @param arary     $data     data provider
+	 * @param array     $data     data provider
 	 * @param boolean   $update   is it update case, or not
 	 * @param string    $link     link to script form
 	 */
@@ -1089,7 +1089,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Function for checking execution confirmation popup.
 	 *
-	 * @param arary     $data    data provider
+	 * @param array     $data    data provider
 	 * @param element   $form    script configuration form
 	 */
 	private function checkConfirmation($data, $form) {
@@ -1111,7 +1111,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Function for checking script form update cancelling.
 	 */
-	public function testFormAdministrationScripts_CancelUpdate() {
+	public function testFormAlertsScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
@@ -1138,7 +1138,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Function for checking script form update without any changes.
 	 */
-	public function testFormAdministrationScripts_SimpleUpdate() {
+	public function testFormAlertsScripts_SimpleUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
@@ -1151,7 +1151,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Function for checking script cloning with only changed name.
 	 */
-	public function testFormAdministrationScripts_Clone() {
+	public function testFormAlertsScripts_Clone() {
 		foreach (self::$clone_scriptids as $scriptid) {
 			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
 			$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
@@ -1183,7 +1183,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Function for testing script delete from configuration form.
 	 */
-	public function testFormAdministrationScripts_Delete() {
+	public function testFormAlertsScripts_Delete() {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
 		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
@@ -1197,7 +1197,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Check all fields default values, lengths, placeholders, element options and table headers.
 	 */
-	public function testFormAdministrationScripts_Layout() {
+	public function testFormAlertsScripts_Layout() {
 		$this->page->login()->open('zabbix.php?action=script.edit');
 		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 
@@ -1270,7 +1270,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Check the visible fields and their default values, and the required class based on the selected scope and type.
 	 */
-	public function testFormAdministrationScripts_VisibleFields() {
+	public function testFormAlertsScripts_VisibleFields() {
 		$common_all_scopes = [
 			'fields' => ['Name', 'Scope', 'Type', 'Description', 'Host group'],
 			'required' => ['Name'],
@@ -1387,7 +1387,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Modify the URI scheme validation rules and check the result for the URL type in script form.
 	 */
-	public function testFormAdministrationScripts_UriScheme() {
+	public function testFormAlertsScripts_UriScheme() {
 		$invalid_schemes = ['dns://zabbix.com', 'message://zabbix.com'];
 		$default_valid_schemes = ['http://zabbix.com', 'https://zabbix.com', 'ftp://zabbix.com', 'file://zabbix.com',
 			'mailto://zabbix.com', 'tel://zabbix.com', 'ssh://zabbix.com'
@@ -1549,7 +1549,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 *
 	 * @dataProvider getContextMenuData
 	 */
-	public function testFormAdministrationScripts_ContextMenu($data) {
+	public function testFormAlertsScripts_ContextMenu($data) {
 		$this->page->login()->open('zabbix.php?action=script.edit');
 		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);

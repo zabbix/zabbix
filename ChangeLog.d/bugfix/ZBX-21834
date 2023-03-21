@@ -1,1 +1,0 @@
-..F....... [ZBX-21834] fixed map navigation tree breaking if in a map a disabled trigger is used as a link indicator between 2 elements (agriscenko)

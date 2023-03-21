@@ -115,7 +115,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	unsigned char	types[3];
-	DC_ITEM		items[3];
+	zbx_dc_item_t	items[3];
 	zbx_uint64_t	itemids[3];
 	int		errcodes[3];
 	size_t		i, num = 0;
@@ -154,7 +154,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 
 	if (0 < num)
 	{
-		DCconfig_get_items_by_itemids(items, itemids, errcodes, num);
+		zbx_dc_config_get_items_by_itemids(items, itemids, errcodes, num);
 
 		for (i = 0; i < num; i++)
 		{
@@ -195,7 +195,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 			zbx_free_agent_result(&value);
 		}
 
-		DCconfig_clean_items(items, errcodes, num);
+		zbx_dc_config_clean_items(items, errcodes, num);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -260,7 +260,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	unsigned char	types[3];
-	DC_ITEM		items[3];
+	zbx_dc_item_t	items[3];
 	zbx_uint64_t	itemids[3];
 	int		errcodes[3];
 	size_t		i, num = 0;
@@ -293,7 +293,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 
 	if (0 < num)
 	{
-		DCconfig_get_items_by_itemids(items, itemids, errcodes, num);
+		zbx_dc_config_get_items_by_itemids(items, itemids, errcodes, num);
 
 		for (i = 0; i < num; i++)
 		{
@@ -334,7 +334,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 			zbx_free_agent_result(&value);
 		}
 
-		DCconfig_clean_items(items, errcodes, num);
+		zbx_dc_config_clean_items(items, errcodes, num);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -351,7 +351,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
  *               successful. FAIL on error.                                   *
  *                                                                            *
  ******************************************************************************/
-static int	httpstep_load_pairs(DC_HOST *host, zbx_httpstep_t *httpstep)
+static int	httpstep_load_pairs(zbx_dc_host_t *host, zbx_httpstep_t *httpstep)
 {
 	int			type, ret = SUCCEED;
 	zbx_db_result_t		result;
@@ -534,7 +534,7 @@ static void	add_http_headers(char *headers, struct curl_slist **headers_slist, c
  *               successful. FAIL on error.                                   *
  *                                                                            *
  ******************************************************************************/
-static int	httptest_load_pairs(DC_HOST *host, zbx_httptest_t *httptest)
+static int	httptest_load_pairs(zbx_dc_host_t *host, zbx_httptest_t *httptest)
 {
 	int			type, ret = SUCCEED;
 	zbx_db_result_t		result;
@@ -616,7 +616,7 @@ out:
  * Purpose: process single scenario of http test                              *
  *                                                                            *
  ******************************************************************************/
-static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay)
+static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int *delay)
 {
 	zbx_db_result_t	result;
 	zbx_db_httpstep	db_httpstep;
@@ -1040,7 +1040,7 @@ int	process_httptests(int now, time_t *nextcheck)
 	zbx_db_row_t		row;
 	zbx_uint64_t		httptestid;
 	zbx_httptest_t		httptest;
-	DC_HOST			host;
+	zbx_dc_host_t		host;
 	int			httptests_count = 0;
 	zbx_dc_um_handle_t	*um_handle;
 
