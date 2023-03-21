@@ -2545,7 +2545,11 @@ function getTypeItemFieldNames(array $input): array {
 			return ['interfaceid'];
 
 		case ITEM_TYPE_DEPENDENT:
-			return ['master_itemid'];
+			if ($input['templateid'] == 0) {
+				return ['master_itemid'];
+			}
+
+			return [];
 
 		case ITEM_TYPE_HTTPAGENT:
 			if ($input['templateid'] == 0) {

@@ -980,7 +980,7 @@ static int	DBpatch_2050105(void)
 
 static int	DBpatch_2050106(void)
 {
-	/* convert meta value (1) to PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE (0x03) flags */
+	/* convert meta value (1) to ZBX_PROXY_HISTORY_FLAG_META | ZBX_PROXY_HISTORY_FLAG_NOVALUE (0x03) flags */
 	if (ZBX_DB_OK > zbx_db_execute("update proxy_history set flags=3 where flags=1"))
 	{
 		return FAIL;

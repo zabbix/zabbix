@@ -731,7 +731,7 @@ static unsigned int	zbx_hex2num(char c)
  *               0 on error (invalid escape sequence)                         *
  *                                                                            *
  ******************************************************************************/
-static unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
+unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
 {
 	bytes[0] = '\0';
 
