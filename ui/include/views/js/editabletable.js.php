@@ -25,6 +25,30 @@
 ?>
 
 <script type="text/javascript">
+
+	$.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
+		_getParentOffset: function() {
+			this.offsetParent = this.helper.offsetParent();
+			const po = this.offsetParent.offset();
+
+			if (this.scrollParent[0] !== this.document[0]
+					&& $.contains(this.scrollParent[ 0 ], this.offsetParent[0])) {
+				po.left += this.scrollParent.scrollLeft();
+				po.top += this.scrollParent.scrollTop();
+			}
+
+			if ((this.offsetParent[0].tagName && this.offsetParent[0].tagName.toLowerCase() === 'html' && $.ui.ie)
+					|| this.offsetParent[0] === this.document[0].body) {
+				po = {top: 0, left: 0};
+			}
+
+			return {
+				top: po.top + (parseInt(this.offsetParent.css('borderTopWidth'), 10) || 0),
+				left: po.left + (parseInt(this.offsetParent.css('borderLeftWidth'), 10) || 0)
+			};
+		}
+	}));
+
 	jQuery(function($) {
 		var	editableTable = function(elm, tmpl) {
 			var table = $(elm),
