@@ -698,6 +698,27 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	return DBget_field_modify(( ZBX_TABLE *)table, fieldname);
 }
 
+int	DBvalidate_field_size(const char *tablename, const char *fieldname, const char *str)
+{
+#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
+	const ZBX_TABLE	*table;
+	const ZBX_FIELD	*field;
+
+	if (NULL == (table = DBget_table(tablename)) || NULL == (field = DBget_field(table, fieldname)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid table: \"%s\" field: \"%s\"", tablename, fieldname);
+		return FAIL;
+	}
+
+	if (strlen(str) > get_string_field_size(field->type))
+		return FAIL;
+
+	return SUCCEED;
+#else
+	return SUCCEED;
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: gets a new identifier(s) for a specified table                    *
