@@ -918,7 +918,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 	$result = (bool) API::Item()->update($items);
 
 	if ($result) {
-		uncheckTableRows();
+		$filter_hostids ? uncheckTableRows(crc32(implode('', $filter_hostids))) : uncheckTableRows();
 	}
 
 	$updated = count($itemids);
@@ -991,7 +991,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	$result = API::Item()->delete($group_itemid);
 
 	if ($result) {
-		uncheckTableRows();
+		$filter_hostids ? uncheckTableRows(crc32(implode('', $filter_hostids))) : uncheckTableRows();
 	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
 }
