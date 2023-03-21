@@ -953,7 +953,16 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 
 	while (ZBX_IS_RUNNING() && NULL != (drule = zbx_dc_drule_next(now, nextcheck)))
 	{
-		if (NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
+		zbx_uint64_t		queue_capacity;
+		zbx_discoverer_job_t	cmp = {.druleid = drule->druleid};
+
+		discoverer_queue_lock(&dmanager.queue);
+		i = zbx_vector_discoverer_jobs_ptr_bsearch(&dmanager.job_refs, &cmp,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - dmanager.queue.pending_checks_count;
+		discoverer_queue_unlock(&dmanager.queue);
+
+		if (i != FAIL || NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
 		{
 			zbx_dc_drule_queue(now, drule->druleid, drule->delay);
 			zbx_discovery_drule_free(drule);
@@ -984,7 +993,6 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 		}
 		else
 		{
-			zbx_uint64_t			queue_capacity;
 			zbx_discoverer_job_t		*job;
 			zbx_discoverer_task_t		*task, *task_out;
 			zbx_hashset_t			tasks, drule_check_counts;
