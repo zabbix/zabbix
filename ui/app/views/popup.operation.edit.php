@@ -28,7 +28,7 @@ $form = (new CForm())
 	->setId('popup-operation')
 	->setName('popup_operation')
 	->addVar('operation[eventsource]', $data['eventsource'])
-	->addVar('operation[recovery]', $data['recovery'])
+	->addVar('operation[recovery]', $data['recovery']);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
