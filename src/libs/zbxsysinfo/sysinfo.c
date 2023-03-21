@@ -2037,7 +2037,7 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-void	get_fqdn(char **hostname)
+static void	get_fqdn(char **hostname)
 {
 	char*			buffer[MAX_STRING_LEN];
 	struct addrinfo		hints = {0};
@@ -2046,18 +2046,17 @@ void	get_fqdn(char **hostname)
 	buffer[MAX_STRING_LEN - 1] = '\0';
 
 	/* check for successful call to the gethostname and check that data fits in the buffer */
-	if (0 == gethostname((char *)buffer ,MAX_STRING_LEN - 1) && MAX_STRING_LEN -2 > strlen((char *)buffer))
-	{
+	if (0 == gethostname((char *)buffer, MAX_STRING_LEN - 1) && MAX_STRING_LEN - 2 > strlen((char *)buffer))
 		*hostname = zbx_strdup(*hostname, (char *)buffer);
-	}
 
 	hints.ai_family=AF_UNSPEC;
 	hints.ai_flags=AI_CANONNAME;
 
-	if (0 == getaddrinfo(*hostname, 0, &hints, &res)) {
+	if (0 == getaddrinfo(*hostname, 0, &hints, &res))
 		*hostname = zbx_strdup(*hostname, res->ai_canonname);
+
+	if (NULL != res)
 		freeaddrinfo(res);
-	}
 }
 
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)

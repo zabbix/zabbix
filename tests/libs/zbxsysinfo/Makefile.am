@@ -12,7 +12,8 @@ if AGENT
 AGENT_tests = \
 	zbx_execute_agent_check \
 	zbx_execute_agent_check_http \
-	check_key_access_rules
+	check_key_access_rules \
+	check_get_fqdn
 endif
 
 noinst_PROGRAMS = $(SERVER_tests) $(AGENT_tests)
@@ -253,5 +254,28 @@ check_key_access_rules_LDADD += @AGENT_LIBS@
 check_key_access_rules_LDFLAGS = @AGENT_LDFLAGS@
 
 check_key_access_rules_CFLAGS = -I@top_srcdir@/tests
+
+# check_get_fqdn
+
+check_get_fqdn_SOURCES = \
+	check_get_fqdn.c \
+	../../zbxmocktest.h
+
+check_get_fqdn_LDADD = $(COMMON_LIB_FILES) \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
+
+check_get_fqdn_LDADD += @AGENT_LIBS@
+
+check_get_fqdn_LDFLAGS = @AGENT_LDFLAGS@
+
+check_get_fqdn_WRAP_FUNCS = \
+	-Wl,--wrap=gethostname \
+	-Wl,--wrap=getaddrinfo \
+	-Wl,--wrap=freeaddrinfo
+
+check_get_fqdn_CFLAGS = $(check_get_fqdn_WRAP_FUNCS) -I@top_srcdir@/tests
 
 endif

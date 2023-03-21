@@ -109,7 +109,8 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 == GetComputerNameExA(ComputerNameDnsFullyQualified, name, &size))
 			{
 				zbx_free(name);
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain FQDN: %s", strerror_from_system(WSAGetLastError())));
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain FQDN: %s",
+						strerror_from_system(WSAGetLastError())));
 				return SYSINFO_RET_FAIL;
 			}
 
