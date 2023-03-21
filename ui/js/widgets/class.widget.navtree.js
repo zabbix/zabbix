@@ -784,7 +784,7 @@ class CWidgetNavTree extends CWidget {
 	_makeSortable() {
 		jQuery('.root-item > .tree-list', jQuery(this._target))
 			.sortable_tree({
-				max_depth: this._max_depth-1,
+				max_depth: this._max_depth,
 				stop: () => {
 					this._setTreeHandlers();
 					this._updateWidgetFields();

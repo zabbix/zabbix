@@ -186,7 +186,7 @@ if (typeof addPopupValues === 'undefined') {
 
 			const parent_item = $(this.placeholder.parent()).closest('.tree-item'),
 				level = +$(this.placeholder.parent()).attr('data-depth'),
-				child_levels = this._levelsUnder(this.currentItem[0]);
+				child_levels = this._levelsUnder(this.currentItem[0])+1;
 			let prev_item = this.placeholder[0].previousSibling ? $(this.placeholder[0].previousSibling) : null,
 				next_item = this.placeholder[0].nextSibling ? $(this.placeholder[0].nextSibling) : null,
 				direction_moved = null,
@@ -256,7 +256,7 @@ if (typeof addPopupValues === 'undefined') {
 
 				this._isAllowed(prev_item, level, level + child_levels);
 
-				if (hovered_branch_depth < this.max_depth+1) {
+				if (hovered_branch_depth < this.options.max_depth+1) {
 					this.changing_parent = setTimeout(function() {
 						$(drop_to)
 							.addClass('highlighted-parent opened')
