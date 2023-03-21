@@ -130,8 +130,8 @@ window.webscenario_step_edit_popup = new class {
 				start: function(e, ui) {
 					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 				}
-			});
-			$element.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
+			})
+			.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
 				const is_disabled = $element[0].querySelectorAll('.sortable').length < 2;
 
 				for (const drag_icon of $element[0].querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
@@ -139,8 +139,8 @@ window.webscenario_step_edit_popup = new class {
 				}
 
 				$element.sortable({disabled: is_disabled});
-			});
-			$element.trigger('afteradd.dynamicRows');
+			})
+			.trigger('afteradd.dynamicRows');
 	}
 
 	_togglePostType(e) {
