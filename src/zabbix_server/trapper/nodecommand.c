@@ -38,13 +38,13 @@
  *                FAIL    - an error occurred                                 *
  *                                                                            *
  ******************************************************************************/
-static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host, char **info, char *error,
+static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t *host, char **info, char *error,
 		size_t max_error_len)
 {
 	int		time_start;
 	zbx_uint64_t	taskid;
-	DB_RESULT	result = NULL;
-	DB_ROW		row;
+	zbx_db_result_t	result = NULL;
+	zbx_db_row_t	row;
 
 	if (0 == (taskid = zbx_script_create_task(script, host, 0, time(NULL))))
 	{
@@ -87,8 +87,8 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 		zbx_uint64_t *groupid, char *error, size_t error_len)
 {
 	int		ret = FAIL;
-	DB_RESULT	db_result;
-	DB_ROW		row;
+	zbx_db_result_t	db_result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	usrgrpid_l, groupid_l;
 
 	db_result = zbx_db_select("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
@@ -157,7 +157,7 @@ fail:
 
 static int	is_user_in_allowed_group(zbx_uint64_t userid, zbx_uint64_t usrgrpid, char *error, size_t error_len)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	int		ret = FAIL;
 
 	result = zbx_db_select("select null"
@@ -199,8 +199,8 @@ fail:
 static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t *r_eventid, char *error,
 		size_t error_len)
 {
-	DB_RESULT	db_result;
-	DB_ROW		row;
+	zbx_db_result_t	db_result;
+	zbx_db_row_t	row;
 
 	if (NULL == (db_result = zbx_db_select("select r_eventid from event_recovery where eventid="ZBX_FS_UI64, eventid)))
 	{
@@ -241,7 +241,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char *clientip, int config_timeout, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
-	DC_HOST			host;
+	zbx_dc_host_t		host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
 	zbx_vector_uint64_t	eventids;
@@ -294,7 +294,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	if (0 != hostid)
 	{
-		if (SUCCEED != DCget_host_by_hostid(&host, hostid))
+		if (SUCCEED != zbx_dc_get_host_by_hostid(&host, hostid))
 		{
 			zbx_strlcpy(error, "Unknown host identifier.", sizeof(error));
 			goto fail;

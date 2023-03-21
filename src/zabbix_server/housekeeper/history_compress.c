@@ -69,8 +69,8 @@ static int		compress_older_cache = 0;
  ******************************************************************************/
 static void	hk_check_table_segmentation(const char *table_name, zbx_compress_table_t type)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
@@ -120,8 +120,8 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 static int	hk_get_table_compression_age(const char *table_name)
 {
 	int		age = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
@@ -164,7 +164,7 @@ static void	hk_check_table_compression_age(const char *table_name, int age)
 
 	if (age != (compress_after = hk_get_table_compression_age(table_name)))
 	{
-		DB_RESULT	res;
+		zbx_db_result_t	res;
 
 		if (0 != compress_after)
 			zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE, table_name));
@@ -241,8 +241,8 @@ void	hk_history_compression_init(void)
 	int		disable_compression = 0;
 	char		*db_log_level = NULL;
 	zbx_config_t	cfg;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
