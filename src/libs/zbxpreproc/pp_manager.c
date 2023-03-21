@@ -702,7 +702,7 @@ static void	preprocessor_sync_configuration(zbx_pp_manager_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	old_revision = revision = zbx_pp_manager_get_revision(manager);
-	DCconfig_get_preprocessable_items(zbx_pp_manager_items(manager), &revision);
+	zbx_dc_config_get_preprocessable_items(zbx_pp_manager_items(manager), &revision);
 	zbx_pp_manager_set_revision(manager, revision);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE) && revision != old_revision)
@@ -1243,7 +1243,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		/* flush local history cache when there is nothing more to process or one second after last flush */
 		if (0 == pending_num + processing_num + finished_num || 1 < sec - time_flush)
 		{
-			dc_flush_history();
+			zbx_dc_flush_history();
 			time_flush = sec;
 		}
 	}

@@ -1017,8 +1017,8 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	free_database_cache(ZBX_SYNC_ALL);
-	free_configuration_cache();
+	zbx_free_database_cache(ZBX_SYNC_ALL);
+	zbx_free_configuration_cache();
 	zbx_db_close();
 
 	zbx_db_deinit();
@@ -1200,7 +1200,7 @@ static void	proxy_db_init(void)
 	zbx_stat_t	db_stat;
 #endif
 
-	if (SUCCEED != zbx_db_init(DCget_nextid, program_type, &error))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -1225,7 +1225,7 @@ static void	proxy_db_init(void)
 	zbx_db_check_character_set();
 	zbx_check_db();
 
-	if (SUCCEED != (version_check = DBcheck_version()))
+	if (SUCCEED != (version_check = DBcheck_version(ZBX_HA_MODE_STANDALONE)))
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
@@ -1388,7 +1388,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -1402,7 +1402,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_configuration_cache(&error))
+	if (SUCCEED != zbx_init_configuration_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1447,7 +1447,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	proxy_db_init();
 
-	change_proxy_history_count(zbx_proxy_get_history_count());
+	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
