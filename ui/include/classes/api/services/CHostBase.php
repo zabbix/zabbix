@@ -39,12 +39,12 @@ abstract class CHostBase extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkTemplates(array &$hosts, array $db_hosts = null): void {
+	protected function checkTemplates(array $hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$edit_templates = [];
 
-		foreach ($hosts as $i1 => &$host) {
+		foreach ($hosts as $i1 => $host) {
 			if (array_key_exists('templates', $host) && array_key_exists('templates_clear', $host)) {
 				$path_clear = '/'.($i1 + 1).'/templates_clear';
 				$path = '/'.($i1 + 1).'/templates';
@@ -83,7 +83,6 @@ abstract class CHostBase extends CApiService {
 				$edit_templates += array_column($host['templates_clear'], null, 'templateid');
 			}
 		}
-		unset($host);
 
 		if (!$edit_templates) {
 			return;

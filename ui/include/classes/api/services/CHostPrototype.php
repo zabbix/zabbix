@@ -790,7 +790,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException
 	 */
-	private function validateUniqueness(array &$hosts): void {
+	private static function validateUniqueness(array &$hosts): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['uuid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
 			'uuid' =>	['type' => API_ANY],
 			'ruleid' =>	['type' => API_ANY],
@@ -1119,7 +1119,7 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Add the UUID to those of the given host prototypes that belongs to a template and don't have the 'uuid' parameter
+	 * Add the UUID to those of the given host prototypes that belong to a template and don't have the 'uuid' parameter
 	 * set.
 	 *
 	 * @param array $hosts
@@ -1133,7 +1133,7 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check for unique host prototype UUIDs.
+	 * Verify host prototype UUIDs are not repeated.
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
@@ -1141,7 +1141,7 @@ class CHostPrototype extends CHostBase {
 	private static function checkUuidDuplicates(array $hosts, array $db_hosts = null): void {
 		$host_indexes = [];
 
-		foreach ($hosts as $i => &$host) {
+		foreach ($hosts as $i => $host) {
 			if ($host['host_status'] != HOST_STATUS_TEMPLATE || !array_key_exists('uuid', $host)) {
 				continue;
 			}
@@ -1150,7 +1150,6 @@ class CHostPrototype extends CHostBase {
 				$host_indexes[$host['uuid']] = $i;
 			}
 		}
-		unset($host);
 
 		if (!$host_indexes) {
 			return;
@@ -1174,7 +1173,8 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array $hosts
+	 * @param array      $hosts
+	 * @param array|null $db_lld_rules
 	 *
 	 * @throws APIException
 	 */
@@ -1218,7 +1218,7 @@ class CHostPrototype extends CHostBase {
 
 
 	/**
-	 * Add host_status property to given host prototypes in accordance of given LLD rules.
+	 * Add host_status property to given host prototypes based on given LLD rules.
 	 *
 	 * @param array $items
 	 * @param array $db_lld_rules
@@ -1231,9 +1231,9 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Add flags property to given host prototypes with the given flags value.
+	 * Assign given flags value to the flags property of given host prototypes.
 	 *
-	 * @param array $items
+	 * @param array $hosts
 	 * @param int   $flags
 	 */
 	private static function addFlags(array &$hosts, int $flags): void {
@@ -1244,12 +1244,12 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check for valid host groups.
+	 * Check if host groups links are valid.
 	 *
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 *
-	 * @throws APIException if groups are not valid.
+	 * @throws APIException
 	 */
 	private static function checkGroupLinks(array $hosts, array $db_hosts = null): void {
 		$edit_groupids = [];
@@ -2145,7 +2145,7 @@ class CHostPrototype extends CHostBase {
 				'host_status' => $upd_db_host['host_status']
 			];
 
-			self::addInheritedFields($upd_host, $upd_db_host, $host);
+			self::addInheritedFields($upd_host, $host);
 
 			$upd_host += [
 				'interfaces' => [],
@@ -2195,7 +2195,7 @@ class CHostPrototype extends CHostBase {
 					'host_status' => $lld_rule['host_status']
 				];
 
-				self::addInheritedFields($ins_host, null, $host);
+				self::addInheritedFields($ins_host, $host);
 
 				$ins_hosts[] = $ins_host;
 			}
@@ -2224,7 +2224,7 @@ class CHostPrototype extends CHostBase {
 
 		self::addInternalFields($upd_db_hosts);
 
-		$parent_indexes = array_flip(array_column($hosts, 'itemid'));
+		$parent_indexes = array_flip(array_column($hosts, 'hostid'));
 
 		$_upd_hosts = [];
 
@@ -2261,7 +2261,7 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	private static function getUpdChildObjectsUsingTemplateid(array $hosts, array $upd_db_hosts): array {
-		$parent_indexes = array_flip(array_column($hosts, 'itemid'));
+		$parent_indexes = array_flip(array_column($hosts, 'hostid'));
 
 		$upd_hosts = [];
 
@@ -2272,7 +2272,7 @@ class CHostPrototype extends CHostBase {
 				array_flip(['hostid', 'ruleid', 'host_status'])
 			);
 
-			self::addInheritedFields($upd_host, $upd_db_host, $host);
+			self::addInheritedFields($upd_host, $host);
 
 			$upd_hosts[] = $upd_host;
 		}
@@ -2282,10 +2282,9 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array      $inh_host
-	 * @param array|null $upd_db_host
 	 * @param array      $host
 	 */
-	private static function addInheritedFields(array &$inh_host, array $upd_db_host = null, array $host): void {
+	private static function addInheritedFields(array &$inh_host, array $host): void {
 		$inh_host += array_intersect_key($host,
 			array_flip(['host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'])
 		);
@@ -2340,29 +2339,7 @@ class CHostPrototype extends CHostBase {
 			$inh_host['macros'] = [];
 
 			foreach ($host['macros'] as $host_macro) {
-				if ($upd_db_host === null) {
-					$macro = array_diff_key($host_macro, array_flip(['hostmacroid']));
-				}
-				else {
-					$macro = [
-						'macro' => $host_macro['macro'],
-						'type' => $host_macro['type'],
-						'value' => $host_macro['value'],
-						'description' => array_key_exists('description', $host_macro)
-							? $host_macro['description']
-							: DB::getDefault('hostmacro', 'description')
-					];
-
-					foreach ($upd_db_host['macros'] as $i => $db_macro) {
-						if (!DB::getUpdatedValues('hostmacro', $macro, $db_macro)) {
-							$macro = ['hostmacroid' => $db_macro['hostmacroid']];
-							unset($upd_db_host['macros'][$i]);
-							break;
-						}
-					}
-				}
-
-				$inh_host['macros'][] = $macro;
+				$inh_host['macros'][] =  array_diff_key($host_macro, array_flip(['hostmacroid']));
 			}
 		}
 	}

@@ -1235,7 +1235,7 @@ class CApiInputValidator {
 	 *                                                                           API_ALLOW_UNEXPECTED
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
-	 * @param string $rule['fields'][<field_name>]['unset']           (optional)
+	 * @param bool   $rule['fields'][<field_name>]['unset']           (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
