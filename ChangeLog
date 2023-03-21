@@ -9,6 +9,8 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 ........S. [ZBXNEXT-8241] added support of signing data using rs256 to the JavaScript engine (dgoloscapov)
 .........T [ZBXNEXT-8217] added connector metrics to Zabbix server health templates (drasikhov)
 .........T [ZBXNEXT-8208] added storage accounts in Azure template (egordymov)
+........S. [ZBXNEXT-8105] fixed connector diagnostic information reporting in case there are no connectors (vso)
+
 
 Bug fixes:
 ..F....... [ZBX-22205] fixed the inability to update a dependent item that is inherited from a template (jfreibergs)
@@ -39,7 +41,6 @@ A.F....... [ZBX-21739] fixed Discover status not being updated for templated gra
 .D.G...... [ZBX-21723] removed syslog LogType from config file for Zabbix agent 2 on Windows (dgoloscapov)
 ........S. [ZBX-22407] fixed a crash when testing an item with the aggregated function count containing invalid argument (dgoloscapov)
 ..F....... [ZBX-22056] fixed the "No data found" message style in Monitoring->Problems (esekace)
-........S. [ZBXNEXT-8105] fixed connector diagnostic information reporting in case there are no connectors (vso)
 ..F....... [ZBX-22411] fixed incorrect time in the dashboard Graph widget hintbox (dfofanovs)
 .......PS. [ZBX-22026] fixed SNMP agent item going to unsupported state on NULL result (vso)
 ..F....... [ZBX-22058] fixed navigation tree collapsing after the page refresh (acikuns)
