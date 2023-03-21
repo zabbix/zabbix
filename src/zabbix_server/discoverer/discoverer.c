@@ -851,7 +851,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids)
+static void	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids,
+		zbx_hashset_t *incomplete_druleids)
 {
 	int					i;
 	zbx_vector_discoverer_results_ptr_t	results;
@@ -859,6 +860,7 @@ static void	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64
 	zbx_hashset_iter_t			iter;
 
 	zbx_vector_discoverer_results_ptr_create(&results);
+	zbx_hashset_clear(incomplete_druleids);
 
 	pthread_mutex_lock(&manager->results_lock);
 	zbx_hashset_iter_reset(&manager->results, &iter);
@@ -873,10 +875,13 @@ static void	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64
 
 		if (NULL != (check_count = zbx_hashset_search(&manager->incomplete_checks_count, &cmp)))
 		{
-			if (0 == check_count->count || FAIL != i)
-				zbx_hashset_remove_direct(&manager->incomplete_checks_count, check_count);
-			else
+			if (0 != check_count->count && FAIL == i)
+			{
+				zbx_hashset_insert(incomplete_druleids, &cmp.druleid, sizeof(zbx_uint64_t));
 				continue;
+			}
+			else
+				zbx_hashset_remove_direct(&manager->incomplete_checks_count, check_count);
 		}
 
 		if (FAIL != i)
@@ -931,8 +936,8 @@ static void	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64
 	zbx_vector_discoverer_results_ptr_destroy(&results);
 }
 
-static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_discoverer_jobs_ptr_t *jobs,
-		zbx_hashset_t *check_counts)
+static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_t *incomplete_druleids,
+		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts)
 {
 	int			rule_count = 0, delay, i;
 	char			*delay_str = NULL;
@@ -948,16 +953,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 
 	while (ZBX_IS_RUNNING() && NULL != (drule = zbx_dc_drule_next(now, nextcheck)))
 	{
-		zbx_discoverer_job_t	cmp = {.druleid = drule->druleid};
-		zbx_uint64_t		queue_capacity;
-
-		discoverer_queue_lock(&dmanager.queue);
-		i = zbx_vector_discoverer_jobs_ptr_bsearch(&dmanager.job_refs, &cmp,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - dmanager.queue.pending_checks_count;
-		discoverer_queue_unlock(&dmanager.queue);
-
-		if (FAIL != i)
+		if (NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
 		{
 			zbx_dc_drule_queue(now, drule->druleid, drule->delay);
 			zbx_discovery_drule_free(drule);
@@ -988,6 +984,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 		}
 		else
 		{
+			zbx_uint64_t			queue_capacity;
 			zbx_discoverer_job_t		*job;
 			zbx_discoverer_task_t		*task, *task_out;
 			zbx_hashset_t			tasks, drule_check_counts;
@@ -999,6 +996,10 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_vector_d
 			zbx_hashset_create(&tasks, 1, discoverer_task_hash, discoverer_task_compare);
 			zbx_hashset_create(&drule_check_counts, 1, discoverer_check_count_hash,
 					discoverer_check_count_compare);
+
+			discoverer_queue_lock(&dmanager.queue);
+			queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - dmanager.queue.pending_checks_count;
+			discoverer_queue_unlock(&dmanager.queue);
 
 			process_rule(drule, &queue_capacity, &tasks, &drule_check_counts);
 			zbx_hashset_iter_reset(&tasks, &iter);
@@ -1605,6 +1606,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	char				*error;
 	zbx_vector_uint64_pair_t	revisions;
 	zbx_vector_uint64_t		del_druleids;
+	zbx_hashset_t			incomplete_druleids;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
@@ -1639,6 +1641,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #endif
 	zbx_vector_uint64_pair_create(&revisions);
 	zbx_vector_uint64_create(&del_druleids);
+	zbx_hashset_create(&incomplete_druleids, 1, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_setproctitle("%s #%d [started]", get_process_type_string(process_type), process_num);
 
@@ -1690,7 +1693,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		zbx_vector_uint64_sort(&del_druleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		process_results(&dmanager, &del_druleids);
+
+		process_results(&dmanager, &del_druleids, &incomplete_druleids);
 
 		/* process discovery rules and create net check jobs */
 
@@ -1706,8 +1710,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			zbx_hashset_create(&check_counts, 1, discoverer_check_count_hash,
 					discoverer_check_count_compare);
 
-			rule_count = process_discovery(&nextcheck, discoverer_args_in->config_timeout, &jobs,
-					&check_counts);
+			rule_count = process_discovery(&nextcheck, discoverer_args_in->config_timeout,
+					&incomplete_druleids, &jobs, &check_counts);
 
 			if (0 == nextcheck)
 				nextcheck = time(NULL) + DISCOVERER_DELAY;
@@ -1800,6 +1804,7 @@ out:
 
 	zbx_vector_uint64_pair_destroy(&revisions);
 	zbx_vector_uint64_destroy(&del_druleids);
+	zbx_hashset_destroy(&incomplete_druleids);
 	discoverer_manager_free(&dmanager);
 	zbx_ipc_service_close(&ipc_service);
 
