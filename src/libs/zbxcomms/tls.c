@@ -37,7 +37,6 @@
 
 /* mutexes for multi-threaded OpenSSL (see "man 3ssl threads" and example in crypto/threads/mttest.c) */
 
-#ifdef _WINDOWS
 #include "zbxmutexs.h"
 
 static zbx_mutex_t	*crypto_mutexes = NULL;
@@ -94,7 +93,6 @@ static void	zbx_openssl_thread_cleanup(void)
 
 	zbx_free(crypto_mutexes);
 }
-#endif	/* _WINDOWS */
 
 static int	zbx_openssl_init_ssl(int opts, void *settings)
 {
@@ -109,8 +107,8 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 #ifdef _WINDOWS
 	ZBX_UNUSED(opts);
 	ZBX_UNUSED(settings);
-	zbx_openssl_thread_setup();
 #endif
+	zbx_openssl_thread_setup();
 	return 1;
 }
 
@@ -118,9 +116,7 @@ static void	OPENSSL_cleanup(void)
 {
 	RAND_cleanup();
 	ERR_free_strings();
-#ifdef _WINDOWS
 	zbx_openssl_thread_cleanup();
-#endif
 }
 #endif	/* defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER) */
 
@@ -147,6 +143,8 @@ size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int
 /* variable for passing information from callback functions if PSK was found among host PSKs or autoregistration PSK */
 static unsigned int	psk_usage;
 
+static zbx_tls_status_t	tls_status = ZBX_TLS_INIT_NONE;
+
 #if defined(HAVE_GNUTLS)
 static ZBX_THREAD_LOCAL gnutls_certificate_credentials_t	my_cert_creds		= NULL;
 static ZBX_THREAD_LOCAL gnutls_psk_client_credentials_t		my_psk_client_creds	= NULL;
@@ -154,7 +152,6 @@ static ZBX_THREAD_LOCAL gnutls_psk_server_credentials_t		my_psk_server_creds	= N
 static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_cert	= NULL;
 static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_psk	= NULL;
 static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_all	= NULL;
-static int							init_done		= 0;
 #elif defined(HAVE_OPENSSL)
 static ZBX_THREAD_LOCAL const SSL_METHOD	*method			= NULL;
 static ZBX_THREAD_LOCAL SSL_CTX			*ctx_cert		= NULL;
@@ -167,7 +164,6 @@ static ZBX_THREAD_LOCAL size_t			psk_identity_len_for_cb	= 0;
 static ZBX_THREAD_LOCAL char			*psk_for_cb		= NULL;
 static ZBX_THREAD_LOCAL size_t			psk_len_for_cb		= 0;
 #endif
-static int					init_done		= 0;
 #ifdef HAVE_OPENSSL_WITH_PSK
 /* variables for capturing PSK identity from server callback function */
 static ZBX_THREAD_LOCAL int			incoming_connection_has_psk = 0;
@@ -1544,13 +1540,18 @@ int	zbx_check_server_issuer_subject(const zbx_socket_t *sock, const char *allowe
  *     initialization is done separately in each child process which uses     *
  *     crypto libraries. On MS Windows it is done in the first thread.        *
  *                                                                            *
- *     Flag 'init_done' is used to prevent library deinitialzation on exit if *
- *     it was not yet initialized (can happen if termination signal is        *
- *     received).                                                             *
+ *     Flag 'init_status' is used to prevent library deinitialization on exit *
+ *     if it was not yet initialized (can happen if termination signal is     *
+ *     received) and library initialization in threads when it was done in    *
+ *     parent process.                                                        *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_tls_library_init(void)
+static void	zbx_tls_library_init(zbx_tls_status_t status)
 {
+	/* skip initialization in threads if it was already done in parent process */
+	if (ZBX_TLS_INIT_NONE != tls_status)
+		return;
+
 #if defined(HAVE_GNUTLS)
 	if (GNUTLS_E_SUCCESS != gnutls_global_init())
 	{
@@ -1558,7 +1559,7 @@ static void	zbx_tls_library_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	init_done = 1;
+	tls_status = status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library (version %s) initialized", gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)
@@ -1569,7 +1570,7 @@ static void	zbx_tls_library_init(void)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	init_done = 1;
+	tls_status = status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", OpenSSL_version(OPENSSL_VERSION));
 #endif
@@ -1580,18 +1581,18 @@ static void	zbx_tls_library_init(void)
  * Purpose: deinitialize TLS library                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tls_library_deinit(void)
+void	zbx_tls_library_deinit(zbx_tls_status_t status)
 {
 #if defined(HAVE_GNUTLS)
-	if (1 == init_done)
+	if (status == tls_status)
 	{
-		init_done = 0;
+		tls_status = 0;
 		gnutls_global_deinit();
 	}
 #elif defined(HAVE_OPENSSL)
-	if (1 == init_done)
+	if (status == tls_status)
 	{
-		init_done = 0;
+		tls_status = 0;
 		OPENSSL_cleanup();
 	}
 #endif
@@ -1604,13 +1605,9 @@ void	zbx_tls_library_deinit(void)
  ******************************************************************************/
 void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg)
 {
-#if defined(_WINDOWS)
 	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
 
-	zbx_tls_library_init();		/* on MS Windows initialize crypto libraries in parent thread */
-#else
-	ZBX_UNUSED(zbx_get_program_type_cb_arg);
-#endif
+	zbx_tls_library_init(ZBX_TLS_INIT_THREADS);
 }
 
 /******************************************************************************
@@ -1655,9 +1652,9 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
-
-	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
+	zbx_tls_library_init(ZBX_TLS_INIT_PROCESS);
+
 	/* need to allocate certificate credentials store? */
 
 	if (NULL != config_tls->cert_file)
@@ -1978,9 +1975,9 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
-
-	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
+	zbx_tls_library_init(ZBX_TLS_INIT_PROCESS);
+
 	if (1 != RAND_status())		/* protect against not properly seeded PRNG */
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize PRNG");
@@ -2581,9 +2578,8 @@ void	zbx_tls_free(void)
 		zbx_free(my_psk);
 	}
 
-#if !defined(_WINDOWS)
-	zbx_tls_library_deinit();
-#endif
+	zbx_tls_library_deinit(ZBX_TLS_INIT_PROCESS);
+
 #elif defined(HAVE_OPENSSL)
 	if (NULL != ctx_cert)
 		SSL_CTX_free(ctx_cert);
@@ -2602,9 +2598,7 @@ void	zbx_tls_free(void)
 		zbx_free(my_psk);
 	}
 
-#if !defined(_WINDOWS)
-	zbx_tls_library_deinit();
-#endif
+	zbx_tls_library_deinit(ZBX_TLS_INIT_PROCESS);
 #endif
 }
 

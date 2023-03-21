@@ -300,9 +300,17 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif	/* #if defined(_WINDOWS) */
 
+typedef enum
+{
+	ZBX_TLS_INIT_NONE,	/* not initialized */
+	ZBX_TLS_INIT_PROCESS,	/* initialized by each process */
+	ZBX_TLS_INIT_THREADS	/* initialized by parent process */
+}
+zbx_tls_status_t;
+
 void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_forks,
 		int config_passive_forks, zbx_get_program_type_f zbx_get_program_type_cb);
-void	zbx_tls_library_deinit(void);
+void	zbx_tls_library_deinit(zbx_tls_status_t status);
 void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg);
 
 void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
