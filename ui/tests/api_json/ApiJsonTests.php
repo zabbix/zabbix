@@ -21,7 +21,21 @@
 
 require_once dirname(__FILE__).'/testJSONRPC.php';
 require_once dirname(__FILE__).'/testAPIInfo.php';
+
 require_once dirname(__FILE__).'/testAction.php';
+require_once dirname(__FILE__).'/testAuditlogAction.php';
+require_once dirname(__FILE__).'/testAuditlogAutoregistration.php';
+require_once dirname(__FILE__).'/testAuditlogDashboard.php';
+require_once dirname(__FILE__).'/testAuditlogEventCorrelation.php';
+require_once dirname(__FILE__).'/testAuditlogIconMap.php';
+require_once dirname(__FILE__).'/testAuditlogMaintenance.php';
+require_once dirname(__FILE__).'/testAuditlogMediaType.php';
+require_once dirname(__FILE__).'/testAuditlogProxy.php';
+require_once dirname(__FILE__).'/testAuditlogScheduledReport.php';
+require_once dirname(__FILE__).'/testAuditlogSettings.php';
+require_once dirname(__FILE__).'/testAuditlogToken.php';
+require_once dirname(__FILE__).'/testAuditlogUser.php';
+require_once dirname(__FILE__).'/testAuditlogUserGroups.php';
 require_once dirname(__FILE__).'/testAuthentication.php';
 require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testCorrelation.php';
@@ -57,19 +71,6 @@ require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
-require_once dirname(__FILE__).'/testAuditlogAction.php';
-require_once dirname(__FILE__).'/testAuditlogAutoregistration.php';
-require_once dirname(__FILE__).'/testAuditlogDashboard.php';
-require_once dirname(__FILE__).'/testAuditlogEventCorrelation.php';
-require_once dirname(__FILE__).'/testAuditlogIconMap.php';
-require_once dirname(__FILE__).'/testAuditlogMaintenance.php';
-require_once dirname(__FILE__).'/testAuditlogMediaType.php';
-require_once dirname(__FILE__).'/testAuditlogProxy.php';
-require_once dirname(__FILE__).'/testAuditlogScheduledReport.php';
-require_once dirname(__FILE__).'/testAuditlogSettings.php';
-require_once dirname(__FILE__).'/testAuditlogToken.php';
-require_once dirname(__FILE__).'/testAuditlogUser.php';
-require_once dirname(__FILE__).'/testAuditlogUserGroups.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -79,7 +80,21 @@ class ApiJsonTests {
 
 		$suite->addTestSuite('testJSONRPC');
 		$suite->addTestSuite('testAPIInfo');
+
 		$suite->addTestSuite('testAction');
+		$suite->addTestSuite('testAuditlogAction');
+		$suite->addTestSuite('testAuditlogAutoregistration');
+		$suite->addTestSuite('testAuditlogDashboard');
+		$suite->addTestSuite('testAuditlogEventCorrelation');
+		$suite->addTestSuite('testAuditlogIconMap');
+		$suite->addTestSuite('testAuditlogMaintenance');
+		$suite->addTestSuite('testAuditlogMediaType');
+		$suite->addTestSuite('testAuditlogProxy');
+		$suite->addTestSuite('testAuditlogScheduledReport');
+		$suite->addTestSuite('testAuditlogSettings');
+		$suite->addTestSuite('testAuditlogToken');
+		$suite->addTestSuite('testAuditlogUser');
+		$suite->addTestSuite('testAuditlogUserGroups');
 		$suite->addTestSuite('testAuthentication');
 		$suite->addTestSuite('testConfiguration');
 		$suite->addTestSuite('testCorrelation');
@@ -115,19 +130,6 @@ class ApiJsonTests {
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
 		$suite->addTestSuite('testWebScenario');
-		$suite->addTestSuite('testAuditlogAction');
-		$suite->addTestSuite('testAuditlogAutoregistration');
-		$suite->addTestSuite('testAuditlogDashboard');
-		$suite->addTestSuite('testAuditlogEventCorrelation');
-		$suite->addTestSuite('testAuditlogIconMap');
-		$suite->addTestSuite('testAuditlogMaintenance');
-		$suite->addTestSuite('testAuditlogMediaType');
-		$suite->addTestSuite('testAuditlogProxy');
-		$suite->addTestSuite('testAuditlogScheduledReport');
-		$suite->addTestSuite('testAuditlogSettings');
-		$suite->addTestSuite('testAuditlogToken');
-		$suite->addTestSuite('testAuditlogUser');
-		$suite->addTestSuite('testAuditlogUserGroups');
 
 		return $suite;
 	}
