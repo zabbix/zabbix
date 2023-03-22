@@ -226,11 +226,11 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 			curlauth = CURLAUTH_DIGEST;
 			break;
 		case HTTPTEST_AUTH_BEARER:
-#if LIBCURL_VERSION_NUM >= 0x073300
+#if defined(CURLAUTH_BEARER)
 			curlauth = CURLAUTH_BEARER;
 #else
 			ZBX_UNUSED(token);
-			*error = zbx_strdup(*error, "cannot set bearer token: cURL library support >= 7.33.0 is"
+			*error = zbx_strdup(*error, "cannot set bearer token: cURL library support >= 7.61.0 is"
 					" required");
 			return FAIL;
 #endif
@@ -249,7 +249,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 
 	switch (authtype)
 	{
-#if LIBCURL_VERSION_NUM >= 0x073300
+#if defined(CURLAUTH_BEARER)
 		case HTTPTEST_AUTH_BEARER:
 			if (NULL == token || '\0' == *token)
 			{
@@ -366,6 +366,15 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 		*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
 		goto clean;
 	}
+
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+#endif
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 	{

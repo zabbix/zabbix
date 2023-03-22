@@ -22,6 +22,6 @@
 
 #include "zbxcacheconfig.h"
 
-int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
+int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding);
 
 #endif

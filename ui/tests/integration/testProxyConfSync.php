@@ -1111,11 +1111,11 @@ class testProxyConfSync extends CIntegrationTest
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_PROXY));
 		$data = explode("\n", $log);
 
-		$sync_lines = preg_grep('/DCsync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
+		$sync_lines = preg_grep('/zbx_dc_sync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
 
 		$sync_lines1 = preg_replace(
 			[
-				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ DCsync_configuration\(\) /",
+				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",
 				"/:sql:[0-9]+\.[0-9]+sec/"
@@ -1373,56 +1373,72 @@ class testProxyConfSync extends CIntegrationTest
 		]);
 	}
 
-	private function importTemplateForUpdate($filename) {
-		$xml = file_get_contents('integration/data/'.$filename);
+	private function importTemplateForUpdate($filename)
+	{
+		$xml = file_get_contents('integration/data/' . $filename);
 
 		$response = $this->call('configuration.import', [
 			'format' => 'xml',
 			'source' => $xml,
 			'rules' => [
-				'template_groups' => [
+				'template_groups' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false
 				],
-				'host_groups' => [
+				'host_groups' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false
 				],
-				'templates' => [
+				'templates' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false
 				],
-				'valueMaps' => [
+				'valueMaps' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'templateDashboards' => [
+				'templateDashboards' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'items' => [
+				'templateLinkage' =>
+				[
+					'createMissing' => false,
+					'deleteMissing' => false
+				],
+				'items' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'discoveryRules' => [
+				'discoveryRules' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'triggers' => [
+				'triggers' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'graphs' => [
+				'graphs' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
 				],
-				'httptests' => [
+				'httptests' =>
+				[
 					'updateExisting' => true,
 					'createMissing' => false,
 					'deleteMissing' => false
@@ -1476,48 +1492,58 @@ class testProxyConfSync extends CIntegrationTest
 			'format' => 'xml',
 			'source' => $xml,
 			'rules' => [
-				'host_groups' => [
-					'updateExisting' => true,
-					'createMissing' => true
+				'host_groups' =>
+				[
+				'updateExisting' => true,
+				'createMissing' => true
 				],
-				'hosts' => [
-					'updateExisting' => true,
-					'createMissing' => true
+				'hosts' =>
+				[
+				'updateExisting' => true,
+				'createMissing' => true
 				],
-				'valueMaps' => [
-					'updateExisting' => true,
-					'createMissing' => true,
-					'deleteMissing' => false
+				'valueMaps' =>
+				[
+				'updateExisting' => true,
+				'createMissing' => true,
+				'deleteMissing' => false
 				],
-				'templateLinkage' => [
-					'createMissing' => true,
-					'deleteMissing' => false
+				'templateLinkage' =>
+				[
+				'createMissing' => true,
+				'deleteMissing' => false
 				],
-				'items' => [
-					'updateExisting' => true,
-					'createMissing' => true,
-					'deleteMissing' => false
+				'items' =>
+				[
+				'updateExisting' => true,
+				'createMissing' => true,
+				'deleteMissing' => false
 				],
-				'discoveryRules' => [
-					'updateExisting' => true,
-					'createMissing' => true,
-					'deleteMissing' => false
+				'discoveryRules' =>
+				[
+				'updateExisting' => true,
+				'createMissing' => true,
+				'deleteMissing' => false
 				],
-				'triggers' => [
-					'updateExisting' => true,
-					'createMissing' => true,
-					'deleteMissing' => false
+				'triggers' =>
+				[
+				'updateExisting' => true,
+				'createMissing' => true,
+				'deleteMissing' => false
 				],
-				'graphs' => [
-					'updateExisting' => true,
-					'createMissing' => true,
-					'deleteMissing' => false
+				'graphs' =>
+				[
+				'updateExisting' => true,
+				'createMissing' => true,
+				'deleteMissing' => false
 				],
-				'httptests' => [
-					'updateExisting' => true,
-					'createMissing' => true,
-					'deleteMissing' => false
+				'httptests' =>
+				[
+				'updateExisting' => true,
+				'createMissing' => true,
+				'deleteMissing' => false
 				]
+
 			]
 		]);
 	}
@@ -1565,7 +1591,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->createProxy();
 
 		self::startComponent(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		self::startComponent(self::COMPONENT_PROXY);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);
@@ -1579,7 +1605,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->loadInitialConfiguration();
 
 		self::startComponent(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		self::startComponent(self::COMPONENT_PROXY);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);
@@ -1649,7 +1675,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->disableAllHosts();
 
 		self::startComponent(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);
@@ -1687,7 +1713,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->purgeHostGroups();
 
 		self::startComponent(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);

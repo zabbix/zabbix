@@ -50,7 +50,6 @@
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
-#include "preprocessor/preproc_manager.h"
 #include "availability/avail_manager.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
@@ -59,13 +58,11 @@
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
 #include "lld/lld_worker.h"
-#include "connector/connector_manager.h"
 #include "reporter/report_manager.h"
 #include "reporter/report_writer.h"
 #include "events.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
-#include "setproctitle.h"
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "zbxvault.h"
@@ -73,7 +70,6 @@
 #include "ha/ha.h"
 #include "zbxrtc.h"
 #include "rtc/rtc_server.h"
-#include "zbxha.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxdiag.h"
@@ -84,8 +80,7 @@
 #include "zbxthreads.h"
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
-#include "preprocessor/preproc_stats.h"
-#include "preproc.h"
+#include "preproc/preproc_server.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -145,9 +140,8 @@ const char	*help_message[] = {
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
-	"                                  preprocessing worker, proxy poller,",
-	"                                  self-monitoring, snmp trapper, task manager,",
-	"                                  timer, trapper, unreachable poller,",
+	"                                  proxy poller, self-monitoring, snmp trapper,",
+	"                                  task manager, timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
 	"                                  availability manager, service manager, odbc poller,",
 	"                                  connector manager, connector worker)",
@@ -161,9 +155,8 @@ const char	*help_message[] = {
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
-	"                                  preprocessing worker, proxy poller,",
-	"                                  self-monitoring, snmp trapper, task manager,",
-	"                                  timer, trapper, unreachable poller,",
+	"                                  proxy poller, self-monitoring, snmp trapper, ",
+	"                                  task manager, timer, trapper, unreachable poller,",
 	"                                  vmware collector, history poller,",
 	"                                  availability manager, service manager, odbc poller,",
 	"                                  connector manager, connector worker)",
@@ -211,7 +204,6 @@ static int	*threads_flags;
 
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
-zbx_cuid_t	ha_sessionid;
 static char	*CONFIG_PID_FILE = NULL;
 
 static zbx_export_file_t	*problems_export = NULL;
@@ -483,10 +475,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER];
 	}
-	else if (local_server_num <= (server_count += 1))
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		*local_process_num = local_server_num - server_count + 1;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER];
 	}
 	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER]))
 	{
@@ -1107,13 +1099,6 @@ static void	zbx_on_exit(int ret)
 		zbx_locks_disable();
 #endif
 
-	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-	{
-		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		free_database_cache(ZBX_SYNC_ALL);
-		zbx_db_close();
-	}
-
 	if (SUCCEED != zbx_ha_stop(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
@@ -1125,7 +1110,12 @@ static void	zbx_on_exit(int ret)
 	{
 		zbx_free_metrics();
 		zbx_ipc_service_free_env();
-		free_configuration_cache();
+
+		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
+		zbx_free_database_cache(ZBX_SYNC_ALL);
+		zbx_db_close();
+
+		zbx_free_configuration_cache();
 
 		/* free history value cache */
 		zbx_vc_destroy();
@@ -1147,9 +1137,7 @@ static void	zbx_on_exit(int ret)
 
 	zbx_locks_destroy();
 
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
+	zbx_setproctitle_deinit();
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_export_deinit(problems_export);
@@ -1194,9 +1182,7 @@ int	main(int argc, char **argv)
 
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
-#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	argv = setproctitle_save_env(argc, argv);
-#endif
+	argv = zbx_setproctitle_init(argc, argv);
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -1274,6 +1260,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_sysinfo(get_config_timeout);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
+	zbx_init_library_preproc(preproc_flush_value_server);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1309,17 +1296,24 @@ static void	zbx_check_db(void)
 	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
 
 	if (SUCCEED == result)
-	{
 		zbx_db_extract_dbextension_info(&db_version_info);
-	}
 
-	if (SUCCEED == result && (
 #ifdef HAVE_POSTGRESQL
-			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
+	if (SUCCEED == result)
+		result = zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 #endif
-			SUCCEED != DBcheck_version()))
+
+	if (SUCCEED == result)
 	{
-		result = FAIL;
+		zbx_ha_mode_t	ha_mode;
+
+		if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+			ha_mode = ZBX_HA_MODE_CLUSTER;
+		else
+			ha_mode = ZBX_HA_MODE_STANDALONE;
+
+		if (SUCCEED != (result = DBcheck_version(ha_mode)))
+			goto out;
 	}
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -1340,9 +1334,7 @@ static void	zbx_check_db(void)
 
 #if defined(HAVE_POSTGRESQL)
 		if (0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
-		{
 			zbx_tsdb_extract_compressed_chunk_flags(&db_version_info);
-		}
 #endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
@@ -1354,9 +1346,11 @@ static void	zbx_check_db(void)
 	}
 
 	zbx_db_close();
-
+out:
 	if (SUCCEED != result)
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
+				ZABBIX_VERSION, ZABBIX_REVISION);
 		zbx_db_version_info_clear(&db_version_info);
 		exit(EXIT_FAILURE);
 	}
@@ -1407,8 +1401,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							config_timeout};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, config_timeout,
-							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, config_timeout};
@@ -1416,7 +1409,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_taskmanager_args	taskmanager_args = {config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, config_timeout};
 	zbx_thread_pinger_args		pinger_args = {config_timeout};
-	zbx_thread_preprocessing_manager_args	preproc_man_args =
+	zbx_thread_pp_manager_args	preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 
 #ifdef HAVE_OPENIPMI
@@ -1428,14 +1421,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 
-	if (SUCCEED != init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
 		return FAIL;
 	}
 
-	if (SUCCEED != init_configuration_cache(&error))
+	if (SUCCEED != zbx_init_configuration_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1487,13 +1480,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		/* skip threaded components */
 		if (ZBX_PROCESS_TYPE_PREPROCESSOR == i)
 			continue;
-
-		/* start single discoverer manager process */
-		if (ZBX_PROCESS_TYPE_DISCOVERER == i)
-		{
-			threads_num++;
-			continue;
-		}
 
 		threads_num += CONFIG_FORKS[i];
 	}
@@ -1628,8 +1614,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
-				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &threads[i]);
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
@@ -1778,8 +1765,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
 	zbx_free_selfmon_collector();
-	free_configuration_cache();
-	free_database_cache(ZBX_SYNC_NONE);
+	zbx_free_configuration_cache();
+	zbx_free_database_cache(ZBX_SYNC_NONE);
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
@@ -1880,7 +1867,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_new_cuid(ha_sessionid.str);
+	zbx_init_library_ha();
 
 #ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS	"YES"
@@ -1991,7 +1978,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_db_init(DCget_nextid, program_type, &error))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -2011,7 +1998,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);

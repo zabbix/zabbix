@@ -137,8 +137,8 @@ static ZBX_THREAD_LOCAL size_t		my_psk_identity_len	= 0;
 static ZBX_THREAD_LOCAL char		*my_psk			= NULL;
 static ZBX_THREAD_LOCAL size_t		my_psk_len		= 0;
 
-/* Pointer to DCget_psk_by_identity() initialized at runtime. This is a workaround for linking. */
-/* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
+/* Pointer to zbx_dc_get_psk_by_identity() initialized at runtime. This is a workaround for linking. */
+/* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where zbx_dc_get_psk_by_identity() resides */
 /* but other components (e.g. agent) do not link dbconfig.o. */
 size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *) = NULL;
 
@@ -348,7 +348,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 
 	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
 	{
-		/* call the function DCget_psk_by_identity() by pointer */
+		/* call the function zbx_dc_get_psk_by_identity() by pointer */
 		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, &psk_usage))
 		{
 			/* The PSK is in configuration cache. Convert PSK to binary form. */
@@ -514,7 +514,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 
 	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
 	{
-		/* call the function DCget_psk_by_identity() by pointer */
+		/* call the function zbx_dc_get_psk_by_identity() by pointer */
 		if (0 < find_psk_in_cache((const unsigned char *)identity, tls_psk_hex, &psk_usage))
 		{
 			/* The PSK is in configuration cache. Convert PSK to binary form. */
@@ -1570,7 +1570,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
@@ -1796,7 +1796,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 		zbx_log_ciphersuites(__func__, "certificate and PSK", ciphersuites_all);
 	}
 #ifndef _WINDOWS
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1893,7 +1893,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
@@ -2422,7 +2422,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 	}
 #endif /* defined(HAVE_OPENSSL_WITH_PSK) */
 #ifndef _WINDOWS
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

@@ -22,82 +22,220 @@
 class CHostImporter extends CImporter {
 
 	/**
+	 * @var array  A list of host IDs which were created or updated to create an interface cache for those hosts.
+	 */
+	protected $processedHostIds = [];
+
+	/**
 	 * Import hosts.
 	 *
 	 * @param array $hosts
 	 *
 	 * @throws Exception
 	 */
-	public function import(array $hosts): array {
-		$hostids = [];
-		$upd_hosts = [];
-		$ins_hosts = [];
-
-		$is_template_linkage = $this->options['templateLinkage']['createMissing']
-			|| $this->options['templateLinkage']['deleteMissing'];
+	public function import(array $hosts): void {
+		$hosts_to_create = [];
+		$hosts_to_update = [];
+		$valuemaps = [];
+		$template_linkage = [];
+		$templates_to_unlink = [];
 
 		foreach ($hosts as $host) {
+			/*
+			 * Save linked templates for 2 purposes:
+			 *  - save linkages to add in case if 'create new' linkages is checked;
+			 *  - calculate missing linkages in case if 'delete missing' is checked.
+			 */
+			if (array_key_exists('templates', $host)) {
+				foreach ($host['templates'] as $template) {
+					$templateid = $this->referencer->findTemplateidByHost($template['name']);
+
+					if ($templateid === null) {
+						throw new Exception(_s('Template "%1$s" for host "%2$s" does not exist.', $template['name'], $host['host']));
+					}
+
+					$template_linkage[$host['host']][] = ['templateid' => $templateid];
+				}
+			}
+
+			unset($host['templates']);
+
 			$host = $this->resolveHostReferences($host);
 
-			if (array_key_exists('hostid', $host)) {
-				if ($this->options['hosts']['updateExisting'] || $this->options['process_hosts']) {
-					$hostids[$host['host']] = $host['hostid'];
-					$this->referencer->setDbHost($host['hostid'], $host);
+			if (array_key_exists('hostid', $host)
+					&& ($this->options['hosts']['updateExisting'] || $this->options['process_hosts'])) {
+				$hosts_to_update[] = $host;
+			}
+			elseif ($this->options['hosts']['createMissing']) {
+				if (array_key_exists('hostid', $host)) {
+					throw new Exception(_s('Host "%1$s" already exists.', $host['host']));
+				}
 
-					if ($this->options['hosts']['updateExisting']) {
-						if (!$is_template_linkage) {
-							unset($host['templates']);
+				$hosts_to_create[] = $host;
+			}
+
+			if (array_key_exists('valuemaps', $host)) {
+				$valuemaps[$host['host']] = $host['valuemaps'];
+			}
+		}
+
+		if ($hosts_to_update) {
+			// Get template linkages to unlink and clear.
+			if ($this->options['templateLinkage']['deleteMissing']) {
+				// Get already linked templates.
+				$db_template_links = API::Host()->get([
+					'output' => ['hostids'],
+					'selectParentTemplates' => ['templateid'],
+					'hostids' => array_column($hosts_to_update, 'hostid'),
+					'preservekeys' => true
+				]);
+
+				foreach ($db_template_links as &$db_template_link) {
+					$db_template_link = array_column($db_template_link['parentTemplates'], 'templateid');
+				}
+				unset($db_template_link);
+
+				foreach ($hosts_to_update as $host) {
+					if (array_key_exists($host['host'], $template_linkage)) {
+						$templates_to_unlink[$host['hostid']] = array_diff(
+							$db_template_links[$host['hostid']],
+							array_column($template_linkage[$host['host']], 'templateid')
+						);
+					}
+					else {
+						$templates_to_unlink[$host['hostid']] = $db_template_links[$host['hostid']];
+					}
+				}
+			}
+
+			if ($this->options['hosts']['updateExisting']) {
+				$hosts_to_update = $this->addInterfaceIds($hosts_to_update);
+
+				API::Host()->update($hosts_to_update);
+			}
+
+			foreach ($hosts_to_update as $host) {
+				$this->processedHostIds[$host['host']] = $host['hostid'];
+
+				// Drop existing template linkages if 'delete missing' selected.
+				if (array_key_exists($host['hostid'], $templates_to_unlink) && $templates_to_unlink[$host['hostid']]) {
+					$host['templates'] = [];
+
+					API::Host()->update($host);
+				}
+
+				// Make new template linkages.
+				if ($this->options['templateLinkage']['createMissing']
+						&& array_key_exists($host['host'], $template_linkage)) {
+					API::Host()->massAdd([
+						'hosts' => $host,
+						'templates' => $template_linkage[$host['host']]
+					]);
+				}
+
+				$db_valuemaps = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name'],
+					'hostids' => [$host['hostid']]
+				]);
+
+				if ($this->options['valueMaps']['createMissing'] && array_key_exists($host['host'], $valuemaps)) {
+					$valuemaps_to_create = [];
+					$valuemap_names = array_column($db_valuemaps, 'name');
+
+					foreach ($valuemaps[$host['host']] as $valuemap) {
+						if (!in_array($valuemap['name'], $valuemap_names)) {
+							$valuemap['hostid'] = $host['hostid'];
+							$valuemaps_to_create[] = $valuemap;
 						}
-
-						$upd_hosts[] = $host;
 					}
-					elseif ($is_template_linkage) {
-						$upd_hosts[] = ['hostid' => $host['hostid'], 'templates' => $host['templates']];
+
+					if ($valuemaps_to_create) {
+						API::ValueMap()->create($valuemaps_to_create);
 					}
 				}
-			}
-			else {
-				if ($this->options['hosts']['createMissing']) {
-					if (!$this->options['templateLinkage']['createMissing']) {
-						unset($host['templates']);
+
+				if ($this->options['valueMaps']['updateExisting'] && array_key_exists($host['host'], $valuemaps)) {
+					$valuemaps_to_update = [];
+
+					foreach ($db_valuemaps as $db_valuemap) {
+						foreach ($valuemaps[$host['host']] as $valuemap) {
+							if ($db_valuemap['name'] === $valuemap['name']) {
+								$valuemap['valuemapid'] = $db_valuemap['valuemapid'];
+								$valuemaps_to_update[] = $valuemap;
+							}
+						}
 					}
 
-					$ins_hosts[] = $host;
+					if ($valuemaps_to_update) {
+						API::ValueMap()->update($valuemaps_to_update);
+					}
+				}
+
+				if ($this->options['valueMaps']['deleteMissing'] && $db_valuemaps) {
+					$valuemapids_to_delete = [];
+
+					if (array_key_exists($host['host'], $valuemaps)) {
+						$valuemap_names = array_column($valuemaps[$host['host']], 'name');
+
+						foreach ($db_valuemaps as $db_valuemap) {
+							if (!in_array($db_valuemap['name'], $valuemap_names)) {
+								$valuemapids_to_delete[] = $db_valuemap['valuemapid'];
+							}
+						}
+					}
+					else {
+						$valuemapids_to_delete = array_column($db_valuemaps, 'valuemapid');
+					}
+
+					if ($valuemapids_to_delete) {
+						API::ValueMap()->delete($valuemapids_to_delete);
+					}
 				}
 			}
 		}
 
-		if ($upd_hosts) {
-			$this->addInterfaceIds($upd_hosts);
+		if ($this->options['hosts']['createMissing'] && $hosts_to_create) {
+			$created_hosts = API::Host()->create($hosts_to_create);
 
-			if ($is_template_linkage) {
-				$this->addExistingTemplates($upd_hosts);
-			}
+			foreach ($hosts_to_create as $index => $host) {
+				$hostid = $created_hosts['hostids'][$index];
 
-			API::Host()->update($upd_hosts);
-		}
-
-		if ($ins_hosts) {
-			$ins_hostids = API::Host()->create($ins_hosts)['hostids'];
-
-			foreach ($ins_hosts as $host) {
-				$hostid = array_shift($ins_hostids);
-
-				$hostids[$host['host']] = $hostid;
 				$this->referencer->setDbHost($hostid, $host);
+				$this->processedHostIds[$host['host']] = $hostid;
+
+				if ($this->options['templateLinkage']['createMissing']
+						&& array_key_exists($host['host'], $template_linkage)) {
+					API::Host()->massAdd([
+						'hosts' => ['hostid' => $hostid],
+						'templates' => $template_linkage[$host['host']]
+					]);
+				}
+
+				if ($this->options['valueMaps']['createMissing'] && array_key_exists($host['host'], $valuemaps)) {
+					$valuemaps_to_create = [];
+
+					foreach ($valuemaps[$host['host']] as $valuemap) {
+						$valuemap['hostid'] = $hostid;
+						$valuemaps_to_create[] = $valuemap;
+					}
+
+					if ($valuemaps_to_create) {
+						API::ValueMap()->create($valuemaps_to_create);
+					}
+				}
 			}
 		}
 
 		// create interfaces cache interface_ref->interfaceid
 		$db_interfaces = API::HostInterface()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'hostids' => array_values($hostids)
+			'hostids' => $this->processedHostIds
 		]);
 
 		foreach ($hosts as $host) {
-			if (array_key_exists($host['host'], $hostids)) {
+			if (array_key_exists($host['host'], $this->processedHostIds)) {
 				foreach ($host['interfaces'] as $interface) {
-					$hostid = $hostids[$host['host']];
+					$hostid = $this->processedHostIds[$host['host']];
 
 					if (!array_key_exists($hostid, $this->referencer->interfaces_cache)) {
 						$this->referencer->interfaces_cache[$hostid] = [];
@@ -132,8 +270,15 @@ class CHostImporter extends CImporter {
 				}
 			}
 		}
+	}
 
-		return array_values($hostids);
+	/**
+	 * Get a list of created or updated host IDs.
+	 *
+	 * @return array
+	 */
+	public function getProcessedHostIds(): array {
+		return $this->processedHostIds;
 	}
 
 	/**
@@ -188,21 +333,6 @@ class CHostImporter extends CImporter {
 			}
 		}
 
-		if ($this->options['templateLinkage']['createMissing'] || $this->options['templateLinkage']['deleteMissing']) {
-			foreach ($host['templates'] as &$template) {
-				$templateid = $this->referencer->findTemplateidByHost($template['name']);
-
-				if ($templateid === null) {
-					throw new Exception(
-						_s('Template "%1$s" for host "%2$s" does not exist.', $template['name'], $host['host'])
-					);
-				}
-
-				$template['templateid'] = $templateid;
-			}
-			unset($template);
-		}
-
 		return $host;
 	}
 
@@ -210,8 +340,10 @@ class CHostImporter extends CImporter {
 	 * For existing hosts we need to set an interfaceid for existing interfaces or they will be added.
 	 *
 	 * @param array $hosts  Hosts from XML for which interfaces will be added.
+	 *
+	 * @return array
 	 */
-	private function addInterfaceIds(array &$hosts): void {
+	protected function addInterfaceIds(array $hosts): array {
 		$db_interfaces = API::HostInterface()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => array_column($hosts, 'hostid'),
@@ -284,46 +416,7 @@ class CHostImporter extends CImporter {
 			unset($interface);
 		}
 		unset($host);
-	}
 
-	/**
-	 * Add the existing templates to given hosts.
-	 *
-	 * @param array $hosts
-	 */
-	private function addExistingTemplates(array &$hosts): void {
-		if ($this->options['templateLinkage']['createMissing'] && $this->options['templateLinkage']['deleteMissing']) {
-			return;
-		}
-
-		$db_hosts = API::Host()->get([
-			'output' => [],
-			'selectParentTemplates' => ['templateid'],
-			'hostids' => array_column($hosts, 'hostid'),
-			'preservekeys' => true
-		]);
-
-		foreach ($hosts as &$host) {
-			if ($this->options['templateLinkage']['createMissing']) {
-				$templateids = array_column($host['templates'], 'templateid');
-
-				foreach ($db_hosts[$host['hostid']]['parentTemplates'] as $db_template) {
-					if (!in_array($db_template['templateid'], $templateids)) {
-						$host['templates'][] = $db_template;
-					}
-				}
-			}
-
-			if ($this->options['templateLinkage']['deleteMissing']) {
-				$db_templateids = array_column($db_hosts[$host['hostid']]['parentTemplates'], 'templateid');
-
-				foreach ($host['templates'] as $i => $template) {
-					if (!in_array($template['templateid'], $db_templateids)) {
-						unset($host['templates'][$i]);
-					}
-				}
-			}
-		}
-		unset($host);
+		return $hosts;
 	}
 }

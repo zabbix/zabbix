@@ -3,18 +3,18 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The updated template for monitoring the Mellanox network switches over SNMP agent. All items collected in one template without any linked templates.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 
 ## Zabbix configuration
 
-The template uses context macros for the temperature trigger expression. By default, it uses a macro value like {$TEMP.MAX.CRIT}. To adjust the threshold for a certain sensor you can define context macros on the host level, with a value corresponding to your device specifications, for example: {$TEMP.MAX.CRIT:"MGMT/BOARD_MONITOR"}. Please, read https://www.zabbix.com/documentation/6.4/manual/config/macros/user_macros_context for more detailed info on user context macros.
+The template uses context macros for the temperature trigger expression. By default, it uses a macro value like {$TEMP.MAX.CRIT}. To adjust the threshold for a certain sensor you can define context macros on the host level, with a value corresponding to your device specifications, for example: {$TEMP.MAX.CRIT:"MGMT/BOARD_MONITOR"}. Please, read https://www.zabbix.com/documentation/7.0/manual/config/macros/user_macros_context for more detailed info on user context macros.
 
 ### Macros used
 

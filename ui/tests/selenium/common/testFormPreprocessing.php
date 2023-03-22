@@ -870,7 +870,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
 								'parameter_3' => 'label_name']
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			[
@@ -2128,6 +2129,13 @@ abstract class testFormPreprocessing extends CWebTest {
 		}
 
 		$form = $this->addItemWithPreprocessing($data, $lld);
+
+		// Take a screenshot to test draggable object position of preprocessing steps.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:preprocessing')->one(), 'Preprocessing'.$this->link);
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -2825,16 +2833,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		if ($templated) {
 			// Check that right templated item is opened.
-			if ($item === 'Discovery rule') {
-				$label = 'Parent discovery rule';
-			}
-			elseif ($item === 'Item prototype') {
-				$label = 'Parent item prototype';
-			}
-			else {
-				$label = 'Parent item';
-			}
-
+			$label = ($item === 'Discovery rule') ? 'Parent discovery rules' : 'Parent items';
 			$this->assertEquals('Inheritance test template', $form->getField($label)->getText());
 		}
 
