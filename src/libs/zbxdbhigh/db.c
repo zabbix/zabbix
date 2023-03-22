@@ -3658,6 +3658,25 @@ int	zbx_db_check_instanceid(void)
 	return ret;
 }
 
+#if defined(HAVE_MYSQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: returns escaped DB name                                           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_get_name_esc(void)
+{
+	static char	*name;
+
+	if (NULL == name)
+	{
+		name = zbx_db_dyn_escape_string(zbx_cfg_dbhigh->config_dbname);
+	}
+
+	return name;
+}
+#endif
+
 #if defined(HAVE_POSTGRESQL)
 /******************************************************************************
  *                                                                            *
