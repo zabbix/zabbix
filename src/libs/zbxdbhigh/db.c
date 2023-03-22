@@ -667,7 +667,7 @@ char	*DBdyn_escape_like_pattern(const char *src)
 	return zbx_db_dyn_escape_like_pattern(src);
 }
 
-static ZBX_TABLE	*DBget_table_modify(const char *tablename)
+static ZBX_TABLE	*db_get_table(const char *tablename)
 {
 	int	t;
 
@@ -680,7 +680,7 @@ static ZBX_TABLE	*DBget_table_modify(const char *tablename)
 	return NULL;
 }
 
-static ZBX_FIELD	*DBget_field_modify(ZBX_TABLE *table, const char *fieldname)
+static ZBX_FIELD	*db_get_field(ZBX_TABLE *table, const char *fieldname)
 {
 	int	f;
 
@@ -695,12 +695,12 @@ static ZBX_FIELD	*DBget_field_modify(ZBX_TABLE *table, const char *fieldname)
 
 const ZBX_TABLE	*DBget_table(const char *tablename)
 {
-	return DBget_table_modify(tablename);
+	return db_get_table(tablename);
 }
 
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
 {
-	return DBget_field_modify(( ZBX_TABLE *)table, fieldname);
+	return db_get_field(( ZBX_TABLE *)table, fieldname);
 }
 
 int	DBvalidate_field_size(const char *tablename, const char *fieldname, const char *str)
@@ -2392,7 +2392,7 @@ void	zbx_dbschema_modify_table(const char *tablename, struct zbx_json *json)
 
 	zbx_vector_str_create(&names);
 
-	if (NULL == (table = DBget_table_modify(tablename)))
+	if (NULL == (table = db_get_table(tablename)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, tablename);
 
@@ -2437,7 +2437,7 @@ void	zbx_dbschema_modify_table(const char *tablename, struct zbx_json *json)
 			ZBX_FIELD	*field;
 
 			zbx_strlower(row[0]);
-			if (NULL == (field = DBget_field_modify(table, row[0])))
+			if (NULL == (field = db_get_field(table, row[0])))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "%s(): table '%s', cannot find field '%s'", __func__,
 						table->table, row[0]);
