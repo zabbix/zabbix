@@ -1180,7 +1180,6 @@ static void	zbx_check_db(void)
 		zbx_db_table_prepare("item_preproc", &db_version_json);
 		zbx_json_close(&db_version_json);
 #endif
-
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
