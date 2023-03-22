@@ -124,7 +124,7 @@ void	zbx_config_tls_free(zbx_config_tls_t *config_tls)
 
 #define ZBX_SOCKET_STRERROR_LEN	512
 
-static char	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN];
+static ZBX_THREAD_LOCAL char	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN];
 
 const char	*zbx_socket_strerror(void)
 {
@@ -1166,7 +1166,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 #if defined(_WINDOWS)
 	/* WSASocket() option to prevent inheritance is available on */
 	/* Windows Server 2008 R2 SP1 or newer and on Windows 7 SP1 or newer */
-	static int	no_inherit_wsapi = -1;
+	static ZBX_THREAD_LOCAL int	no_inherit_wsapi = -1;
 
 	if (-1 == no_inherit_wsapi)
 	{
@@ -1417,11 +1417,14 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 	if (ZBX_PROTO_ERROR == (ret = socket_poll(pds, (unsigned long)s->num_socks, poll_timeout * 1000)))
 	{
 		zbx_set_socket_strerror("poll() failed: %s", strerror_from_system(zbx_socket_last_error()));
-		return ret;
+		goto out;
 	}
 
 	if (0 == ret)
-		return TIMEOUT_ERROR;
+	{
+		ret = TIMEOUT_ERROR;
+		goto out;
+	}
 
 	for (i = 0; i < s->num_socks; i++)
 	{
@@ -1436,14 +1439,14 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 			&nlen)))
 	{
 		zbx_set_socket_strerror("accept() failed: %s", strerror_from_system(zbx_socket_last_error()));
-		return ret;
+		goto out;
 	}
 
 	if (SUCCEED != socket_set_nonblocking(accepted_socket))
 	{
 		zbx_set_socket_strerror("failed to set socket non-blocking mode: %s",
 				strerror_from_system(zbx_socket_last_error()));
-		return ret;
+		goto out;
 	}
 
 	s->socket_orig = s->socket;	/* remember main socket */
@@ -1508,6 +1511,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 
 	ret = SUCCEED;
 out:
+	zbx_free(pds);
+
 	return ret;
 }
 
@@ -1692,9 +1697,9 @@ out:
 
 static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, int timeout)
 {
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	ssize_t	res;
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
 		char	*error = NULL;
