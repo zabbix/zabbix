@@ -113,7 +113,8 @@ static int	zbx_odbc_diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN rc, char **d
 				sizeof(err_msg), NULL)))
 		{
 			zbx_chrcpy_alloc(&buffer, &alloc, &offset, (NULL == buffer ? ':' : '|'));
-			zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s][%ld][%s]", sql_state, (long)err_code, err_msg);
+			zbx_snprintf_alloc(&buffer, &alloc, &offset, "[%s][%ld][%s]", sql_state, (long)err_code,
+					err_msg);
 		}
 	}
 
@@ -396,7 +397,8 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 			{
 				SQLSMALLINT	i;
 
-				query_result->row = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)query_result->col_num);
+				query_result->row = (char **)zbx_malloc(NULL,
+						sizeof(char *) * (size_t)query_result->col_num);
 
 				for (i = 0; ; i++)
 				{
@@ -631,7 +633,8 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 
 				if (SUCCEED != zbx_is_macro_char(*p))
 				{
-					*error = zbx_dsprintf(*error, "Cannot convert column #%d name to macro.", i + 1);
+					*error = zbx_dsprintf(*error, "Cannot convert column #%d name to macro.",
+							i + 1);
 					goto out;
 				}
 			}
