@@ -54,7 +54,7 @@ If your instance uses a non-default TCP port, set the port in your section of od
 |{$MSSQL.INSTANCE}|<p>The instance name for the default instance is SQLServer. For named instance set the macro value as MSSQL$instance name.</p>|`SQLServer`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
 |{$MSSQL.DBNAME.MATCHES}|<p>This macro is used in database discovery. It can be overridden on a host or linked template level.</p>|`.*`|
-|{$MSSQL.DBNAME.NOT_MATCHES}|<p>This macro is used in database discovery. It can be overridden on a host or linked template level.</p>|`master&#124;tempdb&#124;model&#124;msdb`|
+|{$MSSQL.DBNAME.NOT_MATCHES}|<p>This macro is used in database discovery. It can be overridden on a host or linked template level.</p>|`master\|tempdb\|model\|msdb`|
 |{$MSSQL.WORK_FILES.MAX}|<p>The maximum number of work files created per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.WORK_TABLES.MAX}|<p>The maximum number of work tables created per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}|<p>The minimum percentage of the worktables from cache ratio - for the High trigger expression.</p>|`90`|
