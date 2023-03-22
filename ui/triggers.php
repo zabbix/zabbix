@@ -208,7 +208,9 @@ foreach ($tags as $key => $tag) {
  * Actions
  */
 $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
-$filter_hostids = CProfile::getArray($prefix . 'triggers.filter_hostids', []);
+$filter_hostids = getRequest('filter_set')
+	? getRequest('filter_hostids', [])
+	: CProfile::getArray($prefix.'triggers.filter_hostids', []);
 $checkbox_hash = crc32(implode('', $filter_hostids));
 
 $expression_action = '';
