@@ -70,7 +70,6 @@ PROXY_SUBDIRS = \
 	zabbix_server/snmptrapper \
 	zabbix_server/vmware \
 	zabbix_server/ipmi \
-	zabbix_server/odbc \
 	zabbix_server/scripts \
 	zabbix_server/preproc \
 	zabbix_server/availability \

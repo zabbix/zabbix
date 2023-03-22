@@ -21,7 +21,7 @@
 
 #ifdef HAVE_UNIXODBC
 
-#include "odbc.h"
+#include "zbxodbc.h"
 
 #include "log.h"
 #include "zbxjson.h"
