@@ -33,10 +33,7 @@
 
 		_initActionButtons() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-templategroup')) {
-					this._submit(e.target);
-				}
-				else if (e.target.classList.contains('js-update-templategroup')) {
+				if (e.target.classList.contains('js-update-templategroup')) {
 					this._submit(e.target);
 				}
 				else if (e.target.classList.contains('js-clone-templategroup')) {
@@ -149,7 +146,8 @@
 
 					const message_box = makeMessageBox('bad', messages, title)[0];
 
-					this.form.parentNode.insertBefore(message_box, this.form);
+					clearMessages();
+					addMessage(message_box);
 				})
 				.finally(() => {
 					this._unsetLoading();

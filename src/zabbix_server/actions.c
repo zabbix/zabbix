@@ -139,8 +139,8 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	objectids, groupids;
 	zbx_uint64_t		condition_value;
 
@@ -295,8 +295,8 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 
 	while (0 != objectids_pair->values_num)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
 		size_t		sql_offset = 0;
 
 		/* objectids that need parents to be determined */
@@ -405,8 +405,8 @@ static int	check_host_template_condition(const zbx_vector_ptr_t *esc_events, zbx
 {
 	char				*sql = NULL;
 	size_t				sql_alloc = 0;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_uint64_t			condition_value;
 	zbx_vector_uint64_t		objectids;
 	zbx_vector_uint64_pair_t	objectids_pair;
@@ -470,8 +470,8 @@ static int	check_host_condition(const zbx_vector_ptr_t *esc_events, zbx_conditio
 	char			*sql = NULL;
 	const char		*operation;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	objectids;
 	zbx_uint64_t		condition_value;
 
@@ -749,8 +749,8 @@ static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_
 	zbx_vector_uint64_t	eventids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			ret = SUCCEED;
 
 	zbx_vector_uint64_create(&eventids);
@@ -986,8 +986,8 @@ static int	check_drule_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
 	char			*sql = NULL;
 	const char		*operation_and, *operation_where;
 	size_t			sql_alloc = 0, i;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
 	zbx_vector_uint64_t	objectids[2];
 	zbx_uint64_t		condition_value;
@@ -1083,8 +1083,8 @@ static int	check_dcheck_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 	char			*sql = NULL;
 	const char		*operation_where;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			object = EVENT_OBJECT_DSERVICE, i;
 	zbx_vector_uint64_t	objectids;
 	zbx_uint64_t		condition_value;
@@ -1187,8 +1187,8 @@ static int	check_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
 	char			*sql = NULL;
 	const char		*operation_and;
 	size_t			sql_alloc = 0, i;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
 	zbx_vector_uint64_t	objectids[2];
 	zbx_uint64_t		condition_value;
@@ -1279,8 +1279,8 @@ static int	check_dvalue_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			object = EVENT_OBJECT_DSERVICE;
 	zbx_vector_uint64_t	objectids;
 	int			i;
@@ -1380,8 +1380,8 @@ static int	check_dhost_ip_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, i;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
 	zbx_vector_uint64_t	objectids[2];
 	zbx_uint64_t		condition_value;
@@ -1469,8 +1469,8 @@ static int	check_dservice_type_condition(const zbx_vector_ptr_t *esc_events, zbx
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			object = EVENT_OBJECT_DSERVICE;
 	zbx_vector_uint64_t	objectids;
 	int			i, condition_value_i;
@@ -1587,8 +1587,8 @@ static int	check_duptime_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, i;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
 	zbx_vector_uint64_t	objectids[2];
 	int			condition_value_i;
@@ -1681,8 +1681,8 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			object = EVENT_OBJECT_DSERVICE;
 	zbx_vector_uint64_t	objectids;
 	int			i;
@@ -1819,8 +1819,8 @@ static int	check_hostname_metadata_condition(const zbx_vector_ptr_t *esc_events,
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			object = EVENT_OBJECT_ZABBIX_ACTIVE;
 	zbx_vector_uint64_t	objectids;
 	const char		*condition_field;
@@ -1904,8 +1904,8 @@ static int	check_areg_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			object = EVENT_OBJECT_ZABBIX_ACTIVE;
 	zbx_vector_uint64_t	objectids;
 	zbx_uint64_t		condition_value;
@@ -2131,8 +2131,8 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, i;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			objects[3] = {EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE};
 	zbx_vector_uint64_t	objectids[3], groupids;
 	zbx_uint64_t		condition_value;
@@ -2272,8 +2272,8 @@ static int	check_intern_host_template_condition(const zbx_vector_ptr_t *esc_even
 {
 	char				*sql = NULL;
 	size_t				sql_alloc = 0;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_uint64_t			condition_value;
 	int				i, j;
 	int				objects[3] = {EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE};
@@ -2366,8 +2366,8 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 	char			*sql = NULL;
 	const char		*operation, *operation_item;
 	size_t			sql_alloc = 0, i;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			objects[3] = {EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE};
 	zbx_vector_uint64_t	objectids[3];
 	zbx_uint64_t		condition_value;
@@ -2693,8 +2693,8 @@ clean:
  ******************************************************************************/
 static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		groupid, templateid;
 	zbx_vector_uint64_t	lnk_templateids, del_templateids,
 				new_groupids, del_groupids;
@@ -2734,27 +2734,27 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 
 		switch (operationtype)
 		{
-			case OPERATION_TYPE_HOST_ADD:
+			case ZBX_OPERATION_TYPE_HOST_ADD:
 				op_host_add(event, &cfg);
 				break;
-			case OPERATION_TYPE_HOST_REMOVE:
+			case ZBX_OPERATION_TYPE_HOST_REMOVE:
 				op_host_del(event);
 				break;
-			case OPERATION_TYPE_HOST_ENABLE:
+			case ZBX_OPERATION_TYPE_HOST_ENABLE:
 				op_host_enable(event, &cfg);
 				break;
-			case OPERATION_TYPE_HOST_DISABLE:
+			case ZBX_OPERATION_TYPE_HOST_DISABLE:
 				op_host_disable(event, &cfg);
 				break;
-			case OPERATION_TYPE_GROUP_ADD:
+			case ZBX_OPERATION_TYPE_GROUP_ADD:
 				if (0 != groupid)
 					zbx_vector_uint64_append(&new_groupids, groupid);
 				break;
-			case OPERATION_TYPE_GROUP_REMOVE:
+			case ZBX_OPERATION_TYPE_GROUP_REMOVE:
 				if (0 != groupid)
 					zbx_vector_uint64_append(&del_groupids, groupid);
 				break;
-			case OPERATION_TYPE_TEMPLATE_ADD:
+			case ZBX_OPERATION_TYPE_TEMPLATE_ADD:
 				if (0 != templateid)
 				{
 					if (FAIL != (i = zbx_vector_uint64_search(&del_templateids, templateid,
@@ -2766,7 +2766,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 					zbx_vector_uint64_append(&lnk_templateids, templateid);
 				}
 				break;
-			case OPERATION_TYPE_TEMPLATE_REMOVE:
+			case ZBX_OPERATION_TYPE_TEMPLATE_REMOVE:
 				if (0 != templateid)
 				{
 					if (FAIL != (i = zbx_vector_uint64_search(&lnk_templateids, templateid,
@@ -2778,7 +2778,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 					zbx_vector_uint64_append(&del_templateids, templateid);
 				}
 				break;
-			case OPERATION_TYPE_HOST_INVENTORY:
+			case ZBX_OPERATION_TYPE_HOST_INVENTORY:
 				op_host_inventory_mode(event, &cfg, inventory_mode);
 				break;
 			default:
@@ -3194,8 +3194,8 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
 		zbx_vector_uint64_t	eventids;
-		DB_ROW			row;
-		DB_RESULT		result;
+		zbx_db_row_t		row;
+		zbx_db_result_t		result;
 		int			j, index;
 
 		zbx_vector_uint64_create(&eventids);
@@ -3492,8 +3492,8 @@ out:
  ******************************************************************************/
 void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actions)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*filter = NULL;
 	size_t		filter_alloc = 0, filter_offset = 0;
 	zbx_db_action	*action;

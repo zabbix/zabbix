@@ -171,6 +171,7 @@ $input-placeholder-color: #bbbbbb;
 
 // Error messages
 $msg-bad-color: $light-red;
+$msg-btn-text-color: #ffffff;
 $msg-good-color: $light-green;
 $msg-warning-color: #ffb319;
 $msg-warning-border-color: #ffb319;
@@ -398,7 +399,7 @@ $arrow-fill-up-down: #FFFFFF;
 .dashboard-grid-widget {
 	&.dashboard-grid-widget-hidden-header {
 		&.dashboard-grid-widget-focus {
-			.dashboard-grid-widget-head {
+			.dashboard-grid-widget-header {
 				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}
@@ -407,7 +408,7 @@ $arrow-fill-up-down: #FFFFFF;
 
 .dashboard-grid-iterator {
 	&.dashboard-grid-iterator-focus {
-		.dashboard-grid-iterator-head {
+		.dashboard-grid-iterator-header {
 			box-shadow: 0 -6px 8px -2px #000000;
 		}
 	}
@@ -417,7 +418,7 @@ $arrow-fill-up-down: #FFFFFF;
 	.dashboard-grid-widget {
 		&.ui-draggable-dragging {
 			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-head {
+				.dashboard-grid-widget-header {
 					box-shadow: 0 -6px 8px -2px #000000;
 				}
 			}
@@ -433,7 +434,7 @@ $arrow-fill-up-down: #FFFFFF;
 
 	.dashboard-grid-iterator {
 		&.ui-draggable-dragging {
-			.dashboard-grid-iterator-head {
+			.dashboard-grid-iterator-header {
 				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}

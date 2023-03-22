@@ -24,12 +24,12 @@
 #include "zbxicmpping.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "preproc.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxpreproc.h"
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1
@@ -47,13 +47,13 @@
 static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double *value_dbl,	zbx_timespec_t *ts,
 		int ping_result, char *error)
 {
-	DC_ITEM		item;
+	zbx_dc_item_t	item;
 	int		errcode;
 	AGENT_RESULT	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	if (SUCCEED != errcode)
 		goto clean;
@@ -86,9 +86,9 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		zbx_free_agent_result(&value);
 	}
 clean:
-	DCrequeue_items(&item.itemid, &ts->sec, &errcode, 1);
+	zbx_dc_requeue_items(&item.itemid, &ts->sec, &errcode, 1);
 
-	DCconfig_clean_items(&item, &errcode, 1);
+	zbx_dc_config_clean_items(&item, &errcode, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -390,7 +390,7 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
 static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count,
 		int config_timeout)
 {
-	DC_ITEM			item, *items;
+	zbx_dc_item_t		item, *items;
 	int			i, num, count, interval, size, timeout, rc, errcode = SUCCEED;
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
@@ -402,7 +402,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	um_handle = zbx_dc_open_user_macros();
 
 	items = &item;
-	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, &items);
+	num = zbx_dc_config_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, &items);
 
 	for (i = 0; i < num; i++)
 	{
@@ -431,13 +431,13 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
 					items[i].flags, NULL, &ts, items[i].state, error);
 
-			DCrequeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
+			zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
 		}
 
 		zbx_free(items[i].key);
 	}
 
-	DCconfig_clean_items(items, NULL, num);
+	zbx_dc_config_clean_items(items, NULL, num);
 
 	if (items != &item)
 		zbx_free(items);
@@ -570,7 +570,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 
 		free_hosts(&items, &items_count);
 
-		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
+		nextcheck = zbx_dc_config_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",

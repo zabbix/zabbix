@@ -664,6 +664,12 @@ class testFormGraphs extends CWebTest {
 			}
 		}
 
+		// Take a screenshot to test draggable object position of items list.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:itemsTable')->one(), 'Graph'.CTestArrayHelper::get($data['items'][0], 'prototype'));
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 

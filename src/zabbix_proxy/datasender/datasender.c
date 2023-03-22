@@ -238,8 +238,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
 				{
 					zbx_uint64_t	history_maxid;
-					DB_RESULT	result;
-					DB_ROW		row;
+					zbx_db_result_t	result;
+					zbx_db_row_t	row;
 
 					result = zbx_db_select("select max(id) from proxy_history");
 
@@ -250,7 +250,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 					zbx_db_free_result(result);
 
-					reset_proxy_history_count(history_maxid - history_lastid);
+					zbx_reset_proxy_history_count(history_maxid - history_lastid);
 					zbx_proxy_set_hist_lastid(history_lastid);
 				}
 

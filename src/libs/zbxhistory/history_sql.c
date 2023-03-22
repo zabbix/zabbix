@@ -22,8 +22,6 @@
 
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
-#include "zbxnum.h"
-#include "zbxvariant.h"
 
 typedef struct
 {
@@ -34,7 +32,7 @@ zbx_sql_writer_t;
 
 static zbx_sql_writer_t	writer;
 
-typedef void (*vc_str2value_func_t)(zbx_history_value_t *value, DB_ROW row);
+typedef void (*vc_str2value_func_t)(zbx_history_value_t *value, zbx_db_row_t row);
 
 /* history table data */
 typedef struct
@@ -52,23 +50,23 @@ typedef struct
 zbx_vc_history_table_t;
 
 /* row to value converters for all value types */
-static void	row2value_str(zbx_history_value_t *value, DB_ROW row)
+static void	row2value_str(zbx_history_value_t *value, zbx_db_row_t row)
 {
 	value->str = zbx_strdup(NULL, row[0]);
 }
 
-static void	row2value_dbl(zbx_history_value_t *value, DB_ROW row)
+static void	row2value_dbl(zbx_history_value_t *value, zbx_db_row_t row)
 {
 	value->dbl = atof(row[0]);
 }
 
-static void	row2value_ui64(zbx_history_value_t *value, DB_ROW row)
+static void	row2value_ui64(zbx_history_value_t *value, zbx_db_row_t row)
 {
 	ZBX_STR2UINT64(value->ui64, row[0]);
 }
 
 /* timestamp, logeventid, severity, source, value */
-static void	row2value_log(zbx_history_value_t *value, DB_ROW row)
+static void	row2value_log(zbx_history_value_t *value, zbx_db_row_t row)
 {
 	value->log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 
@@ -202,7 +200,7 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_FLOAT != h->value_type)
 			continue;
@@ -223,7 +221,7 @@ static void	add_history_uint(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_UINT64 != h->value_type)
 			continue;
@@ -244,7 +242,7 @@ static void	add_history_str(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_STR != h->value_type)
 			continue;
@@ -265,7 +263,7 @@ static void	add_history_text(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
 			continue;
@@ -287,7 +285,7 @@ static void	add_history_log(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 		const zbx_log_value_t	*log;
 
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
@@ -330,9 +328,10 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
+	int			time_from;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select clock,ns,%s"
@@ -340,18 +339,28 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 			" where itemid=" ZBX_FS_UI64,
 			table->fields, table->name, itemid);
 
+	time_from = end_timestamp - seconds;
+
+	zbx_recalc_time_period(&time_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
+
 	if (ZBX_JAN_2038 == end_timestamp)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", end_timestamp - seconds);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", time_from);
 	}
 	else if (1 == seconds)
 	{
+		if (time_from != end_timestamp - seconds)
+		{
+			zbx_free(sql);
+			goto out;
+		}
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
 	}
 	else
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
-				end_timestamp - seconds, end_timestamp);
+				time_from, end_timestamp);
 	}
 
 	result = zbx_db_select("%s", sql);
@@ -405,8 +414,8 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
 	int			clock_to, clock_from, step = 0, ret = FAIL;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
 	const int		periods[] = {SEC_PER_HOUR, 12 * SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_DAY, SEC_PER_WEEK,
 					SEC_PER_MONTH, 0, -1};
@@ -431,7 +440,10 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 				table->fields, table->name, itemid, clock_to);
 
 		if (clock_from != clock_to)
+		{
+			zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", clock_from);
+		}
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc");
 
@@ -507,8 +519,8 @@ static int	db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 	int			ret = FAIL;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -634,7 +646,7 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (h->value_type == hist->value_type)
 			h_num++;

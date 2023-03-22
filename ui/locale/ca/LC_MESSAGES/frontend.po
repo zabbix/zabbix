@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-12 15:40+0000\n"
+"PO-Revision-Date: 2023-03-14 19:23+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -208,7 +208,7 @@ msgstr[1] "%1$s de %2$s element en estat problemàtic"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr "%1$s preseleccionats, utilitzeu les tecles de fletxa avall, amunt i Intro per seleccionar"
+msgstr "%1$s preseleccionats, empreu les tecles de fletxa avall, amunt i Intro per seleccionar"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
@@ -428,6 +428,10 @@ msgstr "A"
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
 msgstr "AFEGIR INVALIDACIÓ"
+
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr "DESPERTADOR"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -1563,6 +1567,10 @@ msgstr "Atribut"
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr "Atribució"
+
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3292,12 +3300,12 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" perqu
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de la dependència de l'activador \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de la dependència del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió de l'activador \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
@@ -3658,7 +3666,7 @@ msgstr "No es pot pas actualitzar \"%1$s\" per a l'element \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1018
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr "No es pot pas actualitzar \"%1$s\" per a l'activador de plantilla \"%2$s\"."
+msgstr "No es pot pas actualitzar \"%1$s\" per al trigger de plantilla \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1029
 #, c-format
@@ -3700,6 +3708,11 @@ msgstr "No es pot pas actualitzar un gràfic descobert."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "No es pot pas actualitzar un grup d'equips descobert \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -8545,12 +8558,12 @@ msgstr "Grup"
 #: include/classes/api/services/CHostGroup.php:656
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè l'utilitza un prototip d'equip."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè l'empra un prototip d'equip."
 
 #: include/classes/api/services/CHostGroup.php:717
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'utilitza en una condició de correlació."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'empra en una condició de correlació."
 
 #: include/classes/import/importers/CTemplateImporter.php:399
 #, c-format
@@ -9035,7 +9048,7 @@ msgstr "El grup d'equips \"%1$s\" ja existeix."
 #: include/classes/api/services/CHostGroup.php:703
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'utilitza en una condició de correlació."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'empra en una condició de correlació."
 
 #: include/classes/api/services/CHostGroup.php:631
 #, c-format
@@ -9520,7 +9533,7 @@ msgstr "Els mòduls situats a %1$s fan anar accions idèntiques."
 #: include/classes/core/CModuleManager.php:162
 #, c-format
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
-msgstr "Els mòduls situats a %2$s utilitzen un espai de noms idèntic (%1$s)."
+msgstr "Els mòduls situats a %2$s empren un espai de noms idèntic (%1$s)."
 
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
@@ -9955,7 +9968,7 @@ msgstr "Acció de condició de gravetat del trigger incorrecta."
 
 #: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr "Activador de la condició de trigger incorrecta. El trigger no existeix o no hi teniu pas accés."
+msgstr "Trigger de la condició de trigger incorrecta. El trigger no existeix o no hi teniu pas accés."
 
 #: include/classes/validators/CActionCondValidator.php:211
 msgid "Incorrect action condition type."
@@ -10048,7 +10061,7 @@ msgstr "Valor massiu incorrecte per a la interfície."
 #: include/classes/api/services/CHost.php:2241
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr "S'utilitzen caràcters incorrectes per al nom d'equip \"%1$s\"."
+msgstr "S'empren caràcters incorrectes per al nom d'equip \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
@@ -10136,7 +10149,7 @@ msgstr "Operador de condició de filtre incorrecte per a la regla de descobrimen
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/triggers.inc.php:1144
 msgid "Incorrect function is used"
-msgstr "S'utilitza una funció incorrecta"
+msgstr "S'empra una funció incorrecta"
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -11489,7 +11502,7 @@ msgstr "Etiquetes d'elements"
 
 #: jsLoader.php:397
 msgid "Item type does not use interface"
-msgstr "El tipus d'element no utilitza la interfície"
+msgstr "El tipus d'element no empra la interfície"
 
 #: items.php:879
 msgid "Item updated"
@@ -11501,7 +11514,7 @@ msgstr "L'element fa ús d'una interfície d'equip d'un equip no pare."
 
 #: include/classes/api/services/CItemGeneral.php:426
 msgid "Item uses incorrect interface type."
-msgstr "L'element utilitza un tipus d'interfície incorrecta."
+msgstr "L'element empra un tipus d'interfície incorrecta."
 
 #: app/views/popup.tophosts.column.edit.php:63
 #: include/classes/widgets/CWidgetConfig.php:59
@@ -11522,7 +11535,7 @@ msgstr "L'element no s'actualitzarà pas. L'interval d'actualització especifica
 
 #: include/items.inc.php:2094
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
-msgstr "L'element no s'actualitzarà pas. L'interval d'actualització ha d'estar entre 1 s i 1 d. També es poden utilitzar intervals programats/flexibles."
+msgstr "L'element no s'actualitzarà pas. L'interval d'actualització ha d'estar entre 1 s i 1 d. També es poden emprar intervals programats/flexibles."
 
 #: include/classes/api/services/CDashboardGeneral.php:447
 #: include/classes/api/services/CDashboardGeneral.php:454
@@ -12041,6 +12054,10 @@ msgstr "El camp de l'enllaç \"selementid2\" apunta a un ID d'element de mapa in
 msgid "Link indicators"
 msgstr "Indicadors d'enllaç"
 
+#: include/actions.inc.php:863
+msgid "Link template"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
 #: app/views/popup.massupdate.template.php:78
@@ -12411,6 +12428,10 @@ msgstr "Manteniment sense recull de dades"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Manteniment: %1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -12838,7 +12859,7 @@ msgstr "Tipus de suport desactivats per l'Administrador."
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
 msgid "Media types used by action \"%1$s\"."
-msgstr "Tipus de suport utilitzats per l'acció \"%1$s\"."
+msgstr "Tipus de suport emprats per l'acció \"%1$s\"."
 
 #: app/views/administration.usergroup.list.php:76
 #: include/views/configuration.hostgroups.list.php:70
@@ -13141,18 +13162,18 @@ msgstr "Monitoritzat per"
 #: app/views/popup.massupdate.host.php:128
 #: include/views/configuration.host.prototype.edit.php:280
 msgid "Monitored by proxy"
-msgstr "Monitoritzat per servidor intermediari"
+msgstr "Monitoritzat per proxy"
 
 #: include/classes/screens/CScreenDiscovery.php:119
 msgid "Monitored host"
-msgstr "Equip monitoritzat"
+msgstr "Equip monitorat"
 
 #: app/views/search.php:36 app/views/search.php:192
 #: include/classes/helpers/CMenuHelper.php:69
 #: include/classes/helpers/CRoleHelper.php:305
 #: include/views/inventory.host.view.php:135
 msgid "Monitoring"
-msgstr "Monitoritzant"
+msgstr "Monitorant"
 
 #: include/views/js/monitoring.sysmaps.js.php:70
 msgid "Monospace"
@@ -14146,11 +14167,11 @@ msgstr "No s'han triat pas objectius per a l'script global d'operacions d'acció
 #: include/triggers.inc.php:91
 #, c-format
 msgid "No trigger with trigger ID \"%1$s\"."
-msgstr "No hi ha activador amb l'identificador d'activador \"%1$s\"."
+msgstr "No hi ha trigger amb l'identificador de trigger \"%1$s\"."
 
 #: chart4.php:42
 msgid "No triggers defined."
-msgstr "No s'han definit pas activadors."
+msgstr "No s'han definit pas triggers."
 
 #: app/views/js/popup.itemtestedit.view.js.php:41
 msgid "No value"
@@ -16000,12 +16021,12 @@ msgstr "El servidor intermediari \"%1$s\" per a l'equip \"%2$s\" no existeix."
 #: include/classes/api/services/CProxy.php:471
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
-msgstr "El servidor intermediari \"%1$s\" s'utilitza per l'acció \"%2$s\"."
+msgstr "El servidor intermediari \"%1$s\" s'empra per l'acció \"%2$s\"."
 
 #: include/classes/api/services/CProxy.php:428
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr "El servidor intermediari \"%1$s\" s'utilitza per la regla de descobriment \"%2$s\"."
+msgstr "El servidor intermediari \"%1$s\" s'empra per la regla de descobriment \"%2$s\"."
 
 #: app/controllers/CControllerProxyCreate.php:115
 msgid "Proxy added"
@@ -16870,11 +16891,11 @@ msgstr "Torna-ho a provar"
 
 #: include/classes/data/CItemData.php:862
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "Retorna una matriu JSON amb macros LLD que descriuen els objectes MBean o els seus atributs. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON amb macros LLD que descriuen els objectes MBean o els seus atributs. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:866
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
-msgstr "Retorna una matriu JSON amb objectes MBean o els seus atributs. En comparació amb jmx.discovery, aquest no defineix macros LLD. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON amb objectes MBean o els seus atributs. En comparació amb jmx.discovery, aquest no defineix macros LLD. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:838
 msgid "Return first column of the first row of the SQL query result."
@@ -16894,7 +16915,7 @@ msgstr "Retorna el temps de resposta de ping ICMP en segons. Exemple: 0,02"
 
 #: include/classes/data/CItemData.php:1618
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr "Retorna una matriu JSON que descriu les interfícies de xarxa de l'equip configurades a Zabbix. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON que descriu les interfícies de xarxa de l'equip configurades a Zabbix. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:1594
 #: include/classes/data/CItemData.php:1674
@@ -17884,6 +17905,10 @@ msgstr "Els serveis formen una dependència circular."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "Serveis actualitzats"
+
+#: include/classes/api/services/CUser.php:1714
+msgid "Session ID or token is expected."
+msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
@@ -19326,7 +19351,7 @@ msgstr "El mètode \"%1$s.%2$s\" s'ha de cridar sense el paràmetre \"auth\"."
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
-msgstr "La plantilla d'URL s'utilitza per carregar i mostrar la capa de mosaic als mapes geogràfics."
+msgstr "La plantilla d'URL s'empra per carregar i mostrar la capa de mosaic als mapes geogràfics."
 
 #: include/classes/db/DbBackend.php:130
 #, c-format
@@ -19431,16 +19456,16 @@ msgstr "El procediment remot sol·licitat no existeix / no és pas disponible"
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
-msgstr "El token ha caducat. Actualitzeu la data de caducitat per utilitzar el token."
+msgstr "El token ha caducat. Actualitzeu la data de caducitat per emprar el token."
 
 #: include/html.inc.php:718
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "L'activador ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
+msgstr "El trigger ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
 
 #: include/html.inc.php:713
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "L'activador ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
+msgstr "El trigger ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
 
 #: app/views/administration.user.edit.php:255
 msgid "Theme"
@@ -19859,7 +19884,7 @@ msgstr "El trigger \"%1$s\" no pot pas dependre del trigger \"%2$s\", doncs es p
 #: include/classes/api/services/CTriggerGeneral.php:2300
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr "El trigger \"%1$s\" no pot dependre pas de l'activador \"%2$s\", doncs es produiria un enllaç circular (%3$s) per a la plantilla \"%4$s\"."
+msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs es produiria un enllaç circular (%3$s) per a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2316
 #, c-format
@@ -19869,7 +19894,7 @@ msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs es p
 #: include/classes/api/services/CTriggerGeneral.php:2423
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs no es permeten les dependències dels activadors de l'equip a les plantilles de triggers."
+msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs no es permeten les dependències dels triggers de l'equip a les plantilles de triggers."
 
 #: include/classes/api/services/CTriggerGeneral.php:2808
 #, c-format
@@ -20096,7 +20121,7 @@ msgstr "Actualitzats els prototips de triggers"
 
 #: app/views/administration.user.edit.php:743 include/actions.inc.php:45
 msgid "Trigger severity"
-msgstr "Gravitat del trigger"
+msgstr "Gravetat del trigger"
 
 #: app/views/popup.condition.common.php:228
 msgid "Trigger source"
@@ -20589,6 +20614,14 @@ msgstr "Desenllaça de la plantilla"
 msgid "Unlink from templates"
 msgstr "Desenllaça de les plantilles"
 
+#: include/actions.inc.php:864
+msgid "Unlink template"
+msgstr ""
+
+#: include/actions.inc.php:681
+msgid "Unlink templates"
+msgstr ""
+
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Activa el so"
@@ -20894,7 +20927,7 @@ msgstr "L'usuari \"%1$s\" és el destinatari de l'informe \"%2$s\"."
 #: include/classes/api/services/CUser.php:1302
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
-msgstr "L'usuari \"%1$s\" s'utilitza a l'acció \"%2$s\"."
+msgstr "L'usuari \"%1$s\" s'empra a l'acció \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:1375
 #, c-format
@@ -21432,7 +21465,7 @@ msgstr "Temps d'activitat de l'hipervisor de VMware, <url> - URL del servei de V
 
 #: include/classes/data/CItemData.php:1354
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Mida de memòria utilitzada de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
+msgstr "Mida de memòria emprada de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
 
 #: include/classes/data/CItemData.php:1342
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -21734,7 +21767,7 @@ msgstr "Mapes de valors"
 
 #: include/classes/data/CItemData.php:906
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
-msgstr "Valor del tema MQTT. El format de les dades retornades dependrà del contingut del tema. Si s'utilitzen comodins, retorna els valors del tema en format JSON"
+msgstr "Valor del tema MQTT. El format de les dades retornades dependrà del contingut del tema. Si s'empren comodins, retorna els valors del tema en format JSON"
 
 #: include/classes/data/CItemData.php:982
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
@@ -21972,7 +22005,7 @@ msgstr "Web"
 #: include/views/configuration.httpconf.edit.php:27
 #: include/views/configuration.httpconf.list.php:92
 msgid "Web monitoring"
-msgstr "Monitorització web"
+msgstr "Monitoratge web"
 
 #: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
@@ -22567,6 +22600,14 @@ msgstr "[Valor del dia incorrecte: \"%1$s\" ]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[Valor incorrecte del mes: \"%1$s\" ]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
@@ -24726,7 +24767,7 @@ msgstr "sufix de temps no compatible"
 
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"
-msgstr "número de versió no compatible"
+msgstr "nombre de versió no compatible"
 
 #: include/classes/validators/CApiInputValidator.php:3626
 #, c-format

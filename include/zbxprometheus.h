@@ -55,6 +55,7 @@ typedef struct
 {
 	zbx_vector_prometheus_row_t		rows;
 	zbx_vector_prometheus_label_index_t	indexes;
+	pthread_rwlock_t			index_lock;
 }
 zbx_prometheus_t;
 

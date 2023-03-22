@@ -5,30 +5,26 @@
 	li {
 		position: relative;
 		display: inline-block;
-		margin: 0 -1px 0 0;
+		margin-right: -1px;
 		padding: 0;
 
 		&:first-child {
-			border-radius: 3px 0 0 3px;
+			border-top-left-radius: 3px;
+			border-bottom-left-radius: 3px;
 
 			label {
-				border-radius: 2px 0 0 2px;
+				border-top-left-radius: 2px;
+				border-bottom-left-radius: 2px;
 			}
 		}
 
 		&:last-child {
-			border-radius: 0 3px 3px 0;
+			border-top-right-radius: 3px;
+			border-bottom-right-radius: 3px;
 
 			label {
-				border-radius: 0 2px 2px 0;
-			}
-		}
-
-		&:only-child {
-			border-radius: 3px;
-
-			label {
-				border-radius: 2px;
+				border-top-right-radius: 2px;
+				border-bottom-right-radius: 2px;
 			}
 		}
 	}
@@ -64,13 +60,6 @@
 			}
 		}
 
-		&:focus + label {
-			border-color: $form-border-focus-color;
-			background-color: $btn-form-hover-color;
-			position: relative;
-			z-index: 2;
-		}
-
 		&:checked + label {
 			color: $white;
 			border-color: $ui-bg-selected-color;
@@ -79,10 +68,8 @@
 			z-index: 1;
 		}
 
-		&:checked:focus + label {
+		&:focus + label {
 			box-shadow: 0 0 0 2px rgba($blue, .35);
-			position: relative;
-			z-index: 2;
 		}
 
 		&:checked[disabled] + label {
