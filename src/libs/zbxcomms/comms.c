@@ -991,23 +991,13 @@ int	socket_poll(zbx_pollfd_t* fds, unsigned long fds_num, int timeout)
 	for (i = 0; i < fds_num; i++)
 	{
 		if (FD_ISSET(fds[i].fd, &fds_read))
-		{
 			fds[i].revents |= (fds[i].events & (POLLRDNORM | POLLIN));
-			printf("select(): read\n");
-
-		}
 
 		if (FD_ISSET(fds[i].fd, &fds_write))
-		{
 			fds[i].revents |= (fds[i].events & (POLLWRNORM | POLLOUT));
-			printf("select(): write\n");
-		}
 
 		if (FD_ISSET(fds[i].fd, &fds_err))
-		{
 			fds[i].revents = POLLERR;
-			printf("select(): error\n");
-		}
 
 		if (0 != fds[i].revents)
 			ret++;
