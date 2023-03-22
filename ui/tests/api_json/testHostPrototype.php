@@ -1248,7 +1248,19 @@ class testHostPrototype extends CAPITest {
 			'dns' => DB::getDefault('interface', 'dns'),
 			'details' => []
 		];
-		$def_details = DB::getDefaults('interface_snmp');
+
+		$def_details = [
+			'version' => DB::getDefault('interface_snmp', 'version'),
+			'bulk' => DB::getDefault('interface_snmp', 'bulk'),
+			'community' => DB::getDefault('interface_snmp', 'community'),
+			'securityname' => DB::getDefault('interface_snmp', 'securityname'),
+			'securitylevel' => DB::getDefault('interface_snmp', 'securitylevel'),
+			'authpassphrase' => DB::getDefault('interface_snmp', 'authpassphrase'),
+			'privpassphrase' => DB::getDefault('interface_snmp', 'privpassphrase'),
+			'authprotocol' => DB::getDefault('interface_snmp', 'authprotocol'),
+			'privprotocol' => DB::getDefault('interface_snmp', 'privprotocol'),
+			'contextname' => DB::getDefault('interface_snmp', 'contextname'),
+		];
 
 		foreach ($update_interfaces['interfaces'] as &$interface) {
 			$interface += $def_interface;
