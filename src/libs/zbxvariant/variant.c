@@ -60,7 +60,12 @@ zbx_uint32_t	zbx_variant_data_bin_get_const(const void *bin, const void **data)
 
 zbx_uint32_t	zbx_variant_data_bin_get(void *bin, void **data)
 {
-	return zbx_variant_data_bin_get_const(bin, (const void **)data);
+	zbx_uint32_t	size;
+
+	memcpy(&size, bin, sizeof(zbx_uint32_t));
+	if (NULL != data)
+		*data = ((unsigned char *)bin) + sizeof(size);
+	return size;
 }
 
 void	zbx_variant_clear(zbx_variant_t *value)
