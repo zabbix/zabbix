@@ -1416,6 +1416,10 @@ msgstr "Girişimler"
 msgid "Attribution"
 msgstr ""
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -11205,6 +11209,10 @@ msgstr "Veri toplamayarak bakım"
 #: include/html.inc.php:980
 #, c-format
 msgid "Maintenance: %1$s"
+msgstr ""
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
 msgstr ""
 
 #: app/views/administration.token.view.php:42
