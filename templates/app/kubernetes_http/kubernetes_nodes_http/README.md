@@ -3,10 +3,9 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 The template to monitor Kubernetes nodes that work without any external scripts.  
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
-Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.
+Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.4) in your Kubernetes cluster.
 
 Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>/api`.
 
@@ -19,16 +18,21 @@ Then set it to the macro `{$KUBE.API.TOKEN}`.
 Set `{$KUBE.NODES.ENDPOINT.NAME}` with Zabbix agent's endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-zabbix-helm-chrt-agent`.
 Set up the macros to filter the metrics of discovered nodes
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Kubernetes, version 1.19
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.4) in your Kubernetes cluster.
 
 Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>/api`.
 
@@ -74,7 +78,7 @@ See documentation for details:
 
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -100,11 +104,11 @@ No specific Zabbix configuration is required.
 |{$KUBE.POD.FILTER.ANNOTATIONS} |<p>Annotations to filter pods (regex in values are supported)</p> |`` |
 |{$KUBE.POD.FILTER.LABELS} |<p>Labels to filter Pods (regex in values are supported)</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
@@ -112,7 +116,7 @@ There are no template links in this template.
 |Node discovery |<p>-</p> |DEPENDENT |kube.node.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p><p>- {#ROLES} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}`</p><p>- {#ROLES} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}`</p> |
 |Pod discovery |<p>-</p> |DEPENDENT |kube.pod.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT<p>- DISCARD_UNCHANGED_HEARTBEAT<p>**Filter**:</p>AND <p>- {#NODE} MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.MATCHES}`</p><p>- {#NODE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}`</p><p>- {#NAMESPACE} MATCHES_REGEX `{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}`</p><p>- {#NAMESPACE} NOT_MATCHES_REGEX `{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -156,7 +160,7 @@ There are no template links in this template.
 |Kubernetes |Node [{#NODE}] Pod [{#POD}] Status: Phase |<p>The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle.</p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase</p> |DEPENDENT |kube.pod.status.phase[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.phase`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return ['Pending', 'Running', 'Succeeded', 'Failed', 'Unknown'].indexOf(value) + 1 || 'Problem with status processing in JS'; `</p> |
 |Kubernetes |Node [{#NODE}] Pod [{#POD}] Uptime |<p>Pod uptime.</p> |DEPENDENT |kube.pod.uptime[{#POD}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.startTime`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JAVASCRIPT: `return Math.floor((Date.now() - new Date(value)) / 1000);`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|

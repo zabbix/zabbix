@@ -1593,6 +1593,10 @@ msgstr "Atribut"
 msgid "Attribution"
 msgstr "Atribuce"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -3785,6 +3789,11 @@ msgstr "Není možné aktualizovat objevený graf."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Nelze aktualizovat objevenou skupinu hostů \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -12536,6 +12545,10 @@ msgstr "Údržba bez sběru dat"
 msgid "Maintenance: %1$s"
 msgstr "Údržba: %1$s"
 
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
+
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
 msgstr "Nezapomeňte zkopírovat ověřovací token, protože jej po zavření stránky nebudete moci zobrazit."
@@ -18029,6 +18042,10 @@ msgstr "Služby tvoří kruhovou závislost."
 msgid "Services updated"
 msgstr "Služby aktualizovány"
 
+#: include/classes/api/services/CUser.php:1709
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -22726,6 +22743,14 @@ msgstr "[Nesprávná hodnota pro den: \"%1$s\" ]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[Nesprávná hodnota pro měsíc: \"%1$s\" ]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"

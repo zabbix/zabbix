@@ -128,9 +128,6 @@ jQuery(function() {
 
 			graph.data('widget')._pauseUpdating();
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
-
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				graph.data('widget')._resumeUpdating();
 
@@ -141,6 +138,10 @@ jQuery(function() {
 			});
 
 			repositionHintBox(e, graph);
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
+
 			graph
 				.off('mouseup', hintboxSilentMode)
 				.on('mouseup', {graph: graph}, hintboxSilentMode);
@@ -582,20 +583,20 @@ jQuery(function() {
 
 			if (show_hint) {
 				// Calculate time at mouse position.
-				var time = parseInt(data.timeFrom) + parseInt((offsetX - data.dimX) * data.spp);
+				const time = new CDate((data.timeFrom + (offsetX - data.dimX) * data.spp) * 1000);
 
 				html = jQuery('<div>')
-						.addClass('svg-graph-hintbox')
-						.append(
-							jQuery('<div>')
-								.addClass('header')
-								.html(time2str(time))
-						)
-						.append(html)
-						.append(points_total > data.hintMaxRows
-							? makeHintBoxFooter(data.hintMaxRows, points_total)
-							: null
-						);
+					.addClass('svg-graph-hintbox')
+					.append(
+						jQuery('<div>')
+							.addClass('header')
+							.html(time.format(PHP_ZBX_FULL_DATE_TIME))
+					)
+					.append(html)
+					.append(points_total > data.hintMaxRows
+						? makeHintBoxFooter(data.hintMaxRows, points_total)
+						: null
+					);
 			}
 		}
 		else {

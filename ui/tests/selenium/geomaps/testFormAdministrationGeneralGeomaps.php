@@ -43,7 +43,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				[
 					'Tile provider' => 'OpenStreetMap Mapnik',
 					'Tile URL' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-					'Attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+					'Attribution HTML' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 					'Max zoom level' => 19
 				]
 			],
@@ -51,7 +51,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				[
 					'Tile provider' => 'OpenTopoMap',
 					'Tile URL' => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-					'Attribution' => 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">'.
+					'Attribution HTML' => 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">'.
 							'OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | '.
 							'Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> '.
 							'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
@@ -62,7 +62,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				[
 					'Tile provider' => 'Stamen Toner Lite',
 					'Tile URL' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
-					'Attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href='.
+					'Attribution HTML' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href='.
 							'"http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; '.
 							'<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 					'Max zoom level' => 20
@@ -72,7 +72,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				[
 					'Tile provider' => 'Stamen Terrain',
 					'Tile URL' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png',
-					'Attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href='.
+					'Attribution HTML' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href='.
 							'"http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; '.
 							'<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 					'Max zoom level' => 18
@@ -82,7 +82,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				[
 					'Tile provider' => 'USGS US Topo',
 					'Tile URL' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
-					'Attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
+					'Attribution HTML' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
 					'Max zoom level' => 20
 				]
 			],
@@ -90,7 +90,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				[
 					'Tile provider' => 'USGS US Imagery',
 					'Tile URL' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
-					'Attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
+					'Attribution HTML' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
 					'Max zoom level' => 20
 				]
 			],
@@ -98,7 +98,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				[
 					'Tile provider' => 'Other',
 					'Tile URL' => '',
-					'Attribution' => '',
+					'Attribution HTML' => '',
 					'Max zoom level' => ''
 				]
 			]
@@ -134,7 +134,8 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 							"\n{z} represents zoom level parameter in the URL;".
 							"\n{x} and {y} represent tile coordinates;".
 							"\n{r} can be used to add \"@2x\" to the URL to load retina tiles.",
-					'Attribution' => 'Tile provider attribution data displayed in a small text box on the map.',
+					'Attribution HTML' => "Tile provider attribution data displayed in a small text box on the map.".
+						"\nMake sure the code comes from a reliable source and does not contain malicious scripts.",
 					'Max zoom level' => 'Maximum zoom level of the map.'
 			];
 
@@ -148,7 +149,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			// Check Service tab fields' maxlength.
 			$limits = [
 				'Tile URL' => 1024,
-				'Attribution' => 1024,
+				'Attribution HTML' => 1024,
 				'Max zoom level' => 10
 			];
 			foreach ($limits as $field => $max_length) {
@@ -300,7 +301,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Attribution' => 'aaa',
+						'Attribution HTML' => 'aaa',
 						'Max zoom level' => 20
 					]
 				]
@@ -310,7 +311,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => '111',
-						'Attribution' => '222',
+						'Attribution HTML' => '222',
 						'Max zoom level' => 1
 					]
 				]
@@ -320,7 +321,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'йцу',
-						'Attribution' => 'кен',
+						'Attribution HTML' => 'кен',
 						'Max zoom level' => 7
 					]
 				]
@@ -330,7 +331,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png',
-						'Attribution' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
+						'Attribution HTML' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
 								'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
 								'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
 								'OpenStreetMap</a> contributors',
@@ -391,7 +392,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				$expected_db = [
 					'geomaps_tile_provider' => '',
 					'geomaps_tile_url' => $data['fields']['Tile URL'],
-					'geomaps_attribution' => CTestArrayHelper::get($data['fields'], 'Attribution', ''),
+					'geomaps_attribution' => CTestArrayHelper::get($data['fields'], 'Attribution HTML', ''),
 					'geomaps_max_zoom' => $data['fields']['Max zoom level']
 				];
 			}

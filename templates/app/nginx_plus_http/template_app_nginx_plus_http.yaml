@@ -7,8 +7,8 @@ zabbix_export:
   templates:
     -
       uuid: 8cad0f2564694416b60bd8a414948641
-      template: 'Nginx Plus by HTTP'
-      name: 'Nginx Plus by HTTP'
+      template: 'NGINX Plus by HTTP'
+      name: 'NGINX Plus by HTTP'
       description: |
         Get Nginx Plus metrics by HTTP agent.
         Metrics are collected by requests to Nginx Plus API.
@@ -16,7 +16,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -32,7 +32,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns statistics of client connections.'
+          description: 'Returns the statistics of client connections.'
           url: '{$NGINX.API.ENDPOINT}/6/connections/'
           status_codes: '200,404'
           tags:
@@ -106,11 +106,11 @@ zabbix_export:
           triggers:
             -
               uuid: 91c9dab8147a4d0086019119e4e55b5e
-              expression: 'min(/Nginx Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
+              expression: 'min(/NGINX Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
               name: 'Nginx: High connections drop rate'
               event_name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
+              description: 'The rate of dropped connections is greater than `{$NGINX.DROP_RATE.MAX.WARN}` for the last 5 minutes.'
               tags:
                 -
                   tag: scope
@@ -142,7 +142,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status information for each HTTP location zone.'
+          description: 'Returns the status information for each HTTP location zone.'
           url: '{$NGINX.API.ENDPOINT}/6/http/location_zones/'
           status_codes: '200,404'
           tags:
@@ -160,7 +160,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status information for each HTTP server zone.'
+          description: 'Returns the status information for each HTTP server zone.'
           url: '{$NGINX.API.ENDPOINT}/6/http/server_zones/'
           status_codes: '200,404'
           tags:
@@ -178,7 +178,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status of each HTTP upstream server group and its servers.'
+          description: 'Returns the status of each HTTP upstream server group and its servers.'
           url: '{$NGINX.API.ENDPOINT}/6/http/upstreams/'
           status_codes: '200,404'
           tags:
@@ -196,7 +196,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Return status of nginx running instance.'
+          description: 'Return status of the NGINX running instance.'
           url: '{$NGINX.API.ENDPOINT}/6/nginx/'
           status_codes: '200,404'
           tags:
@@ -240,7 +240,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Nginx error description.'
+          description: 'The description of NGINX errors.'
           preprocessing:
             -
               type: JSONPATH
@@ -263,7 +263,7 @@ zabbix_export:
           triggers:
             -
               uuid: e444c708371748bd831bba6c8d9a92e0
-              expression: 'length(last(/Nginx Plus by HTTP/nginx.info.error))>0'
+              expression: 'length(last(/NGINX Plus by HTTP/nginx.info.error))>0'
               name: 'Nginx: Server response error'
               event_name: 'Nginx: Server response error (text: {ITEM.VALUE})'
               priority: HIGH
@@ -302,7 +302,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: uptime
-          description: 'Server uptime.'
+          description: 'The server uptime.'
           preprocessing:
             -
               type: JSONPATH
@@ -322,11 +322,11 @@ zabbix_export:
           triggers:
             -
               uuid: 396fb4be618e45578566971d5399d611
-              expression: 'nodata(/Nginx Plus by HTTP/nginx.info.uptime,30m)=1'
+              expression: 'nodata(/NGINX Plus by HTTP/nginx.info.uptime,30m)=1'
               name: 'Nginx: Failed to fetch info data'
               event_name: 'Nginx: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for metrics for the last 30 minutes'
+              description: 'Zabbix has not received any data for metrics for the last 30 minutes'
               manual_close: 'YES'
               tags:
                 -
@@ -334,11 +334,11 @@ zabbix_export:
                   value: availability
             -
               uuid: 95622a29bd58444b9f0bd985db99f922
-              expression: 'last(/Nginx Plus by HTTP/nginx.info.uptime)<10m'
+              expression: 'last(/NGINX Plus by HTTP/nginx.info.uptime)<10m'
               name: 'Nginx: Host has been restarted'
               event_name: 'Nginx: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -353,7 +353,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Version of nginx.'
+          description: 'A version number of NGINX.'
           preprocessing:
             -
               type: JSONPATH
@@ -372,11 +372,11 @@ zabbix_export:
           triggers:
             -
               uuid: a91ff018fe4f4a1495b08adeb2b0005f
-              expression: 'last(/Nginx Plus by HTTP/nginx.info.version,#1)<>last(/Nginx Plus by HTTP/nginx.info.version,#2) and length(last(/Nginx Plus by HTTP/nginx.info.version))>0'
+              expression: 'last(/NGINX Plus by HTTP/nginx.info.version,#1)<>last(/NGINX Plus by HTTP/nginx.info.version,#2) and length(last(/NGINX Plus by HTTP/nginx.info.version))>0'
               name: 'Nginx: Version has changed'
               event_name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Nginx version has changed. Ack to close.'
+              description: 'The Nginx version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -390,7 +390,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status of client HTTP requests.'
+          description: 'Returns the status of the client''s HTTP requests.'
           url: '{$NGINX.API.ENDPOINT}/6/http/requests/'
           status_codes: '200,404'
           tags:
@@ -450,7 +450,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status information for each resolver zone.'
+          description: 'Returns the status information for each Resolver zone.'
           url: '{$NGINX.API.ENDPOINT}/6/resolvers/'
           status_codes: '200,404'
           tags:
@@ -468,7 +468,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns SSL statistics.'
+          description: 'Returns the SSL statistics.'
           url: '{$NGINX.API.ENDPOINT}/6/ssl/'
           status_codes: '200,404'
           tags:
@@ -555,7 +555,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Returns status information for each stream server zone.'
+          description: 'Returns the status information for each server zone configured in the "stream" directive.'
           url: '{$NGINX.API.ENDPOINT}/6/stream/server_zones/'
           status_codes: '200,404'
           tags:
@@ -615,17 +615,44 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].discarded'
+                    - $.discarded
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              master_item:
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: location_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
+            -
+              uuid: 7dc23595142f45e2bd2a40698c21e34d
+              name: 'Nginx: HTTP location zone [{#NAME}]: Raw data'
+              type: DEPENDENT
+              key: 'nginx.http.location_zones.raw[{#NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the location zone with the name `{#NAME}`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}'']'
               master_item:
                 key: nginx.http.location_zones
               tags:
                 -
                   tag: component
                   value: location_zones
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: zone
                   value: '{#NAME}'
@@ -641,13 +668,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].received'
+                    - $.received
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -667,13 +694,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].requests'
+                    - $.requests
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -688,18 +715,18 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.1xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status codes per second.'
+              description: 'The number of responses with `1xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.1xx'
+                    - $.responses.1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -714,18 +741,18 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status codes per second.'
+              description: 'The number of responses with `2xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.2xx'
+                    - $.responses.2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -740,18 +767,18 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.3xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status codes per second.'
+              description: 'The number of responses with `3xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.3xx'
+                    - $.responses.3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -766,18 +793,18 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status codes per second.'
+              description: 'The number of responses with `4xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.4xx'
+                    - $.responses.4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -792,18 +819,18 @@ zabbix_export:
               key: 'nginx.http.location_zones.responses.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status codes per second.'
+              description: 'The number of responses with `5xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.5xx'
+                    - $.responses.5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -823,13 +850,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.total'
+                    - $.responses.total
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -849,13 +876,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].sent'
+                    - $.sent
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.location_zones
+                key: 'nginx.http.location_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -872,7 +899,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.location_zones.requests.rate[{#NAME}]'
             -
               uuid: 6b05907e4c544986b977a1b496ca92e2
@@ -882,35 +909,35 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.2xx.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.1xx.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.3xx.rate[{#NAME}]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.4xx.rate[{#NAME}]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.location_zones.responses.5xx.rate[{#NAME}]'
           master_item:
             key: nginx.http.location_zones
@@ -961,13 +988,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].discarded'
+                    - $.discarded
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -987,10 +1014,37 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].processing'
+                    - $.processing
+              master_item:
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
+            -
+              uuid: db1046fb656c4ddf8a057cc1d0cb44f6
+              name: 'Nginx: HTTP server zone [{#NAME}]: Raw data'
+              type: DEPENDENT
+              key: 'nginx.http.server_zones.raw[{#NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the HTTP server zone with the name `{#NAME}` .'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}'']'
               master_item:
                 key: nginx.http.server_zones
               tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: server_zones
@@ -1009,13 +1063,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].received'
+                    - $.received
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1035,13 +1089,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].requests'
+                    - $.requests
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1056,18 +1110,18 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.1xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status codes per second.'
+              description: 'The number of responses with `1xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.1xx'
+                    - $.responses.1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1082,18 +1136,18 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status codes per second.'
+              description: 'The number of responses with `2xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.2xx'
+                    - $.responses.2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1108,18 +1162,18 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.3xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status codes per second.'
+              description: 'The number of responses with `3xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.3xx'
+                    - $.responses.3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1134,18 +1188,18 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status codes per second.'
+              description: 'The number of responses with `4xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.4xx'
+                    - $.responses.4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1160,18 +1214,18 @@ zabbix_export:
               key: 'nginx.http.server_zones.responses.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status codes per second.'
+              description: 'The number of responses with `5xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.5xx'
+                    - $.responses.5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1191,13 +1245,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.total'
+                    - $.responses.total
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1217,13 +1271,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].sent'
+                    - $.sent
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.server_zones
+                key: 'nginx.http.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -1240,7 +1294,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.server_zones.requests.rate[{#NAME}]'
             -
               uuid: 5870e9a861f046b3946c2464c6c5007d
@@ -1250,35 +1304,35 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.2xx.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.1xx.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.3xx.rate[{#NAME}]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.4xx.rate[{#NAME}]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.server_zones.responses.5xx.rate[{#NAME}]'
           master_item:
             key: nginx.http.server_zones
@@ -1329,9 +1383,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].active.first()'
+                    - $.active
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1341,7 +1395,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: cd7455016ac549598df2551a716545ef
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Fails, rate'
@@ -1354,13 +1408,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].fails.first()'
+                    - $.fails
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1370,7 +1424,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: b0607f003d7a4713a28f0d75b7933087
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Header time'
@@ -1384,10 +1438,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].header_time.first()'
+                    - $.header_time
                   error_handler: DISCARD_VALUE
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1397,7 +1451,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 89f89850409a4aff8447b9f7c2839f01
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, check'
@@ -1410,9 +1464,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.checks.first()'
+                    - $.health_checks.checks
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1422,7 +1476,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 31292e9dbc8c45dd936ed1e77d44940b
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, fails'
@@ -1435,9 +1489,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.fails.first()'
+                    - $.health_checks.fails
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1447,7 +1501,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 89c57fb94cab4635b14532961560a8bf
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Health checks, unhealthy'
@@ -1455,14 +1509,14 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'How many times the server became unhealthy (state “unhealthy”).'
+              description: 'Displays how many times the server has become `unhealthy` (the state - “unhealthy”.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.unhealthy.first()'
+                    - $.health_checks.unhealthy
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1472,7 +1526,37 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
+            -
+              uuid: 45905cc6029140a39a8c9228d0254063
+              name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Raw data'
+              type: DEPENDENT
+              key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the HTTP upstream with the name `[{#UPSTREAM}]`and peer with the name`[{#PEER}]`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].first()'
+              master_item:
+                key: nginx.http.upstreams
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
             -
               uuid: 8731deb89d1c4fc2bab90aca5802c721
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Received, rate'
@@ -1485,13 +1569,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].received.first()'
+                    - $.received
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1501,7 +1585,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 3ff18cfb4028421e9af0460aeaa2d6a4
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Requests, rate'
@@ -1514,13 +1598,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].requests.first()'
+                    - $.requests
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1530,7 +1614,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 6ca38995050e44488df4fde7dc543541
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 1xx, rate'
@@ -1538,18 +1622,18 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “1xx” status codes per second.'
+              description: 'The number of responses with `1xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.1xx.first()'
+                    - $.responses.1xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1559,7 +1643,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: e526b61c48eb45568ef92434eee3a2cb
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 2xx, rate'
@@ -1567,18 +1651,18 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “2xx” status codes per second.'
+              description: 'The number of responses with `2xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.2xx.first()'
+                    - $.responses.2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1588,7 +1672,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 7b2851137d77418a8548e92332c66c86
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 3xx, rate'
@@ -1596,18 +1680,18 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “3xx” status codes per second.'
+              description: 'The number of responses with `3xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.3xx.first()'
+                    - $.responses.3xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1617,7 +1701,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: cb81f113d289409ca26af48aeb68f8cc
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 4xx, rate'
@@ -1625,18 +1709,18 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “4xx” status codes per second.'
+              description: 'The number of responses with `4xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.4xx.first()'
+                    - $.responses.4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1646,7 +1730,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 172cb81d02f04fd48c7b82d8ae7dac69
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses 5xx, rate'
@@ -1654,18 +1738,18 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'The number of responses with “5xx” status codes per second.'
+              description: 'The number of responses with `5xx` status code per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.5xx.first()'
+                    - $.responses.5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1675,7 +1759,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: d587254989c743b4aa9c8043bf18baa5
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Responses total, rate'
@@ -1688,13 +1772,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].responses.total.first()'
+                    - $.responses.total
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1704,7 +1788,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 868562df5ab44d3cadeb6fa294b33559
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Response time'
@@ -1718,10 +1802,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].response_time.first()'
+                    - $.response_time
                   error_handler: DISCARD_VALUE
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1731,7 +1815,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 2a0a36d22acf453e80d79820990db9b8
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: Sent, rate'
@@ -1744,13 +1828,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].sent.first()'
+                    - $.sent
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1760,7 +1844,7 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
             -
               uuid: 33eacaa48f974c348e37475341a6c8af
               name: 'Nginx: HTTP upstream [{#UPSTREAM}] peer [{#PEER}]: State'
@@ -1770,18 +1854,18 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
+              description: 'The current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].state.first()'
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1791,11 +1875,11 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
               trigger_prototypes:
                 -
                   uuid: fc6586fe2eef457bac1d71ce0313f95d
-                  expression: 'find(/Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Nginx Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
+                  expression: 'find(/NGINX Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/NGINX Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
                   name: 'Nginx: HTTP upstream server is not in UP or DOWN state.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1810,14 +1894,14 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.'
+              description: 'Displays how many times the server has become unavailable for client requests (the state - “unavail”) due to the number of unsuccessful attempts reaching the `max_fails` threshold.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].unavail.first()'
+                    - $.unavail
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -1827,11 +1911,11 @@ zabbix_export:
                   value: '{#PEER}'
                 -
                   tag: upstream
-                  value: '{#NAME}'
+                  value: '{#UPSTREAM}'
           trigger_prototypes:
             -
               uuid: e7b4782a796b4710b50a96f3d24c8208
-              expression: 'sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))'
+              expression: 'sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))'
               name: 'Nginx: Too many HTTP requests with code 4xx'
               event_name: 'Nginx: Too many HTTP requests with code 4xx (over {$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}% for 5m)'
               priority: WARNING
@@ -1841,7 +1925,7 @@ zabbix_export:
                   value: performance
             -
               uuid: f542573d149547d3844f635bf2a87120
-              expression: 'sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/Nginx Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))'
+              expression: 'sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))'
               name: 'Nginx: Too many HTTP requests with code 5xx'
               event_name: 'Nginx: Too many HTTP requests with code 5xx (over {$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}% for 5m)'
               priority: HIGH
@@ -1858,21 +1942,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
             -
               uuid: 49cd8f25969d486ab4482b4986b1815a
@@ -1882,35 +1966,35 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.2xx.rate[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.1xx.rate[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.3xx.rate[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}]'
           master_item:
             key: nginx.http.upstreams
@@ -1964,13 +2048,40 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].keepalive'
+                    - $.keepalive
+              master_item:
+                key: 'nginx.http.upstreams.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: upstreams
+                -
+                  tag: upstream
+                  value: '{#NAME}'
+            -
+              uuid: c3e92f3e636c4c45907fecd332eb700f
+              name: 'Nginx: HTTP upstream [{#NAME}]: Raw data'
+              type: DEPENDENT
+              key: 'nginx.http.upstreams.raw[{#NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the HTTP upstream with the name `{#NAME}`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}'']'
               master_item:
                 key: nginx.http.upstreams
               tags:
                 -
                   tag: component
-                  value: upstreams
+                  value: raw
+                -
+                  tag: component
+                  value: upstream
                 -
                   tag: upstream
                   value: '{#NAME}'
@@ -1986,9 +2097,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].zombies'
+                    - $.zombies
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstreams.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2010,13 +2121,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].zone'
+                    - $.zone
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: nginx.http.upstreams
+                key: 'nginx.http.upstreams.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2062,6 +2173,33 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: f224bd4758e6481cae8779ec28a0ede4
+              name: 'Nginx: Resolver [{#NAME}]: Raw data'
+              type: DEPENDENT
+              key: 'nginx.resolvers.raw[{#NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the `Resolver` with the name `{#NAME}`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}'']'
+              master_item:
+                key: nginx.resolvers
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: resolver
+                -
+                  tag: upstream
+                  value: '{#NAME}'
+            -
               uuid: 8fd2a1c5c148423886dccb939ca61b62
               name: 'Nginx: Resolver [{#NAME}]: Requests addr, rate'
               type: DEPENDENT
@@ -2073,13 +2211,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].requests.addr'
+                    - $.requests.addr
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2099,13 +2237,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].requests.name'
+                    - $.requests.name
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2125,13 +2263,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].requests.srv'
+                    - $.requests.srv
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2146,18 +2284,18 @@ zabbix_export:
               key: 'nginx.resolvers.responses.formerr.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of FORMERR (Format error) responses per second.'
+              description: 'The total number of `FORMERR` (format error) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.formerr'
+                    - $.responses.formerr
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2177,13 +2315,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.noerror'
+                    - $.responses.noerror
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2198,18 +2336,18 @@ zabbix_export:
               key: 'nginx.resolvers.responses.notimp.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of NOTIMP (Unimplemented) responses per second.'
+              description: 'The total number of `NOTIMP` (unimplemented) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.notimp'
+                    - $.responses.notimp
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2224,18 +2362,18 @@ zabbix_export:
               key: 'nginx.resolvers.responses.nxdomain.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of NXDOMAIN (Host not found) responses per second.'
+              description: 'The total number of `NXDOMAIN` (host not found) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.nxdomain'
+                    - $.responses.nxdomain
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2250,18 +2388,18 @@ zabbix_export:
               key: 'nginx.resolvers.responses.refused.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of REFUSED (Operation refused) responses per second.'
+              description: 'The total number of `REFUSED` (operation refused) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.refused'
+                    - $.responses.refused
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2276,18 +2414,18 @@ zabbix_export:
               key: 'nginx.resolvers.responses.servfail.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of SERVFAIL (Server failure) responses per second.'
+              description: 'The total number of `SERVFAIL` (server failure) responses per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.servfail'
+                    - $.responses.servfail
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2307,13 +2445,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.timedout'
+                    - $.responses.timedout
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2333,13 +2471,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].responses.unknown'
+                    - $.responses.unknown
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.resolvers
+                key: 'nginx.resolvers.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2356,21 +2494,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.requests.name.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.requests.srv.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.requests.addr.rate[{#NAME}]'
             -
               uuid: e3535ce974114e6188752937c1bdb2c7
@@ -2380,56 +2518,56 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.responses.noerror.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.responses.formerr.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.responses.servfail.rate[{#NAME}]'
                 -
                   sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: A54F10
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.responses.nxdomain.rate[{#NAME}]'
                 -
                   sortorder: '4'
                   drawtype: GRADIENT_LINE
                   color: FC6EA3
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.responses.notimp.rate[{#NAME}]'
                 -
                   sortorder: '5'
                   drawtype: GRADIENT_LINE
                   color: 6C59DC
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.responses.refused.rate[{#NAME}]'
                 -
                   sortorder: '6'
                   drawtype: GRADIENT_LINE
                   color: AC8C14
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.responses.timedout.rate[{#NAME}]'
                 -
                   sortorder: '7'
                   drawtype: GRADIENT_LINE
                   color: 611F27
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.resolvers.responses.unknown.rate[{#NAME}]'
           master_item:
             key: nginx.resolvers
@@ -2480,13 +2618,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].connections'
+                    - $.connections
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.server_zones
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2506,13 +2644,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].discarded'
+                    - $.discarded
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.server_zones
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2532,10 +2670,37 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].processing'
+                    - $.processing
+              master_item:
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: server_zones
+                -
+                  tag: zone
+                  value: '{#NAME}'
+            -
+              uuid: b3387022f2b44650823ce47394723069
+              name: 'Nginx: Stream server zone [{#NAME}]: Raw data'
+              type: DEPENDENT
+              key: 'nginx.stream.server_zones.raw[{#NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of server zone with the name `{#NAME}`, configured in the "stream" directive.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}'']'
               master_item:
                 key: nginx.stream.server_zones
               tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: server_zones
@@ -2554,13 +2719,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].received'
+                    - $.received
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.server_zones
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2580,13 +2745,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].sent'
+                    - $.sent
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.server_zones
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2601,18 +2766,18 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status codes “2xx” per second.'
+              description: 'The total number of sessions completed with status code `2xx` per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].sessions.2xx'
+                    - $.sessions.2xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.server_zones
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2627,18 +2792,18 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status codes “4xx” per second.'
+              description: 'The total number of sessions completed with status code `4xx` per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].sessions.4xx'
+                    - $.sessions.4xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.server_zones
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2653,18 +2818,18 @@ zabbix_export:
               key: 'nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'The total number of sessions completed with status codes “5xx” per second.'
+              description: 'The total number of sessions completed with status code `5xx` per second.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].sessions.5xx'
+                    - $.sessions.5xx
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.server_zones
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2684,13 +2849,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].sessions.total'
+                    - $.sessions.total
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.server_zones
+                key: 'nginx.stream.server_zones.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -2707,21 +2872,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.stream.server_zones.sessions.2xx.rate[{#NAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.stream.server_zones.sessions.4xx.rate[{#NAME}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.stream.server_zones.sessions.5xx.rate[{#NAME}]'
           master_item:
             key: nginx.stream.server_zones
@@ -2772,9 +2937,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].active.first()'
+                    - $.active
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -2797,9 +2962,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].connections.first()'
+                    - $.connections
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -2823,10 +2988,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].connect_time.first()'
+                    - $.connect_time
                   error_handler: DISCARD_VALUE
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -2849,13 +3014,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].fails.first()'
+                    - $.fails
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -2879,10 +3044,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].first_byte_time.first()'
+                    - $.first_byte_time
                   error_handler: DISCARD_VALUE
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -2905,9 +3070,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.checks.first()'
+                    - $.health_checks.checks
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -2930,9 +3095,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.fails.first()'
+                    - $.health_checks.fails
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -2950,15 +3115,45 @@ zabbix_export:
               key: 'nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'How many times the server became unhealthy (state “unhealthy”).'
+              description: 'Displays how many times the server has become `unhealthy` (the state - “unhealthy”).'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].health_checks.unhealthy.first()'
+                    - $.health_checks.unhealthy
+              master_item:
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
+              tags:
+                -
+                  tag: component
+                  value: upstream
+                -
+                  tag: peer
+                  value: '{#PEER}'
+                -
+                  tag: upstream
+                  value: '{#UPSTREAM}'
+            -
+              uuid: 4501c6c20ccd4c93a54e0e23b75de76b
+              name: 'Nginx: Stream upstream [{#UPSTREAM}] peer [{#PEER}]: Raw data'
+              type: DEPENDENT
+              key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the upstream with the name `[{#UPSTREAM}]`and peer with the name`[{#PEER}]`, configured in the "stream" directive.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].first()'
               master_item:
                 key: nginx.stream.upstreams
               tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: upstream
@@ -2980,13 +3175,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].received.first()'
+                    - $.received
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -3010,10 +3205,10 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].response_time.first()'
+                    - $.response_time
                   error_handler: DISCARD_VALUE
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -3036,13 +3231,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].sent.first()'
+                    - $.sent
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -3062,18 +3257,18 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
+              description: 'The current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].state.first()'
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -3087,7 +3282,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 20ef9b9e953246ef856dd46033595e52
-                  expression: 'find(/Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/Nginx Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
+                  expression: 'find(/NGINX Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/NGINX Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0'
                   name: 'Nginx: Stream upstream server is not in UP or DOWN state.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -3102,14 +3297,14 @@ zabbix_export:
               key: 'nginx.stream.upstream.peer.unavail.rate[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: 7d
-              description: 'How many times the server became unavailable for client requests (state “unavail”) due to the number of unsuccessful attempts reaching the max_fails threshold.'
+              description: 'Displays how many times the server has  become unavailable for client requests (the state - “unavail”) due to the number of unsuccessful attempts reaching the `max_fails` threshold.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#UPSTREAM}''].peers[?(@.server == ''{#PEER}'')].unavail.first()'
+                    - $.unavail
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               tags:
                 -
                   tag: component
@@ -3129,21 +3324,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.stream.upstream.peer.health_checks.checks[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.stream.upstream.peer.health_checks.fails[{#UPSTREAM},{#PEER}]'
                 -
                   sortorder: '2'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
-                    host: 'Nginx Plus by HTTP'
+                    host: 'NGINX Plus by HTTP'
                     key: 'nginx.stream.upstream.peer.health_checks.unhealthy[{#UPSTREAM},{#PEER}]'
           master_item:
             key: nginx.stream.upstreams
@@ -3186,6 +3381,33 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             -
+              uuid: 17a28cedacaf4a67929982037bf61f59
+              name: 'Nginx: Stream upstream [{#NAME}]: Raw data'
+              type: DEPENDENT
+              key: 'nginx.stream.upstreams.raw[{#NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The raw data of the upstream with the name `[{#UPSTREAM}]`, configured in the "stream" directive.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[''{#NAME}'']'
+              master_item:
+                key: nginx.stream.upstreams
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: upstreams
+                -
+                  tag: upstream
+                  value: '{#NAME}'
+            -
               uuid: 5537680fbc024713a077932cc55ef3a7
               name: 'Nginx: Stream upstream [{#NAME}]: Zombies'
               type: DEPENDENT
@@ -3196,9 +3418,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].zombies'
+                    - $.zombies
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstreams.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -3219,13 +3441,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[''{#NAME}''].zone'
+                    - $.zone
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: nginx.stream.upstreams
+                key: 'nginx.stream.upstreams.raw[{#NAME}]'
               tags:
                 -
                   tag: component
@@ -3261,67 +3483,67 @@ zabbix_export:
       macros:
         -
           macro: '{$NGINX.API.ENDPOINT}'
-          description: 'NGINX Plus API URL in the format `<scheme>://<host>:<port>/<location>/`'
+          description: 'NGINX Plus API URL in the format `<scheme>://<host>:<port>/<location>/`.'
         -
           macro: '{$NGINX.DROP_RATE.MAX.WARN}'
           value: '1'
-          description: 'The critical rate of the dropped connections for trigger expression.'
+          description: 'The critical rate of the dropped connections for a  trigger expression.'
         -
           macro: '{$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}'
           value: '5'
-          description: 'Maximum percentage of errors with status code 4xx (for trigger expression).'
+          description: 'The maximum percentage of errors with the status code `4xx` (for a trigger expression).'
         -
           macro: '{$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}'
           value: '5'
-          description: 'Maximum percentage of errors with status code 4xx (for trigger expression).'
+          description: 'The maximum percentage of errors with the status code `5xx` (for a trigger expression).'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable HTTP location zones'
+          description: 'The filter to include the necessary discovered HTTP location zones.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.LOCATION.ZONE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered HTTP location zones'
+          description: 'The filter to exclude discovered HTTP location zones.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable HTTP upstreams'
+          description: 'The filter to include the necessary discovered HTTP upstreams.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.UPSTREAM.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered HTTP upstreams'
+          description: 'The filter to exclude discovered HTTP upstreams.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.ZONE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable HTTP server zones'
+          description: 'The filter to include the necessary discovered HTTP server zones.'
         -
           macro: '{$NGINX.LLD.FILTER.HTTP.ZONE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered HTTP server zones'
+          description: 'The filter to exclude discovered HTTP server zones.'
         -
           macro: '{$NGINX.LLD.FILTER.RESOLVER.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Resolvers'
+          description: 'The filter to include the necessary discovered `Resolvers`.'
         -
           macro: '{$NGINX.LLD.FILTER.RESOLVER.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Resolvers'
+          description: 'The filter to exclude discovered `Resolvers`.'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Stream upstreams'
+          description: 'The filter to include the necessary discovered upstreams of the "stream" directive.'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.UPSTREAM.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Stream upstreams'
+          description: 'The filter to exclude discovered upstreams of the "stream" directive'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.ZONE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Stream server zones'
+          description: 'The filter to include discovered server zones of the "stream" directive.'
         -
           macro: '{$NGINX.LLD.FILTER.STREAM.ZONE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Stream server zones'
+          description: 'The filter to exclude discovered server zones of the "stream" directive.'
   graphs:
     -
       uuid: a8b239f2f21a471fa3ac6a10a0419e9c
@@ -3331,28 +3553,28 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.connections.accepted.rate
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.connections.dropped
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.connections.active
         -
           sortorder: '3'
           drawtype: GRADIENT_LINE
           color: A54F10
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.connections.idle
     -
       uuid: 4be7153e244b4c28a53c527aa9fd5706
@@ -3362,7 +3584,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.requests.total.rate
     -
       uuid: b1c647610c974bc8aad4fb55e1e3c8d3
@@ -3372,21 +3594,21 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.ssl.handshakes.rate
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.ssl.handshakes_failed.rate
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.ssl.session_reuses.rate
     -
       uuid: b2da29d4951745db8a66a076eb99d0aa
@@ -3395,5 +3617,5 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Nginx Plus by HTTP'
+            host: 'NGINX Plus by HTTP'
             key: nginx.info.uptime

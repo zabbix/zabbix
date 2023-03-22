@@ -21,7 +21,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0

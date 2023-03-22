@@ -213,7 +213,9 @@ try {
 			$idp_groups = [];
 
 			if (array_key_exists($groups_key, $user_attributes) && is_array($user_attributes[$groups_key])) {
-				$idp_groups = $user_attributes[$groups_key];
+				$idp_groups = (count($user_attributes[$groups_key]) > 1)
+					? $user_attributes[$groups_key]
+					: explode(';', $user_attributes[$groups_key][0]);
 			}
 
 			$user += $provisioning->getUserGroupsAndRole($idp_groups);
