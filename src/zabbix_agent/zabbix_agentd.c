@@ -18,7 +18,7 @@
 **/
 
 #include "log.h"
-#include "modbtype.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxconf.h"
 #include "zbxexpr.h"
@@ -102,7 +102,6 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #	include "zbxnix.h"
 #endif
 
-#include "setproctitle.h"
 #include "zbxcrypto.h"
 
 const char	*progname = NULL;
@@ -1088,9 +1087,7 @@ static void	zbx_on_exit(int ret)
 	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
 #endif
 	zbx_config_tls_free(zbx_config_tls);
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
+	zbx_setproctitle_deinit();
 #ifdef _WINDOWS
 	while (0 == WSACleanup())
 		;
@@ -1420,9 +1417,7 @@ int	main(int argc, char **argv)
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
 	zbx_config_tls = zbx_config_tls_new();
-#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	argv = setproctitle_save_env(argc, argv);
-#endif
+	argv = zbx_setproctitle_init(argc, argv);
 	progname = get_program_name(argv[0]);
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))

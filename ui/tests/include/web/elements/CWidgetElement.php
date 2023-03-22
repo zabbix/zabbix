@@ -46,8 +46,8 @@ class CWidgetElement extends CElement {
 	 * @return string
 	 */
 	public function getHeaderText() {
-		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
-				' contains(@class, "dashboard-grid-iterator-head")]/h4')->one()->getText();
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4')->one()->getText();
 	}
 
 	/**
@@ -56,8 +56,8 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-content") or'.
-				' contains(@class, "dashboard-grid-iterator-content")]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-contents") or'.
+				' contains(@class, "dashboard-grid-iterator-contents")]')->one();
 	}
 
 	/**

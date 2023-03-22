@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-02 12:23+0000\n"
+"PO-Revision-Date: 2023-03-08 03:33+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1544,6 +1544,10 @@ msgstr "属性"
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr "帰属表示"
+
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3626,6 +3630,11 @@ msgstr "ディスカバリされたグラフを更新できません。"
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "ディスカバリされたホストグループ\"%1$s\"を更新できません。"
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -3931,7 +3940,7 @@ msgstr "snmptrap[]アイテムでキャッチされていないすべてのSNMP�
 #: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
 #: include/events.inc.php:256
 msgid "Cause"
-msgstr "原因"
+msgstr "主要原因の障害"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
@@ -3992,7 +4001,7 @@ msgstr "1秒あたりの差分"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
-msgstr "障害の順位の変更"
+msgstr "障害の種別の変更"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4861,11 +4870,11 @@ msgstr "JSONへの変換"
 
 #: app/views/popup.acknowledge.edit.php:134
 msgid "Convert to cause"
-msgstr "原因に変換"
+msgstr "副次的な障害から削除"
 
 #: app/views/popup.acknowledge.edit.php:135
 msgid "Converts a symptom event back to cause event"
-msgstr "兆候イベントを原因イベントに戻します"
+msgstr "副次的な障害を通常の障害へ戻します"
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -11928,6 +11937,10 @@ msgstr "マップ\"%2$s\"のリンク\"selementid2\"フィールドが存在し�
 msgid "Link indicators"
 msgstr "障害発生時の条件設定"
 
+#: include/actions.inc.php:863
+msgid "Link template"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
 #: app/views/popup.massupdate.template.php:78
@@ -12298,6 +12311,10 @@ msgstr "データ収集なしのメンテナンス"
 msgid "Maintenance: %1$s"
 msgstr "メンテナンス：%1$s"
 
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
+
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
 msgstr "ページを閉じた後は表示できなくなるため、必ず認証トークンをコピーしてください。"
@@ -12477,7 +12494,7 @@ msgstr "3月"
 
 #: jsLoader.php:361
 msgid "Mark as cause"
-msgstr "原因としてマーク"
+msgstr "副次的な障害から削除"
 
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
@@ -12493,7 +12510,7 @@ msgstr "選択をマーク"
 
 #: jsLoader.php:362
 msgid "Mark selected as symptoms"
-msgstr "選択したものを兆候としてマーク"
+msgstr "選択したものを副次的な障害として追加"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -15303,7 +15320,7 @@ msgstr "メンテナンス中の場合に実行を保留"
 
 #: app/views/popup.action.edit.php:227
 msgid "Pause operations for symptom problems"
-msgstr "兆候障害の場合に実行を保留"
+msgstr "副次的な障害の場合に実行を保留"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -16005,7 +16022,7 @@ msgstr "RMCP+"
 
 #: include/events.inc.php:256 include/events.inc.php:272
 msgid "Rank"
-msgstr ""
+msgstr "障害の種別"
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -17751,6 +17768,10 @@ msgstr "サービスの依存関係が循環設定されています。"
 msgid "Services updated"
 msgstr "サービスを更新しました"
 
+#: include/classes/api/services/CUser.php:1714
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -17998,7 +18019,7 @@ msgstr "メンテナンス中の障害を表示"
 #: app/partials/monitoring.problem.filter.php:129
 #: widgets/problems/includes/WidgetForm.php:120
 msgid "Show symptoms"
-msgstr "兆候を表示"
+msgstr "副次的な障害をを表示"
 
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
@@ -18676,7 +18697,7 @@ msgstr "認証方式の変更を行うと現在のセッション以外はリセ
 #: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
 #: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
 msgid "Symptom"
-msgstr "兆候"
+msgstr "副次的な障害"
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -20132,7 +20153,7 @@ msgstr "不明"
 
 #: include/events.inc.php:336 include/events.inc.php:343
 msgid "UPDATING"
-msgstr ""
+msgstr "更新中"
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -20447,6 +20468,14 @@ msgstr "テンプレートとのリンクを解除"
 #: include/actions.inc.php:739
 msgid "Unlink from templates"
 msgstr "テンプレートとのリンクを解除"
+
+#: include/actions.inc.php:864
+msgid "Unlink template"
+msgstr ""
+
+#: include/actions.inc.php:681
+msgid "Unlink templates"
+msgstr ""
 
 #: jsLoader.php:296
 msgid "Unmute"
@@ -22419,6 +22448,14 @@ msgstr "[日の値が正しくありません: \"%1$s\"]"
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[月の値が正しくありません: \"%1$s\"]"
 
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
 msgstr "DNS名を指定してください"
@@ -23896,11 +23933,11 @@ msgstr "障害のクローズの権限がありません"
 
 #: include/classes/api/services/CEvent.php:1054
 msgid "no permissions to convert cause problems to symptom problems"
-msgstr ""
+msgstr "副次的な障害に変更する権限がありません"
 
 #: include/classes/api/services/CEvent.php:1053
 msgid "no permissions to convert symptom problems to cause problems"
-msgstr ""
+msgstr "副次的な障害から削除する権限がありません"
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"

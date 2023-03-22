@@ -117,7 +117,9 @@ jQuery(function() {
 
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
-			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0', graph.parent());
+			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0',
+				graph.closest('.dashboard-grid-widget-container')
+			);
 
 			if (graph.data('simpleTriggersHintbox')) {
 				data.isTriggerHintBoxFrozen = true;
@@ -127,9 +129,6 @@ jQuery(function() {
 			}
 
 			graph.data('widget')._pauseUpdating();
-
-			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				graph.data('widget')._resumeUpdating();
@@ -141,6 +140,10 @@ jQuery(function() {
 			});
 
 			repositionHintBox(e, graph);
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
+
 			graph
 				.off('mouseup', hintboxSilentMode)
 				.on('mouseup', {graph: graph}, hintboxSilentMode);
@@ -436,7 +439,7 @@ jQuery(function() {
 	// Position hintbox near current mouse position.
 	function repositionHintBox(e, graph) {
 		// Use closest positioned ancestor for offset calculation.
-		var offset = graph.parent().offsetParent().offset(),
+		var offset = graph.closest('.dashboard-grid-widget-container').offsetParent().offset(),
 			hbox = jQuery(graph.hintBoxItem),
 			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
 			mouse_distance = 15,
@@ -582,20 +585,20 @@ jQuery(function() {
 
 			if (show_hint) {
 				// Calculate time at mouse position.
-				var time = parseInt(data.timeFrom) + parseInt((offsetX - data.dimX) * data.spp);
+				const time = new CDate((data.timeFrom + (offsetX - data.dimX) * data.spp) * 1000);
 
 				html = jQuery('<div>')
-						.addClass('svg-graph-hintbox')
-						.append(
-							jQuery('<div>')
-								.addClass('header')
-								.html(time2str(time))
-						)
-						.append(html)
-						.append(points_total > data.hintMaxRows
-							? makeHintBoxFooter(data.hintMaxRows, points_total)
-							: null
-						);
+					.addClass('svg-graph-hintbox')
+					.append(
+						jQuery('<div>')
+							.addClass('header')
+							.html(time.format(PHP_ZBX_FULL_DATE_TIME))
+					)
+					.append(html)
+					.append(points_total > data.hintMaxRows
+						? makeHintBoxFooter(data.hintMaxRows, points_total)
+						: null
+					);
 			}
 		}
 		else {
@@ -604,7 +607,9 @@ jQuery(function() {
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
+				hbox = hintBox.createBox(e, graph, html, '', false, false,
+					graph.closest('.dashboard-grid-widget-container')
+				);
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
@@ -770,7 +775,9 @@ jQuery(function() {
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false, graph.parent());
+				hbox = hintBox.createBox(e, graph, html, '', false, false,
+					graph.closest('.dashboard-grid-widget-container')
+				);
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
