@@ -1163,7 +1163,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 
 	*err = '\0';
 
-	if (FAIL == DBvalidate_field_size("item_preproc", "params", pp->params))
+	if (FAIL == zbx_db_validate_field_size("item_preproc", "params", pp->params))
 	{
 		const char	*err_val;
 		char		key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];

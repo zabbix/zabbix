@@ -1176,8 +1176,8 @@ static void	zbx_check_db(void)
 #ifdef HAVE_ORACLE
 		zbx_json_addobject(&db_version_json, NULL);
 		zbx_json_addobject(&db_version_json, "tables");
-		zbx_dbschema_modify_table("items", &db_version_json);
-		zbx_dbschema_modify_table("item_preproc", &db_version_json);
+		zbx_db_table_prepare("items", &db_version_json);
+		zbx_db_table_prepare("item_preproc", &db_version_json);
 		zbx_json_close(&db_version_json);
 #endif
 

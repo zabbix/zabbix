@@ -703,7 +703,7 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	return db_get_field(( ZBX_TABLE *)table, fieldname);
 }
 
-int	DBvalidate_field_size(const char *tablename, const char *fieldname, const char *str)
+int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str)
 {
 	const ZBX_TABLE	*table;
 	const ZBX_FIELD	*field;
@@ -2374,7 +2374,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 }
 
 #if defined(HAVE_ORACLE)
-void	zbx_dbschema_modify_table(const char *tablename, struct zbx_json *json)
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
 {
 #	define ZBX_TYPE_CHAR_STR	"nvarchar2"
 #	define ZBX_PROTO_TAG_FIELDS	"fields"
