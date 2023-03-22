@@ -21,7 +21,8 @@
 
 namespace Zabbix\Widgets;
 
-use CApiInputValidator;
+use CApiInputValidator,
+	DB;
 
 abstract class CWidgetField {
 
@@ -195,7 +196,10 @@ abstract class CWidgetField {
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_STR:
-				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
+				$this->validation_rules = [
+					'type' => API_STRING_UTF8,
+					'length' => DB::getFieldLength('widget_field', 'value_str')
+				];
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_GROUP:
