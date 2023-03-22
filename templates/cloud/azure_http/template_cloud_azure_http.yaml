@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-03-09T07:21:04Z'
+  date: '2023-03-22T09:45:09Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -19,7 +19,7 @@ zabbix_export:
       description: |
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
-        Currently the template supports the discovery of virtual machines (VMs), Cosmos DB for Mongo DB, Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+        Currently the template supports the discovery of virtual machines (VMs), Cosmos DB for MongoDB, Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
@@ -528,6 +528,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.resources.value
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
           overrides:
             -
               name: MongoDB
@@ -3005,7 +3009,7 @@ zabbix_export:
       items:
         -
           uuid: 9e247bdb17f44630b9440b59d5ef251b
-          name: 'Azure Microsoft Cosmos DB: Autoscale Max Throughput'
+          name: 'Azure MongoDB: Autoscale max throughput'
           type: DEPENDENT
           key: azure.cosmosdb.autoscale.max.throughput
           delay: '0'
@@ -3029,7 +3033,7 @@ zabbix_export:
               value: storage
         -
           uuid: 35a7d2c96990407f937e07fd160266a9
-          name: 'Azure Microsoft Cosmos DB: Get errors'
+          name: 'Azure MongoDB: Get errors'
           type: DEPENDENT
           key: azure.cosmosdb.data.errors
           delay: '0'
@@ -3057,7 +3061,7 @@ zabbix_export:
             -
               uuid: dfd484aa8a4e4b759e4e34c5318c7176
               expression: 'length(last(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.data.errors))>0'
-              name: 'Azure Microsoft Cosmos DB: There are errors in requests to API'
+              name: 'Azure MongoDB: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -3067,10 +3071,9 @@ zabbix_export:
                   value: availability
         -
           uuid: 647faea1597c4da6a3cd78694be8e77e
-          name: 'Azure Microsoft Cosmos DB: Get data'
+          name: 'Azure MongoDB: Get data'
           type: SCRIPT
           key: azure.cosmosdb.data.get
-          delay: 5m
           history: 0d
           trends: '0'
           value_type: TEXT
@@ -3102,14 +3105,13 @@ zabbix_export:
                     }
                     try {
                         response = JSON.parse(response);
-                        if (!response.hasOwnProperty('access_token')) {
-                            throw null;
-                        }
                     }
                     catch (error) {
+                        throw 'Failed to parse login session response.';
+                    }
+                    if (!response.hasOwnProperty('access_token')) {
                         throw 'Authentication response does not contain access token.';
                     }
-            
                     AzureCosmoDB.token = response['access_token'];
                 },
             
@@ -3155,7 +3157,7 @@ zabbix_export:
                     end_date = new Date(new Date().getTime()).toISOString().replace(/\.\d+/, '');
                     endpoints = {
                         'requests': '/providers/Microsoft.Insights/metrics?metricnames=TotalRequests,TotalRequestUnits,MetadataRequests,MongoRequests,MongoRequestCharge,ServerSideLatency,ServerSideLatencyGateway,ServerSideLatencyDirect,ServiceAvailability,ReplicationLatency&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
-                        'usage': '/providers/Microsoft.Insights/metrics?metricnames=DataUsage,IndexUsage,DocumentQuota,AvailableStorage,DocumentCount,NormalizedRUConsumption,PhysicalPartitionThroughputInfo,PhysicalPartitionSizeInfo,AutoscaleMaxThroughput,ProvisionedThroughput&api-version=2021-05-01&interval=PT5M&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                        'usage': '/providers/Microsoft.Insights/metrics?metricnames=DataUsage,IndexUsage,DocumentQuota,AvailableStorage,DocumentCount,NormalizedRUConsumption,PhysicalPartitionThroughputInfo,PhysicalPartitionSizeInfo,AutoscaleMaxThroughput,ProvisionedThroughput&api-version=2021-05-01&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
                     };
             
                     Object.keys(endpoints).forEach(function (field) {
@@ -3213,7 +3215,7 @@ zabbix_export:
               value: raw
         -
           uuid: 947a2eb530754a609fa81c59e29fe7b7
-          name: 'Azure Microsoft Cosmos DB: Data Usage'
+          name: 'Azure MongoDB: Data usage'
           type: DEPENDENT
           key: azure.cosmosdb.data.usage
           delay: '0'
@@ -3238,7 +3240,7 @@ zabbix_export:
               value: storage
         -
           uuid: 0bf3da9168144016b663c9b8e76447fa
-          name: 'Azure Microsoft Cosmos DB: Document Count'
+          name: 'Azure MongoDB: Document count'
           type: DEPENDENT
           key: azure.cosmosdb.document.count
           delay: '0'
@@ -3262,7 +3264,7 @@ zabbix_export:
               value: storage
         -
           uuid: 7fa0f59f8cfa4d9e83086b203e4f71ea
-          name: 'Azure Microsoft Cosmos DB: Document Quota'
+          name: 'Azure MongoDB: Document quota'
           type: DEPENDENT
           key: azure.cosmosdb.document.quota
           delay: '0'
@@ -3287,7 +3289,7 @@ zabbix_export:
               value: storage
         -
           uuid: b09f9445d960415185457b89b6a73452
-          name: 'Azure Microsoft Cosmos DB: Index Usage'
+          name: 'Azure MongoDB: Index usage'
           type: DEPENDENT
           key: azure.cosmosdb.index.usage
           delay: '0'
@@ -3312,7 +3314,7 @@ zabbix_export:
               value: storage
         -
           uuid: cd35f04b180542cda50dc5d4e979e54e
-          name: 'Azure Microsoft Cosmos DB: Metadata Requests'
+          name: 'Azure MongoDB: Metadata requests'
           type: DEPENDENT
           key: azure.cosmosdb.metadata.requests
           delay: '0'
@@ -3338,7 +3340,7 @@ zabbix_export:
               value: storage
         -
           uuid: e42cf83e456a490295a84cfe9eb288ef
-          name: 'Azure Microsoft Cosmos DB: Mongo Requests'
+          name: 'Azure MongoDB: Mongo requests'
           type: DEPENDENT
           key: azure.cosmosdb.mongo.requests
           delay: '0'
@@ -3362,7 +3364,7 @@ zabbix_export:
               value: storage
         -
           uuid: 8fd4068986af444799ae64c6bc8f16a6
-          name: 'Azure Microsoft Cosmos DB: Mongo Request Charge'
+          name: 'Azure MongoDB: Mongo request charge'
           type: DEPENDENT
           key: azure.cosmosdb.mongo.requests.charge
           delay: '0'
@@ -3386,7 +3388,7 @@ zabbix_export:
               value: storage
         -
           uuid: fda6b39ce6ef4b8c8418b2e123ecdd17
-          name: 'Azure Microsoft Cosmos DB: Normalized RU Consumption'
+          name: 'Azure MongoDB: Normalized RU consumption'
           type: DEPENDENT
           key: azure.cosmosdb.normalized.ru.consumption
           delay: '0'
@@ -3411,9 +3413,9 @@ zabbix_export:
               value: storage
         -
           uuid: be6800214a0443e899c40f8a4b6c3f21
-          name: 'Azure Microsoft Cosmos DB: Physical Partition Size Info'
+          name: 'Azure MongoDB: Physical partition size'
           type: DEPENDENT
-          key: azure.cosmosdb.physical.partition.size.info
+          key: azure.cosmosdb.physical.partition.size
           delay: '0'
           history: 7d
           units: B
@@ -3436,9 +3438,9 @@ zabbix_export:
               value: storage
         -
           uuid: e30d5eadde15427484e7a0d1cb38e9e3
-          name: 'Azure Microsoft Cosmos DB: Physical Partition Throughput Info'
+          name: 'Azure MongoDB: Physical partition throughput'
           type: DEPENDENT
-          key: azure.cosmosdb.physical.partition.throughput.info
+          key: azure.cosmosdb.physical.partition.throughput
           delay: '0'
           history: 7d
           description: 'The physical partition throughput.'
@@ -3460,7 +3462,7 @@ zabbix_export:
               value: storage
         -
           uuid: 49311bbfb2584a46b42ed1a7d8fcfd94
-          name: 'Azure Microsoft Cosmos DB: Provisioned Throughput'
+          name: 'Azure MongoDB: Provisioned throughput'
           type: DEPENDENT
           key: azure.cosmosdb.provisioned.throughput
           delay: '0'
@@ -3484,7 +3486,7 @@ zabbix_export:
               value: storage
         -
           uuid: 6d7175e27d10406191c883dc2e5949e4
-          name: 'Azure Microsoft Cosmos DB: Replication Latency'
+          name: 'Azure MongoDB: Replication latency, P99'
           type: DEPENDENT
           key: azure.cosmosdb.replication.latency
           delay: '0'
@@ -3514,7 +3516,7 @@ zabbix_export:
               value: network
         -
           uuid: d9b5af0c71874114b48464ce20f8cf3d
-          name: 'Azure Microsoft Cosmos DB: Server Side Latency'
+          name: 'Azure MongoDB: Server side latency'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency
           delay: '0'
@@ -3544,7 +3546,7 @@ zabbix_export:
               value: network
         -
           uuid: 7587d3750d1643f085db5931670dc2f3
-          name: 'Azure Microsoft Cosmos DB: Server Side Latency Direct'
+          name: 'Azure MongoDB: Server side latency, direct'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency.direct
           delay: '0'
@@ -3574,7 +3576,7 @@ zabbix_export:
               value: network
         -
           uuid: 0aefdc3101fe4bcba4743d6e32671554
-          name: 'Azure Microsoft Cosmos DB: Server Side Latency Gateway'
+          name: 'Azure MongoDB: Server side latency, gateway'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency.gateway
           delay: '0'
@@ -3604,14 +3606,14 @@ zabbix_export:
               value: network
         -
           uuid: 42bd03c1753b4f19bc9793b03834cd3d
-          name: 'Azure Microsoft Cosmos DB: Service Availability'
+          name: 'Azure MongoDB: Service availability'
           type: DEPENDENT
           key: azure.cosmosdb.service.availability
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The account requests availability at one hour, day or month granularity.'
+          description: 'The account requests availability.'
           preprocessing:
             -
               type: JSONPATH
@@ -3627,8 +3629,8 @@ zabbix_export:
           triggers:
             -
               uuid: c7649cd317f04a3d8fec0eebe3df6766
-              expression: '(min(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.service.availability,#3))<{$AZURE.COSMOS.MONGO.DB.AVAILABILITY}'
-              name: 'Azure Microsoft Cosmos DB: Cosmos DB for Mongo DB account: Availability is low'
+              expression: '(min(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.service.availability,#3))<{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}'
+              name: 'Azure MongoDB: Cosmos DB for MongoDB account: Availability is low'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
@@ -3637,7 +3639,7 @@ zabbix_export:
                   value: availability
         -
           uuid: f4d4d2def5e945ab9048ada4813b7f04
-          name: 'Azure Microsoft Cosmos DB: Total Request Units'
+          name: 'Azure MongoDB: Total request units'
           type: DEPENDENT
           key: azure.cosmosdb.total.request.units
           delay: '0'
@@ -3662,7 +3664,7 @@ zabbix_export:
               value: storage
         -
           uuid: 3dd2cd4edb7746edb9d917c83b280ca3
-          name: 'Azure Microsoft Cosmos DB: Total Requests'
+          name: 'Azure MongoDB: Total requests'
           type: DEPENDENT
           key: azure.cosmosdb.total.requests
           delay: '0'
@@ -3693,19 +3695,22 @@ zabbix_export:
           value: azure
         -
           tag: target
+          value: cosmosdb
+        -
+          tag: target
           value: mongodb
       macros:
         -
           macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
-          macro: '{$AZURE.COSMOS.MONGO.DB.AVAILABILITY}'
-          value: '70'
-          description: 'The warning threshold of the Cosmos DB for MongoDB service availability.'
-        -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        -
+          macro: '{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the Cosmos DB for MongoDB service availability.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -3722,14 +3727,14 @@ zabbix_export:
       dashboards:
         -
           uuid: 323fb91b388a44bfbd4b7d634f6e6b6c
-          name: 'Cosmos DB for Mongo DB'
+          name: 'Overview Cosmos DB for MongoDB'
           pages:
             -
               widgets:
                 -
                   type: GRAPH_CLASSIC
                   'y': '14'
-                  width: '16'
+                  width: '24'
                   height: '5'
                   fields:
                     -
@@ -3737,11 +3742,11 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Azure Cosmos DB for MongoDB by HTTP'
-                        name: 'Azure Microsoft Cosmos DB: Latency'
+                        name: 'Azure MongoDB: Latency'
                 -
                   type: GRAPH_CLASSIC
                   'y': '9'
-                  width: '16'
+                  width: '24'
                   height: '5'
                   fields:
                     -
@@ -3749,11 +3754,11 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Azure Cosmos DB for MongoDB by HTTP'
-                        name: 'Azure Microsoft Cosmos DB: Requests'
+                        name: 'Azure MongoDB: Requests'
                 -
                   type: GRAPH_CLASSIC
                   'y': '4'
-                  width: '16'
+                  width: '24'
                   height: '5'
                   fields:
                     -
@@ -3761,12 +3766,12 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Azure Cosmos DB for MongoDB by HTTP'
-                        name: 'Azure Microsoft Cosmos DB: Usage'
+                        name: 'Azure MongoDB: Usage'
                 -
                   type: ITEM
                   name: 'Document Count'
-                  x: '12'
-                  width: '4'
+                  x: '18'
+                  width: '6'
                   height: '4'
                   fields:
                     -
@@ -3786,8 +3791,8 @@ zabbix_export:
                 -
                   type: ITEM
                   name: 'Normalized RU Consumption'
-                  x: '8'
-                  width: '4'
+                  x: '12'
+                  width: '6'
                   height: '4'
                   fields:
                     -
@@ -3807,8 +3812,8 @@ zabbix_export:
                 -
                   type: ITEM
                   name: 'Provisioned Throughput'
-                  x: '4'
-                  width: '4'
+                  x: '6'
+                  width: '6'
                   height: '4'
                   fields:
                     -
@@ -3828,7 +3833,7 @@ zabbix_export:
                 -
                   type: ITEM
                   name: 'Service Availability'
-                  width: '4'
+                  width: '6'
                   height: '4'
                   fields:
                     -
@@ -10854,87 +10859,6 @@ zabbix_export:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
     -
-      uuid: 89256a1eba8c49d2b7469a68ff050ac5
-      name: 'Azure Microsoft Cosmos DB: Latency'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.server.side.latency.gateway
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.server.side.latency
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.server.side.latency.direct
-        -
-          sortorder: '3'
-          color: A54F10
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.replication.latency
-    -
-      uuid: a1225fc27d334c5bbb5043e3d468bf02
-      name: 'Azure Microsoft Cosmos DB: Requests'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.total.requests
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.total.request.units
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.metadata.requests
-        -
-          sortorder: '3'
-          color: A54F10
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.mongo.requests
-        -
-          sortorder: '4'
-          color: FC6EA3
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.mongo.requests.charge
-    -
-      uuid: 07168aaf3abb42f6b61746cc6e2d2910
-      name: 'Azure Microsoft Cosmos DB: Usage'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.data.usage
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.index.usage
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Azure Cosmos DB for MongoDB by HTTP'
-            key: azure.cosmosdb.document.quota
-    -
       uuid: 3b278de1b81a4be7acc865568962c323
       name: 'Azure Microsoft SQL: Connections'
       graph_items:
@@ -11036,6 +10960,87 @@ zabbix_export:
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.storage.allocated
+    -
+      uuid: 89256a1eba8c49d2b7469a68ff050ac5
+      name: 'Azure MongoDB: Latency'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency.gateway
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency.direct
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.replication.latency
+    -
+      uuid: a1225fc27d334c5bbb5043e3d468bf02
+      name: 'Azure MongoDB: Requests'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.total.requests
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.total.request.units
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.metadata.requests
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.mongo.requests
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.mongo.requests.charge
+    -
+      uuid: 07168aaf3abb42f6b61746cc6e2d2910
+      name: 'Azure MongoDB: Usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.data.usage
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.index.usage
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.document.quota
     -
       uuid: 750ae48e6ef749c19a06f4bbe716f92f
       name: 'Azure MySQL: Connections'
