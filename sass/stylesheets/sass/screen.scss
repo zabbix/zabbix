@@ -1404,16 +1404,6 @@ form {
 			padding-top: 0;
 		}
 
-		.na-bg,
-		.normal-bg,
-		.info-bg,
-		.average-bg,
-		.warning-bg,
-		.high-bg,
-		.disaster-bg {
-			padding-left: 5px;
-		}
-
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
@@ -1440,6 +1430,16 @@ form {
 
 			&:last-child {
 				padding-right: 0;
+			}
+
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.average-bg,
+			&.warning-bg,
+			&.high-bg,
+			&.disaster-bg {
+				padding-left: 5px;
 			}
 		}
 
