@@ -1069,8 +1069,10 @@ static void	zbx_check_db(void)
 
 	zbx_free(db_version_info.friendly_current_version);
 #ifdef HAVE_ORACLE
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
+	DBclose();
 #endif
 }
 
