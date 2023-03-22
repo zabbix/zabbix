@@ -694,6 +694,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'fields' => [
+			'host_status' =>		['type' => API_ANY],
 			'uuid' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'hostid' =>				['type' => API_ANY],
 			'host' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
