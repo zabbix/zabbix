@@ -1,6 +1,7 @@
 Changes for 7.0.0alpha1
 
 New features:
+..F.I..... [ZBXNEXT-8226] fixed the problem of insufficient length of URL fields (dfofanovs, dgoloscapov)
 ........S. [ZBXNEXT-8312] increased TimescaleDB maximum supported version to 2.10 (mprihodko)
 .......PS. [ZBXNEXT-8317] increased MariaDB maximum supported version to 10.11 (mprihodko)
 A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuthentication method (rdetlavs)
