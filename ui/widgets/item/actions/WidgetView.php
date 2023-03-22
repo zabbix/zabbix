@@ -28,6 +28,7 @@ use API,
 	CSettingsHelper,
 	CUrl,
 	CValueMapHelper,
+	CViewHelper,
 	Manager;
 
 use Widgets\Item\Widget;
@@ -206,7 +207,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_STR:
 					case ITEM_VALUE_TYPE_TEXT:
 					case ITEM_VALUE_TYPE_LOG:
-						$value = formatHistoryValue($last_value, $items[$itemid], false);
+					case ITEM_VALUE_TYPE_BINARY:
+						$value = $value_type == ITEM_VALUE_TYPE_BINARY
+							? CViewHelper::binaryValueSubstitute()
+							: formatHistoryValue($last_value, $items[$itemid], false);
 
 						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
 								&& $last_value !== $prev_value) {

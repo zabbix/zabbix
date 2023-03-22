@@ -148,7 +148,7 @@ class CPieGraphDraw extends CGraphDraw {
 		// fetch values for items with the "last" function
 		$lastValueItems = [];
 		foreach ($this->items as $item) {
-			if ($item['calc_fnc'] == CALC_FNC_LST) {
+			if ($item['calc_fnc'] == CALC_FNC_LST && $item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
 				$lastValueItems[] = $item;
 			}
 		}

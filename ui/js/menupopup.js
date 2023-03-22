@@ -1090,7 +1090,7 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create dependent item'),
 			url: url.getUrl(),
-			disabled: options.isDiscovery || options.binary_value_type
+			disabled: options.isDiscovery
 		});
 
 		url = new Curl('host_discovery.php');
@@ -1104,7 +1104,7 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create dependent discovery rule'),
 			url: url.getUrl(),
-			disabled: options.isDiscovery || options.binary_value_type
+			disabled: options.isDiscovery
 		});
 
 		sections.push({

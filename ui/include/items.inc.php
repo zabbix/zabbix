@@ -1348,7 +1348,9 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	}
 
 	if ($item['value'] !== null) {
-		$value = formatHistoryValue($item['value'], $item);
+		$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+			? CViewHelper::binaryValueSubstitute()
+			: formatHistoryValue($item['value'], $item);
 	}
 
 	$col = (new CCol([$value, $ack]))

@@ -214,7 +214,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$last_value = Manager::History()->getLastValues([$item]);
 
-			if ($last_value) {
+			if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY && $last_value) {
 				$last_value = $last_value[$item['itemid']][0];
 
 				try {

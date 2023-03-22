@@ -573,6 +573,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$history = Manager::History()->getLastValues($items);
 
 				if ($history) {
+					if ($items[0]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+						return null;
+					}
+
 					return $history[$items[0]['itemid']][0]['value'];
 				}
 			}
@@ -652,6 +656,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$history = Manager::History()->getLastValues($items);
 
 				if ($history) {
+					if ($items[0]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+						return null;
+					}
+
 					return $history[$items[0]['itemid']][0]['value'];
 				}
 			}
