@@ -69,7 +69,7 @@ typedef struct
 }
 zbx_pollfd_t;
 
-int	socket_poll(zbx_pollfd_t* fds, int fds_num, int timeout);
+int	socket_poll(zbx_pollfd_t* fds, unsigned long fds_num, int timeout);
 
 #else
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)write((s), (b), (bl)))

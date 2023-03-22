@@ -960,7 +960,8 @@ int	socket_poll(zbx_pollfd_t* fds, unsigned long fds_num, int timeout)
 	fd_set		fds_read;
 	fd_set		fds_write;
 	fd_set		fds_err;
-	int		i, ret;
+	int		ret;
+	unsigned long	i;
 	struct timeval	tv;
 
 	FD_ZERO(&fds_read);
@@ -1062,7 +1063,7 @@ static ssize_t	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
 		if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
 			return FAIL;
 
-		if (0 <= (n = recv(s, buffer, size, MSG_PEEK)))
+		if (0 <= (n = ZBX_TCP_RECV(s, buffer, size, MSG_PEEK)))
 			break;
 
 		if (SUCCEED != socket_had_nonblocking_error())
