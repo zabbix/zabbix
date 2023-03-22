@@ -667,7 +667,7 @@ char	*DBdyn_escape_like_pattern(const char *src)
 	return zbx_db_dyn_escape_like_pattern(src);
 }
 
-ZBX_TABLE	*DBget_table_modify(const char *tablename)
+static ZBX_TABLE	*DBget_table_modify(const char *tablename)
 {
 	int	t;
 
@@ -680,7 +680,7 @@ ZBX_TABLE	*DBget_table_modify(const char *tablename)
 	return NULL;
 }
 
-ZBX_FIELD	*DBget_field_modify(ZBX_TABLE *table, const char *fieldname)
+static ZBX_FIELD	*DBget_field_modify(ZBX_TABLE *table, const char *fieldname)
 {
 	int	f;
 
