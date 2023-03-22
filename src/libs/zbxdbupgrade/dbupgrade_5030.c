@@ -574,8 +574,8 @@ zbx_host_t;
 
 static int	host_compare_func(const void *d1, const void *d2)
 {
-	const zbx_host_t	*h1 = *(const zbx_host_t **)d1;
-	const zbx_host_t	*h2 = *(const zbx_host_t **)d2;
+	const zbx_host_t	*h1 = *(const zbx_host_t * const *)d1;
+	const zbx_host_t	*h2 = *(const zbx_host_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(h1->hostid, h2->hostid);
 	ZBX_RETURN_IF_NOT_EQUAL(h1->valuemapid, h2->valuemapid);
@@ -2347,8 +2347,8 @@ static zbx_vector_char2_t	*sort_dimensions;
 
 static int	DBpatch_block_compare_func(const void *d1, const void *d2)
 {
-	const sciitem_block_t	*i1 = *(const sciitem_block_t **)d1;
-	const sciitem_block_t	*i2 = *(const sciitem_block_t **)d2;
+	const sciitem_block_t	*i1 = *(const sciitem_block_t * const *)d1;
+	const sciitem_block_t	*i2 = *(const sciitem_block_t * const *)d2;
 	zbx_vector_char2_t	*diff1, *diff2;
 	int			unsized_a, unsized_b;
 

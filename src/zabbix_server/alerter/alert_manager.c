@@ -212,7 +212,7 @@ zbx_am_t;
 
 static zbx_hash_t	alerter_hash_func(const void *d)
 {
-	const zbx_am_alerter_t	*alerter = *(const zbx_am_alerter_t **)d;
+	const zbx_am_alerter_t	*alerter = *(const zbx_am_alerter_t * const *)d;
 
 	zbx_hash_t hash = ZBX_DEFAULT_PTR_HASH_FUNC(&alerter->client);
 
@@ -221,8 +221,8 @@ static zbx_hash_t	alerter_hash_func(const void *d)
 
 static int	alerter_compare_func(const void *d1, const void *d2)
 {
-	const zbx_am_alerter_t	*p1 = *(const zbx_am_alerter_t **)d1;
-	const zbx_am_alerter_t	*p2 = *(const zbx_am_alerter_t **)d2;
+	const zbx_am_alerter_t	*p1 = *(const zbx_am_alerter_t * const *)d1;
+	const zbx_am_alerter_t	*p2 = *(const zbx_am_alerter_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->client, p2->client);
 
@@ -274,10 +274,10 @@ static int	am_alert_queue_compare(const void *d1, const void *d2)
 
 static int	am_alertpool_compare(const zbx_am_alertpool_t *pool1, const zbx_am_alertpool_t *pool2)
 {
-	zbx_binary_heap_elem_t	*e1, *e2;
+	const zbx_binary_heap_elem_t	*e1, *e2;
 
-	e1 = zbx_binary_heap_find_min((zbx_binary_heap_t *)&pool1->queue);
-	e2 = zbx_binary_heap_find_min((zbx_binary_heap_t *)&pool2->queue);
+	e1 = zbx_binary_heap_find_min((const zbx_binary_heap_t *)&pool1->queue);
+	e2 = zbx_binary_heap_find_min((const zbx_binary_heap_t *)&pool2->queue);
 
 	return am_alert_compare((const zbx_am_alert_t *)e1->data, (const zbx_am_alert_t *)e2->data);
 }
@@ -292,10 +292,10 @@ static int	am_alertpool_queue_compare(const void *d1, const void *d2)
 
 static int	am_mediatype_compare(const zbx_am_mediatype_t *media1, const zbx_am_mediatype_t *media2)
 {
-	zbx_binary_heap_elem_t	*e1, *e2;
+	const zbx_binary_heap_elem_t	*e1, *e2;
 
-	e1 = zbx_binary_heap_find_min((zbx_binary_heap_t *)&media1->queue);
-	e2 = zbx_binary_heap_find_min((zbx_binary_heap_t *)&media2->queue);
+	e1 = zbx_binary_heap_find_min((const zbx_binary_heap_t *)&media1->queue);
+	e2 = zbx_binary_heap_find_min((const zbx_binary_heap_t *)&media2->queue);
 
 	return am_alertpool_compare((const zbx_am_alertpool_t *)e1->data, (const zbx_am_alertpool_t *)e2->data);
 }
@@ -675,7 +675,7 @@ static zbx_am_alertpool_t	*am_pop_alertpool(zbx_am_mediatype_t *mediatype)
 		return NULL;
 
 	elem = zbx_binary_heap_find_min(&mediatype->queue);
-	alertpool = (zbx_am_alertpool_t *)elem->data;
+	alertpool = (const zbx_am_alertpool_t *)elem->data;
 	alertpool->location = ZBX_AM_LOCATION_NOWHERE;
 
 	zbx_binary_heap_remove_min(&mediatype->queue);
@@ -840,7 +840,7 @@ static zbx_am_alert_t	*am_pop_alert(zbx_am_t *manager)
 {
 	zbx_am_mediatype_t	*mediatype;
 	zbx_am_alertpool_t	*alertpool;
-	zbx_am_alert_t		*alert;
+	const zbx_am_alert_t		*alert;
 	zbx_binary_heap_elem_t	*elem;
 
 	if (NULL == (mediatype = am_pop_mediatype(manager)))
@@ -850,7 +850,7 @@ static zbx_am_alert_t	*am_pop_alert(zbx_am_t *manager)
 		return NULL;
 
 	elem = zbx_binary_heap_find_min(&alertpool->queue);
-	alert = (zbx_am_alert_t *)elem->data;
+	alert = (const zbx_am_alert_t *)elem->data;
 	zbx_binary_heap_remove_min(&alertpool->queue);
 
 	/* requeue media type if the number of parallel alerts has not yet reached */
@@ -1621,28 +1621,28 @@ out:
  ******************************************************************************/
 static int	am_check_queue(zbx_am_t *manager, int now)
 {
-	zbx_binary_heap_elem_t	*elem;
-	zbx_am_mediatype_t	*mediatype;
-	zbx_am_alertpool_t	*alertpool;
-	zbx_am_alert_t		*alert;
+	const zbx_binary_heap_elem_t	*elem;
+	const zbx_am_mediatype_t	*mediatype;
+	const zbx_am_alertpool_t	*alertpool;
+	const zbx_am_alert_t		*alert;
 
 	if (SUCCEED == zbx_binary_heap_empty(&manager->queue))
 		return FAIL;
 
 	elem = zbx_binary_heap_find_min(&manager->queue);
-	mediatype = (zbx_am_mediatype_t *)elem->data;
+	mediatype = (const zbx_am_mediatype_t *)elem->data;
 
 	if (SUCCEED == zbx_binary_heap_empty(&mediatype->queue))
 		return FAIL;
 
 	elem = zbx_binary_heap_find_min(&mediatype->queue);
-	alertpool = (zbx_am_alertpool_t *)elem->data;
+	alertpool = (const zbx_am_alertpool_t *)elem->data;
 
 	if (SUCCEED == zbx_binary_heap_empty(&alertpool->queue))
 		return FAIL;
 
 	elem = zbx_binary_heap_find_min(&alertpool->queue);
-	alert = (zbx_am_alert_t *)elem->data;
+	alert = (const zbx_am_alert_t *)elem->data;
 
 	if (alert->nextsend > now)
 		return FAIL;
@@ -2093,8 +2093,8 @@ static void	am_process_diag_stats(zbx_am_t *manager, zbx_ipc_client_t *client)
  ******************************************************************************/
 static int	am_compare_mediatype_by_alerts_desc(const void *d1, const void *d2)
 {
-	zbx_am_mediatype_t	*m1 = *(zbx_am_mediatype_t **)d1;
-	zbx_am_mediatype_t	*m2 = *(zbx_am_mediatype_t **)d2;
+	zbx_am_mediatype_t	*m1 = *(zbx_am_mediatype_t * const *)d1;
+	zbx_am_mediatype_t	*m2 = *(zbx_am_mediatype_t * const *)d2;
 
 	return m2->refcount - m1->refcount;
 }
@@ -2191,7 +2191,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 
 	zbx_vector_ptr_t	view;
 	zbx_am_alertpool_t	*alertpool;
-	zbx_am_alert_t		*alert;
+	const zbx_am_alert_t		*alert;
 	int			i, sources_num;
 	zbx_hashset_t		sources;
 	zbx_hashset_iter_t	iter;
@@ -2210,7 +2210,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 		{
 			zbx_am_source_stats_t	*source, source_local;
 
-			alert = (zbx_am_alert_t *)alertpool->queue.elems[i].data;
+			alert = (const zbx_am_alert_t *)alertpool->queue.elems[i].data;
 			source_local.source = ZBX_ALERTPOOL_SOURCE(alert->alertpoolid);
 			source_local.object = ZBX_ALERTPOOL_OBJECT(alert->alertpoolid);
 			source_local.objectid = alert->objectid;

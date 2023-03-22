@@ -618,8 +618,8 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
 	const zbx_key_access_rule_t	*a, *b;
 	int				i;
 
-	a = *(zbx_key_access_rule_t **)rule_a;
-	b = *(zbx_key_access_rule_t **)rule_b;
+	a = *(zbx_key_access_rule_t * const *)rule_a;
+	b = *(zbx_key_access_rule_t * const *)rule_b;
 
 	if (a->empty_arguments != b->empty_arguments || a->elements.values_num != b->elements.values_num)
 		return 1;

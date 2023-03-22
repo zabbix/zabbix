@@ -55,7 +55,7 @@ static char	**environ_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
 static char	**argv_int = NULL, **environ_int = NULL;
-static const char	*empty_str = "";
+static char	*empty_str = "";
 
 /* ps display buffer */
 static char	*ps_buf = NULL;

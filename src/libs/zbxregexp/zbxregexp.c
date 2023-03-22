@@ -475,9 +475,9 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
  * Return value: pointer to the matched substring or null                                           *
  *                                                                                                  *
  ****************************************************************************************************/
-static char	*zbx_regexp(const char *string, const char *pattern, int flags, int *len)
+static const char	*zbx_regexp(const char *string, const char *pattern, int flags, int *len)
 {
-	char		*c = NULL;
+	const char		*c = NULL;
 	zbx_regmatch_t	match;
 	zbx_regexp_t	*regexp = NULL;
 	const char*	error = NULL;
@@ -494,7 +494,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 
 		if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match)))
 		{
-			c = (char *)string + match.rm_so;
+			c = (const char *)string + match.rm_so;
 
 			if (NULL != len)
 				*len = match.rm_eo - match.rm_so;
@@ -506,7 +506,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 	return c;
 }
 
-char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
+const char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 {
 	return zbx_regexp(string, pattern, ZBX_REGEXP_MULTILINE, len);
 }
@@ -924,7 +924,7 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
  **********************************************************************************/
 static int	regexp_match_ex_substring(const char *string, const char *pattern, int case_sensitive)
 {
-	char	*ptr = NULL;
+	const char	*ptr = NULL;
 
 	switch (case_sensitive)
 	{

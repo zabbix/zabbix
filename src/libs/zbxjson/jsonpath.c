@@ -1688,7 +1688,7 @@ static int	jsonpath_query_next_segment(zbx_jsonpath_context_t *ctx, const char *
 static int	jsonpath_match_name(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *parent, int path_depth)
 {
 	const zbx_jsonpath_segment_t	*segment = &ctx->path->segments[path_depth];
-	const zbx_jsonpath_list_node_t	*node;
+	zbx_jsonpath_list_node_t	*node;
 	zbx_jsonobj_el_t		el_local, *el;
 
 	/* object contents can match only name list */
