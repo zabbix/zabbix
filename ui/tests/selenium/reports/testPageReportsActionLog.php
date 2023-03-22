@@ -52,12 +52,11 @@ class testPageReportsActionLog extends CWebTest {
 		}
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check filter buttons.
 		foreach (['Apply', 'Reset'] as $button) {
 			$this->assertTrue($form->query('xpath:.//div[@class="filter-forms"]/button[text()="'.$button.'"]')
-				->one()->isClickable()
+					->one()->isClickable()
 			);
 		}
 
@@ -71,7 +70,9 @@ class testPageReportsActionLog extends CWebTest {
 		$this->assertEquals(255, $form->getField('Search string')->waitUntilVisible()->getAttribute('maxlength'));
 
 		// Check table headers.
-		$this->assertEquals(['Time', 'Action', 'Media type', 'Recipient', 'Message', 'Status', 'Info'], $table->getHeadersText());
+		$this->assertEquals(['Time', 'Action', 'Media type', 'Recipient', 'Message', 'Status', 'Info'],
+				$this->query('class:list-table')->asTable()->one()->getHeadersText()
+		);
 
 		// Check status available values.
 		$this->assertEquals(['In progress', 'Sent/Executed', 'Failed'], $this->query('id:filter_status')
@@ -301,9 +302,7 @@ class testPageReportsActionLog extends CWebTest {
 					],
 					'status' => ['In progress'],
 					'result_amount' => 1,
-					'result_status' => [
-						"In progress:\n3 retries left"
-					]
+					'result_status' => ["In progress:\n3 retries left"]
 				]
 			],
 			// #22
@@ -323,9 +322,7 @@ class testPageReportsActionLog extends CWebTest {
 					],
 					'status' => ['In progress'],
 					'result_amount' => 1,
-					'result_status' => [
-						"In progress:\n3 retries left"
-					]
+					'result_status' => ["In progress:\n3 retries left"]
 				]
 			],
 			// #24
@@ -351,9 +348,7 @@ class testPageReportsActionLog extends CWebTest {
 					],
 					'status' => ['Failed'],
 					'result_amount' => 1,
-					'result_status' => [
-						'Failed'
-					]
+					'result_status' => ['Failed']
 				]
 			],
 			// #26
@@ -423,11 +418,38 @@ class testPageReportsActionLog extends CWebTest {
 					],
 					'result_amount' => 9
 				]
+			],
+			// #33
+			[
+				[
+					'fields' => [
+						'Search string' => '     '
+					]
+				]
+			],
+			// #34
+			[
+				[
+					'fields' => [
+						'Search string' => 'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM'
+					],
+					'result_amount' => 1
+				]
+			],
+			// #35
+			[
+				[
+					'fields' => [
+						'Search string' => '2012-02-20 10:01:00'
+					]
+				]
 			]
 		];
 	}
 
 	/**
+	 * Filter action log and check results.
+	 *
 	 * @dataProvider getCheckFilterData
 	 */
 	public function testPageReportsActionLog_CheckFilter($data) {
@@ -445,7 +467,7 @@ class testPageReportsActionLog extends CWebTest {
 			$form->fill($data['fields']);
 		}
 
-		// Status checked - In progress, Sent/Executed, Failed.
+		// Status checked-in - In progress, Sent/Executed, Failed.
 		if (array_key_exists('status', $data)) {
 			$this->query('id:filter_status')->asCheckboxList()->one()->check($data['status']);
 		}
@@ -460,12 +482,12 @@ class testPageReportsActionLog extends CWebTest {
 
 			if (array_key_exists('fields', $data)) {
 				foreach ($data['fields'] as $column => $values) {
-					// Using Search string field in filter - Message column checked.
+					// Filtering by Search string - Message column checked.
 					if ($column === 'Search string') {
 						$column = 'Message';
 						$values = [$values];
 					} else {
-						// We remove last character from filter field label (so it is same as column name now).
+						// We remove last character from filtered field label (so it is same as column name now).
 						$column = substr($column, 0, -1);
 					}
 
@@ -497,5 +519,8 @@ class testPageReportsActionLog extends CWebTest {
 			$this->assertTableStats(0);
 			$this->assertTableData();
 		}
+
+		// Reset filter.
+		$form->query('button:Reset')->one()->click();
 	}
 }
