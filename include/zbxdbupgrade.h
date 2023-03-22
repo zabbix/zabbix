@@ -26,6 +26,5 @@
 void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb);
 
 int	DBcheck_version(void);
-int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh);
 
 #endif

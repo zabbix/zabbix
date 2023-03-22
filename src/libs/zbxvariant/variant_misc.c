@@ -36,7 +36,7 @@
  *               FAIL    - Otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, int dbl_precision, char **errmsg)
+int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)
 {
 	int	ret;
 
@@ -47,7 +47,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, in
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (SUCCEED == (ret = zbx_variant_convert(value, ZBX_VARIANT_DBL)))
 			{
-				if (FAIL == (ret = zbx_validate_value_dbl(value->data.dbl, dbl_precision)))
+				if (FAIL == (ret = zbx_validate_value_dbl(value->data.dbl)))
 				{
 					char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
