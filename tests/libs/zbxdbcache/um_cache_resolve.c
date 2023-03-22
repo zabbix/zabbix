@@ -26,6 +26,8 @@
 #include "zbxcacheconfig/user_macro.h"
 #include "um_cache_mock.h"
 
+extern unsigned char program_type;
+
 static void	mock_get_hostids(zbx_vector_uint64_t *hostids, zbx_mock_handle_t handle)
 {
 	zbx_mock_error_t	err;
@@ -70,7 +72,7 @@ void	zbx_mock_test_entry(void **state)
 
 	um_mock_cache_diff(&mock_cache0, &mock_cache, &gmacros, &hmacros, &htmpls);
 	cache = um_cache_create();
-	cache = um_cache_sync(cache, 0, &gmacros, &hmacros, &htmpls, &config_vault);
+	cache = um_cache_sync(cache, 0, &gmacros, &hmacros, &htmpls, &config_vault, program_type);
 
 	mock_dbsync_clear(&gmacros);
 	mock_dbsync_clear(&hmacros);

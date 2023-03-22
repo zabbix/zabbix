@@ -1421,14 +1421,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 
-	if (SUCCEED != zbx_init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(get_program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_init_configuration_cache(&error))
+	if (SUCCEED != zbx_init_configuration_cache(get_program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1998,7 +1998,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(get_program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
