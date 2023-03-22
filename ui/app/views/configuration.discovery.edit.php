@@ -80,7 +80,7 @@ $discoveryFormList
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addItem([
 				(new CDiv(
-					(new CRadioButtonList('concurrency_max_type', $data['concurrency_max_type']))
+					(new CRadioButtonList('concurrency_max_type', (int) $data['concurrency_max_type']))
 						->addValue(_('One'), ZBX_DISCOVERY_CHECKS_ONE)
 						->addValue(_('Unlimited'), ZBX_DISCOVERY_CHECKS_UNLIMITED)
 						->addValue(_('Custom'), ZBX_DISCOVERY_CHECKS_CUSTOM)
