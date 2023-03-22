@@ -1,1 +1,0 @@
-.........T [ZBX-22298] fixed metrics preprocessing in PVC discovery in Kubernetes cluster state by HTTP template, removed non-existing PVC statuses, combined state phases into single phase metrics, added PV discovery (drasikhov)
