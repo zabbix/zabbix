@@ -1734,11 +1734,20 @@ class CItem extends CItemGeneral {
 			$history = Manager::History()->getLastValues($result, 2, timeUnitToSeconds(CSettingsHelper::get(
 				CSettingsHelper::HISTORY_PERIOD
 			)));
+
 			foreach ($result as &$item) {
-				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
-				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
+				if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY && array_key_exists($item['itemid'], $history)) {
+					foreach ($history[$item['itemid']] as &$row) {
+						$row['value'] = base64_encode($row['value']);
+					}
+					unset($row);
+				}
+
+				$lastHistory = array_key_exists(0, $history[$item['itemid']]) ? $history[$item['itemid']][0] : null;
+				$prevHistory = array_key_exists(1, $history[$item['itemid']]) ? $history[$item['itemid']][1] : null;
 				$no_value = in_array($item['value_type'],
-						[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]) ? '' : '0';
+						[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]
+					) ? '' : '0';
 
 				if (isset($requestedOutput['lastclock'])) {
 					$item['lastclock'] = $lastHistory ? $lastHistory['clock'] : '0';

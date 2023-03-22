@@ -135,15 +135,6 @@ class CHistoryManager {
 			}
 		}
 
-		foreach ($items as $item) {
-			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY && array_key_exists($item['itemid'], $results)) {
-				foreach ($results[$item['itemid']] as &$row) {
-					$row['value'] = UNRESOLVED_MACRO_STRING;
-				}
-				unset($row);
-			}
-		}
-
 		return $results;
 	}
 
@@ -274,17 +265,17 @@ class CHistoryManager {
 				);
 
 				while ($itemid_clock = DBfetch($max_clock_per_item, false)) {
-					$db_values = DBfetchArray(DBselect(
-						'SELECT '.self::output($item).
+					$db_value = DBfetchArray(DBselect(
+						'SELECT *'.
 						' FROM '.$history_table.' h'.
-						' WHERE '.dbConditionId('h.itemid', [$itemid_clock['itemid']]).
+						' WHERE h.itemid='.zbx_dbstr($itemid_clock['itemid']).
 							' AND h.clock='.zbx_dbstr($itemid_clock['clock']).
 						' ORDER BY h.ns DESC',
 						$limit
 					));
 
-					if ($db_values) {
-						$results[$itemid_clock['itemid']] = $db_values;
+					if ($db_value) {
+						$results[$itemid_clock['itemid']] = $db_value;
 					}
 				}
 			}
@@ -294,10 +285,9 @@ class CHistoryManager {
 				$history_table = self::getTableName($value_type);
 
 				foreach ($items as $item) {
-					$db_values = DBselect(
-						'SELECT '.self::output($item).
+					$db_values = DBselect('SELECT *'.
 						' FROM '.$history_table.' h'.
-						' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 							($period !== null ? ' AND h.clock>'.$period : '').
 						' ORDER BY h.clock DESC, h.ns DESC',
 						$limit
@@ -343,7 +333,7 @@ class CHistoryManager {
 				$clock_max = DBfetch(DBselect(
 					'SELECT MAX(h.clock)'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
-					' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						($period !== null ? ' AND h.clock>'.$period : '')
 				), false);
 
@@ -352,9 +342,9 @@ class CHistoryManager {
 
 					if ($clock_max !== null) {
 						$values = DBfetchArray(DBselect(
-							'SELECT '.self::output($item).
+							'SELECT *'.
 							' FROM '.self::getTableName($item['value_type']).' h'.
-							' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 								' AND h.clock='.zbx_dbstr($clock_max).
 							' ORDER BY h.ns DESC',
 							$limit
@@ -371,9 +361,9 @@ class CHistoryManager {
 			foreach ($items as $item) {
 				// Cannot order by h.ns directly here due to performance issues.
 				$values = DBfetchArray(DBselect(
-					'SELECT '.self::output($item).
+					'SELECT *'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
-					' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						($period !== null ? ' AND h.clock>'.$period : '').
 					' ORDER BY h.clock DESC',
 					$limit + 1
@@ -394,9 +384,9 @@ class CHistoryManager {
 						} while ($values && $values[$count - 1]['clock'] == $clock);
 
 						$db_values = DBselect(
-							'SELECT '.$output.
+							'SELECT *'.
 							' FROM '.self::getTableName($item['value_type']).' h'.
-							' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 								' AND h.clock='.$clock.
 							' ORDER BY h.ns DESC',
 							$limit - $count
@@ -442,25 +432,15 @@ class CHistoryManager {
 	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
 	 */
 	public function getValueAt(array $item, $clock, $ns) {
-		$result = null;
-
 		switch (self::getDataSourceType($item['value_type'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
-				$result = $this->getValueAtFromElasticsearch($item, $clock, $ns);
-				break;
+				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
 
 			default:
-				$result = $this->primary_keys_enabled
+				return $this->primary_keys_enabled
 					? $this->getValueAtFromSqlWithPk($item, $clock, $ns)
 					: $this->getValueAtFromSql($item, $clock, $ns);
-				break;
 		}
-
-		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY && $result !== null) {
-			$result['value'] = UNRESOLVED_MACRO_STRING;
-		}
-
-		return $result;
 	}
 
 	/**
@@ -552,12 +532,13 @@ class CHistoryManager {
 		}
 
 		$history_table = self::getTableName($item['value_type']);
-		$sql = 'SELECT '.self::output($item).
-			' FROM '.$history_table.' h'.
-			' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
-				' AND h.clock='.zbx_dbstr($clock).
-				' AND h.ns<='.zbx_dbstr($ns).
-			' ORDER BY h.ns DESC';
+
+		$sql = 'SELECT *'.
+			' FROM '.$history_table.
+			' WHERE itemid='.zbx_dbstr($item['itemid']).
+				' AND clock='.zbx_dbstr($clock).
+				' AND ns<='.zbx_dbstr($ns).
+			' ORDER BY ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			return $row;
@@ -569,12 +550,12 @@ class CHistoryManager {
 			$time_from = max($time_from, time() - $hk_history + 1);
 		}
 
-		$sql = 'SELECT '.self::output($item).
-			' FROM '.$history_table.' h'.
-			' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
-				' AND h.clock<'.zbx_dbstr($clock).
-				' AND h.clock>='.zbx_dbstr($time_from).
-			' ORDER BY h.clock DESC, h.ns DESC';
+		$sql = 'SELECT *'.
+			' FROM '.$history_table.
+			' WHERE itemid='.zbx_dbstr($item['itemid']).
+				' AND clock<'.zbx_dbstr($clock).
+				' AND clock>='.zbx_dbstr($time_from).
+			' ORDER BY clock DESC, ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			return $row;
@@ -598,11 +579,12 @@ class CHistoryManager {
 
 		$result = null;
 		$table = self::getTableName($item['value_type']);
-		$sql = 'SELECT '.self::output($item).
-				' FROM '.$table.' h'.
-				' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
-					' AND h.clock='.zbx_dbstr($clock).
-					' AND h.ns='.zbx_dbstr($ns);
+
+		$sql = 'SELECT *'.
+				' FROM '.$table.
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
+					' AND clock='.zbx_dbstr($clock).
+					' AND ns='.zbx_dbstr($ns);
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			$result = $row;
@@ -615,7 +597,7 @@ class CHistoryManager {
 		$max_clock = 0;
 		$sql = 'SELECT DISTINCT clock'.
 				' FROM '.$table.
-				' WHERE '.dbConditionId('itemid', [$item['itemid']]).
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
 					' AND clock='.zbx_dbstr($clock).
 					' AND ns<'.zbx_dbstr($ns);
 
@@ -645,18 +627,20 @@ class CHistoryManager {
 			return $result;
 		}
 
-		$sql = $clock == $max_clock
-			? 'SELECT '.$output.
-					' FROM '.$table.' h'.
-					' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
-						' AND h.clock='.zbx_dbstr($clock).
-						' AND h.ns<'.zbx_dbstr($ns).
-					' ORDER h.ns DESC'
-			: 'SELECT '.$output.
-					' FROM '.$table.' h'.
-					' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
-						' AND h.clock='.zbx_dbstr($max_clock).
-					' ORDER BY h.ns DESC';
+		if ($clock == $max_clock) {
+			$sql = 'SELECT *'.
+					' FROM '.$table.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock='.zbx_dbstr($clock).
+						' AND ns<'.zbx_dbstr($ns);
+		}
+		else {
+			$sql = 'SELECT *'.
+					' FROM '.$table.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock='.zbx_dbstr($max_clock).
+					' ORDER BY itemid,clock desc,ns desc';
+		}
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			$result = $row;
@@ -1369,7 +1353,7 @@ class CHistoryManager {
 		foreach ($item_tables as $table_name) {
 			$itemids = array_keys(array_intersect($items, [(string) $table_names[$table_name]]));
 
-			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionId('itemid', $itemids))) {
+			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionInt('itemid', $itemids))) {
 				return false;
 			}
 		}
@@ -1560,15 +1544,5 @@ class CHistoryManager {
 		}
 
 		return $grouped_items;
-	}
-
-	/**
-	 * @param array $item
-	 * @param int   $item['value_type']
-	 *
-	 * @return string
-	 */
-	private static function output(array $item): string {
-		return $item['value_type'] == ITEM_VALUE_TYPE_BINARY ? 'h.itemid,h.clock,NULL AS value,h.ns' : '*';
 	}
 }
