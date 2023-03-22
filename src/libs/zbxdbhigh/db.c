@@ -700,7 +700,7 @@ const ZBX_TABLE	*DBget_table(const char *tablename)
 
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
 {
-	return db_get_field(( ZBX_TABLE *)table, fieldname);
+	return db_get_field((ZBX_TABLE *)table, fieldname);
 }
 
 int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str)
@@ -2376,10 +2376,10 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 #if defined(HAVE_ORACLE)
 void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
 {
-#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
-#	define ZBX_PROTO_TAG_FIELDS	"fields"
-#	define ZBX_PROTO_TAG_LENGTH	"length"
-#	define ZBX_PROTO_TAG_CHAR	"char"
+#define ZBX_TYPE_CHAR_STR	"nvarchar2"
+#define ZBX_PROTO_TAG_FIELDS	"fields"
+#define ZBX_PROTO_TAG_LENGTH	"length"
+#define ZBX_PROTO_TAG_CHAR	"char"
 	ZBX_TABLE		*table;
 	int			i;
 	zbx_vector_str_t	names;
@@ -2473,8 +2473,10 @@ cleanup:
 		zbx_json_close(json);
 		zbx_json_close(json);
 	}
+#undef ZBX_TYPE_CHAR_STR
 #undef ZBX_PROTO_TAG_FIELDS
-#undef ZBX_TYPE_TEXT_STR
+#undef ZBX_PROTO_TAG_LENGTH
+#undef ZBX_PROTO_TAG_CHAR
 }
 #endif
 
