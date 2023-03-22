@@ -759,7 +759,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 			 * them.
 			 */
 			CItemPrototype::unlinkTemplateObjects($ruleids);
-			CHostPrototype::unlinkTemplateObjects($ruleids);
+			API::HostPrototype()->unlinkTemplateObjects($ruleids);
 		}
 	}
 
