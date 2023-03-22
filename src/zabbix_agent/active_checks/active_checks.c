@@ -68,19 +68,19 @@ typedef struct
 	unsigned char	flags;
 	zbx_uint64_t	id;
 }
-active_buffer_element;
+active_buffer_element_t;
 
 typedef struct
 {
-	active_buffer_element	*data;
+	active_buffer_element_t	*data;
 	int			count;
 	int			pcount;
 	int			lastsent;
 	int			first_error;
 }
-active_buffer;
+active_buffer_t;
 
-static ZBX_THREAD_LOCAL active_buffer			buffer;
+static ZBX_THREAD_LOCAL active_buffer_t			buffer;
 static ZBX_THREAD_LOCAL zbx_vector_ptr_t		active_metrics;
 static ZBX_THREAD_LOCAL zbx_vector_expression_t		regexps;
 static ZBX_THREAD_LOCAL char				*session_token;
@@ -103,8 +103,8 @@ static void	init_active_metrics(void)
 	if (NULL == buffer.data)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer: first allocation for %d elements", CONFIG_BUFFER_SIZE);
-		sz = (size_t)CONFIG_BUFFER_SIZE * sizeof(active_buffer_element);
-		buffer.data = (active_buffer_element *)zbx_malloc(buffer.data, sz);
+		sz = (size_t)CONFIG_BUFFER_SIZE * sizeof(active_buffer_element_t);
+		buffer.data = (active_buffer_element_t *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
 		buffer.pcount = 0;
@@ -805,7 +805,7 @@ static int	check_response(char *response)
 static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
-	active_buffer_element	*el;
+	active_buffer_element_t	*el;
 	int			ret = SUCCEED, i, now, level;
 	zbx_timespec_t		ts;
 	zbx_socket_t		s;
@@ -1012,7 +1012,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		const unsigned short *severity, const unsigned long *logeventid, unsigned char flags,
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
-	active_buffer_element	*el = NULL;
+	active_buffer_element_t	*el = NULL;
 	int			i, ret = FAIL;
 	size_t			sz;
 
@@ -1090,7 +1090,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 			zbx_free(el->source);
 		}
 
-		sz = (size_t)(CONFIG_BUFFER_SIZE - i - 1) * sizeof(active_buffer_element);
+		sz = (size_t)(CONFIG_BUFFER_SIZE - i - 1) * sizeof(active_buffer_element_t);
 		memmove(&buffer.data[i], &buffer.data[i + 1], sz);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer full: new element %d", buffer.count - 1);
@@ -1098,7 +1098,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		el = &buffer.data[CONFIG_BUFFER_SIZE - 1];
 	}
 
-	memset(el, 0, sizeof(active_buffer_element));
+	memset(el, 0, sizeof(active_buffer_element_t));
 	el->host = zbx_strdup(NULL, host);
 	el->key = zbx_strdup(NULL, key);
 	if (NULL != value)
@@ -1563,9 +1563,11 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			process_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					activechks_args_in->config_timeout);
 
-			/* failed to complete processing active checks */
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
+			{
+				/* failed to complete processing active checks */
 				continue;
+			}
 
 			nextcheck = get_min_nextcheck();
 			if (FAIL == nextcheck)
