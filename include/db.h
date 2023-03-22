@@ -531,7 +531,6 @@ int	zbx_db_validate_config_features(void);
 void	zbx_db_validate_config(void);
 #endif
 
-
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
 void	zbx_dbschema_modify_table(const char *tablename, struct zbx_json *j);
@@ -552,7 +551,7 @@ const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 ZBX_TABLE	*DBget_table_modify(const char *tablename);
 ZBX_FIELD	*DBget_field_modify(ZBX_TABLE *table, const char *fieldname);
-int		DBcheck_field_size(const char *tablename, const char *fieldname, const char *str);
+int		DBvalidate_field_size(const char *tablename, const char *fieldname, const char *str);
 
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);

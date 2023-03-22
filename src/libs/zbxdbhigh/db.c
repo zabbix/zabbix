@@ -578,9 +578,9 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 }
 
 #ifdef HAVE_MYSQL
-static size_t	get_string_field_size(unsigned char type)
+static size_t	get_string_field_size(const ZBX_FIELD *field)
 {
-	switch(type)
+	switch(field->type)
 	{
 		case ZBX_TYPE_LONGTEXT:
 			return ZBX_SIZE_T_MAX;
@@ -596,16 +596,20 @@ static size_t	get_string_field_size(unsigned char type)
 	}
 }
 #elif defined(HAVE_ORACLE)
-static size_t	get_string_field_size(unsigned char type)
+static size_t	get_string_field_size(const ZBX_FIELD *field)
 {
-	switch(type)
+	switch(field->type)
 	{
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
 			return ZBX_SIZE_T_MAX;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
-			return 4000u;
+			if (4000 < field->length)
+				return 32767u;
+			else
+				return 4000u;
+
 		case ZBX_TYPE_CUID:
 			return CUID_LEN - 1;
 		default:
@@ -614,6 +618,16 @@ static size_t	get_string_field_size(unsigned char type)
 	}
 }
 #endif
+
+static size_t	get_string_field_chars(const ZBX_FIELD *field)
+{
+	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+		return ZBX_SIZE_T_MAX;
+	else if (ZBX_TYPE_CUID == field->type)
+		return CUID_LEN;
+	else
+		return field->length;
+}
 
 char	*DBdyn_escape_string_len(const char *src, size_t length)
 {
@@ -627,19 +641,10 @@ char	*DBdyn_escape_string(const char *src)
 
 static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx_escape_sequence_t flag)
 {
-	size_t	length;
-
-	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
-		length = ZBX_SIZE_T_MAX;
-	else if (ZBX_TYPE_CUID == field->type)
-		length = CUID_LEN;
-	else
-		length = field->length;
-
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
-	return zbx_db_dyn_escape_string(src, get_string_field_size(field->type), length, flag);
+	return zbx_db_dyn_escape_string(src, get_string_field_size(field), get_string_field_chars(field), flag);
 #else
-	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, flag);
+	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, get_string_field_chars(field), flag);
 #endif
 }
 
@@ -700,9 +705,9 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
 
 int	DBvalidate_field_size(const char *tablename, const char *fieldname, const char *str)
 {
-#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
 	const ZBX_TABLE	*table;
 	const ZBX_FIELD	*field;
+	size_t		max_bytes, max_chars;
 
 	if (NULL == (table = DBget_table(tablename)) || NULL == (field = DBget_field(table, fieldname)))
 	{
@@ -710,13 +715,20 @@ int	DBvalidate_field_size(const char *tablename, const char *fieldname, const ch
 		return FAIL;
 	}
 
-	if (strlen(str) > get_string_field_size(field->type))
+#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
+	max_bytes = get_string_field_size(field);
+#else
+	max_bytes = ZBX_SIZE_T_MAX;
+#endif
+	max_chars = get_string_field_chars(field);
+
+	if (max_bytes < strlen(str))
+		return FAIL;
+
+	if (max_chars != max_bytes && max_chars < zbx_strlen_utf8(str))
 		return FAIL;
 
 	return SUCCEED;
-#else
-	return SUCCEED;
-#endif
 }
 
 /******************************************************************************
