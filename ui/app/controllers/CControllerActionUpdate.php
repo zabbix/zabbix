@@ -130,9 +130,9 @@ class CControllerActionUpdate extends CController {
 				unset($condition['row_index'], $condition['name']);
 			}
 			unset($condition);
-
-			$action['filter'] = $filter;
 		}
+
+		$action['filter'] = $filter;
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 			foreach ($action[$operation_group] as &$operation) {
