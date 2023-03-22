@@ -253,7 +253,7 @@ class CMapHelper {
 		$labels = getMapLabels($sysmap, $map_info);
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
-		$link_trigger_info = getMapLinkTriggerInfo($sysmap, $options);
+		$link_triggers_info = getMapLinkTriggerInfo($sysmap, $options);
 
 		$problems_total = 0;
 		$status_problems = [];
@@ -333,18 +333,21 @@ class CMapHelper {
 			$link['label'] = CMacrosResolverHelper::resolveMapLabelMacros($link['label']);
 
 			if ($link['permission'] >= PERM_READ && $link['linktriggers']) {
-				$link_triggers = array_filter($link['linktriggers'], function ($link_trigger) use ($link_trigger_info) {
-					return (array_key_exists($link_trigger['triggerid'], $link_trigger_info)
-						&& $link_trigger_info[$link_trigger['triggerid']]['status'] == TRIGGER_STATUS_ENABLED
-						&& $link_trigger_info[$link_trigger['triggerid']]['value'] == TRIGGER_VALUE_TRUE
-					);
-				});
+				$link_triggers = array_filter($link['linktriggers'],
+					function ($link_trigger) use ($link_triggers_info, $options) {
+						return (array_key_exists($link_trigger['triggerid'], $link_triggers_info)
+							&& $link_triggers_info[$link_trigger['triggerid']]['status'] == TRIGGER_STATUS_ENABLED
+							&& $link_triggers_info[$link_trigger['triggerid']]['value'] == TRIGGER_VALUE_TRUE
+							&& $link_triggers_info[$link_trigger['triggerid']]['priority'] >= $options['severity_min']
+						);
+					}
+				);
 
 				// Link-trigger with highest severity or lower triggerid defines link color and drawtype.
 				if ($link_triggers) {
-					$link_triggers = array_map(function ($link_trigger) use ($link_trigger_info) {
+					$link_triggers = array_map(function ($link_trigger) use ($link_triggers_info) {
 						return [
-							'priority' => $link_trigger_info[$link_trigger['triggerid']]['priority']
+							'priority' => $link_triggers_info[$link_trigger['triggerid']]['priority']
 						] + $link_trigger;
 					}, $link_triggers);
 
