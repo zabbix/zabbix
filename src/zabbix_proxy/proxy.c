@@ -1068,6 +1068,10 @@ static void	zbx_check_db(void)
 	}
 
 	zbx_free(db_version_info.friendly_current_version);
+}
+
+static void	zbx_check_db_tables(void)
+{
 #ifdef HAVE_ORACLE
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	zbx_db_table_prepare("items", NULL);
@@ -1075,6 +1079,7 @@ static void	zbx_check_db(void)
 	DBclose();
 #endif
 }
+
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
@@ -1268,6 +1273,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
+
+	zbx_check_db_tables();
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
