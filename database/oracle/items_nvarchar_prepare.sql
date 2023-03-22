@@ -27,4 +27,3 @@ alter table item_preproc rename column params to zbx_old_tmp;
 alter table item_preproc add params nvarchar2(4000) default '';
 update item_preproc set params=zbx_old_tmp;
 alter table item_preproc drop column zbx_old_tmp;
-

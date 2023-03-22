@@ -725,6 +725,9 @@ int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, con
 	if (max_bytes < strlen(str))
 		return FAIL;
 
+	if (ZBX_SIZE_T_MAX == max_chars)
+		return SUCCEED;
+
 	if (max_chars != max_bytes && max_chars < zbx_strlen_utf8(str))
 		return FAIL;
 
