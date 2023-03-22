@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -460,6 +460,14 @@ void	zbx_json_addfloat(struct zbx_json *j, const char *name, double value)
 	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
 }
 
+void	zbx_json_adddouble(struct zbx_json *j, const char *name, double value)
+{
+	char	buffer[MAX_ID_LEN];
+
+	zbx_print_double(buffer, sizeof(buffer), value);
+	zbx_json_addstring(j, name, buffer, ZBX_JSON_TYPE_INT);
+}
+
 int	zbx_json_close(struct zbx_json *j)
 {
 	if (1 == j->level)
@@ -723,7 +731,7 @@ static unsigned int	zbx_hex2num(char c)
  *               0 on error (invalid escape sequence)                         *
  *                                                                            *
  ******************************************************************************/
-static unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
+unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
 {
 	bytes[0] = '\0';
 

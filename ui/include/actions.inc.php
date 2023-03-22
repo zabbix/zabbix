@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -675,10 +675,10 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 				order_result($template_list);
 
 				if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) {
-					$result[$i][] = bold(_('Link to templates').': ');
+					$result[$i][] = bold(_('Link templates').': ');
 				}
 				else {
-					$result[$i][] = bold(_('Unlink from templates').': ');
+					$result[$i][] = bold(_('Unlink templates').': ');
 				}
 
 				$result[$i][] = [implode(', ', $template_list), BR()];
@@ -860,8 +860,8 @@ function operation_type2str($type) {
 		OPERATION_TYPE_HOST_DISABLE => _('Disable host'),
 		OPERATION_TYPE_GROUP_ADD => _('Add to host group'),
 		OPERATION_TYPE_GROUP_REMOVE => _('Remove from host group'),
-		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
-		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
+		OPERATION_TYPE_TEMPLATE_ADD => _('Link template'),
+		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
 		OPERATION_TYPE_RECOVERY_MESSAGE => _('Notify all involved'),
 		OPERATION_TYPE_UPDATE_MESSAGE => _('Notify all involved')
@@ -1499,7 +1499,8 @@ function getSingleEventActions(array $event, array $r_events, array $alerts) {
 	// Sort by action_type is done to put Recovery event before actions, resulted from it. Same for other action_type.
 	CArrayHelper::sort($actions, [
 		['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-		['field' => 'action_type', 'order' => ZBX_SORT_DOWN]
+		['field' => 'action_type', 'order' => ZBX_SORT_DOWN],
+		['field' => 'alertid', 'order' => ZBX_SORT_DOWN]
 	]);
 
 	return [
@@ -1547,25 +1548,34 @@ function getEventUpdates(array $event) {
  * @param array  $actions['severities']    Severity change icon data.
  * @param array  $actions['actions']       Actions icon data.
  * @param array  $users                    User name, surname and username.
+ * @param bool   $is_acknowledged          Is the event currently acknowledged. If true, display icon.
  *
  * @return CCol|string
  */
-function makeEventActionsIcons($eventid, $actions, $users) {
+function makeEventActionsIcons($eventid, $actions, $users, $is_acknowledged) {
 	$suppression_icon = makeEventSuppressionsProblemIcon($actions['suppressions'][$eventid], $users);
 	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
 	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users);
 	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $eventid);
 
 	$action_icons = [];
+
+	if ($is_acknowledged) {
+		$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_ACK_GREEN, 'title' => _('Acknowledged')]);
+	}
+
 	if ($suppression_icon !== null) {
 		$action_icons[] = $suppression_icon;
 	}
+
 	if ($messages_icon !== null) {
 		$action_icons[] = $messages_icon;
 	}
+
 	if ($severities_icon !== null) {
 		$action_icons[] = $severities_icon;
 	}
+
 	if ($actions_icon !== null) {
 		$action_icons[] = $actions_icon;
 	}

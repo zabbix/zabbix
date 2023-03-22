@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('service')))->removeId())
 	->setId('service-form')
 	->setName('service_form')
 	->addItem(getMessages());
@@ -115,12 +116,11 @@ $service_tab = (new CFormGrid())
 	->addItem([
 		new CLabel([
 			_('Status calculation rule'),
-			(new CSpan([
-				' ',
+			(new CSpan(
 				makeWarningIcon(
 					_('Status calculation rule and additional rules are only applicable if child services exist.')
 				)
-			]))
+			))
 				->setId('algorithm-not-applicable-warning')
 				->addStyle($data['form']['children'] ? 'display: none' : '')
 		], 'algorithm_focusable'),

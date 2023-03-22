@@ -3,21 +3,25 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
-The template to monitor InfluxDB by Zabbix that works without any external scripts.
+The template to monitor Kubernetes API server that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 Template `Kubernetes API server by HTTP` — collects metrics by HTTP agent from API server /metrics endpoint.
 
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Kubernetes API server, version 1.19.10
 
+## Requirements
+
+For Zabbix version: 7.0 and higher.
+
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Internal service metrics are collected from /metrics endpoint.
 Template needs to use Authorization via API token.
@@ -27,7 +31,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes API server instance version and configuration.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -41,26 +45,26 @@ No specific Zabbix configuration is required.
 |{$KUBE.API.SERVER.URL} |<p>instance URL</p> |`http://localhost:8086/metrics` |
 |{$KUBE.API.TOKEN} |<p>API Authorization Token</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Authentication attempts discovery |<p>Discovery authentication attempts by result.</p> |DEPENDENT |kubernetes.api.authentication_attempts.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `authentication_attempts{result =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Authentication requests discovery |<p>Discovery authentication attempts by name.</p> |DEPENDENT |kubernetes.api.authenticated_user_requests.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `authenticated_user_requests{username =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Client certificate expiration histogram |<p>Discovery raw data of client certificate expiration</p> |DEPENDENT |kubernetes.api.certificate_expiration.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "apiserver_client_certificate_expiration_seconds_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|Client certificate expiration histogram |<p>Discovery raw data of client certificate expiration</p> |DEPENDENT |kubernetes.api.certificate_expiration.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "apiserver_client_certificate_expiration_seconds_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
 |Etcd objects metrics discovery |<p>Discovery etcd objects by resource.</p> |DEPENDENT |kubernetes.api.etcd_object_counts.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `etcd_object_counts{resource =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |gRPC completed requests discovery |<p>Discovery grpc completed requests by grpc code.</p> |DEPENDENT |kubernetes.api.grpc_client_handled.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `grpc_client_handled_total{grpc_code =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Long-running requests |<p>Discovery of long-running requests by verb, resource and scope.</p> |DEPENDENT |kubernetes.api.longrunning_gauge.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `apiserver_longrunning_gauge{resource =~ ".*", scope =~ ".*", verb =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Request duration histogram |<p>Discovery raw data and percentile items of request duration.</p> |DEPENDENT |kubernetes.api.requests_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "apiserver_request_duration_*", verb =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|Request duration histogram |<p>Discovery raw data and percentile items of request duration.</p> |DEPENDENT |kubernetes.api.requests_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "apiserver_request_duration_*", verb =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
 |Requests inflight discovery |<p>Discovery requests inflight by kind.</p> |DEPENDENT |kubernetes.api.inflight_requests.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `apiserver_current_inflight_requests{request_kind =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Watchers metrics discovery |<p>Discovery watchers by kind.</p> |DEPENDENT |kubernetes.api.apiserver_registered_watchers.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `apiserver_registered_watchers{kind =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Workqueue metrics discovery |<p>Discovery workqueue metrics by name.</p> |DEPENDENT |kubernetes.api.workqueue.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `workqueue_adds_total{name =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -104,7 +108,7 @@ There are no template links in this template.
 |Kubernetes API |Kubernetes API: Client certificate expiration, p1 |<p>1 percentile of the remaining lifetime on the certificate used to authenticate a request.</p> |CALCULATED |kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]<p>**Expression**:</p>`bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)` |
 |Zabbix raw items |Kubernetes API: Get API instance metrics |<p>Get raw metrics from API instance /metrics endpoint.</p> |HTTP_AGENT |kubernetes.api.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -115,7 +119,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

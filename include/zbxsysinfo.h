@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -185,6 +185,8 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
+void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f);
+
 void	zbx_init_metrics(void);
 int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	zbx_free_metrics_ext(ZBX_METRIC **metrics);
@@ -242,5 +244,8 @@ zbx_uint32_t	zbx_get_thread_global_mutex_flag(void);
 void		zbx_add_alias(const char *name, const char *value);
 void		zbx_alias_list_free(void);
 const char	*zbx_alias_get(const char *orig);
+
+int		zbx_init_modbus(char **error);
+void		zbx_deinit_modbus(void);
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

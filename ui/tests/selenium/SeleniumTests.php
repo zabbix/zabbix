@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,6 +118,12 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
+// Media types.
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
+require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
+
 // Monitoring.
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
@@ -152,6 +158,10 @@ require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
 require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
 require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
+
+// Scripts.
+require_once dirname(__FILE__).'/scripts/testFormAlertsScripts.php';
+require_once dirname(__FILE__).'/scripts/testPageAlertsScripts.php';
 
 // Services.
 require_once dirname(__FILE__).'/services/testFormServicesServices.php';
@@ -194,8 +204,6 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
-require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
-require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
@@ -225,10 +233,6 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
 require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
-require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
@@ -407,6 +411,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUserRoles');
 		$suite->addTestSuite('testUserRolesPermissions');
 
+		// Scripts.
+		$suite->addTestSuite('testFormAlertsScripts');
+		$suite->addTestSuite('testPageAlertsScripts');
+
 		// Services.
 		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testPageServicesServices');
@@ -447,7 +455,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationGeneralModules');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
-		$suite->addTestSuite('testPageAdministrationScripts');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
@@ -481,7 +488,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
-		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormHostGroup');

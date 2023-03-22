@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -185,6 +185,12 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
 			],
+			'Test invalid LDAP enabled without LDAP servers' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
+				],
+				'expected_error' => 'At least one LDAP server must exist.'
+			],
 
 			// Invalid SAML auth tests.
 			'Test invalid SAML auth' => [
@@ -262,12 +268,6 @@ class testAuthentication extends CAPITest {
 			],
 
 			// Valid LDAP auth tests.
-			'Test valid LDAP enabled' => [
-				'authentication' => [
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
-				],
-				'expected_error' => null
-			],
 			'Test valid LDAP JIT status' => [
 				'authentication' => [
 					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,

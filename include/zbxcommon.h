@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,7 +304,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SERVICEMAN		34
 #define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	35
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		36
-#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
+#define ZBX_PROCESS_TYPE_CONNECTORMANAGER	37
+#define ZBX_PROCESS_TYPE_CONNECTORWORKER	38
+#define ZBX_PROCESS_TYPE_COUNT			39	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -443,7 +445,7 @@ while (0)
 /* to avoid dependency on libzbxnix.a */
 #define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
 
 extern const char	*progname;
 extern const char	title_message[];
@@ -462,6 +464,7 @@ typedef unsigned char	(*zbx_get_program_type_f)(void);
 typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
+typedef int		(*zbx_get_config_int_f)(void);
 
 typedef enum
 {
@@ -488,7 +491,8 @@ typedef enum
 	HTTPTEST_AUTH_BASIC,
 	HTTPTEST_AUTH_NTLM,
 	HTTPTEST_AUTH_NEGOTIATE,
-	HTTPTEST_AUTH_DIGEST
+	HTTPTEST_AUTH_DIGEST,
+	HTTPTEST_AUTH_BEARER
 }
 zbx_httptest_auth_t;
 
@@ -601,9 +605,9 @@ wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 /* string functions that could not be moved into libzbxstr.a because they */
 /* are used by libzbxcommon.a END */
 
-/* future proctitle library */
+char	**zbx_setproctitle_init(int argc, char **argv);
 void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-/* future proctitle library END */
+void	zbx_setproctitle_deinit(void);
 
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
@@ -646,12 +650,6 @@ int	zbx_write_all(int fd, const char *buf, size_t n);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 
-zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
-zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
-
-zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data);
-zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data);
-
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 #define ZBX_SESSION_ACTIVE		0
@@ -690,6 +688,7 @@ int	zbx_alarm_timed_out(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
 
+#define ZBX_PREPROC_NONE			0
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2
 #define ZBX_PREPROC_LTRIM			3
@@ -726,9 +725,6 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
-/* internal on fail actions */
-#define ZBX_PREPROC_FAIL_FORCE_ERROR	4
-
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1
 #define ZBX_HTTPFIELD_POST_FIELD	2
@@ -738,6 +734,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_POSTTYPE_FORM		1
 #define ZBX_POSTTYPE_JSON		2
 #define ZBX_POSTTYPE_XML		3
+#define ZBX_POSTTYPE_NDJSON		4
 
 #define ZBX_RETRIEVE_MODE_CONTENT	0
 #define ZBX_RETRIEVE_MODE_HEADERS	1
@@ -779,8 +776,6 @@ typedef struct
 }
 zbx_tag_t;
 
-void	zbx_free_tag(zbx_tag_t *tag);
-
 #define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
 
 #define ZBX_CONST_STRING(str) "" str
@@ -798,5 +793,13 @@ zbx_uint64_t	suffix2factor(char c);
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
 char	*zbx_strerror(int errnum);
+
+#if !defined(_WINDOWS)
+#	if defined(HAVE_LIBPTHREAD)
+#		define zbx_sigmask	pthread_sigmask
+#	else
+#		define zbx_sigmask	sigprocmask
+#	endif
+#endif
 
 #endif

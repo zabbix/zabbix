@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ $output = [
 $options = $data['options'];
 
 $http_popup_form = (new CForm())
-	->cleanItems()
 	->setId('http_step')
 	->addVar('no', $options['no'])
 	->addVar('httpstepid', $options['httpstepid'])
@@ -52,7 +51,7 @@ $http_popup_form_list = (new CFormList())
 	->addRow(
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 		new CDiv([
-			(new CTextBox('url', $options['url'], false, null))
+			(new CTextBox('url', $options['url'], false, DB::getFieldLength('httpstep','url')))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

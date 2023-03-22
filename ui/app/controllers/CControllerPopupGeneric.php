@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -142,8 +142,13 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected $disableids = [];
 
+	/**
+	 * @var array
+	 */
+	private $page_options = [];
+
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->disableCsrfValidation();
 
 		$this->popup_properties = [
 			'hosts' => [
@@ -560,7 +565,7 @@ class CControllerPopupGeneric extends CController {
 			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
-			'context' =>							'string|in host,template',
+			'context' =>							'string|in host,template,audit',
 			'enabled_only' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',

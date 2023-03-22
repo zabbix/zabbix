@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,9 +53,6 @@ class CUrlFactory {
 		],
 		'items.php' => [
 			'remove' => ['itemid']
-		],
-		'maintenance.php' => [
-			'remove' => ['maintenanceid']
 		],
 		'sysmaps.php' => [
 			'remove' => ['sysmapid']

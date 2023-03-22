@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.enable');
 
-			this._post(target, actionids, curl.getUrl());
+			this._post(target, actionids, curl);
 		}
 
 		_disable(target, actionids) {
@@ -115,7 +115,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.disable');
 
-			this._post(target, actionids, curl.getUrl());
+			this._post(target, actionids, curl);
 		}
 
 		_delete(target, actionids) {
@@ -130,13 +130,17 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.delete');
 
-			this._post(target, actionids, curl.getUrl());
+			this._post(target, actionids, curl);
 		}
 
 		_post(target, actionids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('action')) ?>
+			);
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({actionids: actionids})

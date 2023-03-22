@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,7 +89,8 @@
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period,
-				dynamic_hostid: dynamic.host ? dynamic.host.id : null
+				dynamic_hostid: dynamic.host ? dynamic.host.id : null,
+				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
 
 			for (const page of dashboard.pages) {
@@ -200,6 +201,9 @@
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.update');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
+			);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -220,7 +224,7 @@
 
 					this.disableNavigationWarning();
 
-					const curl = new Curl('zabbix.php', false);
+					const curl = new Curl('zabbix.php');
 
 					curl.setArgument('action', 'dashboard.view');
 					curl.setArgument('dashboardid', response.dashboardid);
@@ -258,7 +262,7 @@
 		},
 
 		cancelEditing() {
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
 
@@ -367,7 +371,7 @@
 			dynamicHostChange() {
 				const hosts = jQuery('#dynamic_hostid').multiSelect('getData');
 				const host = hosts.length ? hosts[0] : null;
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 
 				curl.setArgument('action', 'dashboard.view');
 

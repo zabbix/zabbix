@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #include "rtc_server.h"
 
 #include "log.h"
-#include "zbxha.h"
 #include "zbxdiag.h"
 #include "zbxtypes.h"
 #include "zbxcommon.h"
@@ -27,6 +26,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
+#include "../ha/ha.h"
 
 static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
@@ -269,7 +269,8 @@ static int	rtc_process_diaginfo(const char *data, char **result)
 
 	if (0 == strcmp(buf, "all"))
 	{
-		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING);
+		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING) |
+				(1 << ZBX_DIAGINFO_CONNECTOR);
 	}
 	else if (0 == strcmp(buf, ZBX_DIAG_VALUECACHE))
 	{
@@ -482,7 +483,7 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
  *                         rtc command handler                                *
  *                                                                            *
  ******************************************************************************/
-int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
 {
 	switch (code)
 	{

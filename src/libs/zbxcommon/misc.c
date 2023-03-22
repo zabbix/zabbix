@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "zbxcommon.h"
 #include "log.h"
-#include "setproctitle.h"
 #include "zbxthreads.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
@@ -284,7 +283,7 @@ void	zbx_usage(void)
 }
 
 static const char	copyright_message[] =
-	"Copyright (C) 2022 Zabbix SIA\n"
+	"Copyright (C) 2023 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -331,31 +330,6 @@ void	zbx_version(void)
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: set process title                                                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_setproctitle(const char *fmt, ...)
-{
-#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	char	title[MAX_STRING_LEN];
-	va_list	args;
-
-	va_start(args, fmt);
-	zbx_vsnprintf(title, sizeof(title), fmt, args);
-	va_end(args);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() title:'%s'", __func__, title);
-#endif
-
-#if defined(HAVE_FUNCTION_SETPROCTITLE)
-	setproctitle("%s", title);
-#elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	setproctitle_set_status(title);
-#endif
 }
 
 /******************************************************************************
@@ -666,11 +640,4 @@ zbx_uint64_t	suffix2factor(char c)
 		default:
 			return 1;
 	}
-}
-
-void	zbx_free_tag(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
 }

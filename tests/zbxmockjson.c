@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,9 @@ static void	json_flatten_value(const char *ptr, const char *path, zbx_vector_ptr
 
 	if (FAIL == zbx_json_brackets_open(ptr, &jp_value))
 	{
-		zbx_json_decodevalue_dyn(ptr, &value, &value_alloc, &type);
+		if (NULL == zbx_json_decodevalue_dyn(ptr, &value, &value_alloc, &type))
+			type = ZBX_JSON_TYPE_NULL;
+
 		json_append_prop(props, path, (ZBX_JSON_TYPE_NULL != type ? value : "null"));
 	}
 	else
