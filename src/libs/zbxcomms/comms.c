@@ -55,8 +55,9 @@ extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
 static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
 static int	socket_set_nonblocking(ZBX_SOCKET s);
-static int	socket_had_nonblocking_error();
+static int	socket_had_nonblocking_error(void);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
+static ssize_t	tcp_read(ZBX_SOCKET s, char *buffer, size_t size, int timeout);
 
 zbx_config_tls_t	*zbx_config_tls_new(void)
 {
@@ -606,7 +607,7 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, int t
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
 
-	for (; 0 != n; n = ZBX_TCP_WRITE(s->socket, buf + offset, len - offset))
+	for (; 0 != n; n = ZBX_TCP_WRITE(s->socket, buf + offset, (len - (size_t)offset)))
 	{
 		if (0 > n)
 		{
@@ -919,7 +920,7 @@ static int	socket_set_nonblocking(ZBX_SOCKET s)
  * Purpose: check if the last socket error was because of non-blocking socket *
  *                                                                            *
  ******************************************************************************/
-static int	socket_had_nonblocking_error()
+static int	socket_had_nonblocking_error(void)
 {
 #ifndef _WINDOWS
 	switch (errno)
@@ -954,7 +955,7 @@ static int	socket_had_nonblocking_error()
  *           supported on older (xp64/server2003) systems                     *
  *                                                                            *
  ******************************************************************************/
-int	socket_poll(zbx_pollfd_t* fds, int fds_num, int timeout)
+int	socket_poll(zbx_pollfd_t* fds, unsigned long fds_num, int timeout)
 {
 	fd_set		fds_read;
 	fd_set		fds_write;
@@ -1086,7 +1087,7 @@ static ssize_t	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
  * Purpose: read data from socket                                             *
  *                                                                            *
  ******************************************************************************/
-ssize_t	tcp_read(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
+static ssize_t	tcp_read(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
 {
 	ssize_t		n;
 	zbx_pollfd_t	pd;
@@ -1414,7 +1415,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 
 	zbx_tcp_unaccept(s);
 
-	pds = (zbx_pollfd_t *)zbx_malloc(NULL, sizeof(zbx_pollfd_t) * s->num_socks);
+	pds = (zbx_pollfd_t *)zbx_malloc(NULL, sizeof(zbx_pollfd_t) * (size_t)s->num_socks);
 
 	for (i = 0; i < s->num_socks; i++)
 	{
@@ -1422,7 +1423,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		pds[i].events = POLLIN;
 	}
 
-	if (ZBX_PROTO_ERROR == (ret = socket_poll(pds, s->num_socks, poll_timeout * 1000)))
+	if (ZBX_PROTO_ERROR == (ret = socket_poll(pds, (unsigned long)s->num_socks, poll_timeout * 1000)))
 	{
 		zbx_set_socket_strerror("poll() failed: %s", strerror_from_system(zbx_socket_last_error()));
 		return ret;
@@ -1604,7 +1605,7 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 	/* data will always fit the static buffer.                                   */
 	if (NULL != s->next_line)
 	{
-		left = s->read_bytes - (s->next_line - s->buffer);
+		left = (size_t)(s->read_bytes - (size_t)(s->next_line - s->buffer));
 		memmove(s->buf_stat, s->next_line, left);
 	}
 	else
@@ -1621,7 +1622,7 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 	if (ZBX_PROTO_ERROR == (nbytes = tcp_read(s->socket, s->buf_stat + left, ZBX_STAT_BUF_LEN - left - 1, 0)))
 		goto out;
 
-	s->buf_stat[left + nbytes] = '\0';
+	s->buf_stat[left + (size_t)nbytes] = '\0';
 
 	if (0 == nbytes)
 	{
@@ -1633,7 +1634,7 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 		goto out;
 	}
 
-	s->read_bytes += nbytes;
+	s->read_bytes += (size_t)nbytes;
 
 	/* check if the static buffer now contains the next line */
 	if (NULL != (line = zbx_socket_find_line(s)))
@@ -1664,10 +1665,10 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 		buffer[nbytes] = '\0';
 		ptr = strchr(buffer, '\n');
 
-		if (s->read_bytes + nbytes < ZBX_TCP_LINE_LEN && s->read_bytes == line_length)
+		if (s->read_bytes + (size_t)nbytes < ZBX_TCP_LINE_LEN && s->read_bytes == line_length)
 		{
-			zbx_strncpy_alloc(&s->buffer, &alloc, &offset, buffer, nbytes);
-			s->read_bytes += nbytes;
+			zbx_strncpy_alloc(&s->buffer, &alloc, &offset, buffer, (size_t)nbytes);
+			s->read_bytes += (size_t)nbytes;
 		}
 		else
 		{
@@ -1682,12 +1683,12 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 			/* if the line exceeds the defined limit then truncate it by skipping data until the newline */
 			if (NULL != ptr)
 			{
-				zbx_strncpy_alloc(&s->buffer, &alloc, &offset, ptr, nbytes - (ptr - buffer));
-				s->read_bytes += nbytes - (ptr - buffer);
+				zbx_strncpy_alloc(&s->buffer, &alloc, &offset, ptr, (size_t)(nbytes - (ptr - buffer)));
+				s->read_bytes += (size_t)(nbytes - (ptr - buffer));
 			}
 		}
 
-		line_length += nbytes;
+		line_length += (size_t)nbytes;
 
 	}
 	while (NULL == ptr);
@@ -1757,12 +1758,12 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 			goto out;
 
 		if (ZBX_BUF_TYPE_STAT == s->buf_type)
-			buf_stat_bytes += nbytes;
+			buf_stat_bytes += (size_t)nbytes;
 		else
 		{
-			if (buf_dyn_bytes + nbytes <= expected_len)
-				memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, nbytes);
-			buf_dyn_bytes += nbytes;
+			if (buf_dyn_bytes + (size_t)nbytes <= expected_len)
+				memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, (size_t)nbytes);
+			buf_dyn_bytes += (size_t)nbytes;
 		}
 
 		if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
@@ -1918,7 +1919,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 				zabbix_log(LOG_LEVEL_TRACE, "%s(): received " ZBX_FS_SIZE_T " bytes with"
 						" compression ratio %.1f", __func__,
 						(zbx_fs_size_t)(buf_stat_bytes + buf_dyn_bytes),
-						(double)reserved / (buf_stat_bytes + buf_dyn_bytes));
+						(double)reserved / (double)(buf_stat_bytes + buf_dyn_bytes));
 			}
 			else
 				s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
@@ -2002,18 +2003,18 @@ ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 			goto out;
 
 		if (ZBX_BUF_TYPE_STAT == s->buf_type)
-			buf_stat_bytes += nbytes;
+			buf_stat_bytes += (size_t)nbytes;
 		else
 		{
-			if (buf_dyn_bytes + nbytes >= allocated)
+			if (buf_dyn_bytes + (size_t)nbytes >= allocated)
 			{
-				while (buf_dyn_bytes + nbytes >= allocated)
+				while (buf_dyn_bytes + (size_t)nbytes >= allocated)
 					allocated *= 2;
 				s->buffer = (char *)zbx_realloc(s->buffer, allocated);
 			}
 
-			memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, nbytes);
-			buf_dyn_bytes += nbytes;
+			memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, (size_t)nbytes);
+			buf_dyn_bytes += (size_t)	nbytes;
 		}
 
 		if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
@@ -2063,7 +2064,7 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
 
 	/* CIDR notation to subnet mask */
 	for (i = (int)prefix_size, j = 0; i > 0 && j < bytes; i -= 8, j++)
-		netmask[j] = i >= 8 ? 0xFF : ~((1 << (8 - i)) - 1);
+		netmask[j] = (unsigned char)(i >= 8 ? 0xFF : ~((1 << (8 - i)) - 1));
 
 	/* The result of the bitwise AND operation of IP address and the subnet mask is the network prefix. */
 	/* All hosts on a subnetwork have the same network prefix. */
@@ -2291,7 +2292,8 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 							ZBX_IPV4_MAX_CIDR_PREFIX : ZBX_IPV6_MAX_CIDR_PREFIX);
 				}
 
-				if (SUCCEED == zbx_ip_cmp(prefix_size_current, current_ai, s->peer_info, 0))
+				if (SUCCEED == zbx_ip_cmp((unsigned int)prefix_size_current, current_ai, s->peer_info,
+						0))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;
@@ -2350,7 +2352,8 @@ int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout
 
 	while (offset < (ssize_t)data_len)
 	{
-		if (ZBX_PROTO_ERROR == (n = zbx_sendto(s->socket, data + offset, data_len - offset, 0, NULL, 0)))
+		if (ZBX_PROTO_ERROR == (n = zbx_sendto(s->socket, data + offset, data_len - (size_t)offset, 0, NULL,
+				0)))
 		{
 			int	rc;
 
@@ -2451,10 +2454,10 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 	else
 	{
 		s->buf_type = ZBX_BUF_TYPE_DYN;
-		s->buffer = (char *)zbx_malloc(s->buffer, n + 1);
+		s->buffer = (char *)zbx_malloc(s->buffer, (size_t)n + 1);
 	}
 
-	memcpy(s->buffer, buffer, n);
+	memcpy(s->buffer, buffer, (size_t)n);
 	s->buffer[n] = '\0';
 
 	return SUCCEED;

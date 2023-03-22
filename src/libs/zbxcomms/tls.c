@@ -94,7 +94,7 @@ static void	zbx_openssl_thread_cleanup(void)
 	zbx_free(crypto_mutexes);
 }
 
-static int	zbx_openssl_init_ssl(int opts, void *settings)
+static int	zbx_openssl_init_ssl(zbx_uint64_t opts, void *settings)
 {
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL
 	ZBX_UNUSED(opts);
@@ -122,7 +122,7 @@ static void	OPENSSL_cleanup(void)
 
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)
 /* OpenSSL 1.1.0 or newer, not LibreSSL */
-static int	zbx_openssl_init_ssl(int opts, void *settings)
+static int	zbx_openssl_init_ssl(zbx_uint64_t opts, void *settings)
 {
 	return OPENSSL_init_ssl(opts, settings);
 }
@@ -274,7 +274,7 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
  *          unfinished operation                                              *
  *                                                                            *
  ******************************************************************************/
-static int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session, int err)
+static int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session, ssize_t err)
 {
 	zbx_pollfd_t	pd;
 	int		ret;
@@ -310,7 +310,7 @@ static int	tls_is_nonblocking_error(ssize_t err)
  *          unfinished operation                                              *
  *                                                                            *
  ******************************************************************************/
-static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, int ssl_err)
+static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 {
 	zbx_pollfd_t	pd;
 	int		ret;
@@ -2902,12 +2902,12 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-static int	zbx_tls_get_error(const SSL *s, int res, const char *func, size_t *error_alloc, size_t *error_offset,
-		char **error)
+static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t *error_alloc,
+		size_t *error_offset, char **error)
 {
 	int	result_code;
 
-	result_code = SSL_get_error(s, res);
+	result_code = SSL_get_error(s, (int)res);
 
 	switch (result_code)
 	{
@@ -2936,7 +2936,7 @@ static int	zbx_tls_get_error(const SSL *s, int res, const char *func, size_t *er
 					/* "man SSL_get_error" describes only res == 0 and res == -1 for */
 					/* SSL_ERROR_SYSCALL case */
 					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
-							" returned undocumented code %d", func, res);
+							" returned undocumented code " ZBX_FS_SSIZE_T, func, res);
 				}
 			}
 			else
@@ -3722,7 +3722,7 @@ out1:
 #	define ZBX_TLS_READ_FUNC_NAME		"SSL_read"
 #	define ZBX_TLS_WANT_WRITE(res)		FAIL
 #	define ZBX_TLS_WANT_READ(res)		FAIL
-#	define ZBX_TLS_ERROR(s, res)		SSL_get_error(s, res)
+#	define ZBX_TLS_ERROR(s, res)		(size_t)SSL_get_error(s, (int)res)
 /* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
 /* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
 #endif
@@ -3740,7 +3740,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, int timeout,
 
 	while (offset < (ssize_t)len)
 	{
-		if (0 == (n = (ssize_t)ZBX_TLS_WRITE(s->tls_ctx->ctx, buf + offset, len - offset)))
+		if (0 == (n = (ssize_t)ZBX_TLS_WRITE(s->tls_ctx->ctx, buf + offset, len - (size_t)offset)))
 		{
 			*error = zbx_dsprintf(*error, "connection closed");
 			return ZBX_PROTO_ERROR;
@@ -3748,7 +3748,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, int timeout,
 
 		if (0 > n)
 		{
-			int	err;
+			ssize_t	err;
 
 			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
 			if (SUCCEED != tls_is_nonblocking_error(err))
@@ -3775,7 +3775,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, int timeout,
 	if (0 > n)
 	{
 		*error = zbx_dsprintf(*error, "gnutls_record_send() failed: " ZBX_FS_SSIZE_T " %s",
-				(zbx_fs_ssize_t)n, gnutls_strerror(n));
+				(zbx_fs_ssize_t)n, gnutls_strerror((int)n));
 
 		return ZBX_PROTO_ERROR;
 	}
@@ -3818,7 +3818,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, int timeout, char *
 
 		if (0 > n)
 		{
-			int	err;
+			ssize_t	err;
 
 			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
 			if (SUCCEED != tls_is_nonblocking_error(err))
@@ -3844,7 +3844,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, int timeout, char *
 	{
 		/* in case of rehandshake a GNUTLS_E_REHANDSHAKE will be returned, deal with it as with error */
 		*error = zbx_dsprintf(*error, "gnutls_record_recv() failed: " ZBX_FS_SSIZE_T " %s",
-				(zbx_fs_ssize_t)n, gnutls_strerror(n));
+				(zbx_fs_ssize_t)n, gnutls_strerror((int)n));
 
 		return ZBX_PROTO_ERROR;
 	}
