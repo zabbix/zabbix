@@ -228,7 +228,7 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 
 		case ZBX_VARIANT_BIN:
 			fields[offset++] = PACKED_FIELD(value->data.bin, sizeof(zbx_uint32_t) +
-					zbx_variant_data_bin_get(value->data.bin, NULL));
+					zbx_variant_data_bin_get_const(value->data.bin, NULL));
 			break;
 	}
 

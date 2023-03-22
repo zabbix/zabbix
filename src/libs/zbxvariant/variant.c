@@ -48,7 +48,7 @@ void	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size)
 	return value_bin;
 }
 
-zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, const void **data)
+zbx_uint32_t	zbx_variant_data_bin_get_const(const void *bin, const void **data)
 {
 	zbx_uint32_t	size;
 
@@ -56,6 +56,11 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, const void **data)
 	if (NULL != data)
 		*data = ((const unsigned char *)bin) + sizeof(size);
 	return size;
+}
+
+zbx_uint32_t	zbx_variant_data_bin_get(void *bin, void **data)
+{
+	return zbx_variant_data_bin_get_const(bin, (const void **)data);
 }
 
 void	zbx_variant_clear(zbx_variant_t *value)
