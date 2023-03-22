@@ -458,10 +458,6 @@
 		const is_custom = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>;
 
 		concurrency_max.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_custom);
-
-		if (is_custom && concurrency_max.value == <?= ZBX_DISCOVERY_CHECKS_ONE ?>) {
-			concurrency_max.value = <?= ZBX_DISCOVERY_CHECKS_UNLIMITED ?>;
-		}
 	}
 
 	$(() => {
