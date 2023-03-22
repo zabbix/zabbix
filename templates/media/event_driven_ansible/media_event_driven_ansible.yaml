@@ -97,7 +97,7 @@ zabbix_export:
                         'event_source',
                         'event_value',
                         'host_id',
-                        'trigger_id']
+                        'trigger_id'];
         
                 required_params.forEach(function (field) {
                     if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
@@ -107,9 +107,8 @@ zabbix_export:
         
                 Eda.params = params;
         
-                Object.keys(Eda.params)
-                    .forEach(function (key) {
-                        if (integer_fields.indexOf(key) !== -1) {
+                integer_fields.forEach(function (key) {
+                        if (Eda.params.hasOwnProperty(key)) {
                             if (isNaN(Eda.params[key])) {
                                 throw 'Parameter "' + key + '" must be integer. Given value: ' + Eda.params[key];
                             }
@@ -119,13 +118,14 @@ zabbix_export:
         
                 // Check type of event. Possible values: 0 - Trigger
                 if (params.event_source != 0) {
-                    throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0';
+                    throw ('Incorrect "event_source" parameter given: ' + params.event_source 
+                        + '\nMust be 0. Only trigger-based events are supported');
                 }
         
                 // Check trigger update and trigger resolve events
                 if (params.event_source == 0 && params.event_value != 1) {
                     throw ('Incorrect "event_value" parameter given: "' + params.event_value 
-                        + '".\nMust be 1. Trigger events of updating and resolving are unsupported');
+                        + '".\nMust be 1. Only trigger-based events of problem are supported');
                 }
                 
                 // Check endpoint
@@ -148,62 +148,37 @@ zabbix_export:
         
             prepareHostgroups: function (hostgroups) {
                 var host_groups = []; 
-                var groups = hostgroups.split(',');
-                for (i = 0; i < groups.length; i++) {
-                    if (groups[i].trim().length > 0) {
-                        host_groups.push(groups[i].trim())
+                hostgroups.split(',').forEach(function (group) {
+                    group = group.trim();
+                    if (group.length > 0) {
+                        host_groups.push(group);
                     }
-                }
+                });
                 return host_groups;
             },
         
-            getTimestamp: function (strDate, strTime) {
-                var EventDate = strDate.split(".");
-                var EventTime = strTime.split(":");
-                
+            getTimestamp: function (date, time) {
                 try {
-                    var newDate = new Date(EventDate[0], EventDate[1] - 1, EventDate[2],
-                        EventTime[0], EventTime[1], EventTime[2])
-                    if (newDate == 'Invalid Date') {
-                        throw ('Incorrect event_date and event_time parameter given. event_date: ' +
-                            strDate + ' event_time: ' + strTime);
-                    }
-                } catch (error) {
-                    throw ('Incorrect event_date and event_time parameter given. event_date: ' +
-                        strDate + ' event_time: ' + strTime);
-                }
-        
-                return newDate.getTime()/1000;
+                    return Date.parse(date.split('.').join('-') + 'T' + time + '.000Z') / 1000 + new Date().getTimezoneOffset() * 60;
+                } catch (_) {}
+            
+                throw ('Failed to parse event time.');
             },
         
             transformTags: function (event_tags) {
                 var tags = {};
-                if (event_tags.length == 0) {
-                    return {};
-                }
-        
-                try {
-                    var input_tags = JSON.parse(event_tags);
-                } catch (error) {
-                    throw 'Incorrect event_tags parameter given: ' + event_tags + '\nMust be in JSON';
-                }
-                
-                if (!Array.isArray(input_tags)) {
-                    throw 'Incorrect event_tags parameter given: ' + event_tags + '\nMust be array';
-                }
-        
-                for (i = 0; i < input_tags.length; i++) {
-                    var obj = input_tags[i];
-                    if (typeof obj === 'object' && obj.hasOwnProperty('tag') && obj.hasOwnProperty('value')) {
-                        if (obj['tag'] in tags) {
-                            tags[obj['tag']].push(obj['value'])
-                        } else {
-                            tags[obj['tag']] = [obj['value']]
-                        }
-                    } else {
-                        throw 'Incorrect event_tags structure given: ' + event_tags + '\nMust contain "tag" and "value"';
+                if (event_tags) {
+                    try {
+                        JSON.parse(event_tags).forEach(function (object) {
+                            var tag = object['tag'];
+                            tags[tag] = tags[tag] || [];
+                            tags[tag].push(object['value']);
+                        });
+                    } catch (error) {
+                        throw 'Event tags format is invalid.';
                     }
                 }
+            
                 return tags;
             },
         
@@ -211,8 +186,7 @@ zabbix_export:
                 var response, request = new HttpRequest();
                 var url = Eda.params['send_to'] + Eda.params['endpoint'];
                 var data = JSON.stringify(Eda.params);
-                Zabbix.log(4, '[ Event-Driven Ansible webhook ] URL: ' + url);
-                Zabbix.log(4, '[ Event-Driven Ansible webhook ] params: ' + data);
+                Zabbix.log(4, '[ Event-Driven Ansible webhook ] URL: ' + url + ' data: ' + data);
                 
                 if (typeof Eda.HTTPProxy !== 'undefined' && Eda.HTTPProxy !== '') {
                     request.setProxy(Eda.HTTPProxy);
@@ -220,8 +194,8 @@ zabbix_export:
                 request.addHeader('Content-Type: application/json');
                 response = request.post(url, data);
                 
-                Zabbix.log(4, '[ Event-Driven Ansible webhook ] HTTP code: ' + request.getStatus());
-                Zabbix.log(4, '[ Event-Driven Ansible webhook ] Response: ' + response);
+                Zabbix.log(4, '[ Event-Driven Ansible webhook ] HTTP code: ' + request.getStatus()
+                    + ' response: ' + response);
         
                 if (request.getStatus() !== 200) {
                     throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -232,7 +206,6 @@ zabbix_export:
         
         try {
             var params = JSON.parse(value);
-            Zabbix.log(4, '[ Event-Driven Ansible webhook ] Executed with params: ' + value);
             
             Eda.setParams(params);
             Eda.setProxy(params.HTTPProxy);
