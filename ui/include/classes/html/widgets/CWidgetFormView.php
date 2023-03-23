@@ -179,7 +179,7 @@ class CWidgetFormView {
 			],
 			'doc_url' => $this->data['url'] === ''
 				? CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT)
-				: ($this->data['url']),
+				: $this->data['url'],
 			'data' => [
 				'original_properties' => [
 					'type' => $this->data['type'],
