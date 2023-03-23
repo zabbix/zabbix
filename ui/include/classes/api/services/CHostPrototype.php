@@ -2491,7 +2491,7 @@ class CHostPrototype extends CHostBase {
 			$templateids = [];
 
 			while ($row = DBfetch($result)) {
-				if (in_array($row['group_prototypeid'], $del_group_prototypeids)) {
+				if (!in_array($row['group_prototypeid'], $del_group_prototypeids)) {
 					$templateids[] = $row['group_prototypeid'];
 
 					$del_group_prototypeids[] = $row['group_prototypeid'];
