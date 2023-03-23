@@ -34,8 +34,6 @@ static int	DBpatch_6050000(void)
 	const int	total_dbl_cols = 4;
 	int		ret = FAIL;
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 #if defined(HAVE_MYSQL)
 	sql = zbx_db_get_name_esc();
 	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
@@ -49,10 +47,12 @@ static int	DBpatch_6050000(void)
 			" where data_type='BINARY_DOUBLE'");
 #endif
 
-	if (NULL == (result = zbx_db_select("%s"
-			" and ((lower(table_name)='trends'"
-					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
-			" or (lower(table_name)='history' and lower(column_name)='value'))", sql)))
+	sql = zbx_dsprintf(sql, "%s"
+			" and ((lower(table_name)='trends' and (lower(column_name)"
+					" in ('value_min', 'value_avg', 'value_max')))"
+			" or (lower(table_name)='history' and lower(column_name)='value'))", sql);
+
+	if (NULL == (result = zbx_db_select(sql)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot select records with columns information");
 		goto out;
@@ -66,7 +66,6 @@ static int	DBpatch_6050000(void)
 
 	zbx_db_free_result(result);
 out:
-	zbx_db_close();
 	zbx_free(sql);
 
 	return ret;
