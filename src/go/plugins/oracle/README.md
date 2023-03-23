@@ -234,12 +234,12 @@ Possible values:
 
 **oracle.sys.params[\<commonParams\>]** — returns a set of the system parameter values.
 
-**oracle.ts.stats[\<commonParams\>,[conname],[tablespace],[type]]** — returns the tablespace statistics. 
+**oracle.ts.stats[\<commonParams\>,[tablespace],[type],[conname]]** — returns the tablespace statistics. 
 
 *Parameters:*  
-`conname` (optional) — the container name for which the information is required.
 `tablespace` (optional) — the name of the tablespace.
 `type` (optional) — the type of the tablespace.
+`conname` (optional) — the container name for which the information is required.
 
 **oracle.ts.discovery[\<commonParams\>]** — returns the list of tablespaces in Low-level discovery (LLD) format.
 
