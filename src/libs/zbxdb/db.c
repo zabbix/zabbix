@@ -2564,7 +2564,10 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	}
 
 	zbx_json_addint64(json, "flag", info->flag);
-
+#ifdef HAVE_ORACLE
+	if (0 != info->tables_json.buffer_offset)
+		zbx_json_addraw(json, "tables", info->tables_json.buffer);
+#endif
 	zbx_json_close(json);
 
 	if (NULL != info->extension)
