@@ -172,7 +172,7 @@ class Group extends ScimApiService {
 
 		$users = [];
 
-		if (array_key_exists('memebers', $options)) {
+		if (array_key_exists('members', $options)) {
 			$scim_group_members = array_column($options['members'], 'value');
 
 			$users = $this->verifyUserids($scim_group_members, $userdirectoryid);
@@ -264,6 +264,7 @@ class Group extends ScimApiService {
 		}
 
 		$scim_group_members = array_column($options['members'], 'value');
+		$this->verifyUserids($scim_group_members, $userdirectoryid);
 
 		$db_scim_group_members = DB::select('user_scim_group', [
 			'output' => ['userid'],
@@ -320,6 +321,7 @@ class Group extends ScimApiService {
 	private function validatePut($options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
 				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
