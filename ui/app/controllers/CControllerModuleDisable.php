@@ -19,15 +19,7 @@
 **/
 
 
-/**
- * Module disable action from module list.
- */
 class CControllerModuleDisable extends CController {
-
-	/**
-	 * List of modules to disable.
-	 */
-	private array $modules = [];
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -54,25 +46,15 @@ class CControllerModuleDisable extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
-			return false;
-		}
-
-		$moduleids = $this->getInput('moduleids');
-
-		$this->modules = API::Module()->get([
-			'output' => [],
-			'moduleids' => $moduleids,
-			'preservekeys' => true
-		]);
-
-		return (count($this->modules) == count($moduleids));
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction(): void {
+		$moduleids = $this->getInput('moduleids');
+
 		$update = [];
 
-		foreach (array_keys($this->modules) as $moduleid) {
+		foreach ($moduleids as $moduleid) {
 			$update[] = [
 				'moduleid' => $moduleid,
 				'status' => MODULE_STATUS_DISABLED
@@ -82,7 +64,7 @@ class CControllerModuleDisable extends CController {
 		$result = API::Module()->update($update);
 
 		if ($result) {
-			$output['success']['title'] = _n('Module disabled', 'Modules disabled', count($this->modules));
+			$output['success']['title'] = _n('Module disabled', 'Modules disabled', count($moduleids));
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -90,12 +72,18 @@ class CControllerModuleDisable extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot disable module', 'Cannot disable modules', count($this->modules)),
+				'title' => _n('Cannot disable module', 'Cannot disable modules', count($moduleids)),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
-		}
 
-		$output['keepids'] = array_keys($this->modules);
+			$modules = API::Module()->get([
+				'output' => [],
+				'moduleids' => $moduleids,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($modules);
+		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}

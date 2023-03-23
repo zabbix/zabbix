@@ -19,15 +19,7 @@
 **/
 
 
-/**
- * Module update action.
- */
 class CControllerModuleUpdate extends CController {
-
-	/**
-	 * Current module data.
-	 */
-	private array $module = [];
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -55,61 +47,45 @@ class CControllerModuleUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
-			return false;
-		}
-
-		$moduleid = $this->getInput('moduleid');
-
-		$module = API::Module()->get([
-			'output' => [],
-			'moduleids' => $moduleid,
-			'preservekeys' => true
-		]);
-
-		if (!$module) {
-			return false;
-		}
-
-		$this->module = [$moduleid => $module];
-
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function doAction(): void {
+		$moduleid = $this->getInput('moduleid');
+
 		$set_status = ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED);
 
-		$db_modules = API::Module()->get([
-			'output' => ['relative_path', 'status'],
-			'sortfield' => 'relative_path',
-			'preservekeys' => true
-		]);
+		$errors = [];
 
-		$module_manager_enabled = new CModuleManager(APP::getRootDir());
+		if ($set_status == MODULE_STATUS_ENABLED) {
+			$module_manager_enabled = new CModuleManager(APP::getRootDir());
 
-		foreach ($db_modules as $moduleid => $db_module) {
-			$new_status = array_key_exists($moduleid, $this->module) ? $set_status : $db_module['status'];
+			$db_modules = API::Module()->get([
+				'output' => ['relative_path', 'status'],
+				'sortfield' => 'relative_path',
+				'preservekeys' => true
+			]);
 
-			if ($new_status == MODULE_STATUS_ENABLED) {
-				$module_manager_enabled->addModule($db_module['relative_path']);
+			foreach ($db_modules as $db_moduleid => $db_module) {
+				$new_status = $db_moduleid == $moduleid ? $set_status : $db_module['status'];
+
+				if ($new_status == MODULE_STATUS_ENABLED) {
+					$module_manager_enabled->addModule($db_module['relative_path']);
+				}
 			}
+
+			$errors = $module_manager_enabled->checkConflicts()['conflicts'];
+
+			array_map('error', $errors);
 		}
-
-		$errors = $module_manager_enabled->checkConflicts()['conflicts'];
-
-		array_map('error', $errors);
 
 		$result = false;
 
 		if (!$errors) {
-			$update = [];
-
-			foreach (array_keys($this->module) as $moduleid) {
-				$update[] = [
+			$update = [
 					'moduleid' => $moduleid,
 					'status' => $set_status
 				];
-			}
 
 			$result = API::Module()->update($update);
 		}
