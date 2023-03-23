@@ -740,28 +740,6 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_RETRIEVE_MODE_HEADERS	1
 #define ZBX_RETRIEVE_MODE_BOTH		2
 
-void	__zbx_update_env(double time_now);
-
-#ifdef _WINDOWS
-#define zbx_update_env(info, time_now)			\
-							\
-do							\
-{							\
-	__zbx_update_env(time_now);			\
-	ZBX_UNUSED(info);				\
-}							\
-while (0)
-#else
-#define zbx_update_env(info, time_now)			\
-							\
-do							\
-{							\
-	__zbx_update_env(time_now);			\
-	zbx_prof_update(info, time_now);		\
-}							\
-while (0)
-#endif
-
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
@@ -800,6 +778,46 @@ char	*zbx_strerror(int errnum);
 #	else
 #		define zbx_sigmask	sigprocmask
 #	endif
+#endif
+
+#define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
+#define LOG_LEVEL_CRIT		1
+#define LOG_LEVEL_ERR		2
+#define LOG_LEVEL_WARNING	3
+#define LOG_LEVEL_DEBUG		4
+#define LOG_LEVEL_TRACE		5
+
+#define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
+
+#define ZBX_CHECK_LOG_LEVEL(level)			\
+		((LOG_LEVEL_INFORMATION != (level) &&	\
+		((level) > zbx_get_log_level() || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
+
+#ifdef HAVE___VA_ARGS__
+#	define ZBX_ZABBIX_LOG_CHECK
+#	define zabbix_log(level, ...)									\
+													\
+	do												\
+	{												\
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
+			zbx_log_handle(level, __VA_ARGS__);						\
+	}												\
+	while (0)
+#else
+#	define zabbix_log zbx_log_handle
+#endif
+
+typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
+
+void	zbx_logging_init(zbx_log_func_t log_func);
+void	zbx_log_handle(int level, const char *fmt, ...);
+int	zbx_get_log_level(void);
+void	zbx_set_log_level(int level);
+
+#ifndef _WINDOWS
+int		zabbix_increase_log_level(void);
+int		zabbix_decrease_log_level(void);
+const char	*zabbix_get_log_level_string(void);
 #endif
 
 #endif

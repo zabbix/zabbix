@@ -36,7 +36,6 @@ static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 static char			log_filename[MAX_STRING_LEN];
 static int			log_type = LOG_TYPE_UNDEFINED;
 static zbx_mutex_t		log_access = ZBX_MUTEX_NULL;
-int				zbx_log_level = LOG_LEVEL_WARNING;
 
 static ZBX_THREAD_LOCAL char	log_component[LOG_COMPONENT_LEN + 1];
 
@@ -69,50 +68,6 @@ static int	get_config_log_file_size(void)
 #	define dup2(fd1, fd2)	_dup2(fd1, fd2)
 #else
 #	define ZBX_DEV_NULL	"/dev/null"
-#endif
-
-#ifndef _WINDOWS
-const char	*zabbix_get_log_level_string(void)
-{
-	switch (zbx_log_level)
-	{
-		case LOG_LEVEL_EMPTY:
-			return "0 (none)";
-		case LOG_LEVEL_CRIT:
-			return "1 (critical)";
-		case LOG_LEVEL_ERR:
-			return "2 (error)";
-		case LOG_LEVEL_WARNING:
-			return "3 (warning)";
-		case LOG_LEVEL_DEBUG:
-			return "4 (debug)";
-		case LOG_LEVEL_TRACE:
-			return "5 (trace)";
-	}
-
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
-}
-
-int	zabbix_increase_log_level(void)
-{
-	if (LOG_LEVEL_TRACE == zbx_log_level)
-		return FAIL;
-
-	zbx_log_level = zbx_log_level + 1;
-
-	return SUCCEED;
-}
-
-int	zabbix_decrease_log_level(void)
-{
-	if (LOG_LEVEL_EMPTY == zbx_log_level)
-		return FAIL;
-
-	zbx_log_level = zbx_log_level - 1;
-
-	return SUCCEED;
-}
 #endif
 
 int	zbx_redirect_stdio(const char *filename)
@@ -310,7 +265,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 	int		type = log_file_cfg->log_type;
 
 	log_type = type;
-	zbx_log_level = level;
+	zbx_set_log_level(level);
 	config_log_file_size = log_file_cfg->log_file_size;
 
 	if (LOG_TYPE_SYSTEM == type)
@@ -388,10 +343,9 @@ void	zabbix_close_log(void)
 	log_type = LOG_TYPE_UNDEFINED;
 }
 
-void	__zbx_zabbix_log(int level, const char *fmt, ...)
+void	zbx_log_impl(int level, const char *fmt, va_list args)
 {
 	char		message[MAX_BUFFER_LEN];
-	va_list		args;
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
@@ -430,9 +384,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 					log_component
 					);
 
-			va_start(args, fmt);
 			vfprintf(log_file, fmt, args);
-			va_end(args);
 
 			fprintf(log_file, "\n");
 
@@ -442,9 +394,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		{
 			zbx_error("failed to open log file: %s", zbx_strerror(errno));
 
-			va_start(args, fmt);
 			zbx_vsnprintf(message, sizeof(message), fmt, args);
-			va_end(args);
 
 			zbx_error("failed to write [%s] into log file", message);
 		}
@@ -476,9 +426,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				log_component
 				);
 
-		va_start(args, fmt);
 		vfprintf(stdout, fmt, args);
-		va_end(args);
 
 		fprintf(stdout, "\n");
 
@@ -489,9 +437,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		return;
 	}
 
-	va_start(args, fmt);
 	zbx_vsnprintf(message, sizeof(message), fmt, args);
-	va_end(args);
 
 	if (LOG_TYPE_SYSTEM == log_type)
 	{
@@ -741,4 +687,59 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 void	zbx_set_log_component(const char *component)
 {
 	zbx_snprintf(log_component, sizeof(log_component), "[%s] ", component);
+}
+
+/* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
+/* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
+/******************************************************************************
+ *                                                                            *
+ * Purpose: react to "/etc/resolv.conf" update                                *
+ *                                                                            *
+ * Comments: it is intended to call this function in the end of each process  *
+ *           main loop. The purpose of calling it at the end (instead of the  *
+ *           beginning of main loop) is to let the first initialization of    *
+ *           libc resolver proceed internally.                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	update_resolver_conf(void)
+{
+#define ZBX_RESOLV_CONF_FILE	"/etc/resolv.conf"
+
+	static time_t	mtime = 0;
+	zbx_stat_t	buf;
+
+	if (0 == zbx_stat(ZBX_RESOLV_CONF_FILE, &buf) && mtime != buf.st_mtime)
+	{
+		mtime = buf.st_mtime;
+
+		if (0 != res_init())
+			zabbix_log(LOG_LEVEL_WARNING, "update_resolver_conf(): res_init() failed");
+	}
+
+#undef ZBX_RESOLV_CONF_FILE
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
+ *          log file after rotation                                           *
+ *                                                                            *
+ * Parameters: time_now - [IN] the time for compare in seconds                *
+ *                                                                            *
+ ******************************************************************************/
+void	__zbx_update_env(double time_now)
+{
+	static double	time_update = 0;
+
+	/* handle /etc/resolv.conf update and log rotate less often than once a second */
+	if (1.0 < time_now - time_update)
+	{
+		time_update = time_now;
+		zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
+		update_resolver_conf();
+#endif
+	}
 }

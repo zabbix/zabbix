@@ -142,6 +142,7 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
+	zbx_logging_init(zbx_log_impl);
 	zbx_init_library_cfg(program_type);
 
 	/* parse the command-line */

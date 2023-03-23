@@ -22,15 +22,6 @@
 
 #include "zbxcommon.h"
 
-#define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
-#define LOG_LEVEL_CRIT		1
-#define LOG_LEVEL_ERR		2
-#define LOG_LEVEL_WARNING	3
-#define LOG_LEVEL_DEBUG		4
-#define LOG_LEVEL_TRACE		5
-
-#define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
-
 #define LOG_TYPE_UNDEFINED	0
 #define LOG_TYPE_SYSTEM		1
 #define LOG_TYPE_FILE		2
@@ -42,7 +33,27 @@
 
 #define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
 
-extern int	zbx_log_level;
+void	__zbx_update_env(double time_now);
+
+#ifdef _WINDOWS
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	ZBX_UNUSED(info);				\
+}							\
+while (0)
+#else
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	zbx_prof_update(info, time_now);		\
+}							\
+while (0)
+#endif
 
 typedef struct
 {
@@ -52,33 +63,9 @@ typedef struct
 	int	log_file_size;
 } zbx_config_log_t;
 
-#define ZBX_CHECK_LOG_LEVEL(level)			\
-		((LOG_LEVEL_INFORMATION != (level) &&	\
-		((level) > zbx_log_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
-
-#ifdef HAVE___VA_ARGS__
-#	define ZBX_ZABBIX_LOG_CHECK
-#	define zabbix_log(level, ...)									\
-													\
-	do												\
-	{												\
-		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
-			__zbx_zabbix_log(level, __VA_ARGS__);						\
-	}												\
-	while (0)
-#else
-#	define zabbix_log __zbx_zabbix_log
-#endif
-
 int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error);
-void	__zbx_zabbix_log(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
+void	zbx_log_impl(int level, const char *fmt, va_list args);
 void	zabbix_close_log(void);
-
-#ifndef _WINDOWS
-int		zabbix_increase_log_level(void);
-int		zabbix_decrease_log_level(void);
-const char	*zabbix_get_log_level_string(void);
-#endif
 
 char		*strerror_from_system(unsigned long error);
 

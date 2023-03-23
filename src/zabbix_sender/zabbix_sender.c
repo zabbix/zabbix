@@ -1498,6 +1498,7 @@ int	main(int argc, char **argv)
 	zbx_thread_sendval_args	*sendval_args = NULL;
 	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
 
+	zbx_logging_init(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();
 
 	progname = get_program_name(argv[0]);

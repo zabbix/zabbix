@@ -1180,6 +1180,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
+	zbx_logging_init(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 	argv = zbx_setproctitle_init(argc, argv);
