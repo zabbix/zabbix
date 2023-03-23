@@ -802,9 +802,16 @@ char	*zbx_strerror(int errnum);
 #	endif
 #endif
 
-#define ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(type, varname, defvalue) \
+#define ZBX_PROPERTY_DECL(type, varname, defvalue) \
 static type	varname = defvalue; \
 static type	get_##varname(void) \
+{ \
+	return varname; \
+}
+
+#define ZBX_PROPERTY_DECL_CONST(type, varname, defvalue) \
+static type	varname = defvalue; \
+static const type	get_##varname(void) \
 { \
 	return varname; \
 }

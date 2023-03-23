@@ -40,9 +40,9 @@ char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
 ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME = NULL;
 
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 1)
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 1)
+ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
@@ -251,7 +251,7 @@ static const char	*get_progname(void)
 }
 #endif
 
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
+ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
@@ -755,8 +755,8 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
-		config_active_args[forks].zbx_config_timeout = zbx_config_timeout;
-		config_active_args[forks].zbx_config_file = zbx_config_file;
+		config_active_args[forks].config_timeout = zbx_config_timeout;
+		config_active_args[forks].config_file = zbx_config_file;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 	}
 

@@ -306,16 +306,11 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-static char	*zbx_config_alert_scripts_path	= NULL;
-static const char	*get_zbx_config_alert_scripts_path(void)
-{
-	return zbx_config_alert_scripts_path;
-}
+ZBX_PROPERTY_DECL_CONST(char *, zbx_config_alert_scripts_path, NULL)
+ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
 
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
-
-static int	zbx_config_startup_time		= 0;
-static int	zbx_config_unavailable_delay	= 60;
+static int	config_startup_time		= 0;
+static int	config_unavailable_delay	= 60;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -347,9 +342,9 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 0)
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
@@ -397,8 +392,8 @@ char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
-static char	*zbx_config_file	= NULL;
-static int	zbx_config_allow_root	= 0;
+static char	*config_file	= NULL;
+static int	config_allow_root	= 0;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -602,7 +597,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
-	zbx_config_startup_time = time(NULL);
+	config_startup_time = time(NULL);
 
 	if (NULL == zbx_config_dbhigh->config_dbhost)
 		zbx_config_dbhigh->config_dbhost = zbx_strdup(zbx_config_dbhigh->config_dbhost, "localhost");
@@ -881,7 +876,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnreachableDelay",		&CONFIG_UNREACHABLE_DELAY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"UnavailableDelay",		&zbx_config_unavailable_delay,		TYPE_INT,
+		{"UnavailableDelay",		&config_unavailable_delay,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
@@ -967,7 +962,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"VMwareTimeout",		&CONFIG_VMWARE_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			300},
-		{"AllowRoot",			&zbx_config_allow_root,			TYPE_INT,
+		{"AllowRoot",			&config_allow_root,			TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1044,7 +1039,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
-	parse_cfg_file(zbx_config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 	zbx_set_defaults();
 
 	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
@@ -1190,8 +1185,8 @@ int	main(int argc, char **argv)
 		{
 			case 'c':
 				opt_c++;
-				if (NULL == zbx_config_file)
-					zbx_config_file = zbx_strdup(zbx_config_file, zbx_optarg);
+				if (NULL == config_file)
+					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'R':
 				opt_r++;
@@ -1243,8 +1238,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == zbx_config_file)
-		zbx_config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
+	if (NULL == config_file)
+		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
 	zbx_init_metrics();
@@ -1281,7 +1276,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(zbx_config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
+	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, NULL);
 }
 
@@ -1393,9 +1388,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
-							zbx_config_startup_time, zbx_config_unavailable_delay};
+							config_startup_time, config_unavailable_delay};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type, listen_sock,
-							zbx_config_startup_time};
+							config_startup_time};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							zbx_config_timeout};
@@ -1405,14 +1400,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, zbx_config_timeout};
 	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout};
-	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, zbx_config_startup_time};
+	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 
 #ifdef HAVE_OPENIPMI
-	zbx_thread_ipmi_manager_args	ipmi_manager_args = {zbx_config_timeout, zbx_config_unavailable_delay};
+	zbx_thread_ipmi_manager_args	ipmi_manager_args = {zbx_config_timeout, config_unavailable_delay};
 #endif
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
@@ -1929,7 +1924,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:               " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", zbx_config_file);
+	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())

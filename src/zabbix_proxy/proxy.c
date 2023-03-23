@@ -200,7 +200,7 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-static int	zbx_config_proxymode		= ZBX_PROXYMODE_ACTIVE;
+static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
@@ -252,10 +252,10 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_timeout, 3)
+ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
 
-static int	zbx_config_startup_time	= 0;
-static int	zbx_config_unavailable_delay	=60;
+static int	config_startup_time		= 0;
+static int	config_unavailable_delay	=60;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -291,9 +291,9 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_enable_remote_commands, 0)
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_log_remote_commands, 0)
-ZBX_DECL_PRIVATE_VARIABLE_WITH_GETTER(int, zbx_config_unsafe_user_parameters, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 
 char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT;
@@ -470,7 +470,7 @@ static void	zbx_set_defaults(void)
 	AGENT_RESULT	result;
 	char		**value = NULL;
 
-	zbx_config_startup_time = time(NULL);
+	config_startup_time = time(NULL);
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
@@ -532,7 +532,7 @@ static void	zbx_set_defaults(void)
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
 		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
 #endif
-	if (ZBX_PROXYMODE_PASSIVE == zbx_config_proxymode)
+	if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
 	{
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_DATASENDER] = 0;
 		program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
@@ -602,7 +602,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (ZBX_PROXYMODE_ACTIVE == zbx_config_proxymode)
+	if (ZBX_PROXYMODE_ACTIVE == config_proxymode)
 	{
 		if (NULL != strchr(CONFIG_SERVER, ','))
 		{
@@ -610,7 +610,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			err = 1;
 		}
 	}
-	else if (ZBX_PROXYMODE_PASSIVE == zbx_config_proxymode && FAIL == zbx_validate_peer_list(CONFIG_SERVER,
+	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode && FAIL == zbx_validate_peer_list(CONFIG_SERVER,
 			&ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
@@ -737,7 +737,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
-		{"ProxyMode",			&zbx_config_proxymode,			TYPE_INT,
+		{"ProxyMode",			&config_proxymode,			TYPE_INT,
 			PARM_OPT,	ZBX_PROXYMODE_ACTIVE,	ZBX_PROXYMODE_PASSIVE},
 		{"Server",			&CONFIG_SERVER,				TYPE_STRING,
 			PARM_MAND,	0,			0},
@@ -807,7 +807,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnreachableDelay",		&CONFIG_UNREACHABLE_DELAY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"UnavailableDelay",		&zbx_config_unavailable_delay,		TYPE_INT,
+		{"UnavailableDelay",		&config_unavailable_delay,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
@@ -957,7 +957,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	zbx_vector_ptr_create(&zbx_addrs);
 
-	if (ZBX_PROXYMODE_PASSIVE != zbx_config_proxymode)
+	if (ZBX_PROXYMODE_PASSIVE != config_proxymode)
 	{
 		char	*error;
 
@@ -1256,25 +1256,24 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t				rtc;
 	zbx_timespec_t				rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, zbx_config_proxymode,
+	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, config_proxymode,
 								zbx_config_timeout};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
-								zbx_config_startup_time, zbx_config_unavailable_delay};
+								config_startup_time, config_unavailable_delay};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, zbx_config_timeout};
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
-								zbx_config_startup_time,
-								zbx_config_enable_remote_commands,
+								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
-								&listen_sock, zbx_config_startup_time};
+								&listen_sock, config_startup_time};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
 #ifdef HAVE_OPENIPMI
-	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, zbx_config_unavailable_delay};
+	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, config_unavailable_delay};
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
@@ -1284,7 +1283,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
-				ZBX_PROXYMODE_PASSIVE == zbx_config_proxymode ? "passive" : "active",
+				ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
@@ -1351,7 +1350,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).",
-			ZBX_PROXYMODE_PASSIVE == zbx_config_proxymode ? "passive" : "active",
+			ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
@@ -1483,7 +1482,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	thread_args.info.program_type = program_type;
 
-	if (ZBX_PROXYMODE_PASSIVE == zbx_config_proxymode)
+	if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
 		rtc_process_request_func = rtc_process_request_ex_passive;
 
 	for (i = 0; i < threads_num; i++)
