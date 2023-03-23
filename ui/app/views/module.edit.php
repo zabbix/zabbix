@@ -24,16 +24,13 @@
  * @var array $data
  */
 
-// Create popup form.
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('module')))->removeId())
-	->setName('module.edit')
-	->setId('module-form')
-	->addVar('moduleid', $data['moduleid'] ?: 0, $data['moduleid'])
+	->setName('module-form')
+	->addVar('moduleid', $data['moduleid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'))
 	->setAttribute('autofocus', 'autofocus');
 
-// Create module details form.
 $module_form = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Name'), 'name'),
@@ -76,12 +73,10 @@ $module_form = (new CFormGrid())
 		)
 	]);
 
-// Append module details to popup form.
 $form
 	->addItem($module_form)
 	->addItem((new CScriptTag('module_edit.init();'))->setOnDocumentReady());
 
-// Popup output.
 $output = [
 	'header' => _('Module'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MODULE_EDIT),

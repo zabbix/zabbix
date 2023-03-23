@@ -101,14 +101,14 @@
 			this._post(target, moduleids, curl);
 		}
 
-		_post(target, moduleids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+		_post(target, moduleids, curl) {
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('module')) ?>
 			);
 
 			target.classList.add('is-loading');
 
-			return fetch(url.getUrl(), {
+			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({moduleids: moduleids})

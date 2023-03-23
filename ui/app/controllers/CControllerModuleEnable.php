@@ -58,17 +58,17 @@ class CControllerModuleEnable extends CController {
 			'preservekeys' => true
 		]);
 
-		$module_manager_enabled = new CModuleManager(APP::getRootDir());
+		$module_manager = new CModuleManager(APP::getRootDir());
 
 		foreach ($db_modules as $db_moduleid => $db_module) {
 			$new_status = in_array($db_moduleid, $moduleids) ? MODULE_STATUS_ENABLED : $db_module['status'];
 
 			if ($new_status == MODULE_STATUS_ENABLED) {
-				$module_manager_enabled->addModule($db_module['relative_path']);
+				$module_manager->addModule($db_module['relative_path']);
 			}
 		}
 
-		$errors = $module_manager_enabled->checkConflicts()['conflicts'];
+		$errors = $module_manager->checkConflicts()['conflicts'];
 
 		array_map('error', $errors);
 
