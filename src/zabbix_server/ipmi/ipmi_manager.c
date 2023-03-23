@@ -358,7 +358,7 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 		zbx_vector_ptr_append(&manager->pollers, poller);
 
 		/* add poller to load balancing poller queue */
-		elem.data = (const void *)poller;
+		elem.data = (void *)poller;
 		zbx_binary_heap_insert(&manager->pollers_load, &elem);
 	}
 

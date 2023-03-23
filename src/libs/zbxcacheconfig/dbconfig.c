@@ -724,7 +724,7 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type
 		return;
 
 	elem.key = item->itemid;
-	elem.data = (const void *)item;
+	elem.data = (void *)item;
 
 	if (ZBX_LOC_QUEUE != item->location)
 	{
@@ -5638,7 +5638,7 @@ static void	dc_drule_queue(zbx_dc_drule_t *drule)
 	zbx_binary_heap_elem_t	elem;
 
 	elem.key = drule->druleid;
-	elem.data = (const void *)drule;
+	elem.data = (void *)drule;
 
 	if (ZBX_LOC_QUEUE != drule->location)
 	{
@@ -5904,7 +5904,7 @@ static void	dc_httptest_queue(zbx_dc_httptest_t *httptest)
 	zbx_binary_heap_elem_t	elem;
 
 	elem.key = httptest->httptestid;
-	elem.data = (const void *)httptest;
+	elem.data = (void *)httptest;
 
 	if (ZBX_LOC_QUEUE != httptest->location)
 	{
