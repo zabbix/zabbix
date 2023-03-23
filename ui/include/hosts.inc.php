@@ -1340,6 +1340,10 @@ function prepareHostPrototypeTags(array $tags): array {
 function prepareHostPrototypeInterfaces(array $interfaces, array $main_interfaces): array {
 	foreach ($interfaces as $i => &$interface) {
 		$interface['main'] = $i == $main_interfaces[$interface['type']] ? INTERFACE_PRIMARY : INTERFACE_SECONDARY;
+
+		if (array_key_exists('details', $interface)) {
+			$interface['details'] += ['bulk' => DB::getDefault('interface_snmp', 'bulk')];
+		}
 	}
 	unset($interface);
 
