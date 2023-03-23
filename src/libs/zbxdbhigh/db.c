@@ -624,7 +624,7 @@ static size_t	get_string_field_chars(const ZBX_FIELD *field)
 	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
 		return ZBX_SIZE_T_MAX;
 	else if (ZBX_TYPE_CUID == field->type)
-		return CUID_LEN;
+		return CUID_LEN - 1;
 	else
 		return field->length;
 }
