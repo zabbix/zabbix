@@ -907,7 +907,9 @@ function createFontSelect(string $name): CSelect {
 <script type="text/x-jquery-tmpl" id="selementFormTriggers">
 	<?= (new CRow([
 			(new CCol([
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+				(new CDiv())
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addStyle('top: 0px;'),
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol([(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)]))
