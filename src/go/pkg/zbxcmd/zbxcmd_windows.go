@@ -72,7 +72,7 @@ func execute(s string, timeout time.Duration, path string, strict bool) (out str
 		CmdLine:       fmt.Sprintf(`/C "%s"`, s),
 	}
 	if err = cmd.Start(); err != nil {
-		return "", fmt.Errorf("Cannot execute command: %s", err)
+		return "", fmt.Errorf("Cannot execute command (%s, path: %s): %s", s, path, err)
 	}
 
 	processHandle := windows.Handle((*process)(unsafe.Pointer(cmd.Process)).Handle)
@@ -136,7 +136,7 @@ func ExecuteBackground(s string) (err error) {
 	}
 
 	if err = cmd.Start(); err != nil {
-		return fmt.Errorf("Cannot execute command: %s", err)
+		return fmt.Errorf("Cannot execute command (%s): %s", s, err)
 	}
 
 	go func() { _ = cmd.Wait() }()
