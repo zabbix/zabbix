@@ -749,7 +749,7 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 		proxy->nextcheck = proxy->proxy_config_nextcheck;
 
 	elem.key = proxy->hostid;
-	elem.data = (const void *)proxy;
+	elem.data = (void *)proxy;
 
 	if (ZBX_LOC_QUEUE != proxy->location)
 	{
