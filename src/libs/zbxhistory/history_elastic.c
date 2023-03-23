@@ -26,10 +26,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxvariant.h"
-
-#define ZBX_ELASTIC_MIN_VERSION				70000
-#define ZBX_ELASTIC_SUPPORTED_VERSION_STR		"7.x"
-#define ZBX_ELASTIC_MAX_VERSION				79999
+#include "zbx_dbversion_constants.h"
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
 #if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
@@ -123,7 +120,7 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 	return value;
 }
 
-static const char	*history_value2str(const ZBX_DC_HISTORY *h)
+static const char	*history_value2str(const zbx_dc_history_t *h)
 {
 	static char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -888,7 +885,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 {
 	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	int			i, num = 0;
-	ZBX_DC_HISTORY		*h;
+	zbx_dc_history_t	*h;
 	struct zbx_json		json_idx, json;
 	size_t			buf_alloc = 0, buf_offset = 0;
 	char			pipeline[14]; /* index name length + suffix "-pipeline" */
@@ -911,7 +908,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (ZBX_DC_HISTORY *)history->values[i];
+		h = (zbx_dc_history_t *)history->values[i];
 
 		if (hist->value_type != h->value_type)
 			continue;
@@ -1126,8 +1123,8 @@ out:
 
 	db_version_info.database = "ElasticDB";
 	db_version_info.friendly_current_version = version_friendly;
-	db_version_info.friendly_min_version = ZBX_ELASTIC_SUPPORTED_VERSION_STR;
-	db_version_info.friendly_max_version = ZBX_ELASTIC_SUPPORTED_VERSION_STR;
+	db_version_info.friendly_min_version = ZBX_ELASTIC_MIN_VERSION_STR;
+	db_version_info.friendly_max_version = ZBX_ELASTIC_MAX_VERSION_STR;
 	db_version_info.friendly_min_supported_version = NULL;
 
 	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,

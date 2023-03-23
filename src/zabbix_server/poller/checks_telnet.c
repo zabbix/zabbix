@@ -22,7 +22,7 @@
 
 #include "zbxsysinfo.h"
 
-int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_telnet(zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;

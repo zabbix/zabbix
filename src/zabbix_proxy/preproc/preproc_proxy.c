@@ -31,7 +31,7 @@ void	preproc_flush_value_proxy(zbx_pp_manager_t *manager, zbx_uint64_t itemid, u
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
+	zbx_dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
