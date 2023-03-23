@@ -7,7 +7,7 @@
 	"version": "1.0",
 	"author": "Zabbix",
 	"description": "Displays the status summary of the active web monitoring scenarios.",
-	"url": "https://www.zabbix.com/documentation/6.4/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring",
 	"widget": {
 		"size": {
 			"width": 6,
