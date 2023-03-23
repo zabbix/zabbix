@@ -32,7 +32,7 @@ void	preproc_flush_value_server(zbx_pp_manager_t *manager, zbx_uint64_t itemid, 
 
 	if (0 == (flags & ZBX_FLAG_DISCOVERY_RULE))
 	{
-		dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
+		zbx_dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
 	}
 	else
 	{

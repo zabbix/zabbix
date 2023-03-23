@@ -786,7 +786,7 @@ static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
 	int	i;
 
 	eval->hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * eval->one_num);
-	eval->dcitems_hk = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * eval->one_num);
+	eval->dcitems_hk = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * eval->one_num);
 	eval->errcodes_hk = (int *)zbx_malloc(NULL, sizeof(int) * eval->one_num);
 
 	for (i = 0; i < eval->queries.values_num; i++)
@@ -803,7 +803,7 @@ static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
 		eval->hostkeys[data->dcitem_hk_index].key = query->ref.key;
 	}
 
-	DCconfig_get_items_by_keys(eval->dcitems_hk, eval->hostkeys, eval->errcodes_hk, eval->one_num);
+	zbx_dc_config_get_items_by_keys(eval->dcitems_hk, eval->hostkeys, eval->errcodes_hk, eval->one_num);
 }
 
 /******************************************************************************
@@ -813,8 +813,8 @@ static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
  ******************************************************************************/
 static	int	compare_dcitems_by_itemid(const void *d1, const void *d2)
 {
-	DC_ITEM	*dci1 = *(DC_ITEM **)d1;
-	DC_ITEM	*dci2 = *(DC_ITEM **)d2;
+	zbx_dc_item_t	*dci1 = *(zbx_dc_item_t **)d1;
+	zbx_dc_item_t	*dci2 = *(zbx_dc_item_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(dci1->itemid, dci2->itemid);
 
@@ -823,8 +823,8 @@ static	int	compare_dcitems_by_itemid(const void *d1, const void *d2)
 
 static int	expression_find_dcitem_by_itemid(const void *d1, const void *d2)
 {
-	zbx_uint64_t	itemid = **(zbx_uint64_t **)d1;
-	DC_ITEM		*dci = *(DC_ITEM **)d2;
+	zbx_uint64_t		itemid = **(zbx_uint64_t **)d1;
+	zbx_dc_item_t		*dci = *(zbx_dc_item_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(itemid, dci->itemid);
 
@@ -889,10 +889,10 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 	{
 		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		eval->dcitems = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
+		eval->dcitems = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * itemids.values_num);
 		eval->errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
-		DCconfig_get_items_by_itemids(eval->dcitems, itemids.values, eval->errcodes, itemids.values_num);
+		zbx_dc_config_get_items_by_itemids(eval->dcitems, itemids.values, eval->errcodes, itemids.values_num);
 
 		for (i = 0; i < itemids.values_num; i++)
 		{
@@ -930,12 +930,12 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query_t *query, const char *name,
 		size_t len, int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
-	char			func_name[MAX_STRING_LEN], *params = NULL;
-	size_t			params_alloc = 0, params_offset = 0;
-	DC_ITEM			*item;
-	int			i, ret = FAIL;
+	char				func_name[MAX_STRING_LEN], *params = NULL;
+	size_t				params_alloc = 0, params_offset = 0;
+	zbx_dc_item_t			*item;
+	int				i, ret = FAIL;
 	zbx_expression_query_one_t	*data;
-	DC_EVALUATE_ITEM		evaluate_item;
+	zbx_dc_evaluate_item_t		evaluate_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int )len, name,
 			ZBX_NULL2EMPTY_STR(query->ref.host), ZBX_NULL2EMPTY_STR(query->ref.key),
@@ -1273,7 +1273,7 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
  * Return value: The cached item.                                             *
  *                                                                            *
  ******************************************************************************/
-static DC_ITEM	*get_dcitem(zbx_vector_ptr_t *dcitem_refs, zbx_uint64_t itemid)
+static zbx_dc_item_t	*get_dcitem(zbx_vector_ptr_t *dcitem_refs, zbx_uint64_t itemid)
 {
 	int	index;
 
@@ -1310,7 +1310,7 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 
 	for (i = 0; i < data->itemids.values_num; i++)
 	{
-		DC_ITEM	*dcitem;
+		zbx_dc_item_t	*dcitem;
 
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
 			continue;
@@ -1462,7 +1462,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 
 	for (i = 0; i < data->itemids.values_num; i++)
 	{
-		DC_ITEM		*dcitem;
+		zbx_dc_item_t	*dcitem;
 		zbx_variant_t	rate;
 		double		le;
 		char		bucket[ZBX_MAX_DOUBLE_LEN + 1];
@@ -1625,7 +1625,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 	for (i = 0; i < data->itemids.values_num; i++)
 	{
-		DC_ITEM	*dcitem;
+		zbx_dc_item_t	*dcitem;
 
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
 			continue;
@@ -1862,7 +1862,7 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 {
 	if (0 != eval->one_num)
 	{
-		DCconfig_clean_items(eval->dcitems_hk, eval->errcodes_hk, eval->one_num);
+		zbx_dc_config_clean_items(eval->dcitems_hk, eval->errcodes_hk, eval->one_num);
 		zbx_free(eval->dcitems_hk);
 		zbx_free(eval->errcodes_hk);
 		zbx_free(eval->hostkeys);
@@ -1870,7 +1870,7 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 
 	if (0 != eval->dcitems_num)
 	{
-		DCconfig_clean_items(eval->dcitems, eval->errcodes, eval->dcitems_num);
+		zbx_dc_config_clean_items(eval->dcitems, eval->errcodes, eval->dcitems_num);
 		zbx_free(eval->dcitems);
 		zbx_free(eval->errcodes);
 	}
@@ -1898,7 +1898,7 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 *                         expression                                          *
 *                                                                             *
 *******************************************************************************/
-void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const DC_ITEM *item)
+void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const zbx_dc_item_t *item)
 {
 	int	i;
 
@@ -1923,7 +1923,7 @@ void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const D
  *             item - [IN] the calculated item                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const DC_ITEM *item)
+void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const zbx_dc_item_t *item)
 {
 	int			i;
 	zbx_dc_um_handle_t	*um_handle;
