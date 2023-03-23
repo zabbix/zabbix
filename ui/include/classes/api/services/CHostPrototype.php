@@ -1171,6 +1171,7 @@ class CHostPrototype extends CHostBase {
 		$duplicates = DB::select('hosts', [
 			'output' => ['uuid'],
 			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				'uuid' => array_keys($host_indexes)
 			],
 			'limit' => 1
