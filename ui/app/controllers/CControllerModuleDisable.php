@@ -95,6 +95,8 @@ class CControllerModuleDisable extends CController {
 			];
 		}
 
+		$output['keepids'] = array_keys($this->modules);
+
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }
