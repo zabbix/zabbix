@@ -94,6 +94,11 @@ class testScimGroup extends CAPIScimTest {
 		$this->assertArrayHasKey('userdirectoryids', $userdirectory_saml);
 		self::$data['userdirectoryids']['saml'] = $userdirectory_saml['userdirectoryids'][0];
 
+		CDataHelper::call('authentication.update', [
+			'saml_auth_enabled' => ZBX_AUTH_SAML_ENABLED,
+			'disabled_usrgrpid' => '9'
+		]);
+
 		// Create active user with newly created userdirectoryid for SAML.
 		$user = CDataHelper::call('user.create', [
 			[
@@ -310,8 +315,7 @@ class testScimGroup extends CAPIScimTest {
 				],
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' =>
-						'Invalid parameter "/schemas/1": value must be "urn:ietf:params:scim:schemas:core:2.0:Group".',
+					'detail' => 'Incorrect schema was sent in the request.',
 					'status' => 400
 				]
 			],
@@ -574,8 +578,7 @@ class testScimGroup extends CAPIScimTest {
 				],
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' =>
-						'Invalid parameter "/schemas/1": value must be "urn:ietf:params:scim:schemas:core:2.0:Group".',
+					'detail' => 'Incorrect schema was sent in the request.',
 					'status' => 400
 				]
 			],
