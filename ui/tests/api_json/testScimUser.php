@@ -83,6 +83,11 @@ class testScimUser extends CAPIScimTest {
 		$this->assertArrayHasKey('userdirectoryids', $userdirectory_saml);
 		self::$data['userdirectoryid']['saml'] = $userdirectory_saml['userdirectoryids'][0];
 
+		CDataHelper::call('authentication.update', [
+			'saml_auth_enabled' => ZBX_AUTH_SAML_ENABLED,
+			'disabled_usrgrpid' => '9'
+		]);
+
 		// Create active user with newly created userdirectoryid for SAML.
 		$user = CDataHelper::call('user.create', [
 			[
@@ -166,15 +171,13 @@ class testScimUser extends CAPIScimTest {
 							'id' 		=> 'saml_user_active',
 							'userName'	=> 'saml_user_active',
 							'active'	=> true,
-							'name' => '',
-							'surname' => ''
+							'name' => ['givenName' => '', 'familyName' => '']
 						],
 						[
 							'id' 		=> 'saml_user_inactive',
 							'userName'	=> 'saml_user_inactive',
 							'active'	=> true,
-							'name' => '',
-							'surname' => ''
+							'name' => ['givenName' => '', 'familyName' => '']
 						]
 					]
 				],
@@ -196,8 +199,7 @@ class testScimUser extends CAPIScimTest {
 					'id' 		=> 'saml_user_active',
 					'userName'	=> 'saml_user_active',
 					'active'	=> true,
-					'name' => '',
-					'surname' => ''
+					'name' => ['givenName' => '', 'familyName' => '']
 				],
 				'expected_error' => null
 			],
@@ -217,8 +219,7 @@ class testScimUser extends CAPIScimTest {
 					'id' 		=> 'saml_user_active',
 					'userName'	=> 'saml_user_active',
 					'active'	=> true,
-					'name' => '',
-					'surname' => ''
+					'name' => ['givenName' => '', 'familyName' => '']
 				],
 				'expected_error' => null
 			]
@@ -250,7 +251,8 @@ class testScimUser extends CAPIScimTest {
 				'expected_result' => null,
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'status' => 400
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
 				]
 			]
 		];
@@ -261,12 +263,6 @@ class testScimUser extends CAPIScimTest {
 	 * @dataProvider createInvalidGetRequest
 	 */
 	public function testUserGet($user, $expected_result, $expected_error) {
-		// Special case with user that belongs to other userdirectory.
-		if (array_key_exists('id', $user) && $user['id'] === 'ldap_user') {
-			$expected_error['detail'] = 'The user '.self::$data['userid']['ldap_user'].
-				' belongs to another userdirectory.';
-		}
-
 		$this->resolveData($user);
 
 		if ($expected_result !== null) {
@@ -291,7 +287,7 @@ class testScimUser extends CAPIScimTest {
 
 	public static function createInvalidPostRequest(): array {
 		return [
-			'Post request with invalid user schema' => [		// TODO this will be fixed with ZBX-21976
+			'Post request with invalid user schema' => [
 				'user' => [
 					'schemas' => ['invalid:schema'],
 					'active' => true,
@@ -302,12 +298,11 @@ class testScimUser extends CAPIScimTest {
 				],
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' =>
-						'Invalid parameter "/schemas/1": value must be "urn:ietf:params:scim:schemas:core:2.0:User".',
+					'detail' => 'Incorrect schema was sent in the request.',
 					'status' => 400
 				]
 			],
-			'Post request with missing user schema' => [		// TODO this will be fixed with ZBX-21976
+			'Post request with missing user schema' => [
 				'user' => [
 					'active' => true,
 					'userName' => 'michael.scott@office.com',
@@ -321,7 +316,7 @@ class testScimUser extends CAPIScimTest {
 					'status' => 400
 				]
 			],
-			'Post request with empty user schema' => [		// TODO this will be fixed with ZBX-21976
+			'Post request with empty user schema' => [
 				'user' => [
 					'schemas' => [],
 					'active' => true,
@@ -336,7 +331,7 @@ class testScimUser extends CAPIScimTest {
 					'status' => 400
 				]
 			],
-			'Post request with missing userName parameter' => [		// TODO this will be fixed with ZBX-21976
+			'Post request with missing userName parameter' => [
 				'user' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
 					'active' => true,
@@ -350,7 +345,7 @@ class testScimUser extends CAPIScimTest {
 					'status' => 400
 				]
 			],
-			'Post request with empty userName parameter' => [		// TODO this will be fixed with ZBX-21976
+			'Post request with empty userName parameter' => [
 				'user' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
 					'userName' => '',
@@ -409,7 +404,7 @@ class testScimUser extends CAPIScimTest {
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
 					'active' => true,
 					'userName' => 'michael.scott@office.com',
-					'name' => 'Michael',
+					'name' => ['givenName' => '', 'familyName' => ''],
 					'surname' => 'Scott',
 					'user_mobile' => '999999999'
 				]
@@ -428,7 +423,7 @@ class testScimUser extends CAPIScimTest {
 					'active' => true,
 					'userName' => 'saml_user_active',
 					'id' => 'saml_user_active',
-					'name' => 'Jim',
+					'name' => ['givenName' => '', 'familyName' => ''],
 					'surname' => 'Halpert',
 					'user_mobile' => '123456789'
 				]
@@ -488,7 +483,7 @@ class testScimUser extends CAPIScimTest {
 
 	public function createInvalidPutRequest() {
 		return [
-			'Put request with invalid user schema' => [		// TODO this will be fixed with ZBX-21976
+			'Put request with invalid user schema' => [
 				'user' => [
 					'schemas' => ['invalid:schema'],
 					'id' => 'saml_user_active',
@@ -500,12 +495,11 @@ class testScimUser extends CAPIScimTest {
 				],
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' =>
-						'Invalid parameter "/schemas/1": value must be "urn:ietf:params:scim:schemas:core:2.0:User".',
+					'detail' => 'Incorrect schema was sent in the request.',
 					'status' => 400
 				]
 			],
-			'Put request with missing user schema' => [		// TODO this will be fixed with ZBX-21976
+			'Put request with missing user schema' => [
 				'user' => [
 					'id' => 'saml_user_active',
 					'active' => true,
@@ -520,7 +514,7 @@ class testScimUser extends CAPIScimTest {
 					'status' => 400
 				]
 			],
-			'Put request with empty user schema' => [		// TODO this will be fixed with ZBX-21976
+			'Put request with empty user schema' => [
 				'user' => [
 					'schemas' => [],
 					'id' => 'saml_user_active',
@@ -536,7 +530,7 @@ class testScimUser extends CAPIScimTest {
 					'status' => 400
 				]
 			],
-			'Put request with missing userName parameter' => [		// TODO this will be fixed with ZBX-21976
+			'Put request with missing userName parameter' => [
 				'user' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
 					'id' => 'saml_user_active',
@@ -551,7 +545,7 @@ class testScimUser extends CAPIScimTest {
 					'status' => 400
 				]
 			],
-			'Put request with empty userName parameter' => [		// TODO this will be fixed with ZBX-21976
+			'Put request with empty userName parameter' => [
 				'user' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
 					'userName' => '',
@@ -567,7 +561,7 @@ class testScimUser extends CAPIScimTest {
 					'status' => 400
 				]
 			],
-			'Put request with missing id parameter' => [		// TODO this will be fixed with ZBX-21976
+			'Put request with missing id parameter' => [
 				'user' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
 					'userName' => 'saml_user_active',
@@ -579,22 +573,6 @@ class testScimUser extends CAPIScimTest {
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
 					'detail' => 'Invalid parameter "/": the parameter "id" is missing.',
-					'status' => 400
-				]
-			],
-			'Put request with empty active parameter' => [		// TODO this will be fixed with ZBX-21976
-				'user' => [
-					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
-					'userName' => 'saml_user_active',
-					'id' => 'saml_user_active',
-					'active' => null,
-					'user_lastname' => 'JimJim',
-					'user_name' => 'HalperHalpert',
-					'user_mobile' => '5555555'
-				],
-				'expected_error' => [
-					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' => 'Invalid parameter "/active": a boolean is expected.',
 					'status' => 400
 				]
 			],
@@ -626,7 +604,8 @@ class testScimUser extends CAPIScimTest {
 				],
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'status' => 400
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
 				]
 			]
 		];
@@ -666,7 +645,7 @@ class testScimUser extends CAPIScimTest {
 					'id' => 'saml_user_active',
 					'active' => true,
 					'surname' => 'JimJim',
-					'name' => 'HalperHalpert',
+					'name' => ['givenName' => '', 'familyName' => ''],
 					'user_mobile' => '5555555'
 				]
 			]
@@ -713,7 +692,7 @@ class testScimUser extends CAPIScimTest {
 
 	public function createInvalidDeleteRequest(): array {
 		return [
-			'Delete request with missing id parameter' => [		// TODO this will be fixed with ZBX-21976
+			'Delete request with missing id parameter' => [
 				'user' => [],
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -733,7 +712,8 @@ class testScimUser extends CAPIScimTest {
 				'user' => ['id' => 'ldap_user'],
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'status' => 400
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
 				]
 			]
 		];
@@ -744,11 +724,6 @@ class testScimUser extends CAPIScimTest {
 	 */
 	public function testInvalidDelete($user, $expected_error): void {
 		$this->resolveData($user);
-
-		if (!array_key_exists('detail', $expected_error)) {
-			$expected_error['detail'] = 'The user '.self::$data['userid']['ldap_user'].
-				' belongs to another userdirectory.';
-		}
 
 		$user['token'] = self::$data['token']['token'];
 
@@ -769,7 +744,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidDeleteRequest
 	 */
-	public function testValidDelete($user, $expected_result) {		// TODO this will be fixed with ZBX-21976
+	public function testValidDelete($user, $expected_result) {
 		$this->resolveData($user);
 
 		$user['token'] = self::$data['token']['token'];
