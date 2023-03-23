@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
+For Zabbix version: 7.0 and higher  
 The template to monitor IIS (Internet Information Services) by Zabbix that works without any external scripts.
 
 
@@ -13,7 +13,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 You have to enable the following Windows Features (Control Panel > Programs and Features > Turn Windows features on or off) on your server
 ```text
@@ -44,7 +44,7 @@ No specific Zabbix configuration is required.
 |{$IIS.PORT} |<p>Listening port.</p> |`80` |
 |{$IIS.QUEUE.MAX.TIME} |<p>The time during which the queue length may exceed the threshold.</p> |`5m` |
 |{$IIS.QUEUE.MAX.WARN} |<p>Maximum application pool's request queue length for trigger expression.</p> |`` |
-|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.4/manual/config/items/itemtypes/simple_checks</p> |`http` |
+|{$IIS.SERVICE} |<p>The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/simple_checks</p> |`http` |
 
 ## Template links
 

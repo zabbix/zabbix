@@ -34,9 +34,9 @@ typedef struct
 }
 DB_DSERVICE;
 
-static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
+static zbx_db_result_t	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	char		*value_esc;
 
 	value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
@@ -55,9 +55,9 @@ static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char 
 	return result;
 }
 
-static DB_RESULT	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char *ip, int port)
+static zbx_db_result_t	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char *ip, int port)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	char		*ip_esc;
 
 	ip_esc = zbx_db_dyn_escape_field("dservices", "ip", ip);
@@ -86,7 +86,7 @@ static DB_RESULT	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char
  ******************************************************************************/
 static void	discovery_separate_host(const zbx_db_drule *drule, zbx_db_dhost *dhost, const char *ip)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	char		*ip_esc, *sql = NULL;
 	zbx_uint64_t	dhostid;
 
@@ -140,8 +140,8 @@ static void	discovery_separate_host(const zbx_db_drule *drule, zbx_db_dhost *dho
 static void	discovery_register_host(const zbx_db_drule *drule, zbx_uint64_t dcheckid, zbx_db_dhost *dhost,
 		const char *ip, int port, int status, const char *value)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		match_value = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' status:%d value:'%s'", __func__, ip, status, value);
@@ -210,8 +210,8 @@ static void	discovery_register_host(const zbx_db_drule *drule, zbx_uint64_t dche
 static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhost, DB_DSERVICE *dservice,
 		const char *ip, const char *dns, int port, int status)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*ip_esc, *dns_esc;
 
 	zbx_uint64_t	dhostid;

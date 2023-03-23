@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-07 06:52+0000\n"
+"PO-Revision-Date: 2023-03-20 12:47+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -415,6 +415,10 @@ msgstr "A"
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
 msgstr "添加覆盖"
+
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr "告警时钟"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -1544,6 +1548,10 @@ msgstr "属性"
 msgid "Attribution"
 msgstr "根因"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -1779,7 +1787,7 @@ msgstr "基础的"
 
 #: app/views/connector.edit.php:136
 msgid "Bearer"
-msgstr ""
+msgstr "持票人"
 
 #: app/views/connector.edit.php:156
 msgid "Bearer token"
@@ -2345,7 +2353,7 @@ msgstr "无法创建图标映射"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "无法创建维护期间"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2524,7 +2532,7 @@ msgstr "无法删除维护"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
+msgstr[0] "无法删除维护时段"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -3625,6 +3633,11 @@ msgstr "无法更新一个被自动发现的数据图"
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "无法更新自动发现的主机组 \"%1$s\"。"
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -3769,7 +3782,7 @@ msgstr "无法更新维护"
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "无法更新维护时段"
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -6014,7 +6027,7 @@ msgstr "删除所选的监控项?"
 
 #: app/views/js/maintenance.list.js.php:88
 msgid "Delete selected maintenance period?"
-msgstr ""
+msgstr "删除所选的维修时段?"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -10653,7 +10666,7 @@ msgstr "安装名称"
 #: include/views/js/item.preprocessing.js.php:180
 #: include/views/js/item.preprocessing.js.php:227
 msgid "Integer from BITS"
-msgstr ""
+msgstr "位转换为整数"
 
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
@@ -11928,6 +11941,10 @@ msgstr "链接“selementid2”字段指向地图“%2$s”的不存在的地图
 msgid "Link indicators"
 msgstr "链接指示器"
 
+#: include/actions.inc.php:863
+msgid "Link template"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
 #: app/views/popup.massupdate.template.php:78
@@ -12253,29 +12270,29 @@ msgstr "维护已删除"
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:218
 msgid "Maintenance period"
-msgstr "维护周期"
+msgstr "维护时段"
 
 #: app/controllers/CControllerMaintenanceCreate.php:142
 msgid "Maintenance period created"
-msgstr ""
+msgstr "维护时段已创建"
 
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
-msgstr[0] ""
+msgstr[0] "维护时段已删除"
 
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
-msgstr "维护期间长度"
+msgstr "维护时段范围"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "维修时段已更新"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
 msgid "Maintenance periods"
-msgstr "维护期间"
+msgstr "维护时段"
 
 #: include/views/configuration.maintenance.edit.php:104
 msgid "Maintenance type"
@@ -12297,6 +12314,10 @@ msgstr "不进行数据收集的维护"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "维护：%1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -12425,11 +12446,11 @@ msgstr "拓扑图更新失败."
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "将用户的 LDAP 媒介属性（例如电子邮件）映射到 Zabbix 用户媒介以便发送通知。"
 
 #: app/views/administration.authentication.edit.php:513
 msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "将用户的 SAML 媒介属性（例如email）映射到 Zabbix 用户媒介以便发送通知。"
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
@@ -12570,7 +12591,7 @@ msgstr "时间选择器的最大周期"
 
 #: app/views/connector.edit.php:171
 msgid "Max records per message"
-msgstr ""
+msgstr "每条消息最大记录数"
 
 #: app/controllers/CControllerPopupItemTest.php:1313
 #: app/controllers/CControllerPopupItemTest.php:1319
@@ -12587,7 +12608,7 @@ msgstr "最大重复计数仅适用于自动发现和 snmp.walk。"
 
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and walk only."
-msgstr ""
+msgstr "最大重复计数仅适用于自动发现和遍历。"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -13475,7 +13496,7 @@ msgstr "新建主机组"
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
 msgid "New maintenance period"
-msgstr ""
+msgstr "创建维修时段"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -15539,7 +15560,7 @@ msgstr "预测函数"
 #: include/views/configuration.item.edit.php:1028
 #: include/views/configuration.item.prototype.edit.php:891
 msgid "Preprocessing"
-msgstr "进程"
+msgstr "预处理"
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:209
@@ -17751,6 +17772,10 @@ msgstr "服务形成了一个环."
 msgid "Services updated"
 msgstr "服务已更新"
 
+#: include/classes/api/services/CUser.php:1714
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -18435,7 +18460,7 @@ msgstr "状态已禁用"
 
 #: include/classes/helpers/CMapHelper.php:287
 msgid "Status maintenance"
-msgstr "状态 维护"
+msgstr "维护状态"
 
 #: app/controllers/CControllerDiscoveryView.php:90
 #: app/views/monitoring.discovery.view.php:34
@@ -18621,7 +18646,7 @@ msgstr "支持"
 
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
-msgstr ""
+msgstr "将不支持使用对旧数值类型。 请升级到扩展范围的数值。"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
@@ -19312,7 +19337,7 @@ msgstr "主题"
 #: app/views/administration.mediatype.edit.php:139
 #: app/views/popup.mediatypetest.edit.php:47
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
-msgstr ""
+msgstr "这些参数将按指定顺序作为命令行参数传递给脚本。"
 
 #: include/func.inc.php:2468
 msgid "This day last week"
@@ -20447,6 +20472,14 @@ msgstr "自模板断开连接"
 #: include/actions.inc.php:739
 msgid "Unlink from templates"
 msgstr "自模板断开链接"
+
+#: include/actions.inc.php:864
+msgid "Unlink template"
+msgstr ""
+
+#: include/actions.inc.php:681
+msgid "Unlink templates"
+msgstr ""
 
 #: jsLoader.php:296
 msgid "Unmute"
@@ -22418,6 +22451,14 @@ msgstr "[日期的错误值：“%1$s”]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[月份值错误：“%1$s”]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"

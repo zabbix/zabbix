@@ -53,6 +53,7 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_dir.o \
 	$(OUTPUTDIR)\sysinfo_alias.o \
 	$(OUTPUTDIR)\eventlog.o \
+	$(OUTPUTDIR)\symbols.o \
 	$(TARGETDIR)\resource.syso
 
 CFLAGS := $(CFLAGS) -O2 -g -DHAVE_STDINT_H=1 -DZBX_BUILD_AGENT2=1  -DHAVE_THREAD_LOCAL=1 \
@@ -238,6 +239,9 @@ $(OUTPUTDIR)\logfiles.o: $(TOPDIR)\src\zabbix_agent\logfiles\logfiles.c
 
 $(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -I$(TOPDIR)\go\win64 -o $@
+
+$(OUTPUTDIR)\symbols.o: $(TOPDIR)\src\libs\zbxsymbols\symbols.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(TARGETDIR)\resource.syso: $(TOPDIR)\build\win32\project\resource.rc
 	$(WINDRES) $^ $(RFLAGS) -D _WINDOWS -D ZABBIX_AGENT2 -o $@

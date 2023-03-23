@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 7.0 and higher  
 Official JMX Template for WildFly Domain Controller.
 
 
@@ -13,7 +13,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/jmx) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
 Metrics are collected by JMX.
 This template works with Domain Controller.

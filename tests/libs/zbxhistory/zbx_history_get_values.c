@@ -31,7 +31,7 @@
 #include "zbxavailability.h"
 
 void	__wrap_zbx_sleep_loop(int sleeptime);
-zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num);
+zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num);
 int	__wrap_zbx_interface_availability_is_set(const zbx_interface_availability_t *ha);
 int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
@@ -50,7 +50,7 @@ void	__wrap_zbx_sleep_loop(int sleeptime)
 	ZBX_UNUSED(sleeptime);
 }
 
-zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num)
+zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num)
 {
 	ZBX_UNUSED(table_name);
 	ZBX_UNUSED(num);
@@ -99,6 +99,12 @@ int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_
 
 void	__wrap_zbx_clean_events(void)
 {
+}
+
+void	__wrap_zbx_config_get(void *cfg, int flags)
+{
+	ZBX_UNUSED(cfg);
+	ZBX_UNUSED(flags);
 }
 
 /******************************************************************************
