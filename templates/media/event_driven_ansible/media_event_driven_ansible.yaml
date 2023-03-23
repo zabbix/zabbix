@@ -108,7 +108,7 @@ zabbix_export:
                 Eda.params = params;
         
                 integer_fields.forEach(function (key) {
-                        if (Eda.params.hasOwnProperty(key)) {
+                        if (typeof Eda.params[key] !== 'undefined') {
                             if (isNaN(Eda.params[key])) {
                                 throw 'Parameter "' + key + '" must be integer. Given value: ' + Eda.params[key];
                             }
@@ -132,10 +132,10 @@ zabbix_export:
                 Eda.params.endpoint = (Eda.params.endpoint.startsWith('/'))
                         ? Eda.params.endpoint : '/' + Eda.params.endpoint;
                 // Prepare groups
-                Eda.params.host_groups = Eda.params.hasOwnProperty('host_groups') 
+                Eda.params.host_groups = (typeof Eda.params['host_groups']!== 'undefined')
                         ? this.prepareHostgroups(Eda.params.host_groups): []
                 // Prepare tags
-                Eda.params.event_tags = params.hasOwnProperty('event_tags') 
+                Eda.params.event_tags = (typeof Eda.params['event_tags']!== 'undefined')
                         ? this.transformTags(Eda.params.event_tags): {}
                 // Prepare timestamp
                 Eda.params.event_datetime_timestamp = this.getTimestamp(
