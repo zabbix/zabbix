@@ -1342,7 +1342,7 @@ function prepareHostPrototypeInterfaces(array $interfaces, array $main_interface
 		$interface['main'] = $i == $main_interfaces[$interface['type']] ? INTERFACE_PRIMARY : INTERFACE_SECONDARY;
 
 		if (array_key_exists('details', $interface)) {
-			$interface['details'] += ['bulk' => DB::getDefault('interface_snmp', 'bulk')];
+			$interface['details'] += ['bulk' => SNMP_BULK_DISABLED];
 		}
 	}
 	unset($interface);
