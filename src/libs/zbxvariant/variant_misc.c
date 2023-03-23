@@ -29,7 +29,6 @@
  *                                                                            *
  * Parameters: value         - [IN/OUT] the value to convert                  *
  *             value_type    - [IN] the target value type                     *
- *             dbl_precision - [IN] double precision option                   *
  *             errmsg        - [OUT] the error message                        *
  *                                                                            *
  * Return value: SUCCEED - Value conversion was successful.                   *
