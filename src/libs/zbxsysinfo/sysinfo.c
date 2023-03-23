@@ -1045,14 +1045,14 @@ void	zbx_test_parameters(void)
 	test_aliases();
 }
 
-static int	zbx_check_user_parameter(const char *param, int zbx_config_unsafe_user_parameters, char *error,
+static int	zbx_check_user_parameter(const char *param, int config_unsafe_user_parameters, char *error,
 		int max_error_len)
 {
 	const char	suppressed_chars[] = "\\'\"`*?[]{}~$!&;()<>|#@\n", *c;
 	char		*buf = NULL;
 	size_t		buf_alloc = 128, buf_offset = 0;
 
-	if (0 != zbx_config_unsafe_user_parameters)
+	if (0 != config_unsafe_user_parameters)
 		return SUCCEED;
 
 	for (c = suppressed_chars; '\0' != *c; c++)
@@ -1083,7 +1083,7 @@ static int	zbx_check_user_parameter(const char *param, int zbx_config_unsafe_use
 	return SUCCEED;
 }
 
-static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int zbx_config_user_parameters,
+static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int config_user_parameters,
 		char **out, char *error, int max_error_len)
 {
 	const char	*pl = cmd, *pr, *tmp;
@@ -1110,7 +1110,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int zbx_
 			{
 				tmp = get_rparam(request, num - 1);
 
-				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, zbx_config_user_parameters, error,
+				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, config_user_parameters, error,
 						max_error_len)))
 				{
 					break;
