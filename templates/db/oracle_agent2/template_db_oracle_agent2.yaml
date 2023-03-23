@@ -2214,7 +2214,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].file_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"]'
               tags:
                 -
                   tag: component
@@ -2243,7 +2243,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].free_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"]'
               tags:
                 -
                   tag: component
@@ -2272,7 +2272,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].max_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"]'
               tags:
                 -
                   tag: component
@@ -2306,7 +2306,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].status.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"]'
               tags:
                 -
                   tag: component
@@ -2362,7 +2362,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"]'
               tags:
                 -
                   tag: component
@@ -2392,7 +2392,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_file_pct.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"]'
               tags:
                 -
                   tag: component
@@ -2447,7 +2447,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_pct_max.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"]'
               tags:
                 -
                   tag: component
@@ -2489,7 +2489,7 @@ zabbix_export:
             -
               uuid: 97ac4acedcde465b8d004a8ac476dd99
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Get tablespaces stats'
-              key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"]'
+              key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"]'
               history: '0'
               trends: '0'
               value_type: TEXT

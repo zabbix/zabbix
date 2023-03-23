@@ -3,8 +3,7 @@
 
 ## Overview
 
-The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2. It requires Zabbix agent 7.0 or newer.
-
+The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2. It requires Zabbix agent 2 version 7.0 or newer.
 ## Tested versions
 
 This template has been tested on:
@@ -175,7 +174,7 @@ There are no template links in this template.
 |Zabbix raw items |Oracle: Get SGA stats |<p>Get SGA statistics.</p> |ZABBIX_PASSIVE |oracle.sga.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle Database '{#DBNAME}': Get CDB and No-CDB info |<p>It gets the information about the container database (CDB) and non-CDB database on an instance.</p> |ZABBIX_PASSIVE |oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"] |
 |Zabbix raw items |Oracle Database '{#DBNAME}': Get PDB info |<p>It gets the information about the PDB database on an instance.</p> |ZABBIX_PASSIVE |oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"] |
-|Zabbix raw items |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Get tablespaces stats |<p>It gets the statistics of the tablespace.</p> |ZABBIX_PASSIVE |oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#CON_NAME}","{#TABLESPACE}","{#CONTENTS}"] |
+|Zabbix raw items |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Get tablespaces stats |<p>It gets the statistics of the tablespace.</p> |ZABBIX_PASSIVE |oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}","{#CON_NAME}"] |
 |Zabbix raw items |Archivelog '{#DEST_NAME}': Get archive log info |<p>It gets the archivelog statistics.</p> |ZABBIX_PASSIVE |oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"] |
 |Zabbix raw items |ASM '{#DGNAME}': Get ASM stats |<p>It gets the ASM disk group statistics.</p> |ZABBIX_PASSIVE |oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"] |
 
