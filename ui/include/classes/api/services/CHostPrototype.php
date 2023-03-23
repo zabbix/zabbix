@@ -444,35 +444,9 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateCreate(array &$host_prototypes): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-			'ruleid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$drule_hosts = API::DiscoveryRule()->get([
-			'output' => [],
-			'selectHosts' => ['status'],
-			'itemids' => array_column($host_prototypes, 'ruleid'),
-			'preservekeys' => true
-		]);
-
-		foreach ($host_prototypes as &$host_prototype) {
-			$host_prototype['host_status'] = array_key_exists($host_prototype['ruleid'], $drule_hosts)
-				? $drule_hosts[$host_prototype['ruleid']]['hosts'][0]['status']
-				: -1;
-		}
-		unset($host_prototype);
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
-			'host_status' =>		['type' => API_INT32],
-			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'ruleid' =>				['type' => API_ID],
+			'uuid' =>				['type' => API_UUID],
+			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
 			'custom_interfaces' =>	['type' => API_INT32, 'in' => implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), 'default' => DB::getDefault('hosts', 'custom_interfaces')],
@@ -578,6 +552,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
+			'uuid' => 	['type' => API_UUID],
 			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'ruleid' => ['type' => API_UNEXPECTED]
 		]];
@@ -598,20 +573,13 @@ class CHostPrototype extends CHostBase {
 
 		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
 			'SELECT h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,h.templateid,'.
-				'hd.parent_itemid AS ruleid,uuid,'.
+				'hd.parent_itemid AS ruleid,'.
 				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM hosts h'.
 			' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
 			' WHERE '.dbConditionId('h.hostid', array_column($host_prototypes, 'hostid'))
 		), 'hostid');
-
-		$drule_hosts = API::DiscoveryRule()->get([
-			'output' => [],
-			'selectHosts' => ['status'],
-			'itemids' => array_column($db_host_prototypes, 'ruleid'),
-			'preservekeys' => true
-		]);
 
 		foreach ($host_prototypes as $i => &$host_prototype) {
 			if ($db_host_prototypes[$host_prototype['hostid']]['templateid'] == 0) {
@@ -628,10 +596,6 @@ class CHostPrototype extends CHostBase {
 			if (!CApiInputValidator::validate($api_input_rules, $host_prototype, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
-
-			// Keep host status for validation purposes.
-			$ruleid = $db_host_prototypes[$host_prototype['hostid']]['ruleid'];
-			$host_prototype['host_status'] = $drule_hosts[$ruleid]['hosts'][0]['status'];
 		}
 		unset($host_prototype);
 
@@ -639,12 +603,7 @@ class CHostPrototype extends CHostBase {
 			['ruleid', 'custom_interfaces']
 		);
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
-			'host_status' => ['type' => API_INT32],
-			'uuid' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
 			'ruleid' =>	['type' => API_ID],
 			'host' =>	['type' => API_H_NAME],
 			'name' =>	['type' => API_STRING_UTF8]
@@ -656,7 +615,6 @@ class CHostPrototype extends CHostBase {
 
 		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
 
-		self::checkAndAddUuid($host_prototypes, $db_host_prototypes);
 		self::checkDuplicates($host_prototypes, $db_host_prototypes);
 		self::checkMainInterfaces($host_prototypes);
 		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
@@ -1072,45 +1030,43 @@ class CHostPrototype extends CHostBase {
 	 * if it doesn't exist.
 	 *
 	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$host_prototypes, array $db_host_prototypes = []): void {
-		$new_host_prototype_uuids = [];
+	private static function checkAndAddUuid(array &$host_prototypes): void {
+		$templated_ruleids = DBfetchColumn(DBselect(
+			'SELECT i.itemid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+			' AND '.dbConditionId('i.itemid', array_unique(array_column($host_prototypes, 'ruleid'))).
+			' AND h.status='.HOST_STATUS_TEMPLATE
+		), 'itemid');
 
-		foreach ($host_prototypes as &$host_prototype) {
-			if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
-				$db_uuid = array_key_exists('hostid', $host_prototype)
-						&& array_key_exists($host_prototype['hostid'], $db_host_prototypes)
-					? $db_host_prototypes[$host_prototype['hostid']]['uuid']
-					: '';
+		foreach ($host_prototypes as $index => &$host_prototype) {
+			if (!in_array($host_prototype['ruleid'], $templated_ruleids) && array_key_exists('uuid', $host_prototype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
 
-				if (!array_key_exists('uuid', $host_prototype)) {
-					$host_prototype['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
-				}
-
-				if ($host_prototype['uuid'] !== $db_uuid) {
-					$new_host_prototype_uuids[] = $host_prototype['uuid'];
-				}
+			if (in_array($host_prototype['ruleid'], $templated_ruleids) && !array_key_exists('uuid', $host_prototype)) {
+				$host_prototype['uuid'] = generateUuidV4();
 			}
 		}
 		unset($host_prototype);
 
-		if ($new_host_prototype_uuids) {
-			$duplicates = DB::select('hosts', [
-				'output' => ['uuid'],
-				'filter' => [
-					'uuid' => $new_host_prototype_uuids
-				],
-				'limit' => 1
-			]);
+		$duplicates = DB::select('hosts', [
+			'output' => ['uuid'],
+			'filter' => [
+				'uuid' => array_column($host_prototypes, 'uuid')
+			],
+			'limit' => 1
+		]);
 
-			if ($duplicates) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
-				);
-			}
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
+			);
 		}
 	}
 
