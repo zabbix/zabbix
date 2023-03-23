@@ -1652,6 +1652,15 @@ form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show {
   form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show label[for='minmax_size'] {
     width: 100%; }
 
+div.dashboard-widget-gauge > div {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 10px; }
+div.dashboard-widget-gauge div {
+  line-height: 1.2em;
+  text-align: center;
+  white-space: nowrap; }
+
 .dashboard-widget-inaccessible {
   display: grid;
   align-items: center;

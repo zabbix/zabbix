@@ -30,9 +30,8 @@ use API,
 	CValueMapHelper,
 	Manager,
 	CNumberParser,
-	CParser;
-
-use Widgets\Gauge\Widget;
+	CParser,
+	CWebUser;
 
 use Zabbix\Core\CWidget;
 
@@ -112,11 +111,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 */
 	private $thresholds;
 
+	private const GAUGE_WIDTH_MIN = 1;
+	private const GAUGE_WIDTH_MAX = 65535;
+	private const GAUGE_HEIGHT_MIN = 1;
+	private const GAUGE_HEIGHT_MAX = 65535;
+
 	protected function init(): void {
 		parent::init();
 
 		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
+			'dynamic_hostid' => 'db hosts.hostid',
+			'content_width' => 'int32|ge '.self::GAUGE_WIDTH_MIN.'|le '.self::GAUGE_WIDTH_MAX,
+			'content_height' => 'int32|ge '.self::GAUGE_HEIGHT_MIN.'|le '.self::GAUGE_HEIGHT_MAX
 		]);
 	}
 
@@ -186,6 +192,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getWidgetName(),
 			'error' => $error,
 			'url' => $url,
+			'bg_color' => $this->fields_values['bg_color'],
+			'content_width' => (int) $this->getInput('content_width', self::GAUGE_WIDTH_MIN),
+			'content_height' => (int) $this->getInput('content_height', self::GAUGE_HEIGHT_MIN),
 			'data' => [
 				'description' => [
 					'text' => $this->getDescription($this->items),
@@ -221,19 +230,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'min' => $this->min,
 					'max' => $this->max,
 					'show' => ($this->fields_values['minmax_show'] == 1),
-					'size' => $this->fields_values['minmax_size']
+					'font_size' => $this->fields_values['minmax_size']
 				],
 				'empty_color' => $this->fields_values['empty_color'],
-				'bg_color' => $this->fields_values['bg_color'],
 				'thresholds' => [
 					'data' => $this->thresholds,
 					'show_arc' => ($this->fields_values['th_show_arc'] == 1),
 					'arc_size' => $this->fields_values['th_arc_size'],
-					'show_labels' => ($this->fields_values['th_show_labels'] == 1)
+					'show' => ($this->fields_values['th_show_labels'] == 1),
+					'font_size' => $this->fields_values['minmax_size']
 				]
 			],
 			'user' => [
-				'debug_mode' => $this->getDebugMode()
+				'debug_mode' => $this->getDebugMode(),
+				'theme' => getUserTheme(CWebUser::$data)
 			]
 		]));
 	}

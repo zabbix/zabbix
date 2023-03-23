@@ -82,6 +82,23 @@ form.dashboard-widget-gauge {
 	}
 }
 
+// Widget view.
+div.dashboard-widget-gauge {
+	$line-height: 1.2em;
+
+	> div {
+		box-sizing: border-box;
+		height: 100%;
+		padding: 10px;
+	}
+
+	div {
+		line-height: $line-height;
+		text-align: center;
+		white-space: nowrap;
+	}
+}
+
 // Modifications by themes.
 
 @if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
