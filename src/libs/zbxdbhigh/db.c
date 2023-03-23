@@ -2386,12 +2386,7 @@ void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
 	ZBX_TABLE		*table;
 	int			i;
 	zbx_vector_str_t	names;
-
-	if (NULL != json)
-	{
-		zbx_json_addobject(json, tablename);
-		zbx_json_addarray(json, ZBX_PROTO_TAG_FIELDS);
-	}
+	size_t			offset = json->buffer_offset;
 
 	zbx_vector_str_create(&names);
 
@@ -2456,6 +2451,12 @@ void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
 
 			if (NULL != json)
 			{
+				if (offset == json->buffer_offset)
+				{
+					zbx_json_addobject(json, tablename);
+					zbx_json_addarray(json, ZBX_PROTO_TAG_FIELDS);
+				}
+
 				zbx_json_addobject(json, NULL);
 				zbx_json_addobject(json, field->name);
 				zbx_json_addstring(json, ZBX_PROTO_TAG_TYPE, ZBX_PROTO_TAG_CHAR, ZBX_JSON_TYPE_STRING);
@@ -2473,8 +2474,11 @@ cleanup:
 
 	if (NULL != json)
 	{
-		zbx_json_close(json);
-		zbx_json_close(json);
+		if (offset != json->buffer_offset)
+		{
+			zbx_json_close(json);
+			zbx_json_close(json);
+		}
 	}
 #undef ZBX_TYPE_CHAR_STR
 #undef ZBX_PROTO_TAG_FIELDS
