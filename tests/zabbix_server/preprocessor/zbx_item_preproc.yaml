@@ -2259,6 +2259,92 @@ out:
   return: SUCCEED
   value: "O K"
 ---
+test case: HMAC in JavaScript - Invalid algorithm
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('xxx', 'xxx', 'yyy');"
+out:
+  return: FAIL
+---
+test case: HMAC in JavaScript - MD5
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('md5', 'xxx', 'yyy');"
+out:
+  return: SUCCEED
+  value: 'd8e8efd954dabfdbfd69398d92ad62d1'
+---
+test case: HMAC in JavaScript - SHA-256
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256', 'xxx', 'yyy');"
+out:
+  return: SUCCEED
+  value: '97f50eed1079c9460f2bb9ddf7dc2e4258471f301ad2c1f14ad50144c4de4303'
+---
+test case: HMAC in JavaScript - Invalid key
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256', null, 'yyy');"
+out:
+  return: FAIL
+---
+test case: HMAC in JavaScript - Missing key
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256');"
+out:
+  return: FAIL
+---
+test case: HMAC in JavaScript - Invalid data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256', 'xxx', null);"
+out:
+  return: FAIL
+---
+test case: HMAC in JavaScript - Missing data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256', 'xxx');"
+out:
+  return: FAIL
+---
 test case: RS256 in JavaScript - single line pkey w/o newlines
 in:
   encryption_required: 1
