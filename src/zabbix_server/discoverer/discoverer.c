@@ -181,7 +181,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 		char		**pvalue;
 		size_t		value_offset = 0;
 		ZBX_FPING_HOST	host;
-		DC_ITEM		item;
+		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
 
 		zbx_alarm_on(config_timeout);
@@ -213,7 +213,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
-				memset(&item, 0, sizeof(DC_ITEM));
+				memset(&item, 0, sizeof(zbx_dc_item_t));
 
 				zbx_strscpy(item.key_orig, dcheck->key_);
 				item.key = item.key_orig;
@@ -416,8 +416,8 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 static void	process_checks(const zbx_db_drule *drule, int *host_status, char *ip, int unique, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids, int config_timeout)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	DB_DCHECK	dcheck;
 	char		sql[MAX_STRING_LEN];
 	size_t		offset = 0;
@@ -646,8 +646,8 @@ out:
  ******************************************************************************/
 static void	discovery_clean_services(zbx_uint64_t druleid)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*iprange = NULL;
 	zbx_vector_uint64_t	keep_dhostids, del_dhostids, del_dserviceids;
 	zbx_uint64_t		dhostid, dserviceid;
@@ -755,8 +755,8 @@ out:
 
 static int	process_discovery(time_t *nextcheck, int config_timeout)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			rule_count = 0, delay;
 	char			*delay_str = NULL;
 	zbx_dc_um_handle_t	*um_handle;

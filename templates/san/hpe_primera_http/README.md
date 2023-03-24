@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
+For Zabbix version: 7.0 and higher  
 The template to monitor HPE Primera by HTTP.
 It works without any external scripts and uses the script item.
 
@@ -13,7 +13,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create user zabbix on the storage with browse role and enable it for all domains.
 2. The WSAPI server does not start automatically.

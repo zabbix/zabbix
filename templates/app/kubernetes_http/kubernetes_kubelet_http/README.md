@@ -3,7 +3,6 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 The template to monitor Kubernetes Controller manager by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -13,14 +12,19 @@ Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.
 
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Kubernetes, version 1.19
 
+## Requirements
+
+For Zabbix version: 7.0 and higher.
+
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Internal service metrics are collected from /metrics endpoint.
 Template needs to use Authorization via API token. 
@@ -29,7 +33,7 @@ Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -43,11 +47,11 @@ No specific Zabbix configuration is required.
 |{$KUBE.KUBELET.PODS.ENDPOINT} |<p>Kubelet /pods endpoint</p> |`/pods` |
 |{$KUBE.KUBELET.URL} |<p>Instance URL</p> |`https://localhost:10250` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
@@ -56,7 +60,7 @@ There are no template links in this template.
 |REST client requests discovery | |DEPENDENT |kube.kubelet.rest.requests.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Runtime operations discovery | |DEPENDENT |kube.kubelet.runtime_operations_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "kubelet_runtime_operations_*", operation_type =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -89,7 +93,7 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage |<p>Current memory usage in bytes, including all memory regardless of when it was accessed.</p> |DEPENDENT |kube.kubelet.container.memory.usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_usage_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set |<p>Current working set in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.working_set["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_working_set_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|

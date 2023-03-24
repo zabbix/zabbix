@@ -87,7 +87,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	now = time(NULL);
 
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
-	DCconfig_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
+	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
 
 	do
 	{
@@ -193,7 +193,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	}
 
 	/* if host exists then check host connection permissions */
-	if (FAIL == DCcheck_host_permissions(host, sock, hostid, revision, &ch_error))
+	if (FAIL == zbx_dc_check_host_permissions(host, sock, hostid, revision, &ch_error))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
 		zbx_free(ch_error);
@@ -205,11 +205,11 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
 
-		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != zbx_dc_get_auto_registration_action_count())
 		{
 			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
 			{
-				if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface,
+				if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
 						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
@@ -226,9 +226,9 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	else
 		heartbeat = 0;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != zbx_dc_get_auto_registration_action_count())
 	{
-		if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
+		if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
 				heartbeat))
 		{
 			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
@@ -286,22 +286,22 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, int config_tim
 		goto out;
 	}
 
-	num = DCconfig_get_active_items_count_by_hostid(hostid);
+	num = zbx_dc_config_get_active_items_count_by_hostid(hostid);
 
 	buffer = (char *)zbx_malloc(buffer, buffer_alloc);
 
 	if (0 != num)
 	{
-		DC_ITEM			*dc_items;
+		zbx_dc_item_t		*dc_items;
 		int			*errcodes;
 		zbx_dc_um_handle_t	*um_handle;
 
 		um_handle = zbx_dc_open_user_macros();
 
-		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * num);
+		dc_items = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
 
-		DCconfig_get_active_items_by_hostid(dc_items, hostid, errcodes, num);
+		zbx_dc_config_get_active_items_by_hostid(dc_items, hostid, errcodes, num);
 
 		for (i = 0; i < num; i++)
 		{
@@ -330,7 +330,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, int config_tim
 					dc_items[i].key_orig, delay, dc_items[i].lastlogsize);
 		}
 
-		DCconfig_clean_items(dc_items, errcodes, num);
+		zbx_dc_config_clean_items(dc_items, errcodes, num);
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
@@ -555,18 +555,18 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)revision);
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 		/* determine items count to ensure allocation is done outside of a lock */
-		num = DCconfig_get_active_items_count_by_hostid(hostid);
+		num = zbx_dc_config_get_active_items_count_by_hostid(hostid);
 	}
 
 	if (0 != num)
 	{
-		DC_ITEM			*dc_items;
+		zbx_dc_item_t		*dc_items;
 		int			*errcodes, delay;
 		zbx_dc_um_handle_t	*um_handle;
 
-		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * num);
+		dc_items = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
-		DCconfig_get_active_items_by_hostid(dc_items, hostid, errcodes, num);
+		zbx_dc_config_get_active_items_by_hostid(dc_items, hostid, errcodes, num);
 
 		um_handle = zbx_dc_open_user_macros();
 
@@ -631,7 +631,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_free(dc_items[i].key);
 		}
 
-		DCconfig_clean_items(dc_items, errcodes, num);
+		zbx_dc_config_clean_items(dc_items, errcodes, num);
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
@@ -644,7 +644,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);
 
-	DCget_expressions_by_names(&regexps, (const char * const *)names.values, names.values_num);
+	zbx_dc_get_expressions_by_names(&regexps, (const char * const *)names.values, names.values_num);
 
 	if (0 < regexps.values_num)
 	{

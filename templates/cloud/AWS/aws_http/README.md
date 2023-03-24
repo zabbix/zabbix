@@ -3,13 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher
+For Zabbix version: 7.0 and higher
 The template to monitor AWS EC2, RDS and S3 instances by HTTP via Zabbix that works without any external scripts.
 
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.  
 

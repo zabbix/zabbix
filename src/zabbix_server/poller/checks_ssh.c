@@ -24,7 +24,7 @@
 
 #include "zbxsysinfo.h"
 
-int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_ssh(zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
