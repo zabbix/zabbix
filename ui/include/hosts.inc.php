@@ -1417,12 +1417,17 @@ function getSanitizedHostPrototypeInterfaceDetailsFields(array $details): array 
 
 	switch ($details['version']) {
 		case SNMP_V1:
-		case SNMP_V2C:
 			$field_names[] = 'community';
 			break;
 
+		case SNMP_V2C:
+			$field_names = array_merge($field_names, ['community', 'max_repetitions']);
+			break;
+
 		case SNMP_V3:
-			$field_names = array_merge($field_names, ['contextname', 'securityname', 'securitylevel']);
+			$field_names = array_merge($field_names,
+				['max_repetitions', 'contextname', 'securityname', 'securitylevel']
+			);
 
 			switch ($details['securitylevel']) {
 				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
