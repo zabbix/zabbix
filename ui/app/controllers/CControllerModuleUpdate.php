@@ -83,9 +83,9 @@ class CControllerModuleUpdate extends CController {
 
 		if (!$errors) {
 			$update = [
-					'moduleid' => $moduleid,
-					'status' => $set_status
-				];
+				'moduleid' => $moduleid,
+				'status' => $set_status
+			];
 
 			$result = API::Module()->update($update);
 		}
