@@ -197,13 +197,15 @@ static void	*pp_worker_entry(void *arg)
 int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
 		char **error)
 {
-	int	err, ret = FAIL;
+	int		err, ret = FAIL;
+	pthread_attr_t	attr;
 
 	worker->id = id;
 	worker->queue = queue;
 	worker->timekeeper = timekeeper;
 
-	if (0 != (err = pthread_create(&worker->thread, NULL, pp_worker_entry, (void *)worker)))
+	zbx_pthread_init_attr(&attr);
+	if (0 != (err = pthread_create(&worker->thread, &attr, pp_worker_entry, (void *)worker)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;

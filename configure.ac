@@ -1797,6 +1797,17 @@ LIBS="$LIBS $ICONV_LIBS"
 
 TIMES_CHECK_NULL_ARG([no])
 
+have_stacksize="no"
+
+AC_ARG_WITH(stacksize,[
+Override default thread stack size:
+AS_HELP_STRING([--with-stacksize=STACKSIZE], [Set default thread stack size in kilobytes.])],
+[case "${withval}" in
+  [[0-9]][[0-9]][[0-9]]|[[0-9]][[0-9]][[0-9]][[0-9]]|[[0-9]][[0-9]][[0-9]][[0-9]][[0-9]])
+    AC_DEFINE_UNQUOTED(HAVE_STACKSIZE, ${withval}, [Override default thread stack size.]) ;;
+  *) AC_MSG_ERROR([bad value ${withval} for --with-stacksize]) ;;
+esac])
+
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
 
