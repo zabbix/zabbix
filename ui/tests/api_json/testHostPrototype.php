@@ -1177,7 +1177,7 @@ class testHostPrototype extends CAPITest {
 		if ($details_interfaceids) {
 			$options = [
 				'output' => ['interfaceid', 'version', 'bulk', 'community', 'securityname', 'securitylevel',
-					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
+					'authpassphrase', 'privpassphrase', 'authprotocol', 'privprotocol', 'contextname', 'max_repetitions'
 				],
 				'interfaceids' => $details_interfaceids
 			];
