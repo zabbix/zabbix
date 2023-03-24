@@ -57,7 +57,7 @@ class C52AggregateItemKeyConverterTest extends TestCase {
 			],
 			[
 				'grpsum["MySQL\\Servers","trap1",last]',
-				'sum(last_foreach(/*/trap1?[group="MySQL\\\\Servers"]))'
+				'sum(last_foreach(/*/trap1?[group="MySQL\\Servers"]))'
 			],
 			[
 				'grpsum[ "Zabbix servers" , trap1 , last, 30s ]',

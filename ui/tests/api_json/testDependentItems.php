@@ -79,6 +79,8 @@ class testDependentItems extends CAPITest {
 	}
 
 	public static function getTestCases() {
+		$dep_count_overflow = ZBX_DEPENDENT_ITEM_MAX_COUNT + 1;
+
 		return [
 			// Simple update master item.
 			[
@@ -142,7 +144,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1015: dependent.items.host.8
 				// 2499: this ID does not exists in the DB
-				'request_data' => self::getItems(1015, 2499, 'dependent.item.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1015, 2499, 'dependent.item.1', 2, 2]]
+				]
 			],
 			// Set incorrect master_itemid for item (update).
 			[
@@ -160,7 +165,10 @@ class testDependentItems extends CAPITest {
 				// 1015: dependent.items.host.8
 				// 2403: dependent.items.host.8:discovery.rule.1
 				// 2499: this ID does not exists in the DB
-				'request_data' => self::getItemPrototypes(1015, 2403, 2499, 'dependent.item.proto.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1015, 2403, 2499, 'dependent.item.proto.1', 2, 2]]
+				]
 			],
 			// Set incorrect master_itemid for item prototype (update).
 			[
@@ -177,7 +185,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'discoveryrule.create',
 				// 1015: dependent.items.host.8
 				// 2499: this ID does not exists in the DB
-				'request_data' => self::getDiscoveryRule(1015, 2499, 'dependent.discovery.rule.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1015, 2499, 'dependent.discovery.rule.1', 2, 2]]
+				]
 			],
 			// Set incorrect master_itemid for discovery rule (update).
 			[
@@ -190,15 +201,18 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for item (create).
 			[
-				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
 				'method' => 'item.create',
 				// 1015: dependent.items.host.8
 				// 2501: dependent.items.host.9:master.item.1
-				'request_data' => self::getItems(1015, 2501, 'dependent.item.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1015, 2501, 'dependent.item.1', 2, 2]]
+				]
 			],
 			// Set master_itemid from other host for item (update).
 			[
-				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
 				'method' => 'item.update',
 				'request_data' => [
 					'itemid' => 2402,		// dependent.items.host.8:dependent.item.1.1
@@ -207,16 +221,19 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for item prototype (create).
 			[
-				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
 				'method' => 'itemprototype.create',
 				// 1015: dependent.items.host.8
 				// 2403: dependent.items.host.8:discovery.rule.1
 				// 2504: dependent.items.host.9:master.item.proto.1
-				'request_data' => self::getItemPrototypes(1015, 2403, 2504, 'dependent.item.proto.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1015, 2403, 2504, 'dependent.item.proto.1', 2, 2]]
+				]
 			],
 			// Set master_itemid from other host for item prototype (update).
 			[
-				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
 				'method' => 'itemprototype.update',
 				'request_data' => [
 					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
@@ -225,16 +242,19 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other discovery rule (create).
 			[
-				'error' => 'Incorrect value for field "master_itemid": ruleid of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": "ruleid" of dependent item and master item should match.',
 				'method' => 'itemprototype.create',
 				// 1015: dependent.items.host.8
 				// 2403: dependent.items.host.8:discovery.rule.1
 				// 2407: dependent.items.host.8:master.item.proto.2
-				'request_data' => self::getItemPrototypes(1015, 2403, 2407, 'dependent.item.proto.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1015, 2403, 2407, 'dependent.item.proto.1', 2, 2]]
+				]
 			],
 			// Set master_itemid from other discovery rule (update).
 			[
-				'error' => 'Incorrect value for field "master_itemid": ruleid of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": "ruleid" of dependent item and master item should match.',
 				'method' => 'itemprototype.update',
 				'request_data' => [
 					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
@@ -243,15 +263,18 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for discovery rule (create).
 			[
-				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
 				'method' => 'discoveryrule.create',
 				// 1015: dependent.items.host.8
 				// 2501: dependent.items.host.9:master.item.1
-				'request_data' => self::getDiscoveryRule(1015, 2501, 'dependent.discovery.rule.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1015, 2501, 'dependent.discovery.rule.1', 2, 2]]
+				]
 			],
 			// Set master_itemid from other host for discovery rule (update).
 			[
-				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
 				'method' => 'discoveryrule.update',
 				'request_data' => [
 					'itemid' => 2409,		// dependent.items.host.8:dependent.discovery.rule.1.1
@@ -264,7 +287,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1014: dependent.items.host.7
 				// 2304: dependent.items.host.7:net.if[eth0]
-				'request_data' => self::getItems(1014, 2304, 'item', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1014, 2304, 'item', 1, 1]]
+				]
 			],
 			// Create dependent item prototype, which depends on discovered item.
 			[
@@ -273,7 +299,10 @@ class testDependentItems extends CAPITest {
 				// 1014: dependent.items.host.7
 				// 2301: dependent.items.host.7:net.if.discovery
 				// 2304: dependent.items.host.7:net.if[eth0]
-				'request_data' => self::getItemPrototypes(1014, 2301, 2304, 'item.proto', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1014, 2301, 2304, 'item.proto', 1, 1]]
+				]
 			],
 			// Create dependent discovery rule, which depends on discovered item.
 			[
@@ -281,7 +310,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'discoveryrule.create',
 				// 1014: dependent.items.host.7
 				// 2304: dependent.items.host.7:net.if[eth0]
-				'request_data' => self::getDiscoveryRule(1014, 2304, 'discovery.rule', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1014, 2304, 'discovery.rule', 1, 1]]
+				]
 			],
 			// Simple update templated master item.
 			[
@@ -440,7 +472,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1008: dependent.items.template.1:dependent.item.1.1.1.1
-				'request_data' => self::getItems(1001, 1008, 'dependent.item.1.1.1.1', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1008, 'dependent.item.1.1.1.1', 1, 1]]
+				]
 			],
 			// Check for maximum depth for the item prototypes tree (create). Add 4th level.
 			[
@@ -449,7 +484,10 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1025: dependent.items.template.1:dependent.item.proto.1.1.1.1
-				'request_data' => self::getItemPrototypes(1001, 1017, 1025, 'dependent.item.1.1.1.1', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1025, 'dependent.item.1.1.1.1', 1, 1]]
+				]
 			],
 			// Check for maximum depth of the discovery rule tree (create). Add 4th level.
 			[
@@ -457,7 +495,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'discoveryrule.create',
 				// 1001: dependent.items.template.1
 				// 1008: dependent.items.template.1:dependent.item.1.1.1.1
-				'request_data' => self::getDiscoveryRule(1001, 1008, 'dependent.discovery.rule.1.1.1.1', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1001, 1008, 'dependent.discovery.rule.1.1.1.1', 1, 1]]
+				]
 			],
 			// Check for maximum depth of the items tree (update). Add 4th level.
 			[
@@ -522,22 +563,22 @@ class testDependentItems extends CAPITest {
 			// Check for maximum depth of the items tree (link a template).
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
-				'method' => 'template.update',
+				'method' => 'host.update',
 				'request_data' => [
-					'templateid' => 1005,	// dependent.items.template.2
-					'hosts' => [
-						['hostid' => 1006]	// dependent.items.host.2
+					'hostid' => 1006,	// dependent.items.host.2
+					'templates' => [
+						['templateid' => 1005]	// dependent.items.template.2
 					]
 				]
 			],
 			// Check for maximum depth of the mixed tree (link a template).
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
-				'method' => 'template.update',
+				'method' => 'host.update',
 				'request_data' => [
-					'templateid' => 1005,	// dependent.items.template.2
-					'hosts' => [
-						['hostid' => 1007]	// dependent.items.host.3
+					'hostid' => 1007,	// dependent.items.host.3
+					'templates' => [
+						['templateid' => 1005]	// dependent.items.template.2
 					]
 				]
 			],
@@ -547,7 +588,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1001: dependent.items.template.1:master.item.1
-				'request_data' => self::getItems(1001, 1001, 'dependent.item.1', 3, 9987)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1001, 'dependent.item.1', 3, $dep_count_overflow - 3]]
+				]
 			],
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
@@ -555,10 +599,11 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1002: dependent.items.template.1:dependent.item.1.1
 				// 1003: dependent.items.template.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getItems(1001, 1002, 'dependent.item.1.1', 3, 5495),
-					self::getItems(1001, 1003, 'dependent.item.1.2', 3, 4494)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1002, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItems'], [1001, 1003, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3]]
+				]
 			],
 			// Check for maximum count of discovery rule in the tree on the template level.
 			[
@@ -566,7 +611,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'discoveryrule.create',
 				// 1001: dependent.items.template.1
 				// 1001: dependent.items.template.1:master.item.1
-				'request_data' => self::getDiscoveryRule(1001, 1001, 'dependent.discovery.rule.1', 2, 9986)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1001, 1001, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2]]
+				]
 			],
 			// Check for maximum count of discovery rule in the tree on the template level.
 			[
@@ -575,10 +623,11 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1002: dependent.items.template.1:dependent.item.1.1
 				// 1003: dependent.items.template.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getDiscoveryRule(1001, 1002, 'dependent.discovery.rule.1.1', 1, 5493),
-					self::getDiscoveryRule(1001, 1003, 'dependent.discovery.rule.1.2', 1, 4492)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1001, 1002, 'dependent.discovery.rule.1.1', 1, floor($dep_count_overflow / 2) - 6]],
+					[[self::class, 'getDiscoveryRule'], [1001, 1003, 'dependent.discovery.rule.1.2', 1, ceil($dep_count_overflow / 2)]]
+				]
 			],
 			// Check for maximum count of items in the tree on the host level.
 			[
@@ -586,7 +635,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1004: dependent.items.host.1
 				// 1301: dependent.items.host.1:master.item.1
-				'request_data' => self::getItems(1004, 1301, 'dependent.item.1', 3, 9987)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1004, 1301, 'dependent.item.1', 3, $dep_count_overflow - 3 - 6]]
+				]
 			],
 			// Check for maximum count of items in the tree on the host level.
 			[
@@ -595,10 +647,11 @@ class testDependentItems extends CAPITest {
 				// 1004: dependent.items.host.1
 				// 1302: dependent.items.host.1:dependent.item.1.1
 				// 1303: dependent.items.host.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getItems(1004, 1302, 'dependent.item.1.1', 3, 5495),
-					self::getItems(1004, 1303, 'dependent.item.1.2', 3, 4494)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1004, 1302, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItems'], [1004, 1303, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3]]
+				]
 			],
 			// Check for maximum count of discovery rule in the tree on the host level.
 			[
@@ -606,7 +659,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'discoveryrule.create',
 				// 1004: dependent.items.host.1
 				// 1301: dependent.items.host.1:master.item.1
-				'request_data' => self::getDiscoveryRule(1004, 1301, 'dependent.discovery.rule.1', 2, 9986)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1004, 1301, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2 - 6]]
+				]
 			],
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
@@ -614,10 +670,11 @@ class testDependentItems extends CAPITest {
 				// 1004: dependent.items.host.1
 				// 1302: dependent.items.host.1:dependent.item.1.1
 				// 1303: dependent.items.host.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getDiscoveryRule(1004, 1302, 'dependent.discovery.rule.1.1', 1, 5493),
-					self::getDiscoveryRule(1004, 1303, 'dependent.discovery.rule.1.2', 1, 4492)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1004, 1302, 'dependent.discovery.rule.1.1', 1, floor($dep_count_overflow / 2) - 6]],
+					[[self::class, 'getDiscoveryRule'], [1004, 1303, 'dependent.discovery.rule.1.2', 1, ceil($dep_count_overflow / 2)]]
+				]
 			],
 			// Check for maximum count of items in the tree on the template level.
 			[
@@ -626,24 +683,31 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1002: dependent.items.template.1:dependent.item.1.1
 				// 1003: dependent.items.template.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getItems(1001, 1002, 'dependent.item.1.1', 3, 9494),
-					self::getItems(1001, 1003, 'dependent.item.1.2', 3, 494)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1002, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItems'], [1001, 1003, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3 - 6 /* 4 existing dependents + parent dependent items */]]
+				]
 			],
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1003: dependent.items.template.1:dependent.item.1.2
-				'request_data' => array_merge(self::getItems(1001, 1003, 'dependent.item.1.2', 495, 9495))
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1003, 'dependent.item.1.2', ceil($dep_count_overflow), ceil($dep_count_overflow) + 1]]
+				]
 			],
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
 				'method' => 'discoveryrule.create',
 				// 1001: dependent.items.template.1
 				// 1001: dependent.items.template.1:master.item.1
-				'request_data' => self::getDiscoveryRule(1001, 1001, 'dependent.discovery.rule.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1001, 1001, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2 - 6]]
+				]
 			],
 			// Check for maximum count of item prototypes in the tree on the template level.
 			[
@@ -652,7 +716,10 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1018: dependent.items.template.1:master.item.proto.1
-				'request_data' => self::getItemPrototypes(1001, 1017, 1018, 'dependent.item.proto.1', 3, 9988)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1018, 'dependent.item.proto.1', 3, $dep_count_overflow - 3]]
+				]
 			],
 			// Check for maximum count of item prototypes in the tree on the template level.
 			[
@@ -662,10 +729,11 @@ class testDependentItems extends CAPITest {
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1019: dependent.items.template.1:dependent.item.proto.1.1
 				// 1020: dependent.items.template.1:dependent.item.proto.1.2
-				'request_data' => array_merge(
-					self::getItemPrototypes(1001, 1017, 1019, 'dependent.item.proto.1.1', 3, 5495),
-					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 3, 4495)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1019, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1020, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3]]
+				]
 			],
 			// Check for maximum count of item prototypes in the tree on the host level.
 			[
@@ -674,7 +742,10 @@ class testDependentItems extends CAPITest {
 				// 1004: dependent.items.host.1
 				// 1317: dependent.items.template.1:discovery.rule.1
 				// 1318: dependent.items.host.1:master.item.proto.1
-				'request_data' => self::getItemPrototypes(1004, 1317, 1318, 'dependent.item.proto.1', 3, 9988)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1004, 1317, 1318, 'dependent.item.proto.1', 3, $dep_count_overflow - 3]]
+				]
 			],
 			// Check for maximum count of item prototypes in the tree on the host level.
 			[
@@ -684,10 +755,11 @@ class testDependentItems extends CAPITest {
 				// 1317: dependent.items.template.1:discovery.rule.1
 				// 1319: dependent.items.host.1:dependent.item.proto.1.1
 				// 1320: dependent.items.host.1:dependent.item.proto.1.2
-				'request_data' => array_merge(
-					self::getItemPrototypes(1004, 1317, 1319, 'dependent.item.proto.1.1', 3, 5495),
-					self::getItemPrototypes(1004, 1317, 1320, 'dependent.item.proto.1.2', 3, 4495)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1004, 1317, 1319, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItemPrototypes'], [1004, 1317, 1320, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3]]
+				]
 			],
 			// Check for maximum count of item prototypes in the tree on the template level.
 			[
@@ -697,10 +769,11 @@ class testDependentItems extends CAPITest {
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1019: dependent.items.template.1:dependent.item.proto.1.1
 				// 1020: dependent.items.template.1:dependent.item.proto.1.2
-				'request_data' => array_merge(
-					self::getItemPrototypes(1001, 1017, 1019, 'dependent.item.proto.1.1', 3, 5495),
-					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 3, 4494)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1019, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3 - 2 /* dependents */]],
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1020, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3 - 2 /* dependents */ - 1 /*rule itself*/]]
+				]
 			],
 			[
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
@@ -708,16 +781,31 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1020: dependent.items.template.1:dependent.item.proto.1.2
-				'request_data' => array_merge(
-					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 4495, 5494)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1020, 'dependent.item.proto.1.2', floor($dep_count_overflow / 2) - 5 + 1 /* from last above */, floor($dep_count_overflow / 2) - 4 + 1]]
+				]
 			]
 		];
 	}
 	/**
 	 * @dataProvider getTestCases
 	 */
-	public function testDependentItems_Update($error, $method, $request_data) {
+	public function testDependentItems_Update($error, $method, ?array $request_data, array $request_data_funcs = null) {
+		// Skip tests with the default option ZBX_DEPENDENT_ITEM_MAX_COUNT to prevent long running tests.
+		if (ZBX_DEPENDENT_ITEM_MAX_COUNT > 300) {
+			self::markTestSkipped('Lower the ZBX_DEPENDENT_ITEM_MAX_COUNT option to run this test.');
+		}
+
+		if ($request_data === null) {
+			$request_data = [];
+			foreach ($request_data_funcs as $request_data_func) {
+				$request_data = array_merge($request_data,
+					call_user_func_array($request_data_func[0], $request_data_func[1])
+				);
+			}
+		}
+
 		$this->call($method, $request_data, $error);
 	}
 }
