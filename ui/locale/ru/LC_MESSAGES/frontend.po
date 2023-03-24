@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-07 06:35+0000\n"
+"PO-Revision-Date: 2023-03-22 08:49+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1595,7 +1595,7 @@ msgstr "Атрибуция"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
-msgstr ""
+msgstr "HTML код авторства"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3793,7 +3793,7 @@ msgstr "Не удалось обновить обнаруженную групп
 #: include/classes/api/services/CGraphGeneral.php:82
 #, c-format
 msgid "Cannot update a templated graph \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" график из шаблона."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -12175,7 +12175,7 @@ msgstr "Индикаторы связи"
 
 #: include/actions.inc.php:863
 msgid "Link template"
-msgstr ""
+msgstr "Присоединить шаблон"
 
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
@@ -12551,7 +12551,7 @@ msgstr "Обслуживание: %1$s"
 
 #: app/views/administration.geomaps.edit.php:60
 msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
-msgstr ""
+msgstr "Убедитесь, что код получен из надежного источника и не содержит вредоносных скриптов."
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -18048,7 +18048,7 @@ msgstr "Услуги обновлены"
 
 #: include/classes/api/services/CUser.php:1714
 msgid "Session ID or token is expected."
-msgstr ""
+msgstr "Ожидается ID сессии или токен."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
@@ -20763,11 +20763,11 @@ msgstr "Отсоединить от шаблонов"
 
 #: include/actions.inc.php:864
 msgid "Unlink template"
-msgstr ""
+msgstr "Отсоединить шаблон"
 
 #: include/actions.inc.php:681
 msgid "Unlink templates"
-msgstr ""
+msgstr "Отсоединить шаблоны"
 
 #: jsLoader.php:296
 msgid "Unmute"
@@ -22762,7 +22762,7 @@ msgstr "[Ошибочное значение для месяца: \"%1$s\" ]"
 #: include/views/configuration.item.edit.php:479
 #: include/views/configuration.item.prototype.edit.php:456
 msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
-msgstr ""
+msgstr "[протокол://][пользователь[:пароль]@]прокси.example.com[:порт]"
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
