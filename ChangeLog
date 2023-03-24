@@ -1,6 +1,7 @@
 Changes for 7.0.0alpha1
 
 New features:
+...G...... [ZBXNEXT-7132] added option of getting fully qualified domain name in system.hostname key to the Zabbix agent and Zabbix agent 2 (kprutkovs)
 ..F.I..... [ZBXNEXT-8226] fixed the problem of insufficient length of URL fields (dfofanovs, dgoloscapov)
 ........S. [ZBXNEXT-8312] increased TimescaleDB maximum supported version to 2.10 (mprihodko)
 .......PS. [ZBXNEXT-8317] increased MariaDB maximum supported version to 10.11 (mprihodko)
