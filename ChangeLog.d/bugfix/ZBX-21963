@@ -1,1 +1,0 @@
-..F....... [ZBX-21963] fixed $ZBX_SERVER value ignored unless $ZBX_SERVER_PORT is also defined (esekace)

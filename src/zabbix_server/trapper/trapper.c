@@ -178,7 +178,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	char		*error = NULL;
-	DC_PROXY	proxy;
+	zbx_dc_proxy_t	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -351,7 +351,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 	now = time(NULL);
 	zbx_vector_ptr_create(&queue);
-	DCget_item_queue(&queue, ZBX_QUEUE_FROM_DEFAULT, ZBX_QUEUE_TO_INFINITY);
+	zbx_dc_get_item_queue(&queue, ZBX_QUEUE_FROM_DEFAULT, ZBX_QUEUE_TO_INFINITY);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -435,7 +435,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 	(void)zbx_tcp_send(sock, json.buffer);
 
-	DCfree_item_queue(&queue);
+	zbx_dc_free_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);
 
 	zbx_json_free(&json);
@@ -718,7 +718,7 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 	templates_res = DBget_template_count(&templates.counter.ui64);
 	users_res = DBget_user_count(&users_online.counter.ui64, &users_offline.counter.ui64);
-	DCget_status(&hosts_monitored.counters, &hosts_not_monitored.counters, &items_active_normal.counters,
+	zbx_dc_get_status(&hosts_monitored.counters, &hosts_not_monitored.counters, &items_active_normal.counters,
 			&items_active_notsupported.counters, &items_disabled.counters,
 			&triggers_enabled_ok.counter.ui64, &triggers_enabled_problem.counter.ui64,
 			&triggers_disabled.counter.ui64, &required_performance.counters);
@@ -921,7 +921,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 		}
 
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE, DCget_item_queue(NULL, from, to));
+		zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE, zbx_dc_get_item_queue(NULL, from, to));
 	}
 	else
 	{
@@ -951,17 +951,17 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 	char		host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
 			hbfreq[ZBX_MAX_UINT64_LEN];
 	zbx_uint64_t	hostid;
-	DC_HOST		dc_host;
+	zbx_dc_host_t	dc_host;
 	unsigned char	*data = NULL;
 	zbx_uint32_t	data_len;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 		return FAIL;
 
-	if (FAIL == DCconfig_get_hostid_by_name(host, &hostid))
+	if (FAIL == zbx_dc_config_get_hostid_by_name(host, &hostid))
 		return FAIL;
 
-	if (FAIL == DCget_host_by_hostid(&dc_host, hostid))
+	if (FAIL == zbx_dc_get_host_by_hostid(&dc_host, hostid))
 		return FAIL;
 
 	if (0 != dc_host.proxy_hostid || HOST_STATUS_NOT_MONITORED == dc_host.status)
@@ -1295,7 +1295,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb);
-	find_psk_in_cache = DCget_psk_by_identity;
+	find_psk_in_cache = zbx_dc_get_psk_by_identity;
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 

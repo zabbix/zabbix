@@ -28,7 +28,7 @@ extern char    *CONFIG_SOURCE_IP;
 /*
  * Example: telnet.run["ls /"]
  */
-int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding)
 {
 	zbx_socket_t	s;
 	int		ret = NOTSUPPORTED, flags;

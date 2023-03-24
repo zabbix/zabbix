@@ -38,7 +38,7 @@
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_db(const DC_ITEM *item, int config_timeout, AGENT_RESULT *result)
+int	get_value_db(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *result)
 {
 	AGENT_REQUEST		request;
 	const char		*dsn, *connection = NULL;

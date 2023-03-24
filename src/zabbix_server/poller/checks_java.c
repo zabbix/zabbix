@@ -115,7 +115,7 @@ exit:
 	return ret;
 }
 
-int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result, int config_timeout)
+int	get_value_java(unsigned char request, const zbx_dc_item_t *item, AGENT_RESULT *result, int config_timeout)
 {
 	int	errcode = SUCCEED;
 
@@ -124,7 +124,7 @@ int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *res
 	return errcode;
 }
 
-void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num,
+void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
 		int config_timeout)
 {
 	zbx_socket_t	s;
