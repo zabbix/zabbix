@@ -73,7 +73,6 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			'groups' => [['groupid' => $groupid]]
 		]);
 		$this->assertArrayHasKey('hostids', $hosts);
-		$hostid = $hosts['hostids'][0];
 
 		// Create items on previously created host.
 		$item_names = ['float', 'char', 'log', 'unsigned', 'text'];
@@ -81,7 +80,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		$items_data = [];
 		foreach ($item_names as $i => $item) {
 			$items_data[] = [
-				'hostid' => $hostid,
+				'hostid' => $hosts['hostids'][0],
 				'name' => $item,
 				'key_' => $item,
 				'type' => 2,
@@ -178,7 +177,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
-	public static function getCheckWidgetTable() {
+	public static function getCheckWidgetTableData() {
 		return [
 			// #0 Filtered by Host group.
 			[
@@ -619,7 +618,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCheckWidgetTable
+	 * @dataProvider getCheckWidgetTableData
 	 *
 	 * @onAfter deleteWidgets
 	 */
@@ -647,7 +646,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Assert Problems widget's table.
 		$dashboard->getWidget($data['fields']['Name']);
-		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {

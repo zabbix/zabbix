@@ -218,7 +218,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		];
 
 		foreach ($radios as $radio => $labels) {
-				$this->assertEquals($labels, $form->getField($radio)->asSegmentedRadio()->getLabels()->asText());
+			$this->assertEquals($labels, $form->getField($radio)->asSegmentedRadio()->getLabels()->asText());
 		}
 
 		// Check Tag display options editability.
@@ -564,7 +564,7 @@ class testDashboardProblemsWidget extends CWebTest {
 
 		$form->submit();
 
-		if (CTestArrayHelper::get($data, 'trim', false)) {
+		if (CTestArrayHelper::get($data, 'trim')) {
 			$data['fields'] = array_map('trim', $data['fields']);
 		}
 
