@@ -47,6 +47,7 @@ OBJS = \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
 	..\..\..\src\libs\zbxfile\file.o \
+	..\..\..\src\libs\zbxfile\win32\win32_file.o \
 	..\..\..\src\libs\zbxparam\param.o \
 	..\..\..\src\libs\zbxtime\time.o \
 	..\..\..\src\libs\zbxexpr\expr.o \
@@ -128,8 +129,7 @@ OBJS = \
 	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\libs\zbxwin32\disk.o \
-	..\..\..\src\libs\zbxwin32\symbols.o \
-	..\..\..\src\libs\zbxfile\win32\win32_file.o
+	..\..\..\src\libs\zbxwin32\symbols.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib $(LIBS)
 
