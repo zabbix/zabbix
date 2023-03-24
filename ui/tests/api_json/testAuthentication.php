@@ -307,6 +307,22 @@ class testAuthentication extends CAPITest {
 					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid']
 				],
 				'expected_error' => null
+			],
+			'Test setting up the deprovisioned user group without unchecking disabled SAML JIT status' => [
+				'authentication' => [
+					'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
+					'saml_jit_status' => JIT_PROVISIONING_ENABLED,
+					'disabled_usrgrpid' => 0
+				],
+				'expected_error' => null
+			],
+			'Test setting up the deprovisioned user group without unchecking disabled LDAP JIT status' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
+					'disabled_usrgrpid' => 0
+				],
+				'expected_error' => null
 			]
 		];
 	}
