@@ -136,7 +136,7 @@ $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxfile\file.c
 $(OUTPUTDIR)\symbols.o: $(TOPDIR)\src\libs\zbxwin32\symbols.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\win32_file.o: $(TOPDIR)\src\libs\zbxwin32\win32_file.c
+$(OUTPUTDIR)\win32_file.o: $(TOPDIR)\src\libs\zbxfile\win32\win32_file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxtime\time.c

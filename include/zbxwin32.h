@@ -109,12 +109,7 @@ wchar_t		*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
 int		zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
 
-/* files and symbols */
-
-#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-#	define PATH_SEPARATOR	'\\'
-
-int	__zbx_open(const char *pathname, int flags);
+/* symbols */
 
 /* some definitions which are not available on older MS Windows versions */
 typedef enum {
