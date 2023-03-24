@@ -209,6 +209,7 @@ class testAuthentication extends CAPITest {
 			],
 			'Test setting up the SAML JIT status without specifying deprovisioned user group' => [
 				'authentication' => [
+					'saml_auth_enabled' => ZBX_AUTH_SAML_ENABLED,
 					'saml_jit_status' => JIT_PROVISIONING_ENABLED,
 					'disabled_usrgrpid' => 0
 				],
