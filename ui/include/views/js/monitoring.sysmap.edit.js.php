@@ -27,7 +27,8 @@
 <script type="text/x-jquery-tmpl" id="url-tpl">
 	<?= (new CRow([
 			(new CTextBox('urls[#{id}][name]'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			(new CTextBox('urls[#{id}][url]'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('urls[#{id}][url]', false, DB::getFieldLength('sysmap_url', 'url')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CSelect('urls[#{id}][elementtype]'))
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
 			(new CCol(

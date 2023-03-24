@@ -158,10 +158,12 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$page_header->addCssFile('imgstore.php?css=1&output=css');
 	}
 
+	$tz_offsets = array_column((new DateTime())->getTimezone()->getTransitions(0, ZBX_MAX_DATE), 'offset', 'ts');
+
 	$page_header
 		->addJavaScript('
-			const PHP_TZ_OFFSET = '.date('Z').';
 			const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
+			const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
 		')
 		->addJsFile((new CUrl('js/browsers.js'))->getUrl());
 

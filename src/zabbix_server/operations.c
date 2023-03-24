@@ -49,8 +49,8 @@ zbx_dcheck_source_t;
  ******************************************************************************/
 static zbx_uint64_t	select_discovered_host(const zbx_db_event *event, char **hostname)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	hostid = 0, proxy_hostid;
 	char		*sql = NULL, *ip_esc;
 
@@ -136,8 +136,8 @@ exit:
  ******************************************************************************/
 static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_uint64_t	groupid;
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
@@ -211,10 +211,10 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  ******************************************************************************/
 static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, zbx_config_t *cfg)
 {
-	DB_RESULT		result;
-	DB_RESULT		result2;
-	DB_ROW			row;
-	DB_ROW			row2;
+	zbx_db_result_t		result;
+	zbx_db_result_t		result2;
+	zbx_db_row_t		row;
+	zbx_db_row_t		row2;
 	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid, druleid;
 	char			*host, *host_esc, *host_unique, *host_visible, *hostname = NULL;
 	unsigned short		port;
@@ -322,8 +322,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 			if (0 == hostid)
 			{
-				DB_RESULT		result3;
-				DB_ROW			row3;
+				zbx_db_result_t		result3;
+				zbx_db_row_t		row3;
 				zbx_dcheck_source_t	host_source, name_source;
 				char			*sql = NULL;
 				size_t			sql_alloc, sql_offset;
@@ -571,7 +571,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				{
 					char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX], psk[HOST_TLS_PSK_LEN_MAX];
 
-					DCget_autoregistration_psk(psk_identity, sizeof(psk_identity),
+					zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
 							(unsigned char *)psk, sizeof(psk));
 
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid",
@@ -873,7 +873,7 @@ out:
  ******************************************************************************/
 void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	zbx_uint64_t	hostid;
 	char		*sql = NULL, *hostname = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
@@ -909,8 +909,8 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 	else
 	{
 		zbx_vector_uint64_t	hostgroupids, found_groupids;
-		DB_RESULT		result2;
-		DB_ROW			row;
+		zbx_db_result_t		result2;
+		zbx_db_row_t		row;
 
 		zbx_db_free_result(result);
 

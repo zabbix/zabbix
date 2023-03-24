@@ -139,7 +139,7 @@ static void	process_trigger_tag(zbx_db_event* event, const zbx_tag_t *tag)
 	validate_and_add_tag(event, t);
 }
 
-static void	substitute_item_tag_macro(const zbx_db_event* event, const DC_ITEM *dc_item, char **str)
+static void	substitute_item_tag_macro(const zbx_db_event* event, const zbx_dc_item_t *dc_item, char **str)
 {
 	zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, dc_item, NULL,
 			NULL, NULL, NULL, NULL, str, MACRO_TYPE_ITEM_TAG, NULL, 0);
@@ -148,7 +148,7 @@ static void	substitute_item_tag_macro(const zbx_db_event* event, const DC_ITEM *
 static void	process_item_tag(zbx_db_event* event, const zbx_item_tag_t *item_tag)
 {
 	zbx_tag_t	*t;
-	DC_ITEM		dc_item; /* used to pass data into zbx_substitute_simple_macros() function */
+	zbx_dc_item_t	dc_item; /* used to pass data into zbx_substitute_simple_macros() function */
 
 	t = duplicate_tag(&item_tag->tag);
 
@@ -661,7 +661,7 @@ static zbx_db_event	*get_event_by_source_object_id(int source, int object, zbx_u
  ******************************************************************************/
 static int	correlation_match_event_hostgroup(const zbx_db_event *event, zbx_uint64_t groupid)
 {
-	DB_RESULT		result;
+	zbx_db_result_t		result;
 	int			ret = FAIL;
 	zbx_vector_uint64_t	groupids;
 	char			*sql = NULL;
@@ -1224,7 +1224,7 @@ static void	correlate_event_by_global_rules(zbx_db_event *event, zbx_problem_sta
 		{
 			if (ZBX_PROBLEM_STATE_UNKNOWN == *problem_state)
 			{
-				DB_RESULT	result;
+				zbx_db_result_t	result;
 
 				result = zbx_db_select_n("select eventid from problem"
 						" where r_eventid is null and source="
@@ -1262,8 +1262,8 @@ static void	correlate_event_by_global_rules(zbx_db_event *event, zbx_problem_sta
 
 	if (0 != corr_old.values_num)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
 
 		/* Process correlations that matches new event and either uses old events in conditions */
 		/* or has operations involving old events.                                              */
@@ -1408,7 +1408,7 @@ static void	flush_correlation_queue(zbx_vector_ptr_t *trigger_diff, zbx_vector_u
 		zbx_vector_uint64_sort(&lockids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&lockids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		DCconfig_lock_triggers_by_triggerids(&lockids, triggerids_lock);
+		zbx_dc_config_lock_triggers_by_triggerids(&lockids, triggerids_lock);
 
 		/* append the locked trigger ids to already locked trigger ids */
 		for (i = num; i < triggerids_lock->values_num; i++)
@@ -1418,7 +1418,7 @@ static void	flush_correlation_queue(zbx_vector_ptr_t *trigger_diff, zbx_vector_u
 	/* process global correlation actions if we have successfully locked trigger(s) */
 	if (0 != triggerids.values_num)
 	{
-		DC_TRIGGER		*triggers, *trigger;
+		zbx_dc_trigger_t	*triggers, *trigger;
 		int			*errcodes, index;
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
@@ -1428,10 +1428,10 @@ static void	flush_correlation_queue(zbx_vector_ptr_t *trigger_diff, zbx_vector_u
 
 		zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		triggers = (DC_TRIGGER *)zbx_malloc(NULL, sizeof(DC_TRIGGER) * triggerids.values_num);
+		triggers = (zbx_dc_trigger_t *)zbx_malloc(NULL, sizeof(zbx_dc_trigger_t) * triggerids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * triggerids.values_num);
 
-		DCconfig_get_triggers_by_triggerids(triggers, triggerids.values, errcodes, triggerids.values_num);
+		zbx_dc_config_get_triggers_by_triggerids(triggers, triggerids.values, errcodes, triggerids.values_num);
 
 		/* add missing diffs to the trigger changeset */
 
@@ -1512,7 +1512,7 @@ static void	flush_correlation_queue(zbx_vector_ptr_t *trigger_diff, zbx_vector_u
 			zbx_hashset_iter_remove(&iter);
 		}
 
-		DCconfig_clean_triggers(triggers, errcodes, triggerids.values_num);
+		zbx_dc_config_clean_triggers(triggers, errcodes, triggerids.values_num);
 		zbx_free(errcodes);
 		zbx_free(triggers);
 	}
@@ -1538,8 +1538,8 @@ out:
  ******************************************************************************/
 static void	update_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	triggerids;
 	zbx_trigger_diff_t	*diff;
 	int			i, index;
@@ -1748,7 +1748,7 @@ static void	db_trigger_get_hosts(zbx_hashset_t *hosts, zbx_db_trigger *trigger)
 
 	zbx_vector_uint64_create(&functionids);
 	zbx_db_trigger_get_all_functionids(trigger, &functionids);
-	DCget_hosts_by_functionids(&functionids, hosts);
+	zbx_dc_get_hosts_by_functionids(&functionids, hosts);
 	zbx_vector_uint64_destroy(&functionids);
 }
 
@@ -1764,8 +1764,8 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 	struct zbx_json		json;
 	size_t			sql_alloc = 256, sql_offset;
 	char			*sql = NULL;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_hashset_t		hosts;
 	zbx_vector_uint64_t	hostids;
 	zbx_hashset_iter_t	iter;
@@ -1785,7 +1785,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 
 	for (i = 0; i < events.values_num; i++)
 	{
-		DC_HOST		*host;
+		zbx_dc_host_t	*host;
 		zbx_db_event	*event;
 
 		event = (zbx_db_event *)events.values[i];
@@ -1836,7 +1836,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 
 		zbx_hashset_iter_reset(&hosts, &iter);
 
-		while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
+		while (NULL != (host = (zbx_dc_host_t *)zbx_hashset_iter_next(&iter)))
 		{
 			zbx_json_addobject(&json,NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, host->host, ZBX_JSON_TYPE_STRING);
@@ -2232,8 +2232,8 @@ static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
 	const char		*separator = "";
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	triggerids, itemids, lldruleids;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_db_event		*event;
 
 	zbx_vector_uint64_create(&triggerids);
@@ -2336,7 +2336,7 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_p
 	zbx_db_event	*event;
 	int		i;
 
-	if (0 != DCget_internal_action_count())
+	if (0 != zbx_dc_get_internal_action_count())
 		return;
 
 	for (i = 0; i < internal_problem_events->values_num; i++)
@@ -2361,8 +2361,8 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_p
  ******************************************************************************/
 static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *problems)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_event_problem_t	*problem;
@@ -2895,12 +2895,12 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
  ******************************************************************************/
 int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid)
 {
-	DC_TRIGGER	trigger;
-	int		errcode, processed_num = 0;
-	zbx_timespec_t	ts;
-	zbx_db_event	*r_event;
+	zbx_dc_trigger_t	trigger;
+	int			errcode, processed_num = 0;
+	zbx_timespec_t		ts;
+	zbx_db_event		*r_event;
 
-	DCconfig_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
+	zbx_dc_config_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
 
 	if (SUCCEED == errcode)
 	{
@@ -2933,7 +2933,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 			unsigned char			*data = NULL;
 			size_t				data_alloc = 0, data_offset = 0;
 
-			DCconfig_triggers_apply_changes(&trigger_diff);
+			zbx_dc_config_triggers_apply_changes(&trigger_diff);
 
 			zbx_events_update_itservices();
 
@@ -2965,7 +2965,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		zbx_vector_ptr_destroy(&trigger_diff);
 	}
 
-	DCconfig_clean_triggers(&trigger, &errcode, 1);
+	zbx_dc_config_clean_triggers(&trigger, &errcode, 1);
 
 	return (0 == processed_num ? FAIL : SUCCEED);
 }

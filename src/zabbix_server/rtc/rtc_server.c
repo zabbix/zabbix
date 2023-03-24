@@ -19,7 +19,6 @@
 #include "rtc_server.h"
 
 #include "log.h"
-#include "zbxha.h"
 #include "zbxdiag.h"
 #include "zbxtypes.h"
 #include "zbxcommon.h"
@@ -27,6 +26,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
+#include "../ha/ha.h"
 
 static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {

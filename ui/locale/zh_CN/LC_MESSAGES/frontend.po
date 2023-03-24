@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-25 21:52+0000\n"
+"PO-Revision-Date: 2023-03-20 12:47+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -418,7 +418,7 @@ msgstr "添加覆盖"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "告警时钟"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -1547,6 +1547,10 @@ msgstr "属性"
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr "根因"
+
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3628,6 +3632,11 @@ msgstr "无法更新一个被自动发现的数据图"
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "无法更新自动发现的主机组 \"%1$s\"。"
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -11932,6 +11941,10 @@ msgstr "链接“selementid2”字段指向地图“%2$s”的不存在的地图
 msgid "Link indicators"
 msgstr "链接指示器"
 
+#: include/actions.inc.php:863
+msgid "Link template"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
 #: app/views/popup.massupdate.template.php:78
@@ -12301,6 +12314,10 @@ msgstr "不进行数据收集的维护"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "维护：%1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -15543,7 +15560,7 @@ msgstr "预测函数"
 #: include/views/configuration.item.edit.php:1028
 #: include/views/configuration.item.prototype.edit.php:891
 msgid "Preprocessing"
-msgstr "进程"
+msgstr "预处理"
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:209
@@ -17754,6 +17771,10 @@ msgstr "服务形成了一个环."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "服务已更新"
+
+#: include/classes/api/services/CUser.php:1714
+msgid "Session ID or token is expected."
+msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
@@ -20452,6 +20473,14 @@ msgstr "自模板断开连接"
 msgid "Unlink from templates"
 msgstr "自模板断开链接"
 
+#: include/actions.inc.php:864
+msgid "Unlink template"
+msgstr ""
+
+#: include/actions.inc.php:681
+msgid "Unlink templates"
+msgstr ""
+
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "取消静音"
@@ -22422,6 +22451,14 @@ msgstr "[日期的错误值：“%1$s”]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[月份值错误：“%1$s”]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"

@@ -17,11 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_BASE64_H
-#define ZABBIX_BASE64_H
+#ifndef ZABBIX_PREPROC_PREPROC_SERVER_H
+#define ZABBIX_PREPROC_PREPROC_SERVER_H
 
-void	str_base64_encode(const char *p_str, char *p_b64str, int in_size);
-void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size);
-void	str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_out_size);
+#include "zbxpreproc.h"
+#include "zbxtime.h"
+#include "zbxtypes.h"
 
-#endif /* ZABBIX_BASE64_H */
+void	preproc_flush_value_server(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
+	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
+
+#endif
