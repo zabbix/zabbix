@@ -1,0 +1,223 @@
+zabbix_export:
+  version: '6.4'
+  media_types:
+    -
+      name: 'Event-Driven Ansible'
+      type: WEBHOOK
+      parameters:
+        -
+          name: acknowledged
+          value: '{EVENT.ACK.STATUS}'
+        -
+          name: endpoint
+          value: /endpoint
+        -
+          name: event_date
+          value: '{EVENT.DATE}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_name
+          value: '{EVENT.NAME}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_object
+          value: '{EVENT.OBJECT}'
+        -
+          name: event_severity
+          value: '{EVENT.SEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_tags
+          value: '{EVENT.TAGSJSON}'
+        -
+          name: event_time
+          value: '{EVENT.TIME}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: host_groups
+          value: '{TRIGGER.HOSTGROUP.NAME}'
+        -
+          name: host_host
+          value: '{HOST.HOST}'
+        -
+          name: host_id
+          value: '{HOST.ID}'
+        -
+          name: host_ip
+          value: '{HOST.IP}'
+        -
+          name: host_port
+          value: '{HOST.PORT}'
+        -
+          name: HTTPProxy
+        -
+          name: monitoring_source
+          value: 'Zabbix sever'
+        -
+          name: operation_data
+          value: '{EVENT.OPDATA}'
+        -
+          name: send_to
+          value: '{ALERT.SENDTO}'
+        -
+          name: subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: trigger_description
+          value: '{TRIGGER.DESCRIPTION}'
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: trigger_name
+          value: '{TRIGGER.NAME}'
+      script: |
+        var Eda = {
+            params: {},
+        
+            setParams: function (params) {
+                var required_params = [
+                        'send_to',
+                        'event_source',
+                        'event_value',
+                        'event_date',
+                        'event_time'],
+                    integer_fields = [
+                        'event_id',
+                        'event_nseverity',
+                        'event_object',
+                        'event_source',
+                        'event_value',
+                        'host_id',
+                        'trigger_id'];
+        
+                required_params.forEach(function (field) {
+                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                        throw 'Required param is not set: "' + field + '".';
+                    }
+                });
+        
+                Eda.params = params;
+        
+                integer_fields.forEach(function (key) {
+                        if (typeof Eda.params[key] !== 'undefined') {
+                            if (isNaN(Eda.params[key])) {
+                                throw 'Parameter "' + key + '" must be integer. Given value: ' + Eda.params[key];
+                            }
+                            Eda.params[key] = parseInt(Eda.params[key]);
+                        }
+                    });
+        
+                // Check type of event. Possible values: 0 - Trigger
+                if (params.event_source != 0) {
+                    throw ('Incorrect "event_source" parameter given: ' + params.event_source 
+                        + '\nOnly trigger-based events are supported');
+                }
+        
+                // Check trigger update and trigger resolve events
+                if (params.event_source == 0 && params.event_value != 1) {
+                    throw ('Incorrect "event_value" parameter given: "' + params.event_value 
+                        + '".\nOnly trigger-based events of problem are supported');
+                }
+                
+                // Check endpoint
+                Eda.params.endpoint = (Eda.params.endpoint.startsWith('/'))
+                        ? Eda.params.endpoint : '/' + Eda.params.endpoint;
+                // Prepare groups
+                Eda.params.host_groups = (typeof Eda.params['host_groups'] !== 'undefined')
+                        ? this.prepareHostgroups(Eda.params.host_groups): []
+                // Prepare tags
+                Eda.params.event_tags = (typeof Eda.params['event_tags'] !== 'undefined')
+                        ? this.transformTags(Eda.params.event_tags): {}
+                // Prepare timestamp
+                Eda.params.event_datetime_timestamp = this.getTimestamp(
+                    Eda.params.event_date, Eda.params.event_time)
+            },
+        
+            setProxy: function (HTTPProxy) {
+                Eda.HTTPProxy = HTTPProxy;
+            },
+        
+            prepareHostgroups: function (hostgroups) {
+                var host_groups = []; 
+                hostgroups.split(',').forEach(function (group) {
+                    group = group.trim();
+                    if (group.length > 0) {
+                        host_groups.push(group);
+                    }
+                });
+                return host_groups;
+            },
+        
+            getTimestamp: function (date, time) {
+                try {
+                    return Date.parse(date.split('.').join('-') + 'T' + time + '.000Z') / 1000 + new Date().getTimezoneOffset() * 60;
+                } catch (_) {}
+            
+                throw ('Failed to parse event time.');
+            },
+        
+            transformTags: function (event_tags) {
+                var tags = {};
+                if (event_tags) {
+                    try {
+                        JSON.parse(event_tags).forEach(function (object) {
+                            var tag = object['tag'];
+                            tags[tag] = tags[tag] || [];
+                            tags[tag].push(object['value']);
+                        });
+                    } catch (error) {
+                        throw 'Event tags format is invalid.';
+                    }
+                }
+            
+                return tags;
+            },
+        
+            sendMessage: function () {
+                var response, request = new HttpRequest();
+                var url = Eda.params['send_to'] + Eda.params['endpoint'];
+                var data = JSON.stringify(Eda.params);
+                Zabbix.log(4, '[ Event-Driven Ansible webhook ] URL: ' + url + ' data: ' + data);
+                
+                if (typeof Eda.HTTPProxy !== 'undefined' && Eda.HTTPProxy !== '') {
+                    request.setProxy(Eda.HTTPProxy);
+                }
+                request.addHeader('Content-Type: application/json');
+                response = request.post(url, data);
+                
+                Zabbix.log(4, '[ Event-Driven Ansible webhook ] HTTP code: ' + request.getStatus()
+                    + ' response: ' + response);
+        
+                if (request.getStatus() !== 200) {
+                    throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                }
+            }
+        };
+        
+        
+        try {
+            var params = JSON.parse(value);
+            
+            Eda.setParams(params);
+            Eda.setProxy(params.HTTPProxy);
+            Eda.sendMessage();
+            return true;
+        }
+        catch (error) {
+            Zabbix.log(3, '[ Event-Driven Ansible webhook ] notification failed: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Event ID: {EVENT.ID}, Host: {HOST.HOST}, Problem: {EVENT.NAME}'
