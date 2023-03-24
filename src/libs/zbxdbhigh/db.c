@@ -3659,25 +3659,6 @@ int	zbx_db_check_instanceid(void)
 	return ret;
 }
 
-#if defined(HAVE_MYSQL)
-/******************************************************************************
- *                                                                            *
- * Purpose: returns escaped DB name                                           *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_db_get_name_esc(void)
-{
-	static char	*name;
-
-	if (NULL == name)
-	{
-		name = zbx_db_dyn_escape_string(zbx_cfg_dbhigh->config_dbname);
-	}
-
-	return name;
-}
-#endif
-
 #if defined(HAVE_POSTGRESQL)
 /******************************************************************************
  *                                                                            *
@@ -3735,4 +3716,163 @@ void	zbx_recalc_time_period(int *ts_from, int table_group)
 	if (least_ts > *ts_from)
 		*ts_from = least_ts;
 #undef HK_CFG_UPDATE_INTERVAL
+}
+
+static int validate_db_type_name(int expected_type, const char* type_name)
+{
+#if defined(HAVE_MYSQL)
+	switch(expected_type)
+	{
+		case ZBX_TYPE_INT:
+			if (0 == strcmp("int", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_CHAR:
+			if (0 == strcmp("varchar", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_FLOAT:
+			if (0 == strcmp("double", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_BLOB:
+			if (0 == strcmp("longblob", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+			if (0 == strcmp("text", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_UINT:
+		case ZBX_TYPE_ID:
+			if (0 == strcmp("bigint", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_LONGTEXT:
+			if (0 == strcmp("longtext", type_name))
+				return SUCCEED;
+			break;
+		default:
+			return FAIL;
+	}
+#elif defined(HAVE_POSTGRESQL)
+	switch(expected_type)
+	{
+		case ZBX_TYPE_INT:
+			if (0 == strcmp("integer", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_CHAR:
+			if (0 == strcmp("character varying", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_FLOAT:
+			if (0 == strcmp("double precision", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_BLOB:
+			if (0 == strcmp("bytea", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+		case ZBX_TYPE_LONGTEXT:
+			if (0 == strcmp("text", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_UINT:
+			if (0 == strcmp("numeric", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_ID:
+			if (0 == strcmp("bigint", type_name))
+				return SUCCEED;
+			break;
+		default:
+			return FAIL;
+	}
+#elif defined(HAVE_ORACLE)
+	switch(expected_type)
+	{
+		case ZBX_TYPE_INT:
+		case ZBX_TYPE_UINT:
+		case ZBX_TYPE_ID:
+			if (0 == strcmp("NUMBER", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_FLOAT:
+			if (0 == strcmp("BINARY_DOUBLE", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_BLOB:
+			if (0 == strcmp("BLOB", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_TEXT:
+			if (0 == strcmp("NCLOB", type_name))
+				return SUCCEED;
+		case ZBX_TYPE_CHAR:
+		case ZBX_TYPE_SHORTTEXT:
+			if (0 == strcmp("NVARCHAR2", type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_LONGTEXT:
+			if (0 == strcmp("NCLOB", type_name))
+				return SUCCEED;
+			break;
+		default:
+			return FAIL;
+	}
+#endif /* defined(HAVE_ORACLE) */
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if the column of specific table in the database has        *
+ *              correct type                                                  *
+ *                                                                            *
+ * Parameters: table_name    - [IN] table name                                *
+ *             column_name   - [IN] column name                               *
+ *             expected_type - [IN] expected type                             *
+ *                                                                            *
+ * Return value: SUCCEED - Column has correct type                            *
+ *               FAIL    - Otherwise                                          *
+ ******************************************************************************/
+int	zbx_db_check_compatibility_colum_type(const char *table_name, const char *column_name, int expected_type)
+{
+	zbx_db_result_t	result = NULL;
+	zbx_db_row_t	row;
+	char		*sql = NULL;
+	int		ret = FAIL;
+
+#if (defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE))
+#if defined(HAVE_MYSQL)
+	sql = zbx_db_dyn_escape_string(zbx_cfg_dbhigh->config_dbname);
+	sql = zbx_dsprintf(sql, "select data_type from information_schema.columns"
+			" where table_schema='%s' and", sql);
+#elif defined(HAVE_POSTGRESQL)
+	sql = zbx_db_get_schema_esc();
+	sql = zbx_dsprintf(sql, "select data_type from information_schema.columns"
+			" where table_schema='%s' and", sql);
+#elif defined(HAVE_ORACLE)
+	sql = zbx_strdup(sql, "select data_type from user_tab_columns where");
+#endif /* defined(HAVE_ORACLE) */
+
+	if (NULL == (result = zbx_db_select("%s lower(table_name)='%s' and lower(column_name)='%s'",
+			sql, table_name, column_name)))
+		goto clean;
+
+	if (NULL != (row = zbx_db_fetch(result)))
+		ret = validate_db_type_name(expected_type, row[0]);
+
+#endif /* defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) */
+
+clean:
+	zbx_db_free_result(result);
+	zbx_free(sql);
+
+	return ret;
 }
