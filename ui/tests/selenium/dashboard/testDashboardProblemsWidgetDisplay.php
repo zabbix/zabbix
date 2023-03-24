@@ -561,7 +561,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 1 char',
-							'Operational data' => '0',
+							'Operational data' => '0'
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 1 float',
