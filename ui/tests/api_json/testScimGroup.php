@@ -45,11 +45,13 @@ class testScimGroup extends CAPIScimTest {
 		],
 		'scim_groupids' => [
 			'group_wo_members' => null,
-			'group_w_members' => null
+			'group_w_members' => null,
+			'group_for_name_change' => null
 		],
 		'scim_group_names' => [
 			'group_wo_members' => 'office_administration',
-			'group_w_members' => 'office_sales'
+			'group_w_members' => 'office_sales',
+			'group_for_name_change' => 'office_reception'
 		],
 		'user_scim_groupids' => [
 			'user_group_w_members' => null
@@ -134,6 +136,13 @@ class testScimGroup extends CAPIScimTest {
 		$this->assertNotEmpty($group_wo_members);
 		self::$data['scim_groupids']['group_wo_members'] = $group_wo_members[0];
 
+		// Create SCIM group for name change.
+		$group_for_name_change = DB::insert('scim_group',
+			[['name' => self::$data['scim_group_names']['group_for_name_change']]]
+		);
+		$this->assertNotEmpty($group_for_name_change);
+		self::$data['scim_groupids']['group_for_name_change'] = $group_for_name_change[0];
+
 		// Create SCIM group and add a member to it.
 		$group_w_members = DB::insert('scim_group', [['name' => self::$data['scim_group_names']['group_w_members']]]);
 		$this->assertNotEmpty($group_w_members);
@@ -213,13 +222,18 @@ class testScimGroup extends CAPIScimTest {
 				'group' => [],
 				'expected_result' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
-					'totalResults' => 2,
+					'totalResults' => 3,
 					'startIndex' => 1,
-					'itemsPerPage' => 2,
+					'itemsPerPage' => 3,
 					'Resources' => [
 						[
 							'id' => 'group_wo_members',
 							'displayName' => 'group_wo_members',
+							'members' => []
+						],
+						[
+							'id' => 'group_for_name_change',
+							'displayName' => 'group_for_name_change',
 							'members' => []
 						],
 						[
@@ -677,7 +691,7 @@ class testScimGroup extends CAPIScimTest {
 					'status' => 400
 				]
 			],
-			'Put request contains non-existing user as a member.' => [		// TODO need to fix Group.php, this is not validated
+			'Put request contains non-existing user as a member.' => [
 				'group' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
 					'id' => 'group_w_members',
@@ -695,7 +709,7 @@ class testScimGroup extends CAPIScimTest {
 					'status' => 404
 				]
 			],
-			'Put request contains user as a member that belongs to another userdirectory.' => [  // TODO need to fix Group.php, this is not validated
+			'Put request contains user as a member that belongs to another userdirectory.' => [
 				'group' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
 					'id' => 'group_w_members',
@@ -713,7 +727,7 @@ class testScimGroup extends CAPIScimTest {
 					'status' => 404
 				]
 			],
-			'Put request is missing "id" parameter.' => [			// TODO In Group need to fix validation rules, so that id is required.
+			'Put request is missing "id" parameter.' => [
 				'group' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
 					'displayName' => 'group_w_members',
@@ -739,9 +753,9 @@ class testScimGroup extends CAPIScimTest {
 		$this->call('group.put', $group, $expected_error);
 	}
 
-	public function createValidPutRequest(): array {		// TODO, when ZBX-21976 is merged, need to add option to change status active to false or true.
+	public function createValidPutRequest(): array {
 		return [
-			'Update SCIM group name without members via PUT request and add new member.' => [ // TODO need to add possibility to change group name
+			'Update SCIM group name without members via PUT request and add new member.' => [
 				'group' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
 					'id' => 'group_wo_members',
@@ -810,6 +824,20 @@ class testScimGroup extends CAPIScimTest {
 					'displayName' => 'group_wo_members',
 					'members' => []
 				]
+			],
+			'Update SCIM group - change group name' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'displayName' => 'new_name',
+					'members' => []
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'displayName' => 'new_name',
+					'members' => []
+				]
 			]
 		];
 	}
@@ -845,6 +873,463 @@ class testScimGroup extends CAPIScimTest {
 			$expected_userids_in_group = array_column($group['members'], 'value');
 
 			$this->assertEquals($expected_userids_in_group, $db_result_user_group);
+		}
+	}
+
+	public function createInvalidPatchRequest(): array {
+		return [
+			'Patch request is missing "schema" parameter' => [
+				'group' => [
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => '3']
+							],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "schemas" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request contains empty "schema" parameter' => [
+				'group' => [
+					'schemas' => [],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/schemas": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Patch request is contains incorrect "schema" parameter' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Incorrect schema was sent in the request.',
+					'status' => 400
+				]
+			],
+			'Patch request is missing "id" parameter' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "id" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request is missing "Operations" parameter' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "Operations" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request contains empty "Operations" parameter' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Patch request is missing "Operations"/"path" parameter' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'add'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1": the parameter "path" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request contains invalid "Operations"/"path" parameter' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'add',
+							'path' => 'users'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1/path": value must be one of "members", "externalId",'.
+						' "displayName".',
+					'status' => 400
+				]
+			],
+			'Patch request is missing "operations"/"op" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1": the parameter "op" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request contains invalid "Operations"/"op" parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'delete',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1/op": value must be one of "add", "remove", '.
+						'"replace", "Add", "Remove", "Replace".',
+					'status' => 400
+				]
+			],
+			'Patch request with displayName path contains incorrect op parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'add',
+							'path' => 'displayName'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1/op": value must be one of "replace", "Replace".',
+					'status' => 400
+				]
+			],
+			'Patch request with displayName path contains incorrect value parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'replace',
+							'path' => 'displayName'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1/value": a character string is expected.',
+					'status' => 400
+				]
+			],
+			'Patch request with path members has incorrect value parameter - as string.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => '3',
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1/value": an array is expected.',
+					'status' => 400
+				]
+			],
+			'Patch request with path members has empty value parameter.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1/value": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Patch request with invalid id number.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => '9999999999999',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => "3"]
+							],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			],
+			'Patch request with invalid member id number.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => '9999999999999']
+							],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPatchRequest
+	 */
+	public function testInvalidPatch(array $group, array $expected_error): void {
+		$this->resolveData($group);
+
+		$group['token'] = self::$data['token']['token'];
+
+		$this->call('group.patch', $group, $expected_error);
+	}
+
+	public function createValidPatchRequest(): array {
+		return [
+			'Patch request to change group name' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_for_name_change',
+					'Operations' => [
+						[
+							'value' => 'office_management',
+							'op' => 'replace',
+							'path' => 'displayName'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_for_name_change',
+					'displayName' => 'office_management',
+					'members' => []
+				]
+			],
+			'Patch request to remove one member from a group.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_w_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => 'user_inactive']
+							],
+							'op' => 'remove',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'group_w_members',
+					'members' => []
+				]
+			],
+			'Patch request to add new member to group.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_w_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => 'user_inactive']
+							],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'group_w_members',
+					'members' => [
+						[
+							'value' => 'user_inactive',
+							'display' => 'user_inactive'
+						]
+					]
+				]
+			],
+			'Patch request to replace existing members and add only "user_active" member.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_w_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => 'user_active']
+							],
+							'op' => 'replace',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_w_members',
+					'displayName' => 'group_w_members',
+					'members' => [
+						[
+							'value' => 'user_active',
+							'display' => 'user_active'
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createValidPatchRequest
+	 */
+	public function testValidPatch(array $group, array $expected_result) {
+		$this->resolveData($group, true);
+		$this->resolveData($expected_result);
+
+		$group['token'] = self::$data['token']['token'];
+
+		$result = $this->call('group.patch', $group);
+
+		// Compare response with expected response.
+		$this->assertEquals($expected_result, $result, 'Returned response should match.');
+
+		// Check that scim group in the database is correct.
+		$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+			zbx_dbstr($result['id'])
+		);
+		$db_result_group = DBFetch($db_result_group_data);
+
+		foreach ($group['Operations'] as $operation) {
+			if ($operation['path'] === 'displayName') {
+				$this->assertEquals($operation['value'], $db_result_group['name']);
+			}
+			elseif ($operation['path'] === 'members') {
+				$db_result_user_group_data = DBSelect('select userid from user_scim_group where scim_groupid='.
+					zbx_dbstr($group['id'])
+				);
+				$db_result_user_group = DBfetchColumn($db_result_user_group_data, 'userid');
+
+				switch ($operation['op']) {
+					case 'add':
+						$this->assertContains($operation['value'][0]['value'], $db_result_user_group);
+						break;
+
+					case 'remove':
+						$this->assertNotContains($operation['value'][0]['value'], $db_result_user_group);
+						break;
+
+					case 'replace':
+						$this->assertEquals([$operation['value'][0]['value']], $db_result_user_group);
+						break;
+				}
+			}
 		}
 	}
 
@@ -929,7 +1414,7 @@ class testScimGroup extends CAPIScimTest {
 	 *
 	 * @return void
 	 */
-	public function resolveData(array &$group_data): void {
+	public function resolveData(array &$group_data, $test = false): void {
 		foreach ($group_data as $attribute_name => &$attribute_value) {
 			if ($attribute_name === 'id' || $attribute_name === 'displayName') {
 				$data_key = ($attribute_name === 'id') ? 'scim_groupids' : 'scim_group_names';
@@ -950,6 +1435,21 @@ class testScimGroup extends CAPIScimTest {
 					}
 				}
 				unset($member);
+			}
+
+			if ($attribute_name === 'Operations') {
+				foreach ($group_data['Operations'] as &$operation) {
+					if (array_key_exists('path', $operation) && $operation['path'] === 'members'
+							&& array_key_exists('value', $operation) && is_array($operation['value'])) {
+						foreach ($operation['value'] as &$value) {
+							if (array_key_exists($value['value'], self::$data['userids'])) {
+								$value['value'] = self::$data['userids'][$value['value']];
+							}
+						}
+						unset($value);
+					}
+				}
+				unset($operation);
 			}
 		}
 		unset($attribute_value);
