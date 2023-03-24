@@ -196,6 +196,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'content_width' => (int) $this->getInput('content_width', self::GAUGE_WIDTH_MIN),
 			'content_height' => (int) $this->getInput('content_height', self::GAUGE_HEIGHT_MIN),
 			'data' => [
+				'angle' => $this->fields_values['angle'],
 				'description' => [
 					'text' => $this->getDescription($this->items),
 					'font_size' => $this->fields_values['desc_size'],

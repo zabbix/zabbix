@@ -97,6 +97,18 @@ div.dashboard-widget-gauge {
 		text-align: center;
 		white-space: nowrap;
 	}
+
+	.arc {
+		fill: none;
+
+		&.empty {
+			stroke: $gauge-empty-color;
+		}
+
+		&.value {
+			stroke: $gauge-fill-color;
+		}
+	}
 }
 
 // Modifications by themes.
