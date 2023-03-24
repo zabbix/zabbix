@@ -2482,29 +2482,6 @@ class CHostPrototype extends CHostBase {
 	 *@param array $del_group_prototypeids
 	 */
 	private static function deleteGroupPrototypes(array $del_group_prototypeids): void {
-		$templateids = $del_group_prototypeids;
-
-		do {
-			$options = [
-				'output' => ['group_prototypeid'],
-				'filter' => [
-					'templateid' => $templateids
-				]
-			];
-			$result = DBselect(DB::makeSql('group_prototype', $options));
-
-			$templateids = [];
-
-			while ($row = DBfetch($result)) {
-				if (!in_array($row['group_prototypeid'], $del_group_prototypeids)) {
-					$templateids[] = $row['group_prototypeid'];
-
-					$del_group_prototypeids[] = $row['group_prototypeid'];
-				}
-			}
-		}
-		while ($templateids);
-
 		// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
 		DBselect(
 			'SELECT NULL'.
@@ -2517,7 +2494,7 @@ class CHostPrototype extends CHostBase {
 
 		DB::update('group_prototype', [
 			'values' => ['templateid' => 0],
-			'where' => ['group_prototypeid' => $del_group_prototypeids]
+			'where' => ['templateid' => $del_group_prototypeids]
 		]);
 		DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
 	}
