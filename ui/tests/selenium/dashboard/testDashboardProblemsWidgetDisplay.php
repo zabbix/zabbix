@@ -613,6 +613,17 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'result' => []
 				]
+			],
+			// #16 Filtered by the same include/exclude group.
+			[
+				[
+					'fields' => [
+						'Name' => 'Include exclude group',
+						'Host groups' => 'Another group to check Overview',
+						'Exclude host groups' => 'Another group to check Overview'
+					],
+					'result' => []
+				]
 			]
 		];
 	}
