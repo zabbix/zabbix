@@ -69,7 +69,7 @@ void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **l
  *             buf      - [IN] buffer to read into                            *
  *             count    - [IN] buffer size in bytes                           *
  *             encoding - [IN] pointer to a text string describing encoding.  *
- *                        See function zbx_find_cr_lf_szbyte() for supported      *
+ *                        See function zbx_find_cr_lf_szbyte() for supported  *
  *                        encodings.                                          *
  *                        "" (empty string) means a single-byte character set.*
  *                                                                            *

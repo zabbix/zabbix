@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxwin32.h"
 #include "zbxfile.h"
+
+#include "zbxwin32.h"
 
 int	__zbx_open(const char *pathname, int flags)
 {

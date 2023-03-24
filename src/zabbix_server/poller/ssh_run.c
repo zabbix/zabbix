@@ -19,8 +19,6 @@
 
 #include "ssh_run.h"
 
-#include "zbxcommon.h"
-
 #include <libssh/libssh.h>
 
 #include "zbxcomms.h"
