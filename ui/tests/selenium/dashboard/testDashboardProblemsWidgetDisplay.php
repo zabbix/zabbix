@@ -65,7 +65,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Create hostgroup for hosts with items triggers.
 		$hostgroups = CDataHelper::call('hostgroup.create', [
 			['name' => 'Group for Problems Widgets'],
-			['name' => 'Group for Cause and Symptoms'],
+			['name' => 'Group for Cause and Symptoms']
 		]);
 		$this->assertArrayHasKey('groupids', $hostgroups);
 		$problem_groupid = $hostgroups['groupids'][0];
@@ -338,7 +338,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'fields' => [
 						'Name' => 'Group, sort by Problem ascending filter',
 						'Host groups' => 'Group for Problems Widgets',
-						'Sort entries by' => 'Problem (ascending)'
+						'Sort entries by' => 'Problem (ascending)',
+						'Show' => 'Problems'
 					],
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 1 char'],
@@ -346,9 +347,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 2 unsigned']
 					],
-					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-							'Update', 'Actions'
-					]
+					'headers' => ['Time', 'Info', 'Host', 'Problem • Severity', 'Duration', 'Update', 'Actions']
 				]
 			],
 			// #4 Filtered by Host, Sort by severity.
@@ -517,7 +516,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Host groups' => 'Zabbix servers',
 						'Show tags' => 3,
 						'Tag name' => 'Shortened',
-						'Show timeline' => false
+						'Show timeline' => false,
+						'Show' => 'History'
 					],
 					'Tags' => [
 						'evaluation' => 'Or',
@@ -599,7 +599,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Name' => 'Host, operational data - Separately, Show suppressed',
 						'Hosts' => 'Host for Problems Widgets',
 						'Show operational data' => 'Separately',
-						'Show suppressed problems' => true
+						'Show suppressed problems' => true,
+						'Show' => 'Recent problems'
 					],
 					'result' => [
 						[
@@ -706,6 +707,17 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					],
 					'result' => []
 				]
+			],
+			// #18 Filtered by the same include/exclude group.
+			[
+				[
+					'fields' => [
+						'Name' => 'Include exclude group',
+						'Host groups' => 'Another group to check Overview',
+						'Exclude host groups' => 'Another group to check Overview'
+					],
+					'result' => []
+				]
 			]
 		];
 	}
@@ -739,7 +751,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Assert Problems widget's table.
 		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
-		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {
