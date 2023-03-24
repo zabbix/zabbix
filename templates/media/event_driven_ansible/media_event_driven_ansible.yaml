@@ -119,23 +119,23 @@ zabbix_export:
                 // Check type of event. Possible values: 0 - Trigger
                 if (params.event_source != 0) {
                     throw ('Incorrect "event_source" parameter given: ' + params.event_source 
-                        + '\nMust be 0. Only trigger-based events are supported');
+                        + '\nOnly trigger-based events are supported');
                 }
         
                 // Check trigger update and trigger resolve events
                 if (params.event_source == 0 && params.event_value != 1) {
                     throw ('Incorrect "event_value" parameter given: "' + params.event_value 
-                        + '".\nMust be 1. Only trigger-based events of problem are supported');
+                        + '".\nOnly trigger-based events of problem are supported');
                 }
                 
                 // Check endpoint
                 Eda.params.endpoint = (Eda.params.endpoint.startsWith('/'))
                         ? Eda.params.endpoint : '/' + Eda.params.endpoint;
                 // Prepare groups
-                Eda.params.host_groups = (typeof Eda.params['host_groups']!== 'undefined')
+                Eda.params.host_groups = (typeof Eda.params['host_groups'] !== 'undefined')
                         ? this.prepareHostgroups(Eda.params.host_groups): []
                 // Prepare tags
-                Eda.params.event_tags = (typeof Eda.params['event_tags']!== 'undefined')
+                Eda.params.event_tags = (typeof Eda.params['event_tags'] !== 'undefined')
                         ? this.transformTags(Eda.params.event_tags): {}
                 // Prepare timestamp
                 Eda.params.event_datetime_timestamp = this.getTimestamp(
