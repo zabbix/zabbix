@@ -3,27 +3,27 @@
 -- select h.name,i.name from item_preproc pp,items i,hosts h where pp.itemid=i.itemid and i.hostid=h.hostid and length(pp.params) > 4000;
 -- select h.name,i.name from items i,hosts h where i.hostid=h.hostid and length(i.params) > 4000;
 -- Alternatively if MAX_STRING_SIZE is set then it's possible to change nvarchar2(4000) to nvarchar2(32767) in following queries
-alter table items rename column params to zbx_old_tmp;
-alter table items add params nvarchar2(4000) default '';
-update items set params=zbx_old_tmp;
-alter table items drop column zbx_old_tmp;
+ALTER TABLE items RENAME COLUMN params TO zbx_old_tmp;
+ALTER TABLE items ADD params nvarchar2(4000) DEFAULT '';
+UPDATE items SET params=zbx_old_tmp;
+ALTER TABLE items DROP COLUMN zbx_old_tmp;
 
-alter table items rename column description to zbx_old_tmp;
-alter table items add description nvarchar2(4000) default '';
-update items set description=zbx_old_tmp;
-alter table items drop column zbx_old_tmp;
+ALTER TABLE items RENAME COLUMN description TO zbx_old_tmp;
+ALTER TABLE items ADD description nvarchar2(4000) DEFAULT '';
+UPDATE items SET description=zbx_old_tmp;
+ALTER TABLE items DROP COLUMN zbx_old_tmp;
 
-alter table items rename column posts to zbx_old_tmp;
-alter table items add posts nvarchar2(4000) default '';
-update items set posts=zbx_old_tmp;
-alter table items drop column zbx_old_tmp;
+ALTER TABLE items RENAME COLUMN posts TO zbx_old_tmp;
+ALTER TABLE items ADD posts nvarchar2(4000) DEFAULT '';
+UPDATE items SET posts=zbx_old_tmp;
+ALTER TABLE items DROP COLUMN zbx_old_tmp;
 
-alter table items rename column headers to zbx_old_tmp;
-alter table items add headers nvarchar2(4000) default '';
-update items set headers=zbx_old_tmp;
-alter table items drop column zbx_old_tmp;
+ALTER TABLE items RENAME COLUMN headers TO zbx_old_tmp;
+ALTER TABLE items ADD headers nvarchar2(4000) DEFAULT '';
+UPDATE items SET headers=zbx_old_tmp;
+ALTER TABLE items DROP COLUMN zbx_old_tmp;
 
-alter table item_preproc rename column params to zbx_old_tmp;
-alter table item_preproc add params nvarchar2(4000) default '';
-update item_preproc set params=zbx_old_tmp;
-alter table item_preproc drop column zbx_old_tmp;
+ALTER TABLE item_preproc RENAME COLUMN params TO zbx_old_tmp;
+ALTER TABLE item_preproc ADD params nvarchar2(4000) DEFAULT '';
+UPDATE item_preproc SET params=zbx_old_tmp;
+ALTER TABLE item_preproc DROP COLUMN zbx_old_tmp;
