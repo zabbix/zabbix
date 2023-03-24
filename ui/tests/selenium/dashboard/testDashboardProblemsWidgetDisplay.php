@@ -282,7 +282,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'fields' => [
 						'Name' => 'Group, sort by Problem ascending filter',
 						'Host groups' => 'Group for Problems Widgets',
-						'Sort entries by' => 'Problem (ascending)'
+						'Sort entries by' => 'Problem (ascending)',
+						'Show' => 'Problems'
 					],
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 1 char'],
@@ -290,7 +291,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 2 unsigned']
 					],
-					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
+					'headers' => ['Time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
 							'Ack', 'Actions'
 					]
 				]
@@ -462,7 +463,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Host groups' => 'Zabbix servers',
 						'Show tags' => 3,
 						'Tag name' => 'Shortened',
-						'Show timeline' => false
+						'Show timeline' => false,
+						'Show' => 'History'
 					],
 					'Tags' => [
 						'evaluation' => 'Or',
@@ -544,7 +546,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Name' => 'Host, operational data - Separately, Show suppressed',
 						'Hosts' => 'Host for Problems Widgets',
 						'Show operational data' => 'Separately',
-						'Show suppressed problems' => true
+						'Show suppressed problems' => true,
+						'Show' => 'Recent problems'
 					],
 					'result' => [
 						[
