@@ -27,6 +27,7 @@
 #include "zbxself.h"
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
+#include "zbxregexp.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
@@ -113,6 +114,8 @@ static void	*pp_worker_entry(void *arg)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+
+	zbx_init_regexp_env();
 
 	worker->stop = 0;
 

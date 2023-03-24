@@ -271,24 +271,53 @@ static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp,
 	return ret;
 }
 
-static unsigned long int compute_recursion_limit(void)
+/* calculate recursion limit, PCRE man page suggests to reckon on about 500 bytes per recursion */
+/* but to be on the safe side - reckon on 800 bytes and do not set limit higher than 100000 */
+#define REGEXP_RECURSION_STEP	800
+#define REGEXP_RECURSION_LIMIT	100000
+
+static ZBX_THREAD_LOCAL unsigned long	rxp_stacklimit = 0;
+
+/****************************************************************************************************
+ *                                                                                                  *
+ * Purpose: initialize regular expression execution environment                                     *
+ *                                                                                                  *
+ ****************************************************************************************************/
+void	zbx_init_regexp_env(void)
 {
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
-	struct rlimit	rlim;
-
-	/* calculate recursion limit, PCRE man page suggests to reckon on about 500 bytes per recursion */
-	/* but to be on the safe side - reckon on 800 bytes and do not set limit higher than 100000 */
-	if (0 == getrlimit(RLIMIT_STACK, &rlim))
-		return rlim.rlim_cur < 80000000 ? rlim.rlim_cur / 800 : 100000;
-	else
-		return 10000;	/* if stack size cannot be retrieved then assume ~8 MB */
-#else
-#define REGEXP_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
-
-	return REGEXP_RECURSION_LIMIT;
-#undef REGEXP_RECURSION_LIMIT
+#ifdef HAVE_STACKSIZE
+	/* get stack size if configured, otherwise it will use default process stack size */
+	if (REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP < (rxp_stacklimit = HAVE_STACKSIZE * ZBX_KIBIBYTE))
+		rxp_stacklimit = REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP;
 #endif
 }
+
+static unsigned long int compute_recursion_limit(void)
+{
+	if (0 == rxp_stacklimit)
+	{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#	define REGEXP_RECURSION_DEFAULT	10000	/* if stack size cannot be retrieved then assume ~8 MB */
+		struct rlimit	rlim;
+
+		if (0 == getrlimit(RLIMIT_STACK, &rlim))
+		{
+			if (REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP < (rxp_stacklimit = rlim.rlim_cur))
+				rxp_stacklimit = REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP;
+		}
+#else
+#	define REGEXP_RECURSION_DEFAULT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+#endif
+		if (0 == rxp_stacklimit)
+			rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
+	}
+
+	return rxp_stacklimit / REGEXP_RECURSION_STEP;
+#undef REGEXP_RECURSION_DEFAULT
+}
+
+#undef REGEXP_RECURSION_LIMIT
+#undef REGEXP_RECURSION_STEP
 
 /***********************************************************************************
  *                                                                                 *
