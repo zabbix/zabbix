@@ -291,9 +291,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 2 unsigned']
 					],
-					'headers' => ['Time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-							'Ack', 'Actions'
-					]
+					'headers' => ['Time', 'Info', 'Host', 'Problem • Severity', 'Duration', 'Ack', 'Actions']
 				]
 			],
 			// #4 Filtered by Host, Sort by severity.
