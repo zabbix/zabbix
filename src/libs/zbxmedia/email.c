@@ -22,7 +22,7 @@
 #include "zbxstr.h"
 #include "log.h"
 #include "zbxcomms.h"
-#include "base64.h"
+#include "zbxcrypto.h"
 #include "zbxalgo.h"
 
 /* number of characters per line when wrapping Base64 data in Email */
@@ -94,7 +94,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 			/* 12 characters are taken by header "=?UTF-8?B?" and trailer "?=" plus '\0' */
 			char	b64_buf[ZBX_EMAIL_B64_MAXWORD_RFC2047 - 12 + 1];
 
-			str_base64_encode(p0, b64_buf, p1 - p0);
+			zbx_base64_encode(p0, b64_buf, p1 - p0);
 
 			if (0 != p_base64_offset)	/* not the first "encoded-word" ? */
 			{
@@ -284,7 +284,7 @@ static char	*email_encode_part(const char *data, size_t data_size)
 {
 	char	*base64 = NULL, *part;
 
-	str_base64_encode_dyn(data, &base64, data_size);
+	zbx_base64_encode_dyn(data, &base64, data_size);
 	part = zbx_str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
 	zbx_free(base64);
 
@@ -769,6 +769,12 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
 		zbx_free(helo_domain);
 	}
+
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_SMTPS | CURLPROTO_SMTP)))
+		goto error;
+#endif
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 		goto error;

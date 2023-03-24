@@ -445,7 +445,7 @@ while (0)
 /* to avoid dependency on libzbxnix.a */
 #define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
 
 extern const char	*progname;
 extern const char	title_message[];
@@ -605,9 +605,9 @@ wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 /* string functions that could not be moved into libzbxstr.a because they */
 /* are used by libzbxcommon.a END */
 
-/* future proctitle library */
+char	**zbx_setproctitle_init(int argc, char **argv);
 void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-/* future proctitle library END */
+void	zbx_setproctitle_deinit(void);
 
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
@@ -649,12 +649,6 @@ char	*zbx_fgets(char *buffer, int size, FILE *fp);
 int	zbx_write_all(int fd, const char *buf, size_t n);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
-
-zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
-zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
-
-zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data);
-zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
@@ -799,5 +793,13 @@ zbx_uint64_t	suffix2factor(char c);
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
 char	*zbx_strerror(int errnum);
+
+#if !defined(_WINDOWS)
+#	if defined(HAVE_LIBPTHREAD)
+#		define zbx_sigmask	pthread_sigmask
+#	else
+#		define zbx_sigmask	sigprocmask
+#	endif
+#endif
 
 #endif

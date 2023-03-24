@@ -481,7 +481,7 @@ void	zbx_db_init_autoincrement_options(void);
 int	zbx_db_connect(int flag);
 void	zbx_db_close(void);
 
-int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhig);
+int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhigh);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 #endif
@@ -491,18 +491,17 @@ void	zbx_db_statement_prepare(const char *sql);
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select_n(const char *query, int n);
-DB_ROW		zbx_db_fetch(DB_RESULT result);
+zbx_db_result_t	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+zbx_db_result_t	zbx_db_select_n(const char *query, int n);
+zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result);
 int		zbx_db_is_null(const char *field);
 void		zbx_db_begin(void);
 int		zbx_db_commit(void);
 void		zbx_db_rollback(void);
 int		zbx_db_end(int ret);
 
-const ZBX_TABLE	*zbx_db_get_table(const char *tablename);
-const ZBX_FIELD	*zbx_db_get_field(const ZBX_TABLE *table, const char *fieldname);
+const zbx_db_table_t	*zbx_db_get_table(const char *tablename);
+const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname);
 #define zbx_db_get_maxid(table)	zbx_db_get_maxid_num(table, 1)
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 
@@ -644,8 +643,8 @@ void	zbx_db_check_character_set(void);
 typedef struct
 {
 	/* the target table */
-	const ZBX_TABLE		*table;
-	/* the fields to insert (pointers to the ZBX_FIELD structures from database schema) */
+	const zbx_db_table_t	*table;
+	/* the fields to insert (pointers to the zbx_db_field_t structures from database schema) */
 	zbx_vector_ptr_t	fields;
 	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
 	zbx_vector_ptr_t	rows;
@@ -654,7 +653,7 @@ typedef struct
 }
 zbx_db_insert_t;
 
-void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, const ZBX_FIELD **fields,
+void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
 void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
@@ -898,4 +897,8 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
-#endif /* ZABBIX_DBHIGH_H */
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(int *ts_from, int table_group);
+
+#endif
