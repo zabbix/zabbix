@@ -19,7 +19,7 @@
 
 #include "zbxfile.h"
 
-void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte)
+void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte)
 {
 	/* default is single-byte character set */
 	*cr = "\r";
@@ -69,7 +69,7 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
  *             buf      - [IN] buffer to read into                            *
  *             count    - [IN] buffer size in bytes                           *
  *             encoding - [IN] pointer to a text string describing encoding.  *
- *                        See function find_cr_lf_szbyte() for supported      *
+ *                        See function zbx_find_cr_lf_szbyte() for supported      *
  *                        encodings.                                          *
  *                        "" (empty string) means a single-byte character set.*
  *                                                                            *
@@ -94,7 +94,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	if (0 >= (nbytes = read(fd, buf, count)))
 		return (int)nbytes;
 
-	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
+	zbx_find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
 	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
 	{

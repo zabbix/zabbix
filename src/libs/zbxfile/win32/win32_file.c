@@ -49,11 +49,19 @@ static	int	get_file_time_stat(const char *path, zbx_file_time_t *time)
 	return SUCCEED;
 }
 
+typedef struct {
+	LARGE_INTEGER	CreationTime;
+	LARGE_INTEGER	LastAccessTime;
+	LARGE_INTEGER	LastWriteTime;
+	LARGE_INTEGER	ChangeTime;
+	DWORD		FileAttributes;
+} file_basic_info_t;
+
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time)
 {
 	int			f = -1, ret = SUCCEED;
 	intptr_t		h;
-	ZBX_FILE_BASIC_INFO	info;
+	file_basic_info_t	info;
 	HANDLE			sym_handle = NULL;
 	wchar_t			*wpath = NULL;
 

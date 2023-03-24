@@ -31,7 +31,7 @@ typedef struct
 zbx_file_time_t;
 
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
-void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
+void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
@@ -39,11 +39,11 @@ int	zbx_write_all(int fd, const char *buf, size_t n);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-#	define PATH_SEPARATOR	'\\'
+#	define ZBX_PATH_SEPARATOR	'\\'
 int	__zbx_open(const char *pathname, int flags);
 #else
 #	define zbx_open(pathname, flags)	open(pathname, flags)
-#	define PATH_SEPARATOR	'/'
+#	define ZBX_PATH_SEPARATOR	'/'
 #endif
 
 #endif /* ZABBIX_ZBXFILE_H */

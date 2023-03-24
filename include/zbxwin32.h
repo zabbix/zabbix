@@ -116,31 +116,13 @@ typedef enum {
 	/* we only use below values, the rest of enumerated values are omitted here */
 	zbx_FileBasicInfo	= 0,
 	zbx_FileIdInfo		= 18
-} ZBX_FILE_INFO_BY_HANDLE_CLASS;
-
-typedef struct {
-	LARGE_INTEGER	CreationTime;
-	LARGE_INTEGER	LastAccessTime;
-	LARGE_INTEGER	LastWriteTime;
-	LARGE_INTEGER	ChangeTime;
-	DWORD		FileAttributes;
-} ZBX_FILE_BASIC_INFO;
-
-typedef struct {
-	ULONGLONG	LowPart;
-	ULONGLONG	HighPart;
-} ZBX_EXT_FILE_ID_128;
-
-typedef struct {
-	ULONGLONG		VolumeSerialNumber;
-	ZBX_EXT_FILE_ID_128	FileId;
-} ZBX_FILE_ID_INFO;
+} zbx_file_info_by_handle_class_t;
 
 extern DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD);
 extern BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
 extern BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
 extern BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
-extern BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, ZBX_FILE_INFO_BY_HANDLE_CLASS, LPVOID, DWORD);
+extern BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
 
 void	zbx_import_symbols(void);
 

@@ -145,7 +145,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 		goto trim;
 	}
 
-	if (NULL != strchr(p + 1, PATH_SEPARATOR))
+	if (NULL != strchr(p + 1, ZBX_PATH_SEPARATOR))
 	{
 		zbx_error("%s: glob pattern should be the last component of the path", glob);
 		return FAIL;
@@ -161,7 +161,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 
 		p--;
 	}
-	while (PATH_SEPARATOR != *p);
+	while (ZBX_PATH_SEPARATOR != *p);
 
 	*path = zbx_strdup(NULL, glob);
 	(*path)[p - glob] = '\0';
