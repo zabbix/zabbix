@@ -45,22 +45,12 @@ window.popup_import_compare = new class {
 	addEventListeners() {
 		this.form.addEventListener('click', (e) => {
 			if (e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')
-					|| e.target.classList.contains('<?= ZBX_STYLE_ARROW_DOWN ?>')
-					|| e.target.classList.contains('<?= ZBX_STYLE_ARROW_UP ?>')) {
-				let arrow, next_sibling;
-				e.preventDefault();
-
-				arrow = e.target;
-				next_sibling = e.target.closest('.<?= ZBX_STYLE_TOC_ROW ?>').nextSibling;
-
-				if (e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')) {
-					arrow = e.target.querySelector('span');
-					next_sibling = e.target.parentNode.nextSibling;
-				}
-
+					|| e.target.parentNode.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')) {
+				const btn = e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>') ? e.target : e.target.parentNode;
+				const arrow = btn.querySelector('span');
 				const show = arrow.classList.contains('<?= ZBX_STYLE_ARROW_UP ?>');
-				next_sibling.style.display = show ? '' : 'none';
 
+				btn.parentNode.nextSibling.style.display = show ? '' : 'none';
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_UP ?>');
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_DOWN ?>');
 			}
