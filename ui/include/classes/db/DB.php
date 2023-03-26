@@ -203,7 +203,7 @@ class DB {
 	 *
 	 * @return array
 	 */
-	public static function getSchema(?string $table): array {
+	public static function getSchema(?string $table = null): array {
 		if (self::$schema === null) {
 			$schema = include __DIR__.'/../../'.self::SCHEMA_FILE;
 
