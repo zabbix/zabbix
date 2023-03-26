@@ -38,7 +38,16 @@
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 
-ZBX_PTR_VECTOR_DECL(discoverer_services_ptr, zbx_dservice_t*)
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	unsigned short	port;
+	char		value[ZBX_MAX_DISCOVERED_VALUE_SIZE];
+	int		status;
+}
+zbx_discoverer_dservice_t;
+
+ZBX_PTR_VECTOR_DECL(discoverer_services_ptr, zbx_discoverer_dservice_t*)
 
 typedef struct
 {
@@ -77,7 +86,7 @@ zbx_discoverer_worker_t;
 
 ZBX_PTR_VECTOR_DECL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
 
-ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_dservice_t*)
+ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_discoverer_dservice_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_results_ptr, zbx_discoverer_results_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
 
@@ -420,7 +429,7 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 	dst->dcheckid = src->dcheckid;
 	dst->druleid = src->druleid;
 	dst->key_ = zbx_strdup(NULL, src->key_);
-	dst->ports = zbx_strdup(NULL, src->ports);
+	dst->ports = NULL;
 	dst->uniq = src->uniq;
 	dst->type = src->type;
 
@@ -437,7 +446,7 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 	}
 }
 
-static void	service_free(zbx_dservice_t *service)
+static void	service_free(zbx_discoverer_dservice_t *service)
 {
 	zbx_free(service);
 }
@@ -615,7 +624,7 @@ static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const cha
 
 	for (i = 0; i < services->values_num; i++)
 	{
-		zbx_dservice_t	*service = (zbx_dservice_t *)services->values[i];
+		zbx_discoverer_dservice_t	*service = (zbx_discoverer_dservice_t *)services->values[i];
 
 		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
 			host_status = service->status;
@@ -1087,13 +1096,13 @@ static void	discoverer_job_remove(zbx_discoverer_job_t *job)
 	discoverer_job_free(job);
 }
 
-static zbx_dservice_t	*result_dservice_create(const zbx_discoverer_task_t *task, const zbx_dc_dcheck_t *dcheck)
+static zbx_discoverer_dservice_t	*result_dservice_create(const zbx_discoverer_task_t *task,
+		const zbx_dc_dcheck_t *dcheck)
 {
-	zbx_dservice_t	*service;
+	zbx_discoverer_dservice_t	*service;
 
-	service = (zbx_dservice_t *)zbx_malloc(NULL, sizeof(zbx_dservice_t));
+	service = (zbx_discoverer_dservice_t *)zbx_malloc(NULL, sizeof(zbx_discoverer_dservice_t));
 	service->dcheckid = dcheck->dcheckid;
-	service->itemtime = time(NULL);
 	service->port = task->port;
 
 	return service;
@@ -1132,7 +1141,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 	{
 		ZBX_FPING_HOST			host;
 		zbx_discoverer_results_t	*result;
-		zbx_dservice_t			*service;
+		zbx_discoverer_dservice_t	*service;
 
 		memset(&host, 0, sizeof(host));
 		host.addr = task->ips->values[i];
@@ -1185,7 +1194,7 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 
 		if (0 != h->rcv)
 		{
-			((zbx_dservice_t*)result->services.values[0])->status = DOBJECT_STATUS_UP;
+			((zbx_discoverer_dservice_t*)result->services.values[0])->status = DOBJECT_STATUS_UP;
 		}
 	}
 
@@ -1266,8 +1275,8 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 
 	for (i = 0; i < task->dchecks.values_num; i++)
 	{
-		zbx_dc_dcheck_t		*dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[i];
-		zbx_dservice_t		*service;
+		zbx_dc_dcheck_t			*dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[i];
+		zbx_discoverer_dservice_t	*service;
 
 		service = result_dservice_create(task, dcheck);
 		service->status = (SUCCEED == discover_service(dcheck, task->ip, task->port, config_timeout, &value,
