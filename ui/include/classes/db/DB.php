@@ -208,17 +208,15 @@ class DB {
 			$schema = include __DIR__.'/../../'.self::SCHEMA_FILE;
 
 			$config = DBfetch(DBselect('SELECT dbversion_status FROM config'));
-			$dbversion_status = json_decode($config['dbversion_status'], true);
+			$dbversion_status = $config ? (array) json_decode($config['dbversion_status'], true) : [];
 
-			if (is_array($dbversion_status)) {
-				foreach ($dbversion_status as $dbversion) {
-					if (array_key_exists('schema_diff', $dbversion)
-							&& array_key_exists('tables', $dbversion['schema_diff'])) {
-						foreach ($dbversion['schema_diff']['tables'] as $table_name => $table_params) {
-							foreach ($table_params['fields'] as $field_name => $field) {
-								$schema[$table_name]['fields'][$field_name]['type'] = $field['type'];
-								$schema[$table_name]['fields'][$field_name]['length'] = $field['length'];
-							}
+			foreach ($dbversion_status as $dbversion) {
+				if (array_key_exists('schema_diff', $dbversion)
+						&& array_key_exists('tables', $dbversion['schema_diff'])) {
+					foreach ($dbversion['schema_diff']['tables'] as $table_name => $table_params) {
+						foreach ($table_params['fields'] as $field_name => $field) {
+							$schema[$table_name]['fields'][$field_name]['type'] = $field['type'];
+							$schema[$table_name]['fields'][$field_name]['length'] = $field['length'];
 						}
 					}
 				}
