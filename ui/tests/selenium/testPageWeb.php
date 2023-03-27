@@ -196,7 +196,7 @@ class testPageWeb extends CWebTest {
 						$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
 			}
 
-			$this->query('button:Reset')->one()->click();
+			$popup->close();
 		}
 	}
 
@@ -204,9 +204,9 @@ class testPageWeb extends CWebTest {
 	 * Function which checks if button "Reset" works properly.
 	 */
 	public function testPageWeb_ResetButtonCheck() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1')->waitUntilReady();
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1');
 		$this->page->waitUntilReady();
+
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check table contents before filtering.
@@ -215,7 +215,7 @@ class testPageWeb extends CWebTest {
 		$start_contents = $this->getTableResult('Name');
 
 		// Filter hosts.
-		$form->fill(['Hosts' => 'Simple form test host']);
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'Simple form test host']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
 
@@ -227,7 +227,7 @@ class testPageWeb extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
-		$this->assertTableStats($start_rows_count);
+		$this->assertTableStats($table->getRows()->count());
 		$this->assertEquals($start_contents, $this->getTableResult('Name'));
 	}
 
@@ -259,16 +259,30 @@ class testPageWeb extends CWebTest {
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
 		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
 
+		$sql =	CDBHelper::getCount('SELECT *'.
+			' FROM httptest, hosts, httpstep'.
+			' WHERE httptest.hostid = hosts.hostid'.
+				' AND hosts.hostid ='.self::$hostid['WebData Host'].
+				' AND httptest.httptestid = httpstep.httptestid'.
+				' AND httptest.httptestid ='.self::$httptestid['Web scenario 3 step'].''
+		);
+
+		// Check if steps in DB are equal to the frontend amount of steps.
+		$this->assertEquals($row->getColumn('Number of steps')->getText(), $sql);
+
 		// Directly open API created Web scenario and add one more step.
 		$this->page->open('httpconf.php?form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
 				self::$httptestid['Web scenario 3 step'])->waitUntilReady();
 		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
 		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
-		$this->page->waitUntilReady();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+
 		$form = $this->query('id:http_step')->asForm()->one();
 		$form->fill(['Name' => 'Step number 4']);
 		$form->query('id:url')->one()->fill('test.com');
 		$form->submit();
+		COverlayDialogElement::find()->one()->waitUntilNotVisible();
+
 		$this->query('button:Update')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
@@ -276,6 +290,19 @@ class testPageWeb extends CWebTest {
 		// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
 		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$this->assertEquals('4', $row->getColumn('Number of steps')->getText());
+
+		// Check that step amount changes after REMOVING step from web service.
+		$this->page->open('httpconf.php?form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
+			self::$httptestid['Web scenario 3 step'])->waitUntilReady();
+		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
+		$this->query('xpath://tbody/tr[2]/td[8]/button[1]')->one()->click();
+		$this->query('button:Update')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
+
+		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+		$this->assertEquals($row->getColumn('Number of steps')->getText(), $sql);
+		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
 	}
 
 	/**
@@ -304,12 +331,24 @@ class testPageWeb extends CWebTest {
 	 */
 	public function testPageWeb_CheckKioskMode() {
 		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
-		$this->page->waitUntilReady();
-		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
+
+		// Check title, filter and table display after pressing Kiosk mode/Normal view.
+		foreach (['Kiosk mode', 'Normal view'] as $status) {
+			$this->query('xpath://button[@title="'.$status.'"]')->one()->click();
+			$this->page->waitUntilReady();
+
+			if ($status === 'Kiosk mode') {
+				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
+			}
+			else {
+				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
+			}
+
+			$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
+			$this->assertTrue($this->query('id:flickerfreescreen_httptest')->exists());
+		}
+
+		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
 	}
 
 	/**
