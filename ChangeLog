@@ -14,6 +14,8 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
+.........T [ZBX-22261] added value mapping in the template PostgreSQL by Zabbix agent 2 for item Checksum failures (ztielidze)
 .......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out of bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
@@ -96,6 +98,7 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 ........S. [ZBXNEXT-8105] fixed connector diagnostic information reporting in case there are no connectors (vso)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ..F....... [ZBX-22205] fixed the inability to update a dependent item that is inherited from a template (jfreibergs)
 .......PS. [ZBX-22310] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
 .......PS. [ZBX-22097] fixed exiting process when connection to the database is lost (askolmeisters)
@@ -492,9 +495,15 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.9
+
+6.2.9rc2 was released as 6.2.9 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.2.9rc2
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.9rc1
@@ -1157,6 +1166,7 @@ New features:
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 .......PS. [ZBX-22097] fixed exiting process when connection to the database is lost (askolmeisters)
 .........T [ZBX-21576] optimized preprocessing in ClickHouse by HTTP template and added lld rule (aiantsen)
 ..F....... [ZBX-21669] added the possibility to filter System user in the audit log (esekace)
@@ -3582,12 +3592,18 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.33
+
+5.0.33rc1 was released as 5.0.33 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.33rc1
 
 New features:
 ...G.....T [ZBXNEXT-8071] added sysdba, sysasm and sysoper login options to Zabbix agent 2 Oracle plugin and updated Oracle by Zabbix agent 2 template documentation (esneiders, knaglis)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ..F....... [ZBX-22413] fixed autofocus for inherited web scenario edit (dfofanovs)
 .........T [ZBX-22520] fixed versions of integrations (aiantsen)
 .......PS. [ZBX-22490] fixed HttpRequest limit in JavaScript being reached even if all objects are destroyed (vso)
