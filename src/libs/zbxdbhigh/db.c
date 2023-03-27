@@ -3812,6 +3812,7 @@ static int validate_db_type_name(int expected_type, const char *type_name)
 		case ZBX_TYPE_TEXT:
 			if (0 == strcmp("NCLOB", type_name))
 				return SUCCEED;
+			ZBX_FALLTHROUGH;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
 			if (0 == strcmp("NVARCHAR2", type_name))
@@ -3850,9 +3851,8 @@ int	zbx_db_check_compatibility_colum_type(const char *table_name, const char *co
 	sql = zbx_dsprintf(sql, "select data_type from information_schema.columns"
 			" where table_schema='%s' and", sql);
 #elif defined(HAVE_POSTGRESQL)
-	sql = zbx_db_get_schema_esc();
 	sql = zbx_dsprintf(NULL, "select data_type from information_schema.columns"
-			" where table_schema='%s' and", sql);
+			" where table_schema='%s' and", zbx_db_get_schema_esc());
 #elif defined(HAVE_ORACLE)
 	sql = zbx_strdup(sql, "select data_type from user_tab_columns where");
 #endif /* defined(HAVE_ORACLE) */

@@ -172,9 +172,7 @@ int	zbx_double_compare(double a, double b)
 int	zbx_validate_value_dbl(double value)
 {
 	if (value < -1e+308 || value > 1e+308)
-	{
 		return FAIL;
-	}
 
 	return SUCCEED;
 }

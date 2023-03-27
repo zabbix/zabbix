@@ -38,10 +38,14 @@ static int	DBpatch_6040999(void)
 			SUCCEED == zbx_db_check_compatibility_colum_type("trends", "value_min", ZBX_TYPE_FLOAT) &&
 			SUCCEED == zbx_db_check_compatibility_colum_type("trends", "value_avg", ZBX_TYPE_FLOAT) &&
 			SUCCEED == zbx_db_check_compatibility_colum_type("trends", "value_max", ZBX_TYPE_FLOAT))
+	{
 		return SUCCEED;
+	}
 	else
+	{
 		zabbix_log(LOG_LEVEL_CRIT, "The old numeric type is no longer supported. Please upgrade to numeric"
 				"values of extended range.");
+	}
 
 	return FAIL;
 }
