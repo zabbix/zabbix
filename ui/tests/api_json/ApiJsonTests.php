@@ -99,7 +99,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testConfiguration');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
-//		$suite->addTestSuite('testDependentItems'); TODO: To be fixed later
+		$suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testDiscoveryRule');
 		$suite->addTestSuite('testGraphPrototype');
 		$suite->addTestSuite('testHaNode');

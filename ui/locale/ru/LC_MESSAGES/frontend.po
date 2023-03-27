@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-03-06 05:23+0000\n"
+"PO-Revision-Date: 2023-03-22 08:30+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1440,7 +1440,7 @@ msgstr "Атрибуция"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
-msgstr ""
+msgstr "HTML код авторства"
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
@@ -11320,7 +11320,7 @@ msgstr "Обслуживание: %1$s"
 
 #: app/views/administration.geomaps.edit.php:60
 msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
-msgstr ""
+msgstr "Убедитесь, что код получен из надежного источника и не содержит вредоносных скриптов."
 
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
