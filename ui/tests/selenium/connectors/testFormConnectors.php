@@ -59,7 +59,7 @@ class testFormConnectors extends CWebTest {
 			[
 				'name' => self::$delete_connector,
 				'url' => '{$URL}'
-			],
+			]
 		]);
 	}
 
@@ -68,92 +68,67 @@ class testFormConnectors extends CWebTest {
 	 */
 	public function testFormConnectors_Layout() {
 		$default_labels = [
-			'fields' => [
-				'Name',
-				'Protocol',
-				'Data type',
-				'URL',
-				'Tag filter',
-				'HTTP authentication',
-				'Advanced configuration',
-				'Max records per message',
-				'Concurrent sessions',
-				'Attempts',
-				'Timeout',
-				'HTTP proxy',
-				'SSL verify peer',
-				'SSL verify host',
-				'SSL certificate file',
-				'SSL key file',
-				'SSL key password',
-				'Description',
-				'Enabled'
+			'fields' => ['Name', 'Protocol', 'Data type', 'URL', 'Tag filter', 'HTTP authentication', 'Advanced configuration',
+				'Max records per message', 'Concurrent sessions', 'Attempts', 'Timeout', 'HTTP proxy', 'SSL verify peer',
+				'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password', 'Description', 'Enabled'
 			],
-			'required' => ['Name', 'URL','Max records per message', 'Concurrent sessions', 'Attempts', 'Timeout'],
-			'default' => [
-				'id:protocol' => '0',
-				'Data type' => 'Item values',
-				'Tag filter' => 'And/Or',
-				'HTTP authentication' => 'None',
-				'Max records per message' => 'Unlimited',
-				'Concurrent sessions' => '1',
-				'Attempts' => '1',
-				'Timeout' => '5s',
-				'SSL verify peer' => true,
-				'SSL verify host' => true,
-				'Enabled' => true
+			'advanced_fields' => ['Max records per message', 'Concurrent sessions', 'Attempts','Timeout', 'HTTP proxy',
+				'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password'
+			],
+			'required' => ['Name', 'URL', 'Max records per message', 'Concurrent sessions', 'Attempts', 'Timeout'],
+			'default' => ['Data type' => 'Item values', 'Tag filter' => 'And/Or', 'HTTP authentication' => 'None',
+				'Max records per message' => 'Unlimited', 'Concurrent sessions' => '1', 'Attempts' => '1',
+				'Timeout' => '5s', 'SSL verify peer' => true, 'SSL verify host' => true, 'Enabled' => true
 			]
 		];
 
 		$http_auth = [
-			'None' => [
-				'fields' => []
-			],
-			'Basic' => [
-				'fields' => ['Username', 'Password']
-			],
-			'NTLM' => [
-				'fields' => ['Username', 'Password']
-			],
-			'Kerberos' => [
-				'fields' => ['Username', 'Password']
-			],
-			'Digest' => [
-				'fields' => ['Username', 'Password']
-			],
-			'Bearer' => [
-				'fields' => ['Bearer token'],
-				'required' => ['Bearer token']
-			]
+			'None' => [],
+			'Basic' => ['Username', 'Password'],
+			'NTLM' => ['Username', 'Password'],
+			'Kerberos' => ['Username', 'Password'],
+			'Digest' => ['Username', 'Password'],
+			'Bearer' => ['Bearer token']
 		];
 
 		$this->page->login()->open('zabbix.php?action=connector.list');
-		$this->query('button:Create connector')->waitUntilClickable()->one()->click();
 
+		// Check title for create/update form.
+		$this->query('link', self::$default_connector)->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->assertEquals('Connector', $dialog->getTitle());
+		$dialog->close();
+
+		$this->query('button:Create connector')->waitUntilClickable()->one()->click();
+		$form = $dialog->asForm();
 		$this->assertEquals('New connector', $dialog->getTitle());
-		$form = $dialog->query('id:connector-form')->asForm()->one();
 
 		// Check advanced configuration default value.
-		$this->assertFalse($form->query('id:advanced_configuration')->asCheckbox()->one()->isChecked());
-		$form->query('id:advanced_configuration')->asCheckbox()->one()->set(true);
+		$form->checkValue(['Advanced configuration' => false]);
+
+		// Check that the 'Advanced configuration' additional fields are hidden.
+		foreach ($default_labels['advanced_fields'] as $label) {
+			$this->assertFalse($form->getLabel($label)->isDisplayed());
+		}
+
+		$form->fill(['Advanced configuration' => true]);
 
 		// Check default values.
 		$form->checkValue($default_labels['default']);
+		$this->assertEquals('Zabbix Streaming Protocol v1.0', $form->getField('Protocol')->getText());
 
 		foreach ($http_auth as $auth => $auth_fields) {
 			$form->fill(['HTTP authentication' => $auth]);
 
 			// Check visible fields.
-			$this->compareArrays(array_merge($default_labels['fields'], $auth_fields['fields']),
-				$form->getLabels(CElementFilter::VISIBLE)->asText()
+			$this->compareArrays(array_merge($default_labels['fields'], $auth_fields),
+					$form->getLabels(CElementFilter::VISIBLE)->asText()
 			);
-			if ($auth === 'Bearer') {
-				// Check required fields.
-				$this->compareArrays(array_merge($default_labels['required'], $auth_fields['required']),
-						$form->getRequiredLabels()
-				);
-			}
+
+			// Check required fields.
+			$this->compareArrays(array_merge($default_labels['required'], ($auth === 'Bearer') ? $auth_fields : []),
+					$form->getRequiredLabels()
+			);
 
 			// Reset the value of the "HTTP authentication" field to avoid issues with the following checks.
 			$form->fill(['HTTP authentication' => 'None']);
@@ -238,7 +213,7 @@ class testFormConnectors extends CWebTest {
 			],
 			'Description' => [
 				'maxlength' => '65535'
-			],
+			]
 		];
 		foreach ($inputs as $field => $attributes) {
 			$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
@@ -249,7 +224,7 @@ class testFormConnectors extends CWebTest {
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 
-		$this->query('button:Cancel')->one()->click();
+		$dialog->close();
 	}
 
 	public static function getConnectorsData() {
@@ -707,7 +682,7 @@ class testFormConnectors extends CWebTest {
 						'Username' => STRING_64,
 						'Password' => STRING_64,
 						'Advanced configuration' => true,
-						'Max records per message' => 'Custom',
+						'id:max_records_mode' => 'Custom',
 						'id:max_records' => ZBX_MAX_INT32,
 						'Concurrent sessions' => '100',
 						'Attempts' => '5',
@@ -720,6 +695,46 @@ class testFormConnectors extends CWebTest {
 						'SSL key password' => STRING_64,
 						'Description' => 'long string check',
 						'Enabled' => true
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '   Test trailing spaces   ',
+						'URL' => '  {$URL}  ',
+						'Data type' => 'Item values',
+						'id:tags_0_tag' => ' tag tag  ',
+						'name:tags[0][operator]' => 'Does not contain',
+						'id:tags_0_value' => ' tag value ',
+						'HTTP authentication' => 'NTLM',
+						'Username' => ' {$USERNAME}  ',
+						'Advanced configuration' => true,
+						'id:max_records_mode' => 'Custom',
+						'id:max_records' => '  1  ',
+						'Concurrent sessions' => ' 1 ',
+						'Timeout' => ' 60 ',
+						'HTTP proxy' => '  proxy  ',
+						'SSL certificate file' => '  {$SSL_CERT}  ',
+						'SSL key file' => '  {$SSL_KEY}  ',
+						'Description' => '  trim check  '
+					],
+					'trim' => [
+						'fields' => [
+							'Name',
+							'URL',
+							'id:tags_0_tag',
+							'id:tags_0_value',
+							'Username',
+							'id:max_records',
+							'Concurrent sessions',
+							'Timeout',
+							'HTTP proxy',
+							'SSL certificate file',
+							'SSL key file',
+							'Description'
+						]
 					]
 				]
 			],
@@ -808,11 +823,16 @@ class testFormConnectors extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Simple create with changed fields and Bearer macro',
+						'Name' => 'Simple create with changed fields, trim and Bearer macro',
 						'URL' => 'https://zabbix.com:82/v1/events',
 						'HTTP authentication' => 'Bearer',
-						'Bearer token' => '{$TOKEN}',
+						'Bearer token' => '  {$TOKEN}  ',
 						'Description' => 'bearer token'
+					],
+					'trim' => [
+						'fields' => [
+							'Bearer token'
+						]
 					]
 				]
 			]
@@ -866,8 +886,7 @@ class testFormConnectors extends CWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $dialog->query('id:connector-form')->asForm()->one();
-		$this->assertEquals(($update ? 'Connector' : 'New connector'), $dialog->getTitle());
+		$form = $dialog->asForm();
 
 		// Add a prefix to the name of the Connector in case of update scenario to avoid duplicate names.
 		if ($update && CTesTArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
@@ -879,9 +898,7 @@ class testFormConnectors extends CWebTest {
 		}
 
 		$form->fill($data['fields']);
-		$values = $form->getValues();
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, ($update ? 'Cannot update connector' : 'Cannot create connector'), $data['error']);
@@ -889,97 +906,169 @@ class testFormConnectors extends CWebTest {
 			$dialog->close();
 		}
 		else {
+			$dialog->ensureNotPresent();
+
+			// Trim leading and trailing spaces from expected results if necessary.
+			if (array_key_exists('trim', $data)) {
+				foreach ($data['trim'] as $trim => $fields) {
+					foreach ($fields as $field) {
+						$data[$trim][$field] = trim($data[$trim][$field]);
+					}
+				}
+			}
+
 			$this->assertMessage(TEST_GOOD, ($update ? 'Connector updated' : 'Connector created'));
 
-			$db_data = CDBHelper::getColumn('SELECT * FROM connector', 'name');
-			$this->assertTrue(in_array($data['fields']['Name'], $db_data));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr($data['fields']['Name'])));
 
 			if ($update) {
-				$this->assertFalse(in_array(self::$update_connector, $db_data));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr(self::$update_connector)));
 				self::$update_connector = $data['fields']['Name'];
 			}
 
 			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
-			$this->assertEquals($values, $form->getValues());
+			$form->checkValue($data['fields']);
 			$dialog->close();
 		}
 	}
 
-	public function testFormConnectors_CancelCreate() {
-		$this->checkCancellationAction();
-	}
-
-	public function testFormConnectors_CancelUpdate() {
-		$this->checkCancellationAction('update');
+	public function getCancellationData() {
+		return [
+			[
+				[
+					'action' => 'Create'
+				]
+			],
+			[
+				[
+					'action' => 'Update',
+					'name' => self::$default_connector,
+					'new_values' => [
+						'Name' => 'New zabbix test connector',
+						'URL' => 'http://zabbix.com:82/v1/history',
+						'HTTP authentication' => 'Bearer',
+						'Bearer token' => STRING_128,
+						'Advanced configuration' => true,
+						'SSL verify peer' => false,
+						'SSL verify host' => false,
+						'SSL certificate file' => '/home/zabbix/',
+						'SSL key file' => '{$KEY}',
+						'SSL key password' => '{$PASSWORD}',
+						'Description' => 'cancellation of create and update actions',
+						'Enabled' => false
+					]
+				]
+			],
+			[
+				[
+					'action' => 'Clone',
+					'name' => self::$default_connector
+				]
+			],
+			[
+				[
+					'action' => 'Delete',
+					'name' => self::$delete_connector,
+					'alert_message' => 'Delete selected connector?'
+				]
+			]
+		];
 	}
 
 	/**
-	 * Check cancellation of create and update actions
+	 * Check cancellation of create, update, clone and delete actions.
 	 *
-	 * @param string	$action		action to be checked
+	 * @dataProvider getCancellationData
 	 */
-	public function checkCancellationAction($action = 'create') {
-		$new_values = [
-			'Name' => 'New zabbix test connector',
-			'URL' => 'http://zabbix.com:82/v1/history',
-			'HTTP authentication' => 'Bearer',
-			'Bearer token' => STRING_128,
-			'Advanced configuration' => true,
-			'SSL verify peer' => false,
-			'SSL verify host' => false,
-			'SSL certificate file' => '/home/zabbix/',
-			'SSL key file' => '{$KEY}',
-			'SSL key password' => '{$PASSWORD}',
-			'Description' => 'cancellation of create and update actions',
-			'Enabled' => false
-		];
-
+	public function testFormConnectors_CancelAction($data) {
 		$old_hash = CDBHelper::getHash(self::$connector_sql);
-		$location = ($action === 'create') ? 'button:Create connector' : 'link:'.self::$update_connector;
+
+		$location = ($data['action'] === 'Create') ? 'button:Create connector' : 'link:'.$data['name'];
 
 		$this->page->login()->open('zabbix.php?action=connector.list');
 		$this->query($location)->one()->click();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
-		$form->fill($new_values);
+
+		// Fill in data for 'Update' scenario.
+		if ($data['action'] === 'Update') {
+			$form->fill($data['new_values']);
+		}
+
+		if ($data['action'] === 'Clone' || ($data['action'] === 'Delete')) {
+			$dialog->getFooter()->query('button', $data['action'])->one()->click();
+
+			// Check alert message and dismiss it.
+			if ($data['action'] === 'Delete') {
+				$this->assertEquals($data['alert_message'], $this->page->getAlertText());
+				$this->page->dismissAlert();
+			}
+		}
+
 		$dialog->query('button:Cancel')->one()->click();
 
 		$dialog->ensureNotPresent();
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::$connector_sql));
 	}
 
+	public static function getCloneData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'Name' => self::$default_connector
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'Name' => self::$delete_connector,
+					'error' => [
+						'Connector "'.self::$delete_connector.'" already exists.'
+					]
+				]
+			]
+		];
+	}
+
 	/**
-	 * Function for checking connector cloning with only changed name.
+	 * @dataProvider getCloneData
+	 *
+	 * Function for checking connector cloning.
 	 */
-	public function testFormConnectors_Clone() {
-		foreach ([self::$update_connector, self::$delete_connector] as $connector) {
-			$this->page->login()->open('zabbix.php?action=connector.list');
-			$this->query('link', $connector)->one()->click();
+	public function testFormConnectors_Clone($data) {
+		$this->page->login()->open('zabbix.php?action=connector.list');
+		$new_name = 'Cloned_'.$data['Name'];
+		$this->query('link', $data['Name'])->one()->click();
 
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
-			$values = $dialog->getFields()->asValues();
-			$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		$values = $form->getValues();
+		$values['Name'] = $new_name;
 
-			$dialog->invalidate();
-			$dialog->fill(['Name' => 'Cloned_'.$connector]);
-			$dialog->submit();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			$form->invalidate();
+			$form->fill(['Name' => $new_name]);
+			$form->submit();
 
 			$this->assertMessage(TEST_GOOD, 'Connector created');
-			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr($connector)));
-			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr('Cloned_'.$connector)));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr($data['Name'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr($new_name)));
 
-			$this->query('link', 'Cloned_'.$connector)->one()->click();
-			$cloned_values = $dialog->getFields()->asValues();
-			$this->assertEquals('Cloned_'.$connector, $cloned_values['Name']);
-
-			// Field Name removed from arrays.
-			unset($cloned_values['Name']);
-			unset($values['Name']);
-			$this->assertEquals($values, $cloned_values);
-			COverlayDialogElement::find()->one()->close();
+			$this->query('link', $new_name)->one()->click();
+			$this->assertEquals($values, $form->getValues());
 		}
+		else {
+			$form->submit();
+			$this->assertMessage(TEST_BAD, 'Cannot create connector', $data['error']);
+			CMessageElement::find()->one()->close();
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr($data['Name'])));
+		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testFormConnectors_Delete() {
@@ -988,6 +1077,7 @@ class testFormConnectors extends CWebTest {
 
 		// Click on the Delete button in the opened Connector configuration dialog.
 		COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->assertEquals('Delete selected connector?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
@@ -1010,7 +1100,7 @@ class testFormConnectors extends CWebTest {
 		$this->query('link', self::$default_connector)->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $dialog->query('id:connector-form')->asForm()->one();
+		$form = $dialog->asForm();
 		$dialog->close();
 
 		// Check default URI scheme rules: http, https, ftp, file, mailto, tel, ssh.
@@ -1046,8 +1136,9 @@ class testFormConnectors extends CWebTest {
 	 * @param string $expected		expected result after connector form submit, TEST_GOOD or TEST_BAD
 	 */
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
+		$this->query('link', self::$default_connector)->one()->click();
+
 		foreach ($data as $scheme) {
-			$this->query('link', self::$default_connector)->one()->click();
 			$form->fill(['URL' => $scheme]);
 			$form->submit();
 			$message = CMessageElement::find()->one();
@@ -1055,13 +1146,15 @@ class testFormConnectors extends CWebTest {
 			if ($expected === TEST_GOOD) {
 				$this->assertMessage(TEST_GOOD, 'Connector updated');
 				$message->close();
+				$this->query('link', self::$default_connector)->one()->click();
 			}
 			else {
 				$this->assertMessage(TEST_BAD, 'Cannot update connector', 'Invalid parameter "/1/url": unacceptable URL.');
 				$message->close();
-				COverlayDialogElement::find()->one()->close();
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
