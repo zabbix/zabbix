@@ -266,7 +266,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	size_t		i, num = 0;
 	AGENT_RESULT	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_FS_DBL,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_CURLINFO_SPEED_DOWNLOAD_FMT,
 			__func__, stat->rspcode, stat->total_time, stat->speed_download);
 
 	result = zbx_db_select("select type,itemid from httpstepitem where httpstepid=" ZBX_FS_UI64, httpstepid);
