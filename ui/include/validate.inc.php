@@ -145,8 +145,6 @@ function unset_all() {
 }
 
 function check_type(&$field, $flags, &$var, $type, $caption = null) {
-	global $DB;
-
 	if ($caption === null) {
 		$caption = $field;
 	}

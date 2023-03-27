@@ -1365,7 +1365,7 @@ class CApiInputValidator {
 		/**
 		 * @deprecated  As of version 3.4, use boolean flags only.
 		 */
-		trigger_error(_('Non-boolean flags are deprecated.'), E_USER_DEPRECATED);
+		trigger_error(_('Non-boolean flags are deprecated.'), E_USER_NOTICE);
 
 		$data = !is_null($data);
 
@@ -1845,8 +1845,6 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateNumeric($rule, &$data, $path, &$error) {
-		global $DB;
-
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (is_int($data)) {
