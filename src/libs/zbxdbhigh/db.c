@@ -3718,7 +3718,7 @@ void	zbx_recalc_time_period(int *ts_from, int table_group)
 #undef HK_CFG_UPDATE_INTERVAL
 }
 
-static int validate_db_type_name(int expected_type, const char* type_name)
+static int validate_db_type_name(int expected_type, const char *type_name)
 {
 #if defined(HAVE_MYSQL)
 	switch(expected_type)
@@ -3834,10 +3834,6 @@ static int validate_db_type_name(int expected_type, const char* type_name)
  * Purpose: checks if the column of specific table in the database has        *
  *              correct type                                                  *
  *                                                                            *
- * Parameters: table_name    - [IN] table name                                *
- *             column_name   - [IN] column name                               *
- *             expected_type - [IN] expected type                             *
- *                                                                            *
  * Return value: SUCCEED - Column has correct type                            *
  *               FAIL    - Otherwise                                          *
  ******************************************************************************/
@@ -3855,7 +3851,7 @@ int	zbx_db_check_compatibility_colum_type(const char *table_name, const char *co
 			" where table_schema='%s' and", sql);
 #elif defined(HAVE_POSTGRESQL)
 	sql = zbx_db_get_schema_esc();
-	sql = zbx_dsprintf(sql, "select data_type from information_schema.columns"
+	sql = zbx_dsprintf(NULL, "select data_type from information_schema.columns"
 			" where table_schema='%s' and", sql);
 #elif defined(HAVE_ORACLE)
 	sql = zbx_strdup(sql, "select data_type from user_tab_columns where");
@@ -3863,13 +3859,14 @@ int	zbx_db_check_compatibility_colum_type(const char *table_name, const char *co
 
 	if (NULL == (result = zbx_db_select("%s lower(table_name)='%s' and lower(column_name)='%s'",
 			sql, table_name, column_name)))
+	{
 		goto clean;
+	}
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ret = validate_db_type_name(expected_type, row[0]);
 
 #endif /* defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) */
-
 clean:
 	zbx_db_free_result(result);
 	zbx_free(sql);
