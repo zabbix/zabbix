@@ -351,33 +351,12 @@ FROM
             NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
             NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE_BYTES,
             NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0) AS USED_BYTES,
-            ROUND(
-                DECODE(
-                    SUM(Y.MAX_BYTES),
-                    0,
-                    0,
-                    (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)
-                ),
-                2
-            ) AS USED_PCT_MAX,
-            ROUND(
-                DECODE(
-                    SUM(Y.BYTES),
-                    0,
-                    0,
-                    (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100
+            ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0,(SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100) ), 2 ) AS USED_PCT_MAX,
+            ROUND(DECODE(SUM(Y.BYTES),0,0,(NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100
                 ),
                 2
             ) AS USED_FILE_PCT,
-            DECODE(
-                Y.STATUS,
-                'ONLINE',
-                1,
-                'OFFLINE',
-                2,
-                'READ ONLY',
-                3,
-                0
+            DECODE(Y.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0
             ) AS STATUS
         FROM
             (
@@ -418,12 +397,7 @@ FROM
                                     TABLESPACE_NAME
                             ) f,
                             (
-                                SELECT
-                                    VALUE
-                                FROM
-                                    V$PARAMETER
-                                WHERE
-                                    NAME = 'db_block_size'
+                                SELECT VALUE FROM V$PARAMETER WHERE NAME = 'db_block_size'
                             ) vp
                         WHERE
                             f.TABLESPACE_NAME = s.TABLESPACE_NAME
@@ -432,22 +406,14 @@ FROM
                             AND f.CON_ID = ct.CON_ID
                     ) AS FREE_BYTES,
                     CASE
-                        WHEN ctf.MAXBYTES = 0 THEN ctf.BYTES
-                        ELSE ctf.MAXBYTES
+                        WHEN ctf.MAXBYTES = 0 THEN ctf.BYTES ELSE ctf.MAXBYTES
                     END AS MAX_BYTES
                 FROM
-                    CDB_TEMP_FILES ctf,
-                    CDB_TABLESPACES ct
+                    CDB_TEMP_FILES ctf, CDB_TABLESPACES ct
                 WHERE
-                    ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
-                    AND ctf.CON_ID = ct.CON_ID
-                    AND ctf.TABLESPACE_NAME = '%s'
+                    ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME AND ctf.CON_ID = ct.CON_ID AND ctf.TABLESPACE_NAME = '%s'
             ) Y
-        GROUP BY
-            Y.CON_NAME,
-            Y.NAME,
-            Y.CONTENTS,
-            Y.STATUS
+        GROUP BY Y.CON_NAME, Y.NAME, Y.CONTENTS, Y.STATUS
     )
 GROUP BY CON_NAME
 `, name)
@@ -574,33 +540,14 @@ FROM
             NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE_BYTES,
             NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0) AS USED_BYTES,
             ROUND(
-                DECODE(
-                    SUM(Y.MAX_BYTES),
-                    0,
-                    0,
-                    (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)
-                ),
-                2
+                DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2
             ) AS USED_PCT_MAX,
             ROUND(
                 DECODE(
-                    SUM(Y.BYTES),
-                    0,
-                    0,
-                    (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100
-                ),
-                2
+                    SUM(Y.BYTES), 0, 0, (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100
+                ),2
             ) AS USED_FILE_PCT,
-            DECODE(
-                Y.STATUS,
-                'ONLINE',
-                1,
-                'OFFLINE',
-                2,
-                'READ ONLY',
-                3,
-                0
-            ) AS STATUS
+            DECODE(Y.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
         FROM
             (
                 SELECT
@@ -654,22 +601,16 @@ FROM
                             AND f.CON_ID = ct.CON_ID
                     ) AS FREE_BYTES,
                     CASE
-                        WHEN ctf.MAXBYTES = 0 THEN ctf.BYTES
-                        ELSE ctf.MAXBYTES
+                        WHEN ctf.MAXBYTES = 0 THEN ctf.BYTES ELSE ctf.MAXBYTES
                     END AS MAX_BYTES
                 FROM
-                    CDB_TEMP_FILES ctf,
-                    CDB_TABLESPACES ct
+                    CDB_TEMP_FILES ctf, CDB_TABLESPACES ct
                 WHERE
                     ctf.TABLESPACE_NAME = ct.TABLESPACE_NAME
                     AND ctf.CON_ID = ct.CON_ID
                     AND ((ct.CON$NAME = '%s') or (ct.CON$NAME is null and ct.CON_ID = 0))
                     AND ctf.TABLESPACE_NAME = '%s'
             ) Y
-        GROUP BY
-            Y.CON_NAME,
-            Y.NAME,
-            Y.CONTENTS,
-            Y.STATUS
+        GROUP BY Y.CON_NAME, Y.NAME, Y.CONTENTS, Y.STATUS
     )`, conName, name)
 }
