@@ -459,7 +459,7 @@ abstract class CItemGeneral extends CApiService {
 			return;
 		}
 
-		$flags = $items[reset($item_indexes)];
+		$flags = $items[reset($item_indexes)]['flags'];
 
 		$duplicates = DB::select('items', [
 			'output' => ['uuid'],
@@ -473,13 +473,13 @@ abstract class CItemGeneral extends CApiService {
 		if ($duplicates) {
 			switch ($flags) {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
-					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.$item_indexes[$duplicates[0]['uuid']] + 1,
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
 						_('item with the same UUID already exists')
 					);
 					break;
 
 				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
-					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.$item_indexes[$duplicates[0]['uuid']] + 1,
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
 						_('item prototype with the same UUID already exists')
 					);
 					break;
