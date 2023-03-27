@@ -582,7 +582,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'uuid', 'host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'],
+			'output' => ['uuid', 'hostid', 'host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -1131,6 +1131,7 @@ class CHostPrototype extends CHostBase {
 				$host['uuid'] = generateUuidV4();
 			}
 		}
+		unset($host);
 	}
 
 	/**
@@ -2087,7 +2088,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$result = DBselect(
-			'SELECT h.hostid,h.uuid,h.host,h.name,h.custom_interfaces,h.status,h.discover,'.
+			'SELECT h.uuid,h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,'.
 				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM hosts h'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
