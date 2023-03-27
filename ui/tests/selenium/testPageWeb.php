@@ -173,34 +173,6 @@ class testPageWeb extends CWebTest {
 	}
 
 	/**
-	 * Function which checks Hosts context menu.
-	 */
-	public function testPageWeb_CheckHostContextMenu() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC')->waitUntilReady();
-
-		$titles = [
-			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Web', 'Configuration', 'Detect operating system',
-			'Ping', 'Selenium script', 'Traceroute'
-		];
-
-		foreach (['WebData Host', 'Simple form test host'] as $name) {
-			$this->query('class:list-table')->asTable()->one()->findRow('Host', $name)->query('link', $name)->one()->click();
-			$this->page->waitUntilReady();
-			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
-			$this->assertTrue($popup->hasItems($titles));
-			$titles = ($name === 'WebData Host') ? ['Graphs', 'Screens'] : ['Screens'];
-
-			foreach ($titles as $disabled) {
-				$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
-						$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
-			}
-
-			$popup->close();
-		}
-	}
-
-	/**
 	 * Function which checks if button "Reset" works properly.
 	 */
 	public function testPageWeb_ResetButtonCheck() {
@@ -229,6 +201,34 @@ class testPageWeb extends CWebTest {
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
 		$this->assertTableStats($table->getRows()->count());
 		$this->assertEquals($start_contents, $this->getTableResult('Name'));
+	}
+
+	/**
+	 * Function which checks Hosts context menu.
+	 */
+	public function testPageWeb_CheckHostContextMenu() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC')->waitUntilReady();
+
+		$titles = [
+			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Web', 'Configuration', 'Detect operating system',
+			'Ping', 'Selenium script', 'Traceroute'
+		];
+
+		foreach (['WebData Host', 'Simple form test host'] as $name) {
+			$this->query('class:list-table')->asTable()->one()->findRow('Host', $name)->query('link', $name)->one()->click();
+			$this->page->waitUntilReady();
+			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+			$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+			$this->assertTrue($popup->hasItems($titles));
+			$titles = ($name === 'WebData Host') ? ['Graphs', 'Screens'] : ['Screens'];
+
+			foreach ($titles as $disabled) {
+				$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
+						$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+			}
+
+			$popup->close();
+		}
 	}
 
 	/**
