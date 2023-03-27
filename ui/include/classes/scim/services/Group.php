@@ -456,6 +456,8 @@ class Group extends ScimApiService {
 			$this->updateProvisionedUserGroups($db_userid, $userdirectoryid);
 		}
 
+		$db_users = $del_userids ? [] : $db_users;
+
 		$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
 
 		return $this->data;
@@ -468,7 +470,7 @@ class Group extends ScimApiService {
 	 */
 	private function validatePatch(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
-			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
 				'op' =>			['type' => API_MULTIPLE, 'rules' => [
