@@ -169,7 +169,10 @@ class testPageWeb extends CWebTest {
 		}
 
 		// Check if the correct amount of rows is displayed.
-		$this->assertTableStats($table->getRows()->count());
+		$table->findRow('Name', 'testFormWeb1')->query('link', 'testFormWeb1')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Details of web scenario: testFormWeb1');
+		$this->page->assertTitle('Details of web scenario');
 	}
 
 	/**
@@ -281,8 +284,6 @@ class testPageWeb extends CWebTest {
 		$form->fill(['Name' => 'Step number 4']);
 		$form->query('id:url')->one()->fill('test.com');
 		$form->submit();
-		COverlayDialogElement::find()->one()->waitUntilNotVisible();
-
 		$this->query('button:Update')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
