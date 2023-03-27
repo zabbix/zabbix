@@ -1,9 +1,15 @@
+Changes for 5.0.33
+
+5.0.33rc1 was released as 5.0.33 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.33rc1
 
 New features:
 ...G.....T [ZBXNEXT-8071] added sysdba, sysasm and sysoper login options to Zabbix agent 2 Oracle plugin and updated Oracle by Zabbix agent 2 template documentation (esneiders, knaglis)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ..F....... [ZBX-22413] fixed autofocus for inherited web scenario edit (dfofanovs)
 .........T [ZBX-22520] fixed versions of integrations (aiantsen)
 .......PS. [ZBX-22490] fixed HttpRequest limit in JavaScript being reached even if all objects are destroyed (vso)
