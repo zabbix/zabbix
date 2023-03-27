@@ -244,7 +244,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
-	public static function getCheckWidgetTable() {
+	public static function getCheckWidgetTableData() {
 		return [
 			// #0 Filtered by Host group.
 			[
@@ -723,7 +723,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCheckWidgetTable
+	 * @dataProvider getCheckWidgetTableData
 	 *
 	 * @onAfter deleteWidgets
 	 */
