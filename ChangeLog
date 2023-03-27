@@ -9,6 +9,7 @@ New features:
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 .......PS. [ZBX-22097] fixed exiting process when connection to the database is lost (askolmeisters)
 .........T [ZBX-21576] optimized preprocessing in ClickHouse by HTTP template and added lld rule (aiantsen)
 ..F....... [ZBX-21669] added the possibility to filter System user in the audit log (esekace)
@@ -2434,12 +2435,18 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.33
+
+5.0.33rc1 was released as 5.0.33 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.33rc1
 
 New features:
 ...G.....T [ZBXNEXT-8071] added sysdba, sysasm and sysoper login options to Zabbix agent 2 Oracle plugin and updated Oracle by Zabbix agent 2 template documentation (esneiders, knaglis)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ..F....... [ZBX-22413] fixed autofocus for inherited web scenario edit (dfofanovs)
 .........T [ZBX-22520] fixed versions of integrations (aiantsen)
 .......PS. [ZBX-22490] fixed HttpRequest limit in JavaScript being reached even if all objects are destroyed (vso)
