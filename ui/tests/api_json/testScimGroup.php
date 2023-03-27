@@ -117,7 +117,7 @@ class testScimGroup extends CAPIScimTest {
 		self::$data['userids']['user_active'] = $user['userids'][0];
 
 		// Create inactive user with newly created userdirectoryid for SAML.
-		$user = CDataHelper::call('user.create', [			// TODO check at the end if this is still necessary.
+		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['user_inactive'],
 				'userdirectoryid' => self::$data['userdirectoryids']['saml'],
@@ -1174,6 +1174,26 @@ class testScimGroup extends CAPIScimTest {
 					'detail' => 'No permissions to referred object or it does not exist!',
 					'status' => 404
 				]
+			],
+			'Patch request contains user that belongs to other userdirectory.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => 'ldap_user']
+							],
+							'op' => 'add',
+							'path' => 'members'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
 			]
 		];
 	}
@@ -1282,6 +1302,71 @@ class testScimGroup extends CAPIScimTest {
 						]
 					]
 				]
+			],
+			'Patch request to replace group name and add two members to a group.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'value' => [
+								['value' => 'user_active']
+							],
+							'op' => 'add',
+							'path' => 'members'
+						],
+						[
+							'value' => [
+								['value' => 'user_inactive']
+							],
+							'op' => 'add',
+							'path' => 'members'
+						],
+						[
+							'value' => 'new_group_name',
+							'op' => 'replace',
+							'path' => 'displayName'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'displayName' => 'new_group_name',
+					'members' => [
+						[
+							'value' => 'user_active',
+							'display' => 'user_active'
+						],
+						[
+							'value' => 'user_inactive',
+							'display' => 'user_inactive'
+						]
+					]
+				]
+			],
+			'Patch request to change group name back and remove all the existing users in the group.' => [
+				'group' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'group_wo_members',
+					'Operations' => [
+						[
+							'op' => 'remove',
+							'path' => 'members'
+						],
+						[
+							'value' => 'office_administration',
+							'op' => 'replace',
+							'path' => 'displayName'
+						]
+					]
+				],
+				'expected_results' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+					'id' => 'group_wo_members',
+					'displayName' => 'group_wo_members',
+					'members' => []
+				]
 			]
 		];
 	}
@@ -1300,14 +1385,14 @@ class testScimGroup extends CAPIScimTest {
 		// Compare response with expected response.
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 
-		// Check that scim group in the database is correct.
-		$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
-			zbx_dbstr($result['id'])
-		);
-		$db_result_group = DBFetch($db_result_group_data);
-
 		foreach ($group['Operations'] as $operation) {
 			if ($operation['path'] === 'displayName') {
+				// Check that scim group in the database is correct.
+				$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+					zbx_dbstr($result['id'])
+				);
+				$db_result_group = DBFetch($db_result_group_data);
+
 				$this->assertEquals($operation['value'], $db_result_group['name']);
 			}
 			elseif ($operation['path'] === 'members') {
@@ -1322,7 +1407,12 @@ class testScimGroup extends CAPIScimTest {
 						break;
 
 					case 'remove':
-						$this->assertNotContains($operation['value'][0]['value'], $db_result_user_group);
+						if (array_key_exists('value', $operation)) {
+							$this->assertNotContains($operation['value'][0]['value'], $db_result_user_group);
+						}
+						else {
+							$this->assertEmpty($db_result_user_group);
+						}
 						break;
 
 					case 'replace':
@@ -1414,42 +1504,47 @@ class testScimGroup extends CAPIScimTest {
 	 *
 	 * @return void
 	 */
-	public function resolveData(array &$group_data, $test = false): void {
+	public function resolveData(array &$group_data): void {
 		foreach ($group_data as $attribute_name => &$attribute_value) {
-			if ($attribute_name === 'id' || $attribute_name === 'displayName') {
-				$data_key = ($attribute_name === 'id') ? 'scim_groupids' : 'scim_group_names';
+			switch ($attribute_name) {
+				case 'id':
+				case 'displayName':
+					$data_key = ($attribute_name === 'id') ? 'scim_groupids' : 'scim_group_names';
 
-				if (array_key_exists($attribute_value, self::$data[$data_key])) {
-					$group_data[$attribute_name] = self::$data[$data_key][$attribute_value];
-				}
-			}
-			elseif ($attribute_name === 'members') {
-				foreach ($attribute_value as &$member) {
-					if (array_key_exists('value', $member)
+					if (array_key_exists($attribute_value, self::$data[$data_key])) {
+						$group_data[$attribute_name] = self::$data[$data_key][$attribute_value];
+					}
+					break;
+
+				case 'members':
+					foreach ($attribute_value as &$member) {
+						if (array_key_exists('value', $member)
 							&& array_key_exists($member['value'], self::$data['userids'])) {
-						$member['value'] = self::$data['userids'][$member['value']];
-					}
-					if (array_key_exists('display', $member)
-							&& array_key_exists($member['display'], self::$data['usernames'])) {
-						$member['display'] = self::$data['usernames'][$member['display']];
-					}
-				}
-				unset($member);
-			}
-
-			if ($attribute_name === 'Operations') {
-				foreach ($group_data['Operations'] as &$operation) {
-					if (array_key_exists('path', $operation) && $operation['path'] === 'members'
-							&& array_key_exists('value', $operation) && is_array($operation['value'])) {
-						foreach ($operation['value'] as &$value) {
-							if (array_key_exists($value['value'], self::$data['userids'])) {
-								$value['value'] = self::$data['userids'][$value['value']];
-							}
+							$member['value'] = self::$data['userids'][$member['value']];
 						}
-						unset($value);
+
+						if (array_key_exists('display', $member)
+							&& array_key_exists($member['display'], self::$data['usernames'])) {
+							$member['display'] = self::$data['usernames'][$member['display']];
+						}
 					}
-				}
-				unset($operation);
+					unset($member);
+					break;
+
+				case 'Operations':
+					foreach ($group_data['Operations'] as &$operation) {
+						if (array_key_exists('path', $operation) && $operation['path'] === 'members'
+							&& array_key_exists('value', $operation) && is_array($operation['value'])) {
+							foreach ($operation['value'] as &$value) {
+								if (array_key_exists($value['value'], self::$data['userids'])) {
+									$value['value'] = self::$data['userids'][$value['value']];
+								}
+							}
+							unset($value);
+						}
+					}
+					unset($operation);
+					break;
 			}
 		}
 		unset($attribute_value);
