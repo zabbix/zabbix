@@ -51,7 +51,7 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (FAIL == (rc = hostname_handle_params(request, result, hostname)))
+	if (FAIL == (rc = hostname_handle_params(request, result, &hostname)))
 		zbx_free(hostname);
 
 	return rc;
