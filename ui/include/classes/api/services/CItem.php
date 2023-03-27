@@ -658,7 +658,7 @@ class CItem extends CItemGeneral {
 		 * fields as they stored in database.
 		 */
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'uuid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
 				'trends', 'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
@@ -1206,8 +1206,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['itemid', 'uuid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
 		];

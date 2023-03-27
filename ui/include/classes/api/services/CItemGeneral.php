@@ -434,6 +434,7 @@ abstract class CItemGeneral extends CApiService {
 				$item['uuid'] = generateUuidV4();
 			}
 		}
+		unset($item);
 	}
 
 	/**
