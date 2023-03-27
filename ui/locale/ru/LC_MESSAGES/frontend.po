@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-07 06:35+0000\n"
+"PO-Revision-Date: 2023-03-22 08:35+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1595,7 +1595,7 @@ msgstr "Атрибуция"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
-msgstr ""
+msgstr "HTML код авторства"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1997,7 +1997,7 @@ msgstr "Использование CPU в процентном отношени�
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr "Использование ЦП в герцах в течение интервала в пуле ресурсов VMware, <url> — URL-адрес службы VMware, <rpid> — идентификатор пула ресурсов VMware"
+msgstr "Использование CPU в герцах в течение интервала в пуле ресурсов VMware, <url> - URL-адрес службы VMware, <rpid> - идентификатор пула ресурсов VMware"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
@@ -3793,7 +3793,7 @@ msgstr "Не удалось обновить обнаруженную групп
 #: include/classes/api/services/CGraphGeneral.php:82
 #, c-format
 msgid "Cannot update a templated graph \"%1$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" график из шаблона."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -12547,7 +12547,7 @@ msgstr "Обслуживание: %1$s"
 
 #: app/views/administration.geomaps.edit.php:60
 msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
-msgstr ""
+msgstr "Убедитесь, что код получен из надежного источника и не содержит вредоносных скриптов."
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -18044,7 +18044,7 @@ msgstr "Услуги обновлены"
 
 #: include/classes/api/services/CUser.php:1709
 msgid "Session ID or token is expected."
-msgstr ""
+msgstr "Ожидается ID сессии или токен."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
@@ -19710,7 +19710,7 @@ msgstr "URL плитки"
 
 #: app/views/administration.geomaps.edit.php:65
 msgid "Tile provider"
-msgstr "Провайдер плитки"
+msgstr "Поставщик плитки"
 
 #: app/views/administration.geomaps.edit.php:58
 msgid "Tile provider attribution data displayed in a small text box on the map."
@@ -22750,7 +22750,7 @@ msgstr "[Ошибочное значение для месяца: \"%1$s\" ]"
 #: include/views/configuration.item.edit.php:479
 #: include/views/configuration.item.prototype.edit.php:456
 msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
-msgstr ""
+msgstr "[протокол://][пользователь[:пароль]@]прокси.example.com[:порт]"
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"

@@ -41,7 +41,7 @@ require_once dirname(__FILE__).'/testConfiguration.php';
 require_once dirname(__FILE__).'/testConnector.php';
 require_once dirname(__FILE__).'/testCorrelation.php';
 require_once dirname(__FILE__).'/testDRule.php';
-// require_once dirname(__FILE__).'/testDependentItems.php';
+require_once dirname(__FILE__).'/testDependentItems.php';
 require_once dirname(__FILE__).'/testDiscoveryRule.php';
 require_once dirname(__FILE__).'/testGraphPrototype.php';
 require_once dirname(__FILE__).'/testHaNode.php';
@@ -104,7 +104,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testConnector');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
-		// $suite->addTestSuite('testDependentItems');
+		$suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testDiscoveryRule');
 		$suite->addTestSuite('testGraphPrototype');
 		$suite->addTestSuite('testHaNode');

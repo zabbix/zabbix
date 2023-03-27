@@ -408,6 +408,11 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.9rc2
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 6.2.9rc1
 
 New features:
