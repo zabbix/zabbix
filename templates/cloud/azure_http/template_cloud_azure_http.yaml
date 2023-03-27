@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-03-23T13:38:14Z'
+  date: '2023-03-27T08:47:02Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -235,7 +235,6 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -375,7 +374,6 @@ zabbix_export:
                 Zabbix.log(3, '[ Azure ] ERROR: ' + error);
                 return JSON.stringify({'error': error});
             }
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -1086,10 +1084,7 @@ zabbix_export:
                     Zabbix.log(3, '[ Azure ] ERROR: ' + error);
                     return JSON.stringify({ 'error': error });
                 }
-                
-              description: |
-                The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.
-                
+              description: 'The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.'
               timeout: '{$AZURE.DATA.TIMEOUT}'
               parameters:
                 -
@@ -1121,7 +1116,6 @@ zabbix_export:
                 The percentage of availability for the storage service or a specified API operation.
                 Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
                 All unexpected errors result in reduced availability for the storage service or the specified API operation.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1169,7 +1163,6 @@ zabbix_export:
                 The percentage of availability for the storage service or a specified API operation.
                 Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
                 All unexpected errors result in reduced availability for the storage service or the specified API operation.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1213,9 +1206,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes.
-                
+              description: 'The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1245,9 +1236,7 @@ zabbix_export:
               key: 'azure.storage.blob.container.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of containers in the storage account with the name `[{#NAME}]`.
-                
+              description: 'The number of containers in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1277,9 +1266,7 @@ zabbix_export:
               key: 'azure.storage.blob.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of blob objects stored in the storage account with the name `[{#NAME}]`.
-                
+              description: 'The number of blob objects stored in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1314,7 +1301,6 @@ zabbix_export:
               description: |
                 The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
                 As a result, this number does not reflect billable egress.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1346,9 +1332,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of storage with the name `[{#NAME}]` used by the Azure Data Lake Storage Gen2 hierarchical index.
-                
+              description: 'The amount of storage with the name `[{#NAME}]` used by the Azure Data Lake Storage Gen2 hierarchical index.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1380,9 +1364,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.
-                
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1417,7 +1399,6 @@ zabbix_export:
               description: |
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1456,7 +1437,6 @@ zabbix_export:
               description: |
                 The average time used to process a successful request by Azure Storage.
                 This value does not include the network latency specified in `SuccessE2ELatency`.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1494,7 +1474,6 @@ zabbix_export:
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests, which produced errors.
                 Use `ResponseType` dimension for the number of different type of responses.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1529,7 +1508,6 @@ zabbix_export:
               description: |
                 The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
                 As a result, this number does not reflect billable egress.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1561,9 +1539,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of File storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.
-                
+              description: 'The amount of File storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1593,9 +1569,7 @@ zabbix_export:
               key: 'azure.storage.file.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of files in the storage account with the name `[{#NAME}]`.
-                
+              description: 'The number of files in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1630,7 +1604,6 @@ zabbix_export:
               description: |
                 The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
                 As a result, this number does not reflect billable egress.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1662,9 +1635,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.
-                
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1695,9 +1666,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: |
-                The upper limit on the amount of storage that can be used by Azure Files Service in bytes.
-                
+              description: 'The upper limit on the amount of storage that can be used by Azure Files Service in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1727,9 +1696,7 @@ zabbix_export:
               key: 'azure.storage.file.share.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of file shares in the storage account.
-                
+              description: 'The number of file shares in the storage account.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1760,9 +1727,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: |
-                The amount of storage used by the snapshots in storage account's File service in bytes.
-                
+              description: 'The amount of storage used by the snapshots in storage account''s File service in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1792,9 +1757,7 @@ zabbix_export:
               key: 'azure.storage.file.shares.snapshot.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of snapshots present on the share in storage account's Files Service.
-                
+              description: 'The number of snapshots present on the share in storage account''s Files Service.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1829,7 +1792,6 @@ zabbix_export:
               description: |
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1868,7 +1830,6 @@ zabbix_export:
               description: |
                 The average time used to process a successful request by Azure Storage.
                 This value does not include the network latency specified in `SuccessE2ELatency`.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1906,7 +1867,6 @@ zabbix_export:
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests, which produced errors.
                 Use `ResponseType` dimension for the number of different type of responses.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1938,9 +1898,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.
-                
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1972,9 +1930,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of Queue storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.
-                
+              description: 'The amount of Queue storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2004,9 +1960,7 @@ zabbix_export:
               key: 'azure.storage.queue.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of queues in the storage account with the name `[{#NAME}]`.
-                
+              description: 'The number of queues in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2041,7 +1995,6 @@ zabbix_export:
               description: |
                 The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
                 As a result, this number does not reflect billable egress.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2073,9 +2026,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.
-                
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2105,9 +2056,7 @@ zabbix_export:
               key: 'azure.storage.queue.message.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of unexpired queue messages in the storage account with the name `[{#NAME}]`.
-                
+              description: 'The number of unexpired queue messages in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2142,7 +2091,6 @@ zabbix_export:
               description: |
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2181,7 +2129,6 @@ zabbix_export:
               description: |
                 The average time used to process a successful request by Azure Storage.
                 This value does not include the network latency specified in `SuccessE2ELatency`.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2219,7 +2166,6 @@ zabbix_export:
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests, which produced errors.
                 Use `ResponseType` dimension for the number of different type of responses.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2254,7 +2200,6 @@ zabbix_export:
               description: |
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2293,7 +2238,6 @@ zabbix_export:
               description: |
                 The average time used to process a successful request by Azure Storage.
                 This value does not include the network latency specified in `SuccessE2ELatency`.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2333,7 +2277,6 @@ zabbix_export:
                 The percentage of availability for the storage service or a specified API operation.
                 Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.
                 All unexpected errors result in reduced availability for the storage service or the specified API operation.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2377,9 +2320,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of storage used by the table service of the storage account with the name `[{#NAME}]`, expressed in bytes.
-                
+              description: 'The amount of storage used by the table service of the storage account with the name `[{#NAME}]`, expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2409,9 +2350,7 @@ zabbix_export:
               key: 'azure.storage.table.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of tables in the storage account with the name `[{#NAME}]`.
-                
+              description: 'The number of tables in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2446,7 +2385,6 @@ zabbix_export:
               description: |
                 The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.
                 As a result, this number does not reflect billable egress.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2476,9 +2414,7 @@ zabbix_export:
               key: 'azure.storage.table.entity.count[{#NAME}]'
               delay: '0'
               history: 7d
-              description: |
-                The number of table entities in the storage account with the name `[{#NAME}]`.
-                
+              description: 'The number of table entities in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2510,9 +2446,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: |
-                The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.
-                
+              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2547,7 +2481,6 @@ zabbix_export:
               description: |
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2586,7 +2519,6 @@ zabbix_export:
               description: |
                 The average time used to process a successful request by Azure Storage.
                 This value does not include the network latency specified in `SuccessE2ELatency`.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2624,7 +2556,6 @@ zabbix_export:
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests, which produced errors.
                 Use `ResponseType` dimension for the number of different type of responses.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2658,7 +2589,6 @@ zabbix_export:
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests, which produced errors.
                 Use `ResponseType` dimension for the number of different type of responses.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2694,7 +2624,6 @@ zabbix_export:
                 The amount of storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.
                 For standard storage accounts, it's the sum of capacity used by blob, table, file, and queue. 
                 For premium storage accounts and Blob storage accounts, it is the same as BlobCapacity or FileCapacity.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -3082,9 +3011,7 @@ zabbix_export:
           key: azure.cosmosdb.autoscale.max.throughput
           delay: '0'
           history: 7d
-          description: |
-            The autoscale max throughput.
-            
+          description: 'The autoscale max throughput.'
           preprocessing:
             -
               type: JSONPATH
@@ -3150,7 +3077,7 @@ zabbix_export:
           params: |
             var AzureCosmoDB = {
                 params: {},
-                token: null, 
+                token: null,
             
                 setParams: function (params) {
                     ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
@@ -3232,14 +3159,11 @@ zabbix_export:
                     Object.keys(endpoints).forEach(function (field) {
                         data[field] = {};
                         try {
-                        metrics = AzureCosmoDB.request('https://management.azure.com' + AzureCosmoDB.params.resource_id + endpoints[field]);
-                        metrics = AzureCosmoDB.request('https://management.azure.com' + AzureCosmoDB.params.resource_id + endpoints[field]);
-            
                             metrics = AzureCosmoDB.request('https://management.azure.com' + AzureCosmoDB.params.resource_id + endpoints[field]);
-            
                             if (!metrics.hasOwnProperty('value')) {
                                 throw 'Failed getting required field. Check debug log for more information.';
                             }
+            
                             for (k in metrics.value) {
                                 key = AzureCosmoDB.getField(metrics.value[k], 'name.value')
                                 if (metrics.value[k].timeseries.length === 0) {
@@ -3297,9 +3221,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: |
-            The total data usage.
-            
+          description: 'The total data usage.'
           preprocessing:
             -
               type: JSONPATH
@@ -3323,9 +3245,7 @@ zabbix_export:
           key: azure.cosmosdb.document.count
           delay: '0'
           history: 7d
-          description: |
-            The total document count.
-            
+          description: 'The total document count.'
           preprocessing:
             -
               type: JSONPATH
@@ -3350,9 +3270,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: |
-            The total storage quota.
-            
+          description: 'The total storage quota.'
           preprocessing:
             -
               type: JSONPATH
@@ -3377,9 +3295,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: |
-            The total index usage.
-            
+          description: 'The total index usage.'
           preprocessing:
             -
               type: JSONPATH
@@ -3406,7 +3322,6 @@ zabbix_export:
           description: |
             The count of metadata requests. 
             Cosmos DB maintains system metadata collection for each account, that allows you to enumerate collections, databases, etc, and their configurations, free of charge.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -3430,9 +3345,7 @@ zabbix_export:
           key: azure.cosmosdb.mongo.requests
           delay: '0'
           history: 7d
-          description: |
-            The number of Mongo requests made.
-            
+          description: 'The number of Mongo requests made.'
           preprocessing:
             -
               type: JSONPATH
@@ -3456,9 +3369,7 @@ zabbix_export:
           key: azure.cosmosdb.mongo.requests.charge
           delay: '0'
           history: 7d
-          description: |
-            The Mongo request units consumed.
-            
+          description: 'The Mongo request units consumed.'
           preprocessing:
             -
               type: JSONPATH
@@ -3483,9 +3394,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: |
-            The max RU consumption percentage per minute.
-            
+          description: 'The max RU consumption percentage per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -3510,9 +3419,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: |
-            The physical partition size in bytes.
-            
+          description: 'The physical partition size in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3536,9 +3443,7 @@ zabbix_export:
           key: azure.cosmosdb.physical.partition.throughput
           delay: '0'
           history: 7d
-          description: |
-            The physical partition throughput.
-            
+          description: 'The physical partition throughput.'
           preprocessing:
             -
               type: JSONPATH
@@ -3562,9 +3467,7 @@ zabbix_export:
           key: azure.cosmosdb.provisioned.throughput
           delay: '0'
           history: 7d
-          description: |
-            The provisioned throughput.
-            
+          description: 'The provisioned throughput.'
           preprocessing:
             -
               type: JSONPATH
@@ -3590,9 +3493,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: |
-            The P99 replication latency across source and target regions for geo-enabled account.
-            
+          description: 'The P99 replication latency across source and target regions for geo-enabled account.'
           preprocessing:
             -
               type: JSONPATH
@@ -3622,9 +3523,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: |
-            The server side latency.
-            
+          description: 'The server side latency.'
           preprocessing:
             -
               type: JSONPATH
@@ -3654,9 +3553,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: |
-            The server side latency in direct connection mode.
-            
+          description: 'The server side latency in direct connection mode.'
           preprocessing:
             -
               type: JSONPATH
@@ -3686,9 +3583,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: |
-            The server side latency in gateway connection mode.
-            
+          description: 'The server side latency in gateway connection mode.'
           preprocessing:
             -
               type: JSONPATH
@@ -3718,9 +3613,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: |
-            The account requests availability at one hour granularity.
-            
+          description: 'The account requests availability at one hour granularity.'
           preprocessing:
             -
               type: JSONPATH
@@ -3752,9 +3645,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: |
-            The request Units consumed per minute.
-            
+          description: 'The request Units consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -3778,9 +3669,7 @@ zabbix_export:
           key: azure.cosmosdb.total.requests
           delay: '0'
           history: 7d
-          description: |
-            Number of requests per minute.
-            
+          description: 'Number of requests per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -4077,7 +3966,6 @@ zabbix_export:
               parameters:
                 - '0'
                 - '3'
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '3'
             -
@@ -4457,7 +4345,6 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -5149,7 +5036,6 @@ zabbix_export:
               parameters:
                 - '0'
                 - '3'
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '3'
             -
@@ -5515,7 +5401,6 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -6047,7 +5932,6 @@ zabbix_export:
               parameters:
                 - '0'
                 - '3'
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '3'
             -
@@ -6438,7 +6322,6 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -6853,7 +6736,6 @@ zabbix_export:
               parameters:
                 - '0'
                 - '3'
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '3'
             -
@@ -7182,7 +7064,6 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -7658,7 +7539,6 @@ zabbix_export:
               parameters:
                 - '0'
                 - '3'
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '3'
             -
@@ -8051,7 +7931,6 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -8587,7 +8466,6 @@ zabbix_export:
               parameters:
                 - '0'
                 - '3'
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '3'
             -
@@ -8905,7 +8783,6 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -9399,7 +9276,6 @@ zabbix_export:
               parameters:
                 - '0'
                 - '3'
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '3'
             -
@@ -10077,7 +9953,6 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
