@@ -780,15 +780,14 @@ int	DBdrop_foreign_key(const char *table_name, int id)
 static int	DBcreate_dbversion_table(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"dbversion", "", 0,
-		{
-			{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{NULL}
-		},
-		NULL
-	};
+			{"dbversion", "", 0,
+				{
+					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
 	int		ret;
 
 	zbx_db_begin();
@@ -852,7 +851,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6040)[];
-/*extern zbx_dbpatch_t	DBPATCH_VERSION(6050)[];*/
+extern zbx_dbpatch_t	DBPATCH_VERSION(6050)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -883,7 +882,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(6020), "6.2 maintenance"},
 	{DBPATCH_VERSION(6030), "6.4 development"},
 	{DBPATCH_VERSION(6040), "6.4 maintenance"},
-/*	{DBPATCH_VERSION(6050), "7.0 development"},*/
+	{DBPATCH_VERSION(6050), "7.0 development"},
 	{NULL}
 };
 
