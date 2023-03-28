@@ -44,7 +44,7 @@ static int	DBpatch_6040999(void)
 	else
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "The old numeric type is no longer supported. Please upgrade to numeric"
-				"values of extended range.");
+				" values of extended range.");
 	}
 
 	return FAIL;

@@ -3718,13 +3718,14 @@ void	zbx_recalc_time_period(int *ts_from, int table_group)
 #undef HK_CFG_UPDATE_INTERVAL
 }
 
-static int validate_db_type_name(int expected_type, const char *type_name)
+static int validate_db_type_name(const int expected_type, const char *type_name,
+		const int type_precision, const int type_length)
 {
 #if defined(HAVE_MYSQL)
 	switch(expected_type)
 	{
 		case ZBX_TYPE_INT:
-			if (0 == strcmp("int", type_name))
+			if (0 == strcmp("int", type_name) && 10 <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_CHAR:
@@ -3732,21 +3733,25 @@ static int validate_db_type_name(int expected_type, const char *type_name)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_FLOAT:
-			if (0 == strcmp("double", type_name))
+			if (0 == strcmp("double", type_name) && 22 <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_BLOB:
 			if (0 == strcmp("longblob", type_name))
 				return SUCCEED;
 			break;
-		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
+			if (2000 <= type_length)
+				return SUCCEED;
+			ZBX_FALLTHROUGH;
+		case ZBX_TYPE_TEXT:
 			if (0 == strcmp("text", type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_UINT:
 		case ZBX_TYPE_ID:
-			if (0 == strcmp("bigint", type_name))
+		case ZBX_TYPE_SERIAL:
+			if (0 == strcmp("bigint", type_name) && 20 <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_LONGTEXT:
@@ -3760,7 +3765,7 @@ static int validate_db_type_name(int expected_type, const char *type_name)
 	switch(expected_type)
 	{
 		case ZBX_TYPE_INT:
-			if (0 == strcmp("integer", type_name))
+			if (0 == strcmp("integer", type_name) && 32 <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_CHAR:
@@ -3768,25 +3773,29 @@ static int validate_db_type_name(int expected_type, const char *type_name)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_FLOAT:
-			if (0 == strcmp("double precision", type_name))
+			if (0 == strcmp("double precision", type_name), 52 <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_BLOB:
 			if (0 == strcmp("bytea", type_name))
 				return SUCCEED;
 			break;
-		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
+			if (2000 <= type_length)
+				return SUCCEED;
+			ZBX_FALLTHROUGH;
+		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_LONGTEXT:
 			if (0 == strcmp("text", type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_UINT:
-			if (0 == strcmp("numeric", type_name))
+			if (0 == strcmp("numeric", type_name), 20 <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_ID:
-			if (0 == strcmp("bigint", type_name))
+		case ZBX_TYPE_SERIAL:
+			if (0 == strcmp("bigint", type_name) && 64 <= type_precision)
 				return SUCCEED;
 			break;
 		default:
@@ -3795,14 +3804,18 @@ static int validate_db_type_name(int expected_type, const char *type_name)
 #elif defined(HAVE_ORACLE)
 	switch(expected_type)
 	{
-		case ZBX_TYPE_INT:
 		case ZBX_TYPE_UINT:
 		case ZBX_TYPE_ID:
-			if (0 == strcmp("NUMBER", type_name))
+		case ZBX_TYPE_SERIAL:
+			if (0 == strcmp("NUMBER", type_name) && 20 <= type_precision)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_INT:
+			if (0 == strcmp("NUMBER", type_name) && 10 <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_FLOAT:
-			if (0 == strcmp("BINARY_DOUBLE", type_name))
+			if (0 == strcmp("BINARY_DOUBLE", type_name) && 8 <= type_length)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_BLOB:
@@ -3810,11 +3823,14 @@ static int validate_db_type_name(int expected_type, const char *type_name)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_TEXT:
-			if (0 == strcmp("NCLOB", type_name))
+			if (0 == strcmp("NCLOB", type_name) || 4000 <= type_length)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_SHORTTEXT:
+			if (2000 <= type_length)
 				return SUCCEED;
 			ZBX_FALLTHROUGH;
 		case ZBX_TYPE_CHAR:
-		case ZBX_TYPE_SHORTTEXT:
 			if (0 == strcmp("NVARCHAR2", type_name))
 				return SUCCEED;
 			break;
@@ -3848,13 +3864,13 @@ int	zbx_db_check_compatibility_colum_type(const char *table_name, const char *co
 #if (defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE))
 #if defined(HAVE_MYSQL)
 	sql = zbx_db_dyn_escape_string(zbx_cfg_dbhigh->config_dbname);
-	sql = zbx_dsprintf(sql, "select data_type from information_schema.columns"
-			" where table_schema='%s' and", sql);
+	sql = zbx_dsprintf(sql, "select data_type, numeric_precision, character_maximum_length from"
+			" information_schema.columns where table_schema='%s' and", sql);
 #elif defined(HAVE_POSTGRESQL)
-	sql = zbx_dsprintf(NULL, "select data_type from information_schema.columns"
-			" where table_schema='%s' and", zbx_db_get_schema_esc());
+	sql = zbx_dsprintf(NULL, "select data_type, numeric_precision, character_maximum_length from"
+			" information_schema.columns where table_schema='%s' and", zbx_db_get_schema_esc());
 #elif defined(HAVE_ORACLE)
-	sql = zbx_strdup(sql, "select data_type from user_tab_columns where");
+	sql = zbx_strdup(sql, "select data_type, data_precision, data_length from user_tab_columns where");
 #endif /* defined(HAVE_ORACLE) */
 
 	if (NULL == (result = zbx_db_select("%s lower(table_name)='%s' and lower(column_name)='%s'",
@@ -3864,7 +3880,8 @@ int	zbx_db_check_compatibility_colum_type(const char *table_name, const char *co
 	}
 
 	if (NULL != (row = zbx_db_fetch(result)))
-		ret = validate_db_type_name(expected_type, row[0]);
+		ret = validate_db_type_name(expected_type, row[0], NULL == row[1] ? 0 : atoi(row[1]),
+				NULL == row[2] ? 0 : atoi(row[2]));
 
 #endif /* defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) */
 clean:
