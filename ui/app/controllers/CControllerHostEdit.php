@@ -262,7 +262,7 @@ class CControllerHostEdit extends CController {
 		unset($data['groups']);
 
 		if ($clone_hostid !== null && count($data['host']['groups']) != count($data['groups_ms'])) {
-			$data['warnings'][] = _('The cloned host belongs to the host group you do not have write permissions. Non-writable group was removed from the new host.');
+			$data['warnings'][] = _("The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host.");
 		}
 
 		$this->extendLinkedTemplates($data['editable_templates']);
