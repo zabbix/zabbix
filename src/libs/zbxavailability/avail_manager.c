@@ -18,6 +18,7 @@
 **/
 
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 
 #include "log.h"
 #include "zbxself.h"
@@ -25,6 +26,10 @@
 #include "zbxnix.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxthreads.h"
 
 #define AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
 

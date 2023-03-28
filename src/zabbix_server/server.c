@@ -80,6 +80,7 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "preproc/preproc_server.h"
+#include "zbxavailability.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"

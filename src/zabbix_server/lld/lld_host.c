@@ -23,6 +23,7 @@
 #include "../db_lengths.h"
 #include "log.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
 #include "zbxnum.h"

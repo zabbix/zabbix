@@ -41,6 +41,7 @@
 #include "zbxhttp.h"
 #include "log.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

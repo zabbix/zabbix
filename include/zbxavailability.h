@@ -25,20 +25,6 @@
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
 
-/* interface availability */
-#define ZBX_INTERFACE_AVAILABLE_UNKNOWN		0
-#define ZBX_INTERFACE_AVAILABLE_TRUE		1
-#define ZBX_INTERFACE_AVAILABLE_FALSE		2
-
-#define ZBX_IPC_SERVICE_AVAILABILITY		"availability"
-#define ZBX_IPC_AVAILABILITY_REQUEST		1
-#define ZBX_IPC_AVAILMAN_ACTIVE_HB		2
-#define ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA	3
-#define ZBX_IPC_AVAILMAN_ACTIVE_STATUS		4
-#define ZBX_IPC_AVAILMAN_CONFSYNC_DIFF		5
-#define ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA	6
-#define ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE	7
-
 /* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
 typedef struct
 {

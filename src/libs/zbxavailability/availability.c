@@ -18,6 +18,7 @@
 **/
 
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 
 #include "log.h"
 #include "zbxipcservice.h"

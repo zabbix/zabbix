@@ -30,6 +30,7 @@
 #include "zbxlld.h"
 #include "events.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

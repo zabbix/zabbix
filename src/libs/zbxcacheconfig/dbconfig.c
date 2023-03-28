@@ -34,6 +34,7 @@
 #include "zbxserialize.h"
 #include "user_macro.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
