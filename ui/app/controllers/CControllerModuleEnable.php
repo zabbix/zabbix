@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerModuleUpdate extends CController {
+class CControllerModuleEnable extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -27,8 +27,7 @@ class CControllerModuleUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleid' =>	'required|db module.moduleid',
-			'status' =>		'in 1'
+			'moduleids' => 'required|array_db module.moduleid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,47 +50,45 @@ class CControllerModuleUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$moduleid = $this->getInput('moduleid');
+		$moduleids = $this->getInput('moduleids');
 
-		$set_status = ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED);
+		$db_modules = API::Module()->get([
+			'output' => ['relative_path', 'status'],
+			'sortfield' => 'relative_path',
+			'preservekeys' => true
+		]);
 
-		$errors = [];
+		$module_manager = new CModuleManager(APP::getRootDir());
 
-		if ($set_status == MODULE_STATUS_ENABLED) {
-			$module_manager_enabled = new CModuleManager(APP::getRootDir());
+		foreach ($db_modules as $db_moduleid => $db_module) {
+			$new_status = in_array($db_moduleid, $moduleids) ? MODULE_STATUS_ENABLED : $db_module['status'];
 
-			$db_modules = API::Module()->get([
-				'output' => ['relative_path', 'status'],
-				'sortfield' => 'relative_path',
-				'preservekeys' => true
-			]);
-
-			foreach ($db_modules as $db_moduleid => $db_module) {
-				$new_status = $db_moduleid == $moduleid ? $set_status : $db_module['status'];
-
-				if ($new_status == MODULE_STATUS_ENABLED) {
-					$module_manager_enabled->addModule($db_module['relative_path']);
-				}
+			if ($new_status == MODULE_STATUS_ENABLED) {
+				$module_manager->addModule($db_module['relative_path']);
 			}
-
-			$errors = $module_manager_enabled->checkConflicts()['conflicts'];
-
-			array_map('error', $errors);
 		}
+
+		$errors = $module_manager->checkConflicts()['conflicts'];
+
+		array_map('error', $errors);
 
 		$result = false;
 
 		if (!$errors) {
-			$update = [
-				'moduleid' => $moduleid,
-				'status' => $set_status
-			];
+			$update = [];
+
+			foreach ($moduleids as $moduleid) {
+				$update[] = [
+					'moduleid' => $moduleid,
+					'status' => MODULE_STATUS_ENABLED
+				];
+			}
 
 			$result = API::Module()->update($update);
 		}
 
 		if ($result) {
-			$output['success']['title'] = _s('Module updated');
+			$output['success']['title'] = _n('Module enabled', 'Modules enabled', count($moduleids));
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -99,9 +96,17 @@ class CControllerModuleUpdate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _s('Cannot update module'),
+				'title' => _n('Cannot enable module', 'Cannot enable modules', count($moduleids)),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
+
+			$modules = API::Module()->get([
+				'output' => [],
+				'moduleids' => $moduleids,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($modules);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

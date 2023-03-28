@@ -256,14 +256,13 @@ ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
 
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	=60;
+static int	config_housekeeping_frequency = 1;
+static int	config_proxy_local_buffer = 0;
+static int	config_proxy_offline_buffer = 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
-
-int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-int	CONFIG_PROXY_LOCAL_BUFFER	= 0;
-int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 
 int	CONFIG_HEARTBEAT_FREQUENCY	= -1;
 
@@ -779,11 +778,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HistoryIndexCacheSize",	&CONFIG_HISTORY_INDEX_CACHE_SIZE,	TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
+		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
 			PARM_OPT,	0,			24},
-		{"ProxyLocalBuffer",		&CONFIG_PROXY_LOCAL_BUFFER,		TYPE_INT,
+		{"ProxyLocalBuffer",		&config_proxy_local_buffer,		TYPE_INT,
 			PARM_OPT,	0,			720},
-		{"ProxyOfflineBuffer",		&CONFIG_PROXY_OFFLINE_BUFFER,		TYPE_INT,
+		{"ProxyOfflineBuffer",		&config_proxy_offline_buffer,		TYPE_INT,
 			PARM_OPT,	1,			720},
 		{"HeartbeatFrequency",		&CONFIG_HEARTBEAT_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	0,			ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX},
@@ -1270,7 +1269,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&listen_sock, config_startup_time};
-	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout};
+	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
+								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, config_unavailable_delay};

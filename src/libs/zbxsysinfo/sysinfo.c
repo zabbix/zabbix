@@ -2085,7 +2085,7 @@ static void	get_fqdn(char **hostname)
 	zbx_rtrim(*hostname, " .\n\r");
 }
 
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char **hostname)
 {
 	char	*type, *transform;
 
@@ -2098,12 +2098,12 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		{
 			char	*dot;
 
-			if (NULL != (dot = strchr(hostname, '.')))
+			if (NULL != (dot = strchr(*hostname, '.')))
 				*dot = '\0';
 		}
 		else if (0 == strcmp(type, "fqdn"))
 		{
-			get_fqdn(&hostname);
+			get_fqdn(hostname);
 		}
 		else if (0 == strcmp(type, "netbios"))
 		{
@@ -2121,7 +2121,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 	{
 		if (0 == strcmp(transform, "lower"))
 		{
-			zbx_strlower(hostname);
+			zbx_strlower(*hostname);
 		}
 		else
 		{
@@ -2130,7 +2130,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		}
 	}
 
-	SET_STR_RESULT(result, hostname);
+	SET_STR_RESULT(result, *hostname);
 
 	return SUCCEED;
 }

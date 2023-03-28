@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerModuleUpdate extends CController {
+class CControllerModuleDisable extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -27,8 +27,7 @@ class CControllerModuleUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'moduleid' =>	'required|db module.moduleid',
-			'status' =>		'in 1'
+			'moduleids' => 'required|array_db module.moduleid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,47 +50,21 @@ class CControllerModuleUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$moduleid = $this->getInput('moduleid');
+		$moduleids = $this->getInput('moduleids');
 
-		$set_status = ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED);
+		$update = [];
 
-		$errors = [];
-
-		if ($set_status == MODULE_STATUS_ENABLED) {
-			$module_manager_enabled = new CModuleManager(APP::getRootDir());
-
-			$db_modules = API::Module()->get([
-				'output' => ['relative_path', 'status'],
-				'sortfield' => 'relative_path',
-				'preservekeys' => true
-			]);
-
-			foreach ($db_modules as $db_moduleid => $db_module) {
-				$new_status = $db_moduleid == $moduleid ? $set_status : $db_module['status'];
-
-				if ($new_status == MODULE_STATUS_ENABLED) {
-					$module_manager_enabled->addModule($db_module['relative_path']);
-				}
-			}
-
-			$errors = $module_manager_enabled->checkConflicts()['conflicts'];
-
-			array_map('error', $errors);
-		}
-
-		$result = false;
-
-		if (!$errors) {
-			$update = [
+		foreach ($moduleids as $moduleid) {
+			$update[] = [
 				'moduleid' => $moduleid,
-				'status' => $set_status
+				'status' => MODULE_STATUS_DISABLED
 			];
-
-			$result = API::Module()->update($update);
 		}
+
+		$result = API::Module()->update($update);
 
 		if ($result) {
-			$output['success']['title'] = _s('Module updated');
+			$output['success']['title'] = _n('Module disabled', 'Modules disabled', count($moduleids));
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -99,9 +72,17 @@ class CControllerModuleUpdate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _s('Cannot update module'),
+				'title' => _n('Cannot disable module', 'Cannot disable modules', count($moduleids)),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
+
+			$modules = API::Module()->get([
+				'output' => [],
+				'moduleids' => $moduleids,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($modules);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
