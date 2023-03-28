@@ -2386,7 +2386,10 @@ void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
 	ZBX_TABLE		*table;
 	int			i;
 	zbx_vector_str_t	names;
-	size_t			offset = json->buffer_offset;
+	size_t			offset;
+
+	if (NULL != json)
+		offset = json->buffer_offset
 
 	zbx_vector_str_create(&names);
 
