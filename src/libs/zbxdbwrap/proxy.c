@@ -2907,7 +2907,7 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
+int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
