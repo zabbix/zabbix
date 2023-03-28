@@ -60,7 +60,6 @@ PROXY_SUBDIRS = \
 else
 
 PROXY_SUBDIRS = \
-	zabbix_server/dbsyncer \
 	zabbix_server/dbconfig \
 	zabbix_server/discoverer \
 	zabbix_server/httppoller \
