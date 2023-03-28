@@ -148,7 +148,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 
 			// Check Service tab fields' maxlength.
 			$limits = [
-				'Tile URL' => 1024,
+				'Tile URL' => 2048,
 				'Attribution HTML' => 1024,
 				'Max zoom level' => 10
 			];
