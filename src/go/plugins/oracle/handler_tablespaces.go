@@ -67,7 +67,7 @@ func getQuery(params map[string]string) (string, error) {
 	t := params["Type"]
 	conn := params["Conname"]
 
-	if ts == "" && t == "" && conn == "" {
+	if ts == "" && t == "" {
 		if conn == "" {
 			return getFullQuery(), nil
 		}
