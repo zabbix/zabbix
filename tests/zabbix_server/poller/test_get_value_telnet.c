@@ -23,9 +23,9 @@
 
 #include "zbxsysinfo.h"
 
-int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
+int	__wrap_telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding);
 
-int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error)
+int	zbx_get_value_telnet_test_run(zbx_dc_item_t *item, char **error)
 {
 	AGENT_RESULT	result;
 	int		ret;
@@ -44,7 +44,7 @@ int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error)
 	return ret;
 }
 
-int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+int	__wrap_telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding)
 {
 	ZBX_UNUSED(item);
 	ZBX_UNUSED(result);

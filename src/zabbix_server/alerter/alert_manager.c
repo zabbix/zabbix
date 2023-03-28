@@ -1373,10 +1373,17 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 {
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
+	char		*error_path = NULL;
 
 	*cmd = (char *)zbx_malloc(NULL, cmd_alloc);
 
 	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", scripts_path, mediatype->exec_path);
+
+	if (FAIL == zbx_check_allowed_path(scripts_path, *cmd, &error_path))
+	{
+		*error = zbx_dsprintf(*error, "Cannot execute command \"%s\": %s", *cmd, error_path);
+		goto out;
+	}
 
 	if (0 == access(*cmd, X_OK))
 	{
@@ -1413,6 +1420,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 out:
 	if (SUCCEED != ret)
 		zbx_free(*cmd);
+	zbx_free(error_path);
 
 	return ret;
 }

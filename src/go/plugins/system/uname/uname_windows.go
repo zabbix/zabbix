@@ -28,6 +28,7 @@ import (
 
 	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/wmi"
+	"zabbix.com/pkg/win32"
 )
 
 func getHostname(params []string) (uname string, err error) {
@@ -36,6 +37,7 @@ func getHostname(params []string) (uname string, err error) {
 	}
 
 	var mode, transform string
+	const ComputerNameDnsFullyQualified = 3
 
 	if len(params) > 0 {
 		mode = params[0]
@@ -56,6 +58,13 @@ func getHostname(params []string) (uname string, err error) {
 		if uname, err = os.Hostname(); err != nil {
 			return "", err
 		}
+	case "fqdn":
+		uname, err = win32.GetComputerNameExA(ComputerNameDnsFullyQualified)
+		if err != nil {
+			return "", err
+		}
+
+		uname = strings.Trim(uname, " .\n\r")
 	case "shorthost":
 		if uname, err = os.Hostname(); err != nil {
 			return "", err

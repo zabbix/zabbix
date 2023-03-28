@@ -34,7 +34,7 @@ void	scriptitem_es_engine_destroy(void)
 		zbx_es_destroy(&es_engine);
 }
 
-int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_script(zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, timeout_seconds, ret = NOTSUPPORTED;
