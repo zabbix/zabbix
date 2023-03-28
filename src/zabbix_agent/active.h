@@ -24,6 +24,7 @@
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxcomms.h"
+#include "cfg.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_HOST_METADATA;
@@ -44,7 +45,7 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 typedef struct
 {
-	zbx_vector_ptr_t	addrs;
+	zbx_vector_addr_ptr_t	addrs;
 	char			*hostname;
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;

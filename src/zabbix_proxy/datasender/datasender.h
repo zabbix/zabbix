@@ -21,15 +21,16 @@
 #define ZABBIX_DATASENDER_H
 
 #include "zbxthreads.h"
-
+#include "cfg.h"
 #include "zbxcomms.h"
+#include "zbxalgo.h"
 
 typedef struct
 {
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
-	zbx_vector_ptr_t	*config_server_addrs;
+	zbx_vector_addr_ptr_t	*config_server_addrs;
 	const char		*config_source_ip;
 	const char		*config_hostname;
 	int			config_proxydata_frequency;

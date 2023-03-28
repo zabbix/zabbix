@@ -601,7 +601,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
  *               FAIL on other cases                                          *
  *                                                                            *
  ******************************************************************************/
-static int	refresh_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *config_tls,
+static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		zbx_uint32_t *config_revision_local, int config_timeout)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
@@ -765,7 +765,7 @@ static int	check_response(char *response)
  *               FAIL - error when sending data                               *
  *                                                                            *
  ******************************************************************************/
-static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec,
+static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
@@ -969,7 +969,7 @@ ret:
  *           process_log(), process_logrt(), zbx_read2() and their callers.   *
  *                                                                            *
  ******************************************************************************/
-static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
+static int	process_value(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
 		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source,
 		const unsigned short *severity, const unsigned long *logeventid, unsigned char flags,
@@ -1132,7 +1132,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		const zbx_config_tls_t *config_tls, int config_timeout, char **error)
@@ -1156,7 +1156,7 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		char **error);
 #endif
 
-static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
+static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
 		const zbx_config_tls_t *config_tls, int config_timeout, char **error)
 {
 	int		ret;
@@ -1227,14 +1227,14 @@ static void	zbx_fill_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, con
 }
 #endif	/* not WINDOWS, not __MINGW32__ */
 
-static void	process_active_checks(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *config_tls,
+static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		int config_timeout)
 {
 	char	*error = NULL;
 	int	i, now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, ((zbx_addr_t *)addrs->values[0])->ip,
-			((zbx_addr_t *)addrs->values[0])->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, addrs->values[0]->ip,
+			addrs->values[0]->port);
 
 	now = (int)time(NULL);
 
@@ -1388,7 +1388,7 @@ static void	zbx_active_checks_sigusr_handler(int flags)
 }
 #endif
 
-static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs, const zbx_config_tls_t *config_tls, int config_timeout)
+static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -1452,7 +1452,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_vector_ptr_create(&activechk_args.addrs);
+	zbx_vector_addr_ptr_create(&activechk_args.addrs);
 
 	zbx_addr_copy(&activechk_args.addrs, &(activechks_args_in->addrs));
 	CONFIG_HOSTNAME = zbx_strdup(NULL, activechks_args_in->hostname);

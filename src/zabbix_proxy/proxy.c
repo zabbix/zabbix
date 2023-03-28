@@ -200,8 +200,6 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-char	*CONFIG_HOSTNAME = NULL;
-
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
@@ -303,6 +301,7 @@ int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
 char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT;
+char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
@@ -344,7 +343,7 @@ static int	config_allow_root	= 0;
 
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
-static zbx_vector_ptr_t	config_server_addrs;
+static zbx_vector_addr_ptr_t	config_server_addrs;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -718,7 +717,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		exit(EXIT_FAILURE);
 }
 
-static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	proxy_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	ZBX_UNUSED(hostnames);
 	ZBX_UNUSED(data);
@@ -959,7 +958,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	zbx_validate_config(task);
 
-	zbx_vector_ptr_create(&config_server_addrs);
+	zbx_vector_addr_ptr_create(&config_server_addrs);
 
 	if (ZBX_PROXYMODE_PASSIVE != config_proxymode)
 	{
