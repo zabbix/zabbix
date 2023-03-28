@@ -135,22 +135,9 @@ abstract class CItemGeneral extends CApiService {
 	 * @param bool  $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
-		$this->addHostStatus($items, $update);
-
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
-			'host_status' => ['type' => API_INT32],
-			'uuid' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
+			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
+			'uuid' => ['type' => API_UUID]
 		]];
 
 		if ($update) {
@@ -167,7 +154,7 @@ abstract class CItemGeneral extends CApiService {
 		if ($update) {
 			$itemDbFields = ['itemid' => null];
 
-			$dbItemsFields = ['itemid', 'templateid', 'uuid'];
+			$dbItemsFields = ['itemid', 'templateid'];
 			foreach ($this->fieldRules as $field => $rule) {
 				if (!isset($rule['system'])) {
 					$dbItemsFields[] = $field;
@@ -176,14 +163,14 @@ abstract class CItemGeneral extends CApiService {
 
 			$dbItems = $this->get([
 				'output' => $dbItemsFields,
-				'itemids' => array_column($items, 'itemid'),
+				'itemids' => zbx_objectValues($items, 'itemid'),
 				'editable' => true,
 				'preservekeys' => true
 			]);
 
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'status', 'name'],
-				'hostids' => array_column($dbItems, 'hostid'),
+				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
 				'preservekeys' => true
@@ -208,7 +195,6 @@ abstract class CItemGeneral extends CApiService {
 			]);
 
 			$discovery_rules = [];
-			$dbItems = [];
 
 			if ($this instanceof CItemPrototype) {
 				$itemDbFields['ruleid'] = null;
@@ -614,7 +600,8 @@ abstract class CItemGeneral extends CApiService {
 		unset($item);
 
 		$this->validateValueMaps($items);
-		$this->checkAndAddUuid($items, $dbItems);
+
+		$this->checkAndAddUuid($items, $dbHosts, $update);
 		$this->checkExistingItems($items);
 	}
 
@@ -622,43 +609,40 @@ abstract class CItemGeneral extends CApiService {
 	 * Check that only items on templates have UUID. Add UUID to all host prototypes on templates,
 	 *   if it doesn't exist.
 	 *
-	 * @param array $items
-	 * @param array $db_items
+	 * @param array $items_to_create
+	 * @param array $db_hosts
+	 * @param bool  $is_update
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$items, array $db_items): void {
-		$new_item_uuids = [];
+	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
+		if ($is_update) {
+			return;
+		}
 
-		foreach ($items as &$item) {
-			if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
-				$db_uuid = array_key_exists('itemid', $item) && array_key_exists($item['itemid'], $db_items)
-					? $db_items[$item['itemid']]['uuid']
-					: '';
+		foreach ($items_to_create as $index => &$item) {
+			if ($db_hosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE && array_key_exists('uuid', $item)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
+			}
 
-				if (!array_key_exists('uuid', $item)) {
-					$item['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
-				}
-
-				if ($item['uuid'] !== $db_uuid) {
-					$new_item_uuids[] = $item['uuid'];
-				}
+			if ($db_hosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
+				$item['uuid'] = generateUuidV4();
 			}
 		}
 		unset($item);
 
-		if ($new_item_uuids) {
-			$db_uuid = DB::select('items', [
-				'output' => ['uuid'],
-				'filter' => ['uuid' => $new_item_uuids],
-				'limit' => 1
-			]);
+		$db_uuid = DB::select('items', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($items_to_create, 'uuid')],
+			'limit' => 1
+		]);
 
-			if ($db_uuid) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-				);
-			}
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
 		}
 	}
 
@@ -2981,59 +2965,5 @@ abstract class CItemGeneral extends CApiService {
 		unset($step);
 
 		return $preprocessing;
-	}
-
-	/**
-	 * Extend $items by host status in 'host_status' property. It indicates if item belongs to host or template.
-	 *
-	 * @param array  $items       Items to extend.
-	 * @param bool   $update      True if called from API update method.
-	 */
-	private function addHostStatus(array &$items, $update): void {
-		if ($update) {
-			$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-				'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED]
-			]];
-
-			if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			$db_items = $this->get([
-				'output' => [],
-				'selectHosts' => ['status'],
-				'itemids' => array_column($items, 'itemid'),
-				'preservekeys' => true
-			]);
-
-			foreach ($items as &$item) {
-				$item['host_status'] = array_key_exists($item['itemid'], $db_items)
-					? $db_items[$item['itemid']]['hosts'][0]['status']
-					: -1;
-			}
-		}
-		else {
-			$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-				'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
-			]];
-
-			if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			$templateids = array_column($items, 'hostid', 'hostid');
-			$db_templates = API::Template()->get([
-				'output' => [],
-				'templateids' => $templateids,
-				'preservekeys' => true
-			]);
-
-			foreach ($items as &$item) {
-				$item['host_status'] = array_key_exists($item['hostid'], $db_templates)
-					? HOST_STATUS_TEMPLATE
-					: -1;
-			}
-			unset($item);
-		}
 	}
 }
