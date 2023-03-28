@@ -24,6 +24,7 @@
 
 extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
 extern int	CONFIG_MAX_HOUSEKEEPER_DELETE;
+extern int      CONFIG_HOUSEKEEPING_MAX_CHUNK_SIZE;
 
 typedef struct
 {

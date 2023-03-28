@@ -272,6 +272,55 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 	zbx_vector_ptr_create(&rule->delete_queue);
 	zbx_vector_ptr_reserve(&rule->delete_queue, HK_INITIAL_DELETE_QUEUE_SIZE);
 
+	if (0 < CONFIG_HOUSEKEEPING_MAX_CHUNK_SIZE) {
+		zbx_uint64_t first_item;
+		zbx_uint64_t next_item;
+		zbx_uint64_t last_item;
+
+		result = zbx_db_select("select itemid from %s order by itemid asc limit 1", rule->table);
+
+		if (NULL != (row = zbx_db_fetch(result)) && FAIL == zbx_db_is_null(row[0]))
+		{
+			ZBX_STR2UINT64(first_item, row[0]);
+		}
+		zbx_db_free_result(result);
+
+		DB_RESULT result = zbx_db_select("select itemid from %s order by itemid desc limit 1", rule->table);
+		if (NULL != (row = zbx_db_fetch(result)) && FAIL == zbx_db_is_null(row[0]))
+		{
+		    ZBX_STR2UINT64(last_item, row[0]);
+		}
+		zbx_db_free_result(result);
+
+		if(NULL == first_item | NULL == last_item) return
+
+		for (zbx_uint64_t i = first_item; i < last_item; i+=CONFIG_HOUSEKEEPING_MAX_CHUNK_SIZE) {
+			next_item = i + CONFIG_HOUSEKEEPING_MAX_CHUNK_SIZE;
+			result = zbx_db_select("select itemid,min(clock) from %s where itemid >= " ZBX_FS_UI64
+				" and itemid <= " ZBX_FS_UI64 " group by itemid", 
+                                rule->table, first_item, next_item);
+
+			while (NULL != (row = zbx_db_fetch(result)))
+			{
+				zbx_uint64_t		itemid;
+				int			min_clock;
+				zbx_hk_item_cache_t	item_record;
+
+				ZBX_STR2UINT64(itemid, row[0]);
+				min_clock = atoi(row[1]);
+
+				item_record.itemid = itemid;
+				item_record.min_clock = min_clock;
+
+				zbx_hashset_insert(&rule->item_cache, &item_record, sizeof(zbx_hk_item_cache_t));
+			}
+
+			zbx_db_free_result(result);
+		}
+
+		return;
+	}
+
 	result = zbx_db_select("select itemid,min(clock) from %s group by itemid", rule->table);
 
 	while (NULL != (row = zbx_db_fetch(result)))
