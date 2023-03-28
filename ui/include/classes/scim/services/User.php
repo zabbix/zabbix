@@ -355,7 +355,7 @@ class User extends ScimApiService {
 		// In order to comply with Azure SCIM without flag "aadOptscim062020", attribute active value is transformed to
 		// boolean.
 		foreach ($options['Operations'] as &$operation) {
-			if ($operation['path'] === 'active') {
+			if ($operation['path'] === 'active' && !is_bool($operation['value'])) {
 				$operation['value'] = strtolower($operation['value']) === 'true';
 			}
 		}
