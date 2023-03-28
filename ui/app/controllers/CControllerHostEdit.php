@@ -189,7 +189,7 @@ class CControllerHostEdit extends CController {
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
 			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-			'warning' => null,
+			'warnings' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -263,7 +263,7 @@ class CControllerHostEdit extends CController {
 						'value' => ''
 					] + $macro;
 
-					$data['warning'] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+					$data['warnings'][] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
 				}
 			}
 			unset($macro);
@@ -277,8 +277,12 @@ class CControllerHostEdit extends CController {
 		}
 
 		// Extend data for view.
-		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups']);
+		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups'], $clone_hostid !== null);
 		unset($data['groups']);
+
+		if ($clone_hostid !== null && count($data['host']['groups']) != count($data['groups_ms'])) {
+			$data['warnings'][] = _('The cloned host belongs to the host group you do not have write permissions. Non-writable group was removed from the new host.');
+		}
 
 		CArrayHelper::sort($data['host']['parentTemplates'], ['name']);
 		$this->extendLinkedTemplates($data['editable_templates']);
@@ -301,10 +305,11 @@ class CControllerHostEdit extends CController {
 	 * Function to prepare data for host group multiselect.
 	 *
 	 * @param array $groups
+	 * @param bool  $skip_non_editable  Whether to include non-editable host groups into response.
 	 *
 	 * @return array
 	 */
-	protected function hostGroupsForMultiselect(array $groups): array {
+	protected function hostGroupsForMultiselect(array $groups, $skip_non_editable = false): array {
 		$groupids = [];
 		foreach ($groups as $group) {
 			if (array_key_exists('new', $group)) {
@@ -343,12 +348,16 @@ class CControllerHostEdit extends CController {
 				];
 			}
 			elseif (array_key_exists($group['groupid'], $groups_all)) {
+				$is_editable = array_key_exists($group['groupid'], $groups_rw);
+
+				if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && $skip_non_editable && !$is_editable) {
+					continue;
+				}
+
 				$groups_ms[] = [
 					'id' => $group['groupid'],
 					'name' => $groups_all[$group['groupid']]['name'],
-					'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
-						&& !array_key_exists($group['groupid'], $groups_rw
-					)
+					'disabled' => CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !$is_editable
 				];
 			}
 		}
