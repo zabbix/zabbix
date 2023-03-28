@@ -316,9 +316,8 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url']))
+		(new CTextBox('url', $data['url'], false, DB::getFieldLength('users', 'url')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('maxlength', DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -354,16 +353,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->setEnabled(!$data['readonly']);
 		}
 		else {
-			$media_name = new CDiv([
-				$media['name'],
-				(new CSpan([
-					' ',
-					makeWarningIcon(
-						_('Media type disabled by Administration.')
-					)
-				]))
-			]);
-
+			$media_name = new CDiv([$media['name'], makeWarningIcon(_('Media type disabled by Administration.'))]);
 			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);
 		}
 

@@ -974,7 +974,8 @@ class testMassUpdateItems extends CWebTest{
 						'Update interval' => ['Delay' => '86400'],
 						'Enable trapping' => ['id' => 'allow_traps', 'value' => 'Yes']
 					]
-				]
+				],
+				'screenshot' => true
 			],
 			[
 				[
@@ -1254,6 +1255,13 @@ class testMassUpdateItems extends CWebTest{
 
 				case 'Headers':
 					$form->query('xpath:.//div[@id="headers_pairs"]/table')->asMultifieldTable()->one()->fill($value);
+
+					// Take a screenshot to test draggable object position of headers in mass update.
+					if (array_key_exists('screenshot', $data)) {
+						$this->page->removeFocus();
+						$this->assertScreenshot($form->query('id:headers_pairs')->waitUntilPresent()->one(), 'Item mass update headers'.$prototypes);
+					}
+
 					break;
 
 				case 'Master item':
@@ -1654,7 +1662,8 @@ class testMassUpdateItems extends CWebTest{
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
 								'parameter_3' => 'label_name']
-					]
+					],
+					'Screenshot' => true
 				]
 			]
 		];
@@ -1678,6 +1687,16 @@ class testMassUpdateItems extends CWebTest{
 
 		if ($data['Preprocessing steps'] !== []) {
 			$this->addPreprocessingSteps($data['Preprocessing steps']);
+
+			// Take a screenshot to test draggable object position of preprocessing steps in mass update.
+			if (array_key_exists('Screenshot', $data)) {
+				$this->page->removeFocus();
+
+				// It is necessary because of unexpected viewport shift.
+				$this->page->updateViewport();
+				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(), 'Item mass update preprocessing'.$prototypes);
+			}
+
 		}
 
 		$dialog->query('button:Update')->one()->waitUntilClickable()->click();

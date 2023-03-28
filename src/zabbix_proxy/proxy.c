@@ -46,9 +46,7 @@
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager.h"
 #include "../zabbix_server/vmware/vmware.h"
-#include "setproctitle.h"
 #include "zbxcomms.h"
-#include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
@@ -62,9 +60,8 @@
 #include "zbx_rtc_constants.h"
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
-#include "../zabbix_server/preprocessor/preproc_stats.h"
 #include "../zabbix_server/ipmi/ipmi_manager.h"
-#include "preproc.h"
+#include "preproc/preproc_proxy.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -263,15 +260,14 @@ static int	get_config_timeout(void)
 
 static int	config_startup_time	= 0;
 static int	config_unavailable_delay	=60;
+static int	config_housekeeping_frequency = 1;
+static int	config_proxy_local_buffer = 0;
+static int	config_proxy_offline_buffer = 1;
 static int	config_histsyncer_frequency = 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
-
-int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-int	CONFIG_PROXY_LOCAL_BUFFER	= 0;
-int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 
 int	CONFIG_HEARTBEAT_FREQUENCY	= -1;
 
@@ -784,11 +780,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HistoryIndexCacheSize",	&CONFIG_HISTORY_INDEX_CACHE_SIZE,	TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
+		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
 			PARM_OPT,	0,			24},
-		{"ProxyLocalBuffer",		&CONFIG_PROXY_LOCAL_BUFFER,		TYPE_INT,
+		{"ProxyLocalBuffer",		&config_proxy_local_buffer,		TYPE_INT,
 			PARM_OPT,	0,			720},
-		{"ProxyOfflineBuffer",		&CONFIG_PROXY_OFFLINE_BUFFER,		TYPE_INT,
+		{"ProxyOfflineBuffer",		&config_proxy_offline_buffer,		TYPE_INT,
 			PARM_OPT,	1,			720},
 		{"HeartbeatFrequency",		&CONFIG_HEARTBEAT_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	0,			ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX},
@@ -1020,8 +1016,8 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	free_database_cache(ZBX_SYNC_ALL);
-	free_configuration_cache();
+	zbx_free_database_cache(ZBX_SYNC_ALL);
+	zbx_free_configuration_cache();
 	zbx_db_close();
 
 	zbx_db_deinit();
@@ -1041,9 +1037,7 @@ static void	zbx_on_exit(int ret)
 
 	zbx_locks_destroy();
 
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
+	zbx_setproctitle_deinit();
 
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_config_dbhigh_free(zbx_config_dbhigh);
@@ -1078,10 +1072,7 @@ int	main(int argc, char **argv)
 
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
-
-#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	argv = setproctitle_save_env(argc, argv);
-#endif
+	argv = zbx_setproctitle_init(argc, argv);
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -1160,6 +1151,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_sysinfo(get_config_timeout);
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
+	zbx_init_library_preproc(preproc_flush_value_proxy);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1207,7 +1199,7 @@ static void	proxy_db_init(void)
 	zbx_stat_t	db_stat;
 #endif
 
-	if (SUCCEED != zbx_db_init(DCget_nextid, program_type, &error))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -1232,7 +1224,7 @@ static void	proxy_db_init(void)
 	zbx_db_check_character_set();
 	zbx_check_db();
 
-	if (SUCCEED != (version_check = DBcheck_version()))
+	if (SUCCEED != (version_check = DBcheck_version(ZBX_HA_MODE_STANDALONE)))
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
@@ -1277,12 +1269,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&listen_sock, config_startup_time};
-	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
+	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout, config_housekeeping_frequency,
+								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {config_timeout};
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {config_timeout, config_unavailable_delay};
 #endif
-	zbx_thread_preprocessing_manager_args	preproc_man_args =
+	zbx_thread_pp_manager_args		preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {config_histsyncer_frequency};
 
@@ -1396,7 +1389,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -1410,7 +1403,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_configuration_cache(&error))
+	if (SUCCEED != zbx_init_configuration_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1455,7 +1448,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	proxy_db_init();
 
-	change_proxy_history_count(zbx_proxy_get_history_count());
+	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
@@ -1581,7 +1574,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &preproc_man_args;
-				zbx_thread_start(preprocessing_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;

@@ -36,7 +36,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
 	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
-	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \

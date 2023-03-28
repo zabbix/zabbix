@@ -245,4 +245,7 @@ void		zbx_add_alias(const char *name, const char *value);
 void		zbx_alias_list_free(void);
 const char	*zbx_alias_get(const char *orig);
 
+int		zbx_init_modbus(char **error);
+void		zbx_deinit_modbus(void);
+
 #endif /* ZABBIX_ZBXSYSINFO_H */

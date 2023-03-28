@@ -1077,6 +1077,19 @@ in:
 out:
   return: FAIL
 ---
+test case: jsonpath13
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"\ud800": 1}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a
+out:
+  return: FAIL
+---
 test case: validate_range(1, 5, 10)
 in:
   value:
