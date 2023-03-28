@@ -32,7 +32,7 @@
 #define PACKED_FIELD_STRING	1
 
 #define PACKED_FIELD(value, size)	\
-		(zbx_packed_field_t){(value), (size), (0 == (size) ? PACKED_FIELD_STRING : PACKED_FIELD_RAW)};
+		(zbx_packed_field_t){(value), (size), (0 == (size) ? PACKED_FIELD_STRING : PACKED_FIELD_RAW)}
 
 static zbx_ipc_message_t	cached_message;
 static int			cached_values;

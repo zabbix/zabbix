@@ -911,7 +911,7 @@ static void	sync_actions(zbx_service_manager_t *service_manager, int revision)
 	result = zbx_db_select("select actionid,evaltype,formula from actions "
 				"where eventsource=%d"
 					" and status=%d",
-			EVENT_SOURCE_SERVICE, ACTION_STATUS_ACTIVE);
+			EVENT_SOURCE_SERVICE, ZBX_ACTION_STATUS_ACTIVE);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1031,7 +1031,7 @@ static void	sync_action_conditions(zbx_service_manager_t *service_manager, int r
 				" where c.actionid=a.actionid"
 					" and a.eventsource=%d"
 					" and a.status=%d",
-			EVENT_SOURCE_SERVICE, ACTION_STATUS_ACTIVE);
+			EVENT_SOURCE_SERVICE, ZBX_ACTION_STATUS_ACTIVE);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1121,8 +1121,8 @@ static void	sync_config(zbx_service_manager_t *service_manager)
 	}
 	else
 	{
-		const ZBX_TABLE	*table;
-		char		field[16];
+		const zbx_db_table_t	*table;
+		char			field[16];
 
 		table = zbx_db_get_table("config");
 

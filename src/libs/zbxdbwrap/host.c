@@ -931,7 +931,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 		zbx_vector_uint64_uniq(&actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update actions set status=%d where",
-				ACTION_STATUS_DISABLED);
+				ZBX_ACTION_STATUS_DISABLED);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids.values,
 				actionids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
@@ -4237,34 +4237,41 @@ static void	DBget_httptests(const zbx_uint64_t hostid, const zbx_vector_uint64_t
 		{
 			unsigned char		uchar_orig;
 
-#define SET_FLAG_STR(r, i, f, s)		\
-{						\
-	if (0 != strcmp(r, (i)))		\
-	{					\
-		s->upd_flags |= f;		\
-		i##_orig = zbx_strdup(NULL, r);	\
-	}					\
-}
+#define SET_FLAG_STR(r, i, f, s)			\
+	do						\
+	{						\
+		if (0 != strcmp(r, (i)))		\
+		{					\
+			s->upd_flags |= f;		\
+			i##_orig = zbx_strdup(NULL, r);	\
+		}					\
+	}						\
+	while(0)
 
-#define SET_FLAG_UCHAR(r, i, f, s)		\
-{						\
-	ZBX_STR2UCHAR(uchar_orig, (r));		\
-	if (uchar_orig != (i))			\
-	{					\
-		s->upd_flags |= f;		\
-		i##_orig = uchar_orig;		\
-	}					\
-}
+#define SET_FLAG_UCHAR(r, i, f, s)			\
+	do 						\
+	{						\
+		ZBX_STR2UCHAR(uchar_orig, (r));		\
+		if (uchar_orig != (i))			\
+		{					\
+			s->upd_flags |= f;		\
+			i##_orig = uchar_orig;		\
+		}					\
+	}						\
+	while(0)
 
-#define SET_FLAG_INT(r, i, f, s)		\
-{						\
-	int_orig = atoi(r);			\
-	if (int_orig != (i))			\
-	{					\
-		s->upd_flags |= f;		\
-		i##_orig = int_orig;		\
-	}					\
-}
+#define SET_FLAG_INT(r, i, f, s)			\
+	do						\
+	{						\
+		int_orig = atoi(r);			\
+		if (int_orig != (i))			\
+		{					\
+			s->upd_flags |= f;		\
+			i##_orig = int_orig;		\
+		}					\
+	}						\
+	while(0)
+
 			SET_FLAG_STR(row[12], httptest->delay, ZBX_FLAG_HTTPTEST_UPDATE_DELAY, httptest);
 			SET_FLAG_UCHAR(row[13], httptest->status, ZBX_FLAG_HTTPTEST_UPDATE_STATUS, httptest);
 			SET_FLAG_STR(row[14], httptest->agent, ZBX_FLAG_HTTPTEST_UPDATE_AGENT, httptest);

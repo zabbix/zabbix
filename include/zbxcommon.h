@@ -445,7 +445,7 @@ while (0)
 /* to avoid dependency on libzbxnix.a */
 #define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
 
 extern const char	*progname;
 extern const char	title_message[];
@@ -801,5 +801,19 @@ char	*zbx_strerror(int errnum);
 #		define zbx_sigmask	sigprocmask
 #	endif
 #endif
+
+#define ZBX_PROPERTY_DECL(type, varname, defvalue) \
+static type	varname = defvalue; \
+static type	get_##varname(void) \
+{ \
+	return varname; \
+}
+
+#define ZBX_PROPERTY_DECL_CONST(type, varname, defvalue) \
+static type	varname = defvalue; \
+static const type	get_##varname(void) \
+{ \
+	return varname; \
+}
 
 #endif

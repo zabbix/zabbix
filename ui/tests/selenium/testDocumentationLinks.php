@@ -1629,7 +1629,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'link:1st Module name'
 						]
 					],
-					'doc_link' => '/en/manual/modules#manifest-preparation'
+					'doc_link' => '/en/manual/extensions/frontendmodules#manifest-preparation'
 				]
 			],
 			// #174 Administration -> General -> Api tokens list view.

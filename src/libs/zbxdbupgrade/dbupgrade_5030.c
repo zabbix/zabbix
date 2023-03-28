@@ -257,28 +257,28 @@ static int	DBpatch_5030003(void)
 
 static int	DBpatch_5030004(void)
 {
-	const ZBX_FIELD	field = {"available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030005(void)
 {
-	const ZBX_FIELD	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030006(void)
 {
-	const ZBX_FIELD	field = {"errors_from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"errors_from", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
 
 static int	DBpatch_5030007(void)
 {
-	const ZBX_FIELD	field = {"disable_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"disable_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface", &field);
 }
@@ -384,23 +384,23 @@ static int	DBpatch_5030025(void)
 
 static int	DBpatch_5030026(void)
 {
-	const ZBX_TABLE table =
-		{"token", "tokenid", 0,
-			{
-				{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, 0, 0},
-				{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"created_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"creator_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-				{0}
-			},
-			NULL
-		};
+	const zbx_db_table_t	table =
+			{"token", "tokenid", 0,
+				{
+					{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, 0, 0},
+					{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"created_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"creator_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -427,36 +427,36 @@ static int	DBpatch_5030030(void)
 
 static int	DBpatch_5030031(void)
 {
-	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("token", 1, &field);
 }
 
 static int	DBpatch_5030032(void)
 {
-	const ZBX_FIELD field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
+	const zbx_db_field_t	field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token", 2, &field);
 }
 
 static int	DBpatch_5030033(void)
 {
-	const ZBX_FIELD	field = {"timeout", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"timeout", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_5030034(void)
 {
-	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"command", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("scripts", &field, &old_field);
 }
 
 static int	DBpatch_5030035(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 			{"script_param", "script_paramid", 0,
 				{
 					{"script_paramid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -473,7 +473,7 @@ static int	DBpatch_5030035(void)
 
 static int	DBpatch_5030036(void)
 {
-	const ZBX_FIELD	field = {"scriptid", NULL, "scripts", "scriptid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"scriptid", NULL, "scripts", "scriptid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("script_param", 1, &field);
 }
@@ -485,23 +485,23 @@ static int	DBpatch_5030037(void)
 
 static int	DBpatch_5030038(void)
 {
-	const ZBX_FIELD field = {"type", "5", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"type", "5", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("scripts", &field);
 }
 
 static int	DBpatch_5030039(void)
 {
-	const ZBX_TABLE table =
-		{"valuemap", "valuemapid", 0,
-			{
-				{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
+	const zbx_db_table_t	table =
+			{"valuemap", "valuemapid", 0,
+				{
+					{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -513,24 +513,24 @@ static int	DBpatch_5030040(void)
 
 static int	DBpatch_5030041(void)
 {
-	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("valuemap", 1, &field);
 }
 
 static int	DBpatch_5030042(void)
 {
-	const ZBX_TABLE table =
-		{"valuemap_mapping", "valuemap_mappingid", 0,
-			{
-				{"valuemap_mappingid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"value", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"newvalue", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
+	const zbx_db_table_t	table =
+			{"valuemap_mapping", "valuemap_mappingid", 0,
+				{
+					{"valuemap_mappingid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"valuemapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"newvalue", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -542,7 +542,7 @@ static int	DBpatch_5030043(void)
 
 static int	DBpatch_5030044(void)
 {
-	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("valuemap_mapping", 1, &field);
 }
@@ -875,7 +875,7 @@ static int	DBpatch_5030046(void)
 
 static int	DBpatch_5030047(void)
 {
-	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, ZBX_TYPE_ID, 0, 0};
+	const zbx_db_field_t	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("items", 3, &field);
 }
@@ -916,7 +916,7 @@ static int	DBpatch_5030052(void)
 
 static int	DBpatch_5030053(void)
 {
-	const ZBX_FIELD	field = {"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"username", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBrename_field("users", "alias", &field);
 }
@@ -1024,56 +1024,56 @@ static int	DBpatch_5030057(void)
 
 static int	DBpatch_5030058(void)
 {
-	const ZBX_FIELD	field = {"scope", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"scope", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_5030059(void)
 {
-	const ZBX_FIELD	field = {"port", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"port", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_5030060(void)
 {
-	const ZBX_FIELD	field = {"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_5030061(void)
 {
-	const ZBX_FIELD	field = {"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_5030062(void)
 {
-	const ZBX_FIELD	field = {"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_5030063(void)
 {
-	const ZBX_FIELD	field = {"publickey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"publickey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_5030064(void)
 {
-	const ZBX_FIELD	field = {"privatekey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"privatekey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_5030065(void)
 {
-	const ZBX_FIELD	field = {"menu_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"menu_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
@@ -1581,7 +1581,7 @@ static int	DBpatch_5030069(void)
 
 static int	DBpatch_5030070(void)
 {
-	const ZBX_FIELD field = {"scriptid", NULL, "scripts","scriptid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"scriptid", NULL, "scripts","scriptid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBset_not_null("opcommand", &field);
 }
@@ -1633,8 +1633,8 @@ static int	DBpatch_5030079(void)
 
 static int	DBpatch_5030080(void)
 {
-	const ZBX_FIELD	old_field = {"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
-	const ZBX_FIELD	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("task_remote_command", &field, &old_field);
 }
@@ -1642,21 +1642,21 @@ static int	DBpatch_5030080(void)
 
 static int	DBpatch_5030081(void)
 {
-	const ZBX_FIELD	field = {"display_period", "30", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"display_period", "30", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("dashboard", &field);
 }
 
 static int	DBpatch_5030082(void)
 {
-	const ZBX_FIELD	field = {"auto_start", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"auto_start", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("dashboard", &field);
 }
 
 static int	DBpatch_5030083(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 			{"dashboard_page", "dashboard_pageid", 0,
 				{
 					{"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1674,7 +1674,8 @@ static int	DBpatch_5030083(void)
 
 static int	DBpatch_5030084(void)
 {
-	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("dashboard_page", 1, &field);
 }
@@ -1701,7 +1702,7 @@ static int	DBpatch_5030086(void)
 
 static int	DBpatch_5030087(void)
 {
-	const ZBX_FIELD	field = {"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+	const zbx_db_field_t	field = {"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	if (SUCCEED != DBadd_field("widget", &field))
 		return FAIL;
@@ -1722,7 +1723,7 @@ static int	DBpatch_5030088(void)
 
 static int	DBpatch_5030089(void)
 {
-	const ZBX_FIELD	field = {"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"dashboard_pageid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBset_not_null("widget", &field);
 }
@@ -1744,7 +1745,7 @@ static int	DBpatch_5030092(void)
 
 static int	DBpatch_5030093(void)
 {
-	const ZBX_FIELD field = {"dashboard_pageid", NULL, "dashboard_page", "dashboard_pageid", 0, 0, 0,
+	const zbx_db_field_t	field = {"dashboard_pageid", NULL, "dashboard_page", "dashboard_pageid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget", 1, &field);
@@ -3640,7 +3641,7 @@ static int	DBpatch_5030109(void)
 
 static int	DBpatch_5030110(void)
 {
-	const ZBX_TABLE table =
+	const zbx_db_table_t	table =
 			{"item_tag", "itemtagid", 0,
 				{
 					{"itemtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -3662,14 +3663,14 @@ static int	DBpatch_5030111(void)
 
 static int	DBpatch_5030112(void)
 {
-	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_tag", 1, &field);
 }
 
 static int	DBpatch_5030113(void)
 {
-	const ZBX_TABLE table =
+	const zbx_db_table_t table =
 			{"httptest_tag", "httptesttagid", 0,
 				{
 					{"httptesttagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -3691,14 +3692,14 @@ static int	DBpatch_5030114(void)
 
 static int	DBpatch_5030115(void)
 {
-	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"httptestid", NULL, "httptest", "httptestid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("httptest_tag", 1, &field);
 }
 
 static int	DBpatch_5030116(void)
 {
-	const ZBX_TABLE table =
+	const zbx_db_table_t	table =
 			{"sysmaps_element_tag", "selementtagid", 0,
 				{
 					{"selementtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -3721,14 +3722,15 @@ static int	DBpatch_5030117(void)
 
 static int	DBpatch_5030118(void)
 {
-	const ZBX_FIELD	field = {"selementid", NULL, "sysmaps_elements", "selementid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"selementid", NULL, "sysmaps_elements", "selementid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sysmaps_element_tag", 1, &field);
 }
 
 static int	DBpatch_5030119(void)
 {
-	const ZBX_FIELD	field = {"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps_elements", &field);
 }
@@ -4316,7 +4318,7 @@ static int	DBpatch_5030144(void)
 
 static int	DBpatch_5030145(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 			{"report", "reportid", 0,
 				{
 					{"reportid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -4349,21 +4351,22 @@ static int	DBpatch_5030146(void)
 
 static int	DBpatch_5030147(void)
 {
-	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report", 1, &field);
 }
 
 static int	DBpatch_5030148(void)
 {
-	const ZBX_FIELD field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"dashboardid", NULL, "dashboard", "dashboardid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report", 2, &field);
 }
 
 static int	DBpatch_5030149(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 			{"report_param", "reportparamid", 0,
 				{
 					{"reportparamid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -4385,14 +4388,14 @@ static int	DBpatch_5030150(void)
 
 static int	DBpatch_5030151(void)
 {
-	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_param", 1, &field);
 }
 
 static int	DBpatch_5030152(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 			{"report_user", "reportuserid", 0,
 				{
 					{"reportuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -4415,28 +4418,28 @@ static int	DBpatch_5030153(void)
 
 static int	DBpatch_5030154(void)
 {
-	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_user", 1, &field);
 }
 
 static int	DBpatch_5030155(void)
 {
-	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_user", 2, &field);
 }
 
 static int	DBpatch_5030156(void)
 {
-	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
+	const zbx_db_field_t	field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("report_user", 3, &field);
 }
 
 static int	DBpatch_5030157(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 			{"report_usrgrp", "reportusrgrpid", 0,
 				{
 					{"reportusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -4458,42 +4461,42 @@ static int	DBpatch_5030158(void)
 
 static int	DBpatch_5030159(void)
 {
-	const ZBX_FIELD field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"reportid", NULL, "report", "reportid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 1, &field);
 }
 
 static int	DBpatch_5030160(void)
 {
-	const ZBX_FIELD field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("report_usrgrp", 2, &field);
 }
 
 static int	DBpatch_5030161(void)
 {
-	const ZBX_FIELD field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
+	const zbx_db_field_t	field = {"access_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("report_usrgrp", 3, &field);
 }
 
 static int	DBpatch_5030162(void)
 {
-	const ZBX_FIELD	field = {"url", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"url", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5030163(void)
 {
-	const ZBX_FIELD	field = {"report_test_timeout", "60s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"report_test_timeout", "60s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_5030164(void)
 {
-	const ZBX_FIELD	field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -5554,7 +5557,7 @@ static int	DBpatch_5030171(void)
 
 static int	DBpatch_5030172(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 			{"trigger_queue", "trigger_queueid", 0,
 				{
 					{"trigger_queueid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -5613,7 +5616,7 @@ static int	DBpatch_5030174(void)
 
 static int	DBpatch_5030175(void)
 {
-	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("valuemap_mapping", &field);
 }
@@ -5635,14 +5638,14 @@ static int	DBpatch_5030178(void)
 
 static int	DBpatch_5030179(void)
 {
-	const ZBX_FIELD	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"valuemapid", NULL, "valuemap", "valuemapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("valuemap_mapping", 1, &field);
 }
 
 static int	DBpatch_5030180(void)
 {
-	const ZBX_FIELD	field = {"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("valuemap_mapping", &field);
 }
@@ -5717,56 +5720,56 @@ out:
 
 static int	DBpatch_5030182(void)
 {
-	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+	const zbx_db_field_t	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("items", &field);
 }
 
 static int	DBpatch_5030183(void)
 {
-	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+	const zbx_db_field_t	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("hosts", &field);
 }
 
 static int	DBpatch_5030184(void)
 {
-	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+	const zbx_db_field_t	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("triggers", &field);
 }
 
 static int	DBpatch_5030185(void)
 {
-	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+	const zbx_db_field_t	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("dashboard", &field);
 }
 
 static int	DBpatch_5030186(void)
 {
-	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+	const zbx_db_field_t	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("graphs", &field);
 }
 
 static int	DBpatch_5030187(void)
 {
-	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+	const zbx_db_field_t	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("hstgrp", &field);
 }
 
 static int	DBpatch_5030188(void)
 {
-	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+	const zbx_db_field_t	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("httptest", &field);
 }
 
 static int	DBpatch_5030189(void)
 {
-	const ZBX_FIELD	field = ZBX_FIELD_UUID;
+	const zbx_db_field_t	field = ZBX_FIELD_UUID;
 
 	return DBadd_field("valuemap", &field);
 }

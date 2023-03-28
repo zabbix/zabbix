@@ -65,7 +65,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
-	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
+	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
@@ -80,7 +80,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
-	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
+	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -137,23 +137,30 @@ else
 if PROXY
 
 PROXY_COMMON_LIB = \
-	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
-	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
-	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
-	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
-	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
-	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/zabbix_proxy/libzbxproxy.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
+	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
+	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
+	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
+	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
+	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
-	$(COMMON_LIB)
+	$(COMMON_LIB) \
+	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a
+
+
 
 DBadd_condition_alloc_SOURCES = \
 	DBadd_condition_alloc.c \

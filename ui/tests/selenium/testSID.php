@@ -127,13 +127,22 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=1&action=module.scan&form=Scan+directory']],
 
 			// #11 Module enable.
-			[['link' => 'zabbix.php?action=module.enable&moduleids[]=1']],
+			[[
+				'link' => 'zabbix.php?action=module.enable&moduleids[]=1',
+				'json_output' => true
+			]],
 
 			// #12 Module disable.
-			[['link' => 'zabbix.php?action=module.disable&moduleids[]=1']],
+			[[
+				'link' => 'zabbix.php?action=module.disable&moduleids[]=1',
+				'json_output' => true
+			]],
 
 			// #13 Module update.
-			[['link' => 'zabbix.php?action=module.update&moduleids%5B%5D=1&form_refresh=1&status=1']],
+			[[
+				'link' => 'zabbix.php?action=module.update&moduleids%5B%5D=1&form_refresh=1&status=1',
+				'json_output' => true
+			]],
 
 			// #14 Regular expressions creation.
 			[['link' => 'zabbix.php?action=regex.create&form_refresh=1&name=cccc&expressions%5B0%5D%5Bexpression_type%5D=0&'.

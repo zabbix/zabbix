@@ -56,7 +56,7 @@ extern int	CONFIG_TRAPPER_TIMEOUT;
 
 typedef struct
 {
-	const ZBX_FIELD	*field;
+	const zbx_db_field_t	*field;
 }
 zbx_const_field_ptr_t;
 
@@ -120,7 +120,7 @@ ZBX_PTR_VECTOR_IMPL(table_row_ptr, zbx_table_row_t *)
 
 typedef struct
 {
-	const ZBX_TABLE			*table;
+	const zbx_db_table_t		*table;
 	zbx_vector_const_field_t	fields;
 	zbx_hashset_t			rows;
 
@@ -300,8 +300,8 @@ out:
  ******************************************************************************/
 static zbx_table_data_t	*proxyconfig_create_table(const char *name)
 {
-	const ZBX_TABLE		*table;
-	const ZBX_FIELD		*field;
+	const zbx_db_table_t	*table;
+	const zbx_db_field_t	*field;
 	zbx_table_data_t	*td;
 	zbx_const_field_ptr_t	ptr;
 
@@ -767,7 +767,7 @@ out:
  *           output value.                                                    *
  *                                                                            *
  ******************************************************************************/
-static int	proxyconfig_convert_value(const ZBX_TABLE *table, const ZBX_FIELD *field, const char *buf,
+static int	proxyconfig_convert_value(const zbx_db_table_t *table, const zbx_db_field_t *field, const char *buf,
 		zbx_json_type_t type, zbx_db_value_t **value, char **error)
 {
 	zbx_db_value_t	value_local;
@@ -860,8 +860,8 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 
 		for (j = 1; NULL != (pf = zbx_json_next_value_dyn(&row->columns, pf, &buf, &buf_alloc, &type)); j++)
 		{
-			const ZBX_FIELD	*field = td->fields.values[j].field;
-			char		*value_esc;
+			const zbx_db_field_t	*field = td->fields.values[j].field;
+			char			*value_esc;
 
 			if (SUCCEED != zbx_flags128_isset(&row->flags, j))
 				continue;
@@ -962,7 +962,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 	{
 		zbx_vector_db_value_ptr_t	values;
 		zbx_db_insert_t			db_insert;
-		const ZBX_FIELD			*fields[ZBX_MAX_FIELDS];
+		const zbx_db_field_t		*fields[ZBX_MAX_FIELDS];
 		int				i, j;
 		char				*buf;
 		size_t				buf_alloc = ZBX_KIBIBYTE;
@@ -1297,7 +1297,7 @@ static void	proxyconfig_check_interface_availability(zbx_table_data_t *td)
 	}
 
 	if (0 != interfaceids.values_num)
-		DCtouch_interfaces_availability(&interfaceids);
+		zbx_dc_touch_interfaces_availability(&interfaceids);
 
 	zbx_vector_uint64_destroy(&interfaceids);
 }
@@ -2117,7 +2117,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
 			if (SUCCEED == zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-				DCsync_kvs_paths(&jp_kvs_paths, config_vault);
+				zbx_dc_sync_kvs_paths(&jp_kvs_paths, config_vault);
 		}
 		else
 		{

@@ -22,8 +22,7 @@
 
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
-#include "zbxnum.h"
-#include "zbxvariant.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {
@@ -202,7 +201,7 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_FLOAT != h->value_type)
 			continue;
@@ -223,7 +222,7 @@ static void	add_history_uint(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_UINT64 != h->value_type)
 			continue;
@@ -244,7 +243,7 @@ static void	add_history_str(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_STR != h->value_type)
 			continue;
@@ -265,7 +264,7 @@ static void	add_history_text(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
 			continue;
@@ -287,7 +286,7 @@ static void	add_history_log(const zbx_vector_ptr_t *history)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 		const zbx_log_value_t	*log;
 
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
@@ -333,6 +332,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
+	int			time_from;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select clock,ns,%s"
@@ -340,18 +340,28 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 			" where itemid=" ZBX_FS_UI64,
 			table->fields, table->name, itemid);
 
+	time_from = end_timestamp - seconds;
+
+	zbx_recalc_time_period(&time_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
+
 	if (ZBX_JAN_2038 == end_timestamp)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", end_timestamp - seconds);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", time_from);
 	}
 	else if (1 == seconds)
 	{
+		if (time_from != end_timestamp - seconds)
+		{
+			zbx_free(sql);
+			goto out;
+		}
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", end_timestamp);
 	}
 	else
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
-				end_timestamp - seconds, end_timestamp);
+				time_from, end_timestamp);
 	}
 
 	result = zbx_db_select("%s", sql);
@@ -431,7 +441,10 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 				table->fields, table->name, itemid, clock_to);
 
 		if (clock_from != clock_to)
+		{
+			zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", clock_from);
+		}
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc");
 
@@ -634,7 +647,7 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const ZBX_DC_HISTORY	*h = (ZBX_DC_HISTORY *)history->values[i];
+		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
 
 		if (h->value_type == hist->value_type)
 			h_num++;

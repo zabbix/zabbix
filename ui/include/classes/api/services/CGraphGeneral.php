@@ -59,8 +59,7 @@ abstract class CGraphGeneral extends CApiService {
 			],
 			'graphids' => $graphids,
 			'editable' => true,
-			'preservekeys' => true,
-			'inherited' => false
+			'preservekeys' => true
 		]);
 
 		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
@@ -72,14 +71,34 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($db_graph);
 
-		foreach ($graphs as &$graph) {
+		foreach ($graphs as $key => &$graph) {
 			// check permissions
 			if (!array_key_exists($graph['graphid'], $db_graphs)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
+			if ($db_graphs[$graph['graphid']]['templateid'] != 0
+					&& $db_graphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update a templated graph "%1$s".',
+					$graph['name']
+				));
+			}
+
 			// cannot update discovered graphs
 			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $db_graphs[$graph['graphid']]);
+
+			// Allow for template inherited graphs to update discover parameter.
+			if ($db_graphs[$graph['graphid']]['templateid'] != 0) {
+				if ($db_graphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+						&& array_key_exists('discover', $graph)) {
+					$graph = ['discover' => $graph['discover']] + $db_graphs[$graph['graphid']];
+					unset($graph['templateid'], $graph['flags'], $graph['uuid']);
+				}
+				else {
+					unset($graphs[$key]);
+				}
+				continue;
+			}
 
 			// validate items on set or pass existing items from DB
 			if (array_key_exists('gitems', $graph)) {
@@ -102,7 +121,9 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $db_graphs);
+		if ($graphs) {
+			$this->validateUpdate($graphs, $db_graphs);
+		}
 
 		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
@@ -131,8 +152,10 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->updateReal($graphs);
-		$this->inherit($graphs);
+		if ($graphs) {
+			$this->updateReal($graphs);
+			$this->inherit($graphs);
+		}
 
 		$resource = ($this instanceof CGraph) ? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $graphs, $db_graphs);
