@@ -39,7 +39,6 @@ if (array_key_exists('no_data', $data)) {
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
-$this->addJsFile('class.calendar.js');
 $this->addJsFile('leaflet.js');
 $this->addJsFile('leaflet.markercluster.js');
 $this->addJsFile('class.dashboard.js');
@@ -50,15 +49,11 @@ $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.calendar.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.coverride.js');
-$this->addJsFile('class.crangecontrol.js');
-$this->addJsFile('colorpicker.js');
 $this->addJsFile('class.csvggraph.js');
-$this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.host.dashboard.view.js.php');
