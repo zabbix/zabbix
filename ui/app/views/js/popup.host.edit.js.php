@@ -41,7 +41,9 @@ window.host_edit_popup = {
 		if (warnings.length) {
 			const message_box = warnings.length == 1
 				? makeMessageBox('warning', warnings, null, true, false)[0]
-				: makeMessageBox('warning', warnings, <?= json_encode(_('Details from cloned host was changed.')) ?>, true, false)[0];
+				: makeMessageBox('warning', warnings,
+						<?= json_encode(_('Cloned host parameter values have been modified.')) ?>, true, false
+					)[0];
 
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}
