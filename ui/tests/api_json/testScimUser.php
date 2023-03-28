@@ -36,18 +36,26 @@ class testScimUser extends CAPIScimTest {
 		'userid' => [
 			'ldap_user' => null,
 			'saml_user_active' => null,
-			'saml_user_inactive' => null
+			'saml_user_inactive' => null,
+			'saml_user_only_username' => null
 		],
 		'username' => [
 			'ldap_user' => 'dwight.schrute@office.com',
 			'saml_user_active' => 'jim.halpert@office.com',
-			'saml_user_inactive' => 'pam.beesly@office.com'
+			'saml_user_inactive' => 'pam.beesly@office.com',
+			'saml_user_only_username' => 'andy.bernard@office.com'
 		],
 		'token' => [
 			'tokenid' => null,
 			'token' => null
 		],
-		'mediatypeid' => '3'
+		'mediatypeid' => '3',
+		'scim_groupids' => [
+			'group_w_members' => null
+		],
+		'user_scim_groupids' => [
+			'user_group_w_members' => null
+		]
 	];
 
 	public function prepareUserData() {
@@ -71,7 +79,7 @@ class testScimUser extends CAPIScimTest {
 			],
 			'provision_groups' => [
 				[
-					'name' => 'group name',
+					'name' => 'group_w_members',
 					'roleid' => 1,
 					'user_groups' => [
 						['usrgrpid' => 7]
@@ -118,6 +126,18 @@ class testScimUser extends CAPIScimTest {
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userid']['saml_user_inactive'] = $user['userids'][0];
 
+		// Create user with only username with newly created userdirectoryid for SAML.
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => self::$data['username']['saml_user_only_username'],
+				'userdirectoryid' => self::$data['userdirectoryid']['saml'],
+				'usrgrps' => [['usrgrpid' => 9]],
+				'roleid' => 1
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userid']['saml_user_only_username'] = $user['userids'][0];
+
 		// Create userdirectory for LDAP.
 		$userdirectory_ldap = CDataHelper::call('userdirectory.create', [
 			'idp_type' => IDP_TYPE_LDAP,
@@ -141,6 +161,26 @@ class testScimUser extends CAPIScimTest {
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userid']['ldap_user'] = $user['userids'][0];
 
+		// Create SCIM group and add a members to it.
+		$group_w_members = DB::insert('scim_group', [['name' => 'group_w_members']]);
+		$this->assertNotEmpty($group_w_members);
+		self::$data['scim_groupids']['group_w_members'] = $group_w_members[0];
+
+		$user_scim_groups = DB::insert('user_scim_group', [
+			[
+				'userid' => self::$data['userid']['saml_user_active'],
+				'scim_groupid' => self::$data['scim_groupids']['group_w_members']
+			],
+			[
+				'userid' => self::$data['userid']['saml_user_only_username'],
+				'scim_groupid' => self::$data['scim_groupids']['group_w_members']
+			]
+		]);
+		$this->assertNotEmpty($user_scim_groups);
+
+		self::$data['user_scim_groupids']['member_saml_user_active'] = $user_scim_groups[0];
+		self::$data['user_scim_groupids']['member_saml_only_username'] = $user_scim_groups[1];
+
 		// Create authorization token to execute requests.
 		$tokenid = CDataHelper::call('token.create', [
 			[
@@ -157,15 +197,55 @@ class testScimUser extends CAPIScimTest {
 		static::$data['token']['token'] = $token[0]['token'];
 	}
 
+	public static function createInvalidGetRequest(): array {
+		return [
+			'Get User by userName which already is linked to other userdirectory' => [
+				'user' => ['userName' => 'ldap_user'],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'User with username dwight.schrute@office.com already exists.',
+					'status' => 400
+				]
+			],
+			'Get non existing user by user id' => [
+				'user' => ['id' => '9999999'],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			],
+			'Get User by id which is already linked to other userdirectory' => [
+				'user' => ['id' => 'ldap_user'],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidGetRequest
+	 */
+	public function testInvalidUserGet($user, $expected_error) {
+		$this->resolveData($user);
+
+		$user['token'] = self::$data['token']['token'];
+
+		$this->call('user.get', $user, $expected_error);
+	}
+
 	public static function createValidGetRequest(): array {
 		return [
 			'Get Users without any parameters (checking connection)' => [
 				'user' => [],
 				'expected_result' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
-					'totalResults' => 2,
+					'totalResults' => 3,
 					'startIndex' => 1,
-					'itemsPerPage' => 2,
+					'itemsPerPage' => 3,
 					'Resources' => [
 						[
 							'id' 		=> 'saml_user_active',
@@ -178,10 +258,15 @@ class testScimUser extends CAPIScimTest {
 							'userName'	=> 'saml_user_inactive',
 							'active'	=> true,
 							'name' => ['givenName' => '', 'familyName' => '']
+						],
+						[
+							'id' 		=> 'saml_user_only_username',
+							'userName'	=> 'saml_user_only_username',
+							'active'	=> true,
+							'name' => ['givenName' => '', 'familyName' => '']
 						]
 					]
-				],
-				'expected_error' => null
+				]
 			],
 			'Get User by userName which does not exist in Zabbix yet' => [
 				'user' => ['userName' => 'michael.scott@office.com'],
@@ -189,8 +274,7 @@ class testScimUser extends CAPIScimTest {
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
 					'totalResults' => 0,
 					'Resources' => []
-				],
-				'expected_error' => null
+				]
 			],
 			'Get User by userName which exist in Zabbix and has the same userdirectoryid' => [
 				'user' => ['userName' => 'saml_user_active'],
@@ -200,8 +284,7 @@ class testScimUser extends CAPIScimTest {
 					'userName'	=> 'saml_user_active',
 					'active'	=> true,
 					'name' => ['givenName' => '', 'familyName' => '']
-				],
-				'expected_error' => null
+				]
 			],
 			'Get User by userName which exist in Zabbix, has the same userdirectoryid, is in disabled group' => [
 				'user' => ['userName' => 'saml_user_inactive'],
@@ -209,8 +292,7 @@ class testScimUser extends CAPIScimTest {
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
 					'totalResults' => 0,
 					'Resources' => []
-				],
-				'expected_error' => null
+				]
 			],
 			'Get User by userid which exist in Zabbix and has the same userdirectoryid' => [
 				'user' => ['id' => 'saml_user_active'],
@@ -220,39 +302,6 @@ class testScimUser extends CAPIScimTest {
 					'userName'	=> 'saml_user_active',
 					'active'	=> true,
 					'name' => ['givenName' => '', 'familyName' => '']
-				],
-				'expected_error' => null
-			]
-		];
-	}
-
-	public static function createInvalidGetRequest(): array {
-		return [
-			'Get User by userName which already is linked to other userdirectory' => [
-				'user' => ['userName' => 'ldap_user'],
-				'expected_result' => null,
-				'expected_error' => [
-					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' => 'User with username dwight.schrute@office.com already exists.',
-					'status' => 400
-				]
-			],
-			'Get non existing user by user id' => [
-				'user' => ['id' => '9999999'],
-				'expected_result' => null,
-				'expected_error' => [
-					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' => 'No permissions to referred object or it does not exist!',
-					'status' => 404
-				]
-			],
-			'Get User by id which is already linked to other userdirectory' => [
-				'user' => ['id' => 'ldap_user'],
-				'expected_result' => null,
-				'expected_error' => [
-					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' => 'No permissions to referred object or it does not exist!',
-					'status' => 404
 				]
 			]
 		];
@@ -260,29 +309,22 @@ class testScimUser extends CAPIScimTest {
 
 	/**
 	 * @dataProvider createValidGetRequest
-	 * @dataProvider createInvalidGetRequest
 	 */
-	public function testUserGet($user, $expected_result, $expected_error) {
+	public function testValidUserGet($user, $expected_result) {
 		$this->resolveData($user);
+		$this->resolveData($expected_result);
 
-		if ($expected_result !== null) {
-			$this->resolveData($expected_result);
-
-			if (array_key_exists('Resources', $expected_result)) {
-				foreach ($expected_result['Resources'] as &$resource) {
-					$this->resolveData($resource);
-				}
-				unset($resource);
+		if (array_key_exists('Resources', $expected_result)) {
+			foreach ($expected_result['Resources'] as &$resource) {
+				$this->resolveData($resource);
 			}
+			unset($resource);
 		}
 
 		$user['token'] = self::$data['token']['token'];
+		$result = $this->call('user.get', $user);
 
-		$result = $this->call('user.get', $user, $expected_error);
-
-		if ($expected_result !== null) {
-			$this->assertEquals($expected_result, $result, 'Returned response should match.');
-		}
+		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 	}
 
 	public static function createInvalidPostRequest(): array {
@@ -617,11 +659,6 @@ class testScimUser extends CAPIScimTest {
 	public function testInvalidUserPut($user, $expected_error) {
 		$this->resolveData($user);
 
-		if (!array_key_exists('detail', $expected_error)) {
-			$expected_error['detail'] = 'The user '.self::$data['userid']['ldap_user'].
-				' belongs to another userdirectory.';
-		}
-
 		$user['token'] = self::$data['token']['token'];
 
 		$this->call('user.put', $user, $expected_error);
@@ -638,6 +675,49 @@ class testScimUser extends CAPIScimTest {
 					'user_lastname' => 'JimJim',
 					'user_name' => 'HalperHalpert',
 					'user_mobile' => '5555555'
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'id' => 'saml_user_active',
+					'active' => true,
+					'surname' => 'JimJim',
+					'name' => ['givenName' => '', 'familyName' => ''],
+					'user_mobile' => '5555555'
+				]
+			],
+			"Put request to update user's attribute active from true to false." => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'id' => 'saml_user_active',
+					'active' => false,
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555'
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'id' => 'saml_user_active',
+					'active' => false,
+					'surname' => 'JimJim',
+					'name' => ['givenName' => '', 'familyName' => ''],
+					'user_mobile' => '5555555'
+				]
+			],
+			"Put request to update user's attribute 'active' from false to true and pass 'groups' parameter." => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_active',
+					'id' => 'saml_user_active',
+					'active' => true,
+					'user_lastname' => 'JimJim',
+					'user_name' => 'HalperHalpert',
+					'user_mobile' => '5555555',
+					// Attribute 'update' is added only to know that this specific test case checks user's 'active'
+					// attribute change.
+					'update' => 'active'
 				],
 				'expected_result' => [
 					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
@@ -688,6 +768,365 @@ class testScimUser extends CAPIScimTest {
 
 		$this->assertEquals($user['user_mobile'], $db_result_user_media['sendto']);
 		$this->assertEquals(self::$data['mediatypeid'], $db_result_user_media['mediatypeid']);
+
+		// Check group mappings when user 'active' attribute is changed.
+		if ($user['active'] === false || array_key_exists('update', $user)) {
+			// Check that user data is still present in 'user_scim_group' table.
+			$db_result_user_scim_group_data = DBselect('select * from user_scim_group where userid='.
+				zbx_dbstr(self::$data['userid']['saml_user_active'])
+			);
+			$db_result_user_scim_group = DBfetch($db_result_user_scim_group_data);
+			$this->assertEquals(self::$data['scim_groupids']['group_w_members'],
+				$db_result_user_scim_group['scim_groupid']
+			);
+
+			// Check that user is added to 'Disabled' group or added back to its mapped group.
+			$db_result_user_groups_data = DBselect('select usrgrpid from users_groups where userid='.
+				zbx_dbstr(self::$data['userid']['saml_user_active'])
+			);
+			$db_result_user_groups = DBfetch($db_result_user_groups_data);
+			$usrgrp = $user['active'] === false ? '9' : '7';
+
+			$this->assertEquals($usrgrp, $db_result_user_groups['usrgrpid']);
+		}
+	}
+
+	public function createInvalidPatchRequest(): array {
+		return [
+			'Patch request with missing schemas parameter' => [
+				'user' => [
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'Add',
+							'path' => 'user_name',
+							'value' => 'Andy'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "schemas" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request with invalid schemas parameter' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'Add',
+							'path' => 'user_name',
+							'value' => 'Andy'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Incorrect schema was sent in the request.',
+					'status' => 400
+				]
+			],
+			'Patch request with empty schemas parameter' => [
+				'user' => [
+					'schemas' => [],
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'Add',
+							'path' => 'user_name',
+							'value' => 'Andy'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/schemas": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Patch request with missing id parameter' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'Operations' => [
+						[
+							'op' => 'Add',
+							'path' => 'user_name',
+							'value' => 'Andy'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/": the parameter "id" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request with non-existing id parameter' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => '1111111111111',
+					'Operations' => [
+						[
+							'op' => 'Add',
+							'path' => 'user_name',
+							'value' => 'Andy'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to referred object or it does not exist!',
+					'status' => 404
+				]
+			],
+			'Patch request with missing Operations parameter' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations": an array is expected.',
+					'status' => 400
+				]
+			],
+			'Patch request with empty Operations parameter' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username',
+					'Operations' => []
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations": cannot be empty.',
+					'status' => 400
+				]
+			],
+			'Patch request is missing "Operations"/"path" parameter' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'Add',
+							'value' => 'Andy'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1": the parameter "path" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request is missing "Operations"/"op" parameter' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'path'=> 'user_name',
+							'value' => 'Andy'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1": the parameter "op" is missing.',
+					'status' => 400
+				]
+			],
+			'Patch request has invalid "Operations"/"op" parameter' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'Delete',
+							'path'=> 'user_name',
+							'value' => 'Andy'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1/op": value must be one of "add", "remove", '.
+						'"replace", "Add", "Remove", "Replace".',
+					'status' => 400
+				]
+			],
+			'Patch request has with "Operations/op" "add" is missing "value" parameter.' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'add',
+							'path'=> 'user_name'
+						]
+					]
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Invalid parameter "/Operations/1": the parameter "value" is missing.',
+					'status' => 400
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPatchRequest
+	 */
+	public function testInvalidUserPatch(array $user, array $expected_error): void {
+		$this->resolveData($user);
+
+		$user['token'] = self::$data['token']['token'];
+
+		$this->call('user.patch', $user, $expected_error);
+	}
+
+	public function createValidPatchRequest(): array {
+		return [
+			'Patch request to add user name, user mobile, user lastname' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username',
+					'userName' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'Add',
+							'path' => 'user_name',
+							'value' => 'Andy'
+						],
+						[
+							'op' => 'Add',
+							'path'=> 'user_lastname',
+							'value' => 'Bernard'
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_only_username',
+					'id' => 'saml_user_only_username',
+					'active' => true,
+					'surname' => 'Bernard',
+					'name' => ['givenName' => '', 'familyName' => '']
+				]
+			],
+			'Patch request to update user status active from true to false' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'replace',
+							'path' => 'active',
+							'value' => false
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_only_username',
+					'id' => 'saml_user_only_username',
+					'active' => false,
+					'name' => ['givenName' => '', 'familyName' => '']
+				]
+			],
+			'Patch request to update user status active from false to true' => [
+				'user' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+					'id' => 'saml_user_only_username',
+					'Operations' => [
+						[
+							'op' => 'replace',
+							'path' => 'active',
+							'value' => true
+						]
+					]
+				],
+				'expected_result' => [
+					'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+					'userName' => 'saml_user_only_username',
+					'id' => 'saml_user_only_username',
+					'active' => true,
+					'name' => ['givenName' => '', 'familyName' => '']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createValidPatchRequest
+	 */
+	public function testValidUserPatch(array $user, array $expected_result): void {
+		$this->resolveData($user);
+		$this->resolveData($expected_result);
+
+		$user['token'] = self::$data['token']['token'];
+
+		$result = $this->call('user.patch', $user);
+
+		// Compare result with expected result.
+		foreach ($expected_result as $key => $expected) {
+			$this->assertArrayHasKey($key, $result);
+			$this->assertEquals($expected, $result[$key], 'Returned response should match.');
+		}
+
+		// Check that user data in the database is correct.
+		$db_result_user_data = DBSelect('select username, name, surname, userdirectoryid from users where userid='.
+			zbx_dbstr(self::$data['userid']['saml_user_only_username'])
+		);
+		$db_result_user = DBFetch($db_result_user_data);
+
+		$active = [];
+		foreach ($user['Operations'] as $operation) {
+			switch ($operation['path']) {
+				case 'userName':
+					$this->assertEquals($operation['value'], $db_result_user['username']);
+					break;
+
+				case 'user_name':
+					$this->assertEquals($operation['value'], $db_result_user['name']);
+					break;
+
+				case 'user_lastname':
+					$this->assertEquals($operation['value'], $db_result_user['surname']);
+					break;
+
+				case 'active':
+					$active = $operation;
+					break;
+			}
+		}
+
+		$this->assertEquals(self::$data['userdirectoryid']['saml'], $db_result_user['userdirectoryid']);
+
+		// Check group mappings when user 'active' attribute is changed.
+		if ($active) {
+			// Check that user data is still present in 'user_scim_group' table.
+			$db_result_user_scim_group_data = DBselect('select * from user_scim_group where userid='.
+				zbx_dbstr(self::$data['userid']['saml_user_only_username'])
+			);
+			$db_result_user_scim_group = DBfetch($db_result_user_scim_group_data);
+
+			$this->assertEquals(self::$data['scim_groupids']['group_w_members'],
+				$db_result_user_scim_group['scim_groupid']
+			);
+
+			// Check that user is added to 'Disabled' group or added back to its mapped group.
+			$db_result_user_groups_data = DBselect('select usrgrpid from users_groups where userid='.
+				zbx_dbstr(self::$data['userid']['saml_user_only_username'])
+			);
+			$db_result_user_groups = DBfetch($db_result_user_groups_data);
+			$usrgrp = $active['value'] === false ? '9' : '7';
+
+			$this->assertEquals($usrgrp, $db_result_user_groups['usrgrpid']);
+		}
 	}
 
 	public function createInvalidDeleteRequest(): array {
@@ -767,7 +1206,7 @@ class testScimUser extends CAPIScimTest {
 		$db_result_user_scim_group_data = DBselect('select * from user_scim_group where userid='.
 			zbx_dbstr(self::$data['userid']['new_user'])
 		);
-		$db_result_user_scim_group = DBfetch($db_result_user_scim_group_data);		// TODO is there a point testing it without Groups requests?
+		$db_result_user_scim_group = DBfetch($db_result_user_scim_group_data);
 		$this->assertEmpty($db_result_user_scim_group, 'User should not have any entries in "user_scim_group" table.');
 
 		// Check that user is added to 'Disabled' group.
@@ -805,6 +1244,10 @@ class testScimUser extends CAPIScimTest {
 
 		// Delete userdirectories.
 		CDataHelper::call('userdirectory.delete', array_values(self::$data['userdirectoryid']));
+
+		// Delete scim groups and its members.
+		DB::delete('user_scim_group', ['userid' => array_values(self::$data['user_scim_groupids'])]);
+		DB::delete('scim_group', ['scim_groupid' => array_values(self::$data['scim_groupids'])]);
 
 		// Delete token.
 		CDataHelper::call('token.delete', [self::$data['token']['tokenid']]);
