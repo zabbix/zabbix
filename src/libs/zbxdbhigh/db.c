@@ -3909,7 +3909,7 @@ int	zbx_db_check_compatibility_colum_type(const char *table_name, const char *co
 	sql = zbx_dsprintf(sql, "select data_type, numeric_precision, character_maximum_length from"
 			" information_schema.columns where table_schema='%s' and", sql);
 #elif defined(HAVE_POSTGRESQL)
-	sql = zbx_dsprintf(NULL, "select data_type, numeric_precision, character_maximum_length from"
+	sql = zbx_dsprintf(sql, "select data_type, numeric_precision, character_maximum_length from"
 			" information_schema.columns where table_schema='%s' and", zbx_db_get_schema_esc());
 #elif defined(HAVE_ORACLE)
 	sql = zbx_strdup(sql, "select data_type, data_precision, data_length from user_tab_columns where");
