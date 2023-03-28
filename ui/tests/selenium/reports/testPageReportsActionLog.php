@@ -623,7 +623,7 @@ class testPageReportsActionLog extends CWebTest {
 
 		foreach ( $statuses as $status => $color) {
 			$this->assertEquals($color,
-					$table->query('xpath:(//td/span[text()='.CXPathHelper::escapeQuotes($status).'])[1]')->one()->getAttribute('class')
+					$table->query("xpath:(//td/span[text()=".CXPathHelper::escapeQuotes($status)."])[1]")->one()->getAttribute('class')
 			);
 		}
 
