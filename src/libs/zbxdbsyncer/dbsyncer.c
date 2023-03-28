@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "dbsyncer.h"
+#include "zbxdbsyncer.h"
 
 #include "log.h"
 #include "zbxnix.h"
@@ -26,9 +26,14 @@
 #include "zbxcachehistory.h"
 #include "zbxexport.h"
 #include "zbxprof.h"
+#include "zbxtimekeeper.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
+#include "zbxthreads.h"
 
-extern int				CONFIG_HISTSYNCER_FREQUENCY;
-static sigset_t				orig_mask;
+static sigset_t			orig_mask;
 
 static zbx_export_file_t	*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
@@ -55,7 +60,6 @@ static zbx_export_file_t	*get_trends_export(void)
  ******************************************************************************/
 static void	zbx_db_flush_timer_queue(void)
 {
-	int			i;
 	zbx_vector_ptr_t	persistent_timers;
 	zbx_db_insert_t		db_insert;
 
@@ -64,9 +68,10 @@ static void	zbx_db_flush_timer_queue(void)
 
 	if (0 != persistent_timers.values_num)
 	{
-		zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
+		zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns",
+				NULL);
 
-		for (i = 0; i < persistent_timers.values_num; i++)
+		for (int i = 0; i < persistent_timers.values_num; i++)
 		{
 			zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)persistent_timers.values[i];
 
@@ -97,7 +102,7 @@ static void	db_trigger_queue_cleanup(void)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(dbsyncer_thread, args)
+ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 {
 	int			sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0,
 				triggers_num;
@@ -110,6 +115,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+
+	zbx_thread_dbsyncer_args	*dbsyncer_args = (zbx_thread_dbsyncer_args *)
+			(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, (process_name = get_process_type_string(process_type)), process_num);
@@ -170,12 +178,13 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		total_triggers_num += triggers_num;
 		total_sec += zbx_time() - sec;
 
-		sleeptime = (ZBX_SYNC_MORE == more ? 0 : CONFIG_HISTSYNCER_FREQUENCY);
+		sleeptime = (ZBX_SYNC_MORE == more ? 0 : dbsyncer_args->config_histsyncer_frequency);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
 			stats_offset = 0;
-			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values", total_values_num);
+			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values",
+					total_values_num);
 
 			if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
@@ -186,9 +195,14 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, " in " ZBX_FS_DBL " sec", total_sec);
 
 			if (0 == sleeptime)
+			{
 				zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
+			}
 			else
-				zbx_setproctitle("%s #%d [%s, idle %d sec]", process_name, process_num, stats, sleeptime);
+			{
+				zbx_setproctitle("%s #%d [%s, idle %d sec]", process_name, process_num, stats,
+						sleeptime);
+			}
 
 			total_values_num = 0;
 			total_triggers_num = 0;
