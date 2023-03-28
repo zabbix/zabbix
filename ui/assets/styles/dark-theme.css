@@ -359,10 +359,8 @@ svg a {
     .sortable .sortable-item:not(.sortable-dragging) {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
-    position: absolute; }
-  .sortable.sortable-opacity .sortable-item.sortable-dragging {
-    opacity: 0.6;
-    z-index: 1; }
+    position: absolute;
+    opacity: 0.6; }
 
 html,
 body {
@@ -1059,6 +1057,8 @@ footer {
     .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span,
     .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
       color: #f2f2f2; }
+  .dashboard-navigation-tabs .sortable-dragging .sortable-item {
+    opacity: 1; }
 
 .dashboard-navigation-controls {
   display: flex;
@@ -1955,6 +1955,9 @@ form.dashboard-widget-svggraph .no-items-message {
   border: none !important;
   top: 0; }
 
+div.dashboard-widget-svggraph {
+  overflow-x: hidden; }
+
 form.dashboard-widget-tophosts #list_columns .text {
   max-width: 250px; }
 form.dashboard-widget-tophosts #column {
@@ -2499,6 +2502,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
     background-color: #503434; }
   .msg-bad::after {
     background-position: -122px -325px; }
+  .msg-bad .msg-details {
+    padding-right: 10px; }
 
 .msg-good {
   border-color: #344e3f; }
@@ -2586,20 +2591,20 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .radio-list-control li {
     position: relative;
     display: inline-block;
-    margin: 0 -1px 0 0;
+    margin-right: -1px;
     padding: 0; }
     .radio-list-control li:first-child {
-      border-radius: 3px 0 0 3px; }
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px; }
       .radio-list-control li:first-child label {
-        border-radius: 2px 0 0 2px; }
+        border-top-left-radius: 2px;
+        border-bottom-left-radius: 2px; }
     .radio-list-control li:last-child {
-      border-radius: 0 3px 3px 0; }
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px; }
       .radio-list-control li:last-child label {
-        border-radius: 0 2px 2px 0; }
-    .radio-list-control li:only-child {
-      border-radius: 3px; }
-      .radio-list-control li:only-child label {
-        border-radius: 2px; }
+        border-top-right-radius: 2px;
+        border-bottom-right-radius: 2px; }
   .radio-list-control label {
     display: inline-block;
     border: 1px solid #4f4f4f;
@@ -2622,21 +2627,14 @@ div.dashboard-widget-tophosts z-bar-gauge {
       .radio-list-control input[type="radio"] + label:active {
         border-color: #4f4f4f;
         background-color: #414141; }
-    .radio-list-control input[type="radio"]:focus + label {
-      border-color: #768d99;
-      background-color: #414141;
-      position: relative;
-      z-index: 2; }
     .radio-list-control input[type="radio"]:checked + label {
       color: #ffffff;
       border-color: #4f4f4f;
       background-color: #4f4f4f;
       position: relative;
       z-index: 1; }
-    .radio-list-control input[type="radio"]:checked:focus + label {
-      box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35);
-      position: relative;
-      z-index: 2; }
+    .radio-list-control input[type="radio"]:focus + label {
+      box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35); }
     .radio-list-control input[type="radio"]:checked[disabled] + label {
       background-color: #a3a3a3 !important;
       transition: none; }
@@ -4324,8 +4322,6 @@ select {
     background-color: #4f4f4f !important; }
   .checkbox-radio:focus + label span {
     border-color: #768d99; }
-  .checkbox-radio:checked:focus + label span {
-    border-color: #768d99; }
   .checkbox-radio:checked[disabled] + label span {
     transition: none; }
     .checkbox-radio:checked[disabled] + label span::after {
@@ -5222,7 +5218,7 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
   display: table;
   position: absolute;
   z-index: 1000;
-  padding: 13px 10px 10px;
+  padding: 17px 10px 10px;
   background-color: #2b2b2b;
   border: 1px solid #383838;
   border-bottom-color: #353535;
@@ -5240,7 +5236,8 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
-    margin: 0 10px; }
+    margin: 0 10px;
+    padding: 13px 10px 10px; }
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
       .overlay-dialogue.modal .dashboard-widget-head .icon-doc-link {

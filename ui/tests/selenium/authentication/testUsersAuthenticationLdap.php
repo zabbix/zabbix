@@ -687,7 +687,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => ''],
 							['name' => 'updated_name', 'description' => 'updated_description']
 						],
 						'userdirectory_ldap' => [
@@ -737,7 +736,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'ldap_with_jit_memberOf', 'description' => 'new test description with jit', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -814,7 +812,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'ldap_with_jit_groupOfNames', 'description' => 'test description with jit', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -907,7 +904,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'test_update_to_groupOfNames', 'description' => 'test_update_to_groupOfNames', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -980,10 +976,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		}
 		else {
 			foreach ($data['db_check'] as $table => $rows) {
-				$bebebe = CDBHelper::getAll('SELECT * FROM '.$table.' LIMIT '.count($rows));
+				$all_rows = CDBHelper::getAll('SELECT * FROM '.$table.' LIMIT '.count($rows));
 				foreach ($rows as $i => $row) {
 					foreach ($row as $key => $value) {
-						$this->assertEquals($value, $bebebe[$i][$key]);
+						$this->assertEquals($value, $all_rows[$i][$key]);
 					}
 				}
 			}
@@ -1263,7 +1259,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'кириллица', 'description' => 'кириллица', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -1338,7 +1333,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'кириллица', 'description' => '', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -1415,7 +1409,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ', 'description' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -1490,7 +1483,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => '!@#$%^&*()_+-=[]{};:"|,./<>?Ž©µÆ', 'description' => '', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -1563,7 +1555,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'leading.trailing', 'description' => 'leading.trailing', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -1634,7 +1625,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'leading.trailing', 'description' => '', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -1713,7 +1703,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							[
 								'name' => STRING_128,
 								'description' => STRING_6000,
@@ -1788,7 +1777,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'LDAP', 'description' => 'description',  'provision_status' => 0]
 						],
 						'userdirectory_ldap' => [
@@ -1856,7 +1844,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => '', 'description' => '', 'provision_status' => 0],
 							['name' => 'create_ldap_with_jit', 'description' => 'create test description with jit', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
@@ -1931,7 +1918,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							['name' => ''],
 							['name' => 'ldap1'],
 							['name' => 'ldap2']
 						],
