@@ -1349,6 +1349,40 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __func__, manager->watchdog.num_data);
 }
 
+static int	check_allowed_path(const char *allowed_path, const char *path, char **error)
+{
+	char	*absolute_path;
+	int	absolute_path_len, allowed_path_len, ret = FAIL;
+
+	if (NULL == (absolute_path = realpath(path, NULL)))
+	{
+		*error = zbx_dsprintf(*error, "cannot resolve path %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	absolute_path_len = strlen(absolute_path);
+
+	if (absolute_path_len < (allowed_path_len = strlen(allowed_path)))
+	{
+		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
+				allowed_path);
+		goto out;
+	}
+
+	if (0 != memcmp(allowed_path, absolute_path, allowed_path_len))
+	{
+		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
+				allowed_path);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(absolute_path);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: gets script media type parameters with expanded macros            *
@@ -1374,7 +1408,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
 
-	if (FAIL == zbx_check_allowed_path(CONFIG_ALERT_SCRIPTS_PATH, *cmd, &error_path))
+	if (FAIL == check_allowed_path(CONFIG_ALERT_SCRIPTS_PATH, *cmd, &error_path))
 	{
 		*error = zbx_dsprintf(*error, "Cannot execute command \"%s\": %s", *cmd, error_path);
 		goto out;
