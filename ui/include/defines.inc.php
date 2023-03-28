@@ -1380,6 +1380,10 @@ define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
 define('API_FILTER_VALUES',			57);
+
+// any type
+define('API_ANY',					59);
+
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
