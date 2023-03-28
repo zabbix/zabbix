@@ -44,7 +44,7 @@ zbx_history_get_values_WRAP = \
 	-Wl,--wrap=zbx_add_event \
 	-Wl,--wrap=zbx_process_events \
 	-Wl,--wrap=zbx_clean_events \
-	-Wl,--wrap=zbx_config_get
+	-Wl,--wrap=zbx_recalc_time_period
 
 zbx_history_get_values_LDADD = $(HISTORY_LIBS) @SERVER_LIBS@
 
