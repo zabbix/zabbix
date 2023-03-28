@@ -141,7 +141,7 @@ class CPopupMenuElement extends CElement {
 	 * Press Escape key to close context menu.
 	 */
 	public function close() {
-		CElementQuery::getPage()->keypress(WebDriverKeys::ESCAPE);
+		CElementQuery::getPage()->keyPress(WebDriverKeys::ESCAPE);
 		(new CElementQuery('xpath://ul['.CXPathHelper::fromClass('menu-popup-top').']'))->waitUntilNotVisible();
 	}
 }

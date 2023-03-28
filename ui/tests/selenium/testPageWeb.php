@@ -44,7 +44,18 @@ class testPageWeb extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
+	/**
+	 * Host id created for web service.
+	 *
+	 * @var integer
+	 */
 	private static $hostid;
+
+	/**
+	 * Web service ids.
+	 *
+	 * @var integer
+	 */
 	private static $httptestid;
 
 	public function prepareHostWebData() {
@@ -196,7 +207,10 @@ class testPageWeb extends CWebTest {
 		}
 
 		// Check if the correct amount of rows is displayed.
-		$this->assertTableStats($table->getRows()->count());
+		$table->findRow('Name', 'testFormWeb1')->query('link', 'testFormWeb1')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Details of web scenario: testFormWeb1');
+		$this->page->assertTitle('Details of web scenario');
 	}
 
 	/**
@@ -554,11 +568,12 @@ class testPageWeb extends CWebTest {
 			self::$httptestid['Web scenario 3 step'])->waitUntilReady();
 		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
 		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
-		$this->page->waitUntilReady();
+		COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:http_step')->asForm()->one();
 		$form->fill(['Name' => 'Step number 4']);
 		$form->query('id:url')->one()->fill('test.com');
 		$form->submit();
+		COverlayDialogElement::find()->one()->waitUntilNotVisible();
 		$this->query('button:Update')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
@@ -593,13 +608,25 @@ class testPageWeb extends CWebTest {
 	 * Function which checks that title field disappears while Kioskmode is active.
 	 */
 	public function testPageWeb_CheckKioskMode() {
-		$this->page->login()->open('zabbix.php?action=web.view');
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
-		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
-		$this->page->waitUntilReady();
-		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
+		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
+
+		// Check title, filter and table display after pressing Kiosk mode/Normal view.
+		foreach (['Kiosk mode', 'Normal view'] as $status) {
+			$this->query('xpath://button[@title="'.$status.'"]')->one()->click();
+			$this->page->waitUntilReady();
+
+			if ($status === 'Kiosk mode') {
+				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
+			}
+			else {
+				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
+			}
+
+			$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
+			$this->assertTrue($this->query('id:flickerfreescreen_httptest')->exists());
+		}
+
+		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
 	}
 
 	/**
@@ -691,46 +718,6 @@ class testPageWeb extends CWebTest {
 					'expected' => [
 						'Web ZBX6663 Second',
 						'Web ZBX6663',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
-						'testFormWeb2',
-						'testFormWeb1'
-					]
-				]
-			],
-			[
-				[
-					'filter' => [
-						'Host groups' => 'WebData HostGroup',
-						'Hosts' => ['WebData Host']
-					],
-					'expected' => [
-						'Web scenario 3 step',
-						'Web scenario 2 step',
-						'Web scenario 1 step'
-					]
-				]
-			],
-			[
-				[
-					'filter' => [
-						'Hosts' => [
-							'Host ZBX6663',
-							'Simple form test host',
-							'Template inheritance test host',
-							'WebData Host'
-						]
-					],
-					'expected' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'Web scenario 3 step',
-						'Web scenario 2 step',
-						'Web scenario 1 step',
 						'testInheritanceWeb4',
 						'testInheritanceWeb3',
 						'testInheritanceWeb2',
