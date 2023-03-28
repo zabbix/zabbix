@@ -38,10 +38,10 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper_proxy.a \
 	$(top_builddir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
-	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \
 	preproc/libpreproc_proxy.a \
+	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \

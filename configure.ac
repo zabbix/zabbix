@@ -1990,6 +1990,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
+	src/libs/zbxodbc/Makefile
 	src/libs/zbxparam/Makefile
 	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
@@ -2056,7 +2057,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/ipmi/Makefile
 	src/zabbix_server/lld/Makefile
-	src/zabbix_server/odbc/Makefile
 	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile
