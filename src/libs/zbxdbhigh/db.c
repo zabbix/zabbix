@@ -2389,7 +2389,7 @@ void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
 	size_t			offset;
 
 	if (NULL != json)
-		offset = json->buffer_offset
+		offset = json->buffer_offset;
 
 	zbx_vector_str_create(&names);
 
