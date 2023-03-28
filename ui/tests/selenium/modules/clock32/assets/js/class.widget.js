@@ -36,9 +36,7 @@ class CWidgetClock2 extends CWidget {
 
 	static DEFAULT_LOCALE = 'en-US';
 
-	_init() {
-		super._init();
-
+	onInitialize() {
 		this._time_offset = 0;
 		this._interval_id = null;
 		this._clock_type = CWidgetClock2.TYPE_ANALOG;
@@ -51,14 +49,12 @@ class CWidgetClock2 extends CWidget {
 		this._is_enabled = true;
 	}
 
-	_registerEvents() {
-		super._registerEvents();
-
+	onStart() {
 		this._events.resize = () => {
 			const padding = 25;
-			const header_height = this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+			const header_height = this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
 				? 0
-				: this._content_header.offsetHeight;
+				: this._header.offsetHeight;
 
 			this._target.style.setProperty(
 				'--content-height',
@@ -67,33 +63,21 @@ class CWidgetClock2 extends CWidget {
 		}
 	}
 
-	_activateEvents() {
-		super._activateEvents();
+	onActivate() {
+		this._startClock();
 
 		this._resize_observer = new ResizeObserver(this._events.resize);
 		this._resize_observer.observe(this._target);
 	}
 
-	_deactivateEvents() {
-		super._deactivateEvents();
+	onDeactivate() {
+		this._stopClock();
 
 		this._resize_observer.disconnect();
 	}
 
-	_doActivate() {
-		super._doActivate();
-
-		this._startClock();
-	}
-
-	_doDeactivate() {
-		super._doDeactivate();
-
-		this._stopClock();
-	}
-
-	_processUpdateResponse(response) {
-		super._processUpdateResponse(response);
+	processUpdateResponse(response) {
+		super.processUpdateResponse(response);
 
 		this._stopClock();
 
@@ -259,7 +243,7 @@ class CWidgetClock2 extends CWidget {
 		clock_time_zone.textContent = timezone_text;
 	}
 
-	_hasPadding() {
+	hasPadding() {
 		return this._fields.clock_type === undefined || this._fields.clock_type == CWidgetClock2.TYPE_ANALOG;
 	}
 }

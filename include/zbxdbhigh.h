@@ -898,8 +898,4 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
-#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
-#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_recalc_time_period(int *ts_from, int table_group);
-
 #endif
