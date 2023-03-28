@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ typedef struct
 {
 	zbx_vector_prometheus_row_t		rows;
 	zbx_vector_prometheus_label_index_t	indexes;
+	pthread_rwlock_t			index_lock;
 }
 zbx_prometheus_t;
 

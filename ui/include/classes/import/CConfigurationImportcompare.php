@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -182,8 +182,8 @@ class CConfigurationImportcompare {
 	 * Compare two entities and separate all their keys into added/removed/updated.
 	 * First entities gets compared by uuid then by its unique field values.
 	 *
-	 * @param array $before
-	 * @param array $after
+	 * @param array  $before
+	 * @param array  $after
 	 * @param string $type
 	 *
 	 * @return array
@@ -210,10 +210,20 @@ class CConfigurationImportcompare {
 			}
 
 			foreach ($before as $b_key => $before_entity) {
-				if ($before_entity['uuid'] == $after_entity['uuid']
-						|| $before_entity['uniqueness'] == $after_entity['uniqueness']) {
+				if (array_key_exists('uuid', $before_entity) && $before_entity['uuid'] === $after_entity['uuid']) {
 					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
 
+					$same_entities[$b_key]['before'] = $before_entity;
+					$same_entities[$b_key]['after'] = $after_entity;
+
+					unset($before[$b_key], $after[$a_key]);
+					continue 2;
+				}
+			}
+
+			foreach ($before as $b_key => $before_entity) {
+				if ($before_entity['uniqueness'] === $after_entity['uniqueness']) {
+					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
 					$before_entity['uuid'] = $after_entity['uuid'];
 
 					$same_entities[$b_key]['before'] = $before_entity;
@@ -227,6 +237,7 @@ class CConfigurationImportcompare {
 
 		$removed_entities = $before;
 		$added_entities = $after;
+
 		foreach ($added_entities as $entity) {
 			unset($entity['uniqueness']);
 
@@ -262,7 +273,6 @@ class CConfigurationImportcompare {
 	private function addUniquenessParameterByEntityType(array $entities, string $type): array {
 		foreach ($entities as &$entity) {
 			foreach ($this->unique_fields_keys_by_type[$type] as $unique_field_key) {
-
 				$unique_values = $this->getUniqueValuesByFieldPath($entity, $unique_field_key);
 
 				$entity['uniqueness'][] = $unique_values;
@@ -281,13 +291,13 @@ class CConfigurationImportcompare {
 	/**
 	 * Get entity field values by giving field key path constructed.
 	 *
-	 * @param array        $entity    entity
-	 * @param string|array $field_key
+	 * @param array        $entity    Entity.
+	 * @param string|array $field_key Field key or field key path given.
 	 */
 	private function getUniqueValuesByFieldPath(array $entity, $field_key_path) {
 		if (is_array($field_key_path)) {
 			foreach ($field_key_path as $sub_key => $sub_field) {
-				if ($sub_key != 'numeric_keys') {
+				if ($sub_key !== 'numeric_keys') {
 					$sub_entities = $entity[$sub_key];
 				}
 				else {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
+#include "zbxcommon.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -2035,8 +2036,32 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 	zbx_free(mpoint);
 }
 
-#ifndef _WINDOWS
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+static void	get_fqdn(char **hostname)
+{
+	char			buffer[MAX_STRING_LEN];
+	struct addrinfo		hints = {0};
+	struct addrinfo*	res = NULL;
+
+	buffer[MAX_STRING_LEN - 1] = '\0';
+
+	/* check for successful call to the gethostname and check that data fits in the buffer */
+	if (0 == gethostname(buffer, MAX_STRING_LEN - 1) && MAX_STRING_LEN - 2 > strlen(buffer))
+		*hostname = zbx_strdup(*hostname, buffer);
+
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_flags = AI_CANONNAME;
+
+	if (0 == getaddrinfo(*hostname, 0, &hints, &res))
+		*hostname = zbx_strdup(*hostname, res->ai_canonname);
+
+	if (NULL != res)
+		freeaddrinfo(res);
+
+	zbx_rtrim(*hostname, " .\n\r");
+}
+
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char **hostname)
 {
 	char	*type, *transform;
 
@@ -2049,8 +2074,12 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		{
 			char	*dot;
 
-			if (NULL != (dot = strchr(hostname, '.')))
+			if (NULL != (dot = strchr(*hostname, '.')))
 				*dot = '\0';
+		}
+		else if (0 == strcmp(type, "fqdn"))
+		{
+			get_fqdn(hostname);
 		}
 		else if (0 == strcmp(type, "netbios"))
 		{
@@ -2068,7 +2097,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 	{
 		if (0 == strcmp(transform, "lower"))
 		{
-			zbx_strlower(hostname);
+			zbx_strlower(*hostname);
 		}
 		else
 		{
@@ -2077,7 +2106,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		}
 	}
 
-	SET_STR_RESULT(result, hostname);
+	SET_STR_RESULT(result, *hostname);
 
 	return SUCCEED;
 }

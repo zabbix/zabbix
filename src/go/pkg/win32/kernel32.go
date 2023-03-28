@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ var (
 	getDiskFreeSpaceW                uintptr
 	getVolumePathNameW               uintptr
 	getNativeSystemInfo              uintptr
+	getComputerNameExA               uintptr
 )
 
 const (
@@ -78,6 +79,7 @@ func init() {
 	getDiskFreeSpaceW = hKernel32.mustGetProcAddress("GetDiskFreeSpaceW")
 	getVolumePathNameW = hKernel32.mustGetProcAddress("GetVolumePathNameW")
 	getProcessHandleCount = hKernel32.mustGetProcAddress("GetProcessHandleCount")
+	getComputerNameExA = hKernel32.mustGetProcAddress("GetComputerNameExA")
 
 	getNativeSystemInfo, err = hKernel32.getProcAddress("GetNativeSystemInfo")
 	if err != nil {
@@ -205,4 +207,19 @@ func GetNativeSystemInfo() (sysInfo SystemInfo) {
 	syscall.Syscall(getNativeSystemInfo, 1, uintptr(unsafe.Pointer(&sysInfo)), 0, 0)
 
 	return sysInfo
+}
+
+func GetComputerNameExA(name_type int) (name string, err error) {
+	var ret uintptr
+	size := uint32(0)
+
+	syscall.Syscall(getComputerNameExA, 3, uintptr(name_type), 0, uintptr(unsafe.Pointer(&size)))
+
+	buffer := make([]byte, size)
+	ret, _, err = syscall.Syscall(getComputerNameExA, 3, uintptr(name_type), uintptr(unsafe.Pointer(&buffer[0])), uintptr(unsafe.Pointer(&size)))
+	if ret == 0 && err != nil {
+		return "", err
+	}
+
+	return string(buffer[:size]), nil
 }

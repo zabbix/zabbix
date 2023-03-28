@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_LIST))
 	->setControls((new CList([
 		(new CForm('get'))
-			->cleanItems()
 			->setName('main_filter')
 			->setAttribute('aria-label', _('Main filter'))
 			->addItem((new CVar('action', 'user.list'))->removeId()),
@@ -142,6 +141,8 @@ $table = (new CTableInfo())
 		_('Info')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('user');
+
 foreach ($data['users'] as $user) {
 	$userid = $user['userid'];
 	$session = $data['sessions'][$userid];
@@ -169,7 +170,7 @@ foreach ($data['users'] as $user) {
 		? (new CLink(_('Blocked'), 'zabbix.php?action=user.unblock&userids[]='.$userid))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addSID()
+			->addCsrfToken($csrf_token)
 		: (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
 
 	order_result($user['usrgrps'], 'name');
@@ -300,10 +301,15 @@ $form->addItem([
 		'user.provision' => [
 			'name' => _('Provision now'),
 			'attributes' => ['data-required' => 'ldap'],
-			'confirm' => _('Provision selected LDAP users?')
+			'confirm' => _('Provision selected LDAP users?'),
+			'csrf_token' => $csrf_token
 		],
-		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?')],
-		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?')]
+		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?'),
+			'csrf_token' => $csrf_token
+		],
+		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?'),
+			'csrf_token' => $csrf_token
+		]
 	], 'user')
 ]);
 

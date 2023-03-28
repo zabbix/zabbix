@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,5 +41,21 @@ void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_c
 void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb, const void *arg);
 
 void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time);
+
+/* the process statistics */
+typedef struct
+{
+	double	busy_max;
+	double	busy_min;
+	double	busy_avg;
+	double	idle_max;
+	double	idle_min;
+	double	idle_avg;
+	int	count;
+}
+zbx_process_info_t;
+
+typedef void (*zbx_zabbix_stats_procinfo_func_t)(zbx_process_info_t *info);
+void	zbx_register_stats_procinfo_func(int proc_type, zbx_zabbix_stats_procinfo_func_t procinfo_cb);
 
 #endif

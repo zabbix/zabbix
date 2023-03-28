@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -488,7 +488,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'name' => 'Test script',
 					'form' => [
-						'Send to' => '/../"'
+						'Script parameters' => '/../"'
 					],
 					'error' => "Connection to Zabbix server \"localhost:10051\" refused. Possible reasons:\n".
 							"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".

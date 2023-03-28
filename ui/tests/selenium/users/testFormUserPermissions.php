@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -487,6 +487,7 @@ class testFormUserPermissions extends CWebTest {
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Module enabled');
 
 		foreach ([true, false] as $enable_modules) {
 			$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();

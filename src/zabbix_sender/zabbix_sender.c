@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -541,7 +541,7 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 			case 0:
 				if (' ' == *p || '\t' == *p)
 				{
-					/* skipping the leading spaces */;
+					/* skipping the leading spaces */
 				}
 				else if ('"' == *p)
 				{

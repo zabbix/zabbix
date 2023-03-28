@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-06 19:14+0000\n"
-"Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
+"PO-Revision-Date: 2023-03-07 08:41+0000\n"
+"Last-Translator: Patrick <pmo@abomicro.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -429,6 +429,10 @@ msgstr "M"
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
 msgstr "AJOUTER SURCHARGE"
+
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr "RÉVEIL"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -1073,7 +1077,7 @@ msgstr "Étiquettes avancées"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "Options avancées"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1565,6 +1569,10 @@ msgstr "Attribut"
 msgid "Attribution"
 msgstr "Attribution"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -1797,6 +1805,14 @@ msgstr "Couleur de base"
 #: include/httptest.inc.php:28
 msgid "Basic"
 msgstr "Basique"
+
+#: app/views/connector.edit.php:136
+msgid "Bearer"
+msgstr "Bearer"
+
+#: app/views/connector.edit.php:156
+msgid "Bearer token"
+msgstr "Jeton bearer"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
@@ -2337,6 +2353,11 @@ msgstr "Impossible de créer une autre connexion base de donnée."
 msgid "Cannot create circular dependencies."
 msgstr "Impossible de créer des dépendances circulaires."
 
+#: app/controllers/CControllerConnectorCreate.php:89
+#: app/controllers/CControllerConnectorCreate.php:164
+msgid "Cannot create connector"
+msgstr "Impossible de créer le connecteur"
+
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
 msgstr "Impossible de créer une dépendance sur le déclencheur lui-même."
@@ -2353,6 +2374,11 @@ msgstr "Impossible de créer une règle de découverte"
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Impossible de créer la correspondance d'icône"
+
+#: app/controllers/CControllerMaintenanceCreate.php:72
+#: app/controllers/CControllerMaintenanceCreate.php:150
+msgid "Cannot create maintenance period"
+msgstr "Impossible de créer la période de maintenance"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2407,6 +2433,12 @@ msgstr "Impossible de supprimer l'action"
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "Impossible de supprimer le rôle utilisateur attribué \"%1$s\"."
+
+#: app/controllers/CControllerConnectorDelete.php:68
+msgid "Cannot delete connector"
+msgid_plural "Cannot delete connectors"
+msgstr[0] "Impossible de supprimer le connecteur"
+msgstr[1] "Impossible de supprimer les connecteurs"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2531,6 +2563,12 @@ msgstr "Impossible de supprimer les éléments"
 #: maintenance.php:224
 msgid "Cannot delete maintenance"
 msgstr "Impossible de supprimer une maintenance"
+
+#: app/controllers/CControllerMaintenanceDelete.php:71
+msgid "Cannot delete maintenance period"
+msgid_plural "Cannot delete maintenance periods"
+msgstr[0] "Impossible de supprimer la période de maintenance"
+msgstr[1] "Impossible de supprimer les périodes de maintenance"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2709,6 +2747,12 @@ msgid_plural "Cannot disable actions"
 msgstr[0] "Impossible de désactiver l'action"
 msgstr[1] "Impossible de désactiver les actions"
 
+#: app/controllers/CControllerConnectorDisable.php:77
+msgid "Cannot disable connector"
+msgid_plural "Cannot disable connectors"
+msgstr[0] "Impossible de désactiver le connecteur"
+msgstr[1] "Impossible de désactiver les connecteurs"
+
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
@@ -2792,6 +2836,12 @@ msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Impossible d'activer l'action"
 msgstr[1] "Impossible d'activer les actions"
+
+#: app/controllers/CControllerConnectorEnable.php:77
+msgid "Cannot enable connector"
+msgid_plural "Cannot enable connectors"
+msgstr[0] "Impossible d'activer le connecteur"
+msgstr[1] "Impossible d'activer les connecteurs"
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -3660,6 +3710,11 @@ msgstr "Impossible de mettre à jour un graphique découvert."
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Impossible de mettre à jour un groupe d'hôtes découvert \"%1$s\"."
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -3689,6 +3744,11 @@ msgstr "Impossible de mettre à jour l'authentification"
 #: app/controllers/CControllerTrigDisplayUpdate.php:111
 msgid "Cannot update configuration"
 msgstr "Impossible de mettre à jour la configuration"
+
+#: app/controllers/CControllerConnectorUpdate.php:90
+#: app/controllers/CControllerConnectorUpdate.php:173
+msgid "Cannot update connector"
+msgstr "Impossible de mettre à jour le connecteur"
 
 #: app/controllers/CControllerCorrelationCreate.php:47
 #: app/controllers/CControllerCorrelationUpdate.php:48
@@ -3798,6 +3858,11 @@ msgstr "Impossible de mettre à jour les macros"
 #: maintenance.php:119
 msgid "Cannot update maintenance"
 msgstr "Impossible de mettre à jour la maintenance"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:73
+#: app/controllers/CControllerMaintenanceUpdate.php:152
+msgid "Cannot update maintenance period"
+msgstr "Impossible de mettre à jour la période de maintenance"
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -4746,6 +4811,48 @@ msgstr "Connexion à l'hôte"
 msgid "Connections to proxy"
 msgstr "Connexion au proxy"
 
+#: app/controllers/CControllerAuditLogList.php:212
+#: app/views/connector.edit.php:283 app/views/connector.edit.php:297
+msgid "Connector"
+msgstr "Connecteur"
+
+#: include/classes/api/services/CConnector.php:446
+#, c-format
+msgid "Connector \"%1$s\" already exists."
+msgstr "Le connecteur \"%1$s\" existe déjà."
+
+#: app/controllers/CControllerConnectorCreate.php:156
+msgid "Connector created"
+msgstr "Connecteur créé"
+
+#: app/controllers/CControllerConnectorDelete.php:60
+msgid "Connector deleted"
+msgid_plural "Connectors deleted"
+msgstr[0] "Connecteur supprimé"
+msgstr[1] "Connecteurs supprimés"
+
+#: app/controllers/CControllerConnectorDisable.php:69
+msgid "Connector disabled"
+msgid_plural "Connectors disabled"
+msgstr[0] "Connecteur désactivé"
+msgstr[1] "Connecteurs désactivés"
+
+#: app/controllers/CControllerConnectorEnable.php:69
+msgid "Connector enabled"
+msgid_plural "Connectors enabled"
+msgstr[0] "Connecteur activé"
+msgstr[1] "Connecteurs activés"
+
+#: app/controllers/CControllerConnectorUpdate.php:165
+msgid "Connector updated"
+msgstr "Connecteur mis à jour"
+
+#: app/controllers/CControllerConnectorList.php:104
+#: app/views/connector.list.php:132 include/classes/helpers/CMenuHelper.php:360
+#: include/html.inc.php:891
+msgid "Connectors"
+msgstr "Connecteurs"
+
 #: include/views/monitoring.sysmap.list.php:85
 #: include/views/monitoring.sysmap.list.php:86
 msgid "Constructor"
@@ -4870,6 +4977,27 @@ msgstr "Coordonnées"
 msgid "Copy"
 msgstr "Copier"
 
+#: app/views/copy.edit.php:50
+#, c-format
+msgid "Copy %1$s graph"
+msgid_plural "Copy %1$s graphs"
+msgstr[0] "Copier le graphique %1$s"
+msgstr[1] "Copier les graphiques %1$s"
+
+#: app/views/copy.edit.php:36
+#, c-format
+msgid "Copy %1$s item"
+msgid_plural "Copy %1$s items"
+msgstr[0] "Copier l'élément %1$s"
+msgstr[1] "Copier les éléments %1$s"
+
+#: app/views/copy.edit.php:43
+#, c-format
+msgid "Copy %1$s trigger"
+msgid_plural "Copy %1$s triggers"
+msgstr[0] "Copier le déclencheur %1$s"
+msgstr[1] "Copier les déclencheurs %1$s"
+
 #: app/views/popup.token.view.php:54
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papier"
@@ -4936,6 +5064,10 @@ msgstr "Nombre de lignes correspondantes dans la supervision de fichier de log a
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Nombre de lignes correspondantes dans la supervision de fichier de log. Retourne un entier"
 
+#: include/classes/data/CItemData.php:1802
+msgid "Count of values enqueued in the connector queue."
+msgstr "Nombre de valeurs mises en file d'attente dans la file d'attente du connecteur."
+
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
 msgstr "Nombre de valeurs mises en file d'attente dans la file d'attente de traitement de découverte de bas niveau."
@@ -4972,6 +5104,10 @@ msgstr "Créer et modifier des cartes"
 #: app/views/administration.image.list.php:62
 msgid "Create background"
 msgstr "Créer un fond"
+
+#: app/views/connector.list.php:139
+msgid "Create connector"
+msgstr "Créer un connecteur"
 
 #: app/views/configuration.correlation.list.php:37
 msgid "Create correlation"
@@ -5471,6 +5607,10 @@ msgstr "Etiquette de jeu de données"
 msgid "Data storage period"
 msgstr "Période de stockage des données"
 
+#: app/views/connector.edit.php:54 app/views/connector.list.php:73
+msgid "Data type"
+msgstr "Type de données"
+
 #: include/classes/setup/CSetupWizard.php:565
 #: include/classes/setup/CSetupWizard.php:717
 #: include/classes/setup/CSetupWizard.php:976
@@ -5896,6 +6036,14 @@ msgstr "Supprimer l'action sélectionnée ?"
 msgid "Delete selected actions?"
 msgstr "Supprimer les actions sélectionnées ?"
 
+#: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
+msgid "Delete selected connector?"
+msgstr "Supprimer le connecteur sélectionné ?"
+
+#: app/views/js/connector.list.js.php:128
+msgid "Delete selected connectors?"
+msgstr "Supprimer les connecteurs sélectionnés ?"
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "Supprimer les corrélations sélectionnées ?"
@@ -5968,6 +6116,10 @@ msgstr "Supprimer les prototypes d'éléments sélectionnés ?"
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
 msgstr "Supprimer les éléments sélectionnés ?"
+
+#: app/views/js/maintenance.list.js.php:88
+msgid "Delete selected maintenance period?"
+msgstr "Supprimer la période de maintenance sélectionnée ?"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -6326,6 +6478,14 @@ msgstr "Désactiver l'action sélectionnée ?"
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
 msgstr "Désactiver les actions sélectionnées ?"
+
+#: app/views/js/connector.list.js.php:114
+msgid "Disable selected connector?"
+msgstr "Désactiver le connecteur sélectionné ?"
+
+#: app/views/js/connector.list.js.php:113
+msgid "Disable selected connectors?"
+msgstr "Désactiver les connecteurs sélectionnés ?"
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -7127,6 +7287,14 @@ msgstr "Activer l'action sélectionnée ?"
 msgid "Enable selected actions?"
 msgstr "Activer les actions sélectionnées ?"
 
+#: app/views/js/connector.list.js.php:99
+msgid "Enable selected connector?"
+msgstr "Activer le connecteur sélectionné ?"
+
+#: app/views/js/connector.list.js.php:98
+msgid "Enable selected connectors?"
+msgstr "Activer les connecteurs sélectionnés ?"
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "Activer les corrélations sélectionnées ?"
@@ -7412,6 +7580,10 @@ msgid "Event updated"
 msgid_plural "Events updated"
 msgstr[0] "Mettre à jour l'événement"
 msgstr[1] "Mettre à jour les événements"
+
+#: app/views/connector.edit.php:58 app/views/connector.list.php:99
+msgid "Events"
+msgstr "Événements"
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -10593,6 +10765,13 @@ msgstr "Installation"
 msgid "Installer name"
 msgstr "Nom de l'installeur"
 
+#: include/forms.inc.php:1392 include/forms.inc.php:1425
+#: include/views/js/item.preprocessing.js.php:142
+#: include/views/js/item.preprocessing.js.php:180
+#: include/views/js/item.preprocessing.js.php:227
+msgid "Integer from BITS"
+msgstr "Entier de BITS"
+
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
 msgstr "Intégrations"
@@ -11876,6 +12055,10 @@ msgstr "Le champs de lien \"selementid2\" pointe vers l'identifiant d'élément 
 msgid "Link indicators"
 msgstr "Indicateurs de lien"
 
+#: include/actions.inc.php:863
+msgid "Link template"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
 #: app/views/popup.massupdate.template.php:78
@@ -12203,9 +12386,23 @@ msgstr "Maintenance supprimée"
 msgid "Maintenance period"
 msgstr "Période de maintenance"
 
+#: app/controllers/CControllerMaintenanceCreate.php:142
+msgid "Maintenance period created"
+msgstr "Période de maintenance créée"
+
+#: app/controllers/CControllerMaintenanceDelete.php:61
+msgid "Maintenance period deleted"
+msgid_plural "Maintenance periods deleted"
+msgstr[0] "Période de maintenance supprimée"
+msgstr[1] "Périodes de maintenance supprimées"
+
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
 msgstr "Durée de la période de maintenance"
+
+#: app/controllers/CControllerMaintenanceUpdate.php:144
+msgid "Maintenance period updated"
+msgstr "Période de maintenance mise à jour"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12232,6 +12429,10 @@ msgstr "Maintenance sans collecte de données"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Maintenance: %1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -12360,11 +12561,11 @@ msgstr "La mise à jour de la carte a échoué."
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "Mappez les attributs médias LDAP de l'utilisateur (par exemple, e-mail) sur les médias utilisateur Zabbix pour l'envoi de notifications."
 
 #: app/views/administration.authentication.edit.php:513
 msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "Mappez les attributs médias SAML de l'utilisateur (par exemple, e-mail) sur les médias utilisateur Zabbix pour l'envoi de notifications."
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
@@ -12503,6 +12704,10 @@ msgstr "Nombre maximal de colonnes et de lignes dans les tableaux d'aperçu"
 msgid "Max period for time selector"
 msgstr "Période maximale pour le sélecteur de temps"
 
+#: app/views/connector.edit.php:171
+msgid "Max records per message"
+msgstr "Nombre maximum d'enregistrements par message"
+
 #: app/controllers/CControllerPopupItemTest.php:1313
 #: app/controllers/CControllerPopupItemTest.php:1319
 #: app/controllers/CControllerPopupItemTest.php:1325
@@ -12518,7 +12723,7 @@ msgstr "Le nombre maximal de répétitions s'applique uniquement à la découver
 
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and walk only."
-msgstr ""
+msgstr "Le nombre maximal de répétitions s'applique uniquement à la découverte et à walk."
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -13372,6 +13577,10 @@ msgstr "Nouvelle colonne"
 msgid "New condition"
 msgstr "Nouvelle condition"
 
+#: app/views/connector.edit.php:312 app/views/connector.edit.php:341
+msgid "New connector"
+msgstr "Nouveau connecteur"
+
 #: app/controllers/CControllerDashboardView.php:154
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
 msgid "New dashboard"
@@ -13407,6 +13616,11 @@ msgstr "Nouvel hôte"
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
 msgstr "Nouveau groupe d'hôtes"
+
+#: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
+#: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
+msgid "New maintenance period"
+msgstr "Nouvelle période de maintenance"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -15055,18 +15269,42 @@ msgstr "Paramètres"
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
 msgstr "Les paramètres \"esc_step_from\" et \"esc_step_to\" doivent être définis ensemble."
 
+#: include/views/configuration.host.discovery.edit.php:68
+msgid "Parent discovery rule"
+msgstr "Règle de découverte parente"
+
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
 msgid "Parent discovery rules"
 msgstr "Règles de découverte parentes"
 
+#: include/views/configuration.graph.edit.php:88
+msgid "Parent graph"
+msgstr "Graphique parent"
+
+#: include/views/configuration.graph.edit.php:91
+msgid "Parent graph prototype"
+msgstr "Prototype de graphique parent"
+
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "Graphique parent"
 
+#: include/views/configuration.host.prototype.edit.php:81
+msgid "Parent host prototype"
+msgstr "Prototype d'hôte parent"
+
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
 msgstr "Valeur de l'hôte parent"
+
+#: include/views/configuration.item.edit.php:71
+msgid "Parent item"
+msgstr "Élément parent"
+
+#: include/views/configuration.item.prototype.edit.php:70
+msgid "Parent item prototype"
+msgstr "Prototype d'élément parent"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -15078,14 +15316,30 @@ msgstr "Éléments parents"
 msgid "Parent services"
 msgstr "Services parents"
 
+#: app/partials/configuration.tags.tab.php:38
+msgid "Parent template"
+msgstr "Modèle parent"
+
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
 msgstr "Modèles parent"
+
+#: include/views/configuration.triggers.edit.php:104
+msgid "Parent trigger"
+msgstr "Déclencheur parent"
+
+#: include/views/configuration.trigger.prototype.edit.php:95
+msgid "Parent trigger prototype"
+msgstr "Prototype de déclencheur parent"
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
 msgid "Parent triggers"
 msgstr "Déclencheurs parents"
+
+#: include/views/configuration.httpconf.edit.php:76
+msgid "Parent web scenario"
+msgstr "Scénario web parent"
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15678,6 +15932,10 @@ msgstr "Prometheus vers JSON"
 #: include/views/monitoring.sysmap.list.php:83 jsLoader.php:144
 msgid "Properties"
 msgstr "Propriétés"
+
+#: app/views/connector.edit.php:47
+msgid "Protocol"
+msgstr "Protocole"
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -17250,6 +17508,10 @@ msgid_plural "Scripts deleted"
 msgstr[0] "Script supprimé"
 msgstr[1] "Script supprimé"
 
+#: app/views/popup.mediatypetest.edit.php:60
+msgid "Script does not have parameters."
+msgstr "Le script n'a pas de paramètres."
+
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
 msgstr "Journal d'exécution du script"
@@ -17644,6 +17906,10 @@ msgstr "Les services forment une dépendance circulaire."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "Services mis à jour"
+
+#: include/classes/api/services/CUser.php:1714
+msgid "Session ID or token is expected."
+msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
@@ -18513,6 +18779,10 @@ msgstr "Super administrateur"
 msgid "Support"
 msgstr "Support"
 
+#: app/partials/administration.system.info.php:124
+msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
+msgstr "La prise en charge de l'ancien type numérique est obsolète. Veuillez passer aux valeurs numériques de la plage étendue."
+
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
 msgstr "Formats supportés :"
@@ -19201,6 +19471,11 @@ msgstr "Le déclencheur n'est plus découvert et sera supprimé lors du prochain
 #: app/views/administration.user.edit.php:255
 msgid "Theme"
 msgstr "Thème"
+
+#: app/views/administration.mediatype.edit.php:139
+#: app/views/popup.mediatypetest.edit.php:47
+msgid "These parameters will be passed to the script as command-line arguments in the specified order."
+msgstr "Ces paramètres seront transmis au script en tant qu'arguments de ligne de commande dans l'ordre spécifié."
 
 #: include/func.inc.php:2468
 msgid "This day last week"
@@ -20340,6 +20615,14 @@ msgstr "Supprimer lien au modèle"
 msgid "Unlink from templates"
 msgstr "Supprimer lien aux modèles"
 
+#: include/actions.inc.php:864
+msgid "Unlink template"
+msgstr ""
+
+#: include/actions.inc.php:681
+msgid "Unlink templates"
+msgstr ""
+
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Enlever la sourdine"
@@ -20534,6 +20817,10 @@ msgstr "Mis à jour"
 #, c-format
 msgid "Updated status of host \"%1$s\"."
 msgstr "État de l'hôte \"%1$s\" mis à jour."
+
+#: include/events.inc.php:346
+msgid "Updating"
+msgstr "Mise à jour"
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
@@ -21573,6 +21860,10 @@ msgstr "Chaîne de requête du coffre secrète"
 msgid "Vendor"
 msgstr "Fabricant"
 
+#: include/views/configuration.template.edit.php:93
+msgid "Vendor and version"
+msgstr "Fournisseur et version"
+
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Verbeux"
@@ -22215,6 +22506,10 @@ msgstr "Zabbix"
 msgid "Zabbix Integrations"
 msgstr "Intégrations Zabbix"
 
+#: app/views/connector.edit.php:49
+msgid "Zabbix Streaming Protocol v1.0"
+msgstr "Protocole de streaming Zabbix v1.0"
+
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
 msgstr "Support Technique Zabbix"
@@ -22306,6 +22601,14 @@ msgstr "[Mauvaise valeur pour le jour : \"%1$s\"]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[Mauvaise valeur pour le mois : \"%1$s\"]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
@@ -22697,6 +23000,10 @@ msgstr "clignotant"
 #: include/classes/api/services/CItemGeneral.php:488
 msgid "both username and password should be either present or empty"
 msgstr "le nom d'utilisateur et le mot de passe doivent être présents ou vides"
+
+#: include/classes/api/services/CTemplate.php:522
+msgid "both vendor_name and vendor_version should be either present or empty"
+msgstr "Les deux vendor_name et vendor_version doivent être soit présents, soit vides"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:484
 msgid "bytelength() - Returns the length in bytes"

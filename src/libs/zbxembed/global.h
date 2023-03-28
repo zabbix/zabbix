@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@
 #define ZABBIX_GLOBAL_H
 
 #include "zbxembed.h"
+#include "duktape.h"
 
 void	es_init_global_functions(zbx_es_t *es);
+char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len);
 
 #endif

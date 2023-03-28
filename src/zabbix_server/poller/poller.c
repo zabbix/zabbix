@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,6 @@
 
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "preproc.h"
 #include "zbxrtc.h"
 #include "zbxcrypto.h"
 #include "zbxjson.h"
@@ -81,7 +80,7 @@ static int	update_interface_availability(unsigned char **data, size_t *data_allo
  *             ia           - [OUT] the interface availability data           *
  *                                                                            *
  ******************************************************************************/
-static void	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_interface_availability_t *ia)
+static void	interface_get_availability(const zbx_dc_interface_t *dc_interface, zbx_interface_availability_t *ia)
 {
 	zbx_agent_availability_t	*availability = &ia->agent;
 
@@ -103,7 +102,7 @@ static void	interface_get_availability(const DC_INTERFACE *dc_interface, zbx_int
  *             ia           - [IN] the interface availability data              *
  *                                                                              *
  *******************************************************************************/
-static void	interface_set_availability(DC_INTERFACE *dc_interface, const zbx_interface_availability_t *ia)
+static void	interface_set_availability(zbx_dc_interface_t *dc_interface, const zbx_interface_availability_t *ia)
 {
 	const zbx_agent_availability_t	*availability = &ia->agent;
 	unsigned char			*pavailable;
@@ -168,7 +167,7 @@ static const char	*item_type_agent_string(zbx_item_type_t item_type)
  *             ts         - [IN] the timestamp                                  *
  *                                                                              *
  *******************************************************************************/
-void	zbx_activate_item_interface(zbx_timespec_t *ts, DC_ITEM *item,  unsigned char **data, size_t *data_alloc,
+void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item,  unsigned char **data, size_t *data_alloc,
 		size_t *data_offset)
 {
 	zbx_interface_availability_t	in, out;
@@ -184,7 +183,7 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, DC_ITEM *item,  unsigned ch
 
 	interface_get_availability(&item->interface, &in);
 
-	if (FAIL == DCinterface_activate(item->interface.interfaceid, ts, &in.agent, &out.agent))
+	if (FAIL == zbx_dc_interface_activate(item->interface.interfaceid, ts, &in.agent, &out.agent))
 		goto out;
 
 	if (FAIL == update_interface_availability(data, data_alloc, data_offset, &out))
@@ -209,20 +208,22 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/********************************************************************************
- *                                                                              *
- * Purpose: deactivate item interface                                           *
- *                                                                              *
- * Parameters: ts         - [IN] the timestamp                                  *
- *             item       - [IN/OUT] the item                                   *
- *             data       - [IN/OUT] the serialized availability data           *
- *             data_alloc - [IN/OUT] the serialized availability data size      *
- *             data_alloc - [IN/OUT] the serialized availability data offset    *
- *             ts         - [IN] the timestamp                                  *
- *                                                                              *
- *******************************************************************************/
-void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned char **data, size_t *data_alloc,
-		size_t *data_offset, const char *error)
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: deactivate item interface                                              *
+ *                                                                                 *
+ * Parameters: ts                - [IN] timestamp                                  *
+ *             item              - [IN/OUT] item                                   *
+ *             data              - [IN/OUT] serialized availability data           *
+ *             data_alloc        - [IN/OUT] serialized availability data size      *
+ *             data_alloc        - [IN/OUT] serialized availability data offset    *
+ *             ts                - [IN] timestamp                                  *
+ *             unavailable_delay - [IN]                                            *
+ *             error             - [IN/OUT]                                        *
+ *                                                                                 *
+ ***********************************************************************************/
+void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsigned char **data, size_t *data_alloc,
+		size_t *data_offset, int unavailable_delay, const char *error)
 {
 	zbx_interface_availability_t	in, out;
 
@@ -237,8 +238,11 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item, unsigned c
 
 	interface_get_availability(&item->interface, &in);
 
-	if (FAIL == DCinterface_deactivate(item->interface.interfaceid, ts, &in.agent, &out.agent, error))
+	if (FAIL == zbx_dc_interface_deactivate(item->interface.interfaceid, ts, unavailable_delay, &in.agent, &out.agent,
+			error))
+	{
 		goto out;
+	}
 
 	if (FAIL == update_interface_availability(data, data_alloc, data_offset, &out))
 		goto out;
@@ -284,7 +288,7 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 	zbx_free(result);
 }
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
+static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
 	int	res = FAIL;
@@ -365,7 +369,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 	return res;
 }
 
-static int	parse_query_fields(const DC_ITEM *item, char **query_fields, unsigned char expand_macros)
+static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, unsigned char expand_macros)
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN], *str = NULL;
@@ -435,7 +439,8 @@ static int	parse_query_fields(const DC_ITEM *item, char **query_fields, unsigned
 	return SUCCEED;
 }
 
-void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros)
+void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
+		unsigned char expand_macros)
 {
 	int			i;
 	char			*port = NULL, error[ZBX_ITEM_ERROR_LEN_MAX];
@@ -696,8 +701,9 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 
 }
 
-void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,
-		unsigned char poller_type, const zbx_config_comms_args_t *config_comms, int config_startup_time)
+void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
+		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
+		int config_startup_time)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -736,7 +742,7 @@ void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *resul
 		THIS_SHOULD_NEVER_HAPPEN;
 }
 
-void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
+void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 {
 	int	i;
 
@@ -807,15 +813,15 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  * Return value: number of items processed                                    *
  *                                                                            *
  * Comments: processes single item at a time except for Java, SNMP items,     *
- *           see DCconfig_get_poller_items()                                  *
+ *           see zbx_dc_config_get_poller_items()                             *
  *                                                                            *
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+		int config_startup_time, int config_unavailable_delay)
 {
-	DC_ITEM			item, *items;
-	AGENT_RESULT		results[MAX_POLLER_ITEMS];
-	int			errcodes[MAX_POLLER_ITEMS];
+	zbx_dc_item_t		item, *items;
+	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
+	int			errcodes[ZBX_MAX_POLLER_ITEMS];
 	zbx_timespec_t		timespec;
 	int			i, num, last_available = INTERFACE_AVAILABLE_UNKNOWN;
 	zbx_vector_ptr_t	add_results;
@@ -825,11 +831,11 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	items = &item;
-	num = DCconfig_get_poller_items(poller_type, config_comms->config_timeout, &items);
+	num = zbx_dc_config_get_poller_items(poller_type, config_comms->config_timeout, &items);
 
 	if (0 == num)
 	{
-		*nextcheck = DCconfig_get_poller_nextcheck(poller_type);
+		*nextcheck = zbx_dc_config_get_poller_nextcheck(poller_type);
 		goto exit;
 	}
 
@@ -861,7 +867,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 				if (INTERFACE_AVAILABLE_FALSE != last_available)
 				{
 					zbx_deactivate_item_interface(&timespec, &items[i], &data, &data_alloc,
-							&data_offset, results[i].msg);
+							&data_offset, config_unavailable_delay, results[i].msg);
 					last_available = INTERFACE_AVAILABLE_FALSE;
 				}
 				break;
@@ -926,13 +932,13 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 					items[i].flags, NULL, &timespec, items[i].state, results[i].msg);
 		}
 
-		DCpoller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1, poller_type,
+		zbx_dc_poller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1, poller_type,
 				nextcheck);
 	}
 
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
-	DCconfig_clean_items(items, NULL, num);
+	zbx_dc_config_clean_items(items, NULL, num);
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 
@@ -985,7 +991,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type),
 				process_num);
 
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
+		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	}
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
@@ -1008,7 +1014,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		}
 
 		processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
-				poller_args_in->config_startup_time);
+				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

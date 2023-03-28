@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ struct zbx_dbsync
 	zbx_vector_ptr_t		rows;
 
 	/* the database result set for ZBX_DBSYNC_ALL mode */
-	DB_RESULT			dbresult;
+	zbx_db_result_t			dbresult;
 
 	/* the row preprocessing function */
 	zbx_dbsync_preproc_row_func_t	preproc_row_func;
@@ -162,5 +162,7 @@ int	zbx_dbsync_prepare_httpsteps(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_httpstep_fields(zbx_dbsync_t *sync);
 void	zbx_dbsync_clear_user_macros(void);
 
+int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync);
+int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

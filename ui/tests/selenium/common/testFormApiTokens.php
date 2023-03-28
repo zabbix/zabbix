@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -346,7 +346,7 @@ class testFormApiTokens extends CWebTest {
 	 */
 	private function checkAuthToken($auth_token, $original_token) {
 		// Get token text.
-		$token_text = str_replace('  Copy to clipboard', '', $auth_token->getText());
+		$token_text = str_replace(' Copy to clipboard', '', $auth_token->getText());
 		$this->assertEquals(64, strlen($token_text));
 
 		if ($original_token) {

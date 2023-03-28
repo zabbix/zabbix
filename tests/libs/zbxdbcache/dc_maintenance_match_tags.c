@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,16 +31,8 @@
 
 static int	dc_compare_maintenance_tags(const void *d1, const void *d2)
 {
-	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t **)d1;
-	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t **)d2;
-
-	return strcmp(tag1->tag, tag2->tag);
-}
-
-static int	dc_compare_tags(const void *d1, const void *d2)
-{
-	const zbx_tag_t	*tag1 = *(const zbx_tag_t **)d1;
-	const zbx_tag_t	*tag2 = *(const zbx_tag_t **)d2;
+	const zbx_dc_maintenance_tag_t	*tag1 = *(const zbx_dc_maintenance_tag_t * const *)d1;
+	const zbx_dc_maintenance_tag_t	*tag2 = *(const zbx_dc_maintenance_tag_t * const *)d2;
 
 	return strcmp(tag1->tag, tag2->tag);
 }
@@ -75,7 +67,7 @@ static void	get_maintenance_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tag
 	zbx_vector_ptr_sort(tags, dc_compare_maintenance_tags);
 }
 
-static void	get_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tags)
+static void	get_tags(zbx_mock_handle_t handle, zbx_vector_tags_t *tags)
 {
 	zbx_mock_error_t	mock_err;
 	zbx_mock_handle_t	htag;
@@ -88,13 +80,13 @@ static void	get_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tags)
 		value = zbx_mock_get_object_member_string(htag, "value");
 
 		tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-		tag->tag = (char *)key;
-		tag->value = (char *)value;
+		tag->tag = zbx_strdup(NULL, key);
+		tag->value = zbx_strdup(NULL, value);
 
-		zbx_vector_ptr_append(tags, tag);
+		zbx_vector_tags_append(tags, tag);
 	}
 
-	zbx_vector_ptr_sort(tags, dc_compare_tags);
+	zbx_vector_tags_sort(tags, zbx_compare_tags);
 }
 
 static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
@@ -115,13 +107,13 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_vector_ptr_t	tags;
+	zbx_vector_tags_t	tags;
 	zbx_dc_maintenance_t	maintenance;
 	int			returned_ret, expected_ret;
 
 	ZBX_UNUSED(state);
 
-	zbx_vector_ptr_create(&tags);
+	zbx_vector_tags_create(&tags);
 	zbx_vector_ptr_create(&maintenance.tags);
 
 	get_maintenance(&maintenance);
@@ -135,6 +127,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_ptr_clear_ext(&maintenance.tags, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&maintenance.tags);
 
-	zbx_vector_ptr_clear_ext(&tags, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&tags);
+	zbx_vector_tags_clear_ext(&tags, zbx_free_tag);
+	zbx_vector_tags_destroy(&tags);
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_db(const DC_ITEM *item, int config_timeout, AGENT_RESULT *result)
+int	get_value_db(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *result)
 {
 	AGENT_REQUEST		request;
 	const char		*dsn, *connection = NULL;

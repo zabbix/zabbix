@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
 	->setId('service-list')
 	->setName('service_list');
 
@@ -89,7 +88,7 @@ foreach ($data['services'] as $serviceid => $service) {
 			? new CLink($problem_event['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
+					->setArgument('filter_set', '1')
 					->setArgument('triggerids', [$problem_event['triggerid']])
 			)
 			: $problem_event['name'];

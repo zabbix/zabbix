@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -412,6 +412,10 @@ function interfaceIdsByType(array $interfaces) {
 function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_template, array $dst_hostids): bool {
 	$options = in_array($src_type, ['templateids', 'hostids']) ? ['inherited' => false] : [];
 
+	if ($src_type === 'hostids') {
+		$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
+	}
+
 	$src_items = API::Item()->get([
 		'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 			'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
@@ -561,14 +565,16 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 	if ($dep_itemids) {
 		$master_items = API::Item()->get([
 			'output' => ['itemid', 'key_'],
-			'itemids' => array_keys($dep_itemids)
+			'itemids' => array_keys($dep_itemids),
+			'webitems' => true
 		]);
 
 		$options = $dst_is_template ? ['templateids' => $dst_hostids] : ['hostids' => $dst_hostids];
 
 		$dst_master_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_'],
-			'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))]
+			'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))],
+			'webitems' => true
 		] + $options);
 
 		$dst_master_itemids = [];
@@ -598,6 +604,10 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 
 	do {
 		$dst_items = [];
+
+		if (!$dst_hostids) {
+			return true;
+		}
 
 		foreach ($dst_hostids as $dst_hostid) {
 			foreach ($src_items as $src_item) {
@@ -1348,56 +1358,90 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 }
 
 /**
- * Format history value.
- * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
- * value.
+ * Prepare item value for displaying, apply value map and/or convert units.
  *
- * @param mixed     $value
- * @param array     $item
- * @param int       $item['value_type']  type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param string    $item['units']       units of item
- * @param array     $item['valuemap']
- * @param bool      $trim
+ * @see formatHistoryValueRaw
+ *
+ * @param int|float|string  $value
+ * @param array             $item
+ * @param bool              $trim             Whether to trim non-numeric value to a length of 20 characters.
+ * @param array             $convert_options  Options for unit conversion. See @convertUnitsRaw.
  *
  * @return string
  */
-function formatHistoryValue($value, array $item, $trim = true) {
-	$mapping = false;
+function formatHistoryValue($value, array $item, bool $trim = true, array $convert_options = []): string {
+	$formatted_value = formatHistoryValueRaw($value, $item, $trim, $convert_options);
 
-	// format value
-	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convertUnits([
-			'value' => $value,
-			'units' => $item['units']
-		]);
-	}
-	elseif (!in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG])) {
-		$value = _('Unknown value type');
-	}
+	return $formatted_value['value'].($formatted_value['units'] !== '' ? ' '.$formatted_value['units'] : '');
+}
 
-	// apply value mapping
+/**
+ * Prepare item value for displaying, apply value map and/or convert units.
+ *
+ * @param int|float|string  $value
+ * @param array             $item
+ * @param bool              $trim             Whether to trim non-numeric value to a length of 20 characters.
+ * @param array             $convert_options  Options for unit conversion. See @convertUnitsRaw.
+ *
+ * $item = [
+ *     'value_type' => (int)     ITEM_VALUE_TYPE_FLOAT | ITEM_VALUE_TYPE_UINT64, ...
+ *     'units' =>      (string)  Item units.
+ *     'valuemap' =>   (array)   Item value map.
+ * ]
+ *
+ * @return array
+ */
+function formatHistoryValueRaw($value, array $item, bool $trim = true, array $convert_options = []): array {
+	$mapped_value = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR])
+		? CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap'])
+		: false;
+
 	switch ($item['value_type']) {
-		case ITEM_VALUE_TYPE_STR:
-			$mapping = CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap']);
-			// break; is not missing here
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+			if ($mapped_value !== false) {
+				return [
+					'value' => $mapped_value.' ('.$value.')',
+					'units' => '',
+					'is_mapped' => true
+				];
+			}
 
+			$converted_value = convertUnitsRaw([
+				'value' => $value,
+				'units' => $item['units']
+			] + $convert_options);
+
+			return [
+				'value' => $converted_value['value'],
+				'units' => $converted_value['units'],
+				'is_mapped' => false
+			];
+
+		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
 			if ($trim && mb_strlen($value) > 20) {
 				$value = mb_substr($value, 0, 20).'...';
 			}
 
-			if ($mapping !== false) {
-				$value = $mapping.' ('.$value.')';
+			if ($mapped_value !== false) {
+				$value = $mapped_value.' ('.$value.')';
 			}
 
-			break;
+			return [
+				'value' => $value,
+				'units' => '',
+				'is_mapped' => $mapped_value !== false
+			];
 
 		default:
-			$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
+			return [
+				'value' => _('Unknown value type'),
+				'units' => '',
+				'is_mapped' => false
+			];
 	}
-
-	return $value;
 }
 
 /**
@@ -2501,7 +2545,11 @@ function getTypeItemFieldNames(array $input): array {
 			return ['interfaceid'];
 
 		case ITEM_TYPE_DEPENDENT:
-			return ['master_itemid'];
+			if ($input['templateid'] == 0) {
+				return ['master_itemid'];
+			}
+
+			return [];
 
 		case ITEM_TYPE_HTTPAGENT:
 			if ($input['templateid'] == 0) {
@@ -2573,7 +2621,7 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 			case 'username':
 			case 'password':
 				return $input['type'] != ITEM_TYPE_HTTPAGENT || in_array($input['authtype'],
-					[HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]
+					[ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST]
 				);
 
 			case 'delay':

@@ -147,6 +147,12 @@
 			color: $font-selected-color;
 		}
 	}
+
+	.sortable-dragging {
+		.sortable-item {
+			opacity: 1;
+		}
+	}
 }
 
 .dashboard-navigation-controls {
@@ -312,7 +318,7 @@
 	flex-direction: column;
 }
 
-.dashboard-grid-widget-head {
+.dashboard-grid-widget-header {
 	position: absolute;
 	top: .25rem;
 	left: .25rem;
@@ -359,7 +365,28 @@
 	transition: opacity .2s ease-out;
 }
 
-.dashboard-grid-widget-content {
+.dashboard-grid-widget-messages {
+	.msg-bad,
+	.msg-good,
+	.msg-warning {
+		margin: 0 10px 8px;
+	}
+}
+
+.dashboard-grid-widget-body {
+	display: contents;
+}
+
+.dashboard-grid-widget-debug {
+	.debug-output {
+		margin: 8px 10px 0;
+		max-height: none;
+		border-color: $table-border-color;
+	}
+}
+
+.dashboard-grid-widget-contents {
+	position: relative;
 	flex-grow: 1;
 	margin-top: 2rem;
 	box-sizing: border-box;
@@ -402,22 +429,11 @@
 		}
 	}
 
-	.debug-output {
-		max-height: none;
-		border-color: $table-border-color;
-	}
-
-	.msg-bad,
-	.msg-good,
-	.msg-warning {
-		margin: 0 10px;
-	}
-
 	&.no-padding {
-		.msg-bad,
-		.msg-good,
-		.msg-warning {
-			margin: 8px 10px;
+		.dashboard-grid-widget-debug {
+			.debug-output {
+				margin: 8px 10px;
+			}
 		}
 	}
 }
@@ -435,15 +451,25 @@
 	position: absolute;
 
 	&.dashboard-grid-widget-hidden-header {
-		.dashboard-grid-widget-head {
+		.dashboard-grid-widget-header {
 			height: 0;
 			transition: height .3s, margin-top .3s, box-shadow .3s;
 		}
 
-		.dashboard-grid-widget-content {
+		.dashboard-grid-widget-contents {
 			margin-top: 0;
 			height: 100%;
 			padding-top: 8px;
+
+			&.no-padding {
+				.dashboard-grid-widget-messages {
+					.msg-bad,
+					.msg-good,
+					.msg-warning {
+						margin: 8px 10px;
+					}
+				}
+			}
 
 			.list-table {
 				&.sticky-footer {
@@ -457,7 +483,7 @@
 		}
 
 		&.dashboard-grid-widget-focus {
-			.dashboard-grid-widget-head {
+			.dashboard-grid-widget-header {
 				height: 2rem;
 				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
@@ -495,7 +521,7 @@
 	height: 100%;
 }
 
-.dashboard-grid-iterator-head {
+.dashboard-grid-iterator-header {
 	position: absolute;
 	top: .25rem;
 	left: .25rem;
@@ -555,7 +581,7 @@
 	}
 }
 
-.dashboard-grid-iterator-content {
+.dashboard-grid-iterator-contents {
 	// To catch vertical resize events correctly.
 	position: absolute;
 	top: 0;
@@ -620,7 +646,7 @@
 			display: flex;
 		}
 
-		.dashboard-grid-iterator-content {
+		.dashboard-grid-iterator-contents {
 			display: none;
 		}
 	}
@@ -628,7 +654,7 @@
 	&.dashboard-grid-iterator-focus {
 		z-index: 5;
 
-		.dashboard-grid-iterator-head {
+		.dashboard-grid-iterator-header {
 			margin-top: -2rem;
 			height: 2rem;
 			box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
@@ -639,7 +665,7 @@
 		}
 
 		&.dashboard-grid-iterator-hidden-header.iterator-double-header {
-			.dashboard-grid-iterator-head {
+			.dashboard-grid-iterator-header {
 				margin-top: calc(-4rem - 8px);
 				height: calc(4rem + 8px);
 			}
@@ -661,7 +687,7 @@
 	}
 
 	&.iterator-alt-content {
-		.dashboard-grid-iterator-content {
+		.dashboard-grid-iterator-contents {
 			position: absolute;
 			top: .25rem;
 			left: .25rem;
@@ -707,20 +733,20 @@
 
 .dashboard-grid-widget.ui-draggable,
 .dashboard-grid-iterator.ui-draggable {
-	.dashboard-grid-widget-head,
-	.dashboard-grid-iterator-head {
+	.dashboard-grid-widget-header,
+	.dashboard-grid-iterator-header {
 		@extend %cursor-drag;
 	}
 
 	&.ui-draggable-dragging {
-		.dashboard-grid-widget-head,
-		.dashboard-grid-iterator-head {
+		.dashboard-grid-widget-header,
+		.dashboard-grid-iterator-header {
 			@extend %cursor-dragging;
 		}
 	}
 
-	.dashboard-grid-widget .dashboard-grid-widget-head,
-	.dashboard-grid-iterator .dashboard-grid-iterator-head {
+	.dashboard-grid-widget .dashboard-grid-widget-header,
+	.dashboard-grid-iterator .dashboard-grid-iterator-header {
 		cursor: auto;
 	}
 }
@@ -735,7 +761,7 @@
 
 		.dashboard-grid-widget {
 			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-head {
+				.dashboard-grid-widget-header {
 					transition: none;
 				}
 			}
@@ -743,7 +769,7 @@
 
 		.dashboard-grid-iterator {
 			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-head {
+				.dashboard-grid-widget-header {
 					transition: none;
 				}
 			}
@@ -771,7 +797,7 @@
 
 		&.ui-resizable-resizing {
 			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-head {
+				.dashboard-grid-widget-header {
 					margin-top: 0;
 					height: 0;
 					box-shadow: none;
@@ -785,7 +811,7 @@
 			}
 
 			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-head {
+				.dashboard-grid-widget-header {
 					margin-top: -2rem;
 					height: 2rem;
 					box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
@@ -810,11 +836,11 @@
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
 			}
 
-			.dashboard-grid-widget-head {
+			.dashboard-grid-widget-header {
 				border-color: darken($ui-border-color, 6%);
 			}
 
-			.dashboard-grid-widget-content {
+			.dashboard-grid-widget-contents {
 				border-color: darken($ui-border-color, 6%);
 			}
 		}
@@ -835,7 +861,7 @@
 		}
 
 		&.ui-resizable-resizing {
-			.dashboard-grid-iterator-head {
+			.dashboard-grid-iterator-header {
 				margin-top: 0;
 				height: 0;
 				box-shadow: none;
@@ -848,7 +874,7 @@
 				visibility: hidden;
 			}
 
-			.dashboard-grid-iterator-head {
+			.dashboard-grid-iterator-header {
 				margin-top: -2rem;
 				height: 2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
@@ -856,7 +882,7 @@
 			}
 
 			&.dashboard-grid-iterator-hidden-header.iterator-double-header {
-				.dashboard-grid-iterator-head {
+				.dashboard-grid-iterator-header {
 					margin-top: calc(-4rem - 8px);
 					height: calc(4rem + 8px);
 				}
@@ -879,17 +905,17 @@
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
 			}
 
-			.dashboard-grid-iterator-head {
+			.dashboard-grid-iterator-header {
 				border-color: darken($ui-border-color, 6%);
 			}
 
-			.dashboard-grid-iterator-content {
+			.dashboard-grid-iterator-contents {
 				.dashboard-grid-widget {
-					.dashboard-grid-widget-head {
+					.dashboard-grid-widget-header {
 						border-color: darken($ui-border-color, 6%);
 					}
 
-					.dashboard-grid-widget-content {
+					.dashboard-grid-widget-contents {
 						border-color: darken($ui-border-color, 6%);
 					}
 				}
@@ -1016,8 +1042,8 @@
 	}
 }
 
-.dashboard-grid-widget-content,
-.dashboard-grid-iterator-content {
+.dashboard-grid-widget-contents,
+.dashboard-grid-iterator-contents {
 	&.is-loading::before {
 		margin: calc(.25rem + 1px);
 	}

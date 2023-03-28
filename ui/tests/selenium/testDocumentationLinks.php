@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'link:No'
+							'element' => 'link:Update'
 						]
 					],
 					'doc_link' => '/en/manual/acknowledgment#updating-problems'
@@ -530,7 +530,7 @@ class testDocumentationLinks extends CWebTest {
 			// #50 Update template view.
 			[
 				[
-					'url' => 'templates.php?form=update&templateid=10050',
+					'url' => 'templates.php?form=update&templateid=10047',
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
@@ -1272,21 +1272,33 @@ class testDocumentationLinks extends CWebTest {
 			// #133 Maintenance list view.
 			[
 				[
-					'url' => 'maintenance.php',
+					'url' => 'zabbix.php?action=maintenance.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/maintenance'
 				]
 			],
-			// #134 Create maintenance form view.
+			// #134 Create maintenance form popup.
 			[
 				[
-					'url' => 'maintenance.php?form=create',
+					'url' => 'zabbix.php?action=maintenance.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create maintenance period'
+						]
+					],
 					'doc_link' => '/en/manual/maintenance#configuration'
 				]
 			],
-			// #135 Edit maintenance form view.
+			// #135 Edit maintenance form popup.
 			[
 				[
-					'url' => 'maintenance.php?form=update&maintenanceid=4',
+					'url' => 'zabbix.php?action=maintenance.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Maintenance for update (data collection)"]'
+						]
+					],
 					'doc_link' => '/en/manual/maintenance#configuration'
 				]
 			],
@@ -1617,7 +1629,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'link:1st Module name'
 						]
 					],
-					'doc_link' => '/en/manual/modules#manifest-preparation'
+					'doc_link' => '/en/manual/extensions/frontendmodules#manifest-preparation'
 				]
 			],
 			// #174 Administration -> General -> Api tokens list view.
