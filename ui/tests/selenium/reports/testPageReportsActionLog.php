@@ -41,16 +41,23 @@ class testPageReportsActionLog extends CWebTest {
 				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (9, 13, 1, 9, ".
 				"1329724880, 3, '77777777', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
 		);
+
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+			"message, status, retries, error, esc_step, alerttype, parameters) VALUES (10, 13, 1, 9, ".
+			"1329724890, 3, '77777777', 'subject_no_space', 'message_no_space', 1, 0, '', 1, 0, '');"
+		);
 	}
 
 	public function testPageReportsActionLog_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=actionlog.list&from=now-2y&to=now');
+		$this->page->login()->open('zabbix.php?action=actionlog.list&from=now-2y&to=now')->waitUntilReady();
 
 		// If the filter is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 
+		$this->page->assertHeader('Action log');
+		$this->page->assertTitle('Action log');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Check filter buttons.
@@ -88,41 +95,55 @@ class testPageReportsActionLog extends CWebTest {
 					'fields' => [
 						'Recipients' => ['test-timezone']
 					],
-					'result_amount' => 1
+					'result' => [
+						['Recipient' => "test-timezone\n77777777"],
+						['Recipient' => "test-timezone\n77777777"]
+					]
 				]
 			],
 			// #1
 			[
 				[
 					'fields' => [
-						'Recipients' => ['Tag-user', 'test-timezone']
+						'Actions' => ['Trigger action 2']
 					],
-					'result_amount' => 1
+					'result' => [
+						['Action' => 'Trigger action 2'],
+						['Action' => 'Trigger action 2'],
+						['Action' => 'Trigger action 2'],
+						['Action' => 'Trigger action 2'],
+						['Action' => 'Trigger action 2'],
+						['Action' => 'Trigger action 2'],
+						['Action' => 'Trigger action 2'],
+					]
 				]
 			],
 			// #2
 			[
 				[
 					'fields' => [
-						'Recipients' => ['Administrator']
+						'Actions' => ['Simple action']
 					],
-					'result_amount' => 6
+					'result' => []
 				]
 			],
 			// #3
 			[
 				[
 					'fields' => [
-						'Actions' => ['Trigger action 2']
+						'Recipients' => ['filter-update']
 					],
-					'result_amount' => 7
+					'result' => []
 				]
 			],
 			// #4
 			[
 				[
 					'fields' => [
-						'Actions' => ['Simple action']
+						'Media types' => ['Discord']
+					],
+					'result' => [
+						['Media type' => 'Discord']
 					]
 				]
 			],
@@ -130,7 +151,12 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Recipients' => ['filter-update']
+						'Media types' => ['Discord', 'SMS']
+					],
+					'result' => [
+						['Media type' => 'SMS'],
+						['Media type' => 'SMS'],
+						['Media type' => 'Discord']
 					]
 				]
 			],
@@ -138,25 +164,30 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Media types' => ['Discord']
+						'Media types' => ['Github']
 					],
-					'result_amount' => 1
+					'result' => []
 				]
 			],
 			// #7
 			[
 				[
 					'fields' => [
-						'Media types' => ['Discord', 'SMS']
+						'Actions' => ['Trigger action 2'],
+						'Media types' => ['Discord']
 					],
-					'result_amount' => 2
+					'result' => []
 				]
 			],
 			// #8
 			[
 				[
 					'fields' => [
-						'Media types' => ['Github']
+						'Actions' => ['Trigger action 3'],
+						'Media types' => ['Discord']
+					],
+					'result' => [
+						['Action' => 'Trigger action 3', 'Media type' => 'Discord']
 					]
 				]
 			],
@@ -164,8 +195,11 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Actions' => ['Trigger action 2'],
-						'Media types' => ['Discord']
+						'Recipients' => ['Administrator'],
+						'Actions' => ['Trigger action 3']
+					],
+					'result' => [
+						['Action' => 'Trigger action 3', 'Recipient' => "Admin (Zabbix Administrator)\ntest.test@zabbix.com"]
 					]
 				]
 			],
@@ -173,33 +207,19 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Actions' => ['Trigger action 3'],
-						'Media types' => ['Discord']
-					],
-					'result_amount' => 1
-				]
-			],
-			// #11
-			[
-				[
-					'fields' => [
-						'Recipients' => ['Administrator'],
-						'Actions' => ['Trigger action 3']
-					],
-					'result_amount' => 1
-				]
-			],
-			// #12
-			[
-				[
-					'fields' => [
 						'Recipients' => ['Administrator'],
 						'Media types' => ['Email']
 					],
-					'result_amount' => 5
+					'result' => [
+						['Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						['Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						['Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						['Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						['Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"]
+					]
 				]
 			],
-			// #13
+			// #11
 			[
 				[
 					'fields' => [
@@ -207,81 +227,120 @@ class testPageReportsActionLog extends CWebTest {
 						'Media types' => ['Email', 'Discord', 'SMS'],
 						'Actions' => ['Trigger action 2', 'Trigger action 3']
 					],
-					'result_amount' => 7
+					'result' => [
+						['Action' => 'Trigger action 3', 'Media type' => 'SMS', 'Recipient' => "test-timezone\n77777777"],
+						['Action' => 'Trigger action 3', 'Media type' => 'SMS', 'Recipient' => "test-timezone\n77777777"],
+						['Action' => 'Trigger action 3', 'Media type' => 'Discord', 'Recipient' => "Admin (Zabbix Administrator)\ntest.test@zabbix.com"],
+						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+					]
+				]
+			],
+			// #12
+			[
+				[
+					'fields' => ['id:filter_statuses_2' => true],
+					'result' => [
+						['Status' => 'Failed']
+					]
+				]
+			],
+			// #13
+			[
+				[
+					'fields' => ['id:filter_statuses_1' => true],
+					'result' => [
+						['Status' => 'Sent'],
+						['Status' => 'Sent'],
+						['Status' => 'Sent'],
+						['Status' => 'Executed'],
+						['Status' => 'Executed'],
+						['Status' => 'Sent'],
+						['Status' => 'Sent'],
+						['Status' => 'Sent']
+					]
 				]
 			],
 			// #14
 			[
 				[
-					'status' => ['Failed'],
-					'result_amount' => 1,
-					'result_status' => ['Failed']
+					'fields' => ['id:filter_statuses_0' => true],
+					'result' => [
+						['Status' => "In progress:\n3 retries left"]
+					]
 				]
 			],
 			// #15
 			[
 				[
-					'status' => ['Sent/Executed'],
-					'result_amount' => 7,
-					'result_status' => [
-						'Sent',
-						'Sent',
-						'Executed',
-						'Executed',
-						'Sent',
-						'Sent',
-						'Sent'
+					'fields' => [
+						'id:filter_statuses_2' => true,
+						'id:filter_statuses_0' => true
+					],
+					'result' => [
+						['Status' => "In progress:\n3 retries left"],
+						['Status' => 'Failed']
 					]
 				]
 			],
 			// #16
 			[
 				[
-					'status' => ['In progress'],
-					'result_amount' => 1,
-					'result_status' => ["In progress:\n3 retries left"]
+					'fields' => [
+						'id:filter_statuses_0' => true,
+						'id:filter_statuses_1' => true,
+						'id:filter_statuses_2' => true
+					],
+					'result' => [
+						['Status' => 'Sent'],
+						['Status' => 'Sent'],
+						['Status' => 'Sent'],
+						['Status' => 'Executed'],
+						['Status' => 'Executed'],
+						['Status' => "In progress:\n3 retries left"],
+						['Status' => 'Failed'],
+						['Status' => 'Sent'],
+						['Status' => 'Sent'],
+						['Status' => 'Sent']
+					]
 				]
 			],
 			// #17
 			[
 				[
-					'status' => ['Failed', 'In progress'],
-					'result_amount' => 2,
-					'result_status' => [
-						"In progress:\n3 retries left",
-						'Failed'
+					'fields' => [
+						'Actions' => ['Trigger action 3'],
+						'id:filter_statuses_1' => true
+					],
+					'result' => [
+						['Action' => 'Trigger action 3', 'Status' => 'Sent'],
+						['Action' => 'Trigger action 3', 'Status' => 'Sent'],
+						['Action' => 'Trigger action 3', 'Status' => 'Sent']
 					]
 				]
 			],
 			// #18
 			[
 				[
-					'status' => ['Failed', 'Sent/Executed', 'In progress'],
-					'result_amount' => 9,
-					'result_status' => [
-						'Sent',
-						'Sent',
-						'Executed',
-						'Executed',
-						"In progress:\n3 retries left",
-						'Failed',
-						'Sent',
-						'Sent',
-						'Sent'
-					]
+					'fields' => [
+						'Actions' => ['Trigger action 3'],
+						'id:filter_statuses_0' => true
+					],
+					'result' => []
 				]
 			],
 			// #19
 			[
 				[
 					'fields' => [
-						'Actions' => ['Trigger action 3']
+						'Recipients' => ['Administrator', 'test-timezone'],
+						'id:filter_statuses_0' => true
 					],
-					'status' => ['Sent/Executed'],
-					'result_amount' => 2,
-					'result_status' => [
-						'Sent',
-						'Sent'
+					'result' => [
+						['Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com", 'Status' => "In progress:\n3 retries left"]
 					]
 				]
 			],
@@ -289,54 +348,72 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Actions' => ['Trigger action 3']
+						'Recipients' => ['test-timezone'],
+						'id:filter_statuses_0' => true
 					],
-					'status' => ['In progress']
+					'result' => []
 				]
 			],
 			// #21
 			[
 				[
 					'fields' => [
-						'Recipients' => ['Administrator', 'test-timezone']
+						'Media types' => ['Email'],
+						'id:filter_statuses_0' => true
 					],
-					'status' => ['In progress'],
-					'result_amount' => 1,
-					'result_status' => ["In progress:\n3 retries left"]
+					'result' => [
+						['Media type' => 'Email', 'Status' => "In progress:\n3 retries left"]
+					]
 				]
 			],
 			// #22
 			[
 				[
 					'fields' => [
-						'Recipients' => ['test-timezone']
+						'Media types' => ['Email'],
+						'id:filter_statuses_1' => true
 					],
-					'status' => ['In progress']
+					'result' => [
+						['Media type' => 'Email', 'Status' => 'Sent'],
+						['Media type' => 'Email', 'Status' => 'Sent'],
+						['Media type' => 'Email', 'Status' => 'Sent']
+					]
 				]
 			],
 			// #23
 			[
 				[
 					'fields' => [
-						'Media types' => ['Email']
+						'Media types' => ['Email'],
+						'id:filter_statuses_2' => true
 					],
-					'status' => ['In progress'],
-					'result_amount' => 1,
-					'result_status' => ["In progress:\n3 retries left"]
+					'result' => [
+						['Media type' => 'Email', 'Status' => 'Failed']
+					]
 				]
 			],
 			// #24
 			[
 				[
 					'fields' => [
-						'Media types' => ['Email']
+						'Media types' => ['Email'],
+						'Actions' => ['Trigger action 2'],
+						'Recipients' => ['Administrator'],
+						'id:filter_statuses_1' => true
 					],
-					'status' => ['Sent/Executed'],
-					'result_amount' => 3,
-					'result_status' => [
-						'Sent',
-						'Sent',
-						'Sent'
+					'result' => [
+						[
+							'Action' => 'Trigger action 2', 'Media type' => 'Email',
+								'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com", 'Status' => 'Sent'
+						],
+						[
+							'Action' => 'Trigger action 2', 'Media type' => 'Email',
+								'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com", 'Status' => 'Sent'
+						],
+						[
+							'Action' => 'Trigger action 2', 'Media type' => 'Email',
+								'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com", 'Status' => 'Sent'
+						]
 					]
 				]
 			],
@@ -344,27 +421,19 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Media types' => ['Email']
+						'Search string' => 'test'
 					],
-					'status' => ['Failed'],
-					'result_amount' => 1,
-					'result_status' => ['Failed']
+					'result' => []
 				]
 			],
 			// #26
 			[
 				[
 					'fields' => [
-						'Media types' => ['Email'],
-						'Actions' => ['Trigger action 2'],
-						'Recipients' => ['Administrator']
+						'Search string' => '10:00:40'
 					],
-					'status' => ['Sent/Executed'],
-					'result_amount' => 3,
-					'result_status' => [
-						'Sent',
-						'Sent',
-						'Sent'
+					'result' => [
+						['Message' => "Subject:\nPROBLEM: Value of item key1 > 20\n\nMessage:\nEvent at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: PROBLEM"]
 					]
 				]
 			],
@@ -372,7 +441,29 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Search string' => 'test'
+						'Search string' => '.'
+					],
+					'result' => [
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 20\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:40 Hostname: H1 Value of item key1 > 20: PROBLEM"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 10\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 7\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:20 Hostname: H1 Value of item key1 > 7: PROBLEM"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 6\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:10 Hostname: H1 Value of item key1 > 6: PROBLEM"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 5\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:00 Hostname: H1 Value of item key1 > 5: PROBLEM Last value: 6"
+						]
 					]
 				]
 			],
@@ -380,68 +471,107 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Search string' => '10:00:40'
+						'Search string' => '5'
 					],
-					'result_amount' => 1,
-					'result_status' => ["In progress:\n3 retries left"]
+					'result' => [
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 5\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:00 Hostname: H1 Value of item key1 > 5: PROBLEM Last value: 6"
+						]
+					]
 				]
 			],
 			// #29
 			[
 				[
-					'fields' => [
-						'Search string' => '.'
-					],
-					'result_amount' => 5
+					'fields' => '',
+					'result' => [
+						['Time' => '2012-02-20 10:01:30'],
+						['Time' => '2012-02-20 10:01:20'],
+						['Time' => '2012-02-20 10:01:10'],
+						['Time' => '2012-02-20 10:01:00'],
+						['Time' => '2012-02-20 10:00:50'],
+						['Time' => '2012-02-20 10:00:40'],
+						['Time' => '2012-02-20 10:00:30'],
+						['Time' => '2012-02-20 10:00:20'],
+						['Time' => '2012-02-20 10:00:10'],
+						['Time' => '2012-02-20 10:00:00'],
+					]
 				]
 			],
 			// #30
 			[
 				[
 					'fields' => [
-						'Search string' => '5'
+						'Search string' => ' '
 					],
-					'result_amount' => 1
+					'result' => [
+						[
+							'Message' => "Subject:\nsubject here\n\nMessage:\nmessage here"
+						],
+						[
+							'Message' => "Subject:\nsubject here\n\nMessage:\nmessage here"
+						],
+						[
+							'Message' => "Command:\nCommand: H1:ls -la"
+						],
+						[
+							'Message' => "Command:\nCommand: H1:ls -la"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 20\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:40 Hostname: H1 Value of item key1 > 20: PROBLEM"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 10\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 7\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:20 Hostname: H1 Value of item key1 > 7: PROBLEM"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 6\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:10 Hostname: H1 Value of item key1 > 6: PROBLEM"
+						],
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 5\n\nMessage:\nEvent at 2012.02.20 ".
+									"10:00:00 Hostname: H1 Value of item key1 > 5: PROBLEM Last value: 6"
+						]
+					]
 				]
 			],
 			// #31
 			[
 				[
-					'result_amount' => 9
+					'fields' => [
+						'Search string' => '     '
+					],
+					'result' => []
 				]
 			],
 			// #32
 			[
 				[
 					'fields' => [
-						'Search string' => ' '
+						'Search string' => 'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM'
 					],
-					'result_amount' => 9
+					'result' => [
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 10\n\nMessage:\nEvent at 2012.02.20 ".
+								"10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM"
+						]
+					],
+					'result_count' => 1
 				]
 			],
 			// #33
 			[
 				[
 					'fields' => [
-						'Search string' => '     '
-					]
-				]
-			],
-			// #34
-			[
-				[
-					'fields' => [
-						'Search string' => 'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM'
-					],
-					'result_amount' => 1
-				]
-			],
-			// #35
-			[
-				[
-					'fields' => [
 						'Search string' => '2012-02-20 10:01:00'
-					]
+					],
+					'result' => []
 				]
 			]
 		];
@@ -461,63 +591,19 @@ class testPageReportsActionLog extends CWebTest {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 
+		// Fill filter.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-
-		if (array_key_exists('fields', $data)) {
-			$form->fill($data['fields']);
-		}
-
-		// Status checked-in - In progress, Sent/Executed, Failed.
-		if (array_key_exists('status', $data)) {
-			$this->query('id:filter_status')->asCheckboxList()->one()->check($data['status']);
-		}
-
-		$form->submit();
+		$form->fill($data['fields'])->submit();
 		$this->page->waitUntilReady();
 
-		if (array_key_exists('result_amount', $data)) {
-			// Check result amount.
-			$this->assertEquals($data['result_amount'], $this->query('class:list-table')->asTable()->one()->getRows()->count());
-			$this->assertTableStats($data['result_amount']);
-
-			if (array_key_exists('fields', $data)) {
-				foreach ($data['fields'] as $column => $values) {
-					// Filtering by Search string - Message column checked.
-					if ($column === 'Search string') {
-						$column = 'Message';
-						$values = [$values];
-					} else {
-						// We remove last character from filtered field label (so it is same as column name now).
-						$column = substr($column, 0, -1);
-					}
-
-					// We get all column data from table result as array.
-					$column_values = $this->getTableColumnData($column);
-
-					// $values are array - what we search in action log.
-					foreach ($values as $value) {
-						foreach ($column_values as $column_value) {
-							// If "column value" contains "value" that we search - we remove this column value from array.
-							if (str_contains($column_value, $value)) {
-								$column_values = array_values(array_diff($column_values, [$column_value]));
-							}
-						}
-					}
-				}
-
-				// If everything are correct - in table result were displayed only searched values.
-				// And we remove those result values from $column_values array. So - there should be 0 values at the end.
-				$this->assertEquals(0, count($column_values));
-			}
-
-			// Checking status column if needed.
-			if (array_key_exists('result_status', $data)) {
-				$this->assertEquals($data['result_status'], $this->getTableColumnData('Status'));
-			}
+		// Check table result.
+		if (empty($data['result'])) {
+			$this->assertTableData();
+			$this->assertTableStats(0);
 		}
 		else {
-			$this->assertTableStats(0);
-			$this->assertTableData();
+			$this->assertTableHasData($data['result']);
+			$this->assertTableStats(count($data['result']));
 		}
 
 		// Reset filter.
