@@ -2629,13 +2629,9 @@ void	zbx_tls_free(void)
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, int timeout, char **error)
+		const char *server_name, char **error)
 {
-	int		ret = FAIL, res;
-	zbx_timespec_t	deadline;
-
-	if (0 != timeout)
-		zbx_ts_get_deadline(&deadline, timeout);
+	int	ret = FAIL, res;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
@@ -2801,7 +2797,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 				goto out;
 			}
 
-			if (0 == res && 0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+			if (0 == res && SUCCEED != zbx_socket_check_deadline(s))
 			{
 				*error = zbx_strdup(*error, "gnutls_handshake() timed out");
 				goto out;
@@ -2963,18 +2959,14 @@ static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t
 }
 
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, int timeout, char **error)
+		const char *server_name, char **error)
 {
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
-	zbx_timespec_t	deadline;
 
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	char	psk_buf[HOST_TLS_PSK_LEN / 2];
 #endif
-
-	if (0 != timeout)
-		zbx_ts_get_deadline(&deadline, timeout);
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
@@ -3097,7 +3089,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			goto out;
 		}
 
-		if (0 == res && 0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+		if (0 == res && SUCCEED != zbx_socket_check_deadline(s))
 		{
 			*error = zbx_strdup(*error, "SSL_connect() timed out");
 			goto out;
@@ -3183,16 +3175,12 @@ out1:
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
-int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char **error)
+int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 {
 	int				ret = FAIL, res;
 	gnutls_credentials_type_t	creds;
-	zbx_timespec_t			deadline;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 != timeout)
-		zbx_ts_get_deadline(&deadline, timeout);
 
 	/* set up TLS context */
 
@@ -3336,7 +3324,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char *
 				goto out;
 			}
 
-			if (0 == res && 0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+			if (0 == res && SUCCEED != zbx_socket_check_deadline(s))
 			{
 				*error = zbx_strdup(*error, "gnutls_handshake() timed out");
 				goto out;
@@ -3454,20 +3442,17 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char **error)
+int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 {
 	const char	*cipher_name;
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
 	long		verify_result;
-	zbx_timespec_t	deadline;
+
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer, or LibreSSL */
 	const unsigned char	session_id_context[] = {'Z', 'b', 'x'};
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 != timeout)
-		zbx_ts_get_deadline(&deadline, timeout);
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
@@ -3615,7 +3600,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char *
 			goto out;
 		}
 
-		if (0 == res && 0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+		if (0 == res && SUCCEED != zbx_socket_check_deadline(s))
 		{
 			*error = zbx_strdup(*error, "SSL_accept() timed out");
 			goto out;
@@ -3727,17 +3712,13 @@ out1:
 /* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
 #endif
 
-ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, int timeout, char **error)
+ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
 	ssize_t		offset = 0, n;
-	zbx_timespec_t	deadline;
 
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
-	if (0 != timeout)
-		zbx_ts_get_deadline(&deadline, timeout);
-
 	while (offset < (ssize_t)len)
 	{
 		if (0 == (n = (ssize_t)ZBX_TLS_WRITE(s->tls_ctx->ctx, buf + offset, len - (size_t)offset)))
@@ -3764,7 +3745,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, int timeout,
 		else
 			offset += n;
 
-		if (0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
 			*error = zbx_strdup(*error, "write timeout");
 			return ZBX_PROTO_ERROR;
@@ -3797,17 +3778,13 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, int timeout,
 	return n;
 }
 
-ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, int timeout, char **error)
+ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 {
 	ssize_t		n = 0;
-	zbx_timespec_t	deadline;
 
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
-	if (0 != timeout)
-		zbx_ts_get_deadline(&deadline, timeout);
-
 	while (0 >= n)
 	{
 		if (0 == (n = (ssize_t)ZBX_TLS_READ(s->tls_ctx->ctx, buf, len)))
@@ -3832,7 +3809,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, int timeout, char *
 			}
 		}
 
-		if (0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
+		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
 			*error = zbx_strdup(*error, "read timeout");
 			return ZBX_PROTO_ERROR;
@@ -3873,14 +3850,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, int timeout, char *
  ******************************************************************************/
 void	zbx_tls_close(zbx_socket_t *s)
 {
-	int		res;
-	zbx_timespec_t	deadline;
+	int	res;
 
 	if (NULL == s->tls_ctx)
 		return;
 
-	if (0 != s->timeout)
-		zbx_ts_get_deadline(&deadline, s->timeout);
+	zbx_socket_set_deadline(s, s->timeout);
 
 #if defined(HAVE_GNUTLS)
 	if (NULL != s->tls_ctx->ctx)
@@ -3904,6 +3879,12 @@ void	zbx_tls_close(zbx_socket_t *s)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
 						strerror_from_system(zbx_socket_last_error()));
+				break;
+			}
+
+			if (SUCCEED != zbx_socket_check_deadline(s))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "timeout while closing tls connection");
 				break;
 			}
 		}
@@ -3947,6 +3928,12 @@ void	zbx_tls_close(zbx_socket_t *s)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
 						strerror_from_system(zbx_socket_last_error()));
+				break;
+			}
+
+			if (SUCCEED != zbx_socket_check_deadline(s))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "timeout while closing tls connection");
 				break;
 			}
 		}

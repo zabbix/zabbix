@@ -1173,7 +1173,7 @@ void	zbx_ts_get_deadline(zbx_timespec_t *ts, int sec)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if deadline has been reached                                *
+ * Purpose: check if deadline has not been reached                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_ts_check_deadline(const zbx_timespec_t *deadline)

@@ -21,6 +21,7 @@
 #define ZABBIX_ZBXCOMMS_H
 
 #include "zbxalgo.h"
+#include "zbxtime.h"
 
 #define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
@@ -146,6 +147,7 @@ typedef struct
 	char				peer[ZBX_MAX_DNSNAME_LEN + 1];
 	int				protocol;
 	int				timeout;
+	zbx_timespec_t			deadline;
 }
 zbx_socket_t;
 
@@ -203,6 +205,9 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
+
+void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
+int	zbx_socket_check_deadline(zbx_socket_t *s);
 
 int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
