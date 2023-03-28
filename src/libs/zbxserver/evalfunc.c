@@ -2707,7 +2707,8 @@ out:
 static int	evaluate_TREND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *func,
 		const char *parameters, const zbx_timespec_t *ts, char **error)
 {
-	int		start, end, ret = FAIL;
+	time_t		start, end;
+	int		ret = FAIL;
 	char		*period = NULL;
 	const char	*table;
 	double		value_dbl;

@@ -479,7 +479,7 @@ void	zbx_tfc_destroy(void)
  *               FAIL - no cached item value of the function over the range   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_function_t function, double *value,
+int	zbx_tfc_get_value(zbx_uint64_t itemid, size_t start, size_t end, zbx_trend_function_t function, double *value,
 		zbx_trend_state_t *state)
 {
 	zbx_tfc_data_t	*data, data_local;
@@ -558,7 +558,7 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
  *             state    - [IN] the state to cache                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tfc_put_value(zbx_uint64_t itemid, int start, int end, zbx_trend_function_t function, double value,
+void	zbx_tfc_put_value(zbx_uint64_t itemid, size_t start, size_t end, zbx_trend_function_t function, double value,
 		zbx_trend_state_t state)
 {
 	zbx_tfc_data_t	*data, data_local, *root;
