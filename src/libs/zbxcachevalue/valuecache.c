@@ -274,9 +274,9 @@ static void	vc_cache_item_update(zbx_uint64_t itemid, zbx_vc_item_update_type_t 
 /* the value cache */
 static zbx_vc_cache_t	*vc_cache = NULL;
 
-#define	RDLOCK_CACHE	zbx_rwlock_rdlock(vc_lock);
-#define	WRLOCK_CACHE	zbx_rwlock_wrlock(vc_lock);
-#define	UNLOCK_CACHE	zbx_rwlock_unlock(vc_lock);
+#define	RDLOCK_CACHE	zbx_rwlock_rdlock(vc_lock)
+#define	WRLOCK_CACHE	zbx_rwlock_wrlock(vc_lock)
+#define	UNLOCK_CACHE	zbx_rwlock_unlock(vc_lock)
 
 /* function prototypes */
 static void	vc_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type);
@@ -2513,7 +2513,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 {
 	zbx_vc_item_t		*item;
 	int			i;
-	ZBX_DC_HISTORY		*h;
+	zbx_dc_history_t	*h;
 
 	if (SUCCEED != zbx_history_add_values(history, ret_flush))
 		return FAIL;
@@ -2525,7 +2525,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (ZBX_DC_HISTORY *)history->values[i];
+		h = (zbx_dc_history_t *)history->values[i];
 
 		if (NULL != (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid)))
 		{

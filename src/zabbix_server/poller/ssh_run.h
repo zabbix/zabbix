@@ -31,7 +31,7 @@
 #define KEY_CIPHERS_STR		"Ciphers"
 #define KEY_MACS_STR		"MACs"
 
-int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options);
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
 
 #endif

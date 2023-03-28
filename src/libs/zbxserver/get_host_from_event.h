@@ -22,6 +22,6 @@
 
 #include "zbxcacheconfig.h"
 
-int	get_host_from_event(const zbx_db_event *event, DC_HOST *host, char *error, size_t max_error_len);
+int	get_host_from_event(const zbx_db_event *event, zbx_dc_host_t *host, char *error, size_t max_error_len);
 
 #endif

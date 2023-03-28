@@ -37,9 +37,9 @@ static int	DBpatch_3020000(void)
 
 int	DBpatch_3020001(void)
 {
-	DB_RESULT		result;
+	zbx_db_result_t		result;
 	zbx_vector_uint64_t	eventids;
-	DB_ROW			row;
+	zbx_db_row_t		row;
 	zbx_uint64_t		eventid;
 	int			sources[] = {EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL};
 	int			objects[] = {EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE}, i;
