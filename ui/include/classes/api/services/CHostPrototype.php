@@ -1155,12 +1155,14 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
+	 *
+	 * @throws APIException
 	 */
 	private static function checkUuidDuplicates(array $hosts, array $db_hosts = null): void {
 		$host_indexes = [];
 
 		foreach ($hosts as $i => $host) {
-			if ($host['host_status'] != HOST_STATUS_TEMPLATE || !array_key_exists('uuid', $host)) {
+			if (!array_key_exists('uuid', $host)) {
 				continue;
 			}
 
