@@ -320,7 +320,7 @@ static int	get_config_timeout(void)
 
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
-static int	config_histsyncer_frequency = 1;
+static int	config_histsyncer_frequency	= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
