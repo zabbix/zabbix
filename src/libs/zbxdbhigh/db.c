@@ -3718,6 +3718,48 @@ void	zbx_recalc_time_period(int *ts_from, int table_group)
 #undef HK_CFG_UPDATE_INTERVAL
 }
 
+#if defined(HAVE_MYSQL)
+#	define COMPAT_TYPE_INT4_STR		"int"
+#	define COMPAT_TYPE_INT8_STR		"bigint"
+#	define COMPAT_TYPE_VARCHAR_STR		"varchar"
+#	define COMPAT_TYPE_FLOAT_STR		"double"
+#	define COMPAT_TYPE_BLOB_STR		"longblob"
+#	define COMPAT_TYPE_TEXT_STR		"text"
+#	define COMPAT_TYPE_LONGTEXT_STR		"longtext"
+
+#	define COMPAT_TYPE_INT4_LEN		10
+#	define COMPAT_TYPE_INT8_LEN		20
+#	define COMPAT_TYPE_FLOAT_LEN		22
+#	define COMPAT_TYPE_SHORTTEXT_LEN	2000
+#elif defined(HAVE_POSTGRESQL)
+#	define COMPAT_TYPE_INT4_STR		"integer"
+#	define COMPAT_TYPE_INT8_STR		"bigint"
+#	define COMPAT_TYPE_UINT_STR		"numeric"
+#	define COMPAT_TYPE_VARCHAR_STR		"character varying"
+#	define COMPAT_TYPE_FLOAT_STR		"double precision"
+#	define COMPAT_TYPE_BLOB_STR		"bytea"
+#	define COMPAT_TYPE_TEXT_STR		"text"
+
+#	define COMPAT_TYPE_INT4_LEN		32
+#	define COMPAT_TYPE_INT8_LEN		64
+#	define COMPAT_TYPE_UINT_LEN		20
+#	define COMPAT_TYPE_FLOAT_LEN		52
+#	define COMPAT_TYPE_SHORTTEXT_LEN	2000
+#elif defined(HAVE_ORACLE)
+#	define COMPAT_TYPE_INT4_STR		"NUMBER"
+#	define COMPAT_TYPE_INT8_STR		"NUMBER"
+#	define COMPAT_TYPE_VARCHAR_STR		"NVARCHAR2"
+#	define COMPAT_TYPE_FLOAT_STR		"BINARY_DOUBLE"
+#	define COMPAT_TYPE_BLOB_STR		"BLOB"
+#	define COMPAT_TYPE_TEXT_STR		"NCLOB"
+
+#	define COMPAT_TYPE_INT4_LEN		10
+#	define COMPAT_TYPE_INT8_LEN		20
+#	define COMPAT_TYPE_FLOAT_LEN		8
+#	define COMPAT_TYPE_SHORTTEXT_LEN	2000
+#	define COMPAT_TYPE_TEXT_LEN		4000
+#endif /* defined(HAVE_ORACLE) */
+
 static int validate_db_type_name(const int expected_type, const char *type_name,
 		const int type_precision, const int type_length)
 {
@@ -3725,37 +3767,37 @@ static int validate_db_type_name(const int expected_type, const char *type_name,
 	switch(expected_type)
 	{
 		case ZBX_TYPE_INT:
-			if (0 == strcmp("int", type_name) && 10 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_INT4_STR, type_name) && COMPAT_TYPE_INT4_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_CHAR:
-			if (0 == strcmp("varchar", type_name))
+			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_FLOAT:
-			if (0 == strcmp("double", type_name) && 22 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_FLOAT_STR, type_name) && COMPAT_TYPE_FLOAT_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_BLOB:
-			if (0 == strcmp("longblob", type_name))
+			if (0 == strcmp(COMPAT_TYPE_BLOB_STR, type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_SHORTTEXT:
-			if (2000 <= type_length)
+			if (COMPAT_TYPE_SHORTTEXT_LEN <= type_length)
 				return SUCCEED;
 			ZBX_FALLTHROUGH;
 		case ZBX_TYPE_TEXT:
-			if (0 == strcmp("text", type_name))
+			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_UINT:
 		case ZBX_TYPE_ID:
 		case ZBX_TYPE_SERIAL:
-			if (0 == strcmp("bigint", type_name) && 20 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_INT8_STR, type_name) && COMPAT_TYPE_INT8_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_LONGTEXT:
-			if (0 == strcmp("longtext", type_name))
+			if (0 == strcmp(COMPAT_TYPE_LONGTEXT_STR, type_name))
 				return SUCCEED;
 			break;
 		default:
@@ -3765,37 +3807,37 @@ static int validate_db_type_name(const int expected_type, const char *type_name,
 	switch(expected_type)
 	{
 		case ZBX_TYPE_INT:
-			if (0 == strcmp("integer", type_name) && 32 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_INT4_STR, type_name) && COMPAT_TYPE_INT4_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_CHAR:
-			if (0 == strcmp("character varying", type_name))
+			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_FLOAT:
-			if (0 == strcmp("double precision", type_name), 52 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_FLOAT_STR, type_name) && COMPAT_TYPE_FLOAT_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_BLOB:
-			if (0 == strcmp("bytea", type_name))
+			if (0 == strcmp(COMPAT_TYPE_BLOB_STR, type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_SHORTTEXT:
-			if (2000 <= type_length)
+			if (COMPAT_TYPE_SHORTTEXT_LEN <= type_length)
 				return SUCCEED;
 			ZBX_FALLTHROUGH;
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_LONGTEXT:
-			if (0 == strcmp("text", type_name))
+			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_UINT:
-			if (0 == strcmp("numeric", type_name), 20 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_UINT_STR, type_name), COMPAT_TYPE_UINT_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_ID:
 		case ZBX_TYPE_SERIAL:
-			if (0 == strcmp("bigint", type_name) && 64 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_INT8_STR, type_name) && COMPAT_TYPE_INT8_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		default:
@@ -3807,35 +3849,35 @@ static int validate_db_type_name(const int expected_type, const char *type_name,
 		case ZBX_TYPE_UINT:
 		case ZBX_TYPE_ID:
 		case ZBX_TYPE_SERIAL:
-			if (0 == strcmp("NUMBER", type_name) && 20 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_INT8_STR, type_name) && COMPAT_TYPE_INT8_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_INT:
-			if (0 == strcmp("NUMBER", type_name) && 10 <= type_precision)
+			if (0 == strcmp(COMPAT_TYPE_INT4_STR, type_name) && COMPAT_TYPE_INT4_LEN <= type_precision)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_FLOAT:
-			if (0 == strcmp("BINARY_DOUBLE", type_name) && 8 <= type_length)
+			if (0 == strcmp(COMPAT_TYPE_FLOAT_STR, type_name) && COMPAT_TYPE_FLOAT_LEN <= type_length)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_BLOB:
-			if (0 == strcmp("BLOB", type_name))
+			if (0 == strcmp(COMPAT_TYPE_BLOB_STR, type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_TEXT:
-			if (0 == strcmp("NCLOB", type_name) || 4000 <= type_length)
+			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name) || COMPAT_TYPE_TEXT_LEN <= type_length)
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_SHORTTEXT:
-			if (2000 <= type_length)
+			if (COMPAT_TYPE_SHORTTEXT_LEN <= type_length)
 				return SUCCEED;
 			ZBX_FALLTHROUGH;
 		case ZBX_TYPE_CHAR:
-			if (0 == strcmp("NVARCHAR2", type_name))
+			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name))
 				return SUCCEED;
 			break;
 		case ZBX_TYPE_LONGTEXT:
-			if (0 == strcmp("NCLOB", type_name))
+			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name))
 				return SUCCEED;
 			break;
 		default:
