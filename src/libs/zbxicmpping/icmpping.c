@@ -539,8 +539,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_cou
 	char		*linebuf = NULL;
 	size_t		linebuf_size;
 	size_t		offset;
-	double		sec;
-	int 		i, ret = NOTSUPPORTED, index, rc;
+	int 		i, ret = NOTSUPPORTED, rc;
 	sigset_t	mask, orig_mask;
 
 #ifdef HAVE_IPV6
