@@ -1769,7 +1769,7 @@ int	zbx_check_allowed_path(const char *allowed_path, const char *path, char **er
 
 	if (NULL == (absolute_path = realpath(path, NULL)))
 	{
-		*error = zbx_dsprintf(*error, "cannot get canonical name %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(*error, "cannot resolve path %s", zbx_strerror(errno));
 		return FAIL;
 	}
 
