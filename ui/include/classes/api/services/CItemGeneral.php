@@ -442,12 +442,14 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array      $items
 	 * @param array|null $db_items
+	 *
+	 * @throws APIException
 	 */
 	protected static function checkUuidDuplicates(array $items, array $db_items = null): void {
 		$item_indexes = [];
 
 		foreach ($items as $i => $item) {
-			if ($item['host_status'] != HOST_STATUS_TEMPLATE || !array_key_exists('uuid', $item)) {
+			if (!array_key_exists('uuid', $item)) {
 				continue;
 			}
 
