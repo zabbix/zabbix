@@ -609,4 +609,34 @@ class testPageReportsActionLog extends CWebTest {
 		// Reset filter.
 		$form->query('button:Reset')->one()->click();
 	}
+
+	/**
+	 * Check Status column colors and Info column hintbox.
+	 */
+	public function testPageReportsActionLog_CheckStatusInfo() {
+		$this->page->login()->open('zabbix.php?action=actionlog.list&from=2012-02-20+09:01:00&to=2012-02-20+11:01:00&'.
+				'filter_messages=&filter_set=1')->waitUntilReady();
+
+		// Check status color correctness.
+		$table = $this->query('class:list-table')->asTable()->one();
+		$statuses = ['Executed' => 'green', 'In progress:' => 'yellow', 'Failed' => 'red', 'Sent' => 'green'];
+
+		foreach ( $statuses as $status => $color) {
+			$this->assertEquals($color,
+					$table->query('xpath:(//td/span[text()='.CXPathHelper::escapeQuotes($status).'])[1]')->one()->getAttribute('class')
+			);
+		}
+
+		// Check hintbox.
+		$table->findRow('Status', 'Failed')->getColumn('Info')->query('xpath:.//a')->waitUntilClickable()->one()->click();
+		$hintbox = $this->query('class:overlay-dialogue');
+		$hintbox->waitUntilPresent();
+		$this->assertEquals('Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused',
+				$hintbox->query('xpath:.//div[@class="hintbox-wrap red"]')->one()->getText()
+		);
+
+		// Close hintbox.
+		$hintbox->query('xpath:.//button[@title="Close"]')->one()->click();
+		$hintbox->waitUntilNotPresent();
+	}
 }
