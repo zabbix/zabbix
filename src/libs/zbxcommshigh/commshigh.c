@@ -27,7 +27,6 @@
 #include "zbxnix.h"
 #endif
 
-#include "zbxalgo.h"
 #include "cfg.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

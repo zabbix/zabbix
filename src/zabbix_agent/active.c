@@ -31,6 +31,7 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxalgo.h"
 
 extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
 extern int				CONFIG_HEARTBEAT_FREQUENCY;

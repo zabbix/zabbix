@@ -23,7 +23,6 @@
 #include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxcomms.h"
-#include "zbxalgo.h"
 
 typedef struct
 {
