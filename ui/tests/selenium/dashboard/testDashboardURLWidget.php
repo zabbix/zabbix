@@ -188,7 +188,7 @@ class testDashboardURLWidget extends CWebTest {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form = $dialog->asForm();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -212,7 +212,7 @@ class testDashboardURLWidget extends CWebTest {
 				'placeholder' => 'default'
 			],
 			'URL' => [
-				'maxlength' => '255'
+				'maxlength' => '2048'
 			]
 		];
 		foreach ($inputs as $field => $attributes) {
@@ -387,8 +387,7 @@ class testDashboardURLWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget(self::$update_widget)->edit();
-		$form->submit();
+		$dashboard->getWidget(self::$update_widget)->edit()->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 
@@ -422,7 +421,7 @@ class testDashboardURLWidget extends CWebTest {
 				? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
 				: $dashboard->edit()->addWidget()->asForm();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -530,7 +529,7 @@ class testDashboardURLWidget extends CWebTest {
 		else {
 			$form = $dashboard->addWidget()->asForm();
 
-			if ($form->getField('Type') !== 'URL') {
+			if ($form->getField('Type')->getText() !== 'URL') {
 				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 			}
 		}
@@ -669,7 +668,7 @@ class testDashboardURLWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget(self::$default_widget)->edit();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -712,6 +711,7 @@ class testDashboardURLWidget extends CWebTest {
 
 			// Verifies that host in widget can or can't be updated regarding 'Use iframe sandboxing' state.
 			$this->assertFalse($this->query('class:msg-good')->one(false)->isVisible($state));
+
 			// After successful host update, the page is redirected to the list of hosts where Update button isn't visible.
 			$this->assertTrue($this->query('button:Update')->one(false)->isVisible($state));
 			$this->page->switchTo();
@@ -768,9 +768,9 @@ class testDashboardURLWidget extends CWebTest {
 
 		// Check that already created widget became invalid and returns error regarding invalid parameter.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$widget = $dashboard->getWidget('URL')->getContent();
+		$widget = $dashboard->getWidget(self::$default_widget)->getContent();
 		$this->assertEquals('Invalid parameter "URL": unacceptable URL.', $widget->query('class:msg-details')->one()->getText());
-		$broken_form = $dashboard->getWidget('URL')->edit();
+		$broken_form = $dashboard->getWidget(self::$default_widget)->edit();
 
 		// Check that the widget URL field is empty.
 		$broken_form->checkValue(['URL' => '', 'Name' => self::$default_widget]);
@@ -783,7 +783,7 @@ class testDashboardURLWidget extends CWebTest {
 		$message->close();
 
 		// Check updated valid URI schemes.
-		$dashboard->getWidget('URL')->edit();
+		$dashboard->getWidget(self::$default_widget)->edit();
 		$broken_form->fill(['URL' => 'any'])->submit();
 		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
 		$this->assertUriScheme($form, $invalid_schemes);
