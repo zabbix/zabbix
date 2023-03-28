@@ -384,11 +384,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 			}
 		}
 
-		if kind == kindConn {
-			params[p.name] = *val
-		}
-
-		if kind == kindGeneral {
+		if kind == kindConn || kind == kindGeneral {
 			params[p.name] = *val
 		}
 	}
