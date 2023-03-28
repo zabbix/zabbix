@@ -34,6 +34,8 @@
 #	define ZBX_NO_RETURN
 #endif
 
+unsigned char get_program_type(void);
+
 int	get_config_timeout(void);
 
 void	zbx_mock_test_entry(void **state);

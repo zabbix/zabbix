@@ -31,8 +31,6 @@
 ZBX_VECTOR_DECL(kv, zbx_dc_kv_t)
 ZBX_VECTOR_IMPL(kv, zbx_dc_kv_t)
 
-extern unsigned char program_type;
-
 typedef struct
 {
 	zbx_um_cache_t		*cache;
@@ -177,7 +175,7 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		um_mock_cache_init(&step->mock_cache, hconfig);
 		um_mock_cache_diff(mock_cache_last, &step->mock_cache, &gmacros, &hmacros, &htmpls);
 		config->um_cache = step->cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls,
-				&config_vault, program_type);
+				&config_vault, get_program_type());
 
 		mock_dbsync_clear(&gmacros);
 		mock_dbsync_clear(&hmacros);

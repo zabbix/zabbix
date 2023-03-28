@@ -27,8 +27,6 @@
 #include "zbxalgo.h"
 #include "um_cache_mock.h"
 
-extern unsigned char program_type;
-
 typedef struct
 {
 	zbx_uint32_t		refs;
@@ -144,7 +142,7 @@ void	zbx_mock_test_entry(void **state)
 
 		um_mock_cache_diff(mock_cache, &steps.values[i]->mock_cache, &gmacros, &hmacros, &htmpls);
 		umc = steps.values[i]->cache = um_cache_sync(umc, 0, &gmacros, &hmacros, &htmpls, &config_vault,
-				program_type);
+				get_program_type());
 		umc->refcount += steps.values[i]->refs;
 
 		mock_dbsync_clear(&gmacros);

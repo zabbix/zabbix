@@ -84,7 +84,7 @@ ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 
-static zbx_get_program_type_f	get_program_type_cb;
+static zbx_get_program_type_f	get_program_type_cb = NULL;
 
 /******************************************************************************
  *                                                                            *

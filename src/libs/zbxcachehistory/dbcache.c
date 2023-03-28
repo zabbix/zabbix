@@ -57,7 +57,7 @@ static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 static char		*sql = NULL;
 static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
-static zbx_get_program_type_f	get_program_type_cb;
+static zbx_get_program_type_f	get_program_type_cb = NULL;
 extern int		CONFIG_DOUBLE_PRECISION;
 
 #define ZBX_IDS_SIZE	10
