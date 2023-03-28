@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+$this->includeJsFile('module.list.js.php');
+
 if ($data['uncheck']) {
 	uncheckTableRows('modules');
 }
@@ -88,29 +90,23 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['modules'] as $moduleid => $module) {
-	$name = new CLink($module['name'],
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'module.edit')
-			->setArgument('moduleid', $moduleid)
-			->getUrl()
-	);
-
-	$status_url = (new CUrl('zabbix.php'))
-		->setArgument('action', ($module['status'] == MODULE_STATUS_ENABLED) ? 'module.disable' : 'module.enable')
-		->setArgument('moduleids[]', $moduleid)
-		->getUrl();
+	$name = (new CLink($module['name']))
+		->addClass('js-edit-module')
+		->setAttribute('data-moduleid', $moduleid);
 
 	if ($module['status'] == MODULE_STATUS_ENABLED) {
-		$status = (new CLink(_('Enabled'), $status_url))
-			->addCsrfToken($csrf_token)
+		$status = (new CLink(_('Enabled')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_GREEN);
+			->addClass(ZBX_STYLE_GREEN)
+			->addClass('js-disable-module')
+			->setAttribute('data-moduleid', $moduleid);
 	}
 	else {
-		$status = (new CLink(_('Disabled'), $status_url))
-			->addCsrfToken($csrf_token)
+		$status = (new CLink(_('Disabled')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_RED);
+			->addClass(ZBX_STYLE_RED)
+			->addClass('js-enable-module')
+			->setAttribute('data-moduleid', $moduleid);
 	}
 
 	// append table row
@@ -129,11 +125,17 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'moduleids', [
-		'module.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected modules?'),
-			'csrf_token' => $csrf_token
+		'module.massenable' => [
+			'content' => (new CSimpleButton(_('Enable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-module')
+				->addClass('no-chkbxrange')
 		],
-		'module.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected modules?'),
-			'csrf_token' => $csrf_token
+		'module.massdisable' => [
+			'content' => (new CSimpleButton(_('Disable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-module')
+				->addClass('no-chkbxrange')
 		]
 	], 'modules')
 ]);
@@ -142,3 +144,7 @@ $form->addItem([
 $html_page->addItem($form);
 
 $html_page->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();
