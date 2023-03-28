@@ -104,6 +104,7 @@ void	zbx_trim_str_list(char *list, char delimiter);
 int	zbx_strcmp_null(const char *s1, const char *s2);
 
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
+int	zbx_check_allowed_path(const char *allowed_path, const char *path, char **error);
 
 int	zbx_strcmp_natural(const char *s1, const char *s2);
 int	zbx_str_extract(const char *text, size_t len, char **value);
