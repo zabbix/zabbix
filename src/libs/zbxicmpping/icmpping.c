@@ -50,7 +50,7 @@ static ZBX_THREAD_LOCAL int		fping_ipv6_supported;
 #endif
 
 static ZBX_THREAD_LOCAL time_t		fping_check_reset_at;	/* time of the last fping options expiration */
-static ZBX_THREAD_LOCAL char		tmpfile_uniq[255] = "";
+static ZBX_THREAD_LOCAL char		tmpfile_uniq[255] = {'\0'};
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
@@ -595,6 +595,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #endif	/* HAVE_IPV6 */
 	}
 
+	if ('\0' == *tmpfile_uniq)
+		zbx_snprintf(tmpfile_uniq, sizeof(tmpfile_uniq), "%li", zbx_get_thread_id());
+
 	zbx_snprintf(filename, sizeof(filename), "%s/%s_%s.pinger", config_icmpping->get_tmpdir(), progname,
 			tmpfile_uniq);
 
@@ -855,6 +858,7 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
 void	zbx_init_icmpping_env(const char *prefix, long int id)
 {
 	zbx_snprintf(tmpfile_uniq, sizeof(tmpfile_uniq), "%s_%li", prefix, id);
+	zbx_remove_chars(tmpfile_uniq, " ");
 }
 
 /******************************************************************************

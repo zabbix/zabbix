@@ -552,7 +552,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-	zbx_init_icmpping_env("pinger", zbx_get_thread_id());
+	zbx_init_icmpping_env(get_process_type_string(process_type), zbx_get_thread_id());
 
 	if (NULL == items)
 		items = (icmpitem_t *)zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);

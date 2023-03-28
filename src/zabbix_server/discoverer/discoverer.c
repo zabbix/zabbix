@@ -1341,7 +1341,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 	if (0 > (err = zbx_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block the signals: %s", zbx_strerror(err));
 
-	zbx_init_icmpping_env("discoverer", worker->worker_id);
+	zbx_init_icmpping_env(get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
 	worker->stop = 0;
 
 	discoverer_queue_lock(queue);
@@ -1506,13 +1506,13 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 
 	for (i = 0; i < workers_num; i++)
 	{
+		manager->workers[i].worker_id = i + 1;
+
 		if (SUCCEED != discoverer_worker_init(&manager->workers[i], &manager->queue, manager->timekeeper,
 				discoverer_worker_entry, error))
 		{
 			goto out;
 		}
-
-		manager->workers[i].worker_id = i + 1;
 	}
 
 	/* wait for threads to start */
@@ -1704,7 +1704,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 			if (FAIL == (k = zbx_vector_uint64_pair_bsearch(&revisions, revision,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)) ||
-					((zbx_uint64_pair_t*)&revisions.values[k])->second != job->drule_revision)
+					revisions.values[k].second != job->drule_revision)
 			{
 				zbx_vector_uint64_append(&del_druleids, job->druleid);
 				discoverer_job_tasks_free(job);
@@ -1784,7 +1784,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			zbx_hashset_destroy(&check_counts);
 		}
 
-		/* update sleeptime and process title */
+		/* update sleeptime */
 
 		sleeptime.sec = 0 != more_results ? 0 : zbx_calculate_sleeptime(nextcheck, DISCOVERER_DELAY);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
