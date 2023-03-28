@@ -1413,6 +1413,10 @@ msgstr "ניסיונות"
 msgid "Attribution"
 msgstr "יחוס"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -3136,6 +3140,11 @@ msgstr "לא ניתן לעדכן את התרשים שהתגלה."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "לא ניתן לעדכן את קבוצת המארחים שהתגלתה „%1$s”."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -11204,6 +11213,10 @@ msgstr "תחזוקה ללא איסוף נתונים"
 msgid "Maintenance: %1$s"
 msgstr "תחזוקה: %1$s"
 
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
+
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -16229,6 +16242,10 @@ msgstr "שירותים מתלות מעגלית."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "שירותים עודכנו"
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
