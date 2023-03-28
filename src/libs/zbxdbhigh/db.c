@@ -2405,6 +2405,7 @@ void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
 				zbx_vector_str_append(&names, (char *)table->fields[i].name);
 				break;
 			default:
+				break;
 		}
 	}
 
