@@ -31,14 +31,14 @@ void	__wrap_freeaddrinfo(struct addrinfo *res);
 int	__wrap_gethostname(char *name, size_t len)
 {
 	const char	*gethostname_str;
-	int		length = 0;
+	size_t		length = 0;
 
 	gethostname_str = zbx_mock_get_parameter_string("in.gethostname");
 
 	if (NULL == gethostname_str || '\0' == *gethostname_str)
 		return 1;
 
-	length = strlen(gethostname_str);
+	length = (size_t)strlen(gethostname_str);
 
 	for (size_t i = 0; i < len && i < length; i++)
 		name[i] = gethostname_str[i];
@@ -51,6 +51,10 @@ int	__wrap_gethostname(char *name, size_t len)
 int	__wrap_getaddrinfo(const char *node, const char *service, const struct addrinfo *hints, struct addrinfo **res)
 {
 	const char	*fqdn_str;
+
+	ZBX_UNUSED(node);
+	ZBX_UNUSED(service);
+	ZBX_UNUSED(hints);
 
 	fqdn_str = zbx_mock_get_parameter_string("in.fqdn");
 
@@ -83,6 +87,8 @@ void	zbx_mock_test_entry(void **state)
 	char		*hostname;
 	const char	*expected_fqdn;
 
+	ZBX_UNUSED(state);
+
 	expected_code = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	expected_fqdn = zbx_mock_get_parameter_string("out.result");
 	hostname = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.hostname"));
@@ -91,7 +97,11 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_request(&request);
 
 	zbx_parse_item_key("system.hostname[fqdn]", &request);
-	returned_code = hostname_handle_params(&request, &result, hostname);
+	returned_code = hostname_handle_params(&request, &result, &hostname);
+
+	if (FAIL == returned_code)
+		zbx_free(hostname);
+
 	zbx_mock_assert_result_eq("Return value", expected_code, returned_code);
 
 	if (SUCCEED == returned_code)
