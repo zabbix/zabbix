@@ -1455,6 +1455,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, cha
 #define	ZBX_SID_AUTH_TOKEN_LENGTH	64
 
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
+int	zbx_check_allowed_path(const char *allowed_path, const char *path, char **error);
 
 #define ZBX_DO_NOT_SEND_RESPONSE	0
 #define ZBX_SEND_RESPONSE		1

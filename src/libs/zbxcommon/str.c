@@ -22,6 +22,7 @@
 #include "module.h"
 
 #include "zbxcrypto.h"
+#include "log.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>
@@ -2911,6 +2912,40 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
 	*pout = '\0';
 
 	return arg_esc;
+}
+
+int	zbx_check_allowed_path(const char *allowed_path, const char *path, char **error)
+{
+	char	*absolute_path;
+	int	absolute_path_len, allowed_path_len, ret = FAIL;
+
+	if (NULL == (absolute_path = realpath(path, NULL)))
+	{
+		*error = zbx_dsprintf(*error, "cannot resolve path %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	absolute_path_len = strlen(absolute_path);
+
+	if (absolute_path_len < (allowed_path_len = strlen(allowed_path)))
+	{
+		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
+				allowed_path);
+		goto out;
+	}
+
+	if (0 != memcmp(allowed_path, absolute_path, allowed_path_len))
+	{
+		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
+				allowed_path);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(absolute_path);
+
+	return ret;
 }
 
 /******************************************************************************
