@@ -49,12 +49,26 @@ class testPageReportsActionLog extends CWebTest {
 	}
 
 	public function testPageReportsActionLog_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=actionlog.list&from=now-2y&to=now')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=actionlog.list')->waitUntilReady();
 
-		// If the filter is not visible - enable it.
-		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
+		// If the time selector is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-1')->one()->click();
 		}
+
+		$time_form = $this->query('class:time-input')->one();
+
+		foreach (['From' => 'now-1h', 'To' => 'now'] as $period => $time) {
+			$this->assertEquals($time, $time_form->query('xpath:.//label[text()="'.$period.'"]/../..//input')
+					->one()->getAttribute('value')
+			);
+		}
+
+		// Check that filter set to display Last hour data.
+		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
+
+		// Press to display filter.
+		$this->query('id:ui-id-2')->one()->click();
 
 		$this->page->assertHeader('Action log');
 		$this->page->assertTitle('Action log');
@@ -340,7 +354,10 @@ class testPageReportsActionLog extends CWebTest {
 						'id:filter_statuses_0' => true
 					],
 					'result' => [
-						['Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com", 'Status' => "In progress:\n3 retries left"]
+						[
+							'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com",
+							'Status' => "In progress:\n3 retries left"
+						]
 					]
 				]
 			],
@@ -433,7 +450,10 @@ class testPageReportsActionLog extends CWebTest {
 						'Search string' => '10:00:40'
 					],
 					'result' => [
-						['Message' => "Subject:\nPROBLEM: Value of item key1 > 20\n\nMessage:\nEvent at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: PROBLEM"]
+						[
+							'Message' => "Subject:\nPROBLEM: Value of item key1 > 20\n\nMessage:\nEvent ".
+									"at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: PROBLEM"
+						]
 					]
 				]
 			],
