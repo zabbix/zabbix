@@ -65,7 +65,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
-	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
+	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
@@ -80,7 +80,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
-	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
+	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -154,14 +154,12 @@ PROXY_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
-	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
-	$(top_srcdir)/src/zabbix_server/service/libservice.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
 	$(COMMON_LIB) \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a
-	
+
 
 
 DBadd_condition_alloc_SOURCES = \

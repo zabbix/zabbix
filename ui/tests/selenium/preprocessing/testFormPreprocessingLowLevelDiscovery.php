@@ -183,7 +183,8 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30'],
 						['type' => 'XML to JSON']
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			[

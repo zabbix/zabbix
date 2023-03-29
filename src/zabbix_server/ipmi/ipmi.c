@@ -78,7 +78,7 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *error, size_t max_error_len)
+int	zbx_ipmi_execute_command(const zbx_dc_host_t *host, const char *command, char *error, size_t max_error_len)
 {
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;
@@ -86,7 +86,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 	zbx_uint32_t		data_len;
 	unsigned char		*data = NULL;
 	int			ret = FAIL, op;
-	DC_INTERFACE		interface;
+	zbx_dc_interface_t	interface;
 	zbx_timespec_t		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:\"%s\" command:%s", __func__, host->host, command);
@@ -102,7 +102,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 
 	zbx_ipc_message_init(&message);
 
-	if (FAIL == DCconfig_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI))
+	if (FAIL == zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_IPMI))
 	{
 		zbx_strlcpy(error, "cannot find host IPMI interface", max_error_len);
 		goto cleanup;
@@ -166,7 +166,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ipmi_test_item(const DC_ITEM *item, char **info)
+int	zbx_ipmi_test_item(const zbx_dc_item_t *item, char **info)
 {
 	zbx_ipc_socket_t	ipmi_socket;
 	zbx_ipc_message_t	message;

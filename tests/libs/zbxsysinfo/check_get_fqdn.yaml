@@ -1,0 +1,37 @@
+---
+test case: Hostname and fqdn can be fetched
+in:
+  hostname: "hostname"
+  gethostname: "hostname2"
+  fqdn: "fqdn_string1"
+out:
+  result: "fqdn_string1"
+  return: "SUCCEED"
+---
+test case: Hostname cannot be fetched, fqdn can be fetched
+in:
+  hostname: "hostname"
+  gethostname: ""
+  fqdn: "fqdn_string2"
+out:
+  result: "fqdn_string2"
+  return: "SUCCEED"
+---
+test case: Hostname can be fetched, fqdn cannot be fetched
+in:
+  hostname: "hostname"
+  gethostname: "hostname2"
+  fqdn: ""
+out:
+  result: "hostname2"
+  return: "SUCCEED"
+---
+test case: Hostname and fqdn cannot be fetched
+in:
+  hostname: "hostname"
+  gethostname: ""
+  fqdn: ""
+out:
+  result: "hostname"
+  return: "SUCCEED"
+...

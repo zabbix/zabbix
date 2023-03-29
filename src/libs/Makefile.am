@@ -17,6 +17,7 @@ DIST_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
@@ -41,6 +42,7 @@ DIST_SUBDIRS = \
 	zbxmutexs \
 	zbxnix \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
@@ -78,6 +80,7 @@ SERVER_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
@@ -92,6 +95,7 @@ SERVER_SUBDIRS = \
 	zbxkvs \
 	zbxmedia \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
@@ -125,6 +129,7 @@ PROXY_SUBDIRS = \
 	zbxcachevalue \
 	zbxdbhigh \
 	zbxdbwrap \
+	zbxdbsyncer \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
@@ -137,6 +142,7 @@ PROXY_SUBDIRS = \
 	zbxip \
 	zbxkvs \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
@@ -183,6 +189,7 @@ SUBDIRS = \
 	zbxprof \
 	zbxnix \
 	zbxnum \
+	zbxodbc \
 	zbxparam \
 	zbxregexp \
 	zbxsysinfo \

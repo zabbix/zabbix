@@ -20,16 +20,19 @@
 #ifndef ZABBIX_PROXYDATA_H
 #define ZABBIX_PROXYDATA_H
 
-#include "zbxjson.h"
-#include "zbxcachehistory.h"
+#include "zbxcacheconfig.h"
+#include "zbxcomms.h"
+#include "zbxdbhigh.h"
+#include "zbxtime.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, int config_timeout);
+void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+		const zbx_events_funcs_t *events_cbs, int config_timeout);
 void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms);
 void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms);
 
-int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int status,
+int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
 		int upload_status);
 
 int	init_proxy_history_lock(char **error);

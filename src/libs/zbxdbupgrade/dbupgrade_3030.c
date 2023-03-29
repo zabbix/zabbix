@@ -151,18 +151,17 @@ static int	DBpatch_3030013(void)
 static int	DBpatch_3030015(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"item_preproc", "item_preprocid", 0,
-		{
-			{"item_preprocid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"step", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"params", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"item_preproc", "item_preprocid", 0,
+				{
+					{"item_preprocid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"step", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"params", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -459,26 +458,25 @@ static int	DBpatch_3030036(void)
 static int	DBpatch_3030037(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"task_remote_command", "taskid", 0,
-		{
-			{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"command_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"execute_on", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"port", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"publickey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"privatekey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-			{"alertid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"task_remote_command", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"command_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"execute_on", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"port", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"authtype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"username", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"publickey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"privatekey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"alertid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -493,17 +491,16 @@ static int	DBpatch_3030038(void)
 static int	DBpatch_3030039(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"task_remote_command_result", "taskid", 0,
-		{
-			{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"task_remote_command_result", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -535,31 +532,30 @@ static int	DBpatch_3030042(void)
 static int	DBpatch_3030043(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"sysmap_shape", "shapeid", 0,
-		{
-			{"shapeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"width", "200", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"height", "200", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"text", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-			{"font", "9", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"font_size", "11", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"font_color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"text_halign", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"text_valign", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"border_type", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"border_width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"border_color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL,0},
-			{"background_color", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"zindex", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"sysmap_shape", "shapeid", 0,
+				{
+					{"shapeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"width", "200", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"height", "200", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"text", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"font", "9", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"font_size", "11", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"font_color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"text_halign", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"text_valign", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"border_type", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"border_width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"border_color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL,0},
+					{"background_color", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"zindex", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -618,16 +614,15 @@ static int	DBpatch_3030048(void)
 static int	DBpatch_3030049(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"sysmap_element_trigger", "selement_triggerid", 0,
-		{
-			{"selement_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"selementid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"sysmap_element_trigger", "selement_triggerid", 0,
+				{
+					{"selement_triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"selementid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -704,18 +699,17 @@ out:
 static int	DBpatch_3030054(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"httptest_field", "httptest_fieldid", 0,
-		{
-			{"httptest_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"httptestid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"httptest_field", "httptest_fieldid", 0,
+				{
+					{"httptest_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"httptestid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -735,18 +729,17 @@ static int	DBpatch_3030056(void)
 static int	DBpatch_3030057(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"httpstep_field", "httpstep_fieldid", 0,
-		{
-			{"httpstep_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"httpstepid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"httpstep_field", "httpstep_fieldid", 0,
+				{
+					{"httpstep_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"httpstepid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -1827,17 +1820,16 @@ static int	DBpatch_3030147(void)
 static int	DBpatch_3030148(void)
 {
 	const zbx_db_table_t table =
-	{
-		"dashboard", "dashboardid", 0,
-		{
-			{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"name", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"private", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"dashboard", "dashboardid", 0,
+				{
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"private", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -1852,17 +1844,16 @@ static int	DBpatch_3030149(void)
 static int	DBpatch_3030150(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"dashboard_user", "dashboard_userid", 0,
-		{
-			{"dashboard_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"dashboard_user", "dashboard_userid", 0,
+				{
+					{"dashboard_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -1890,17 +1881,16 @@ static int	DBpatch_3030153(void)
 static int	DBpatch_3030154(void)
 {
 	const zbx_db_table_t table =
-	{
-		"dashboard_usrgrp", "dashboard_usrgrpid", 0,
-		{
-			{"dashboard_usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"dashboard_usrgrp", "dashboard_usrgrpid", 0,
+				{
+					{"dashboard_usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -1928,21 +1918,20 @@ static int	DBpatch_3030157(void)
 static int	DBpatch_3030158(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"widget", "widgetid", 0,
-		{
-			{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"type", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{0}
-		},
-		NULL
-	};
+			{"widget", "widgetid", 0,
+				{
+					{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"dashboardid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -1963,24 +1952,23 @@ static int	DBpatch_3030160(void)
 static int	DBpatch_3030161(void)
 {
 	const zbx_db_table_t table =
-	{
-		"widget_field", "widget_fieldid", 0,
-		{
-			{"widget_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"value_int", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"value_str", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"value_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{"value_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{"value_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{"value_graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{"value_sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{0}
-		},
-		NULL
-	};
+			{"widget_field", "widget_fieldid", 0,
+				{
+					{"widget_fieldid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value_int", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value_str", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"value_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"value_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"value_graphid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"value_sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{0}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -2200,18 +2188,17 @@ static int	DBpatch_3030187(void)
 	if (SUCCEED == zbx_db_field_exists("widget", "row"))
 	{
 		const zbx_db_table_t	table =
-		{
-			"widget_tmp", "", 0,
-			{
-				{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
+				{"widget_tmp", "", 0,
+					{
+						{"widgetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+						{"x", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+						{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+						{"width", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+						{"height", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+						{0}
+					},
+					NULL
+				};
 
 		return DBcreate_table(&table);
 	}
