@@ -306,16 +306,6 @@ class CDashboardElement extends CElement {
 	 * {@inheritDoc}
 	 */
 	public function getReadyCondition() {
-		$target = $this;
-
-		return function () use ($target) {
-			foreach ($target->getWidgets() as $widget) {
-				if (!$widget->isReady()) {
-					return false;
-				}
-			}
-
-			return true;
-		};
+		return ($this->getWidgets()->filter(CElementFilter::NOT_READY)->count() > 0);
 	}
 }
