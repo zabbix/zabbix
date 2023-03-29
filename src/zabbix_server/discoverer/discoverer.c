@@ -864,11 +864,11 @@ out:
 }
 
 static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids,
-		zbx_hashset_t *incomplete_druleids)
+		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks)
 {
 #define DISCOVERER_BATCH_RESULTS_NUM	1000
 	int					i;
-	zbx_uint64_t				res_check_count = 0;
+	zbx_uint64_t				res_check_total = 0,res_check_count = 0;
 	zbx_vector_discoverer_results_ptr_t	results;
 	zbx_discoverer_results_t		*result, *result_tmp;
 	zbx_hashset_iter_t			iter;
@@ -894,6 +894,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 			continue;
 		}
 
+		res_check_total += (zbx_uint64_t)result->services.values_num;
+
 		if (DISCOVERER_BATCH_RESULTS_NUM <= res_check_count ||
 				(NULL != (check_count = zbx_hashset_search(&manager->incomplete_checks_count, &cmp)) &&
 				0 != check_count->count))
@@ -912,6 +914,10 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 		zbx_vector_discoverer_results_ptr_append(&results, result_tmp);
 		zbx_hashset_iter_remove(&iter);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() results=%d checks:" ZBX_FS_UI64 "/" ZBX_FS_UI64 " del_druleids=%d"
+			" incomplete_druleids=%d", __func__, results.values_num, res_check_count, res_check_total,
+			del_druleids->values_num, incomplete_druleids->num_data);
 
 	pthread_mutex_unlock(&manager->results_lock);
 
@@ -947,6 +953,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 					result->now);
 		}
 	}
+
+	*unsaved_checks = res_check_total - res_check_count;
 
 	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);
 	zbx_vector_discoverer_results_ptr_destroy(&results);
@@ -1681,7 +1689,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		int		processing_rules_num, i, more_results;
-		zbx_uint64_t	queue_used;
+		zbx_uint64_t	queue_used, unsaved_checks;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -1716,13 +1724,13 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		discoverer_queue_unlock(&dmanager.queue);
 
-		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_DBL "%% of queue used]",
-				get_process_type_string(process_type), process_num, processing_rules_num,
-				100 * ((double)queue_used / DISCOVERER_QUEUE_MAX_SIZE));
-
 		zbx_vector_uint64_sort(&del_druleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids, &unsaved_checks);
 
-		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids);
+		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_DBL "%% of queue used, " ZBX_FS_UI64
+				" unsaved checks]", get_process_type_string(process_type), process_num,
+				processing_rules_num, 100 * ((double)queue_used / DISCOVERER_QUEUE_MAX_SIZE),
+				unsaved_checks);
 
 		/* process discovery rules and create net check jobs */
 
