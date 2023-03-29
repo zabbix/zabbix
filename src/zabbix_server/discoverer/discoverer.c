@@ -28,7 +28,6 @@
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
-#include "../events.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
@@ -465,7 +464,8 @@ static void	process_checks(const zbx_db_drule *drule, int *host_status, char *ip
 }
 
 static int	process_services(const zbx_db_drule *drule, zbx_db_dhost *dhost, const char *ip, const char *dns,
-		int now, const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
+		int now, const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids,
+		zbx_add_event_func_t add_event_cb)
 {
 	int	i, ret;
 
@@ -486,7 +486,7 @@ static int	process_services(const zbx_db_drule *drule, zbx_db_dhost *dhost, cons
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			zbx_discovery_update_service(drule, service->dcheckid, dhost, ip, dns, service->port,
-					service->status, service->value, now);
+					service->status, service->value, now, add_event_cb);
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		{
@@ -505,7 +505,7 @@ fail:
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(zbx_db_drule *drule, int config_timeout)
+static void	process_rule(zbx_db_drule *drule, int config_timeout, const zbx_events_funcs_t *events_cbs)
 {
 	zbx_db_dhost		dhost;
 	int			host_status, now;
@@ -598,7 +598,8 @@ static void	process_rule(zbx_db_drule *drule, int config_timeout)
 				goto out;
 			}
 
-			if (SUCCEED != process_services(drule, &dhost, ip, dns, now, &services, &dcheckids))
+			if (SUCCEED != process_services(drule, &dhost, ip, dns, now, &services, &dcheckids,
+					events_cbs->add_event_cb))
 			{
 				zbx_db_rollback();
 
@@ -613,9 +614,13 @@ static void	process_rule(zbx_db_drule *drule, int config_timeout)
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				zbx_discovery_update_host(&dhost, host_status, now);
-				zbx_process_events(NULL, NULL);
-				zbx_clean_events();
+				zbx_discovery_update_host(&dhost, host_status, now, events_cbs->add_event_cb);
+
+				if (NULL != events_cbs->process_events_cb)
+					events_cbs->process_events_cb(NULL, NULL);
+
+				if (NULL != events_cbs->clean_events_cb)
+					events_cbs->clean_events_cb();
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule->druleid, ip, dns, host_status, now);
@@ -753,7 +758,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	process_discovery(time_t *nextcheck, int config_timeout)
+static int	process_discovery(time_t *nextcheck, int config_timeout, const zbx_events_funcs_t *events_cbs)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -806,7 +811,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 				drule.name = row[1];
 				ZBX_DBROW2UINT64(drule.unique_dcheckid, row[2]);
 
-				process_rule(&drule, config_timeout);
+				process_rule(&drule, config_timeout, events_cbs);
 			}
 
 			zbx_dc_drule_queue(now, druleid, delay);
@@ -880,7 +885,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
-			rule_count += process_discovery(&nextcheck, discoverer_args_in->config_timeout);
+			rule_count += process_discovery(&nextcheck, discoverer_args_in->config_timeout,
+					discoverer_args_in->events_cbs);
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)
@@ -919,7 +925,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}
-
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

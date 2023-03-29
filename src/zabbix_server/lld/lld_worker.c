@@ -20,11 +20,12 @@
 #include "lld_worker.h"
 #include "lld.h"
 
+#include "../events/events.h"
+
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "../events.h"
 #include "lld_protocol.h"
 #include "zbxtime.h"
 #include "zbxdbwrap.h"
