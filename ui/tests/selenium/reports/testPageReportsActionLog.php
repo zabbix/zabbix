@@ -656,4 +656,56 @@ class testPageReportsActionLog extends CWebTest {
 		// Close hintbox.
 		$hintbox->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotPresent();
 	}
+
+	/**
+	 * Check Reset button.
+	 */
+	public function testPageReportsActionLog_CheckResetButton() {
+		$this->page->login()->open('zabbix.php?action=actionlog.list&from=2012-02-20+09:01:00&to=2012-02-20+11:01:00&'.
+				'filter_messages=&filter_set=1')->waitUntilReady();
+
+		// If the filter is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-2')->one()->click();
+		}
+
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$empty_form = [
+			'Recipients' => '',
+			'Actions' => '',
+			'Media types' => '',
+			'Search string' => '',
+			'id:filter_statuses_0' => false,
+			'id:filter_statuses_1' => false,
+			'id:filter_statuses_2' => false
+		];
+		$filled_form = [
+			'Recipients' => 'test-timezone',
+			'Actions' => 'Trigger action 3',
+			'Media types' => 'SMS',
+			'Search string' => 'test',
+			'id:filter_statuses_0' => true,
+			'id:filter_statuses_1' => true,
+			'id:filter_statuses_2' => true
+		];
+
+		// Check reset button with/without filter submit.
+		foreach ([true, false] as $submit) {
+			$this->assertTableStats(10);
+			$form->checkValue($empty_form);
+			$form->fill($filled_form);
+
+			if ($submit) {
+				$form->submit();
+				$this->page->waitUntilReady();
+				$this->assertTableStats(0);
+			}
+
+			$form->invalidate()->checkValue($filled_form);
+			$form->query('button:Reset')->one()->click();
+			$this->page->waitUntilReady();
+			$form->invalidate()->checkValue($empty_form);
+			$this->assertTableStats(10);
+		}
+	}
 }
