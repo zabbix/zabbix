@@ -22,7 +22,7 @@
 static int		log_level = LOG_LEVEL_WARNING;
 static zbx_log_func_t	log_func_callback = NULL;
 
-void	zbx_logging_init(zbx_log_func_t log_func)
+void	zbx_init_library_common(zbx_log_func_t log_func)
 {
 	log_func_callback = log_func;
 }

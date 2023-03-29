@@ -10,7 +10,7 @@ libzbxcommon_a_SOURCES = \
 	common_str.c \
 	cuid.c \
 	components_strings_representations.c \
-	log.c
+	common_log.c
 
 libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS)
 

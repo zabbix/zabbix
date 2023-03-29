@@ -809,7 +809,7 @@ char	*zbx_strerror(int errnum);
 
 typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
 
-void	zbx_logging_init(zbx_log_func_t log_func);
+void	zbx_init_library_common(zbx_log_func_t log_func);
 void	zbx_log_handle(int level, const char *fmt, ...);
 int	zbx_get_log_level(void);
 void	zbx_set_log_level(int level);

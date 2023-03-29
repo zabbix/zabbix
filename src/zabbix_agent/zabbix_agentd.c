@@ -1404,7 +1404,7 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
-	zbx_logging_init(zbx_log_impl);
+	zbx_init_library_common(zbx_log_impl);
 	zbx_init_library_cfg(program_type);
 	zbx_init_library_sysinfo(get_config_timeout);
 #if defined(_WINDOWS) || defined(__MINGW32__)
