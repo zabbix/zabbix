@@ -1010,7 +1010,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			}
 			break;
 		case ',':
-			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION_ARGS))
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION_ARGS) && 0 < ctx->stack.values_num)
 			{
 				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_COMMA, token);
 				return SUCCEED;
