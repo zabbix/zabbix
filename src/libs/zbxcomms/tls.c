@@ -285,7 +285,12 @@ static int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session, ssize_t err)
 	pd.events = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
 
 	if (0 > (ret = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
-		return FAIL;
+	{
+		if (SUCCEED != socket_had_nonblocking_error())
+			return FAIL;
+
+		return SUCCEED;
+	}
 
 	if (1 == ret && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
 		return FAIL;
@@ -331,7 +336,12 @@ static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 	}
 
 	if (0 > (ret = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
-		return FAIL;
+	{
+		if (SUCCEED != socket_had_nonblocking_error())
+			return FAIL;
+
+		return SUCCEED;
+	}
 
 	if (1 == ret && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
 		return FAIL;
@@ -2797,7 +2807,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 				goto out;
 			}
 
-			if (0 == res && SUCCEED != zbx_socket_check_deadline(s))
+			if (SUCCEED != zbx_socket_check_deadline(s))
 			{
 				*error = zbx_strdup(*error, "gnutls_handshake() timed out");
 				goto out;
@@ -3324,7 +3334,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 				goto out;
 			}
 
-			if (0 == res && SUCCEED != zbx_socket_check_deadline(s))
+			if (SUCCEED != zbx_socket_check_deadline(s))
 			{
 				*error = zbx_strdup(*error, "gnutls_handshake() timed out");
 				goto out;
@@ -3719,7 +3729,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
-	while (offset < (ssize_t)len)
+	while (1)
 	{
 		if (0 == (n = (ssize_t)ZBX_TLS_WRITE(s->tls_ctx->ctx, buf + offset, len - (size_t)offset)))
 		{
@@ -3743,7 +3753,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 			}
 		}
 		else
+		{
 			offset += n;
+
+			if (offset == (ssize_t)len)
+				break;
+		}
 
 		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
@@ -3807,12 +3822,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 						strerror_from_system(zbx_socket_last_error()));
 				return ZBX_PROTO_ERROR;
 			}
-		}
 
-		if (SUCCEED != zbx_socket_check_deadline(s))
-		{
-			*error = zbx_strdup(*error, "read timeout");
-			return ZBX_PROTO_ERROR;
+			if (SUCCEED != zbx_socket_check_deadline(s))
+			{
+				*error = zbx_strdup(*error, "read timeout");
+				return ZBX_PROTO_ERROR;
+			}
 		}
 	}
 

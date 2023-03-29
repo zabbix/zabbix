@@ -86,4 +86,6 @@ typedef struct pollfd zbx_pollfd_t;
 
 #endif
 
+int	socket_had_nonblocking_error(void);
+
 #endif /* ZABBIX_COMMS_H */

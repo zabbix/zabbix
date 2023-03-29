@@ -55,7 +55,6 @@ extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
 static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
 static int	socket_set_nonblocking(ZBX_SOCKET s);
-static int	socket_had_nonblocking_error(void);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size);
 
@@ -390,26 +389,20 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
 
-	do
+	while (0 >= (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 	{
-		if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+		if (-1 == rc && SUCCEED != socket_had_nonblocking_error())
 		{
-			if (SUCCEED != socket_had_nonblocking_error())
-			{
-				*error = zbx_strdup(NULL, "cannot wait for connection");
-				return FAIL;
-			}
-
-			continue;
+			*error = zbx_strdup(NULL, "cannot wait for connection");
+			return FAIL;
 		}
 
-		if (0 == rc && SUCCEED != zbx_socket_check_deadline(s))
+		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
 			*error = zbx_strdup(NULL, "connection timed out");
 			return FAIL;
 		}
 	}
-	while (0 >= rc);
 
 	if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
 	{
@@ -614,15 +607,14 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 
 			if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 			{
-				if (SUCCEED == socket_had_nonblocking_error())
-					continue;
-
-				zbx_set_socket_strerror("cannot wait for socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
-				return ZBX_PROTO_ERROR;
+				if (SUCCEED != socket_had_nonblocking_error())
+				{
+					zbx_set_socket_strerror("cannot wait for socket: %s",
+							strerror_from_system(zbx_socket_last_error()));
+					return ZBX_PROTO_ERROR;
+				}
 			}
-
-			if (0 != rc && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+			else if (0 != rc && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
 			{
 				zbx_set_socket_strerror("connection error");
 				return ZBX_PROTO_ERROR;
@@ -918,7 +910,7 @@ static int	socket_set_nonblocking(ZBX_SOCKET s)
  * Purpose: check if the last socket error was because of non-blocking socket *
  *                                                                            *
  ******************************************************************************/
-static int	socket_had_nonblocking_error(void)
+int	socket_had_nonblocking_error(void)
 {
 #ifndef _WINDOWS
 	switch (errno)
@@ -1030,15 +1022,13 @@ static ssize_t	tcp_peek(zbx_socket_t *s, char *buffer, size_t size)
 	{
 		int	rc;
 
-		while (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+		if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 		{
-			if (SUCCEED == socket_had_nonblocking_error())
-				continue;
-
-			return FAIL;
+			if (SUCCEED != socket_had_nonblocking_error())
+				return FAIL;
 		}
 
-		if (0 == rc)
+		if (0 >= rc)
 		{
 			if (SUCCEED != zbx_socket_check_deadline(s))
 				return TIMEOUT_ERROR;
@@ -1086,20 +1076,24 @@ static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size)
 	{
 		int	rc;
 
-		while (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+		if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 		{
-			if (SUCCEED == socket_had_nonblocking_error())
-				continue;
-
-			zbx_set_socket_strerror("cannot wait for socket: %s",
-					strerror_from_system(zbx_socket_last_error()));
-			return ZBX_PROTO_ERROR;
+			if (SUCCEED != socket_had_nonblocking_error())
+			{
+				zbx_set_socket_strerror("cannot wait for socket: %s",
+						strerror_from_system(zbx_socket_last_error()));
+				return ZBX_PROTO_ERROR;
+			}
 		}
 
-		if (0 == rc && SUCCEED != zbx_socket_check_deadline(s))
+		if (0 >= rc)
 		{
-			zbx_set_socket_strerror("read timeout");
-			return ZBX_PROTO_ERROR;
+			if (SUCCEED != zbx_socket_check_deadline(s))
+			{
+				zbx_set_socket_strerror("read timeout");
+				return ZBX_PROTO_ERROR;
+			}
+			continue;
 		}
 
 		if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
