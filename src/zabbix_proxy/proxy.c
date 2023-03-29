@@ -22,6 +22,7 @@
 #include "cfg.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
@@ -339,6 +340,16 @@ static int	config_allow_root	= 0;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 zbx_vector_ptr_t	zbx_addrs;
+
+/* proxy has no any events processing */
+static const zbx_events_funcs_t	events_cbs = {
+	.add_event_cb			= NULL,
+	.process_events_cb		= NULL,
+	.clean_events_cb		= NULL,
+	.reset_event_recovery_cb	= NULL,
+	.export_events_cb		= NULL,
+	.events_update_itservices_cb	= NULL
+};
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1014,7 +1025,7 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	zbx_free_database_cache(ZBX_SYNC_ALL);
+	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 	zbx_free_configuration_cache();
 	zbx_db_close();
 
@@ -1266,9 +1277,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+								&events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
-								&listen_sock, config_startup_time};
+								&events_cbs, &listen_sock, config_startup_time};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
@@ -1277,7 +1289,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
-	zbx_thread_dbsyncer_args		dbsyncer_args = {config_histsyncer_frequency};
+	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 

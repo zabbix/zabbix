@@ -21,10 +21,12 @@
 #define ZABBIX_DBSYNCER_H
 
 #include "zbxthreads.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {
-	int	config_histsyncer_frequency;
+	const zbx_events_funcs_t	*events_cbs;
+	int				config_histsyncer_frequency;
 }
 zbx_thread_dbsyncer_args;
 

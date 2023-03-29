@@ -60,7 +60,7 @@
 #include "lld/lld_worker.h"
 #include "reporter/report_manager.h"
 #include "reporter/report_writer.h"
-#include "events.h"
+#include "events/events.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
 #include "zbxhistory.h"
@@ -397,6 +397,15 @@ static int	config_allow_root	= 0;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
+
+static	const zbx_events_funcs_t	events_cbs = {
+	.add_event_cb			= zbx_add_event,
+	.process_events_cb		= zbx_process_events,
+	.clean_events_cb		= zbx_clean_events,
+	.reset_event_recovery_cb	= zbx_reset_event_recovery,
+	.export_events_cb		= zbx_export_events,
+	.events_update_itservices_cb	= zbx_events_update_itservices
+};
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1090,7 +1099,6 @@ static void	zbx_on_exit(int ret)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 		zbx_locks_disable();
 #endif
-
 	if (SUCCEED != zbx_ha_stop(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
@@ -1104,7 +1112,7 @@ static void	zbx_on_exit(int ret)
 		zbx_ipc_service_free_env();
 
 		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		zbx_free_database_cache(ZBX_SYNC_ALL);
+		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 		zbx_db_close();
 
 		zbx_free_configuration_cache();
@@ -1387,14 +1395,16 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_config_comms_args_t		config_comms = {zbx_config_tls, NULL, 0, zbx_config_timeout};
 
 	zbx_thread_args_t		thread_args;
+
 	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 							config_startup_time, config_unavailable_delay};
-	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type, listen_sock,
-							config_startup_time};
+	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
+							&events_cbs, listen_sock, config_startup_time};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
-							zbx_config_timeout};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
+							zbx_config_timeout, &events_cbs};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+							&events_cbs};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
 
@@ -1414,7 +1424,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			zbx_config_dbhigh};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
-	zbx_thread_dbsyncer_args		dbsyncer_args = {config_histsyncer_frequency};
+	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 
 	if (SUCCEED != zbx_init_database_cache(&error))
 	{
@@ -1762,12 +1772,10 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_vmware_destroy();
 	zbx_free_selfmon_collector();
 	zbx_free_configuration_cache();
-	zbx_free_database_cache(ZBX_SYNC_NONE);
-
+	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs);
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif
-
 	ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
