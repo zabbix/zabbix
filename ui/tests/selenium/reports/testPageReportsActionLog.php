@@ -56,11 +56,10 @@ class testPageReportsActionLog extends CWebTest {
 			$this->query('id:ui-id-1')->one()->click();
 		}
 
-		$time_form = $this->query('class:time-input')->one();
-
+		// Check data set values in input field.
 		foreach (['From' => 'now-1h', 'To' => 'now'] as $period => $time) {
-			$this->assertEquals($time, $time_form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($period).
-					"]/../..//input")->one()->getAttribute('value')
+			$this->assertEquals($time, $this->query("xpath://*[@class='time-input']//label[text()=".
+					CXPathHelper::escapeQuotes($period)."]/../..//input")->one()->getAttribute('value')
 			);
 		}
 
@@ -649,14 +648,12 @@ class testPageReportsActionLog extends CWebTest {
 
 		// Check hintbox.
 		$table->findRow('Status', 'Failed')->getColumn('Info')->query('xpath:.//a')->waitUntilClickable()->one()->click();
-		$hintbox = $this->query('class:overlay-dialogue');
-		$hintbox->waitUntilPresent();
+		$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
 		$this->assertEquals('Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused',
-				$hintbox->query('xpath:.//div[@class="hintbox-wrap red"]')->one()->getText()
+				$hintbox->one()->getText()
 		);
 
 		// Close hintbox.
-		$hintbox->query('xpath:.//button[@title="Close"]')->one()->click();
-		$hintbox->waitUntilNotPresent();
+		$hintbox->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotPresent();
 	}
 }
