@@ -21,6 +21,7 @@
 #include "zbxserver.h"
 
 #include "log.h"
+#include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxnix.h"
 #include "zbxself.h"

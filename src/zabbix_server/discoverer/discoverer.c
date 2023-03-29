@@ -20,6 +20,7 @@
 #include "discoverer.h"
 
 #include "log.h"
+#include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
 #include "zbxserver.h"
