@@ -93,8 +93,8 @@ class CActionButtonList extends CObject {
 				if (array_key_exists('redirect', $button_data)) {
 					$on_click_action = 'const form = this.closest("form");' .
 						// Save the original form action
-						// Function getAttribute()/setAttribute() is used instead of action(), because there are many
-						// buttons with name 'action' and action() function selects these buttons.
+						// Function getAttribute()/setAttribute() is used instead of .action, because there are many
+						// buttons with name 'action' and .action selects these buttons.
 						'if (!form.dataset.action) {
 							form.dataset.action = form.getAttribute("action");
 						}

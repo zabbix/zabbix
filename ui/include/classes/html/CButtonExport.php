@@ -36,8 +36,8 @@ class CButtonExport extends CList {
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->onClick('const form = this.closest("form");'.
 					// Save the original form action.
-					// Function getAttribute()/setAttribute() is used instead of action(), because there are many
-					// buttons with name 'action' and action() function selects those.
+					// Function getAttribute()/setAttribute() is used instead of .action, because there are many
+					// buttons with name 'action' and .action selects these buttons.
 					'if (!form.dataset.action) {
 						form.dataset.action = form.getAttribute("action");
 					}'.
