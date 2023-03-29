@@ -282,7 +282,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 85
+					'rows' => 86
 				]
 			],
 			[
