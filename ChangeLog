@@ -1,7 +1,5 @@
 Changes for 6.4.1rc2
 
-New features:
-
 Bug fixes:
 
 --------------------------------------------------------------------------------
@@ -3516,6 +3514,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.34rc1
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.33
