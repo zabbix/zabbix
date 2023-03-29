@@ -46,7 +46,7 @@ static void	udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
  * Purpose: Logical right shift of 128 bit unsigned integer.                  *
  *                                                                            *
  * Parameters: base  - [IN/OUT] initial value and result                      *
- *             bits  - [IN] number of bits to shift for.                      *
+ *             bits  - [IN] number of bits to shift for                       *
  *                                                                            *
  ******************************************************************************/
 static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)

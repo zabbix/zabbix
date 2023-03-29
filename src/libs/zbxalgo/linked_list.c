@@ -21,24 +21,31 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create single linked list (with custom memory functions)          *
+ * Purpose: create singly linked list (with custom memory functions)          *
  *                                                                            *
- * Parameters: queue           - [IN/OUT]                                     *
+ * Parameters: list            - [IN/OUT]                                     *
  *             mem_malloc_func - [IN] callback for malloc                     *
  *             mem_free_func   - [IN] callback for free                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func, zbx_mem_free_func_t mem_free_func)
+void	zbx_list_create_ext(zbx_list_t *list, zbx_mem_malloc_func_t mem_malloc_func, zbx_mem_free_func_t mem_free_func)
 {
-	memset(queue, 0, sizeof(*queue));
+	memset(list, 0, sizeof(*list));
 
-	queue->mem_malloc_func = mem_malloc_func;
-	queue->mem_free_func = mem_free_func;
+	list->mem_malloc_func = mem_malloc_func;
+	list->mem_free_func = mem_free_func;
 }
 
-void	zbx_list_create(zbx_list_t *queue)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create singly linked list                                         *
+ *                                                                            *
+ * Parameters: list - [IN]                                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_list_create(zbx_list_t *list)
 {
-	zbx_list_create_ext(queue, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_list_create_ext(list, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
 void	zbx_list_destroy(zbx_list_t *list)
