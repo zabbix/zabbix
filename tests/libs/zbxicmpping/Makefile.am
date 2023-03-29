@@ -28,9 +28,8 @@ ICMPPING_LIBS = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
-	-lz
+	-lz -lssl -lcrypto
 
 process_fping_output_line_SOURCES = \
 	process_fping_output_line.c \

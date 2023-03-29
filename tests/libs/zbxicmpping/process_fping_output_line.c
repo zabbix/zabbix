@@ -25,12 +25,16 @@
 
 #include "../../../src/libs/zbxicmpping/icmpping.c"
 
-static const char	*get_source_ip(void)
+const char	*mock_get_source_ip(void);
+void		test_process_fping_statistics_line(void);
+void		test_process_response_to_individual_fping_request(void);
+
+const char	*mock_get_source_ip(void)
 {
 	return "NotNull";
 }
 
-void	test_process_fping_statistics_line()
+void	test_process_fping_statistics_line(void)
 {
 	const size_t	hosts_count = 1, host_idx = 0;
 	char		*linebuf, host_up;
@@ -73,7 +77,7 @@ void	test_process_fping_statistics_line()
 	free(linebuf);
 }
 
-void test_process_response_to_individual_fping_request()
+void test_process_response_to_individual_fping_request(void)
 {
 	const size_t	hosts_count = 1, host_idx = 0;
 	char		*linebuf;
@@ -114,8 +118,8 @@ void test_process_response_to_individual_fping_request()
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*test_type;
-	static zbx_config_icmpping_t	config_icmpping = {
-		get_source_ip,
+	static zbx_config_icmpping_t	mock_config_icmpping = {
+		mock_get_source_ip,
 		NULL,
 #ifdef HAVE_IPV6
 		NULL,
@@ -124,7 +128,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_init_library_icmpping(&config_icmpping);
+	zbx_init_library_icmpping(&mock_config_icmpping);
 
 	test_type = zbx_mock_get_parameter_string("in.test_type");
 
