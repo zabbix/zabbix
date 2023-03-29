@@ -175,7 +175,7 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		um_mock_cache_init(&step->mock_cache, hconfig);
 		um_mock_cache_diff(mock_cache_last, &step->mock_cache, &gmacros, &hmacros, &htmpls);
 		config->um_cache = step->cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls,
-				&config_vault);
+				&config_vault, get_program_type());
 
 		mock_dbsync_clear(&gmacros);
 		mock_dbsync_clear(&hmacros);
