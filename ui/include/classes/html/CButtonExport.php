@@ -34,12 +34,14 @@ class CButtonExport extends CList {
 				->removeAttribute('name')
 				->removeAttribute('value')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->onClick('var $_form = jQuery(this).closest("form");'.
+				->onClick('const form = this.closest("form");'.
 					// Save the original form action.
-					'if (!$_form.data("action")) {'.
-						'$_form.data("action", $_form.attr("action"));'.
-					'}'.
-					'$_form.attr("action", '.json_encode(
+					// Function getAttribute()/setAttribute() is used instead of action(), because there are many
+					// buttons with name 'action' and action() function selects those.
+					'if (!form.dataset.action) {
+						form.dataset.action = form.getAttribute("action");
+					}'.
+					'form.setAttribute("action", '. json_encode(
 						(new CUrl('zabbix.php'))
 							->setArgument('action', $action)
 							->setArgument('format', CExportWriterFactory::YAML)
