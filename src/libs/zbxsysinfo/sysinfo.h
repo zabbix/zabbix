@@ -104,12 +104,14 @@ typedef struct
 zbx_mpoint_t;
 
 int	sysinfo_get_config_timeout(void);
+int	sysinfo_get_config_log_remote_commands(void);
+int	sysinfo_get_config_unsafe_user_parameters(void);
 
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 
 #ifndef _WINDOWS
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char **hostname);
 
 typedef struct
 {

@@ -36,7 +36,7 @@
 #include "zbxcomms.h"
 
 #include "alerter/alerter.h"
-#include "dbsyncer/dbsyncer.h"
+#include "zbxdbsyncer.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
 #include "httppoller/httppoller.h"
@@ -306,20 +306,12 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-static char	*config_alert_scripts_path	= NULL;
-static const char	*get_alert_scripts_path(void)
-{
-	return config_alert_scripts_path;
-}
-
-static int	config_timeout = 3;
-static int	get_config_timeout(void)
-{
-	return config_timeout;
-}
+ZBX_PROPERTY_DECL_CONST(char *, zbx_config_alert_scripts_path, NULL)
+ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
 
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
+static int	config_histsyncer_frequency	= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -328,7 +320,6 @@ char	*CONFIG_SERVER			= NULL;		/* not used in zabbix_server, required for linkin
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
-int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
 
 int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
@@ -350,9 +341,10 @@ int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
-int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
-int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
-int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
+
+ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
@@ -400,7 +392,7 @@ char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
-static char	*config_file		= NULL;
+static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
@@ -616,8 +608,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
 
-	if (NULL == config_alert_scripts_path)
-		config_alert_scripts_path = zbx_strdup(config_alert_scripts_path, DEFAULT_ALERT_SCRIPTS_PATH);
+	if (NULL == zbx_config_alert_scripts_path)
+		zbx_config_alert_scripts_path = zbx_strdup(zbx_config_alert_scripts_path, DEFAULT_ALERT_SCRIPTS_PATH);
 
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
@@ -876,7 +868,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"Timeout",			&config_timeout,			TYPE_INT,
+		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
 			PARM_OPT,	1,			300},
@@ -902,7 +894,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
-		{"AlertScriptsPath",		&config_alert_scripts_path,		TYPE_STRING,
+		{"AlertScriptsPath",		&zbx_config_alert_scripts_path,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"ExternalScripts",		&CONFIG_EXTERNALSCRIPTS,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1258,7 +1250,8 @@ int	main(int argc, char **argv)
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_stats(get_program_type);
-	zbx_init_library_sysinfo(get_config_timeout);
+	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 	zbx_init_library_preproc(preproc_flush_value_server);
 
@@ -1274,7 +1267,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = rtc_process(t.opts, config_timeout, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, zbx_config_timeout, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1391,35 +1384,37 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_config_comms_args_t		config_comms = {zbx_config_tls, NULL, 0, config_timeout};
+	zbx_config_comms_args_t		config_comms = {zbx_config_tls, NULL, 0, zbx_config_timeout};
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 							config_startup_time, config_unavailable_delay};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type, listen_sock,
 							config_startup_time};
-	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, config_timeout};
+	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
-							config_timeout};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
+							zbx_config_timeout};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
-	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, config_timeout};
-	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {config_timeout};
-	zbx_thread_taskmanager_args	taskmanager_args = {config_timeout, config_startup_time};
-	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, config_timeout};
-	zbx_thread_pinger_args		pinger_args = {config_timeout};
+
+	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, zbx_config_timeout};
+	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout};
+	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
+	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout};
+	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 
 #ifdef HAVE_OPENIPMI
-	zbx_thread_ipmi_manager_args	ipmi_manager_args = {config_timeout, config_unavailable_delay};
+	zbx_thread_ipmi_manager_args	ipmi_manager_args = {zbx_config_timeout, config_unavailable_delay};
 #endif
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
-	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_alert_scripts_path,
+	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
 			zbx_config_dbhigh};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
+	zbx_thread_dbsyncer_args		dbsyncer_args = {config_histsyncer_frequency};
 
 	if (SUCCEED != zbx_init_database_cache(&error))
 	{
@@ -1585,7 +1580,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
-				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
+				thread_args.args = &dbsyncer_args;
+				zbx_thread_start(zbx_dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 				thread_args.args = &escalator_args;
@@ -1941,7 +1937,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	zbx_initialize_events();
 
-	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, config_timeout, 1))
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(EXIT_FAILURE);
