@@ -56,6 +56,9 @@ class testPageReportsActionLog extends CWebTest {
 			$this->query('id:ui-id-1')->one()->click();
 		}
 
+		// Check that filter set to display Last hour data.
+		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
+
 		// Check data set values in input field.
 		foreach (['From' => 'now-1h', 'To' => 'now'] as $period => $time) {
 			$this->assertEquals($time, $this->query("xpath://*[@class='time-input']//label[text()=".
@@ -63,12 +66,10 @@ class testPageReportsActionLog extends CWebTest {
 			);
 		}
 
-		// Check that filter set to display Last hour data.
-		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
-
 		// Press to display filter.
 		$this->query('id:ui-id-2')->one()->click();
 
+		// Check header and title.
 		$this->page->assertHeader('Action log');
 		$this->page->assertTitle('Action log');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -241,14 +242,46 @@ class testPageReportsActionLog extends CWebTest {
 						'Actions' => ['Trigger action 2', 'Trigger action 3']
 					],
 					'result' => [
-						['Action' => 'Trigger action 3', 'Media type' => 'SMS', 'Recipient' => "test-timezone\n77777777"],
-						['Action' => 'Trigger action 3', 'Media type' => 'SMS', 'Recipient' => "test-timezone\n77777777"],
-						['Action' => 'Trigger action 3', 'Media type' => 'Discord', 'Recipient' => "Admin (Zabbix Administrator)\ntest.test@zabbix.com"],
-						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
-						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
-						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
-						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
-						['Action' => 'Trigger action 2', 'Media type' => 'Email', 'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"],
+						[
+							'Action' => 'Trigger action 3',
+							'Media type' => 'SMS',
+							'Recipient' => "test-timezone\n77777777"
+						],
+						[
+							'Action' => 'Trigger action 3',
+							'Media type' => 'SMS',
+							'Recipient' => "test-timezone\n77777777"
+						],
+						[
+							'Action' => 'Trigger action 3',
+							'Media type' => 'Discord',
+							'Recipient' => "Admin (Zabbix Administrator)\ntest.test@zabbix.com"
+						],
+						[
+							'Action' => 'Trigger action 2',
+							'Media type' => 'Email',
+							'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"
+						],
+						[
+							'Action' => 'Trigger action 2',
+							'Media type' => 'Email',
+							'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"
+						],
+						[
+							'Action' => 'Trigger action 2',
+							'Media type' => 'Email',
+							'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"
+						],
+						[
+							'Action' => 'Trigger action 2',
+							'Media type' => 'Email',
+							'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"
+						],
+						[
+							'Action' => 'Trigger action 2',
+							'Media type' => 'Email',
+							'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"
+						],
 					]
 				]
 			],
