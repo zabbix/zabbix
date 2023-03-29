@@ -21,7 +21,6 @@
 #include "algodefs.h"
 
 #include "zbxstr.h"
-#include "zbxnum.h"
 
 typedef unsigned char uchar;
 
@@ -215,7 +214,7 @@ int	next_prime(int n)
  *                                                                            *
  * Purpose: calculate integer part of square root of a 32 bit integer value   *
  *                                                                            *
- * Parameters: value     - [IN] the value to calculate square root for        *
+ * Parameters: value     - [IN] value to calculate square root for            *
  *                                                                            *
  * Return value: the integer part of square root                              *
  *                                                                            *

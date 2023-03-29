@@ -19,7 +19,6 @@
 
 #include "zbxalgo.h"
 
-#include "zbxcommon.h"
 #include "log.h"
 
 static void	swap(zbx_binary_heap_t *heap, int index_1, int index_2);
@@ -70,7 +69,8 @@ static void	__binary_heap_ensure_free_space(zbx_binary_heap_t *heap)
 
 	if (heap->elems_alloc != tmp_elems_alloc)
 	{
-		heap->elems = (zbx_binary_heap_elem_t *)heap->mem_realloc_func(heap->elems, tmp_elems_alloc * sizeof(zbx_binary_heap_elem_t));
+		heap->elems = (zbx_binary_heap_elem_t *)heap->mem_realloc_func(heap->elems, tmp_elems_alloc *
+				sizeof(zbx_binary_heap_elem_t));
 
 		if (NULL == heap->elems)
 		{

@@ -62,6 +62,7 @@ static int	zbx_matrix_alloc(zbx_matrix_t *m, int rows, int columns)
 	return SUCCEED;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -85,6 +86,7 @@ static int	zbx_matrix_copy(zbx_matrix_t *dest, zbx_matrix_t *src)
 	return SUCCEED;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -119,6 +121,7 @@ static int	zbx_transpose_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 	return SUCCEED;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -265,6 +268,7 @@ out:
 	return res;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -295,6 +299,7 @@ static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t
 	return SUCCEED;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -332,6 +337,7 @@ out:
 	zbx_matrix_free(to_be_inverted);
 	zbx_matrix_free(left_part);
 	zbx_matrix_free(right_part);
+
 	return res;
 }
 
@@ -439,6 +445,7 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, int k, zbx
 out:
 	zbx_matrix_free(independent);
 	zbx_matrix_free(dependent);
+
 	return res;
 }
 
@@ -703,17 +710,15 @@ while(0)
 	}
 	else
 		res = SUCCEED;
-
 out:
 	zbx_matrix_free(denominator_multiplicands);
 	zbx_matrix_free(updates);
 	return res;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
-
 #undef ZBX_MAX_ITERATIONS
-
 #undef Re
 #undef Im
 }
@@ -782,6 +787,7 @@ out:
 	return res;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -838,6 +844,7 @@ out:
 	return res;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -862,6 +869,7 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t f
 	return SUCCEED;
 error:
 	THIS_SHOULD_NEVER_HAPPEN;
+
 	return FAIL;
 }
 
@@ -942,8 +950,8 @@ static void	zbx_log_expression(double now, zbx_fit_t fit, int k, zbx_matrix_t *c
 	/* x is item value, t is time in seconds counted from now */
 	if (FIT_LINEAR == fit)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") + (" ZBX_FS_DBL ") * (" ZBX_FS_DBL " + t)",
-				ZBX_MATRIX_EL(coeffs, 0, 0), ZBX_MATRIX_EL(coeffs, 1, 0), now);
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") + (" ZBX_FS_DBL ") * ("
+				ZBX_FS_DBL " + t)", ZBX_MATRIX_EL(coeffs, 0, 0), ZBX_MATRIX_EL(coeffs, 1, 0), now);
 	}
 	else if (FIT_POLYNOMIAL == fit)
 	{
@@ -965,18 +973,19 @@ static void	zbx_log_expression(double now, zbx_fit_t fit, int k, zbx_matrix_t *c
 	}
 	else if (FIT_EXPONENTIAL == fit)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") * exp( (" ZBX_FS_DBL ") * (" ZBX_FS_DBL " + t) )",
-				exp(ZBX_MATRIX_EL(coeffs, 0, 0)), ZBX_MATRIX_EL(coeffs, 1, 0), now);
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") * exp( (" ZBX_FS_DBL ") * ("
+				ZBX_FS_DBL " + t) )", exp(ZBX_MATRIX_EL(coeffs, 0, 0)), ZBX_MATRIX_EL(coeffs, 1, 0),
+				now);
 	}
 	else if (FIT_LOGARITHMIC == fit)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") + (" ZBX_FS_DBL ") * log(" ZBX_FS_DBL " + t)",
-				ZBX_MATRIX_EL(coeffs, 0, 0), ZBX_MATRIX_EL(coeffs, 1, 0), now);
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") + (" ZBX_FS_DBL ") * log("
+				ZBX_FS_DBL " + t)", ZBX_MATRIX_EL(coeffs, 0, 0), ZBX_MATRIX_EL(coeffs, 1, 0), now);
 	}
 	else if (FIT_POWER == fit)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") * (" ZBX_FS_DBL " + t) ^ (" ZBX_FS_DBL ")",
-				exp(ZBX_MATRIX_EL(coeffs, 0, 0)), now, ZBX_MATRIX_EL(coeffs, 1, 0));
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") * (" ZBX_FS_DBL " + t) ^ ("
+				ZBX_FS_DBL ")", exp(ZBX_MATRIX_EL(coeffs, 0, 0)), now, ZBX_MATRIX_EL(coeffs, 1, 0));
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -1122,7 +1131,6 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 		THIS_SHOULD_NEVER_HAPPEN;
 		res = FAIL;
 	}
-
 out:
 	zbx_matrix_free(coefficients);
 
@@ -1199,7 +1207,6 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 		THIS_SHOULD_NEVER_HAPPEN;
 		res = FAIL;
 	}
-
 out:
 	if (SUCCEED != res)
 	{
@@ -1216,5 +1223,6 @@ out:
 	}
 
 	zbx_matrix_free(coefficients);
+
 	return result;
 }

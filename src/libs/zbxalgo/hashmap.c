@@ -20,8 +20,6 @@
 #include "zbxalgo.h"
 #include "algodefs.h"
 
-#include "zbxcommon.h"
-
 static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *slot);
 
 #define	CRIT_LOAD_FACTOR	5/1
@@ -181,7 +179,8 @@ void	zbx_hashmap_set(zbx_hashmap_t *hm, zbx_uint64_t key, int value)
 
 			inc_slots = next_prime(hm->num_slots * SLOT_GROWTH_FACTOR);
 
-			hm->slots = (ZBX_HASHMAP_SLOT_T *)hm->mem_realloc_func(hm->slots, inc_slots * sizeof(ZBX_HASHMAP_SLOT_T));
+			hm->slots = (ZBX_HASHMAP_SLOT_T *)hm->mem_realloc_func(hm->slots, inc_slots *
+					sizeof(ZBX_HASHMAP_SLOT_T));
 			memset(hm->slots + hm->num_slots, 0, (inc_slots - hm->num_slots) * sizeof(ZBX_HASHMAP_SLOT_T));
 
 			for (s = 0; s < hm->num_slots; s++)

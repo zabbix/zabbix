@@ -20,7 +20,6 @@
 #include "zbxalgo.h"
 #include "algodefs.h"
 
-#include "zbxcommon.h"
 #include "log.h"
 
 static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
@@ -132,8 +131,8 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
  *                                                                            *
  * Purpose: allocation not less than the required number of slots for hashset *
  *                                                                            *
- * Parameters: hs            - [IN] the destination hashset                   *
- *             num_slots_req - [IN] the number of required slots              *
+ * Parameters: hs            - [IN] destination hashset                       *
+ *             num_slots_req - [IN] number of required slots                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req)
@@ -453,8 +452,8 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
  *                                                                               *
  * Purpose: copy hashset with fixed size entries                                 *
  *                                                                               *
- * Parameters:  dst  - [OUT] the destination hashset                             *
- *              src  - [IN] the source hashset                                   *
+ * Parameters:  dst  - [OUT] destination hashset                                 *
+ *              src  - [IN] source hashset                                       *
  *              size - [IN] hashset entry data size                              *
  *                                                                               *
  * Comments: Do NOT use this function with hashsets having variable size entries,*
