@@ -59,8 +59,8 @@ class testPageReportsActionLog extends CWebTest {
 		$time_form = $this->query('class:time-input')->one();
 
 		foreach (['From' => 'now-1h', 'To' => 'now'] as $period => $time) {
-			$this->assertEquals($time, $time_form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($period).
-					']/../..//input')->one()->getAttribute('value')
+			$this->assertEquals($time, $time_form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($period).
+					"]/../..//input")->one()->getAttribute('value')
 			);
 		}
 
