@@ -1721,17 +1721,10 @@ void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout)
  ******************************************************************************/
 int	zbx_socket_check_deadline(zbx_socket_t *s)
 {
-	zbx_timespec_t	ts;
-
 	if (0 == s->deadline.sec)
 		return SUCCEED;
 
-	zbx_timespec(&ts);
-
-	if (0 < zbx_timespec_compare(&ts, &s->deadline))
-		return FAIL;
-
-	return SUCCEED;
+	return zbx_ts_check_deadline(&s->deadline);
 }
 
 /******************************************************************************
