@@ -201,7 +201,7 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for item (create).
 			[
-				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
 				'method' => 'item.create',
 				// 1015: dependent.items.host.8
 				// 2501: dependent.items.host.9:master.item.1
@@ -212,7 +212,7 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for item (update).
 			[
-				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
 				'method' => 'item.update',
 				'request_data' => [
 					'itemid' => 2402,		// dependent.items.host.8:dependent.item.1.1
@@ -221,7 +221,7 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for item prototype (create).
 			[
-				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
 				'method' => 'itemprototype.create',
 				// 1015: dependent.items.host.8
 				// 2403: dependent.items.host.8:discovery.rule.1
@@ -233,7 +233,7 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for item prototype (update).
 			[
-				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
 				'method' => 'itemprototype.update',
 				'request_data' => [
 					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
@@ -242,7 +242,7 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other discovery rule (create).
 			[
-				'error' => 'Incorrect value for field "master_itemid": "ruleid" of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": ruleid of dependent item and master item should match.',
 				'method' => 'itemprototype.create',
 				// 1015: dependent.items.host.8
 				// 2403: dependent.items.host.8:discovery.rule.1
@@ -254,7 +254,7 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other discovery rule (update).
 			[
-				'error' => 'Incorrect value for field "master_itemid": "ruleid" of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": ruleid of dependent item and master item should match.',
 				'method' => 'itemprototype.update',
 				'request_data' => [
 					'itemid' => 2405,		// dependent.items.host.8:dependent.item.proto.1.1
@@ -263,7 +263,7 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for discovery rule (create).
 			[
-				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
 				'method' => 'discoveryrule.create',
 				// 1015: dependent.items.host.8
 				// 2501: dependent.items.host.9:master.item.1
@@ -274,7 +274,7 @@ class testDependentItems extends CAPITest {
 			],
 			// Set master_itemid from other host for discovery rule (update).
 			[
-				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
+				'error' => 'Incorrect value for field "master_itemid": hostid of dependent item and master item should match.',
 				'method' => 'discoveryrule.update',
 				'request_data' => [
 					'itemid' => 2409,		// dependent.items.host.8:dependent.discovery.rule.1.1
