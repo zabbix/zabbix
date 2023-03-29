@@ -679,7 +679,8 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 	char			*compressed_data = NULL;
 	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)0;
 
-	zbx_socket_set_deadline(s, timeout);
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, timeout);
 
 	if (0 != (flags & ZBX_TCP_PROTOCOL))
 	{
@@ -790,6 +791,9 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 	}
 cleanup:
 	zbx_free(compressed_data);
+
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, 0);
 
 	return ret;
 
@@ -1488,6 +1492,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	}
 
+	zbx_socket_set_deadline(s, 0);
+
 	ret = SUCCEED;
 out:
 	zbx_free(pds);
@@ -1573,8 +1579,6 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 	/* check if the buffer already contains the next line */
 	if (NULL != (line = zbx_socket_find_line(s)))
 		return line;
-
-	zbx_socket_set_deadline(s, 0);
 
 	/* Find the size of leftover data from the last read line operation and copy */
 	/* the leftover data to the static buffer and reset the dynamic buffer.      */
@@ -1758,7 +1762,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 	s->buffer = s->buf_stat;
 
-	zbx_socket_set_deadline(s, timeout);
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, timeout);
 
 	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes)))
 	{
@@ -1978,6 +1983,9 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 		s->buffer[s->read_bytes] = '\0';
 	}
 out:
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, 0);
+
 	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes + offset));
 
 #undef ZBX_TCP_EXPECT_HEADER
@@ -2004,7 +2012,8 @@ ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 	s->buffer = s->buf_stat;
 
-	zbx_socket_set_deadline(s, timeout);
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, timeout);
 
 	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes)))
 	{
@@ -2050,6 +2059,10 @@ ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 	s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
 	s->buffer[s->read_bytes] = '\0';
 out:
+
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, 0);
+
 	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes));
 }
 
