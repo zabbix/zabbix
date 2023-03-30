@@ -23,7 +23,6 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
 #include "zbxcommon.h"
-#include "log.h"
 
 int zbx_log_level = LOG_LEVEL_WARNING;
 
@@ -31,21 +30,20 @@ int	zbx_agent_pid;
 
 void handleZabbixLog(int level, const char *message);
 
-void __zbx_zabbix_log(int level, const char *format, ...)
+void zbx_log_go_impl(int level, const char *fmt, va_list args)
 {
 	if (zbx_agent_pid == getpid())
 	{
-		va_list	args;
+		va_list	tmp;
 		char *message = NULL;
 		size_t size;
 
-		va_start(args, format);
-		size = vsnprintf(NULL, 0, format, args) + 2;
-		va_end(args);
+		va_copy(tmp, args);
+		size = vsnprintf(NULL, 0, fmt, args) + 2;
+		va_end(tmp);
+
 		message = (char *)zbx_malloc(NULL, size);
-		va_start(args, format);
-		vsnprintf(message, size, format, args);
-		va_end(args);
+		vsnprintf(message, size, fmt, args);
 
 		handleZabbixLog(level, message);
 		zbx_free(message);
@@ -63,6 +61,11 @@ int	zbx_redirect_stdio(const char *filename)
 	return FAIL;
 }
 
+void	log_init(void)
+{
+	zbx_init_library_common(zbx_log_go_impl);
+}
+
 */
 import "C"
 
@@ -77,4 +80,5 @@ func SetLogLevel(level int) {
 func init() {
 	log.Tracef("Calling C function \"getpid()\"")
 	C.zbx_agent_pid = C.getpid()
+	C.log_init()
 }
