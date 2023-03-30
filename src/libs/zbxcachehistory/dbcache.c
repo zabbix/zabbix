@@ -4305,9 +4305,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
  *              item_flags      - [IN] item flags (e. g. lld rule)            *
  *              value           - [IN] agent result containing value to add   *
  *              ts              - [IN] value timestamp                        *
- *              state           - [IN] item state                             *
- *              error           - [IN] error message in case item state       *
- *                                     is ITEM_STATE_NOTSUPPORTED             *
+ *              value_opt       - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
@@ -4406,7 +4404,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			if (ITEM_VALUE_TYPE_BIN == value_type && FAIL == zbx_base64_validate(value->data.str))
 			{
 				dc_local_add_history_notsupported(itemid, &ts,
-						"Binary type requires base 64 encoded string. ", lastlogsize, mtime,
+						"Binary type requires Base 64 encoded string. ", lastlogsize, mtime,
 						value_flags);
 				return;
 			}
@@ -4751,6 +4749,9 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				cache->stats.history_log_counter++;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA");
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 				cache->stats.history_bin_counter++;
 				break;
 			case ITEM_VALUE_TYPE_NONE:

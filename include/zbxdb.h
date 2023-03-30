@@ -137,9 +137,9 @@ int		zbx_db_statement_execute(int iters);
 #endif
 
 #if defined (HAVE_MYSQL)
-void	zbx_mysql_escape_bin(char* src, char dst[], size_t size);
+void	zbx_mysql_escape_bin(const char *src, char *dst, size_t size);
 #elif defined(HAVE_POSTGRESQL)
-void	zbx_postgresql_escape_bin(char* src, char **dst, size_t size);
+void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size);
 #endif
 
 int		zbx_db_vexecute(const char *fmt, va_list args);

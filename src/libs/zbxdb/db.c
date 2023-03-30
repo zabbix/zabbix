@@ -1328,11 +1328,10 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 
 			for (i = 0; i < rows_num; i++)
 			{
-				char	*dst = NULL;
-				size_t	dst_len, src_len;
+				size_t	dst_len;
+				size_t	src_len = strlen(rows[i][position].str) * 3 / 4 + 1;
+				char	*dst = (char*)zbx_malloc(NULL, src_len);
 
-				src_len = strlen(rows[i][position].str) * 3 / 4 + 1;
-				dst = (char*)zbx_malloc(NULL, src_len);
 				zbx_base64_decode(rows[i][position].str, (char *)dst, src_len, &dst_len);
 				sizes[i] = dst_len;
 				zbx_free(rows[i][position].str);
@@ -1423,16 +1422,16 @@ out:
 #endif
 
 #if defined(HAVE_MYSQL)
-void	zbx_mysql_escape_bin(char* src, char dst[], size_t size)
+void	zbx_mysql_escape_bin(const char *src, char *dst, size_t size)
 {
 	mysql_real_escape_string(conn, dst, src, size);
 }
 #elif defined(HAVE_POSTGRESQL)
-void	zbx_postgresql_escape_bin(char* src, char **dst, size_t size)
+void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size)
 {
-	size_t	l;
+	size_t	dst_size;
 
-	*dst = (char*)PQescapeByteaConn(conn, (unsigned char*)src, size, &l);
+	*dst = (char*)PQescapeByteaConn(conn, (const unsigned char*)src, size, &dst_size);
 }
 #endif
 

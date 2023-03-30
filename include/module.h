@@ -82,10 +82,10 @@ zbx_log_t;
 #define AR_DOUBLE	0x02
 #define AR_STRING	0x04
 #define AR_TEXT		0x08
-#define AR_BIN		0x10
-#define AR_LOG		0x20
-#define AR_MESSAGE	0x40
-#define AR_META		0x80
+#define AR_LOG		0x10
+#define AR_MESSAGE	0x20
+#define AR_META		0x40
+#define AR_BIN		0x80
 
 /* agent return structure */
 typedef struct

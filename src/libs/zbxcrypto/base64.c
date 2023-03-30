@@ -26,8 +26,8 @@ static int	base64_block_regex_is_valid(const char c)
 {
 	if (('A' <= c && 'Z' >= c) ||
 		('a' <= c && 'z' >= c) ||
-		('0' <= c && '9' >= c) ||
-		'/' == c || '+' == c)
+		('/' <= c && '9' >= c) ||
+		'+' == c)
 	{
 		return SUCCEED;
 	}
@@ -37,7 +37,7 @@ static int	base64_block_regex_is_valid(const char c)
 
 /*************************************************************************************************
  *                                                                                               *
- * Purpose: Check if the string is a valid based 64 encoded string.                              *
+ * Purpose: Check if the string is a valid Base64 encoded string.                                *
  *          Check is based on RFC 4648, based on the following regexp:                           *
  *   "^(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4})$"  *
  *                                                                                               *
@@ -47,55 +47,61 @@ static int	base64_block_regex_is_valid(const char c)
  *                                                                                               *
  * Parameters: p_str - [IN] string to validate                                                   *
  *                                                                                               *
- * Return value: SUCCEED - the string is a valid base64 encoded string                           *
+ * Return value: SUCCEED - the string is a valid Base64 encoded string                           *
  *               FAIL - otherwise                                                                *
  *                                                                                               *
  *************************************************************************************************/
-int	zbx_base64_validate(const char* p_str)
+int	zbx_base64_validate(const char *p_str)
 {
-	size_t	i, len = strlen(p_str);
+	size_t	i;
 
-	for (i = 0; i < len; i = i + 4)
+	if ('\0' == p_str[0])
+		return SUCCEED;
+
+	for (i = 1; '\0' != p_str[i]; i++)
 	{
-		/* validate first block: (?:[A-Za-z0-9+\\/]{4}) */
-		if (i + 4 <= len && SUCCEED == base64_block_regex_is_valid(p_str[i]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i + 1]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i + 2]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i + 3]))
-		{
+		if (i < 4 || 0 != i % 4)
 			continue;
+		/* validate first block: (?:[A-Za-z0-9+\\/]{4}) */
+		if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i - 2]) &&
+				SUCCEED == base64_block_regex_is_valid(p_str[i - 1]))
+		{
+			if ('\0' == p_str[i])
+				return SUCCEED;
+			else
+				continue;
 		}
 		/* validate second block: (?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4}) */
-		else if (i + 4 == len)
+		else if ('\0' == p_str[i])
 		{
-			if (SUCCEED == base64_block_regex_is_valid(p_str[i]) &&
-					SUCCEED == base64_block_regex_is_valid(p_str[i + 1]) && '=' == p_str[i + 2] &&
-					'=' == p_str[i + 3])
+			if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
+					SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) && '=' == p_str[i - 2] &&
+					'=' == p_str[i - 1])
+			{
+					return SUCCEED;
+			}
+			else if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
+					SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) &&
+					SUCCEED == base64_block_regex_is_valid(p_str[i - 2]) &&
+					'=' == p_str[i - 1])
 			{
 				return SUCCEED;
 			}
-			else if (SUCCEED == base64_block_regex_is_valid(p_str[i]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i + 1]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i + 2]) &&
-				'=' == p_str[i+3])
-			{
-				return SUCCEED;
-			}
-			else if (SUCCEED == base64_block_regex_is_valid(p_str[i]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i + 1]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i + 2]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i + 3]))
+			else if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
+					SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) &&
+					SUCCEED == base64_block_regex_is_valid(p_str[i - 2]) &&
+					SUCCEED == base64_block_regex_is_valid(p_str[i - 1]))
 			{
 				return SUCCEED;
 			}
 			else
 				return FAIL;
 		}
-		else
-			return FAIL;
 	}
 
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************

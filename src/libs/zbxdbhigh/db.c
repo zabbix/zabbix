@@ -3028,25 +3028,29 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 /******************************************************************************
  *                                                                            *
- * Purpose: decodes base64 encoded binary data and escapes it allow it to     *
- *          to be used inside sql statement                                   *
+ * Purpose: decodes Base64 encoded binary data and escapes it allowing it to  *
+ *          be used inside sql statement                                      *
  *                                                                            *
  * Parameters: sql_insert_data     - [IN/OUT] base64 encoded unescaped data   *
  *                                                                            *
+ * Comment: input data is released from memory and replaced with pointer      *
+ *          to the output data.                                               *
+ *                                                                            *
  ******************************************************************************/
-static void	format_binary_value_for_sql(char **sql_insert_data)
+static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
 {
-	char	*escaped_binary, *binary_data = NULL;
-	size_t	binary_data_len, binary_data_max_len;
+	size_t	binary_data_len;
+	char	*escaped_binary;
 
-	binary_data_max_len = strlen(*sql_insert_data) * 3 / 4 + 1;
-	binary_data = (char*)zbx_malloc(NULL, binary_data_max_len);
-	zbx_base64_decode(*sql_insert_data, (char *)binary_data, binary_data_max_len, &binary_data_len);
+	size_t	binary_data_max_len = strlen(*sql_insert_data) * 3 / 4 + 1;
+	char	*binary_data = (char*)zbx_malloc(NULL, binary_data_max_len);
+
+	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
 #if defined (HAVE_MYSQL)
 	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
-	zbx_mysql_escape_bin((char*)binary_data, escaped_binary, binary_data_len);
+	zbx_mysql_escape_bin(binary_data, escaped_binary, binary_data_len);
 #elif defined (HAVE_POSTGRESQL)
-	zbx_postgresql_escape_bin((char*)binary_data, &escaped_binary, binary_data_len);
+	zbx_postgresql_escape_bin(binary_data, &escaped_binary, binary_data_len);
 #endif
 	zbx_free(binary_data);
 	zbx_free(*sql_insert_data);
@@ -3244,7 +3248,7 @@ retry_oracle:
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-					format_binary_value_for_sql(&(value->str));
+					decode_and_escape_binary_value_for_sql(&(value->str));
 #elif defined(HAVE_ORACLE)
 					/* Oracle converts base64 to binary when it formats prepared statement */
 #endif

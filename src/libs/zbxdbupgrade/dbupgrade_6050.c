@@ -21,8 +21,6 @@
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 
-#include "zbxdbschema.h"
-
 /*
  * 7.0 development database patches
  */
@@ -92,8 +90,8 @@ static int	DBpatch_6050008(void)
 				{
 					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"value", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
 					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
 					{NULL}
 				},
 				NULL
