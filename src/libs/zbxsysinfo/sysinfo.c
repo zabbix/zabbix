@@ -284,6 +284,15 @@ void	zbx_init_metrics(void)
 	commands_local = (ZBX_METRIC *)zbx_malloc(commands_local, sizeof(ZBX_METRIC));
 	commands_local[0].key = NULL;
 
+#if (!defined(WITH_AGENT_METRICS) && !defined(WITH_COMMON_METRICS) &&			\
+		!defined(WITH_HTTP_METRICS) && !defined(WITH_SPECIFIC_METRICS) &&	\
+		!defined(WITH_SIMPLE_METRICS))
+	ZBX_UNUSED(i);
+#if (!defined(WITH_HOSTNAME_METRIC))
+	ZBX_UNUSED(error);
+#endif
+#endif
+
 #ifdef WITH_AGENT_METRICS
 	for (i = 0; NULL != parameters_agent[i].key; i++)
 	{
