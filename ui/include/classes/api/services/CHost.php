@@ -1903,8 +1903,8 @@ class CHost extends CHostGeneral {
 				);
 			}
 
-			// Properties 'auto_compress' and 'uuid' are not supported for hosts.
-			if (array_intersect_key(array_flip(['auto_compress', 'uuid']), $host)) {
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
@@ -2140,8 +2140,8 @@ class CHost extends CHostGeneral {
 				);
 			}
 
-			// Properties 'auto_compress' and 'uuid' are not supported for hosts.
-			if (array_intersect_key(array_flip(['auto_compress', 'uuid']), $host)) {
+			// Property 'auto_compress' is not supported for hosts.
+			if (array_key_exists('auto_compress', $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
