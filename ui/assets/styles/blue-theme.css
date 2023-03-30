@@ -3379,6 +3379,7 @@ form.is-loading {
 .form-submit-hidden {
   position: absolute;
   visibility: hidden;
+  min-height: 0;
   max-height: 0; }
 
 .list-table {
