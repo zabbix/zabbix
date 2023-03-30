@@ -1,1 +1,1 @@
-..F....... [ZBX-22238] fixed non-writable hostgroup appearance in host group field when host is cloned; added warning message when groups are removed from field (miks)
+..F....... [ZBX-22238] fixed non-writable hostgroup appearance in host and host prototype clone forms (miks)
