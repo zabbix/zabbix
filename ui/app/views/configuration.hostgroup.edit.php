@@ -42,6 +42,7 @@ $data += [
 				->addClass('js-clone-hostgroup')
 				->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
 			(new CSimpleButton(_('Delete')))
+				->setAttribute('confirm', _('Delete selected host group?'))
 				->addClass('js-delete-hostgroup'),
 			$cancel_button
 		]

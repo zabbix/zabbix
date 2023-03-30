@@ -43,7 +43,7 @@
 					this._clone();
 				}
 				else if (e.target.classList.contains('js-delete-hostgroup')) {
-					this._delete();
+					this._delete(e.target);
 				}
 			});
 		}
@@ -79,8 +79,10 @@
 			post(curl.getUrl(), {name: fields.name});
 		}
 
-		_delete() {
-			if (!confirm(<?= json_encode(_('Delete selected host group?')) ?>)) {
+		_delete(button) {
+			const confirm_text = button.getAttribute('confirm');
+
+			if (!confirm(confirm_text)) {
 				return;
 			}
 
