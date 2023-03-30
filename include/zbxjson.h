@@ -367,9 +367,15 @@ typedef struct
 }
 zbx_jsonobj_el_t;
 
+typedef struct zbx_jsonpath_index zbx_jsonpath_index_t;
+
 int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath);
 int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char **output);
+int	zbx_jsonobj_query_ext(zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path, char **output);
 void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath);
+
+zbx_jsonpath_index_t	*zbx_jsonpath_index_create(void);
+void	zbx_jsonpath_index_free(zbx_jsonpath_index_t *index);
 
 int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj);
 void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);

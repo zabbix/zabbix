@@ -23,8 +23,6 @@
 #include "zbxjson.h"
 #include "jsonobj.h"
 
-typedef struct zbx_jsonpath_index zbx_jsonpath_index_t;
-
 typedef struct
 {
 	zbx_jsonobj_t			*root;		/* the root object */

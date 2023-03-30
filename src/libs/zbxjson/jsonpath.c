@@ -2832,9 +2832,10 @@ static void	jsonpath_ctx_clear(zbx_jsonpath_context_t *ctx)
  *                                                                            *
  * Purpose: perform jsonpath query on the specified json object               *
  *                                                                            *
- * Parameters: obj    - [IN] the json object                                  *
- *             path   - [IN] the jsonpath                                     *
- *             output - [OUT] the output value                                *
+ * Parameters: obj    - [IN] json object                                  *
+ *             index  - [IN] jsonpath index (optional)                        *
+ *             path   - [IN] jsonpath                                         *
+ *             output - [OUT] output value                                    *
  *                                                                            *
  * Return value: SUCCEED - the query was performed successfully (empty result *
  *                         being counted as successful query)                 *
@@ -3122,7 +3123,7 @@ zbx_jsonpath_index_t	*zbx_jsonpath_index_create(void)
  * Purpose: destroy jsonpath index                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_jsonpath_index_destroy(zbx_jsonpath_index_t *index)
+void	zbx_jsonpath_index_free(zbx_jsonpath_index_t *index)
 {
 	pthread_mutex_destroy(&index->lock);
 	zbx_vector_jsonobj_index_ptr_clear_ext(&index->indexes, jsonobj_index_free);
