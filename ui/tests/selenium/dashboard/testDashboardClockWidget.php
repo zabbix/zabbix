@@ -90,7 +90,8 @@ class testDashboardClockWidget extends CWebTest {
 		]);
 		$hostid = CDataHelper::getIds('host');
 		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.
-				$hostid['Host for clock widget']);
+				$hostid['Host for clock widget']
+		);
 
 		CDataHelper::call('item.create', [
 			[
@@ -207,7 +208,7 @@ class testDashboardClockWidget extends CWebTest {
 		$this->assertEquals('255', $form->query('id:name')->one()->getAttribute('maxlength'));
 
 		// Check fields "Refresh interval" and "Time type" values.
-		$dropdowns =[
+		$dropdowns = [
 			'Refresh interval' => ['Default (15 minutes)',  'No refresh', '10 seconds', '30 seconds',
 					'1 minute', '2 minutes', '10 minutes', '15 minutes'
 			],
