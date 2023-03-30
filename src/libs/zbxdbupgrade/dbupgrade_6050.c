@@ -23,6 +23,7 @@
 #include "zbxexpr.h"
 #include "zbxeval.h"
 #include "zbxalgo.h"
+#include "log.h"
 
 /*
  * 7.0 development database patches
@@ -158,7 +159,7 @@ ZBX_VECTOR_IMPL(fun_stack, expr_fun_call)
 static int	DBpatch_6050009(void)
 {
 	char			*error = NULL;
-	int			ret;
+	int			ret = SUCCEED;
 	zbx_eval_context_t	ctx;
 	int			token_num;
 	const zbx_eval_token_t	*token;
@@ -178,13 +179,13 @@ static int	DBpatch_6050009(void)
 	if (NULL == (result = zbx_db_select("select itemid,params from items where type = 15")))
 		goto clean;
 
-	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		ret = zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION ^ ZBX_EVAL_PARSE_VAR_STR, &error);
+		ret = zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error);
 		if (FAIL == ret)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Failed to parse calculated item expression \"%s\" for"
-					" item with id %s", row[1], row[0]);
+					" item with id %s, error: %s", row[1], row[0], error);
 			goto clean;
 		}
 		zbx_free(error);
@@ -251,20 +252,19 @@ static int	DBpatch_6050009(void)
 		zbx_eval_clear(&ctx);
 
 		if (SUCCEED == ret)
-			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	zbx_db_free_result(result);
-	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
-		if (ZBX_DB_OK > DBexecute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 
 clean:
-	zbx_eval_clear(&ctx);
 	zbx_free(error);
 	zbx_free(substitute);
 
