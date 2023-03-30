@@ -297,6 +297,17 @@ class testFormHost extends CWebTest {
 			);
 		}
 
+		// Check hintbox.
+		$form->query('class:icon-help-hint')->one()->click();
+		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
+
+		// Assert text.
+		$this->assertEquals("Max repetition count is applicable to discovery and walk only.", $hint->one()->getText());
+
+		// Close the hintbox.
+		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->waitUntilNotPresent();
+
 		// Close host form popup to avoid unexpected alert in further cases.
 		if (!$this->standalone) {
 			COverlayDialogElement::find()->one()->close();
@@ -754,6 +765,7 @@ class testFormHost extends CWebTest {
 							'Connect to' => 'DNS',
 							'port' => '200',
 							'SNMP version' => 'SNMPv3',
+							'Max repetition count' => '15',
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
@@ -1183,6 +1195,26 @@ class testFormHost extends CWebTest {
 					'error_title' => 'Cannot update host',
 					'error' => 'Incorrect arguments passed to function.'
 				]
+			],
+			// Zero Max repetition count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Invalid snmp community'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Max repetition count' => 0
+						]
+					],
+					'error_title' => 'Cannot update host',
+					'error' => 'Incorrect arguments passed to function.'
+				]
 			]
 		];
 	}
@@ -1236,6 +1268,7 @@ class testFormHost extends CWebTest {
 							'Connect to' => 'DNS',
 							'port' => '166',
 							'SNMP version' => 'SNMPv3',
+							'Max repetition count' => '10',
 							'Context name' => 'zabbix',
 							'Security name' => 'selenium',
 							'Security level' => 'authPriv',
@@ -1305,6 +1338,7 @@ class testFormHost extends CWebTest {
 							'port' => '122',
 							'Connect to' => 'DNS',
 							'SNMP version' => 'SNMPv3',
+							'Max repetition count' => '1000',
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'authNoPriv',
@@ -1409,6 +1443,7 @@ class testFormHost extends CWebTest {
 							'index' => 2,
 							'port' => '501',
 							'SNMP version' => 'SNMPv3',
+							'Max repetition count' => '20',
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'noAuthNoPriv',
@@ -1666,6 +1701,7 @@ class testFormHost extends CWebTest {
 								'Connect to' => 'IP',
 								'port' => '122',
 								'SNMP version' => 'SNMPv3',
+								'Max repetition count' => '13',
 								'Context name' => 'zabbix',
 								'Security name' => 'selenium',
 								'Security level' => 'authPriv',
