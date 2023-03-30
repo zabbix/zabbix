@@ -89,8 +89,8 @@ class testDashboardClockWidget extends CWebTest {
 			]
 		]);
 		$hostid = CDataHelper::getIds('host');
-
-		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.$hostid['Host for clock widget']);
+		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.
+				$hostid['Host for clock widget']);
 
 		CDataHelper::call('item.create', [
 			[
@@ -200,7 +200,8 @@ class testDashboardClockWidget extends CWebTest {
 	 * Check clock widgets layout.
 	 */
 	public function testDashboardClockWidget_Layout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['Dashboard for creating clock widgets']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for creating clock widgets']);
 		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
 		$form = $dialog->asForm();
 		$this->assertEquals('Add widget', $dialog->getTitle());
@@ -234,10 +235,12 @@ class testDashboardClockWidget extends CWebTest {
 		foreach (['Local time', 'Server time', 'Host time'] as $type) {
 			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
 
-			// If the clock widgets type equals to "Host time", then additional field appears - 'Item',
-			// which requires to select item of the "Host", in this case array_splice function allows us to put
-			// this fields name into the array. Positive offset (4) starts from the beginning of the array,
-			// while - (0) length parameter - specifies how many elements will be removed.
+			/**
+			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
+			 * which requires to select item of the "Host", in this case array_splice function allows us to put
+			 * this fields name into the array. Positive offset (4) starts from the beginning of the array,
+			 * while - (0) length parameter - specifies how many elements will be removed.
+			 */
 			if ($type === 'Host time') {
 				array_splice($fields, 4, 0, ['Item']);
 				$form->checkValue(['Item' => '']);
@@ -260,7 +263,8 @@ class testDashboardClockWidget extends CWebTest {
 	 * the widget name.
 	 */
 	public function testDashboardClockWidget_CheckClockWidgetsName() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['Dashboard for creating clock widgets']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for creating clock widgets']);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('LayoutClock')->edit();
 		$form->fill(['Name' => '']);
@@ -462,9 +466,9 @@ class testDashboardClockWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$update
-			? $linkid = self::$dashboardid['Dashboard for updating clock widgets']
-			: $linkid = self::$dashboardid['Dashboard for creating clock widgets'];
+		$linkid = $update
+			? self::$dashboardid['Dashboard for updating clock widgets']
+			: self::$dashboardid['Dashboard for creating clock widgets'];
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$linkid);
 		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
@@ -611,7 +615,8 @@ class testDashboardClockWidget extends CWebTest {
 	private function checkNoChanges($cancel = false, $create = false, $save_dashboard = true) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['Dashboard for creating clock widgets']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for creating clock widgets']);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -673,7 +678,8 @@ class testDashboardClockWidget extends CWebTest {
 	 * Check clock widgets deletion.
 	 */
 	public function testDashboardClockWidget_Delete() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['Dashboard for creating clock widgets']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for creating clock widgets']);
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget('DeleteClock');
 		$this->assertTrue($widget->isEditable());
