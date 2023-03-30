@@ -18,18 +18,24 @@
 **/
 
 #include "events.h"
-#include "zbxserver.h"
 
-#include "db_lengths.h"
+#include "../db_lengths.h"
+#include "../actions.h"
+
+#include "zbxserver.h"
 #include "log.h"
-#include "actions.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbxexpr.h"
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxjson.h"
+#include "zbxvariant.h"
 #include "zbxconnector.h"
 #include "zbxtagfilter.h"
 
@@ -182,16 +188,16 @@ static void	get_item_tags_by_expression(const zbx_db_trigger *trigger, zbx_vecto
  *             value    - [IN] event value (TRIGGER_VALUE_*,                  *
  *                             TRIGGER_STATE_*, ITEM_STATE_* ... depends on   *
  *                             source and object)                             *
- *             trigger_description         - [IN] trigger description         *
+ *             trigger_description         - [IN]                             *
  *             trigger_expression          - [IN] trigger short expression    *
- *             trigger_recovery_expression - [IN] trigger recovery expression *
- *             trigger_priority            - [IN] trigger priority            *
+ *             trigger_recovery_expression - [IN]                             *
+ *             trigger_priority            - [IN]                             *
  *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
- *             trigger_tags                - [IN] trigger tags                *
- *             trigger_correlation_mode    - [IN] trigger correlation mode    *
- *             trigger_correlation_tag     - [IN] trigger correlation tag     *
- *             trigger_value               - [IN] trigger value               *
- *             trigger_opdata              - [IN] trigger operational data    *
+ *             trigger_tags                - [IN]                             *
+ *             trigger_correlation_mode    - [IN]                             *
+ *             trigger_correlation_tag     - [IN]                             *
+ *             trigger_value               - [IN]                             *
+ *             trigger_opdata              - [IN]                             *
  *             event_name                  - [IN] event name, can be NULL     *
  *             error                       - [IN] error for internal events   *
  *                                                                            *
@@ -323,28 +329,28 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 	return event;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: add closing OK event for the specified problem event to an array  *
- *                                                                            *
- * Parameters: eventid  - [IN] the problem eventid                            *
- *             objectid - [IN] trigger, item ... identifier from database,    *
- *                             depends on source and object                   *
- *             ts       - [IN] event time                                     *
- *             userid   - [IN] the user closing the problem                   *
- *             correlationid - [IN] the correlation rule                      *
- *             c_eventid - [IN] the correlation event                         *
- *             trigger_description         - [IN] trigger description         *
- *             trigger_expression          - [IN] trigger short expression    *
- *             trigger_recovery_expression - [IN] trigger recovery expression *
- *             trigger_priority            - [IN] trigger priority            *
- *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
- *             trigger_opdata              - [IN] trigger operational data    *
- *             event_name                  - [IN] event name                  *
- *                                                                            *
- * Return value: Recovery event, created to close the specified event.        *
- *                                                                            *
- ******************************************************************************/
+/**********************************************************************************************
+ *                                                                                            *
+ * Purpose: add closing OK event for the specified problem event to an array                  *
+ *                                                                                            *
+ * Parameters: eventid                     - [IN] problem eventid                             *
+ *             objectid                    - [IN] trigger, item ... identifier from database, *
+ *                                                depends on source and object                *
+ *             ts                          - [IN] event time                                  *
+ *             userid                      - [IN] user closing the problem                    *
+ *             correlationid               - [IN] correlation rule                            *
+ *             c_eventid                   - [IN] correlation event                           *
+ *             trigger_description         - [IN]                                             *
+ *             trigger_expression          - [IN] trigger short expression                    *
+ *             trigger_recovery_expression - [IN]                                             *
+ *             trigger_priority            - [IN]                                             *
+ *             trigger_type                - [IN] TRIGGER_TYPE_* defines                      *
+ *             trigger_opdata              - [IN] trigger operational data                    *
+ *             event_name                  - [IN]                                             *
+ *                                                                                            *
+ * Return value: Recovery event, created to close the specified event.                        *
+ *                                                                                            *
+ *********************************************************************************************/
 static zbx_db_event	*close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid, const zbx_timespec_t *ts,
 		zbx_uint64_t userid, zbx_uint64_t correlationid, zbx_uint64_t c_eventid,
 		const char *trigger_description, const char *trigger_expression,
@@ -624,9 +630,9 @@ static void	save_event_recovery(void)
  *                                                                            *
  * Purpose: find event index by its source object                             *
  *                                                                            *
- * Parameters: source   - [IN] the event source                               *
- *             object   - [IN] the object type                                *
- *             objectid - [IN] the object id                                  *
+ * Parameters: source   - [IN] event source                                   *
+ *             object   - [IN] object type                                    *
+ *             objectid - [IN]                                                *
  *                                                                            *
  * Return value: the event or NULL                                            *
  *                                                                            *
@@ -652,8 +658,8 @@ static zbx_db_event	*get_event_by_source_object_id(int source, int object, zbx_u
  * Purpose: checks if the event matches the specified host group              *
  *          (including nested groups)                                         *
  *                                                                            *
- * Parameters: event   - [IN] the new event to check                          *
- *             groupid - [IN] the group id to match                           *
+ * Parameters: event   - [IN] new event to check                              *
+ *             groupid - [IN] group id to match                               *
  *                                                                            *
  * Return value: SUCCEED - the group matches                                  *
  *               FAIL    - otherwise                                          *
@@ -698,25 +704,22 @@ static int	correlation_match_event_hostgroup(const zbx_db_event *event, zbx_uint
  *                                                                            *
  * Purpose: checks if the correlation condition matches the new event         *
  *                                                                            *
- * Parameters: condition - [IN] the correlation condition to check            *
- *             event     - [IN] the new event to match                        *
- *             old_value - [IN] SUCCEED - the old event conditions may        *
+ * Parameters: condition - [IN] correlation condition to check                *
+ *             event     - [IN] new event to match                            *
+ *             old_value - [IN] SUCCEED - old event conditions may            *
  *                                        match event                         *
- *                              FAIL    - the old event conditions never      *
+ *                              FAIL    - old event conditions never          *
  *                                        match event                         *
  *                                                                            *
- * Return value: "1"            - the correlation rule match event            *
- *               "0"            - the correlation rule doesn't match event    *
- *               "ZBX_UNKNOWN0" - the correlation rule might match            *
+ * Return value: "1"            - correlation rule match event                *
+ *               "0"            - correlation rule doesn't match event        *
+ *               "ZBX_UNKNOWN " - correlation rule might match                *
  *                                depending on old events                     *
  *                                                                            *
  ******************************************************************************/
-static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *condition,
+static const char	*correlation_condition_match_new_event(const zbx_corr_condition_t *condition,
 		const zbx_db_event *event, int old_value)
 {
-	int		i, ret;
-	zbx_tag_t	*tag;
-
 	/* return SUCCEED for conditions using old events */
 	switch (condition->type)
 	{
@@ -727,6 +730,9 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 
 	switch (condition->type)
 	{
+		int		i, ret;
+		const zbx_tag_t	*tag;
+
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 			for (i = 0; i < event->tags.values_num; i++)
 			{
@@ -740,7 +746,7 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 			for (i = 0; i < event->tags.values_num; i++)
 			{
-				zbx_corr_condition_tag_value_t	*cond = &condition->data.tag_value;
+				const zbx_corr_condition_tag_value_t	*cond = &condition->data.tag_value;
 
 				tag = event->tags.values[i];
 
@@ -778,20 +784,20 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
  *                                                                            *
  * Purpose: checks if the correlation rule might match the new event          *
  *                                                                            *
- * Parameters: correlation - [IN] the correlation rule to check               *
- *             event       - [IN] the new event to match                      *
- *             old_value   - [IN] SUCCEED - the old event conditions may      *
+ * Parameters: correlation - [IN] correlation rule to check                   *
+ *             event       - [IN] new event to match                          *
+ *             old_value   - [IN] SUCCEED - old event conditions may          *
  *                                          match event                       *
- *                                FAIL    - the old event conditions never    *
+ *                                FAIL    - old event conditions never        *
  *                                          match event                       *
  *                                                                            *
- * Return value: CORRELATION_MATCH     - the correlation rule match           *
- *               CORRELATION_MAY_MATCH - the correlation rule might match     *
+ * Return value: CORRELATION_MATCH     - correlation rule match               *
+ *               CORRELATION_MAY_MATCH - correlation rule might match         *
  *                                       depending on old events              *
- *               CORRELATION_NO_MATCH  - the correlation rule doesn't match   *
+ *               CORRELATION_NO_MATCH  - correlation rule doesn't match       *
  *                                                                            *
  ******************************************************************************/
-static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlation_t *correlation,
+static zbx_correlation_match_result_t	correlation_match_new_event(const zbx_correlation_t *correlation,
 		const zbx_db_event *event, int old_value)
 {
 	char				*expression, error[256];
@@ -800,7 +806,6 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 	int				pos = 0;
 	zbx_uint64_t			conditionid;
 	zbx_strloc_t			*loc;
-	zbx_corr_condition_t		*condition;
 	double				result;
 	zbx_correlation_match_result_t	ret = CORRELATION_NO_MATCH;
 
@@ -811,6 +816,8 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 
 	for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
+		const zbx_corr_condition_t	*condition;
+
 		if (ZBX_TOKEN_OBJECTID != token.type)
 			continue;
 
@@ -849,7 +856,7 @@ out:
  *                                                                            *
  * Purpose: checks if correlation has operations to change old events         *
  *                                                                            *
- * Parameters: correlation - [IN] the correlation to check                    *
+ * Parameters: correlation - [IN] correlation to check                        *
  *                                                                            *
  * Return value: SUCCEED - correlation has operations to change old events    *
  *               FAIL    - otherwise                                          *
@@ -882,9 +889,9 @@ static int	correlation_has_old_event_operation(const zbx_correlation_t *correlat
  * Parameters: sql         - [IN/OUT]                                              *
  *             sql_alloc   - [IN/OUT]                                              *
  *             sql_offset  - [IN/OUT]                                              *
- *             tag         - [IN] the tag to match                                 *
- *             value       - [IN] the tag value to match                           *
- *             op          - [IN] the matching operation (ZBX_CONDITION_OPERATOR_) *
+ *             tag         - [IN] tag to match                                     *
+ *             value       - [IN] tag value to match                               *
+ *             op          - [IN] matching operation (ZBX_CONDITION_OPERATOR_)     *
  *                                                                                 *
  ***********************************************************************************/
 static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *tag,
@@ -931,13 +938,14 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
  * Purpose: creates sql filter to find events matching a correlation          *
  *          condition                                                         *
  *                                                                            *
- * Parameters: condition - [IN] the correlation condition to match            *
- *             event     - [IN] the new event to match                        *
+ * Parameters: condition - [IN] correlation condition to match                *
+ *             event     - [IN] new event to match                            *
  *                                                                            *
  * Return value: the created filter or NULL                                   *
  *                                                                            *
  ******************************************************************************/
-static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condition, const zbx_db_event *event)
+static char	*correlation_condition_get_event_filter(const zbx_corr_condition_t *condition,
+		const zbx_db_event *event)
 {
 	int			i;
 	zbx_tag_t		*tag;
@@ -1024,15 +1032,15 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
  * Parameters: sql         - [IN/OUT]                                         *
  *             sql_alloc   - [IN/OUT]                                         *
  *             sql_offset  - [IN/OUT]                                         *
- *             correlation - [IN] the correlation rule to match               *
- *             event       - [IN] the new event to match                      *
+ *             correlation - [IN] correlation rule to match                   *
+ *             event       - [IN] new event to match                          *
  *                                                                            *
- * Return value: SUCCEED - the filter was added successfully                  *
+ * Return value: SUCCEED - filter was added successfully                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		zbx_correlation_t *correlation, const zbx_db_event *event)
+		const zbx_correlation_t *correlation, const zbx_db_event *event)
 {
 	char			*expression, *filter;
 	zbx_token_t		token;
@@ -1084,13 +1092,13 @@ out:
  * Purpose: execute correlation operations for the new event and matched      *
  *          old eventid                                                       *
  *                                                                            *
- * Parameters: correlation  - [IN] the correlation to execute                 *
- *             event        - [IN] the new event                              *
- *             old_eventid  - [IN] the old eventid                            *
- *             old_objectid - [IN] the old event source objectid (triggerid)  *
+ * Parameters: correlation  - [IN] correlation to execute                     *
+ *             event        - [IN/OUT] new event                              *
+ *             old_eventid  - [IN]                                            *
+ *             old_objectid - [IN] old event source objectid (triggerid)      *
  *                                                                            *
  ******************************************************************************/
-static void	correlation_execute_operations(zbx_correlation_t *correlation, zbx_db_event *event,
+static void	correlation_execute_operations(const zbx_correlation_t *correlation, zbx_db_event *event,
 		zbx_uint64_t old_eventid, zbx_uint64_t old_objectid)
 {
 	int			i;
@@ -1170,7 +1178,7 @@ zbx_problem_state_t;
  * Purpose: find problem events that must be recovered by global correlation  *
  *          rules and check if the new event must be closed                   *
  *                                                                            *
- * Parameters: event         - [IN] the new event                             *
+ * Parameters: event         - [IN] new event                                 *
  *             problem_state - [IN/OUT] problem state cache variable          *
  *                                                                            *
  * Comments: The correlation data (zbx_event_recovery_t) of events that       *
@@ -1528,8 +1536,8 @@ out:
  *                                                                            *
  * Purpose: update number of open problems                                    *
  *                                                                            *
- * Parameters: trigger_diff    - [IN/OUT] the changeset of triggers that      *
- *                               generated the events in local cache.         *
+ * Parameters: trigger_diff    - [IN/OUT] changeset of triggers that          *
+ *                               generated the events in local cache          *
  *                                                                            *
  * Comments: When a specific event is closed (by correlation or manually) the *
  *           open problem count has to be queried from problem table to       *
@@ -2181,10 +2189,10 @@ static int	flush_events(void)
  *                                                                            *
  * Purpose: recover an event                                                  *
  *                                                                            *
- * Parameters: eventid   - [IN] the event to recover                          *
- *             source    - [IN] the recovery event source                     *
- *             object    - [IN] the recovery event object                     *
- *             objectid  - [IN] the recovery event object id                  *
+ * Parameters: eventid   - [IN]                                               *
+ *             source    - [IN] recovery event source                         *
+ *             object    - [IN] recovery event object                         *
+ *             objectid  - [IN] recovery event object id                      *
  *                                                                            *
  ******************************************************************************/
 static void	recover_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid)
@@ -2224,7 +2232,7 @@ static void	recover_event(zbx_uint64_t eventid, int source, int object, zbx_uint
  * Parameters: ok_events - [IN] the recovery events to process                *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
+static void	process_internal_ok_events(const zbx_vector_ptr_t *ok_events)
 {
 	int			i, object;
 	zbx_uint64_t		objectid, eventid;
@@ -2355,8 +2363,8 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_p
  *                                                                            *
  * Purpose: gets open problems created by the specified triggers              *
  *                                                                            *
- * Parameters: triggerids - [IN] the trigger identifiers (sorted)             *
- *             problems   - [OUT] the problems                                *
+ * Parameters: triggerids - [IN] trigger identifiers (sorted)                 *
+ *             problems   - [OUT]                                             *
  *                                                                            *
  ******************************************************************************/
 static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *problems)
@@ -2458,10 +2466,10 @@ static void	trigger_dep_free(zbx_trigger_dep_t *dep)
  *                                                                            *
  * Purpose: check event dependency based on cached and actual trigger values  *
  *                                                                            *
- * Parameters: event        - [IN] the event to check                         *
- *             deps         - [IN] the trigger dependency data (sorted by     *
+ * Parameters: event        - [IN] event to check                             *
+ *             deps         - [IN] trigger dependency data (sorted by         *
  *                                 triggerid)                                 *
- *             trigger_diff - [IN] the trigger changeset - source of actual   *
+ *             trigger_diff - [IN] trigger changeset - source of actual       *
  *                                 trigger values (sorted by triggerid)       *
  *                                                                            *
  ******************************************************************************/
@@ -2506,9 +2514,9 @@ static int	event_check_dependency(const zbx_db_event *event, const zbx_vector_pt
  *                                                                            *
  * Purpose: checks if the two tag sets have matching tag                      *
  *                                                                            *
- * Parameters: name  - [IN] the name of tag to match                          *
- *             tags1 - [IN] the first tag vector                              *
- *             tags2 - [IN] the second tag vector                             *
+ * Parameters: name  - [IN] name of tag to match                              *
+ *             tags1 - [IN] first tag vector                                  *
+ *             tags2 - [IN] second tag vector                                 *
  *                                                                            *
  * Return value: SUCCEED - both tag sets contains a tag with the specified    *
  *                         name and the same value                            *
@@ -2543,11 +2551,11 @@ static int	match_tag(const char *name, const zbx_vector_tags_t *tags1, const zbx
  *                                                                            *
  * Purpose: processes trigger events                                          *
  *                                                                            *
- * Parameters: trigger_events - [IN] the trigger events to process            *
- *             trigger_diff   - [IN] the trigger changeset                    *
+ * Parameters: trigger_events - [IN] trigger events to process                *
+ *             trigger_diff   - [IN] trigger changeset                        *
  *                                                                            *
  ******************************************************************************/
-static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_ptr_t *trigger_diff)
+static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events, const zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, j, index;
 	zbx_vector_uint64_t	triggerids;
@@ -2700,13 +2708,13 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
  * Purpose: process internal trigger events                                   *
  *          to avoid trigger dependency                                       *
  *                                                                            *
- * Parameters: internal_events - [IN] the internal events to process          *
- *             trigger_events  - [IN] the trigger events used for dependency  *
- *             trigger_diff   -  [IN] the trigger changeset                   *
+ * Parameters: internal_events - [IN] internal events to process              *
+ *             trigger_events  - [IN] trigger events used for dependency      *
+ *             trigger_diff   -  [IN] trigger changeset                       *
  *                                                                            *
  ******************************************************************************/
-static void	process_internal_events_dependency(zbx_vector_ptr_t *internal_events, zbx_vector_ptr_t *trigger_events,
-		zbx_vector_ptr_t *trigger_diff)
+static void	process_internal_events_dependency(const zbx_vector_ptr_t *internal_events,
+		const zbx_vector_ptr_t *trigger_events, const zbx_vector_ptr_t *trigger_diff)
 {
 	int			i, index;
 	zbx_db_event		*event;
@@ -2768,20 +2776,20 @@ static void	process_internal_events_dependency(zbx_vector_ptr_t *internal_events
  *                                                                            *
  * Purpose: processes cached events                                           *
  *                                                                            *
- * Parameters: trigger_diff    - [IN/OUT] the changeset of triggers that      *
+ * Parameters: trigger_diff    - [IN/OUT] The changeset of triggers that      *
  *                               generated the events in local cache. When    *
  *                               processing global correlation rules new      *
  *                               diffs can be added to trigger changeset.     *
  *                               Can be NULL when processing events from      *
  *                               non trigger sources                          *
- *             triggerids_lock - [IN/OUT] the ids of triggers locked by items.*
+ *             triggerids_lock - [IN/OUT] The ids of triggers locked by items.*
  *                               When processing global correlation rules new *
  *                               triggers can be locked and added to this     *
  *                               vector.                                      *
  *                               Can be NULL when processing events from      *
  *                               non trigger sources                          *
  *                                                                            *
- * Return value: The number of processed events                               *
+ * Return value: number of processed events                                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
@@ -2885,9 +2893,9 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
  *                                                                            *
  * Purpose: closes problem event                                              *
  *                                                                            *
- * Parameters: triggerid - [IN] the source trigger id                         *
- *             eventid   - [IN] the event to close                            *
- *             userid    - [IN] the user closing the event                    *
+ * Parameters: triggerid - [IN] source trigger id                             *
+ *             eventid   - [IN] event to close                                *
+ *             userid    - [IN] user closing the event                        *
  *                                                                            *
  * Return value: SUCCEED - the problem was closed                             *
  *               FAIL    - otherwise                                          *

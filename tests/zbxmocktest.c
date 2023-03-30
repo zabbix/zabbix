@@ -25,7 +25,12 @@
 
 /* unresolved symbols needed for linking */
 
-unsigned char	program_type	= 0;
+static unsigned char	program_type	= 0;
+
+unsigned char	get_program_type(void)
+{
+	return program_type;
+}
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
@@ -94,9 +99,6 @@ int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_LOG_LEVEL		= 0;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
-int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
-int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
@@ -161,10 +163,28 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
-static int	config_timeout = 3;
-int		get_config_timeout(void)
+static int	zbx_config_timeout = 3;
+int	get_zbx_config_timeout(void)
 {
-	return config_timeout;
+	return zbx_config_timeout;
+}
+
+static int	zbx_config_enable_remote_commands = 0;
+int	get_zbx_config_enable_remote_commands(void)
+{
+	return zbx_config_enable_remote_commands;
+}
+
+static int	zbx_config_log_remote_commands = 0;
+int	get_zbx_config_log_remote_commands(void)
+{
+	return zbx_config_log_remote_commands;
+}
+
+static int	zbx_config_unsafe_user_parameters = 0;
+int	get_zbx_config_unsafe_user_parameters(void)
+{
+	return zbx_config_unsafe_user_parameters;
 }
 
 /* test itself */

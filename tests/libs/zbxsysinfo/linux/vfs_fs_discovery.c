@@ -70,7 +70,8 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
-	zbx_init_library_sysinfo(get_config_timeout);
+	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
 
 	if (expected_result != (actual_result = vfs_fs_discovery(&request, &result)))
 	{

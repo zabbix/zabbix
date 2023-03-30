@@ -5,6 +5,7 @@ SUBDIRS = \
 	dbconfig \
 	diag \
 	discoverer \
+	events \
 	housekeeper \
 	httppoller \
 	pinger \
@@ -37,8 +38,6 @@ libzbxserver_a_SOURCES = \
 	db_lengths.h \
 	actions.c \
 	actions.h \
-	events.c \
-	events.h \
 	operations.c \
 	operations.h \
 	postinit.c \
@@ -62,6 +61,7 @@ zabbix_server_LDADD = \
 	diag/libzbxdiag_server.a \
 	alerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
+	events/libzbxevents.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \
