@@ -65,7 +65,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testAuditLog');
 		$suite->addTestSuite('testConfiguration');
-//		$suite->addTestSuite('testDependentItems'); TODO: To be fix later
+		$suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testGraphPrototype');

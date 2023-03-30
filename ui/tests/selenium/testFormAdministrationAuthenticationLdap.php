@@ -27,11 +27,13 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 	public function getLdapData() {
 		return [
+			// #0.
 			[
 				[
 					'error' => 'Incorrect value for field "authentication_type": LDAP is not configured.'
 				]
 			],
+			// #1.
 			[
 				[
 					'ldap_settings' => [
@@ -40,6 +42,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'error' => 'Incorrect value for field "ldap_host": cannot be empty.'
 				]
 			],
+			// #2.
 			[
 				[
 					'ldap_settings' => [
@@ -49,6 +52,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'error' => 'Incorrect value for field "ldap_base_dn": cannot be empty.'
 				]
 			],
+			// #3.
 			[
 				[
 					'ldap_settings' => [
@@ -59,6 +63,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'error' => 'Incorrect value for field "ldap_search_attribute": cannot be empty.'
 				]
 			],
+			// #4.
 			[
 				[
 					'ldap_settings' => [
@@ -70,6 +75,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'error' => 'Login name or password is incorrect.'
 				]
 			],
+			// #5.
 			[
 				[
 					'ldap_settings' => [
@@ -82,6 +88,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'error' => 'Login name or password is incorrect.'
 				]
 			],
+			// #6.
 			[
 				[
 					'ldap_settings' => [
@@ -94,6 +101,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'error' => 'Incorrect value for field "ldap_bind_dn": cannot be empty.'
 				]
 			],
+			// #7.
 			[
 				[
 					'user' => 'Admin',
@@ -102,22 +110,22 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						'Enable LDAP authentication' => true,
 						'LDAP host' => PHPUNIT_LDAP_HOST,
 						'Port' => '389',
-						'Base DN' => 'DC=zbx,DC=local',
-						'Search attribute' => 'sAMAccountName',
-						'Bind DN' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
+						'Base DN' => 'dc=zbx,dc=local',
+						'Search attribute' => 'uid',
+						'Bind DN' => 'cn=admin,dc=zbx,dc=local',
 						'Case sensitive login' => true,
 						'Bind password' => PHPUNIT_LDAP_BIND_PASSWORD,
-						'Login' => PHPUNIT_LDAP_USERNAME ,
+						'Login' => PHPUNIT_LDAP_USERNAME,
 						'User password' => PHPUNIT_LDAP_USER_PASSWORD
 					],
 					'db_check' => [
 						'authentication_type' => '1',
 						'ldap_host' => PHPUNIT_LDAP_HOST,
 						'ldap_port' => '389',
-						'ldap_base_dn' => 'DC=zbx,DC=local',
-						'ldap_bind_dn' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
+						'ldap_base_dn' => 'dc=zbx,dc=local',
+						'ldap_bind_dn' => 'cn=admin,dc=zbx,dc=local',
 						'ldap_bind_password' => PHPUNIT_LDAP_BIND_PASSWORD,
-						'ldap_search_attribute' => 'sAMAccountName',
+						'ldap_search_attribute' => 'uid',
 						'http_auth_enabled' => '0',
 						'http_login_form' => '0',
 						'http_strip_domains' => '',
