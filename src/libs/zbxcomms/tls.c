@@ -277,12 +277,12 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 static int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session, ssize_t err)
 {
 	zbx_pollfd_t	pd;
-	int		ret;
+	int		ret, event;
 
 	ZBX_UNUSED(err);
 
 	pd.fd = s;
-	pd.events = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
+	pd.events = event = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
 
 	if (0 > (ret = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 	{
@@ -292,7 +292,7 @@ static int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session, ssize_t err)
 		return SUCCEED;
 	}
 
-	if (1 == ret && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+	if (1 == ret && 0 == (pd.revents & event))
 		return FAIL;
 
 	return SUCCEED;
@@ -318,7 +318,7 @@ static int	tls_is_nonblocking_error(ssize_t err)
 static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 {
 	zbx_pollfd_t	pd;
-	int		ret;
+	int		ret, event;
 
 	ZBX_UNUSED(ctx);
 
@@ -335,6 +335,8 @@ static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 			return FAIL;
 	}
 
+	event = pd.events;
+
 	if (0 > (ret = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 	{
 		if (SUCCEED != socket_had_nonblocking_error())
@@ -343,7 +345,7 @@ static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 		return SUCCEED;
 	}
 
-	if (1 == ret && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+	if (1 == ret && 0 == (pd.revents & event))
 		return FAIL;
 
 	return SUCCEED;

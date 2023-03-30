@@ -404,7 +404,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 		}
 	}
 
-	if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+	if (0 == (pd.revents & POLLOUT))
 	{
 		*error = zbx_strdup(NULL, "connection error");
 		return FAIL;
@@ -614,7 +614,7 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 					return ZBX_PROTO_ERROR;
 				}
 			}
-			else if (0 != rc && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+			else if (0 != rc && 0 == (pd.revents & POLLOUT))
 			{
 				zbx_set_socket_strerror("connection error");
 				return ZBX_PROTO_ERROR;
@@ -1036,7 +1036,7 @@ static ssize_t	tcp_peek(zbx_socket_t *s, char *buffer, size_t size)
 			continue;
 		}
 
-		if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+		if (0 == (pd.revents & POLLIN))
 			return FAIL;
 
 		if (0 <= (n = ZBX_TCP_RECV(s->socket, buffer, size, MSG_PEEK)))
@@ -1096,7 +1096,7 @@ static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size)
 			continue;
 		}
 
-		if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+		if (0 == (pd.revents & POLLIN))
 		{
 			zbx_set_socket_strerror("connection error");
 			return ZBX_PROTO_ERROR;
@@ -2388,7 +2388,7 @@ int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout
 				return FAIL;
 			}
 
-			if (0 != rc && 0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+			if (0 != rc && 0 == (pd.revents & POLLOUT))
 			{
 				zbx_set_socket_strerror("connection error");
 				return FAIL;
@@ -2459,7 +2459,7 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 				}
 			}
 
-			if (0 != (pd.revents & (POLLERR | POLLHUP | POLLNVAL)))
+			if (0 == (pd.revents & POLLOUT))
 			{
 				zbx_set_socket_strerror("connection error");
 				return FAIL;
