@@ -59,15 +59,14 @@ void	zbx_list_destroy(zbx_list_t *list)
  * Purpose: allocate memory and initialize a new list item                    *
  *                                                                            *
  * Parameters: list     - [IN]                                                *
- *             value    - [IN] data to be stored                              *
+ *             value    - [IN] Data to be stored. Ownership of 'value' goes   *
+ *                             to list item.                                  *
  *             created  - [OUT] pointer to the created list item              *
  *                                                                            *
  ******************************************************************************/
 static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **created)
 {
 	zbx_list_item_t *item;
-
-	ZBX_UNUSED(list);
 
 	item = (zbx_list_item_t *)list->mem_malloc_func(NULL, sizeof(zbx_list_item_t));
 	item->next = NULL;
@@ -83,7 +82,8 @@ static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **cr
  * Parameters: list     - [IN]                                                *
  *             after    - [IN] specified position (can be NULL to insert at   *
  *                             the end of the list)                           *
- *             value    - [IN] value to be inserted                           *
+ *             value    - [IN] Value to be inserted. Ownership of 'value'     *
+ *                             goes to list item.                             *
  *             inserted - [OUT] pointer to the inserted list item             *
  *                                                                            *
  ******************************************************************************/
@@ -118,7 +118,8 @@ void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value
  * Purpose: append value to the end of the list                               *
  *                                                                            *
  * Parameters: list     - [IN]                                                *
- *             value    - [IN] value to append                                *
+ *             value    - [IN] Value to append. Ownership of 'value' goes to  *
+ *                             list item.                                     *
  *             inserted - [OUT] pointer to the inserted list item             *
  *                                                                            *
  ******************************************************************************/
@@ -132,7 +133,8 @@ void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
  * Purpose: prepend value to the beginning of the list                        *
  *                                                                            *
  * Parameters: list     - [IN]                                                *
- *             value    - [IN] value to prepend                               *
+ *             value    - [IN] Value to prepend. Ownership of 'value' goes to *
+ *                             list item.                                     *
  *             inserted - [OUT] pointer to the inserted list item             *
  *                                                                            *
  ******************************************************************************/
@@ -156,7 +158,8 @@ void	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
  * Purpose: removes a value from the beginning of the list                    *
  *                                                                            *
  * Parameters: list  - [IN]                                                   *
- *             value - [OUT]                                                  *
+ *             value - [IN/OUT] pointer to data removed from list. Ownership  *
+ *                              goes to caller.                               *
  *                                                                            *
  * Return value: SUCCEED is returned if list is not empty, otherwise, FAIL is *
  *               returned.                                                    *
@@ -185,10 +188,11 @@ int	zbx_list_pop(zbx_list_t *list, void **value)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get value from the queue without dequeuing                        *
+ * Purpose: get value from the list without removing                          *
  *                                                                            *
  * Parameters: list  - [IN]                                                   *
- *             value - [OUT]                                                  *
+ *             value - [OUT] non-owning pointer to data stored in first       *
+ *                           element of list                                  *
  *                                                                            *
  * Return value: SUCCEED is returned if list is not empty, otherwise, FAIL is *
  *               returned.                                                    *
@@ -248,7 +252,8 @@ int	zbx_list_iterator_next(zbx_list_iterator_t *iterator)
  * Purpose: get value without removing it from list                           *
  *                                                                            *
  * Parameters: iterator - [IN]  initialized list iterator                     *
- *             value    - [OUT]                                               *
+ *             value    - [OUT]  non-owning pointer to data stored in element *
+ *                               pointed to by iterator                       *
  *                                                                            *
  * Return value: SUCCEED is returned if item exists, otherwise, FAIL is       *
  *               returned.                                                    *

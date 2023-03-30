@@ -123,7 +123,7 @@ void	zbx_queue_ptr_destroy(zbx_queue_ptr_t *queue)
  * Purpose: pushes value in the queue                                         *
  *                                                                            *
  * Parameters: queue - [IN]                                                   *
- *             elem  - [IN]                                                   *
+ *             value - [IN] Data to push onto queue. Ownership goes to queue. *
  *                                                                            *
  ******************************************************************************/
 void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *value)
