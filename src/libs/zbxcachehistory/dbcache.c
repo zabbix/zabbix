@@ -4408,6 +4408,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 						value_flags);
 				return;
 			}
+
 			dc_local_add_history_text(itemid, value_type, &ts, value->data.str, lastlogsize, mtime,
 					value_flags);
 			break;
@@ -4749,9 +4750,6 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				cache->stats.history_log_counter++;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
-				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA");
-				THIS_SHOULD_NEVER_HAPPEN;
-				exit(EXIT_FAILURE);
 				cache->stats.history_bin_counter++;
 				break;
 			case ITEM_VALUE_TYPE_NONE:

@@ -55,14 +55,16 @@ int	zbx_base64_validate(const char *p_str)
 {
 	size_t	i;
 
+	/* consider empty strings - valid Base64 encodings */
 	if ('\0' == p_str[0])
 		return SUCCEED;
 
-	for (i = 1; '\0' != p_str[i]; i++)
+	for (i = 1; '\0' != p_str[i] || (0 == i % 4); i++)
 	{
-		if (i < 4 || 0 != i % 4)
+		if (0 != i % 4)
 			continue;
-		/* validate first block: (?:[A-Za-z0-9+\\/]{4}) */
+
+		/* validate first/repeated block: (?:[A-Za-z0-9+\\/]{4}) */
 		if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
 				SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) &&
 				SUCCEED == base64_block_regex_is_valid(p_str[i - 2]) &&
@@ -73,7 +75,7 @@ int	zbx_base64_validate(const char *p_str)
 			else
 				continue;
 		}
-		/* validate second block: (?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4}) */
+		/* validate second/final block: (?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4}) */
 		else if ('\0' == p_str[i])
 		{
 			if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
@@ -99,6 +101,7 @@ int	zbx_base64_validate(const char *p_str)
 			else
 				return FAIL;
 		}
+		return FAIL;
 	}
 
 	return FAIL;
