@@ -2,10 +2,10 @@
 
 SUBDIRS = \
 	alerter \
-	dbsyncer \
 	dbconfig \
 	diag \
 	discoverer \
+	events \
 	housekeeper \
 	httppoller \
 	pinger \
@@ -18,7 +18,6 @@ SUBDIRS = \
 	vmware \
 	taskmanager \
 	ipmi \
-	odbc \
 	scripts \
 	stats \
 	preproc \
@@ -39,8 +38,6 @@ libzbxserver_a_SOURCES = \
 	db_lengths.h \
 	actions.c \
 	actions.h \
-	events.c \
-	events.h \
 	operations.c \
 	operations.h \
 	postinit.c \
@@ -59,11 +56,12 @@ zabbix_server_SOURCES = \
 	server.c
 
 zabbix_server_LDADD = \
-	dbsyncer/libzbxdbsyncer.a \
+	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
 	alerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
+	events/libzbxevents.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \
@@ -78,11 +76,11 @@ zabbix_server_LDADD = \
 	proxyconfigread/libzbxproxyconfigread.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
-	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	availability/libavailability.a \
 	connector/libconnector.a \
 	service/libservice.a \
+	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \

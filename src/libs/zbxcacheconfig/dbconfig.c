@@ -84,6 +84,8 @@ ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 
+static zbx_get_program_type_f	get_program_type_cb = NULL;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validate macro value when expanding user macros                   *
@@ -102,8 +104,6 @@ ZBX_DC_CONFIG		*config = NULL;
 zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
 zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
 zbx_shmem_info_t	*config_mem;
-
-extern unsigned char	program_type;
 
 ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
 
@@ -831,7 +831,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	{
 		/* load default config data */
 
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 
 		config_table = zbx_db_get_table("config");
@@ -6887,7 +6887,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	START_SYNC;
 	sec = zbx_time();
 	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync,
-			config_vault);
+			config_vault, get_program_type_cb());
 	um_cache_sec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6897,7 +6897,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	FINISH_SYNC;
 
 	/* postpone configuration sync until macro secrets are received from Zabbix server */
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
+	if (0 == (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
 			ZBX_DBSYNC_INIT == mode)
 	{
 		goto clean;
@@ -8009,11 +8009,13 @@ static int	__config_session_compare(const void *d1, const void *d2)
  * Purpose: Allocate shared memory for configuration cache                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_init_configuration_cache(char **error)
+int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, char **error)
 {
 	int	i, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_UI64, __func__, CONFIG_CONF_CACHE_SIZE);
+
+	get_program_type_cb = get_program_type;
 
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto out;
@@ -8213,7 +8215,7 @@ int	zbx_init_configuration_cache(char **error)
 	config->proxy_lastaccess_ts = time(NULL);
 
 	/* create data session token for proxies */
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY))
 	{
 		char	*token;
 
@@ -11361,7 +11363,7 @@ int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts
 	/* Don't try activating interface if:                */
 	/* - (server, proxy) host is not monitored any more; */
 	/* - (server) host is monitored by proxy.            */
-	if ((0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
+	if ((0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
 			HOST_STATUS_MONITORED != dc_host->status)
 	{
 		goto unlock;
@@ -11426,7 +11428,7 @@ int	zbx_dc_interface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *
 	/* Don't try deactivating interface if:               */
 	/* - (server, proxy) host is not monitored any more;  */
 	/* - (server) host is monitored by proxy.             */
-	if ((0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
+	if ((0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
 			HOST_STATUS_MONITORED != dc_host->status)
 	{
 		goto unlock;
@@ -12987,7 +12989,7 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 		/* not updated its status during the maximum proxy heartbeat period.  */
 		/* In this case reset all interfaces to unknown status.               */
 		if (0 == interface->reset_availability &&
-				0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != host->proxy_hostid)
+				0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) && 0 != host->proxy_hostid)
 		{
 			ZBX_DC_PROXY	*proxy;
 
@@ -15723,3 +15725,40 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 #	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
 #endif
 
+void	zbx_recalc_time_period(int *ts_from, int table_group)
+{
+#define HK_CFG_UPDATE_INTERVAL	5
+	time_t			least_ts = 0, now;
+	zbx_config_t		cfg;
+	static time_t		last_cfg_retrieval = 0;
+	static zbx_config_hk_t	hk;
+
+	now = time(NULL);
+
+	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
+	{
+		last_cfg_retrieval = now;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk = cfg.hk;
+	}
+
+	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
+	{
+		if (1 != hk.history_global)
+			return;
+
+		least_ts = now - hk.history;
+	}
+	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
+	{
+		if (1 != hk.trends_global)
+			return;
+
+		least_ts = now - hk.trends + 1;
+	}
+
+	if (least_ts > *ts_from)
+		*ts_from = (int)least_ts;
+#undef HK_CFG_UPDATE_INTERVAL
+}
