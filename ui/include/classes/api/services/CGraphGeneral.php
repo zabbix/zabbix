@@ -599,14 +599,8 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateCreate(array &$graphs) {
 		$colorValidator = new CColorValidator();
 
-		self::addHostStatus($graphs);
-
 		$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-			'host_status' =>	['type' => API_ANY],
-			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('graphs', 'uuid')]
-			]],
+			'uuid' => ['type' => API_UUID],
 			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 		]];
 
@@ -682,50 +676,43 @@ abstract class CGraphGeneral extends CApiService {
 		unset($graph);
 
 		$this->validateHostsAndTemplates($graphs);
-		$this->checkAndAddUuid($graphs, [], $templated_graph_indexes);
+		$this->checkAndAddUuid($graphs, $templated_graph_indexes);
 	}
 
 	/**
 	 * Check that only graphs on templates have UUID. Add UUID to all graphs on templates, if it does not exists.
 	 *
-	 * @param array $graphs
-	 * @param array $db_graphs
+	 * @param array $graphs_to_create
 	 * @param array $templated_graph_indexes
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$graphs, array $db_graphs, array $templated_graph_indexes): void {
-		$new_graph_uuids = [];
+	protected function checkAndAddUuid(array &$graphs_to_create, array $templated_graph_indexes): void {
+		foreach ($graphs_to_create as $index => &$graph) {
+			if (!array_key_exists($index, $templated_graph_indexes) && array_key_exists('uuid', $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1),
+						_s('unexpected parameter "%1$s"', 'uuid')
+					)
+				);
+			}
 
-		foreach ($graphs as $index => &$graph) {
-			if (array_key_exists($index, $templated_graph_indexes)) {
-				$db_uuid = array_key_exists('graphid', $graph) && array_key_exists($graph['graphid'], $db_graphs)
-					? $db_graphs[$graph['graphid']]['uuid']
-					: '';
-
-				if (!array_key_exists('uuid', $graph)) {
-					$graph['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
-				}
-
-				if ($graph['uuid'] !== $db_uuid) {
-					$new_graph_uuids[] = $graph['uuid'];
-				}
+			if (array_key_exists($index, $templated_graph_indexes) && !array_key_exists('uuid', $graph)) {
+				$graph['uuid'] = generateUuidV4();
 			}
 		}
 		unset($graph);
 
-		if ($new_graph_uuids) {
-			$db_uuid = DB::select('graphs', [
-				'output' => ['uuid'],
-				'filter' => ['uuid' => $new_graph_uuids],
-				'limit' => 1
-			]);
+		$db_uuid = DB::select('graphs', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($graphs_to_create, 'uuid')],
+			'limit' => 1
+		]);
 
-			if ($db_uuid) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-				);
-			}
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
 		}
 	}
 
@@ -800,14 +787,8 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
 
-		self::addHostStatus($graphs);
-
-		$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-			'host_status' => ['type' => API_ANY],
-			'uuid' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-				['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('graphs', 'uuid')]
-			]],
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'uuid' => ['type' => API_UUID],
 			'name' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 		]];
 
@@ -826,7 +807,6 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		$read_only_fields = ['templateid', 'flags'];
-		$templated_graph_indexes = [];
 
 		foreach ($graphs as $key => $graph) {
 			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_update, $graph['name']);
@@ -855,7 +835,6 @@ abstract class CGraphGeneral extends CApiService {
 				// if the current graph is templated and new items to be added
 				if (HOST_STATUS_TEMPLATE == $host['status']) {
 					$templatedGraph = $host['hostid'];
-					$templated_graph_indexes[$key] = true;
 
 					$itemIds = [];
 
@@ -898,7 +877,6 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		$this->validateHostsAndTemplates($graphs);
-		$this->checkAndAddUuid($graphs, $dbGraphs, $templated_graph_indexes);
 	}
 
 	/**
@@ -1374,55 +1352,6 @@ abstract class CGraphGeneral extends CApiService {
 
 		if ($graphs) {
 			$this->inherit($graphs, $data['hostids']);
-		}
-	}
-
-	/**
-	 * Extend $graphs by host status in 'host_status' property. It indicates if graph belongs to host or template.
-	 *
-	 * Function is using only the first graph item to determin its host status.
-	 *
-	 * @param array  $graphs       Graphs to extend.
-	 */
-	private static function addHostStatus(array &$graphs): void {
-		$itemids_by_graph = [];
-		foreach ($graphs as $index => $graph) {
-			$itemids_by_graph[$index] = array_column($graph['gitems'], 'itemid');
-		}
-
-		if ($itemids_by_graph) {
-			$itemids = [];
-			foreach ($itemids_by_graph as $grap_itemids) {
-				$itemids += array_flip($grap_itemids);
-			}
-
-			$items = API::Item()->get([
-				'output' => [],
-				'selectHosts' => ['status'],
-				'itemids' => array_keys($itemids),
-				'preservekeys' => true
-			]);
-
-			if (count($items) != count($itemids)) {
-				$items += API::ItemPrototype()->get([
-					'output' => [],
-					'selectHosts' => ['status'],
-					'itemids' => array_keys($itemids),
-					'preservekeys' => true
-				]);
-			}
-
-			foreach ($graphs as $index => &$graph) {
-				$graph += ['host_status' => -1];
-
-				if ($graph['host_status'] == -1) {
-					$itemid = $itemids_by_graph[$index][0];
-					if (array_key_exists($itemid, $items)) {
-						$graph['host_status'] = $items[$itemid]['hosts'][0]['status'];
-					}
-				}
-			}
-			unset($graph);
 		}
 	}
 }
