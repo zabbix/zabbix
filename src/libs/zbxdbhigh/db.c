@@ -20,7 +20,6 @@
 #include "zbxdbhigh.h"
 
 #include "log.h"
-#include "events.h"
 #include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
@@ -1596,19 +1595,17 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  *                                                                            *
  * Purpose: register unknown host and generate event                          *
  *                                                                            *
- * Parameters: host - host name                                               *
- *                                                                            *
  ******************************************************************************/
 void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now)
+		int now, const zbx_events_funcs_t *events_cbs)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
 	zbx_vector_ptr_create(&autoreg_hosts);
 
 	zbx_db_register_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
-	zbx_db_register_host_flush(&autoreg_hosts, proxy_hostid);
+	zbx_db_register_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
 
 	zbx_db_register_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
@@ -1628,7 +1625,7 @@ void	zbx_db_register_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *h
 		int now)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	int 			i;
+	int			i;
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)	/* duplicate check */
 	{
@@ -1794,7 +1791,8 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 	return 0;
 }
 
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
+void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
+		const zbx_events_funcs_t *events_cbs)
 {
 	zbx_autoreg_host_t	*autoreg_host;
 	zbx_uint64_t		autoreg_hostid = 0;
@@ -1890,12 +1888,20 @@ void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t pr
 		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
 		ts.sec = autoreg_host->now;
-		zbx_add_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+
+		if (NULL != events_cbs->add_event_cb)
+		{
+			events_cbs->add_event_cb(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
+					autoreg_host->autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0,
+					0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+		}
 	}
 
-	zbx_process_events(NULL, NULL);
-	zbx_clean_events();
+	if (NULL != events_cbs->process_events_cb)
+		events_cbs->process_events_cb(NULL, NULL);
+
+	if (NULL != events_cbs->clean_events_cb)
+		events_cbs->clean_events_cb();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -3735,42 +3741,3 @@ char	*zbx_db_get_schema_esc(void)
 	return name;
 }
 #endif
-
-void	zbx_recalc_time_period(int *ts_from, int table_group)
-{
-#define HK_CFG_UPDATE_INTERVAL	5
-	int			least_ts, now;
-	zbx_config_t		cfg;
-	static int		last_cfg_retrieval = 0;
-	static zbx_config_hk_t	hk;
-
-	now = (int)time(NULL);
-
-	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
-	{
-		last_cfg_retrieval = now;
-
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
-		hk = cfg.hk;
-	}
-
-	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
-	{
-		if (1 != hk.history_global)
-			return;
-
-		least_ts = now - hk.history;
-	}
-	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
-	{
-		if (1 != hk.trends_global)
-			return;
-
-		least_ts = now - hk.trends + 1;
-	}
-
-
-	if (least_ts > *ts_from)
-		*ts_from = least_ts;
-#undef HK_CFG_UPDATE_INTERVAL
-}

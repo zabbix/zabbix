@@ -22,6 +22,7 @@
 
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {

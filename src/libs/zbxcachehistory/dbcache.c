@@ -23,7 +23,6 @@
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxserver.h"
-#include "events.h"
 #include "zbxmodules.h"
 #include "module.h"
 #include "zbxexport.h"
@@ -58,7 +57,7 @@ static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 static char		*sql = NULL;
 static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
-extern unsigned char	program_type;
+static zbx_get_program_type_f	get_program_type_cb = NULL;
 extern int		CONFIG_DOUBLE_PRECISION;
 
 #define ZBX_IDS_SIZE	10
@@ -205,7 +204,7 @@ void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info)
 	wcache_info->index_free = hc_index_mem->free_size;
 	wcache_info->index_total = hc_index_mem->total_size;
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		wcache_info->trend_free = trend_mem->free_size;
 		wcache_info->trend_total = trend_mem->orig_size;
@@ -1659,8 +1658,9 @@ static void	DCsync_trends(void)
  * Purpose: 1) calculate changeset of trigger fields to be updated            *
  *          2) generate events                                                *
  *                                                                            *
- * Parameters: trigger - [IN] the trigger to process                          *
- *             diffs   - [OUT] the vector with trigger changes                *
+ * Parameters: trigger      - [IN] trigger to process                         *
+ *             add_event_cb - [IN]                                            *
+ *             diffs        - [OUT] vector with trigger changes               *
  *                                                                            *
  * Return value: SUCCEED - trigger processed successfully                     *
  *               FAIL    - no changes                                         *
@@ -1686,7 +1686,7 @@ static void	DCsync_trends(void)
  *        '-' - should never happen                                           *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_process_trigger(zbx_dc_trigger_t *trigger, zbx_vector_ptr_t *diffs)
+static int	process_trigger(zbx_dc_trigger_t *trigger, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *diffs)
 {
 	const char		*new_error;
 	int			new_state, new_value, ret = FAIL;
@@ -1734,22 +1734,24 @@ static int	zbx_process_trigger(zbx_dc_trigger_t *trigger, zbx_vector_ptr_t *diff
 	if (0 == (flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE) && 0 == (event_flags & ZBX_FLAGS_TRIGGER_CREATE_EVENT))
 		goto out;
 
-	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT))
+	if (NULL != add_event_cb)
 	{
-		zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, new_value, trigger->description,
-				trigger->expression, trigger->recovery_expression,
-				trigger->priority, trigger->type, &trigger->tags,
-				trigger->correlation_mode, trigger->correlation_tag, trigger->value, trigger->opdata,
-				trigger->event_name, NULL);
-	}
+		if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT))
+		{
+			add_event_cb(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+					&trigger->timespec, new_value, trigger->description, trigger->expression,
+					trigger->recovery_expression, trigger->priority, trigger->type, &trigger->tags,
+					trigger->correlation_mode, trigger->correlation_tag, trigger->value,
+					trigger->opdata, trigger->event_name, NULL);
+		}
 
-	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
-	{
-		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, new_state, NULL, trigger->expression,
-				trigger->recovery_expression, 0, 0, &trigger->tags, 0, NULL, 0, NULL, NULL,
-				new_error);
+		if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
+		{
+			add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+					&trigger->timespec, new_state, NULL, trigger->expression,
+					trigger->recovery_expression, 0, 0, &trigger->tags, 0, NULL, 0, NULL, NULL,
+					new_error);
+		}
 	}
 
 	zbx_append_trigger_diff(diffs, trigger->triggerid, trigger->priority, flags, trigger->value, new_state,
@@ -1765,7 +1767,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Comments: helper function for zbx_process_triggers()                       *
+ * Comments: helper function for process_triggers()                           *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
@@ -1783,15 +1785,17 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
  * Purpose: process triggers - calculates property changeset and generates    *
  *          events                                                            *
  *                                                                            *
- * Parameters: triggers     - [IN] the triggers to process                    *
- *             trigger_diff - [OUT] the trigger changeset                     *
+ * Parameters: triggers     - [IN] triggers to process                        *
+ *             add_event_cb - [IN]                                            *
+ *             trigger_diff - [OUT] trigger changeset                         *
  *                                                                            *
  * Comments: The trigger_diff changeset must be cleaned by the caller:        *
  *                zbx_vector_ptr_clear_ext(trigger_diff,                      *
  *                              (zbx_clean_func_t)zbx_trigger_diff_free);     *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff)
+static void	process_triggers(zbx_vector_ptr_t *triggers, zbx_add_event_func_t add_event_cb,
+		zbx_vector_ptr_t *trigger_diff)
 {
 	int	i;
 
@@ -1803,7 +1807,7 @@ static void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *t
 	zbx_vector_ptr_sort(triggers, zbx_trigger_topoindex_compare);
 
 	for (i = 0; i < triggers->values_num; i++)
-		zbx_process_trigger((zbx_dc_trigger_t *)triggers->values[i], trigger_diff);
+		process_trigger((zbx_dc_trigger_t *)triggers->values[i], add_event_cb, trigger_diff);
 
 	zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 out:
@@ -1820,7 +1824,8 @@ out:
  *                                      (used for item lookup)                *
  *             history_items     - [IN] the items                             *
  *             history_errcodes  - [IN] item error codes                      *
- *             timers            - [IN] the trigger timers                    *
+ *             timers            - [IN] trigger timers                        *
+ *             add_event_cb      - [IN]                                       *
  *             trigger_diff      - [OUT] trigger updates                      *
  *             itemids           - [OUT] the item identifiers                 *
  *                                      (used for item lookup)                *
@@ -1831,9 +1836,9 @@ out:
  ******************************************************************************/
 static void	recalculate_triggers(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
-		const int *history_errcodes, const zbx_vector_ptr_t *timers, zbx_vector_ptr_t *trigger_diff,
-		zbx_uint64_t *itemids, zbx_timespec_t *timespecs, zbx_hashset_t *trigger_info,
-		zbx_vector_ptr_t *trigger_order)
+		const int *history_errcodes, const zbx_vector_ptr_t *timers, zbx_add_event_func_t add_event_cb,
+		zbx_vector_ptr_t *trigger_diff, zbx_uint64_t *itemids, zbx_timespec_t *timespecs,
+		zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order)
 {
 	int			i, item_num = 0, timers_num = 0;
 
@@ -1895,7 +1900,7 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 
 	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	zbx_evaluate_expressions(trigger_order, history_itemids, history_items, history_errcodes);
-	zbx_process_triggers(trigger_order, trigger_diff);
+	process_triggers(trigger_order, add_event_cb, trigger_diff);
 
 	zbx_dc_free_triggers(trigger_order);
 
@@ -2205,15 +2210,17 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
  *                                                                            *
  * Purpose: calculates what item fields must be updated                       *
  *                                                                            *
- * Parameters: item      - [IN] the item                                      *
- *             h         - [IN] the historical data to process                *
+ * Parameters: item         - [IN/OUT]                                        *
+ *             h            - [IN] historical data to process                 *
+ *             add_event_cb - [IN]                                            *
  *                                                                            *
  * Return value: The update data. This data must be freed by the caller.      *
  *                                                                            *
  * Comments: Will generate internal events when item state switches.          *
  *                                                                            *
  ******************************************************************************/
-static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, const zbx_dc_history_t *h)
+static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, const zbx_dc_history_t *h,
+		zbx_add_event_func_t add_event_cb)
 {
 	zbx_uint64_t	flags = 0;
 	const char	*item_error = NULL;
@@ -2237,8 +2244,11 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" became not supported: %s",
 					item->host.host, item->key_orig, h->value.str);
 
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state, NULL,
-					NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, h->value.err);
+			if (NULL != add_event_cb)
+			{
+				add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
+						NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, h->value.err);
+			}
 
 			if (0 != strcmp(ZBX_NULL2EMPTY_STR(item->error), h->value.err))
 				item_error = h->value.err;
@@ -2248,10 +2258,13 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 			zabbix_log(LOG_LEVEL_WARNING, "item \"%s:%s\" became supported",
 					item->host.host, item->key_orig);
 
-			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
-			/* supported is handled in lld_process_discovery_rule()        */
-			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
-					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+			if (NULL != add_event_cb)
+			{
+				/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
+				/* supported is handled in lld_process_discovery_rule()        */
+				add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
+						NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+			}
 
 			item_error = "";
 		}
@@ -2919,18 +2932,19 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
  * Parameters: history             - [IN/OUT] array of history data           *
  *             itemids             - [IN] the item identifiers                *
  *                                        (used for item lookup)              *
- *             items               - [IN] the items                           *
+ *             items               - [IN]                                     *
  *             errcodes            - [IN] item error codes                    *
  *             history_num         - [IN] number of history structures        *
+ *             add_event_cb        - [IN]                                     *
  *             item_diff           - [OUT] the changes in item data           *
  *             inventory_values    - [OUT] the inventory values to add        *
  *             compression_age     - [IN] history compression age             *
- *             proxy_subscriptions - [IN] history compression age             *
+ *             proxy_subscriptions - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_item_t *items, const int *errcodes,
-		int history_num, zbx_vector_ptr_t *item_diff, zbx_vector_ptr_t *inventory_values, int compression_age,
-		zbx_vector_uint64_pair_t *proxy_subscriptions)
+		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *item_diff,
+		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscriptions)
 {
 	static time_t	last_history_discard = 0;
 	time_t		now;
@@ -3006,7 +3020,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		normalize_item_value(item, h);
 
 		/* calculate item update and update already retrieved item status for trigger calculation */
-		if (NULL != (diff = calculate_item_update(item, h)))
+		if (NULL != (diff = calculate_item_update(item, h, add_event_cb)))
 			zbx_vector_ptr_append(item_diff, diff);
 
 		DCinventory_value_add(inventory_values, item, h);
@@ -3362,9 +3376,10 @@ static void	sync_proxy_history(int *total_num, int *more)
  * Purpose: flush history cache to database, process triggers of flushed      *
  *          and timer triggers from timer queue                               *
  *                                                                            *
- * Parameters: sync_timeout - [IN] the timeout in seconds                     *
+ * Parameters:                                                                *
  *             values_num   - [IN/OUT] the number of synced values            *
  *             triggers_num - [IN/OUT] the number of processed timers         *
+ *             events_cbs   - [IN]                                            *
  *             more         - [OUT] a flag indicating the cache emptiness:    *
  *                               ZBX_SYNC_DONE - nothing to sync, go idle     *
  *                               ZBX_SYNC_MORE - more data to sync            *
@@ -3379,7 +3394,8 @@ static void	sync_proxy_history(int *total_num, int *more)
  *            b) less than 500 (full batch) timer triggers were processed     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_server_history(int *values_num, int *triggers_num, int *more)
+static void	sync_server_history(int *values_num, int *triggers_num,
+		const zbx_events_funcs_t *events_cbs, int *more)
 {
 	static ZBX_HISTORY_FLOAT	*history_float;
 	static ZBX_HISTORY_INTEGER	*history_integer;
@@ -3395,8 +3411,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_t		triggerids ;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers,
 					trigger_order;
-	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
-	zbx_dc_history_t			history[ZBX_HC_SYNC_MAX];
+	zbx_vector_uint64_pair_t	trends_diff, proxy_subscriptions;
+	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
 	zbx_uint64_t			trigger_itemids[ZBX_HC_SYNC_MAX];
 	zbx_timespec_t			trigger_timespecs[ZBX_HC_SYNC_MAX];
 	zbx_history_sync_item_t		*items = NULL;
@@ -3450,7 +3466,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_ptr_create(&item_diff);
 	zbx_vector_ptr_create(&trigger_diff);
 	zbx_vector_uint64_pair_create(&trends_diff);
-	zbx_vector_uint64_pair_create(&proxy_subscribtions);
+	zbx_vector_uint64_pair_create(&proxy_subscriptions);
 
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, ZBX_HC_SYNC_MAX);
@@ -3531,8 +3547,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			um_handle = zbx_dc_open_user_macros();
 
-			DCmass_prepare_history(history, items, errcodes, history_num, &item_diff,
-					&inventory_values, compression_age, &proxy_subscribtions);
+			DCmass_prepare_history(history, items, errcodes, history_num,
+					events_cbs->add_event_cb, &item_diff,
+					&inventory_values, compression_age, &proxy_subscriptions);
 
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
@@ -3549,14 +3566,21 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					DBmass_update_items(&item_diff, &inventory_values);
 					DBmass_update_trends(trends, trends_num, &trends_diff);
 
-					/* process internal events generated by DCmass_prepare_history() */
-					zbx_process_events(NULL, NULL);
+					if (NULL != events_cbs->process_events_cb)
+					{
+						/* process internal events generated by DCmass_prepare_history() */
+						events_cbs->process_events_cb(NULL, NULL);
+					}
 
 					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
+					{
 						DCupdate_trends(&trends_diff);
+					}
 					else
-						zbx_reset_event_recovery();
-
+					{
+						if (NULL != events_cbs->reset_event_recovery_cb)
+							events_cbs->reset_event_recovery_cb();
+					}
 					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
 				while (ZBX_DB_DOWN == txn_error);
@@ -3564,7 +3588,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			zbx_dc_close_user_macros(um_handle);
 
-			zbx_clean_events();
+			if (NULL != events_cbs->clean_events_cb)
+				events_cbs->clean_events_cb();
 
 			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
 			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
@@ -3599,25 +3624,31 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					zbx_db_begin();
 
 					recalculate_triggers(history, history_num, &itemids, items, errcodes,
-							&trigger_timers, &trigger_diff, trigger_itemids,
+							&trigger_timers, events_cbs->add_event_cb, &trigger_diff,
+							trigger_itemids,
 							trigger_timespecs, &trigger_info, &trigger_order);
 
-					/* process trigger events generated by recalculate_triggers() */
-					zbx_process_events(&trigger_diff, &triggerids);
+					if (NULL != events_cbs->process_events_cb)
+					{
+						/* process trigger events generated by recalculate_triggers() */
+						events_cbs->process_events_cb(&trigger_diff, &triggerids);
+					}
+
 					if (0 != trigger_diff.values_num)
 						zbx_db_save_trigger_changes(&trigger_diff);
 
 					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
 						zbx_dc_config_triggers_apply_changes(&trigger_diff);
-					else
-						zbx_clean_events();
+					else if (NULL != events_cbs->clean_events_cb)
+						events_cbs->clean_events_cb();
 
-					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
+					zbx_vector_ptr_clear_ext(&trigger_diff,
+							(zbx_clean_func_t)zbx_trigger_diff_free);
 				}
 				while (ZBX_DB_DOWN == txn_error);
 
-				if (ZBX_DB_OK == txn_error)
-					zbx_events_update_itservices();
+				if (ZBX_DB_OK == txn_error && NULL != events_cbs->events_update_itservices_cb)
+					events_cbs->events_update_itservices_cb();
 			}
 		}
 
@@ -3634,11 +3665,11 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			zbx_vector_ptr_clear(&trigger_timers);
 		}
 
-		if (0 != proxy_subscribtions.values_num)
+		if (0 != proxy_subscriptions.values_num)
 		{
-			zbx_vector_uint64_pair_sort(&proxy_subscribtions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_dc_proxy_update_nodata(&proxy_subscribtions);
-			zbx_vector_uint64_pair_clear(&proxy_subscribtions);
+			zbx_vector_uint64_pair_sort(&proxy_subscriptions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_dc_proxy_update_nodata(&proxy_subscriptions);
+			zbx_vector_uint64_pair_clear(&proxy_subscriptions);
 		}
 
 		if (0 != history_num)
@@ -3731,8 +3762,12 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					0 != connector_filters_events.values_num)
 			{
 				data_offset = 0;
-				zbx_export_events(event_export_enabled, &connector_filters_events, &data, &data_alloc,
-						&data_offset);
+
+				if (NULL != events_cbs->export_events_cb)
+				{
+					events_cbs->export_events_cb(event_export_enabled, &connector_filters_events,
+							&data, &data_alloc, &data_offset);
+				}
 
 				if (0 != data_offset)
 				{
@@ -3743,7 +3778,10 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		}
 
 		if (0 != history_num || 0 != timers_num)
-			zbx_clean_events();
+		{
+			if (NULL != events_cbs->clean_events_cb)
+				events_cbs->clean_events_cb();
+		}
 
 		if (0 != history_num)
 		{
@@ -3778,7 +3816,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
-	zbx_vector_uint64_pair_destroy(&proxy_subscribtions);
+	zbx_vector_uint64_pair_destroy(&proxy_subscriptions);
 
 	zbx_vector_ptr_destroy(&trigger_timers);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -3794,7 +3832,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
  *           unnecessary.                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_history_cache_full(void)
+static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 {
 	int			values_num = 0, triggers_num = 0, more;
 	zbx_hashset_iter_t	iter;
@@ -3814,7 +3852,7 @@ static void	sync_history_cache_full(void)
 	/*   * other parts of the program do not hold pointers to the elements of history queue that is       */
 	/*     stored in the shared memory.                                                                   */
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		/* unlock all triggers before full sync so no items are locked by triggers */
 		zbx_dc_config_unlock_all_triggers();
@@ -3841,8 +3879,8 @@ static void	sync_history_cache_full(void)
 
 		do
 		{
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-				sync_server_history(&values_num, &triggers_num, &more);
+			if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+				sync_server_history(&values_num, &triggers_num, events_cbs, &more);
 			else
 				sync_proxy_history(&values_num, &more);
 
@@ -3913,21 +3951,24 @@ void	zbx_log_sync_history_cache_progress(void)
  *                                                                            *
  * Purpose: writes updates and new data from history cache to database        *
  *                                                                            *
- * Parameters: values_num - [OUT] the number of synced values                  *
- *             more      - [OUT] a flag indicating the cache emptiness:       *
+ * Parameters:                                                                *
+ *             events_cbs   - [IN]                                            *
+ *             values_num   - [OUT] the number of synced values               *
+ *             triggers_num - [OUT]                                           *
+ *             more         - [OUT] a flag indicating the cache emptiness:    *
  *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
  *                                ZBX_SYNC_MORE - more data to sync           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more)
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int *values_num, int *triggers_num, int *more)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
 	*values_num = 0;
 	*triggers_num = 0;
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		sync_server_history(values_num, triggers_num, more);
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+		sync_server_history(values_num, triggers_num, events_cbs, more);
 	else
 		sync_proxy_history(values_num, more);
 }
@@ -4220,8 +4261,11 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		return;
 
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
-	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) &&
+			0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	{
 		return;
+	}
 
 	value_flags = 0;
 
@@ -4243,7 +4287,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 				return;
 
 			/* proxy stores low-level discovery (lld) values in db */
-			if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+			if (0 == (ZBX_PROGRAM_TYPE_SERVER & get_program_type_cb()))
 				dc_local_add_history_lld(itemid, ts, result->text);
 
 			return;
@@ -4342,7 +4386,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
 	if (ZBX_DC_FLAG_NOVALUE == (value_flags & (ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_META)) &&
-			0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		return;
 	}
@@ -4367,7 +4411,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			return;
 
 		/* proxy stores low-level discovery (lld) values in db */
-		if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		if (0 == (ZBX_PROGRAM_TYPE_SERVER & get_program_type_cb()))
 			dc_local_add_history_lld(itemid, &ts, value->data.str);
 
 		return;
@@ -5081,11 +5125,13 @@ out:
  * Purpose: Allocate shared memory for database cache                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_init_database_cache(char **error)
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, char **error)
 {
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	get_program_type_cb = get_program_type;
 
 	if (NULL != cache)
 	{
@@ -5124,7 +5170,7 @@ int	zbx_init_database_cache(char **error)
 	zbx_binary_heap_create_ext(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY,
 			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_hashset_create_ext(&(cache->proxyqueue.index), ZBX_HC_SYNC_MAX,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
@@ -5202,12 +5248,13 @@ int	zbx_get_proxy_history_count(void)
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_all(void)
+static void	DCsync_all(const zbx_events_funcs_t *events_cbs)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	sync_history_cache_full();
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	sync_history_cache_full(events_cbs);
+
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
@@ -5218,12 +5265,12 @@ static void	DCsync_all(void)
  * Purpose: Free memory allocated for database cache                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_database_cache(int sync)
+void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_SYNC_ALL == sync)
-		DCsync_all();
+		DCsync_all(events_cbs);
 
 	cache = NULL;
 
@@ -5235,7 +5282,7 @@ void	zbx_free_database_cache(int sync)
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_shmem_destroy(trend_mem);
 		trend_mem = NULL;

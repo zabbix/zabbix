@@ -30,9 +30,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
-	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a
-	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
-	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 
