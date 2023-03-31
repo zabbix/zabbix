@@ -27,6 +27,12 @@ class CWidgetSvgGraph extends CWidget {
 		this._svg_options = {};
 	}
 
+	_doStart() {
+		super._doStart();
+
+		this._content_body.classList.add('dashboard-grid-widget-svggraph');
+	}
+
 	_doActivate() {
 		super._doActivate();
 

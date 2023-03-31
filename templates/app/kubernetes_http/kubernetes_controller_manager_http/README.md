@@ -3,17 +3,21 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
 The template to monitor Kubernetes Controller manager by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 Template `Kubernetes Controller manager by HTTP` — collects metrics by HTTP agent from Controller manager /metrics endpoint.
 
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Kubernetes Controller manager, version 1.19.10
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
@@ -27,7 +31,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes Controller manager instance version and configuration.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -39,17 +43,17 @@ No specific Zabbix configuration is required.
 |{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} |<p>Maximum number of HTTP client requests failures used for trigger</p> |`2` |
 |{$KUBE.CONTROLLER.SERVER.URL} |<p>Instance URL</p> |`http://localhost:10252/metrics` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Workqueue metrics discovery | |DEPENDENT |kubernetes.controller.workqueue.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "workqueue_*", name =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|Workqueue metrics discovery | |DEPENDENT |kubernetes.controller.workqueue.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "workqueue_*", name =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -82,7 +86,7 @@ There are no template links in this template.
 |Kubernetes Controller |Kubernetes Controller Manager: ["{#NAME}"]: Queue duration seconds bucket, {#LE} |<p>How long in seconds an item stays in workqueue before being requested.</p> |DEPENDENT |kubernetes.controller.queue_duration_seconds_bucket[{#LE},"{#NAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `workqueue_queue_duration_seconds_bucket{name = "{#NAME}",le = "{#LE}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Zabbix raw items |Kubernetes Controller: Get Controller metrics |<p>Get raw metrics from Controller instance /metrics endpoint.</p> |HTTP_AGENT |kubernetes.controller.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -90,7 +94,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 
