@@ -2393,7 +2393,7 @@ out:
  *     big_rec         - [IN/OUT] state variable to remember whether a long   *
  *                       record is being processed                            *
  *     encoding        - [IN] text string describing encoding.                *
- *                       See function zbx_find_cr_lf_szbyte() for supported       *
+ *                       See function zbx_find_cr_lf_szbyte() for supported   *
  *                       encodings.                                           *
  *                       "" (empty string) means a single-byte character set  *
  *                       (e.g. ASCII).                                        *
@@ -3262,7 +3262,7 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     logfiles_new     - [OUT] new array of logfiles                         *
  *     logfiles_num_new - [OUT] number of elements in "logfiles_new"          *
  *     encoding         - [IN] text string describing encoding.               *
- *                        See function zbx_find_cr_lf_szbyte() for supported      *
+ *                        See function zbx_find_cr_lf_szbyte() for supported  *
  *                        encodings.                                          *
  *                        "" (empty string) means a single-byte character set *
  *                        (e.g. ASCII).                                       *
