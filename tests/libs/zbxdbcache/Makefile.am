@@ -34,6 +34,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
@@ -43,7 +44,6 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
@@ -223,7 +223,7 @@ dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue
-	
+
 dc_expand_user_macros_in_func_params_SOURCES = \
 	dc_expand_user_macros_in_func_params.c
 dc_expand_user_macros_in_func_params_LDADD = \
@@ -274,7 +274,7 @@ um_cache_resolve_cont_CFLAGS = \
 um_cache_resolve_cont_SOURCES = \
 	um_cache_resolve_cont.c \
 	um_cache_mock.c \
-	um_cache_mock.h 
+	um_cache_mock.h
 um_cache_resolve_cont_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 um_cache_resolve_cont_LDFLAGS = @SERVER_LDFLAGS@ \

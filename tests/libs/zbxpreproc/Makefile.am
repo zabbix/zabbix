@@ -30,7 +30,6 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
@@ -39,13 +38,15 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a
+
 
 zbx_item_preproc_SOURCES = \
 	zbx_item_preproc.c
-	
+
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 
 zbx_item_preproc_LDADD += @SERVER_LIBS@
@@ -55,7 +56,7 @@ zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAG
 
 item_preproc_xpath_SOURCES = \
 	item_preproc_xpath.c \
-	$(COMMON_SRC_FILES) 
+	$(COMMON_SRC_FILES)
 
 item_preproc_xpath_LDADD = $(JSON_LIBS)
 
