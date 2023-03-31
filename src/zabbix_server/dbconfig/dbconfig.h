@@ -27,6 +27,8 @@ typedef struct
 {
 	zbx_config_vault_t	*config_vault;
 	int			config_timeout;
+	int			proxyconfig_frequency;
+	int			proxydata_frequency;
 }
 zbx_thread_dbconfig_args;
 

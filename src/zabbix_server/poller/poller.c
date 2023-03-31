@@ -212,18 +212,21 @@ out:
  *                                                                                 *
  * Purpose: deactivate item interface                                              *
  *                                                                                 *
- * Parameters: ts                - [IN] timestamp                                  *
- *             item              - [IN/OUT] item                                   *
- *             data              - [IN/OUT] serialized availability data           *
- *             data_alloc        - [IN/OUT] serialized availability data size      *
- *             data_alloc        - [IN/OUT] serialized availability data offset    *
- *             ts                - [IN] timestamp                                  *
- *             unavailable_delay - [IN]                                            *
- *             error             - [IN/OUT]                                        *
+ * Parameters: ts                 - [IN] timestamp                                 *
+ *             item               - [IN/OUT] item                                  *
+ *             data               - [IN/OUT] serialized availability data          *
+ *             data_alloc         - [IN/OUT] serialized availability data size     *
+ *             data_alloc         - [IN/OUT] serialized availability data offset   *
+ *             ts                 - [IN] timestamp                                 *
+ *             unavailable_delay  - [IN]                                           *
+ *             unreachable_period - [IN]                                           *
+ *             unreachable_delay  - [IN]                                           *
+ *             error              - [IN/OUT]                                       *
  *                                                                                 *
  ***********************************************************************************/
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsigned char **data, size_t *data_alloc,
-		size_t *data_offset, int unavailable_delay, const char *error)
+		size_t *data_offset, int unavailable_delay, int unreachable_period, int unreachable_delay,
+		const char *error)
 {
 	zbx_interface_availability_t	in, out;
 
@@ -238,8 +241,8 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsi
 
 	interface_get_availability(&item->interface, &in);
 
-	if (FAIL == zbx_dc_interface_deactivate(item->interface.interfaceid, ts, unavailable_delay, &in.agent, &out.agent,
-			error))
+	if (FAIL == zbx_dc_interface_deactivate(item->interface.interfaceid, ts, unavailable_delay, unreachable_period,
+			unreachable_delay, &in.agent, &out.agent, error))
 	{
 		goto out;
 	}
@@ -809,6 +812,9 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  *             config_comms        - [IN] server/proxy configuration for      *
  *                                      communication                         *
  *             config_startup_time - [IN] program startup time                *
+ *             config_unavailable_delay   - [IN]                              *
+ *             config_unreachable_period  - [IN]                              *
+ *             config_unreachable_delay   - [IN]                              *
  *                                                                            *
  * Return value: number of items processed                                    *
  *                                                                            *
@@ -817,7 +823,8 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  *                                                                            *
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, int config_unavailable_delay)
+		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
+		int config_unreachable_delay)
 {
 	zbx_dc_item_t		item, *items;
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
@@ -867,7 +874,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 				if (INTERFACE_AVAILABLE_FALSE != last_available)
 				{
 					zbx_deactivate_item_interface(&timespec, &items[i], &data, &data_alloc,
-							&data_offset, config_unavailable_delay, results[i].msg);
+							&data_offset, config_unavailable_delay,
+							config_unreachable_period, config_unreachable_delay,
+							results[i].msg);
 					last_available = INTERFACE_AVAILABLE_FALSE;
 				}
 				break;
@@ -1014,7 +1023,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		}
 
 		processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
-				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay);
+				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
+				poller_args_in->config_unreachable_period, poller_args_in->config_unreachable_delay);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

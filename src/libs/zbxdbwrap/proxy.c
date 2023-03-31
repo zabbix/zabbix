@@ -40,8 +40,6 @@
 #include "zbxcachehistory.h"
 #include "zbxpreproc.h"
 
-extern char	*CONFIG_SERVER;
-
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
 
@@ -355,6 +353,7 @@ int	zbx_get_active_proxy_from_request(const struct zbx_json_parse *jp, zbx_dc_pr
  *     req            - [IN] request, included into error message             *
  *     config_tls     - [IN] configured requirements to allow access          *
  *     config_timeout - [IN]                                                  *
+ *     server         - [IN]                                                  *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - access is allowed                                            *
@@ -362,11 +361,11 @@ int	zbx_get_active_proxy_from_request(const struct zbx_json_parse *jp, zbx_dc_pr
  *                                                                            *
  ******************************************************************************/
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *config_tls, int config_timeout)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *server)
 {
 	char	*msg = NULL;
 
-	if (FAIL == zbx_tcp_check_allowed_peers(sock, CONFIG_SERVER))
+	if (FAIL == zbx_tcp_check_allowed_peers(sock, server))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer,
 				zbx_socket_strerror());
@@ -2833,10 +2832,12 @@ static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_off
  * Parameters: ts          - [IN] timestamp when the proxy connection was     *
  *                                established                                 *
  *             proxy_staus - [IN] - active or passive proxy                   *
+ *             proxydata_frequency - [IN]                                     *
  *             diff        - [IN/OUT] the properties to update                *
  *                                                                            *
  ******************************************************************************/
-static void	check_proxy_nodata(const zbx_timespec_t *ts, unsigned char proxy_status, zbx_proxy_diff_t *diff)
+static void	check_proxy_nodata(const zbx_timespec_t *ts, unsigned char proxy_status, int proxydata_frequency,
+		zbx_proxy_diff_t *diff)
 {
 	int	delay;
 
@@ -2849,7 +2850,7 @@ static void	check_proxy_nodata(const zbx_timespec_t *ts, unsigned char proxy_sta
 	delay = ts->sec - diff->lastaccess;
 
 	if ((HOST_STATUS_PROXY_PASSIVE == proxy_status &&
-			(2 * CONFIG_PROXYDATA_FREQUENCY) < delay && NET_DELAY_MAX < delay) ||
+			(2 * proxydata_frequency) < delay && NET_DELAY_MAX < delay) ||
 			(HOST_STATUS_PROXY_ACTIVE == proxy_status && NET_DELAY_MAX < delay))
 	{
 		diff->nodata_win.values_num = 0;
@@ -2899,6 +2900,7 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *                                 established                                *
  *             proxy_status - [IN] active or passive proxy mode               *
  *             events_cbs   - [IN]                                            *
+ *             proxydata_frequency - [IN]                                     *
  *             more         - [OUT] available data flag                       *
  *             error        - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *
@@ -2908,7 +2910,8 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *                                                                            *
  ******************************************************************************/
 int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
-		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int *more, char **error)
+		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
+		char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED, flags_old;
@@ -2944,7 +2947,8 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *j
 
 	proxy_diff.flags |= ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY;
 	flags_old = proxy_diff.nodata_win.flags;
-	check_proxy_nodata(ts, proxy_status, &proxy_diff);	/* first packet can be empty for active proxy */
+	/* first packet can be empty for active proxy */
+	check_proxy_nodata(ts, proxy_status, proxydata_frequency, &proxy_diff);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d period_end:%d delay:%d"
 			" timestamp:%d lastaccess:%d proxy_delay:%d more:%d", __func__, proxy_diff.nodata_win.flags,

@@ -5005,7 +5005,7 @@ int	hc_get_history_compression_age(void)
 
 ZBX_SHMEM_FUNC_IMPL(__trend, trend_mem)
 
-static int	init_trend_cache(char **error)
+static int	init_trend_cache(zbx_uint64_t trends_cache_size, char **error)
 {
 	size_t	sz;
 	int	ret;
@@ -5016,13 +5016,13 @@ static int	init_trend_cache(char **error)
 		goto out;
 
 	sz = zbx_shmem_required_size(1, "trend cache", "TrendCacheSize");
-	if (SUCCEED != (ret = zbx_shmem_create(&trend_mem, CONFIG_TRENDS_CACHE_SIZE, "trend cache", "TrendCacheSize", 0,
+	if (SUCCEED != (ret = zbx_shmem_create(&trend_mem, trends_cache_size, "trend cache", "TrendCacheSize", 0,
 			error)))
 	{
 		goto out;
 	}
 
-	CONFIG_TRENDS_CACHE_SIZE -= sz;
+	trends_cache_size -= sz;
 
 	cache->trends_num = 0;
 	cache->trends_last_cleanup_hour = 0;
@@ -5047,7 +5047,8 @@ out:
  * Purpose: Allocate shared memory for database cache                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, char **error)
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_uint64_t history_cache_size,
+		zbx_uint64_t history_index_cache_size,zbx_uint64_t trends_cache_size, char **error)
 {
 	int	ret;
 
@@ -5067,13 +5068,13 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, char **erro
 	if (SUCCEED != (ret = zbx_mutex_create(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_shmem_create(&hc_mem, CONFIG_HISTORY_CACHE_SIZE, "history cache",
+	if (SUCCEED != (ret = zbx_shmem_create(&hc_mem, history_cache_size, "history cache",
 			"HistoryCacheSize", 1, error)))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_shmem_create(&hc_index_mem, CONFIG_HISTORY_INDEX_CACHE_SIZE, "history index cache",
+	if (SUCCEED != (ret = zbx_shmem_create(&hc_index_mem, history_index_cache_size, "history index cache",
 			"HistoryIndexCacheSize", 0, error)))
 	{
 		goto out;
@@ -5103,7 +5104,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, char **erro
 
 		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
 
-		if (SUCCEED != (ret = init_trend_cache(error)))
+		if (SUCCEED != (ret = init_trend_cache(trends_cache_size, error)))
 			goto out;
 	}
 

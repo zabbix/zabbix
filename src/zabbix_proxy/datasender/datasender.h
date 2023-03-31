@@ -29,10 +29,9 @@ typedef struct
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
+	int			proxydata_frequency;
 }
 zbx_thread_datasender_args;
-
-extern int	CONFIG_PROXYDATA_FREQUENCY;
 
 ZBX_THREAD_ENTRY(datasender_thread, args);
 

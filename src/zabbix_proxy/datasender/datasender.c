@@ -82,7 +82,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *                                                                            *
  ******************************************************************************/
 static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_config_tls_t *config_tls,
-		const zbx_thread_info_t *info, int config_timeout)
+		const zbx_thread_info_t *info, int config_timeout, int proxydata_frequency)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
@@ -106,7 +106,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp &&
+	if (SUCCEED == upload_state && proxydata_frequency <= now - data_timestamp &&
 			ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
 	{
 		if (SUCCEED == zbx_get_interface_availability_data(&j, &availability_ts))
@@ -186,7 +186,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 		/* retry till have a connection */
 		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
-				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, config_tls))
+				proxydata_frequency, LOG_LEVEL_WARNING, config_tls))
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -321,7 +321,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 		do
 		{
 			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state,
-					datasender_args_in->zbx_config_tls, info, datasender_args_in->config_timeout);
+					datasender_args_in->zbx_config_tls, info, datasender_args_in->config_timeout,
+					datasender_args_in->proxydata_frequency);
 
 			time_now = zbx_time();
 			time_diff = time_now - time_start;

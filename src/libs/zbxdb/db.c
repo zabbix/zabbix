@@ -71,7 +71,7 @@ static int		txn_end_error = ZBX_DB_OK;	/* transaction result */
 
 static char		*last_db_strerror = NULL;	/* last database error message */
 
-extern int		CONFIG_LOG_SLOW_QUERIES;
+static int		config_log_slow_queries;
 
 static int		db_auto_increment;
 
@@ -886,11 +886,13 @@ out:
 	return ret;
 }
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, char **error)
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, const int log_slow_queries, char **error)
 {
 #ifdef HAVE_SQLITE3
 	zbx_stat_t	buf;
-
+#endif
+	config_log_slow_queries = log_slow_queries;
+#ifdef HAVE_SQLITE3
 	if (0 != zbx_stat(dbname, &buf))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open database file \"%s\": %s", dbname, zbx_strerror(errno));
@@ -1421,7 +1423,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 
-	if (0 != CONFIG_LOG_SLOW_QUERIES)
+	if (0 != config_log_slow_queries)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
@@ -1562,10 +1564,10 @@ lbl_exec:
 		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
-	if (0 != CONFIG_LOG_SLOW_QUERIES)
+	if (0 != config_log_slow_queries)
 	{
 		sec = zbx_time() - sec;
-		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
+		if (sec > (double)config_log_slow_queries / 1000.0)
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
@@ -1604,7 +1606,7 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 
-	if (0 != CONFIG_LOG_SLOW_QUERIES)
+	if (0 != config_log_slow_queries)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
@@ -1863,10 +1865,10 @@ lbl_get_table:
 	if (0 == txn_level)
 		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
-	if (0 != CONFIG_LOG_SLOW_QUERIES)
+	if (0 != config_log_slow_queries)
 	{
 		sec = zbx_time() - sec;
-		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
+		if (sec > (double)config_log_slow_queries / 1000.0)
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
