@@ -44,6 +44,7 @@ require_once dirname(__FILE__).'/graphs/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
+require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHostInterfaces.php';
 require_once dirname(__FILE__).'/testPageHostPrototypes.php';
@@ -265,6 +266,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
+		$suite->addTestSuite('testPageMonitoringHostsGraph');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
