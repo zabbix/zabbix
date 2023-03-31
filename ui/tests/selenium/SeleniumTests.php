@@ -163,6 +163,7 @@ require_once dirname(__FILE__).'/testUrlUserPermissions.php';
 require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardClockWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
@@ -329,6 +330,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
+		$suite->addTestSuite('testDashboardClockWidget');
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
