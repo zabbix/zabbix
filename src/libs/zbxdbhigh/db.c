@@ -539,7 +539,7 @@ static size_t	get_string_field_size(unsigned char type)
 	{
 		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
-			return ZBX_SIZE_T_MAX;
+			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
@@ -559,7 +559,7 @@ static size_t	get_string_field_size(unsigned char type)
 		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
-			return ZBX_SIZE_T_MAX;
+			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
 			return 4000u;
