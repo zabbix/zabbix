@@ -1,6 +1,7 @@
 Changes for 7.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-8237] changed module details view to a modal (popup) and updated module details (ddauksa)
 ...G...... [ZBXNEXT-7132] added option of getting fully qualified domain name in system.hostname key to the Zabbix agent and Zabbix agent 2 (kprutkovs)
 ..F.I..... [ZBXNEXT-8226] fixed the problem of insufficient length of URL fields (dfofanovs, dgoloscapov)
 ........S. [ZBXNEXT-8312] increased TimescaleDB maximum supported version to 2.10 (mprihodko)
@@ -14,6 +15,7 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
 .......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 .........T [ZBX-22261] added value mapping in the template PostgreSQL by Zabbix agent 2 for item Checksum failures (ztielidze)
 .......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
