@@ -83,6 +83,23 @@ static int	DBpatch_6050007(void)
 	return DBmodify_field_type("widget_field", &field, NULL);
 }
 
+static int	DBpatch_6050008(void)
+{
+	if (SUCCEED != DBmodify_field_type("history", zbx_db_get_field(zbx_db_get_table("history"), "value"), NULL))
+		return FAIL;
+
+	if (SUCCEED != DBmodify_field_type("trends", zbx_db_get_field(zbx_db_get_table("trends"), "value_min"), NULL))
+		return FAIL;
+
+	if (SUCCEED != DBmodify_field_type("trends", zbx_db_get_field(zbx_db_get_table("trends"), "value_avg"), NULL))
+		return FAIL;
+
+	if (SUCCEED != DBmodify_field_type("trends", zbx_db_get_field(zbx_db_get_table("trends"), "value_max"), NULL))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -97,5 +114,6 @@ DBPATCH_ADD(6050004, 0, 1)
 DBPATCH_ADD(6050005, 0, 1)
 DBPATCH_ADD(6050006, 0, 1)
 DBPATCH_ADD(6050007, 0, 1)
+DBPATCH_ADD(6050008, 0, 1)
 
 DBPATCH_END()
