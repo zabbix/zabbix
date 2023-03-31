@@ -47,12 +47,12 @@ class testDashboardProblemsWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-	' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
-	' w.width, w.height'.
-	' FROM widget_field wf'.
-	' INNER JOIN widget w'.
-	' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-	' wf.value_itemid, wf.value_graphid';
+		' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+		' w.width, w.height'.
+		' FROM widget_field wf'.
+		' INNER JOIN widget w'.
+		' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+		' wf.value_itemid, wf.value_graphid';
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -120,9 +120,9 @@ class testDashboardProblemsWidget extends CWebTest {
 		$dialog->waitUntilReady();
 
 		$this->assertEquals(['Type', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Exclude host groups', 'Hosts',
-			'Problem', 'Severity', 'Tags', '', 'Show tags', 'Tag name', 'Tag display priority', 'Show operational data',
-			'Show suppressed problems', 'Show unacknowledged only', 'Sort entries by', 'Show timeline', 'Show lines'],
-			$form->getLabels()->asText()
+				'Problem', 'Severity', 'Tags', '', 'Show tags', 'Tag name', 'Tag display priority', 'Show operational data',
+				'Show suppressed problems', 'Show unacknowledged only', 'Sort entries by', 'Show timeline', 'Show lines'],
+				$form->getLabels()->asText()
 		);
 
 		// Check default fields.
@@ -180,10 +180,10 @@ class testDashboardProblemsWidget extends CWebTest {
 		// Check dropdowns options presence.
 		$dropdowns = [
 			'Refresh interval' => ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes',
-				'10 minutes', '15 minutes'
+					'10 minutes', '15 minutes'
 			],
 			'Sort entries by' => ['Time (descending)', 'Time (ascending)', 'Severity (descending)', 'Severity (ascending)',
-				'Problem (descending)', 'Problem (ascending)', 'Host (descending)', 'Host (ascending)'
+					'Problem (descending)', 'Problem (ascending)', 'Host (descending)', 'Host (ascending)'
 			]
 		];
 

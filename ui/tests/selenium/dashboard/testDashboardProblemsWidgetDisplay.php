@@ -47,7 +47,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
-			'name' => 'Dashboard for Problem widget check',
+			'name' => 'Dashboard for Problem widget check'
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $response);
@@ -140,30 +140,30 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		foreach ($triggerids as $name => $id) {
 			// Create events.
 			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.
-				(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.zbx_dbstr(self::$time).', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.zbx_dbstr(self::$time).', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
 			);
 
 			// Create problems.
 			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.
-				(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.zbx_dbstr(self::$time).', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+					(1009950 + $i).', 0, 0, '.zbx_dbstr($id).', '.zbx_dbstr(self::$time).', 0, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
 			);
 			$i++;
 		}
 
 		// Change triggers' state to Problem.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for widget 1 float').', '.
-			zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
-			zbx_dbstr('Trigger for widget text').')'
+				zbx_dbstr('Trigger for widget 2 log').', '.zbx_dbstr('Trigger for widget 2 unsigned').', '.
+				zbx_dbstr('Trigger for widget text').')'
 		);
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
 		DBexecute('UPDATE triggers SET value = 1, manual_close = 1 WHERE description = '.
-			zbx_dbstr('Trigger for widget 1 char')
+				zbx_dbstr('Trigger for widget 1 char')
 		);
 
 		// Suppress the problem: 'Trigger for widget text'.
 		DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until)'.
-			'VALUES (100990, 1009954, NULL, 0)'
+				'VALUES (100990, 1009954, NULL, 0)'
 		);
 
 		// Acknowledge the problem: 'Trigger for widget 2 unsigned' and get acknowledge time.
@@ -311,7 +311,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						['Problem • Severity' => 'Trigger for widget 2 unsigned']
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-						'Ack', 'Actions'
+							'Ack', 'Actions'
 					]
 				]
 			],
@@ -413,7 +413,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-						'Duration', 'Ack', 'Actions', 'Tags'
+							'Duration', 'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -451,7 +451,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Second test trigger with tag priority' => 'Beta: bEpsilon: eEta: eZeta: z'
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-						'Duration', 'Ack', 'Actions', 'Tags'
+							'Duration', 'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -497,7 +497,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-						'Ack', 'Actions', 'Tags'
+							'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -535,7 +535,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
-						'Ack', 'Actions', 'Tags'
+							'Ack', 'Actions', 'Tags'
 					]
 				]
 			],
@@ -572,7 +572,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
-						'Operational data', 'Duration', 'Ack', 'Actions'
+							'Operational data', 'Duration', 'Ack', 'Actions'
 					]
 				]
 			],
@@ -674,7 +674,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {
 			if (CTestArrayHelper::get($row, 'Time')) {
-				$row['Time'] = date('H:i:s', self::$time+10800);
+				$row['Time'] = date('H:i:s', self::$time);
 			}
 			unset($row);
 		}
@@ -700,8 +700,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							// Check rows in hint's table.
 							foreach ($hint_table->getRows() as $i => $row) {
 								$icon['actions'][$i]['Time'] = ($icon['actions'][$i]['Time'] === 'acknowledged')
-									? date('Y-m-d H:i:s', self::$acktime+10800)
-									: date('Y-m-d H:i:s', self::$time+10800);
+									? date('Y-m-d H:i:s', self::$acktime)
+									: date('Y-m-d H:i:s', self::$time);
 								$row->assertValues($icon['actions'][$i]);
 							}
 
@@ -747,7 +747,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_tag_ellipsis')) {
 			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
 				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:icon-wzrd-action')
-					->waitUntilClickable()->one()->click();
+						->waitUntilClickable()->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
 				$this->assertEquals($ellipsis_text, $hint->getText());
 				$hint->close();
@@ -757,7 +757,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Check eye icon for suppressed problem.
 		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
 			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
-				->query('class:icon-invisible')->waitUntilClickable()->one()->click();
+					->query('class:icon-invisible')->waitUntilClickable()->one()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
 			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
 			$hint->close();
