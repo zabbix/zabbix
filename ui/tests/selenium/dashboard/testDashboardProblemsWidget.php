@@ -47,68 +47,61 @@ class testDashboardProblemsWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_hostid';
+	' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+	' w.width, w.height'.
+	' FROM widget_field wf'.
+	' INNER JOIN widget w'.
+	' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+	' wf.value_itemid, wf.value_graphid';
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
 			'name' => 'Problem widget dashboard',
-			'auto_start' => 0,
-			'pages' => [
+			'widgets' => [
 				[
-					'name' => 'First Page',
-					'display_period' => 3600,
-					'widgets' => [
-						[
-							'type' => 'problems',
-							'name' => 'Problem widget for updating',
-							'x' => 0,
-							'y' => 0,
-							'width' => 11,
-							'height' => 6,
-							'view_mode' => 0,
-							'fields' => [
-								['type' => 0, 'name' => 'severities', 'value' => 0],
-								['type' => 0, 'name' => 'severities', 'value' => 4],
-								['type' => 0, 'name' => 'severities', 'value' => 2],
-								['type' => 0, 'name' => 'evaltype', 'value' => 2],
-								['type' => 0, 'name' => 'rf_rate', 'value' => '900'],
-								['type' => 0, 'name' => 'show', 'value' => 3],
-								['type' => 0, 'name' => 'show_lines', 'value' => 12],
-								['type' => 0, 'name' => 'show_opdata', 'value' => 1],
-								['type' => 0, 'name' => 'show_suppressed', 'value' => 1],
-								['type' => 0, 'name' => 'show_tags', 'value' => 2],
-								['type' => 0, 'name' => 'sort_triggers', 'value' => 15],
-								['type' => 0, 'name' => 'show_timeline', 'value' => 0],
-								['type' => 0, 'name' => 'tag_name_format', 'value' => 1],
-								['type' => 0, 'name' => 'tags.operator.0', 'value' => 1],
-								['type' => 0, 'name' => 'tags.operator.1', 'value' => 1],
-								['type' => 0, 'name' => 'unacknowledged', 'value' => 1],
-								['type' => 1, 'name' => 'problem', 'value' => 'test2'],
-								['type' => 1, 'name' => 'tags.value.0', 'value' => '2'],
-								['type' => 1, 'name' => 'tags.value.1', 'value' => '33'],
-								['type' => 1, 'name' => 'tag_priority', 'value' => '1,2'],
-								['type' => 1, 'name' => 'tags.tag.0', 'value' => 'tag2'],
-								['type' => 1, 'name' => 'tags.tag.1', 'value' => 'tagg33'],
-								['type' => 2, 'name' => 'exclude_groupids', 'value' => 50014],
-								['type' => 2, 'name' => 'groupids', 'value' => 50005],
-								['type' => 3, 'name' => 'hostids', 'value' => 99026]
-							]
-						],
-						[
-							'type' => 'problems',
-							'name' => 'Problem widget for delete',
-							'x' => 11,
-							'y' => 0,
-							'width' => 10,
-							'height' => 5,
-							'view_mode' => 0
-						]
+					'type' => 'problems',
+					'name' => 'Problem widget for updating',
+					'x' => 0,
+					'y' => 0,
+					'width' => 11,
+					'height' => 6,
+					'view_mode' => 0,
+					'fields' => [
+						['type' => 0, 'name' => 'severities', 'value' => 0],
+						['type' => 0, 'name' => 'severities', 'value' => 4],
+						['type' => 0, 'name' => 'severities', 'value' => 2],
+						['type' => 0, 'name' => 'evaltype', 'value' => 2],
+						['type' => 0, 'name' => 'rf_rate', 'value' => '900'],
+						['type' => 0, 'name' => 'show', 'value' => 3],
+						['type' => 0, 'name' => 'show_lines', 'value' => 12],
+						['type' => 0, 'name' => 'show_opdata', 'value' => 1],
+						['type' => 0, 'name' => 'show_suppressed', 'value' => 1],
+						['type' => 0, 'name' => 'show_tags', 'value' => 2],
+						['type' => 0, 'name' => 'sort_triggers', 'value' => 15],
+						['type' => 0, 'name' => 'show_timeline', 'value' => 0],
+						['type' => 0, 'name' => 'tag_name_format', 'value' => 1],
+						['type' => 0, 'name' => 'tags.operator.0', 'value' => 1],
+						['type' => 0, 'name' => 'tags.operator.1', 'value' => 1],
+						['type' => 0, 'name' => 'unacknowledged', 'value' => 1],
+						['type' => 1, 'name' => 'problem', 'value' => 'test2'],
+						['type' => 1, 'name' => 'tags.value.0', 'value' => '2'],
+						['type' => 1, 'name' => 'tags.value.1', 'value' => '33'],
+						['type' => 1, 'name' => 'tag_priority', 'value' => '1,2'],
+						['type' => 1, 'name' => 'tags.tag.0', 'value' => 'tag2'],
+						['type' => 1, 'name' => 'tags.tag.1', 'value' => 'tagg33'],
+						['type' => 2, 'name' => 'exclude_groupids', 'value' => 50014],
+						['type' => 2, 'name' => 'groupids', 'value' => 50005],
+						['type' => 3, 'name' => 'hostids', 'value' => 99026]
 					]
+				],
+				[
+					'type' => 'problems',
+					'name' => 'Problem widget for delete',
+					'x' => 11,
+					'y' => 0,
+					'width' => 10,
+					'height' => 5,
+					'view_mode' => 0
 				]
 			]
 		]);
@@ -127,9 +120,9 @@ class testDashboardProblemsWidget extends CWebTest {
 		$dialog->waitUntilReady();
 
 		$this->assertEquals(['Type', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Exclude host groups', 'Hosts',
-				'Problem', 'Severity', 'Tags', '', 'Show tags', 'Tag name', 'Tag display priority', 'Show operational data',
-				'Show suppressed problems', 'Show unacknowledged only', 'Sort entries by', 'Show timeline', 'Show lines'],
-				$form->getLabels()->asText()
+			'Problem', 'Severity', 'Tags', '', 'Show tags', 'Tag name', 'Tag display priority', 'Show operational data',
+			'Show suppressed problems', 'Show unacknowledged only', 'Sort entries by', 'Show timeline', 'Show lines'],
+			$form->getLabels()->asText()
 		);
 
 		// Check default fields.
@@ -182,16 +175,15 @@ class testDashboardProblemsWidget extends CWebTest {
 			}
 		}
 
-		$this->assertEquals(['Show lines'], $form->getRequiredLabels());
+		$this->assertEquals(['Show lines'], array_values($form->getRequiredLabels()));
 
 		// Check dropdowns options presence.
 		$dropdowns = [
 			'Refresh interval' => ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes',
-					'10 minutes', '15 minutes'
+				'10 minutes', '15 minutes'
 			],
-			'id:tags_0_operator' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
 			'Sort entries by' => ['Time (descending)', 'Time (ascending)', 'Severity (descending)', 'Severity (ascending)',
-					'Problem (descending)', 'Problem (ascending)', 'Host (descending)', 'Host (ascending)'
+				'Problem (descending)', 'Problem (ascending)', 'Host (descending)', 'Host (ascending)'
 			]
 		];
 
@@ -199,12 +191,16 @@ class testDashboardProblemsWidget extends CWebTest {
 			$this->assertEquals($labels, $form->getField($dropdown)->asDropdown()->getOptions()->asText());
 		}
 
+		$this->assertEquals(['Contains', 'Equals'],
+			$form->getField('id:tags_0_operator')->asSegmentedRadio()->getLabels()->asText()
+		);
+
 		// Check severities fields.
 		$severities = ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'];
 
 		foreach ($severities as $id => $label) {
 			$this->assertTrue($form->getField('Severity')->query("xpath:.//label[text()=".
-					CXPathHelper::escapeQuotes($label)."]/../input[@id='severities_".$id."']")->exists()
+				CXPathHelper::escapeQuotes($label)."]/../input[@id='severities_".$id."']")->exists()
 			);
 		}
 
@@ -347,24 +343,25 @@ class testDashboardProblemsWidget extends CWebTest {
 							],
 							[
 								'tag' => 'tag2',
-								'operator' => 'Exists'
+								'operator' => 'Equals'
 							],
 							[
 								'tag' => 'tag3',
-								'operator' => 'Does not exist'
+								'operator' => 'Equals'
 							],
 							[
 								'tag' => '{$MACRO:A}',
-								'operator' => 'Does not equal',
+								'operator' => 'Contains',
 								'value' => '{$MACRO:A}'
 							],
 							[
 								'tag' => '{$MACRO}',
-								'operator' => 'Does not contain',
+								'operator' => 'Contains',
 								'value' => '{$MACRO}'
 							],
 							[
 								'tag' => 'Таг',
+								'operator' => 'Equals',
 								'value' => 'Значение'
 							]
 						]
@@ -539,7 +536,17 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		if (array_key_exists('Tags', $data)) {
-			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
+			// Mapping for tags in problem widgets.
+			$mapping = [
+				'tag',
+				[
+					'name' => 'operator',
+					'class' => CSegmentedRadioElement::class
+				],
+				'value'
+			];
+
+			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable(['mapping' => $mapping]);
 
 			if (empty($data['Tags'])) {
 				$tags_table->clear();
@@ -604,7 +611,7 @@ class testDashboardProblemsWidget extends CWebTest {
 
 			// If tags table has been cleared, after form saving there is one empty tag field.
 			if (CTestArrayHelper::get($data, 'Tags') === []) {
-				$values[''] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
+				$values[''] = [['tag' => '', '1' => 'Contains', 'value' => '']];
 			}
 
 			// Check widget form fields and values in frontend.
@@ -615,13 +622,9 @@ class testDashboardProblemsWidget extends CWebTest {
 			}
 
 			// Check that widget is saved in DB.
-			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM widget w'.
-					' WHERE EXISTS ('.
-						'SELECT NULL'.
-						' FROM dashboard_page dp'.
-						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-							' AND dp.dashboardid='.self::$dashboardid.
-							' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM widget
+					WHERE dashboardid ='.self::$dashboardid.
+					' AND name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', ''))
 			));
 		}
 	}
@@ -703,33 +706,43 @@ class testDashboardProblemsWidget extends CWebTest {
 
 		if ($cancel || !$save_dashboard) {
 			$form->fill([
-					'Name' => 'new name',
-					'Refresh interval' => '10 minutes',
-					'Host groups' => 'Empty group',
-					'Show' => 'Problems',
-					'Exclude host groups' => 'Group to copy graph',
-					'Hosts' => 'Available host',
-					'Problem' => 'Test problem',
-					'id:severities_3' => true,
-					'Show tags' => 2,
-					'Tag name' => 'None',
-					'Tag display priority' => 'one, two, four',
-					'Show operational data' => 'With problem name',
-					'Show suppressed problems' => true,
-					'Sort entries by' => 'Time (descending)',
-					'Show timeline' => false,
-					'Show lines' => 99
+				'Name' => 'new name',
+				'Refresh interval' => '10 minutes',
+				'Host groups' => 'Empty group',
+				'Show' => 'Problems',
+				'Exclude host groups' => 'Group to copy graph',
+				'Hosts' => 'Available host',
+				'Problem' => 'Test problem',
+				'id:severities_3' => true,
+				'Show tags' => 2,
+				'Tag name' => 'None',
+				'Tag display priority' => 'one, two, four',
+				'Show operational data' => 'With problem name',
+				'Show suppressed problems' => true,
+				'Sort entries by' => 'Time (descending)',
+				'Show timeline' => false,
+				'Show lines' => 99
 			]);
 
 			$form->getField('id:evaltype')->fill('Or');
-			$form->getField('id:tags_table_tags')->asMultifieldTable()->fill([
-					[
-						'action' => USER_ACTION_UPDATE,
-						'index' => 0,
-						'tag' => 'new tag',
-						'operator' => 'Does not equal',
-						'value' => 'new value'
-					]
+
+			// Mapping for tags in problem widgets.
+			$mapping = [
+				'tag',
+				[
+					'name' => 'operator',
+					'class' => CSegmentedRadioElement::class
+				],
+				'value'
+			];
+			$form->getField('id:tags_table_tags')->asMultifieldTable(['mapping' => $mapping])->fill([
+				[
+					'action' => USER_ACTION_UPDATE,
+					'index' => 0,
+					'tag' => 'new tag',
+					'operator' => 'Equals',
+					'value' => 'new value'
+				]
 			]);
 		}
 
@@ -779,9 +792,9 @@ class testDashboardProblemsWidget extends CWebTest {
 		// Check that widget is not present on dashboard and in DB.
 		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
-				' LEFT JOIN widget w'.
-					' ON w.widgetid=wf.widgetid'.
-					' WHERE w.name='.zbx_dbstr($name)
+			' LEFT JOIN widget w'.
+			' ON w.widgetid=wf.widgetid'.
+			' WHERE w.name='.zbx_dbstr($name)
 		));
 	}
 }
