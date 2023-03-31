@@ -32,11 +32,9 @@ import (
 	"strings"
 	"testing"
 
-	"zabbix.com/pkg/zbxerr"
-
 	"github.com/omeid/go-yarn"
-
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/zbxerr"
 )
 
 type TestConfig struct {

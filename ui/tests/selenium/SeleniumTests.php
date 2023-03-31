@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
 require_once dirname(__FILE__).'/problems/testPageProblems.php';
+require_once dirname(__FILE__).'/scripts/testFormAdministrationScripts.php';
+require_once dirname(__FILE__).'/scripts/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageScreens.php';
 require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
@@ -35,7 +37,6 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralValuemap.php';
 require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
-require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/graphs/testFormGraph.php';
@@ -97,7 +98,6 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralWorkperiod.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
-require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
@@ -173,6 +173,8 @@ require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/testSID.php';
 
@@ -221,11 +223,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 		$suite->addTestSuite('testPageOverview');
-/*
-		$suite->addTestSuite('testPageQueueDetails');
-		$suite->addTestSuite('testPageQueueOverview');
-		$suite->addTestSuite('testPageQueueOverviewByProxy');
-*/
+		/*
+				$suite->addTestSuite('testPageQueueDetails');
+				$suite->addTestSuite('testPageQueueOverview');
+				$suite->addTestSuite('testPageQueueOverviewByProxy');
+		*/
 		$suite->addTestSuite('testPageReportsActionLog');
 		$suite->addTestSuite('testPageReportsAudit');
 		$suite->addTestSuite('testPageReportsNotifications');
@@ -246,7 +248,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
-//		$suite->addTestSuite('testFormAdministrationGeneralImages');
+		//		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralMacro');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
@@ -337,6 +339,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardProblemsWidget');
+		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testSID');
 

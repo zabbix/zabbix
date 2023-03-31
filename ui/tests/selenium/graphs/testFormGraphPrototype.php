@@ -756,7 +756,8 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'graphName' => 'graphSimple',
 					'hostCheck' => true,
-					'dbCheck' => true
+					'dbCheck' => true,
+					'screenshot' => true
 				]
 			],
 			[
@@ -1078,6 +1079,12 @@ class testFormGraphPrototype extends CLegacyWebTest {
 				'context' => $this->hostGroup
 			]);
 			$this->query('link', $this->itemSimple)->waitUntilClickable()->one()->click();
+
+			// Take a screenshot to test draggable object position of items list.
+			if (array_key_exists('screenshot', $data)) {
+				$this->page->removeFocus();
+				$this->assertScreenshot($this->query('id:itemsTable')->one(), 'Graph prototype - Items');
+			}
 
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');
