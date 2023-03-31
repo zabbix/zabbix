@@ -639,7 +639,7 @@ abstract class CItemGeneral extends CApiService {
 			'host_status' =>	['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'uuid'), 'unset' => true]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]]
 		]];
 
