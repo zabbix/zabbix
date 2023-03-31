@@ -4725,8 +4725,8 @@ return [
 			],
 			'value' => [
 				'null' => false,
-				'type' => t_bin,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_BLOB,
+				'length' => 2048,
 				'default' => ''
 			]
 		]

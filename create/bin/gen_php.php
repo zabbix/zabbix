@@ -67,7 +67,7 @@ function parse_schema($path) {
 						$type = 'DB::FIELD_TYPE_BLOB';
 						$length = 2048;
 						break;
-					case 't_blob':
+					case 't_bin':
 						$type = 'DB::FIELD_TYPE_BLOB';
 						$length = 2048;
 						break;
