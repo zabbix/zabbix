@@ -1171,7 +1171,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$descriptions = [];
 
-		foreach ($triggers as &$trigger) {
+		foreach ($triggers as $index => &$trigger) {
 			$db_trigger = $db_triggers[$trigger['triggerid']];
 			$description = array_key_exists('description', $trigger)
 				? $trigger['description']
