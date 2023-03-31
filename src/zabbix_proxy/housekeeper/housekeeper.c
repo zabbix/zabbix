@@ -118,15 +118,15 @@ rollback:
  ******************************************************************************/
 static int	housekeeping_history(int now)
 {
-        int	records = 0;
+	int	records = 0;
 
-        zabbix_log(LOG_LEVEL_DEBUG, "In housekeeping_history()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In housekeeping_history()");
 
 	records += delete_history("proxy_history", "history_lastid", now);
 	records += delete_history("proxy_dhistory", "dhistory_lastid", now);
 	records += delete_history("proxy_autoreg_host", "autoreg_host_lastid", now);
 
-        return records;
+	return records;
 }
 
 static int	get_housekeeper_period(double time_slept)
