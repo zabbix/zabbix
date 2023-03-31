@@ -1,6 +1,12 @@
+Changes for 6.4.1
+
+6.4.1rc2 was released as 6.4.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.4.1rc2
 
 Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.1rc1
@@ -1074,9 +1080,15 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.15
+
+6.0.15rc2 was released as 6.0.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.15rc2
 
 Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.15rc1
@@ -3519,6 +3531,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.34rc1
 
 Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.33
@@ -6282,9 +6295,15 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.45
+
+4.0.45rc2 was released as 4.0.45 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.45rc2
 
 Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45rc1
