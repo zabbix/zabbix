@@ -2843,6 +2843,7 @@ form.is-loading {
 .form-submit-hidden {
   position: absolute;
   visibility: hidden;
+  min-height: 0;
   max-height: 0; }
 
 .list-table {
@@ -4589,6 +4590,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       margin: 0 -10px 10px;
       padding: 0 10px;
       position: relative; }
+      .overlay-dialogue.modal .overlay-dialogue-body > form {
+        padding: 2px 0; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
