@@ -546,11 +546,11 @@ abstract class CGraphGeneral extends CApiService {
 			'preservekeys' => true
 		] + $permission_options);
 
-		if (self::FLAGS == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if (static::FLAGS == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_items += API::ItemPrototype()->get([
 				'output' => ['name', 'value_type', 'hostid'],
 				'selectHosts' => ['status'],
-				'selectItemDiscovery' => ['parent_itemid'],
+				'selectDiscoveryRule' => ['itemid'],
 				'itemids' => $itemids,
 				'preservekeys' => true
 			] + $permission_options);
@@ -560,7 +560,7 @@ abstract class CGraphGeneral extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (self::FLAGS == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if (static::FLAGS == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$this->checkDiscoveryRuleCount($graphs, $db_items);
 		}
 
@@ -646,8 +646,8 @@ abstract class CGraphGeneral extends CApiService {
 				$lld_ruleids = [];
 
 				foreach ($graph['gitems'] as $gitem) {
-					if (array_key_exists('itemDiscovery', $db_items[$gitem['itemid']])) {
-						$lld_ruleids[$db_items[$gitem['itemid']]['itemDiscovery']['parent_itemid']] = true;
+					if (array_key_exists('discoveryRule', $db_items[$gitem['itemid']])) {
+						$lld_ruleids[$db_items[$gitem['itemid']]['discoveryRule']['itemid']] = true;
 					}
 				}
 
