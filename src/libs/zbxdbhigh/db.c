@@ -24,6 +24,7 @@
 #include "threads.h"
 #include "dbcache.h"
 #include "cfg.h"
+#include "zbx_dbversion_constants.h"
 
 typedef struct
 {
@@ -1012,8 +1013,8 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 	if (DB_VERSION_LOWER_THAN_MINIMUM == db_version_info->ext_flag)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Version must be at least %d. Recommended version should be at least"
-				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY,
-				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_STR,
+				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM;
 		ret = FAIL;
 		goto out;
@@ -1023,7 +1024,7 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %u is not officially supported. Recommended version"
 				" should be at least %s %s.", db_version_info->ext_current_version,
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
 
 		if (0 == allow_unsupported_ver)
@@ -1038,7 +1039,7 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info->ext_flag)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should not be higher than %s %s.",
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MAX_VERSION_FRIENDLY);
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MAX_VERSION_STR);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM;
 
 		if (0 == allow_unsupported_ver)
@@ -1064,13 +1065,13 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
 				" supported in %s.", ZBX_NULL2EMPTY_STR(db_version_info->ext_lic),
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
-			ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+			ZBX_TIMESCALE_LICENSE_COMMUNITY_STR);
 
 	if (ZBX_EXT_ERR_UNDEFINED == db_version_info->ext_err_code)
 		db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
@@ -3907,3 +3908,42 @@ char	*zbx_db_get_schema_esc(void)
 	return name;
 }
 #endif
+
+void	zbx_recalc_time_period(int *ts_from, int table_group)
+{
+#define HK_CFG_UPDATE_INTERVAL	5
+	int			least_ts, now;
+	zbx_config_t		cfg;
+	static int		last_cfg_retrieval = 0;
+	static zbx_config_hk_t	hk;
+
+	now = (int)time(NULL);
+
+	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
+	{
+		last_cfg_retrieval = now;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk = cfg.hk;
+	}
+
+	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
+	{
+		if (1 != hk.history_global)
+			return;
+
+		least_ts = now - hk.history;
+	}
+	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
+	{
+		if (1 != hk.trends_global)
+			return;
+
+		least_ts = now - hk.trends + 1;
+	}
+
+
+	if (least_ts > *ts_from)
+		*ts_from = least_ts;
+#undef HK_CFG_UPDATE_INTERVAL
+}

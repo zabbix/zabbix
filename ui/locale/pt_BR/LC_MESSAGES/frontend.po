@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-02-01 12:37+0000\n"
+"PO-Revision-Date: 2023-03-15 20:00+0000\n"
 "Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -1415,6 +1415,10 @@ msgstr "Tentativas"
 msgid "Attribution"
 msgstr "Atribuição"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -2513,7 +2517,7 @@ msgstr[1] "Não foi possível desabilitar os módulos: %1$s."
 #: app/controllers/CControllerScheduledReportDisable.php:78
 msgid "Cannot disable scheduled report"
 msgid_plural "Cannot disable scheduled reports"
-msgstr[0] ""
+msgstr[0] "Não é possível desativar o relatório agendado"
 msgstr[1] "Não é possível desativar os relatórios agendados"
 
 #: triggers.php:490
@@ -2541,8 +2545,8 @@ msgstr "Não é possível exibir mais de um item com o tipo \"Soma do gráfico\"
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível ativar o token da API"
+msgstr[1] "Não é possível ativar os tokens da API"
 
 #: app/controllers/CControllerSlaEnable.php:88
 msgid "Cannot enable SLA"
@@ -2591,14 +2595,14 @@ msgstr[1] "Não foi possível ativar os tipos de mídia"
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível ativar o módulo: %1$s."
+msgstr[1] "Não foi possível ativar os módulos: %1$s."
 
 #: app/controllers/CControllerScheduledReportEnable.php:78
 msgid "Cannot enable scheduled report"
 msgid_plural "Cannot enable scheduled reports"
 msgstr[0] "Não possível ativar o relatório agendado"
-msgstr[1] ""
+msgstr[1] "Não possível ativar os relatórios agendados"
 
 #: triggers.php:489
 msgid "Cannot enable trigger"
@@ -2614,7 +2618,7 @@ msgstr[1] "Não foi possível ativar os cenários web"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
-msgstr ""
+msgstr "Não é possível avaliar a expressão"
 
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
@@ -2675,17 +2679,17 @@ msgstr "Não foi possível encontrar o mapeamento de ícones \"%1$s\" usado no m
 #: include/classes/import/CConfigurationImport.php:952
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Não foi possível localizar a interface \"%1$s\" utilizada na regra de descoberta \"%2$s\" em \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar a interface \"%1$s\" usada no item \"%2$s\" em \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1105
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar a interface \"%1$s\" usada no protótipo de item \"%2$s\" da regra de descoberta \"%3$s\" em \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1601
 #, c-format
@@ -2735,7 +2739,7 @@ msgstr "Não foi possível localizar o template \"%1$s\" para o protótipo de ho
 #: include/classes/import/CConfigurationImport.php:1002
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o template \"%1$s\" para sobrepor \"%2$s\" da regra de descoberta\"%3$s\" em \"%4$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:179
 #: include/classes/import/importers/CMapImporter.php:229
@@ -2759,13 +2763,13 @@ msgstr "Não foi possível localizar o mapeamento de valores \"%1$s\" utilizado 
 #: include/classes/api/services/CRole.php:683
 #, c-format
 msgid "Cannot have non-default \"%2$s\" rule while having \"%3$s\" set to %4$d for user role \"%1$s\"."
-msgstr ""
+msgstr "Não é possível ter uma regra \"%2$s\" fora de padrão enquanto tiver \"%3$s\" definido como %4$d para a tipo de usuário \"%1$s\"."
 
 #: include/classes/api/services/CRole.php:569
 #: include/classes/api/services/CRole.php:645
 #, c-format
 msgid "Cannot have non-empty tag value while having empty tag in rule \"%2$s\" for user role \"%1$s\"."
-msgstr ""
+msgstr "Não é possível ter um valor de etiqueta ao ter uma etiqueta vazia na regra \"%2$s\" para o tipo de usuário \"%1$s\"."
 
 #: include/classes/import/importers/CTemplateImporter.php:258
 #: include/classes/import/importers/CTemplateImporter.php:410
@@ -2786,7 +2790,7 @@ msgstr "Falha na associação do template"
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "Não é possível vincular o template \"%1$s\" para o host \"%2$s\" pois seu template pai \"%3$s\" será vinculado duas vezes."
 
 #: include/classes/api/services/CHostBase.php:678
 #: include/classes/api/services/CHostBase.php:755
@@ -2802,12 +2806,12 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Não é possível vincular o template \"%1$s\" ao host \"%2$s\", pois seu template pai \"%3$s\" seria vinculado duas vezes."
 
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "Não é possível vincular o template \"%1$s\" ao protótipo de host \"%2$s\", pois seu template pai \"%3$s\" será vinculado duas vezes."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
@@ -2823,12 +2827,12 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Não é possível vincular o template \"%1$s\" ao protótipo de host \"%2$s\", porque seu template pai \"%3$s\" seria vinculado duas vezes."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because circular linkage (%3$s) will occurs."
-msgstr ""
+msgstr "Não é possivel vincular o template \"%1$s\" ao template \"%2$s\" porque uma vinculação circular (%3$s) ocorrerá."
 
 #: include/classes/api/services/CHostBase.php:514
 #, c-format
@@ -3140,6 +3144,11 @@ msgstr "Não é possível atualizar um gráfico descoberto."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Não é possível atualizar um grupo de hosts descoberto \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -10661,7 +10670,7 @@ msgstr "Último"
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] "Último %1$d dia"
-msgstr[1] "Último %1$d dias"
+msgstr[1] "Últimos %1$d dias"
 
 #: include/func.inc.php:2514
 #, c-format
@@ -11203,6 +11212,10 @@ msgstr "Manutenção sem coleta de dados"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Manutenção: %1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
@@ -14265,31 +14278,31 @@ msgstr "Ano anterior"
 
 #: include/hosts.inc.php:399
 msgid "Primary POC cell"
-msgstr "POC - Célula primária"
+msgstr "POC - celular primário"
 
 #: include/hosts.inc.php:384
 msgid "Primary POC email"
-msgstr "POC - E-mail primário"
+msgstr "POC - e-mail primário"
 
 #: include/hosts.inc.php:379
 msgid "Primary POC name"
-msgstr "POC - Nome primário"
+msgstr "POC - nome primário"
 
 #: include/hosts.inc.php:409
 msgid "Primary POC notes"
-msgstr "POC - Notas primárias"
+msgstr "POC - notas primárias"
 
 #: include/hosts.inc.php:389
 msgid "Primary POC phone A"
-msgstr "POC - Telefone A"
+msgstr "POC - telefone A"
 
 #: include/hosts.inc.php:394
 msgid "Primary POC phone B"
-msgstr "POC - Telefone B"
+msgstr "POC - telefone B"
 
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
-msgstr "POC - Nome primário da tela"
+msgstr "POC - nome de usuário primário"
 
 #: app/partials/configuration.host.interface.row.php:179
 #: app/views/popup.discovery.check.php:117
@@ -14480,7 +14493,7 @@ msgstr "Proxy"
 #: include/classes/api/services/CProxy.php:606
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
-msgstr ""
+msgstr "O proxy \"%1$s\" já existe."
 
 #: include/classes/import/importers/CHostImporter.php:313
 #, c-format
@@ -15921,31 +15934,31 @@ msgstr ""
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
-msgstr "POC - Célula secundária"
+msgstr "POC - celular secundário"
 
 #: include/hosts.inc.php:419
 msgid "Secondary POC email"
-msgstr "POC - E-mail secundário"
+msgstr "POC - e-mail secundário"
 
 #: include/hosts.inc.php:414
 msgid "Secondary POC name"
-msgstr "POC - Nome secundário"
+msgstr "POC - nome secundário"
 
 #: include/hosts.inc.php:444
 msgid "Secondary POC notes"
-msgstr "POC - Notas secundárias"
+msgstr "POC - notas secundárias"
 
 #: include/hosts.inc.php:424
 msgid "Secondary POC phone A"
-msgstr "POC - Telefone A secundário"
+msgstr "POC - telefone A secundário"
 
 #: include/hosts.inc.php:429
 msgid "Secondary POC phone B"
-msgstr "POC - Telefone B secundário"
+msgstr "POC - telefone B secundário"
 
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
-msgstr "POC - Nome secundário da tela"
+msgstr "POC - nome de usuário secundário"
 
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
@@ -16156,7 +16169,7 @@ msgstr ""
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Serviço removido"
-msgstr[1] ""
+msgstr[1] "Serviços removidos"
 
 #: app/views/administration.userrole.edit.php:144
 #: app/views/administration.userrole.edit.php:185
@@ -16230,6 +16243,10 @@ msgstr "Os serviços formam uma dependência circular."
 
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
 msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
@@ -17191,7 +17208,7 @@ msgstr "A tabela \"%1$s\" não possui um campo chamado \"%2$s\"."
 #: app/views/popup.condition.common.php:323 include/hosts.inc.php:144
 #: include/views/inventory.host.list.php:90
 msgid "Tag"
-msgstr "Plaqueta"
+msgstr "Etiqueta"
 
 #: app/partials/monitoring.latest.filter.php:172
 #: app/partials/monitoring.problem.filter.php:233
@@ -21267,7 +21284,7 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2846
 msgid "geographical coordinates (values of comma separated latitude and longitude) are expected"
-msgstr ""
+msgstr "são esperadas coordenadas geográficas (valores de latitude e longitude separados por vírgula)."
 
 #: include/views/configuration.item.edit.php:828
 #: include/views/configuration.item.edit.php:833

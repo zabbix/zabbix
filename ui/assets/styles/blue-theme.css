@@ -2081,7 +2081,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
     color: #768d99;
-    font-size: 1.167em; }
+    font-size: 1.167em;
+    background-color: transparent; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -2098,7 +2099,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-bad button,
   .msg-good button,
   .msg-warning button {
-    background-color: #ffffff; }
+    background-color: transparent; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
@@ -2690,6 +2691,9 @@ div.dashboard-grid-widget-slareport .date-vertical {
 .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .table-forms-container, .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .browser-warning-container {
   border: 1px solid #dfe4e7; }
 
+div.dashboard-grid-widget-svggraph {
+  overflow-x: hidden; }
+
 .link-action {
   border-bottom: 1px dotted;
   cursor: pointer;
@@ -2916,7 +2920,6 @@ form.is-loading {
     padding-bottom: 0;
     border-bottom: 0;
     box-shadow: inset 0 -1px 0 0 rgba(31, 44, 51, 0.1);
-    color: #1f2c33;
     height: 22px;
     vertical-align: middle;
     white-space: nowrap; }
