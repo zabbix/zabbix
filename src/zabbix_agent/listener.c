@@ -175,9 +175,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			continue;
 		}
 
-		if (EINTR == zbx_socket_last_error())
-			continue;
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (NULL != msg)
 		{

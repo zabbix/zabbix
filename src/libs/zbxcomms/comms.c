@@ -1413,7 +1413,11 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 	if (ZBX_SOCKET_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr,
 			&nlen)))
 	{
-		zbx_set_socket_strerror("accept() failed: %s", strerror_from_system(zbx_socket_last_error()));
+		if (SUCCEED == socket_had_nonblocking_error())
+			ret = TIMEOUT_ERROR;
+		else
+			zbx_set_socket_strerror("accept() failed: %s", strerror_from_system(zbx_socket_last_error()));
+
 		goto out;
 	}
 

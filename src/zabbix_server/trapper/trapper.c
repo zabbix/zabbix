@@ -1364,7 +1364,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 			zbx_tcp_unaccept(&s);
 		}
-		else if (EINTR != zbx_socket_last_error())
+		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
 					zbx_socket_strerror());
