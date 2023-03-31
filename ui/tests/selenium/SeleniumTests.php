@@ -200,6 +200,8 @@ require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
 require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.php';
@@ -408,6 +410,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopHostsWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardPages');
+		$suite->addTestSuite('testDashboardProblemsWidget');
+		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
 		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testPageTemplateDashboards');
