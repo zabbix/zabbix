@@ -1,6 +1,7 @@
 Changes for 5.0.34rc1
 
 Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.33
