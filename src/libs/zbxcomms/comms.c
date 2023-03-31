@@ -1391,7 +1391,11 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 
 	if (ZBX_PROTO_ERROR == (ret = socket_poll(pds, (unsigned long)s->num_socks, poll_timeout * 1000)))
 	{
-		zbx_set_socket_strerror("poll() failed: %s", strerror_from_system(zbx_socket_last_error()));
+		if (SUCCEED == socket_had_nonblocking_error())
+			ret = TIMEOUT_ERROR;
+		else
+			zbx_set_socket_strerror("poll() failed: %s", strerror_from_system(zbx_socket_last_error()));
+
 		goto out;
 	}
 
