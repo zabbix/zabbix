@@ -1010,7 +1010,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 			}
 			break;
 		case ',':
-			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION_ARGS) && 0 < ctx->stack.values_num)
+			if (0 != (ctx->rules & ZBX_EVAL_PARSE_FUNCTION_ARGS))
 			{
 				eval_parse_character_token(pos, ZBX_EVAL_TOKEN_COMMA, token);
 				return SUCCEED;
@@ -1380,6 +1380,12 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 					if (FAIL == eval_append_operator(ctx, optoken, error))
 						goto out;
 					ctx->ops.values_num--;
+				}
+				else if (ZBX_EVAL_TOKEN_GROUP_OPEN == ctx->last_token_type)
+				{
+					*error = zbx_dsprintf(*error, "parenthesis cannot close empty group at \"%s\"",
+							ctx->expression + pos);
+					goto out;
 				}
 			}
 		}
