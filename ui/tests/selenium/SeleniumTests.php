@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/testGeneric.php';
-require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
@@ -40,9 +39,15 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralValuemap.php';
 require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
-require_once dirname(__FILE__).'/testPageGraphPrototypes.php';
+require_once dirname(__FILE__).'/graphs/testFormGraph.php';
+require_once dirname(__FILE__).'/graphs/testFormGraphPrototype.php';
+require_once dirname(__FILE__).'/graphs/testGraphAxis.php';
+require_once dirname(__FILE__).'/graphs/testInheritanceGraph.php';
+require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
+require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
+require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
+require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
-require_once dirname(__FILE__).'/testPageHostGraph.php';
 require_once dirname(__FILE__).'/testPageHostPrototypes.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
@@ -96,8 +101,6 @@ require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebho
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
-require_once dirname(__FILE__).'/testFormGraph.php';
-require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormHostLinkTemplates.php';
@@ -144,12 +147,10 @@ require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceApplication.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
-require_once dirname(__FILE__).'/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
-require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testMultiselect.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
@@ -219,6 +220,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
+		$suite->addTestSuite('testPageMonitoringHostsGraph');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 		$suite->addTestSuite('testPageOverview');
 		/*
