@@ -976,9 +976,11 @@ class testFormWebScenario extends CWebTest {
 					$i = 1;
 					foreach ($data[$field_name] as $field_pair) {
 						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@data-type=".
-								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[1]")->one()->getValue());
+								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[1]")->one()->getValue()
+						);
 						$this->assertEquals($field_pair['value'], $field->query("xpath:(//table[@data-type=".
-								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[2]")->one()->getValue());
+								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[2]")->one()->getValue()
+						);
 						$i++;
 					}
 				}

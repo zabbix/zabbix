@@ -138,14 +138,9 @@ class WebScenarios {
 				],
 				'steps' => [
 					[
-						'name' => 'step 1 of clone scenario',
+						'name' => 'Первый этап вэб сценария',
 						'url' => 'http://zabbix.com',
-						'no' => 1
-					],
-					[
-						'name' => 'Второй этап вэб сценария',
-						'url' => 'http://zabbix.com',
-						'no' => 2,
+						'no' => 1,
 						'follow_redirects' => 0,
 						'headers' => [
 							[
@@ -191,6 +186,11 @@ class WebScenarios {
 								'value' => '+=_-)(*&^%$#@_yreuq'
 							]
 						]
+					],
+					[
+						'name' => 'step 2 of clone scenario',
+						'url' => 'http://zabbix.com',
+						'no' => 2
 					]
 				]
 			],

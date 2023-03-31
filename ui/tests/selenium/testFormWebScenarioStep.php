@@ -33,11 +33,12 @@ class testFormWebScenarioStep extends CWebTest {
 
 	private static $hostid;
 	private static $templateid;
-	private static $update_step = '	step 1 of scenario 1';
+	private static $update_step = 'step 2 of clone scenario';
 
 	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
-	const UPDATE_SCENARIO = 'Scenario for Update';
-	const SQL = 'SELECT * FROM httptest_step';
+	const UPDATE_SCENARIO = 'Scenario for Clone';
+	const CREATE_SCENARIO = 'Scenario for Update';
+	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid';
 
 
 	/**
@@ -131,8 +132,8 @@ class testFormWebScenarioStep extends CWebTest {
 			$step_fields['id:url']['value'] = 'http://zabbix.com';
 			$step_fields['Post type']['value'] = 'Raw data';
 			$step_fields['Raw post']['visible'] = true;
-			$step_fields['xpath:(.//table[@data-type="post_fields"]//input)[1]']['visible'] = false;
-			$step_fields['xpath:(.//table[@data-type="post_fields"]//input)[2]']['visible'] = false;
+			$step_fields["xpath:(.//table[@data-type='post_fields']//input)[1]"]['visible'] = false;
+			$step_fields["xpath:(.//table[@data-type='post_fields']//input)[2]"]['visible'] = false;
 			$step_fields['Follow redirects']['value'] = true;
 
 			$initial_type = 'Raw data';
@@ -152,7 +153,7 @@ class testFormWebScenarioStep extends CWebTest {
 			$visible = (array_key_exists('visible', $attributes)) ? $attributes['visible'] : true;
 			$enabled = (array_key_exists('enabled', $attributes)) ? $attributes['enabled'] : true;
 
-			$this->assertEquals($visible, $step_form->getField($field)->isVisible());
+			$this->assertEquals($visible, $step_form->getField($field)->isVisible(), $field.' visibility is not '.$visible);
 			$this->assertEquals($value, $step_form->getField($field)->getValue());
 			$this->assertTrue($step_form->getField($field)->isEnabled($enabled));
 
@@ -270,7 +271,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => '   ',
 						'id:url' => 'https://zabbix.com'
 					],
-					'sep_error' => 'Incorrect value for field "name": cannot be empty.'
+					'step_error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			// Empty URL
@@ -303,7 +304,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with missing query field name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'query_fields' => [
+					'query fields' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -320,9 +321,10 @@ class testFormWebScenarioStep extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' =>  [
 						'Name' => 'Step with missing post field name',
+						'Post type' => 'Form data',
 						'id:url' => 'http://zabbix.com'
 					],
-					'post_fields' => [
+					'post fields' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -341,7 +343,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with missing variable name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -360,7 +362,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with missing variable nameopening bracket',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -378,7 +380,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with missing variable name closing bracket',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -396,7 +398,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Misplaced brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -414,7 +416,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Double brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -432,7 +434,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Only brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -450,7 +452,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Duplicate Variable names',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -473,7 +475,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Missing Headers name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'header_fields' => [
+					'headers' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -577,7 +579,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Required status codes' => 'AAA'
 					],
-					'step_error' => 'Invalid response code "AAA".'
+					'scenario_error' => 'Invalid response code "AAA".'
 				]
 			],
 			// Too big status code.
@@ -589,7 +591,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Required status codes' => '2150000000'
 					],
-					'step_error' => 'Invalid response code "2150000000".'
+					'scenario_error' => 'Invalid response code "2150000000".'
 				]
 			],
 			// Minimal step configuration.
@@ -601,21 +603,31 @@ class testFormWebScenarioStep extends CWebTest {
 					]
 				]
 			],
+			// Retrieve mode set to Headers - Disabled post fields.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'Retrieve headers',
+						'id:url' => 'http://zabbix.com',
+						'Retrieve mode' => 'Headers'
+					]
+				]
+			],
 			// All fields popullated.
 			[
 				[
 					'fields' =>  [
-						'Name' => 'Min config step',
+						'Name' => 'All possible fields specified',
 						'id:url' => '良い一日を',
+						'Retrieve mode' => 'Body and headers',
 						'Post type' => 'Raw data',
 						'Raw post' => 'name=良い一日を',
 						'Follow redirects' => true,
-						'Retrieve mode' => 'Body and headers',
 						'Timeout' => '33s',
 						'Required string' => '良い一日を',
 						'Required status codes' => '200,300,401'
 					],
-					'query_fields' => [
+					'query fields' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -626,18 +638,18 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => '2nd query value - 良い一日を'
 						]
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'name' => '{1st variable name - 良い一日を}'
 						],
 						[
-							'name' => '{2nd variable name - 良い一日を}',
+							'name' => '{the 2nd variable name - 良い一日を}',
 							'value' => '2nd variable value - 良い一日を'
 						]
 					],
-					'header_fields' => [
+					'headers' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -654,13 +666,14 @@ class testFormWebScenarioStep extends CWebTest {
 			[
 				[
 					'fields' =>  [
-						'Name' => STRING_255,
+						'Name' => STRING_64,
 						'id:url' => 'URL has no maxlength',
+						'Post type' => 'Form data',
 						'Timeout' => '3600s',
 						'Required string' => STRING_255,
 						'Required status codes' => '200'.str_repeat(',200', 63)
 					],
-					'query_fields' => [
+					'query fields' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -668,7 +681,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => STRING_255
 						]
 					],
-					'post_fields' => [
+					'post fields' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -676,7 +689,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => STRING_2000
 						]
 					],
-					'variable_fields' => [
+					'variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -684,7 +697,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => STRING_2000
 						]
 					],
-					'header_fields' => [
+					'headers' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -694,17 +707,187 @@ class testFormWebScenarioStep extends CWebTest {
 					]
 				]
 			],
-			// Retrieve mode set to Headers - Disabled post fields.
+			// Trim trailing and leading spaces from step fields.
 			[
 				[
 					'fields' =>  [
-						'Name' => 'Retrieve heaers',
-						'id:url' => 'http://zabbix.com',
-						'Retrieve mode' => 'Headers'
-					]
+						'Name' => '   Step with trailing and leading spaces   ',
+						'id:url' => '   http://zabbix.com'   ,
+						'Timeout' => '   15   ',
+						'Required string' => '   Zabbix   ',
+						'Required status codes' => '   404   '
+					],
+					'trim' => true
 				]
 			]
 		];
+	}
+
+	/**
+	 * @dataProvider getWebScenarioStepData
+	 */
+	public function testFormWebScenarioStep_Create($data) {
+		$this->checkStepAction($data, 'create');
+	}
+
+	/**
+	 * @dataProvider getWebScenarioStepData
+	 */
+	public function testFormWebScenarioStep_Update($data) {
+		$this->checkStepAction($data, 'update');
+	}
+
+	private function checkStepAction($data, $action) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+
+		// An attempt to save form is done only in TEST_BAD scenarios with scenario level errors, so only then hash is needed.
+		if (CTestArrayHelper::get($data, 'scenario_error')) {
+			$old_hash = CDBHelper::getHash(self::SQL);
+		}
+
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+
+		$scenario = ($action === 'update') ? self::UPDATE_SCENARIO : self::CREATE_SCENARIO;
+		$this->query('link', $scenario)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$scenario_form = $this->query('id:httpForm')->asForm()->one();
+
+		$scenario_form->selectTab('Steps');
+		$steps_table = $scenario_form->getField('Steps')->asTable();
+
+		$open_step = ($action === 'create') ? 'button:Add' : 'link:'.self::$update_step;
+		$steps_table->query($open_step)->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$step_form = $dialog->asForm();
+
+		$step_form->fill($data['fields']);
+
+		foreach (['variables', 'query fields', 'post fields', 'headers'] as $field_name) {
+			if (array_key_exists($field_name, $data)) {
+				// TODO: Replace the below workaround with the commented line when ZBX-22433 is merged.
+//				$form->getField(ucfirst($field_name))->asMultifieldTable()->fill($data[$field_name]);
+				$field = $step_form->getField(ucfirst($field_name));
+
+				// Apart from field labels, field data types have underscores instead of spaces.
+				$data_type = in_array($field_name, ['query fields', 'post fields'])
+					? str_replace(' ', '_', $field_name)
+					: $field_name;
+
+				if (count($data[$field_name]) > 1) {
+					$field->query('button:Add')->one()->click();
+				}
+
+				$i = 1;
+				$n = (in_array($field_name, ['variables', 'headers'])) ? 3 : 1;
+				foreach ($data[$field_name] as $field_pair) {
+					// Resetting 2nd row input element index as Variables Headers tables on Web scenario don't have 2nd rows.
+					if (array_search($field_pair, $data[$field_name]) > 0 && in_array($field_name, ['variables', 'headers'])) {
+						$n = 1;
+					}
+
+					$this->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($data_type)."]//tr[".
+							$i."]//input)[".$n."]"
+					)->one()->fill($field_pair['name']);
+
+					if (array_key_exists('value', $field_pair)) {
+						$this->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($data_type)."]//tr[".
+								$i."]//input)[".($n + 1)."]"
+						)->one()->fill($field_pair['value']);
+					}
+					$i++;
+				}
+			}
+		}
+
+		$step_form->submit();
+
+		if ($expected === TEST_BAD) {
+			if (CTestArrayHelper::get($data, 'step_error')) {
+				$this->assertMessage(TEST_BAD, null, $data['step_error']);
+				$dialog->close();
+			}
+			else {
+				$scenario_form->submit();
+				$this->assertMessage(TEST_BAD, 'Cannot update web scenario', $data['scenario_error']);
+				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+			}
+		}
+		else {
+			$scenario_form->submit();
+			$this->assertMessage(TEST_GOOD, 'Web scenario updated');
+
+			// TODO: add logic to trim headers an variables after ZBX-22433 is merged.
+			if (array_key_exists('trim', $data)) {
+				$data['fields'] = array_map('trim', $data['fields']);
+			}
+
+			if ($action === 'update') {
+				self::$update_step = $data['fields']['Name'];
+			}
+
+			$this->query('link', $scenario)->waitUntilCLickable()->one()->click();
+			$this->page->waitUntilReady();
+
+			$scenario_form->selectTab('Steps');
+
+			// Check values displayed in Steps table
+			$step_row = $scenario_form->getField('Steps')->asTable()->findRow('Name', $data['fields']['Name']);
+			$this->assertEquals($data['fields']['id:url'], $step_row->getColumn('URL')->getText());
+
+			$column_mappring = [
+				'Required' => 'Required string',
+				'Status codes' => 'Required status codes'
+			];
+
+			foreach (['Timeout' => '15s', 'Required' => '', 'Status codes' => ''] as $column => $value) {
+				$actual_field = ($column === 'Timeout') ? $column : $column_mappring[$column];
+
+				if (array_key_exists($actual_field, $data['fields'])) {
+					$value = $data['fields'][$actual_field];
+				}
+
+				$this->assertEquals($value, $step_row->getColumn($column)->getText());
+			}
+
+			$step_row->query('link', $data['fields']['Name'])->one()->click();
+			$step_form->invalidate();
+
+			$step_form->checkValue($data['fields']);
+
+			foreach (['variables', 'query fields', 'post fields', 'headers'] as $field_name) {
+				if (array_key_exists($field_name, $data)) {
+					// TODO: Replace the below workaround with a check via $table->checkValue() when ZBX-22433 is merged.
+					$field = $step_form->getField(ucfirst($field_name));
+
+					// Apart from field labels, field data types have underscores instead of spaces.
+					$data_type = in_array($field_name, ['query fields', 'post fields'])
+						? str_replace(' ', '_', $field_name)
+						: $field_name;
+
+					$i = 1;
+					$n = (in_array($field_name, ['variables', 'headers'])) ? 3 : 1;
+					foreach ($data[$field_name] as $field_pair) {
+						// Resetting 2nd row input element index as Variables Headers tables on Web scenario don't have 2nd rows.
+						if (array_search($field_pair, $data[$field_name]) > 0 && in_array($field_name, ['variables', 'headers'])) {
+							$n = 1;
+						}
+
+						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@data-type=".
+								CXPathHelper::escapeQuotes($data_type)."]//tr[".$i."]//input)[".$n."]")->one()->getValue()
+						);
+
+						if (array_key_exists('value', $field_pair)) {
+							$this->assertEquals($field_pair['value'], $field->query("xpath:(//table[@data-type=".
+									CXPathHelper::escapeQuotes($data_type)."]//tr[".$i."]//input)[".($n + 1)."]")->one()->getValue()
+							);
+						}
+
+						$i++;
+					}
+				}
+			}
+		}
 	}
 
 	// Convert raw data to form fields + URL parse + Cancel create + Cancel update + Simple update + Remove
