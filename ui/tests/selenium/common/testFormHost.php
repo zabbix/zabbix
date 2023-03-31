@@ -295,6 +295,20 @@ class testFormHost extends CWebTest {
 			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use combined requests"]')->one()
 					->asCheckbox()->isChecked()
 			);
+			if ($field === 'SNMPv3') {
+				// Check fields' lengths.
+				$field_lenghts = [
+					'Max repetition count' =>  20,
+					'Context name' => 255,
+					'Security name' => 64,
+					'Authentication passphrase' => 64,
+					'Privacy passphrase' => 64
+				];
+
+				foreach ($field_lenghts as $label => $length) {
+					$this->assertEquals($length, $snmp_form->getField($label)->getAttribute('maxlength'));
+				}
+			}
 		}
 
 		// Check hintbox.
