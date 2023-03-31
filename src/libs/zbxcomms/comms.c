@@ -436,6 +436,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*server_name = NULL;
 #endif
+	zbx_socket_clean(s);
 
 	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
 	{
@@ -455,8 +456,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		return FAIL;
 	}
 #endif
-
-	zbx_socket_clean(s);
 	s->timeout = timeout;
 
 	zbx_snprintf(service, sizeof(service), "%hu", port);
