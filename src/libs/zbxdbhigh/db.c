@@ -23,6 +23,7 @@
 #include "events.h"
 #include "threads.h"
 #include "zbxserver.h"
+#include "zbx_dbversion_constants.h"
 #include "dbcache.h"
 #include "zbxalgo.h"
 #include "cfg.h"
@@ -848,10 +849,6 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  ******************************************************************************/
 void	zbx_db_check_tsdb_capabilities(void)
 {
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
-#define ZBX_TIMESCALE_MIN_VERSION				10500
-#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 	int		major, minor, patch, version;
 	int		compression_available = OFF;
 	char		*tsdb_lic = NULL;
@@ -923,10 +920,6 @@ out:
 		zabbix_log(LOG_LEVEL_WARNING, "failed to set database compression availability");
 
 	DBclose();
-#undef ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB
-#undef ZBX_TIMESCALE_MIN_VERSION
-#undef ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT
-#undef ZBX_TIMESCALE_LICENSE_COMMUNITY
 }
 
 int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
@@ -3664,7 +3657,32 @@ char	*zbx_db_get_schema_esc(void)
 
 	return name;
 }
-
-
-
 #endif
+
+void	zbx_recalc_history_time_period(int *ts_from)
+{
+#define HK_CFG_UPDATE_INTERVAL	5
+	int			least_ts, now;
+	zbx_config_t		cfg;
+	static int		last_cfg_retrieval = 0;
+	static zbx_config_hk_t	hk;
+
+	now = (int)time(NULL);
+
+	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
+	{
+		last_cfg_retrieval = now;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk = cfg.hk;
+	}
+
+	if (1 != hk.history_global)
+		return;
+
+	least_ts = (int)time(NULL) - hk.history;
+
+	if (least_ts > *ts_from)
+		*ts_from = least_ts;
+#undef HK_CFG_UPDATE_INTERVAL
+}

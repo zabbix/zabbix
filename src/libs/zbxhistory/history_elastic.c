@@ -407,6 +407,16 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 		goto out;
 	}
 
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS,
+			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+#endif
+
 	*page_w[hist->value_type].errbuf = '\0';
 
 	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PRIVATE, &page_w[hist->value_type])))
@@ -723,6 +733,16 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
+
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS,
+			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "sending query to %s; post data: %s", data->post_url, query.buffer);
 

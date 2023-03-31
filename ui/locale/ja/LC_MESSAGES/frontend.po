@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-01-08 02:31+0000\n"
+"PO-Revision-Date: 2023-03-02 15:03+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -2727,6 +2727,11 @@ msgstr "ディスカバリされたグラフを更新できません。"
 #: include/classes/api/services/CHostGroup.php:866
 msgid "Cannot update a discovered host group."
 msgstr "ディスカバリされたホストグループを更新できません。"
+
+#: include/classes/api/services/CGraphGeneral.php:69
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "テンプレートのグラフ\"%1$s\"を更新できません。"
 
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format

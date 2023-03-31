@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -406,7 +406,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'disabled');
+			$this->zbxTestAssertAttribute("//z-select[@id='graphtype']", 'readonly');
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentXpath("//z-select[@id='graphtype'][@disabled]");
@@ -693,13 +693,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		$this->zbxTestTabSwitch('Preview');
-
-		if (isset($data['templatedHost'])) {
-			$this->zbxTestAssertAttribute("//button[@id='update']", 'disabled');
-		}
-		else {
-			$this->zbxTestAssertElementNotPresentXpath("//button[@id='update'][@disabled]");
-		}
+		$this->zbxTestAssertElementNotPresentXpath("//button[@id='update'][@disabled]");
 
 		$this->zbxTestAssertVisibleId('cancel');
 		$this->zbxTestAssertElementText("//button[@id='cancel']", 'Cancel');
@@ -762,7 +756,8 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'graphName' => 'graphSimple',
 					'hostCheck' => true,
-					'dbCheck' => true
+					'dbCheck' => true,
+					'screenshot' => true
 				]
 			],
 			[
@@ -1084,6 +1079,12 @@ class testFormGraphPrototype extends CLegacyWebTest {
 				'context' => $this->hostGroup
 			]);
 			$this->query('link', $this->itemSimple)->waitUntilClickable()->one()->click();
+
+			// Take a screenshot to test draggable object position of items list.
+			if (array_key_exists('screenshot', $data)) {
+				$this->page->removeFocus();
+				$this->assertScreenshot($this->query('id:itemsTable')->one(), 'Graph prototype - Items');
+			}
 
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');
