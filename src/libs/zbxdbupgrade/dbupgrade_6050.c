@@ -181,7 +181,7 @@ static int	DBpatch_6050009(void)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		ret = zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error);
+		ret = zbx_eval_parse_expression_str_v64_compat(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error);
 		if (FAIL == ret)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Failed to parse calculated item expression \"%s\" for"
@@ -246,8 +246,8 @@ static int	DBpatch_6050009(void)
 			zbx_free(escaped);
 		}
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update items set params='%s' where itemid=%s;\n", substitute, row[0]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set params='%s' where itemid=%s;\n",
+				zbx_db_dyn_escape_string(substitute), row[0]);
 		zbx_free(substitute);
 		zbx_eval_clear(&ctx);
 
