@@ -992,7 +992,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
 		case '8':
 		case '9':
 			/* after ',' there will be at least one value on the stack */
-			if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type &&
+			if (ZBX_EVAL_TOKEN_COMMA == ctx->last_token_type && 0 < ctx->stack.values_num &&
 				ZBX_EVAL_TOKEN_ARG_QUERY == ctx->stack.values[ctx->stack.values_num - 1].type)
 			{
 				return eval_parse_period_token(ctx, pos, token, error);
