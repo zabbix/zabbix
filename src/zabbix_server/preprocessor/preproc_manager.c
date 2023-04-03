@@ -1287,16 +1287,21 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 	zbx_vector_ptr_create(&history);
 	zbx_preprocessor_unpack_result(&value, &history, &error, message->data);
 
-	if (FAIL == preprocessor_set_variant_result(request, &value, error))
+	if (ZBX_VARIANT_NONE != value.type || NULL != error)
 	{
-		preprocessor_update_history(manager, request->value.itemid, NULL);
-		zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
+		if (FAIL == preprocessor_set_variant_result(request, &value, error))
+		{
+			preprocessor_update_history(manager, request->value.itemid, NULL);
+			zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
+		}
+		else
+		{
+			preprocessor_enqueue_dependent_value(manager, &request->value);
+			preprocessor_update_history(manager, request->value.itemid, &history);
+		}
 	}
 	else
-	{
-		preprocessor_enqueue_dependent_value(manager, &request->value);
-		preprocessor_update_history(manager, request->value.itemid, &history);
-	}
+		zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 
 	preprocessor_set_request_state_done(manager, (zbx_preprocessing_request_base_t *)request, worker->task);
 
