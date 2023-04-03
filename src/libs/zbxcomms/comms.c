@@ -1429,6 +1429,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 	{
 		zbx_set_socket_strerror("failed to set socket non-blocking mode: %s",
 				strerror_from_system(zbx_socket_last_error()));
+		zbx_tcp_unaccept(s);
 		goto out;
 	}
 
