@@ -20,6 +20,7 @@
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
+#include "log.h"
 
 /*
  * 7.0 development database patches
@@ -85,19 +86,42 @@ static int	DBpatch_6050007(void)
 
 static int	DBpatch_6050008(void)
 {
-	if (SUCCEED != DBmodify_field_type("history", zbx_db_get_field(zbx_db_get_table("history"), "value"), NULL))
-		return FAIL;
+	const zbx_db_field_t	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	if (SUCCEED != DBmodify_field_type("trends", zbx_db_get_field(zbx_db_get_table("trends"), "value_min"), NULL))
-		return FAIL;
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-	if (SUCCEED != DBmodify_field_type("trends", zbx_db_get_field(zbx_db_get_table("trends"), "value_avg"), NULL))
-		return FAIL;
+	return DBmodify_field_type("history", &field, &field);
+}
 
-	if (SUCCEED != DBmodify_field_type("trends", zbx_db_get_field(zbx_db_get_table("trends"), "value_max"), NULL))
-		return FAIL;
+static int	DBpatch_6050009(void)
+{
+	const zbx_db_field_t	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 
-	return SUCCEED;
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050010(void)
+{
+	const zbx_db_field_t	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050011(void)
+{
+	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
 }
 
 #endif
@@ -115,5 +139,8 @@ DBPATCH_ADD(6050005, 0, 1)
 DBPATCH_ADD(6050006, 0, 1)
 DBPATCH_ADD(6050007, 0, 1)
 DBPATCH_ADD(6050008, 0, 1)
+DBPATCH_ADD(6050009, 0, 1)
+DBPATCH_ADD(6050010, 0, 1)
+DBPATCH_ADD(6050011, 0, 1)
 
 DBPATCH_END()
