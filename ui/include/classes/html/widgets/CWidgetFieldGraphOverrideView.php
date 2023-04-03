@@ -364,7 +364,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 					->setAttribute('title', _('Delete'))
 					->addClass(ZBX_STYLE_BTN_REMOVE)
 					->removeId()
-			))->addClass('dataset-actions'),
+			))->addClass('list-item-actions'),
 			(new CList($inputs))
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
 				->addItem(
@@ -372,8 +372,6 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 						->setAttribute('data-row', $row_num)
 						->addClass(ZBX_STYLE_BTN_ALT)
 				)
-		]))
-			->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM)
-			->addClass($this->field->isTemplateDashboard() ? 'with-hosts-multiselect' : null);
+		]))->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM);
 	}
 }

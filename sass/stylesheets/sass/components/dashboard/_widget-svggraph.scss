@@ -81,7 +81,7 @@ form.dashboard-widget-svggraph {
 		}
 	}
 
-	.dataset-actions {
+	.list-item-actions {
 		text-align: right;
 
 		.btn-remove {
@@ -164,10 +164,8 @@ form.dashboard-widget-svggraph {
 			}
 		}
 
-		&.with-hosts-multiselect { // FIXME - wrong classname. without host
-			.multiselect-control {
-				grid-column: span 2;
-			}
+		.list-item-actions {
+			grid-column: 6;
 		}
 	}
 
@@ -217,16 +215,8 @@ form.dashboard-widget-svggraph {
 			width: 100%;
 		}
 
-		.btn-remove {
-			right: 0;
-			top: 0;
-			vertical-align: baseline;
-		}
-
-		&.with-hosts-multiselect {// FIXME - wrong classname. without host
-			.multiselect-control {
-				grid-column: span 2;
-			}
+		.list-item-actions {
+			grid-column: 3;
 		}
 	}
 
