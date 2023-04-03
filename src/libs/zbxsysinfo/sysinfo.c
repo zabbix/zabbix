@@ -274,8 +274,13 @@ int	sysinfo_get_config_timeout(void)
 
 void	zbx_init_metrics(void)
 {
+#if (defined(WITH_AGENT_METRICS) || defined(WITH_COMMON_METRICS) || defined(WITH_HTTP_METRICS) ||	\
+	defined(WITH_SPECIFIC_METRICS) || defined(WITH_SIMPLE_METRICS))
 	int	i;
 	char	error[MAX_STRING_LEN];
+#elif (defined(WITH_HOSTNAME_METRIC))
+	char	error[MAX_STRING_LEN];
+#endif
 
 	zbx_init_key_access_rules();
 
@@ -283,15 +288,6 @@ void	zbx_init_metrics(void)
 	commands[0].key = NULL;
 	commands_local = (ZBX_METRIC *)zbx_malloc(commands_local, sizeof(ZBX_METRIC));
 	commands_local[0].key = NULL;
-
-#if (!defined(WITH_AGENT_METRICS) && !defined(WITH_COMMON_METRICS) &&			\
-		!defined(WITH_HTTP_METRICS) && !defined(WITH_SPECIFIC_METRICS) &&	\
-		!defined(WITH_SIMPLE_METRICS))
-	ZBX_UNUSED(i);
-#if (!defined(WITH_HOSTNAME_METRIC))
-	ZBX_UNUSED(error);
-#endif
-#endif
 
 #ifdef WITH_AGENT_METRICS
 	for (i = 0; NULL != parameters_agent[i].key; i++)
