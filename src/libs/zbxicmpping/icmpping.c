@@ -22,13 +22,12 @@
 #include <signal.h>
 
 #include "log.h"
-#include "zbxcommon.h"
 #include "zbxcomms.h"
 #include "zbxexec.h"
-#include "zbxip.h"
 #include "zbxstr.h"
+#include "zbxip.h"
 #include "zbxthreads.h"
-#include "zbxtypes.h"
+#include "zbxfile.h"
 
 static const zbx_config_icmpping_t	*config_icmpping;
 

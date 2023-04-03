@@ -20,7 +20,6 @@
 #include "zbxdbhigh.h"
 
 #include "log.h"
-#include "events.h"
 #include "zbxnum.h"
 
 /******************************************************************************
