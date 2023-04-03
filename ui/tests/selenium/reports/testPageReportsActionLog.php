@@ -43,8 +43,18 @@ class testPageReportsActionLog extends CWebTest {
 		);
 
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-			"message, status, retries, error, esc_step, alerttype, parameters) VALUES (10, 13, 1, 9, ".
-			"1329724890, 3, '77777777', 'subject_no_space', 'message_no_space', 1, 0, '', 1, 0, '');"
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (10, 13, 1, 9, ".
+				"1329724890, 3, '77777777', 'subject_no_space', 'message_no_space', 1, 0, '', 1, 0, '');"
+		);
+
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (11, 13, 1, 1, ".
+				"1597439400, 3, 'igor.danoshaites@zabbix.com', 'time_subject_1', 'time_message_1', 1, 0, '', 1, 0, '');"
+		);
+
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (12, 12, 1, 9, ".
+				"1597440000, 3, 'igor.danoshaites@zabbix.com', 'time_subject_2', 'time_message_', 1, 0, '', 1, 0, '');"
 		);
 	}
 
@@ -625,6 +635,35 @@ class testPageReportsActionLog extends CWebTest {
 					],
 					'result' => []
 				]
+			],
+			// 34
+			[
+				[
+					'fields' => '',
+					'time' => [
+						'from' => '2020-08-15 00:00:00',
+						'to' => '2020-08-15 01:0:00'
+					],
+					'result' => [
+						['Time' => '2020-08-15 00:20:00'],
+						['Time' => '2020-08-15 00:10:00']
+					]
+				]
+			],
+			// 35
+			[
+				[
+					'fields' => [
+						'Actions' => 'Trigger action 2'
+					],
+					'time' => [
+						'from' => '2020-08-15 00:00:00',
+						'to' => '2020-08-15 01:0:00'
+					],
+					'result' => [
+						['Time' => '2020-08-15 00:20:00', 'Action' => 'Trigger action 2']
+					]
+				]
 			]
 		];
 	}
@@ -637,6 +676,20 @@ class testPageReportsActionLog extends CWebTest {
 	public function testPageReportsActionLog_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=actionlog.list&from=2012-02-20+09:01:00&to=2012-02-20+11:01:00&'.
 				'filter_messages=&filter_set=1')->waitUntilReady();
+
+		// Filter by time.
+		if (array_key_exists('time', $data)) {
+			if ($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists()) {
+				$this->query('id:ui-id-1')->one()->click();
+			}
+
+			foreach ($data['time'] as $id => $value) {
+				$this->query("xpath://input[@id=".CXPathHelper::escapeQuotes($id)."]")->one()->fill($value);
+			}
+
+			$this->query('id:apply')->one()->click();
+			$this->page->waitUntilReady();
+		}
 
 		// If the filter is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
@@ -658,7 +711,6 @@ class testPageReportsActionLog extends CWebTest {
 			$this->assertTableStats(count($data['result']));
 		}
 
-		// Reset filter.
 		$form->query('button:Reset')->one()->click();
 	}
 
