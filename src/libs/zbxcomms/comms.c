@@ -752,18 +752,11 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 
 		send_bytes = offset + take_bytes;
 
-		while (written < (ssize_t)send_bytes)
+		if (ZBX_PROTO_ERROR == (written = zbx_tcp_write(s, header_buf, send_bytes)))
 		{
-			if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, header_buf + written,
-					send_bytes - (size_t)written)))
-			{
-				ret = FAIL;
-				goto cleanup;
-			}
-			written += bytes_sent;
+			ret = FAIL;
+			goto cleanup;
 		}
-
-		written -= (ssize_t)offset;
 	}
 
 	while (written < (ssize_t)send_len)
