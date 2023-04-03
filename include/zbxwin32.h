@@ -118,11 +118,18 @@ typedef enum {
 	zbx_FileIdInfo		= 18
 } zbx_file_info_by_handle_class_t;
 
-extern DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD);
-extern BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
-extern BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
-extern BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
-extern BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
+
+typedef DWORD	(__stdcall *GetGuiResources)(HANDLE, DWORD);
+typedef BOOL	(__stdcall *GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
+typedef BOOL	(__stdcall *GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
+typedef BOOL	(__stdcall *GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
+typedef BOOL	(__stdcall *GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
+
+GetGuiResources			*zbx_get_GetGuidResources(void);
+GetProcessIoCounters		*zbx_get_GetProcessIoCounters(void);
+GetPerformanceInfo		*zbx_get_GetPerformanceInfo(void);
+GetGlobalMemoryStatusEx		*zbx_get_GetGlobalMemoryStatusEx(void);
+GetFileInformationByHandleEx	*zbx_get_GetFileInformationByHandleEx(void);
 
 void	zbx_import_symbols(void);
 

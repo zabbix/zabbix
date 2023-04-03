@@ -354,9 +354,9 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 	}
 	else if (2 == use_ino)
 	{
-		if (NULL != zbx_GetFileInformationByHandleEx)
+		if (NULL != zbx_get_GetFileInformationByHandleEx())
 		{
-			if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, zbx_FileIdInfo, &fid, sizeof(fid)))
+			if (0 != zbx_get_GetFileInformationByHandleEx()((HANDLE)h, zbx_FileIdInfo, &fid, sizeof(fid)))
 			{
 				*dev = fid.VolumeSerialNumber;
 				*ino_lo = fid.FileId.LowPart;
