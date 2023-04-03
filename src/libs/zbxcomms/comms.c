@@ -1411,6 +1411,12 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 			break;
 	}
 
+	if (i == s->num_socks)
+	{
+		zbx_set_socket_strerror("incoming connection has failed");
+		goto out;
+	}
+
 	/* Since this socket was returned by poll, we know we have */
 	/* a connection waiting and that this accept() will not block. */
 	nlen = sizeof(serv_addr);
