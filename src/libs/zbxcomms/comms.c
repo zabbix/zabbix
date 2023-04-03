@@ -2456,21 +2456,22 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 
 			if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 			{
-				if (SUCCEED == socket_had_nonblocking_error())
-					continue;
-
-				zbx_set_socket_strerror("cannot wait for socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
-				return FAIL;
+				if (SUCCEED != socket_had_nonblocking_error())
+				{
+					zbx_set_socket_strerror("cannot wait for socket: %s",
+							strerror_from_system(zbx_socket_last_error()));
+					return FAIL;
+				}
 			}
 
-			if (0 == rc)
+			if (0 >= rc)
 			{
 				if (SUCCEED != zbx_socket_check_deadline(s))
 				{
 					zbx_set_socket_strerror("send timeout");
 					return FAIL;
 				}
+				continue;
 			}
 
 			if (0 == (pd.revents & POLLIN))
