@@ -31,11 +31,11 @@
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
 	->addField(array_key_exists('graphid', $data['fields'])
-		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'], $data['captions']['ms']['graphs']['graphid'])
+		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'], $data['captions']['graphs']['graphid'])
 		: null
 	)
 	->addField(array_key_exists('itemid', $data['fields'])
-		? new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid'])
+		? new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid'])
 		: null
 	)
 	->addField(
