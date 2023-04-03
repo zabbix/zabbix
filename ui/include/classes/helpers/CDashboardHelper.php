@@ -79,7 +79,7 @@ class CDashboardHelper {
 					'widgetid' => $widget_data['widgetid'],
 					'type' => $widget_data['type'],
 					'name' => $widget_data['name'],
-					'view_mode' => $widget_data['view_mode'],
+					'view_mode' => (int) $widget_data['view_mode'],
 					'pos' => [
 						'x' => (int) $widget_data['x'],
 						'y' => (int) $widget_data['y'],

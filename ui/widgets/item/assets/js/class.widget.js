@@ -20,13 +20,11 @@
 
 class CWidgetItem extends CWidget {
 
-	_registerEvents() {
-		super._registerEvents();
-
+	onStart() {
 		this._events.resize = () => {
 			const margin = 5;
 			const padding = 10;
-			const header_height = this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 0 : 33;
+			const header_height = this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 0 : 33;
 
 			this._target.style.setProperty(
 				'--content-height',
@@ -35,20 +33,16 @@ class CWidgetItem extends CWidget {
 		}
 	}
 
-	_activateEvents() {
-		super._activateEvents();
-
+	onActivate() {
 		this._resize_observer = new ResizeObserver(this._events.resize);
 		this._resize_observer.observe(this._target);
 	}
 
-	_deactivateEvents() {
-		super._deactivateEvents();
-
+	onDeactivate() {
 		this._resize_observer.disconnect();
 	}
 
-	_hasPadding() {
+	hasPadding() {
 		return false;
 	}
 }

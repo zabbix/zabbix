@@ -11,7 +11,7 @@
   .timeline-axis::before {
     background-color: #454f55 !important; }
 
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-head h4, .dashboard-grid-iterator-head h4, form.dashboard-widget-tophosts #list_columns .text, .list-table .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, form.dashboard-widget-tophosts #list_columns .text, .list-table .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -359,7 +359,8 @@ svg a {
     .sortable .sortable-item:not(.sortable-dragging) {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
-    position: absolute; }
+    position: absolute;
+    opacity: 0.6; }
 
 html,
 body {
@@ -700,6 +701,8 @@ footer {
     line-height: 24px; }
   .form-grid .form-actions button:not(:first-of-type) {
     margin-left: 10px; }
+  .form-grid.form-grid-actions {
+    margin-top: 10px; }
   .form-grid .form-field.offset-1 {
     grid-column-start: 2 !important; }
   .form-grid .form-field.offset-2 {
@@ -723,6 +726,8 @@ footer {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
     line-height: 1.4em; }
+  .form-grid .form-field .icon-info {
+    margin-left: 5px; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
     .form-grid.form-grid-1-1.label-width-true {
@@ -1052,6 +1057,8 @@ footer {
     .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span,
     .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
       color: #f2f2f2; }
+  .dashboard-navigation-tabs .sortable-dragging .sortable-item {
+    opacity: 1; }
 
 .dashboard-navigation-controls {
   display: flex;
@@ -1151,7 +1158,7 @@ footer {
   display: flex;
   flex-direction: column; }
 
-.dashboard-grid-widget-head {
+.dashboard-grid-widget-header {
   position: absolute;
   top: .25rem;
   left: .25rem;
@@ -1167,24 +1174,38 @@ footer {
   border-bottom: 0;
   background-color: #2b2b2b;
   z-index: 3; }
-  .dashboard-grid-widget-head h4 {
+  .dashboard-grid-widget-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
     color: #dedede;
     font-weight: bold; }
-  .dashboard-grid-widget-head ul {
+  .dashboard-grid-widget-header ul {
     flex-shrink: 0; }
-    .dashboard-grid-widget-head ul li {
+    .dashboard-grid-widget-header ul li {
       float: left;
       padding: 0; }
-      .dashboard-grid-widget-head ul li select {
+      .dashboard-grid-widget-header ul li select {
         margin: 4px 0; }
 
 .dashboard-grid-widget-actions {
   opacity: 0;
   transition: opacity .2s ease-out; }
 
-.dashboard-grid-widget-content {
+.dashboard-grid-widget-messages .msg-bad,
+.dashboard-grid-widget-messages .msg-good,
+.dashboard-grid-widget-messages .msg-warning {
+  margin: 0 10px 8px; }
+
+.dashboard-grid-widget-body {
+  display: contents; }
+
+.dashboard-grid-widget-debug .debug-output {
+  margin: 8px 10px 0;
+  max-height: none;
+  border-color: #383838; }
+
+.dashboard-grid-widget-contents {
+  position: relative;
   flex-grow: 1;
   margin-top: 2rem;
   box-sizing: border-box;
@@ -1193,26 +1214,17 @@ footer {
   overflow: auto;
   border: 1px solid #303030;
   background-color: #2b2b2b; }
-  .dashboard-grid-widget-content .list-table {
+  .dashboard-grid-widget-contents .list-table {
     border: 0; }
-    .dashboard-grid-widget-content .list-table tbody tr:last-child th, .dashboard-grid-widget-content .list-table tbody tr:last-child td {
+    .dashboard-grid-widget-contents .list-table tbody tr:last-child th, .dashboard-grid-widget-contents .list-table tbody tr:last-child td {
       border-bottom: 1px solid #383838; }
-      .dashboard-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
+      .dashboard-grid-widget-contents .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-widget-contents .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: 0; }
-    .dashboard-grid-widget-content .list-table.sticky-footer {
+    .dashboard-grid-widget-contents .list-table.sticky-footer {
       margin-bottom: -8px; }
-      .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+      .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: -8px; }
-  .dashboard-grid-widget-content .debug-output {
-    max-height: none;
-    border-color: #383838; }
-  .dashboard-grid-widget-content .msg-bad,
-  .dashboard-grid-widget-content .msg-good,
-  .dashboard-grid-widget-content .msg-warning {
-    margin: 0 10px; }
-  .dashboard-grid-widget-content.no-padding .msg-bad,
-  .dashboard-grid-widget-content.no-padding .msg-good,
-  .dashboard-grid-widget-content.no-padding .msg-warning {
+  .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-debug .debug-output {
     margin: 8px 10px; }
 
 .dashboard-grid-widget-mask {
@@ -1225,18 +1237,22 @@ footer {
 
 .dashboard-grid-widget {
   position: absolute; }
-  .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+  .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
     height: 0;
     transition: height .3s, margin-top .3s, box-shadow .3s; }
-  .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content {
+  .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
     padding-top: 8px; }
-    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer {
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-bad,
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-good,
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-warning {
+      margin: 8px 10px; }
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents .list-table.sticky-footer {
       margin-bottom: 0; }
-      .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+      .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: 0; }
-  .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-head {
+  .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
     height: 2rem;
     margin-top: -2rem;
     box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
@@ -1257,7 +1273,7 @@ footer {
   width: 100%;
   height: 100%; }
 
-.dashboard-grid-iterator-head {
+.dashboard-grid-iterator-header {
   position: absolute;
   top: .25rem;
   left: .25rem;
@@ -1275,31 +1291,31 @@ footer {
   opacity: 0;
   transition: margin-top .3s ease-out, height .3s ease-out, opacity .15s .15s ease-out, box-shadow .3s ease-out;
   z-index: 3; }
-  .dashboard-grid-iterator-head h4 {
+  .dashboard-grid-iterator-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
     color: #dedede;
     font-weight: bold; }
-  .dashboard-grid-iterator-head ul {
+  .dashboard-grid-iterator-header ul {
     flex-shrink: 0; }
-    .dashboard-grid-iterator-head ul li {
+    .dashboard-grid-iterator-header ul li {
       float: left;
       padding: 0; }
-  .dashboard-grid-iterator-head .dashboard-grid-iterator-pager {
+  .dashboard-grid-iterator-header .dashboard-grid-iterator-pager {
     margin: 0 10px;
     height: 2rem;
     display: none;
     flex-direction: row;
     flex-shrink: 0;
     align-items: center; }
-    .dashboard-grid-iterator-head .dashboard-grid-iterator-pager .dashboard-grid-iterator-pager-info {
+    .dashboard-grid-iterator-header .dashboard-grid-iterator-pager .dashboard-grid-iterator-pager-info {
       margin: 2px .5em 0;
       white-space: nowrap;
       color: #dedede; }
-  .dashboard-grid-iterator-head.pager-visible .dashboard-grid-iterator-pager {
+  .dashboard-grid-iterator-header.pager-visible .dashboard-grid-iterator-pager {
     display: flex; }
 
-.dashboard-grid-iterator-content {
+.dashboard-grid-iterator-contents {
   position: absolute;
   top: 0;
   left: 0;
@@ -1348,17 +1364,17 @@ footer {
   position: absolute; }
   .dashboard-grid-iterator.iterator-too-small .dashboard-grid-iterator-too-small {
     display: flex; }
-  .dashboard-grid-iterator.iterator-too-small .dashboard-grid-iterator-content {
+  .dashboard-grid-iterator.iterator-too-small .dashboard-grid-iterator-contents {
     display: none; }
   .dashboard-grid-iterator.dashboard-grid-iterator-focus {
     z-index: 5; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-head {
+    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-header {
       margin-top: -2rem;
       height: 2rem;
       box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
       opacity: 1;
       transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-head {
+    .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
       margin-top: calc(-4rem - 8px);
       height: calc(4rem + 8px); }
   .dashboard-grid-iterator.ui-resizable-resizing.resizing-top .dashboard-grid-iterator-container {
@@ -1367,7 +1383,7 @@ footer {
   .dashboard-grid-iterator.ui-resizable-resizing.resizing-left .dashboard-grid-iterator-container {
     left: auto;
     right: 0; }
-  .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content {
+  .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents {
     position: absolute;
     top: .25rem;
     left: .25rem;
@@ -1375,29 +1391,29 @@ footer {
     bottom: .25rem;
     border: 1px solid #303030;
     background-color: #2b2b2b; }
-    .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div {
+    .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div {
       padding-top: 8px; }
-      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table {
+      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table {
         border: 0; }
-        .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table tbody tr:last-child th, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table tbody tr:last-child td {
+        .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table tbody tr:last-child th, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table tbody tr:last-child td {
           border-bottom: 1px solid #383838; }
-          .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table tbody tr:last-child td.list-table-footer {
+          .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table tbody tr:last-child td.list-table-footer {
             border-bottom: 0; }
-      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .msg-good,
-      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .msg-bad {
+      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .msg-good,
+      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .msg-bad {
         margin: 0 10px; }
 
-.dashboard-grid-widget.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-head,
-.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-head {
+.dashboard-grid-widget.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-header {
   cursor: auto; }
 
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-actions {
   opacity: 1; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   transition: none; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-iterator.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-iterator.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   transition: none; }
 .dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget-mask {
   display: block; }
@@ -1407,13 +1423,13 @@ footer {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-focus .ui-resizable-handle {
   visibility: visible; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   margin-top: 0;
   height: 0;
   box-shadow: none; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .ui-resizable-handle {
   visibility: hidden; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
@@ -1430,9 +1446,9 @@ footer {
     bottom: .25rem;
     background-color: rgba(1, 1, 1, 0.75);
     box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-head {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-header {
     border-color: #212121; }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-content, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-content {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #212121; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.dashboard-grid-widget-focus) {
   transition-property: width, height, left, top;
@@ -1441,19 +1457,19 @@ footer {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus .ui-resizable-handle {
   visibility: visible; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-header {
   margin-top: 0;
   height: 0;
   box-shadow: none;
   opacity: 0; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .ui-resizable-handle {
   visibility: hidden; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-header {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: .5; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
   margin-top: calc(-4rem - 8px);
   height: calc(4rem + 8px); }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging {
@@ -1468,13 +1484,13 @@ footer {
     bottom: .25rem;
     background-color: rgba(1, 1, 1, 0.75);
     box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-head {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-header {
     border-color: #212121; }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-head {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-header {
     border-color: #212121; }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-content, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-content {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-contents {
     border-color: #212121; }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-iterator-placeholder > div, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-iterator-placeholder > div {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-iterator-placeholder > div, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-iterator-placeholder > div {
     border-color: #212121; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
     border: 1px solid #1c1c1c;
@@ -1516,9 +1532,9 @@ footer {
   .dashboard-widget .msg-warning {
     margin: 0 10px; }
 
-.dashboard-grid-widget-content .list-table th:first-child, .dashboard-grid-widget-content .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
+.dashboard-grid-widget-contents .list-table th:first-child, .dashboard-grid-widget-contents .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
   padding-left: 10px; }
-.dashboard-grid-widget-content .list-table th:last-child, .dashboard-grid-widget-content .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+.dashboard-grid-widget-contents .list-table th:last-child, .dashboard-grid-widget-contents .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
   padding-right: 10px; }
 
 .dashboard-widget-head {
@@ -1544,8 +1560,8 @@ footer {
   .dashboard-widget-graph-link:link {
     border: 0; }
 
-.dashboard-grid-widget-content.is-loading::before,
-.dashboard-grid-iterator-content.is-loading::before {
+.dashboard-grid-widget-contents.is-loading::before,
+.dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
 .dashboard-list .dashboard-list-item {
@@ -1658,86 +1674,86 @@ form.dashboard-widget-item .fields-group.fields-group-change-indicator {
   form.dashboard-widget-item .fields-group.fields-group-change-indicator .input-color-picker {
     display: block; }
 
-div.dashboard-widget-item > div {
+div.dashboard-widget-item .dashboard-grid-widget-body > div {
   box-sizing: border-box;
   height: 100%;
   padding: 10px;
   overflow-x: hidden; }
-div.dashboard-widget-item a {
+div.dashboard-widget-item .dashboard-grid-widget-body a {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   height: 100%;
   color: inherit; }
-  div.dashboard-widget-item a:focus, div.dashboard-widget-item a:hover, div.dashboard-widget-item a:visited {
+  div.dashboard-widget-item .dashboard-grid-widget-body a:focus, div.dashboard-widget-item .dashboard-grid-widget-body a:hover, div.dashboard-widget-item .dashboard-grid-widget-body a:visited {
     border: none; }
-  div.dashboard-widget-item a > div {
+  div.dashboard-widget-item .dashboard-grid-widget-body a > div {
     display: flex;
     flex: 1 1 calc(100% / 3); }
-div.dashboard-widget-item .item-description,
-div.dashboard-widget-item .item-value,
-div.dashboard-widget-item .item-time {
+div.dashboard-widget-item .dashboard-grid-widget-body .item-description,
+div.dashboard-widget-item .dashboard-grid-widget-body .item-value,
+div.dashboard-widget-item .dashboard-grid-widget-body .item-time {
   flex: 1 1 auto;
   max-width: 100%; }
-div.dashboard-widget-item .item-value {
+div.dashboard-widget-item .dashboard-grid-widget-body .item-value {
   display: flex;
   flex-wrap: wrap;
   margin: 0 5px; }
-  div.dashboard-widget-item .item-value > .units:first-child, div.dashboard-widget-item .item-value > .units:last-child {
+  div.dashboard-widget-item .dashboard-grid-widget-body .item-value > .units:first-child, div.dashboard-widget-item .dashboard-grid-widget-body .item-value > .units:last-child {
     flex: 0 0 100%; }
-  div.dashboard-widget-item .item-value > .units:first-child {
+  div.dashboard-widget-item .dashboard-grid-widget-body .item-value > .units:first-child {
     margin-bottom: -0.07em; }
-  div.dashboard-widget-item .item-value > .units:last-child {
+  div.dashboard-widget-item .dashboard-grid-widget-body .item-value > .units:last-child {
     margin-top: -0.07em; }
-  div.dashboard-widget-item .item-value.type-text {
+  div.dashboard-widget-item .dashboard-grid-widget-body .item-value.type-text {
     min-width: 0; }
-    div.dashboard-widget-item .item-value.type-text .item-value-content {
+    div.dashboard-widget-item .dashboard-grid-widget-body .item-value.type-text .item-value-content {
       min-width: 0; }
-div.dashboard-widget-item .item-value-content {
+div.dashboard-widget-item .dashboard-grid-widget-body .item-value-content {
   display: flex;
   align-items: baseline;
   overflow: hidden; }
-div.dashboard-widget-item .item-description,
-div.dashboard-widget-item .item-time,
-div.dashboard-widget-item .type-text .value {
+div.dashboard-widget-item .dashboard-grid-widget-body .item-description,
+div.dashboard-widget-item .dashboard-grid-widget-body .item-time,
+div.dashboard-widget-item .dashboard-grid-widget-body .type-text .value {
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis; }
-div.dashboard-widget-item .item-description,
-div.dashboard-widget-item .value,
-div.dashboard-widget-item .decimals,
-div.dashboard-widget-item .units,
-div.dashboard-widget-item .item-time {
+div.dashboard-widget-item .dashboard-grid-widget-body .item-description,
+div.dashboard-widget-item .dashboard-grid-widget-body .value,
+div.dashboard-widget-item .dashboard-grid-widget-body .decimals,
+div.dashboard-widget-item .dashboard-grid-widget-body .units,
+div.dashboard-widget-item .dashboard-grid-widget-body .item-time {
   font-size: calc(var(--content-height) * var(--widget-item-font) / 1.14);
   line-height: 1.14; }
-div.dashboard-widget-item .units:not(:last-child),
-div.dashboard-widget-item .change-indicator:not(:last-child) {
+div.dashboard-widget-item .dashboard-grid-widget-body .units:not(:last-child),
+div.dashboard-widget-item .dashboard-grid-widget-body .change-indicator:not(:last-child) {
   margin-right: 5px; }
-div.dashboard-widget-item .units:not(:first-child),
-div.dashboard-widget-item .change-indicator:not(:first-child) {
+div.dashboard-widget-item .dashboard-grid-widget-body .units:not(:first-child),
+div.dashboard-widget-item .dashboard-grid-widget-body .change-indicator:not(:first-child) {
   margin-left: 5px; }
-div.dashboard-widget-item .svg-arrow {
+div.dashboard-widget-item .dashboard-grid-widget-body .svg-arrow {
   height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / 1.14); }
-div.dashboard-widget-item .item-value-no-data {
+div.dashboard-widget-item .dashboard-grid-widget-body .item-value-no-data {
   color: #737373; }
-div.dashboard-widget-item .left {
+div.dashboard-widget-item .dashboard-grid-widget-body .left {
   justify-content: flex-start;
   max-width: max-content;
   margin-right: auto; }
-div.dashboard-widget-item .center {
+div.dashboard-widget-item .dashboard-grid-widget-body .center {
   justify-content: center; }
-div.dashboard-widget-item .right {
+div.dashboard-widget-item .dashboard-grid-widget-body .right {
   justify-content: flex-end;
   max-width: max-content;
   margin-left: auto; }
-div.dashboard-widget-item .top {
+div.dashboard-widget-item .dashboard-grid-widget-body .top {
   align-self: flex-start; }
-div.dashboard-widget-item .middle {
+div.dashboard-widget-item .dashboard-grid-widget-body .middle {
   align-self: center; }
-div.dashboard-widget-item .bottom {
+div.dashboard-widget-item .dashboard-grid-widget-body .bottom {
   align-self: flex-end; }
-div.dashboard-widget-item .bold {
+div.dashboard-widget-item .dashboard-grid-widget-body .bold {
   font-weight: bold; }
 
 .dashboard-widget-item .svg-arrow-up {
@@ -1938,6 +1954,9 @@ form.dashboard-widget-svggraph .no-items-message {
 [theme="hc-light"] form.dashboard-widget-svggraph .overrides-options-list > li > div > .subfilter-disable-btn {
   border: none !important;
   top: 0; }
+
+div.dashboard-widget-svggraph {
+  overflow-x: hidden; }
 
 form.dashboard-widget-tophosts #list_columns .text {
   max-width: 250px; }
@@ -2425,7 +2444,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad .overlay-close-btn,
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
-    color: #737373; }
+    color: #737373;
+    background-color: transparent; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -2442,7 +2462,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad button,
   .msg-good button,
   .msg-warning button {
-    background-color: #ffffff; }
+    background-color: transparent; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
@@ -2476,12 +2496,14 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .msg-bad ul {
     border-top-color: #503434; }
   .msg-bad button {
-    color: #ae2929;
+    color: #ffffff;
     border-color: #503434; }
   .msg-bad::before {
     background-color: #503434; }
   .msg-bad::after {
     background-position: -122px -325px; }
+  .msg-bad .msg-details {
+    padding-right: 10px; }
 
 .msg-good {
   border-color: #344e3f; }
@@ -2569,20 +2591,20 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .radio-list-control li {
     position: relative;
     display: inline-block;
-    margin: 0 -1px 0 0;
+    margin-right: -1px;
     padding: 0; }
     .radio-list-control li:first-child {
-      border-radius: 3px 0 0 3px; }
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px; }
       .radio-list-control li:first-child label {
-        border-radius: 2px 0 0 2px; }
+        border-top-left-radius: 2px;
+        border-bottom-left-radius: 2px; }
     .radio-list-control li:last-child {
-      border-radius: 0 3px 3px 0; }
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px; }
       .radio-list-control li:last-child label {
-        border-radius: 0 2px 2px 0; }
-    .radio-list-control li:only-child {
-      border-radius: 3px; }
-      .radio-list-control li:only-child label {
-        border-radius: 2px; }
+        border-top-right-radius: 2px;
+        border-bottom-right-radius: 2px; }
   .radio-list-control label {
     display: inline-block;
     border: 1px solid #4f4f4f;
@@ -2605,21 +2627,14 @@ div.dashboard-widget-tophosts z-bar-gauge {
       .radio-list-control input[type="radio"] + label:active {
         border-color: #4f4f4f;
         background-color: #414141; }
-    .radio-list-control input[type="radio"]:focus + label {
-      border-color: #768d99;
-      background-color: #414141;
-      position: relative;
-      z-index: 2; }
     .radio-list-control input[type="radio"]:checked + label {
       color: #ffffff;
       border-color: #4f4f4f;
       background-color: #4f4f4f;
       position: relative;
       z-index: 1; }
-    .radio-list-control input[type="radio"]:checked:focus + label {
-      box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35);
-      position: relative;
-      z-index: 2; }
+    .radio-list-control input[type="radio"]:focus + label {
+      box-shadow: 0 0 0 2px rgba(66, 154, 227, 0.35); }
     .radio-list-control input[type="radio"]:checked[disabled] + label {
       background-color: #a3a3a3 !important;
       transition: none; }
@@ -3483,7 +3498,6 @@ form.is-loading {
     padding-bottom: 0;
     border-bottom: 0;
     box-shadow: inset 0 -1px 0 0 rgba(242, 242, 242, 0.1);
-    color: #f2f2f2;
     height: 22px;
     vertical-align: middle;
     white-space: nowrap; }
@@ -4102,6 +4116,8 @@ form.is-loading {
       display: block;
       height: 24px;
       line-height: 24px; }
+      .table-forms .table-forms-td-left label .icon-info {
+        margin-left: 5px; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;
@@ -4125,6 +4141,8 @@ form.is-loading {
         word-wrap: break-word; }
       .table-forms .table-forms-td-right td:last-child {
         padding-right: 0; }
+      .table-forms .table-forms-td-right td .icon-info {
+        margin-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
@@ -4303,8 +4321,6 @@ select {
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #4f4f4f !important; }
   .checkbox-radio:focus + label span {
-    border-color: #768d99; }
-  .checkbox-radio:checked:focus + label span {
     border-color: #768d99; }
   .checkbox-radio:checked[disabled] + label span {
     transition: none; }
@@ -5202,7 +5218,7 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
   display: table;
   position: absolute;
   z-index: 1000;
-  padding: 13px 10px 10px;
+  padding: 17px 10px 10px;
   background-color: #2b2b2b;
   border: 1px solid #383838;
   border-bottom-color: #353535;
@@ -5220,7 +5236,8 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
-    margin: 0 10px; }
+    margin: 0 10px;
+    padding: 13px 10px 10px; }
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
       .overlay-dialogue.modal .dashboard-widget-head .icon-doc-link {
@@ -6188,22 +6205,22 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.dashboard-grid-widget-content, div.dashboard-widget-item > div, .msg-details ul, z-select button.focusable,
+.dashboard-grid-widget-contents, div.dashboard-widget-item .dashboard-grid-widget-body > div, .msg-details ul, z-select button.focusable,
 .z-select button.focusable, z-select .list,
 .z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
-  .dashboard-grid-widget-content::-webkit-scrollbar, div.dashboard-widget-item > div::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
+  .dashboard-grid-widget-contents::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
   .z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
   .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
     width: 9px; }
-  .dashboard-grid-widget-content::-webkit-scrollbar-track, div.dashboard-widget-item > div::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
+  .dashboard-grid-widget-contents::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
   .z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
   .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #1f1f1f; }
-  .dashboard-grid-widget-content::-webkit-scrollbar-thumb, div.dashboard-widget-item > div::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
+  .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
   .z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
   .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
@@ -6213,18 +6230,18 @@ span.is-loading {
 .overflow-table::-webkit-scrollbar {
   height: 9px; }
 
-.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-head,
-.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-head, form.dashboard-widget-svggraph .list-accordion-item > label, .drag-icon,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-svggraph .list-accordion-item > label, .drag-icon,
 .ui-draggable .dashboard-widget-head {
   cursor: move;
   cursor: grab; }
 
-.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
-.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head,
-.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head, .ui-draggable .drag-icon,
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header,
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable .drag-icon,
 .ui-draggable .dashboard-widget-head, .cursor-dragging {
   cursor: move;
   cursor: grabbing; }
@@ -7490,31 +7507,31 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashboard-navigation-tabs .csortable > .csortable-item > div, .dashboard-navigation-tabs .csortable-list > .csortable-item > div:hover {
   border: 1px solid transparent; }
 
-.dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-head {
+.dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
   box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 
-.dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-head {
+.dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-header {
   box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing::before, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging::before {
   box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.5); }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-header {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-content, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-content {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-header {
   box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing::before, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging::before {
   box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.5); }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-header {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-header {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-content, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-content {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-contents {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-iterator-placeholder > div, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-iterator-placeholder > div {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-iterator-placeholder > div, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-iterator-placeholder > div {
   border-color: #303030; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
   border: 0; }

@@ -28,6 +28,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxfile.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
@@ -541,7 +542,7 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 			case 0:
 				if (' ' == *p || '\t' == *p)
 				{
-					/* skipping the leading spaces */;
+					/* skipping the leading spaces */
 				}
 				else if ('"' == *p)
 				{

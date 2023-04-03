@@ -3,21 +3,25 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
 The template to monitor Kubernetes Scheduler by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 Template `Kubernetes Scheduler by HTTP` — collects metrics by HTTP agent from Scheduler /metrics endpoint.
 
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Kubernetes Scheduler, version 1.19.10
 
+## Requirements
+
+For Zabbix version: 7.0 and higher.
+
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Internal service metrics are collected from /metrics endpoint.
 Template needs to use Authorization via API token.
@@ -27,7 +31,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 *NOTE.* Some metrics may not be collected depending on your Kubernetes Scheduler instance version and configuration.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -41,19 +45,19 @@ No specific Zabbix configuration is required.
 |{$KUBE.SCHEDULER.SERVER.URL} |<p>Instance URL</p> |`http://localhost:10251/metrics` |
 |{$KUBE.SCHEDULER.UNSCHEDULABLE} |<p>Maximum number of scheduling failures with 'unschedulable' used for trigger</p> |`2` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Binding histogram |<p>Discovery raw data of binding latency.</p> |DEPENDENT |kubernetes.scheduler.binding.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_binding_duration_seconds_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
-|e2e scheduling histogram |<p>Discovery raw data and percentile items of e2e scheduling latency.</p> |DEPENDENT |kubernetes.controller.e2e_scheduling.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_e2e_scheduling_duration_*", result =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
-|Scheduling algorithm histogram |<p>Discovery raw data of scheduling algorithm latency.</p> |DEPENDENT |kubernetes.scheduler.scheduling_algorithm.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_scheduling_algorithm_duration_seconds_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|Binding histogram |<p>Discovery raw data of binding latency.</p> |DEPENDENT |kubernetes.scheduler.binding.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_binding_duration_seconds_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
+|e2e scheduling histogram |<p>Discovery raw data and percentile items of e2e scheduling latency.</p> |DEPENDENT |kubernetes.controller.e2e_scheduling.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_e2e_scheduling_duration_*", result =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
+|Scheduling algorithm histogram |<p>Discovery raw data of scheduling algorithm latency.</p> |DEPENDENT |kubernetes.scheduler.scheduling_algorithm.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "scheduler_scheduling_algorithm_duration_seconds_*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -88,7 +92,7 @@ There are no template links in this template.
 |Kubernetes Scheduler |Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p99 |<p>95 percentile of e2e scheduling latency.</p> |CALCULATED |kubernetes.scheduler.e2e_scheduling_p99["{#RESULT}"]<p>**Expression**:</p>`bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,99)` |
 |Zabbix raw items |Kubernetes Scheduler: Get Scheduler metrics |<p>Get raw metrics from Scheduler instance /metrics endpoint.</p> |HTTP_AGENT |kubernetes.scheduler.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -98,7 +102,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

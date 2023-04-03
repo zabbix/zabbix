@@ -20,11 +20,12 @@
 #include "lld_worker.h"
 #include "lld.h"
 
+#include "../events/events.h"
+
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "../events.h"
 #include "lld_protocol.h"
 #include "zbxtime.h"
 #include "zbxdbwrap.h"
@@ -60,7 +61,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 	char			*value, *error;
 	zbx_timespec_t		ts;
 	zbx_item_diff_t		diff;
-	DC_ITEM			item;
+	zbx_dc_item_t		item;
 	int			errcode, mtime;
 	unsigned char		state, meta;
 
@@ -68,7 +69,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	zbx_lld_deserialize_item_value(message->data, &itemid, &hostid, &value, &ts, &meta, &lastlogsize, &mtime, &error);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
 	if (SUCCEED != errcode)
 		goto out;
 
@@ -149,13 +150,13 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		if (16 < sql_offset)
 			zbx_db_execute("%s", sql);
 
-		DCconfig_items_apply_changes(&diffs);
+		zbx_dc_config_items_apply_changes(&diffs);
 
 		zbx_vector_ptr_destroy(&diffs);
 		zbx_free(sql);
 	}
 
-	DCconfig_clean_items(&item, &errcode, 1);
+	zbx_dc_config_clean_items(&item, &errcode, 1);
 out:
 	zbx_free(value);
 	zbx_free(error);

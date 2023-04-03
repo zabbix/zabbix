@@ -3,14 +3,14 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 7.0 and higher  
 Templates to monitor PostgreSQL by Zabbix.
 This template was tested on PostgreSQL versions 9.6, 10 and 11 on Linux and Windows.
 
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 1. Install Zabbix agent and create a read-only `zbx_monitor` user with proper access to your PostgreSQL server.
 

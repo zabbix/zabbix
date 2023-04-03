@@ -22,6 +22,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "log.h"
+#include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
@@ -39,35 +40,6 @@
 #if defined(HAVE_SQLITE3)
 #	include "zbxmutexs.h"
 #endif
-
-#define ZBX_MYSQL_MIN_VERSION				50728
-#define ZBX_MYSQL_MIN_VERSION_STR			"5.07.28"
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION			80030
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR		"8.00.30"
-#define ZBX_MYSQL_MAX_VERSION				80099
-#define ZBX_MYSQL_MAX_VERSION_STR			"8.00.x"
-
-#define ZBX_MARIA_MIN_VERSION				100200
-#define ZBX_MARIA_MIN_VERSION_STR			"10.02.00"
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION			100500
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION_STR		"10.05.00"
-#define ZBX_MARIA_MAX_VERSION				101099
-#define ZBX_MARIA_MAX_VERSION_STR			"10.10.xx"
-
-#define ZBX_POSTGRESQL_MIN_VERSION			100009
-#define ZBX_POSTGRESQL_MIN_VERSION_STR			"10.9"
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION		130000
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR	"13.0"
-#define ZBX_POSTGRESQL_MAX_VERSION			159999
-#define ZBX_POSTGRESQL_MAX_VERSION_STR			"15.x"
-
-#define ZBX_ORACLE_MIN_VERSION				1201000200
-#define ZBX_ORACLE_MIN_VERSION_STR			"Database 12c Release 12.01.00.02.x"
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR		"Database 19c Release 19.x.x"
-#define ZBX_ORACLE_MAX_VERSION				2199000000
-#define ZBX_ORACLE_MAX_VERSION_STR			"Database 21c Release 21.x.x"
-
 struct zbx_db_result
 {
 #if defined(HAVE_MYSQL)
@@ -75,7 +47,7 @@ struct zbx_db_result
 #elif defined(HAVE_ORACLE)
 	OCIStmt		*stmthp;	/* the statement handle for select operations */
 	int		ncolumn;
-	DB_ROW		values;
+	zbx_db_row_t	values;
 	ub4		*values_alloc;
 	OCILobLocator	**clobs;
 #elif defined(HAVE_POSTGRESQL)
@@ -83,13 +55,13 @@ struct zbx_db_result
 	int		row_num;
 	int		fld_num;
 	int		cursor;
-	DB_ROW		values;
+	zbx_db_row_t	values;
 #elif defined(HAVE_SQLITE3)
 	int		curow;
 	char		**data;
 	int		nrow;
 	int		ncolumn;
-	DB_ROW		values;
+	zbx_db_row_t	values;
 #endif
 };
 
@@ -142,8 +114,8 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
-static void	OCI_DBclean_result_handle(DB_RESULT result);
-static void	OCI_DBclean_result(DB_RESULT result);
+static void	OCI_DBclean_result_handle(zbx_db_result_t result);
+static void	OCI_DBclean_result(zbx_db_result_t result);
 #endif
 
 static zbx_err_codes_t last_db_errcode;
@@ -331,10 +303,10 @@ static int	zbx_db_execute_basic(const char *fmt, ...)
 }
 
 __zbx_attr_format_printf(1, 2)
-static DB_RESULT	zbx_db_select_basic(const char *fmt, ...)
+static zbx_db_result_t	zbx_db_select_basic(const char *fmt, ...)
 {
 	va_list		args;
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	va_start(args, fmt);
 	result = zbx_db_vselect(fmt, args);
@@ -408,25 +380,9 @@ void	zbx_db_init_autoincrement_options_basic(void)
  *               ZBX_DB_FAIL - failed to connect                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
+int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
-	const char	*host, *user, *password, *dbname, *dbschema, *dbsocket, *tls_connect, *cert, *key, *ca, *cipher,
-			*cipher_13;
-	const int	port = config_dbhigh->config_dbport;
-
-	host = config_dbhigh->config_dbhost;
-	user = config_dbhigh->config_dbuser;
-	password = config_dbhigh->config_dbpassword;
-	dbname = config_dbhigh->config_dbname;
-	dbschema = config_dbhigh->config_dbschema;
-	dbsocket = config_dbhigh->config_dbsocket;
-	tls_connect = config_dbhigh->config_db_tls_connect;
-	cert = config_dbhigh->config_db_tls_cert_file;
-	key = config_dbhigh->config_db_tls_key_file;
-	ca = config_dbhigh->config_db_tls_ca_file;
-	cipher = config_dbhigh->config_db_tls_cipher;
-	cipher_13 = config_dbhigh->config_db_tls_cipher_13;
 #if defined(HAVE_MYSQL)
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
@@ -443,8 +399,8 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 
 	int		rc;
 	char		*cport = NULL;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	const char	*keywords[ZBX_DB_MAX_PARAMS + 1];
 	const char	*values[ZBX_DB_MAX_PARAMS + 1];
 	unsigned int	i = 0;
@@ -452,9 +408,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	char		*p, *path = NULL;
 #endif
 
-#ifndef HAVE_MYSQL
-	ZBX_UNUSED(dbsocket);
-#endif
 	/* Allow executing statements during a connection initialization. Make sure to mark transaction as failed. */
 	if (0 != txn_level)
 		txn_error = ZBX_DB_DOWN;
@@ -466,8 +419,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	txn_level = 0;
 
 #if defined(HAVE_MYSQL)
-	ZBX_UNUSED(dbschema);
-
 	if (NULL == (conn = mysql_init(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
@@ -495,13 +446,13 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	}
 
 #if defined(HAVE_MYSQL_TLS)
-	if (ZBX_DB_OK == ret && NULL != tls_connect)
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_connect)
 	{
 		unsigned int	mysql_tls_mode;
 
-		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 			mysql_tls_mode = SSL_MODE_REQUIRED;
-		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+		else if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 			mysql_tls_mode = SSL_MODE_VERIFY_CA;
 		else
 			mysql_tls_mode = SSL_MODE_VERIFY_IDENTITY;
@@ -513,44 +464,45 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 		}
 	}
 
-	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_options(conn, MYSQL_OPT_SSL_CA, ca))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_ca_file && 0 != mysql_options(conn, MYSQL_OPT_SSL_CA,
+			cfg->config_db_tls_ca_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CA option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != key && 0 != mysql_options(conn, MYSQL_OPT_SSL_KEY, key))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_key_file && 0 != mysql_options(conn, MYSQL_OPT_SSL_KEY,
+			cfg->config_db_tls_key_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_KEY option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != cert && 0 != mysql_options(conn, MYSQL_OPT_SSL_CERT, cert))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cert_file && 0 != mysql_options(conn, MYSQL_OPT_SSL_CERT,
+			cfg->config_db_tls_cert_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CERT option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != cipher && 0 != mysql_options(conn, MYSQL_OPT_SSL_CIPHER, cipher))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cipher && 0 != mysql_options(conn, MYSQL_OPT_SSL_CIPHER,
+			cfg->config_db_tls_cipher))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
 		ret = ZBX_DB_FAIL;
 	}
 #if defined(HAVE_MYSQL_TLS_CIPHERSUITES)
-	if (ZBX_DB_OK == ret && NULL != cipher_13 && 0 != mysql_options(conn, MYSQL_OPT_TLS_CIPHERSUITES, cipher_13))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cipher_13 && 0 != mysql_options(conn,
+			MYSQL_OPT_TLS_CIPHERSUITES, cfg->config_db_tls_cipher_13))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_TLS_CIPHERSUITES option.");
 		ret = ZBX_DB_FAIL;
 	}
-#else
-	ZBX_UNUSED(cipher_13);
 #endif
 #elif defined(HAVE_MARIADB_TLS)
-	ZBX_UNUSED(cipher_13);
-
-	if (ZBX_DB_OK == ret && NULL != tls_connect)
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_connect)
 	{
-		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 		{
 			my_bool	enforce_tls = 1;
 
@@ -572,43 +524,40 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 		}
 	}
 
-	if (ZBX_DB_OK == ret && NULL != ca && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CA, ca))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_ca_file && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CA,
+			cfg->config_db_tls_ca_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CA option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != key && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_KEY, key))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_key_file && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_KEY,
+			cfg->config_db_tls_key_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_KEY option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != cert && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CERT, cert))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cert_file && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CERT,
+			cfg->config_db_tls_cert_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CERT option.");
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && NULL != cipher && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CIPHER, cipher))
+	if (ZBX_DB_OK == ret && NULL != cfg->config_db_tls_cipher && 0 != mysql_optionsv(conn, MYSQL_OPT_SSL_CIPHER,
+			cfg->config_db_tls_cipher))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set MYSQL_OPT_SSL_CIPHER option.");
 		ret = ZBX_DB_FAIL;
 	}
-#else
-	ZBX_UNUSED(tls_connect);
-	ZBX_UNUSED(cert);
-	ZBX_UNUSED(key);
-	ZBX_UNUSED(ca);
-	ZBX_UNUSED(cipher);
-	ZBX_UNUSED(cipher_13);
 #endif
-	if (ZBX_DB_OK == ret &&
-			NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket,
-				CLIENT_MULTI_STATEMENTS))
+	if (ZBX_DB_OK == ret && NULL == mysql_real_connect(conn, cfg->config_dbhost, cfg->config_dbuser,
+			cfg->config_dbpassword, cfg->config_dbname, cfg->config_dbport, cfg->config_dbsocket,
+			CLIENT_MULTI_STATEMENTS))
 	{
 		err_no = (int)mysql_errno(conn);
-		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), cfg->config_dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -636,14 +585,14 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
 		err_no = (int)mysql_errno(conn);
-		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), cfg->config_dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
+	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, cfg->config_dbname))
 	{
 		err_no = (int)mysql_errno(conn);
-		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, err_no, mysql_error(conn), cfg->config_dbname);
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -651,33 +600,25 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 		ret = ZBX_DB_DOWN;
 
 #elif defined(HAVE_ORACLE)
-	ZBX_UNUSED(dbschema);
-	ZBX_UNUSED(tls_connect);
-	ZBX_UNUSED(cert);
-	ZBX_UNUSED(key);
-	ZBX_UNUSED(ca);
-	ZBX_UNUSED(cipher);
-	ZBX_UNUSED(cipher_13);
-
 	memset(&oracle, 0, sizeof(oracle));
 
 	zbx_vector_ptr_create(&oracle.db_results);
 
 	/* connection string format: [//]host[:port][/service name] */
 
-	if ('\0' != *host)
+	if ('\0' != *cfg->config_dbhost)
 	{
 		/* Easy Connect method */
-		connect = zbx_strdcatf(connect, "//%s", host);
-		if (0 != port)
-			connect = zbx_strdcatf(connect, ":%d", port);
-		if ('\0' != *dbname)
-			connect = zbx_strdcatf(connect, "/%s", dbname);
+		connect = zbx_strdcatf(connect, "//%s", cfg->config_dbhost);
+		if (0 != cfg->config_dbport)
+			connect = zbx_strdcatf(connect, ":%d", cfg->config_dbport);
+		if ('\0' != *cfg->config_dbname)
+			connect = zbx_strdcatf(connect, "/%s", cfg->config_dbname);
 	}
 	else
 	{
 		/* Net Service Name method */
-		connect = zbx_strdup(connect, dbname);
+		connect = zbx_strdup(connect, cfg->config_dbname);
 	}
 
 	while (ZBX_DB_OK == ret)
@@ -717,9 +658,10 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 
 		/* get the session */
 		err = OCILogon2(oracle.envhp, oracle.errhp, &oracle.svchp,
-				(text *)user, (ub4)(NULL != user ? strlen(user) : 0),
-				(text *)password, (ub4)(NULL != password ? strlen(password) : 0),
-				(text *)connect, (ub4)strlen(connect),
+				(text *)cfg->config_dbuser, (ub4)(NULL != cfg->config_dbuser ?
+				strlen(cfg->config_dbuser) : 0), (text *)cfg->config_dbpassword,
+				(ub4)(NULL != cfg->config_dbpassword ?
+				strlen(cfg->config_dbpassword) : 0), (text *)connect, (ub4)strlen(connect),
 				OCI_DEFAULT);
 
 		switch (err)
@@ -761,67 +703,64 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 
 	zbx_free(connect);
 #elif defined(HAVE_POSTGRESQL)
-	ZBX_UNUSED(cipher);
-	ZBX_UNUSED(cipher_13);
-
-	if (NULL != tls_connect)
+	if (NULL != cfg->config_db_tls_connect)
 	{
 		keywords[i] = "sslmode";
 
-		if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
+		if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_REQUIRED_TXT))
 			values[i++] = "require";
-		else if (0 == strcmp(tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
+		else if (0 == strcmp(cfg->config_db_tls_connect, ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT))
 			values[i++] = "verify-ca";
 		else
 			values[i++] = "verify-full";
 	}
 
-	if (NULL != cert)
+	if (NULL != cfg->config_db_tls_cert_file)
 	{
 		keywords[i] = "sslcert";
-		values[i++] = cert;
+		values[i++] = cfg->config_db_tls_cert_file;
 	}
 
-	if (NULL != key)
+	if (NULL != cfg->config_db_tls_key_file)
 	{
 		keywords[i] = "sslkey";
-		values[i++] = key;
+		values[i++] = cfg->config_db_tls_key_file;
 	}
 
-	if (NULL != ca)
+	if (NULL != cfg->config_db_tls_ca_file)
 	{
 		keywords[i] = "sslrootcert";
-		values[i++] = ca;
+		values[i++] = cfg->config_db_tls_ca_file;
 	}
 
-	if (NULL != host)
+	if (NULL != cfg->config_dbhost)
 	{
 		keywords[i] = "host";
-		values[i++] = host;
+		values[i++] = cfg->config_dbhost;
 	}
 
-	if (NULL != dbname)
+	if (NULL != cfg->config_dbname)
 	{
 		keywords[i] = "dbname";
-		values[i++] = dbname;
+		values[i++] = cfg->config_dbname;
 	}
 
-	if (NULL != user)
+	if (NULL != cfg->config_dbuser)
 	{
 		keywords[i] = "user";
-		values[i++] = user;
+		values[i++] = cfg->config_dbuser;
 	}
 
-	if (NULL != password)
+	if (NULL != cfg->config_dbpassword)
 	{
 		keywords[i] = "password";
-		values[i++] = password;
+		values[i++] = cfg->config_dbpassword;
 	}
 
-	if (0 != port)
+	if (0 != cfg->config_dbport)
 	{
 		keywords[i] = "port";
-		values[i++] = cport = zbx_dsprintf(cport, "%d", port);
+		values[i++] = cport = zbx_dsprintf(cport, "%d", cfg->config_dbport);
 	}
 
 	keywords[i] = NULL;
@@ -834,16 +773,17 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	/* check to see that the backend connection was successfully made */
 	if (CONNECTION_OK != PQstatus(conn))
 	{
-		zbx_db_errlog(ERR_Z3001, 0, PQerrorMessage(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, 0, PQerrorMessage(conn), cfg->config_dbname);
 		ret = ZBX_DB_DOWN;
 		goto out;
 	}
 
-	if (NULL != dbschema && '\0' != *dbschema)
+	if (NULL != cfg->config_dbschema && '\0' != *cfg->config_dbschema)
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = zbx_db_dyn_escape_string_basic(dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON);
+		dbschema_esc = zbx_db_dyn_escape_string_basic(cfg->config_dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX,
+				ESCAPE_SEQUENCE_ON);
 		if (ZBX_DB_DOWN == (rc = zbx_db_execute_basic("set schema '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
 			ret = rc;
 		zbx_free(dbschema_esc);
@@ -854,7 +794,7 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 
 	result = zbx_db_select_basic("select oid from pg_type where typname='bytea'");
 
-	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 	{
 		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 		goto out;
@@ -880,7 +820,7 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 
 	result = zbx_db_select_basic("show standard_conforming_strings");
 
-	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
 	{
 		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
 		goto out;
@@ -898,24 +838,13 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *config_dbhigh)
 	}
 out:
 #elif defined(HAVE_SQLITE3)
-	ZBX_UNUSED(host);
-	ZBX_UNUSED(user);
-	ZBX_UNUSED(password);
-	ZBX_UNUSED(dbschema);
-	ZBX_UNUSED(port);
-	ZBX_UNUSED(tls_connect);
-	ZBX_UNUSED(cert);
-	ZBX_UNUSED(key);
-	ZBX_UNUSED(ca);
-	ZBX_UNUSED(cipher);
-	ZBX_UNUSED(cipher_13);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
-	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
+	if (SQLITE_OK != sqlite3_open_v2(cfg->config_dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
-	if (SQLITE_OK != sqlite3_open(dbname, &conn))
+	if (SQLITE_OK != sqlite3_open(cfg->config_dbname, &conn))
 #endif
 	{
-		zbx_db_errlog(ERR_Z3001, 0, sqlite3_errmsg(conn), dbname);
+		zbx_db_errlog(ERR_Z3001, 0, sqlite3_errmsg(conn), cfg->config_dbname);
 		ret = ZBX_DB_DOWN;
 		goto out;
 	}
@@ -935,7 +864,7 @@ out:
 	if (ZBX_DB_OK != ret)
 		goto out;
 
-	path = zbx_strdup(NULL, dbname);
+	path = zbx_strdup(NULL, cfg->config_dbname);
 
 	if (NULL != (p = strrchr(path, '/')))
 		*++p = '\0';
@@ -1655,13 +1584,13 @@ clean:
  *                                                                            *
  * Purpose: execute a select statement                                        *
  *                                                                            *
- * Return value: data, NULL (on error) or (DB_RESULT)ZBX_DB_DOWN              *
+ * Return value: data, NULL (on error) or (zbx_db_result_t)ZBX_DB_DOWN        *
  *                                                                            *
  ******************************************************************************/
-DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
+zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 {
 	char		*sql = NULL;
-	DB_RESULT	result = NULL;
+	zbx_db_result_t	result = NULL;
 	double		sec = 0;
 #if defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
@@ -1689,7 +1618,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_MYSQL)
-	result = (DB_RESULT)zbx_malloc(NULL, sizeof(struct zbx_db_result));
+	result = (zbx_db_result_t)zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->result = NULL;
 
 	if (NULL == conn)
@@ -1709,7 +1638,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			zbx_db_free_result(result);
-			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
+			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (zbx_db_result_t)ZBX_DB_DOWN : NULL);
 		}
 	}
 #elif defined(HAVE_ORACLE)
@@ -1868,7 +1797,7 @@ error:
 		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
 		zbx_db_free_result(result);
 
-		result = (ZBX_DB_DOWN == server_status ? (DB_RESULT)(intptr_t)server_status : NULL);
+		result = (ZBX_DB_DOWN == server_status ? (zbx_db_result_t)(intptr_t)server_status : NULL);
 	}
 #elif defined(HAVE_POSTGRESQL)
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
@@ -1889,7 +1818,7 @@ error:
 		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
 		{
 			zbx_db_free_result(result);
-			result = (DB_RESULT)ZBX_DB_DOWN;
+			result = (zbx_db_result_t)ZBX_DB_DOWN;
 		}
 		else
 		{
@@ -1926,7 +1855,7 @@ lbl_get_table:
 				result = NULL;
 				break;
 			default:
-				result = (DB_RESULT)ZBX_DB_DOWN;
+				result = (zbx_db_result_t)ZBX_DB_DOWN;
 				break;
 		}
 	}
@@ -1955,7 +1884,7 @@ clean:
 /*
  * Execute SQL statement. For select statements only.
  */
-DB_RESULT	zbx_db_select_n_basic(const char *query, int n)
+zbx_db_result_t	zbx_db_select_n_basic(const char *query, int n)
 {
 #if defined(HAVE_ORACLE)
 	return zbx_db_select_basic("select * from (%s) where rownum<=%d", query, n);
@@ -2025,7 +1954,7 @@ static void	db_set_fetch_error(int dberr)
 }
 #endif
 
-DB_ROW	zbx_db_fetch_basic(DB_RESULT result)
+zbx_db_row_t	zbx_db_fetch_basic(zbx_db_result_t result)
 {
 #if defined(HAVE_ORACLE)
 	int		i;
@@ -2041,7 +1970,7 @@ DB_ROW	zbx_db_fetch_basic(DB_RESULT result)
 	if (NULL == result->result)
 		return NULL;
 
-	return (DB_ROW)mysql_fetch_row(result->result);
+	return (zbx_db_row_t)mysql_fetch_row(result->result);
 #elif defined(HAVE_ORACLE)
 	if (NULL == result->stmthp)
 		return NULL;
@@ -2197,7 +2126,7 @@ int	zbx_db_is_null_basic(const char *field)
 }
 
 #ifdef HAVE_ORACLE
-static void	OCI_DBclean_result_handle(DB_RESULT result)
+static void	OCI_DBclean_result_handle(zbx_db_result_t result)
 {
 	if (NULL != result->values)
 	{
@@ -2220,7 +2149,7 @@ static void	OCI_DBclean_result_handle(DB_RESULT result)
 		result->stmthp = NULL;
 	}
 }
-static void	OCI_DBclean_result(DB_RESULT result)
+static void	OCI_DBclean_result(zbx_db_result_t result)
 {
 	if (NULL == result)
 		return;
@@ -2241,7 +2170,7 @@ static void	OCI_DBclean_result(DB_RESULT result)
 }
 #endif
 
-void	zbx_db_free_result(DB_RESULT result)
+void	zbx_db_free_result(zbx_db_result_t result)
 {
 #if defined(HAVE_MYSQL)
 	if (NULL == result)
@@ -2764,13 +2693,13 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	{
 		version_info->database = "MariaDB";
 
-		version_info->min_version = ZBX_MARIA_MIN_VERSION;
-		version_info->max_version = ZBX_MARIA_MAX_VERSION;
-		version_info->min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION;
+		version_info->min_version = ZBX_MARIADB_MIN_VERSION;
+		version_info->max_version = ZBX_MARIADB_MAX_VERSION;
+		version_info->min_supported_version = ZBX_MARIADB_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_STR;
-		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_STR;
-		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_STR;
+		version_info->friendly_min_version = ZBX_MARIADB_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MARIADB_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MARIADB_MIN_SUPPORTED_VERSION_STR;
 	}
 	else
 	{
@@ -2920,7 +2849,7 @@ out:
 #ifdef HAVE_POSTGRESQL
 static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 {
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 	int		ret;
 
 	if (1 == ZBX_DB_TSDB_V1) {
@@ -2933,7 +2862,7 @@ static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 				" where hypertable_name in (%s) and is_compressed='t'", table_names);
 	}
 
-	if ((DB_RESULT)ZBX_DB_DOWN == result)
+	if ((zbx_db_result_t)ZBX_DB_DOWN == result)
 	{
 		ret = FAIL;
 		goto out;
@@ -2985,13 +2914,13 @@ void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *versi
  ******************************************************************************/
 static char	*zbx_tsdb_get_license(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*tsdb_lic = NULL;
 
 	result = zbx_db_select_basic("show timescaledb.license");
 
-	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch_basic(result)))
+	if ((zbx_db_result_t)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch_basic(result)))
 	{
 		tsdb_lic = zbx_strdup(NULL, row[0]);
 	}
@@ -3055,8 +2984,8 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 int	zbx_tsdb_get_version(void)
 {
 	int		ver, major, minor, patch;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	if (-1 == ZBX_TSDB_VERSION)
 	{
@@ -3070,7 +2999,7 @@ int	zbx_tsdb_get_version(void)
 		result = zbx_db_select_basic("select extversion from pg_extension where extname = 'timescaledb'");
 
 		/* database down, can re-query in the next call */
-		if ((DB_RESULT)ZBX_DB_DOWN == result)
+		if ((zbx_db_result_t)ZBX_DB_DOWN == result)
 		{
 			ver = 0;
 			goto out;

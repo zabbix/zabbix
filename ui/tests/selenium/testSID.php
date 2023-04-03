@@ -127,13 +127,22 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=1&action=module.scan&form=Scan+directory']],
 
 			// #11 Module enable.
-			[['link' => 'zabbix.php?action=module.enable&moduleids[]=1']],
+			[[
+				'link' => 'zabbix.php?action=module.enable&moduleids[]=1',
+				'json_output' => true
+			]],
 
 			// #12 Module disable.
-			[['link' => 'zabbix.php?action=module.disable&moduleids[]=1']],
+			[[
+				'link' => 'zabbix.php?action=module.disable&moduleids[]=1',
+				'json_output' => true
+			]],
 
 			// #13 Module update.
-			[['link' => 'zabbix.php?action=module.update&moduleids%5B%5D=1&form_refresh=1&status=1']],
+			[[
+				'link' => 'zabbix.php?action=module.update&moduleids%5B%5D=1&form_refresh=1&status=1',
+				'json_output' => true
+			]],
 
 			// #14 Regular expressions creation.
 			[['link' => 'zabbix.php?action=regex.create&form_refresh=1&name=cccc&expressions%5B0%5D%5Bexpression_type%5D=0&'.
@@ -717,8 +726,8 @@ class testSID extends CWebTest {
 			[[
 				'link' => 'zabbix.php?action=popup.itemtest.edit&key=agent.hostname&delay=1m&value_type=3&item_type=0&'.
 					'itemid=0&interfaceid=50040&hostid=50012&test_type=0&step_obj=-2&show_final_result=1&get_value=1',
-				'json_result' => '{"header":"Test item","doc_url":"https:\/\/www.zabbix.com\/documentation\/6.'.
-						'4\/en\/manual\/config\/items\/item#testing","script_inline":"\n\/**\n *'
+				'json_result' => '{"header":"Test item","doc_url":"https:\/\/www.zabbix.com\/documentation\/'.
+						ZABBIX_EXPORT_VERSION.'\/en\/manual\/config\/items\/item#testing","script_inline":"\n\/**\n *'
 			]],
 
 			// #105 Popup item test get value.

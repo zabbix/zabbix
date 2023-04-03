@@ -4,6 +4,7 @@ SUBDIRS = \
 	diag \
 	housekeeper \
 	proxyconfig \
+	preproc \
 	datasender \
 	rtc \
 	stats \
@@ -15,7 +16,6 @@ sbin_PROGRAMS = zabbix_proxy
 noinst_LIBRARIES = libzbxproxy.a
 
 libzbxproxy_a_SOURCES = \
-	events.c \
 	proxy_lld.c
 
 libzbxproxy_a_CFLAGS = \
@@ -26,7 +26,7 @@ zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
-	$(top_builddir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
+	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
 	$(top_builddir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
@@ -37,10 +37,10 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper_proxy.a \
 	$(top_builddir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
-	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \
-	$(top_builddir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	preproc/libpreproc_proxy.a \
+	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
@@ -80,8 +80,8 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_builddir)/src/libs/zbxgetopt/libzbxgetopt.a \
 	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
-	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxhttp/libzbxhttp.a \
@@ -106,6 +106,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_builddir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_builddir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
