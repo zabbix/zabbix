@@ -745,6 +745,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'es.node.get.data[{#ES.NODE}]'
               delay: '0'
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Returns cluster nodes statistics.'
