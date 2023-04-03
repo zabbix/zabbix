@@ -86,6 +86,8 @@ typedef struct perf_counter_data
 }
 zbx_perf_counter_data_t;
 
+void		zbx_init_library_win32(zbx_get_progname_f get_progname);
+
 zbx_uint64_t	zbx_get_cluster_size(const char *path, char **error);
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath);
@@ -101,12 +103,27 @@ PDH_STATUS	zbx_calculate_counter_value(const char *function, const char *counter
 wchar_t		*zbx_get_counter_name(DWORD pdhIndex);
 int		zbx_check_counter_path(char *counterPath, int convert_from_numeric);
 int		zbx_init_builtin_counter_indexes(void);
-DWORD 		zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
-DWORD 		zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
+DWORD		zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
+DWORD		zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
 wchar_t		*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
 int		zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
 
-void		zbx_init_library_win32(zbx_get_progname_f get_progname);
+/* symbols */
+
+/* some definitions which are not available on older MS Windows versions */
+typedef enum {
+	/* we only use below values, the rest of enumerated values are omitted here */
+	zbx_FileBasicInfo	= 0,
+	zbx_FileIdInfo		= 18
+} zbx_file_info_by_handle_class_t;
+
+extern DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD);
+extern BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
+extern BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
+extern BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
+extern BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
+
+void	zbx_import_symbols(void);
 
 #endif /* ZABBIX_WIN32_H */

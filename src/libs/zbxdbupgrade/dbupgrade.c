@@ -1257,7 +1257,7 @@ static int	DBget_changelog_table_by_name(const char *table_name)
 {
 	const zbx_db_table_changelog_t	*table;
 
-	for (table = changelog_tables; NULL != table->table; table++)
+	for (table = zbx_dbschema_get_changelog_tables(); NULL != table->table; table++)
 	{
 		if (0 == strcmp(table_name, table->table))
 			return table->object;

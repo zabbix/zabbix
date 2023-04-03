@@ -28,6 +28,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxfile.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"

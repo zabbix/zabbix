@@ -32,7 +32,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
-#include "zbxcommon.h"
+#include "zbxfile.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
