@@ -1045,21 +1045,17 @@ sub main()
 		$szcol3 = 0;
 		$szcol4 = 0;
 		$sql_suffix="\";\n";
-		$fkeys_prefix = "static const char\t*db_schema_fkeys[] =\n{\n";
-		$fkeys_suffix = "\tNULL\n};\n";
 
 		print "#if defined(HAVE_SQLITE3)\nstatic const char\t*db_schema = \"\\\n";
 		%output = %sqlite3;
 		process();
 		print "#else\t/* HAVE_SQLITE3 */\n";
 		print "static const char\t*db_schema = NULL;\n";
-		print "static const char\t*db_schema_fkeys[] =\n{\n\tNULL\n};\n";
 		print "#endif\t/* not HAVE_SQLITE3 */\n";
 		print "\nconst zbx_db_table_t\t*zbx_dbschema_get_tables(void)\n{\n\treturn tables;\n}\n";
 		print "\nconst zbx_db_table_changelog_t\t*zbx_dbschema_get_changelog_tables(void)\n" .
 				"{\n\treturn changelog_tables;\n}\n";
 		print "\nconst char\t*zbx_dbschema_get_schema(void)\n{\n\treturn db_schema;\n}\n";
-		print "\nconst char\t**zbx_dbschema_get_schema_fkeys(void)\n{\n\treturn db_schema_fkeys;\n}\n";
 	}
 }
 
