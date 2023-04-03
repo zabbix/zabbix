@@ -83,10 +83,10 @@ switch ($page['type']) {
 		header('X-Content-Type-Options: nosniff');
 		header('X-XSS-Protection: 1; mode=block');
 
-		if (CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS) !== '') {
+		if (strcasecmp(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS), 'null') != 0) {
 			if (strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'SAMEORIGIN') == 0
 					|| strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'DENY') == 0) {
-				$x_frame_options = CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS);
+				header('X-Frame-Options: '.CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
 			}
 			else {
 				$x_frame_options = 'SAMEORIGIN';
@@ -98,14 +98,19 @@ switch ($page['type']) {
 				if ($url_to_check) {
 					foreach ($allowed_urls as $allowed_url) {
 						if (strcasecmp(trim($allowed_url), $url_to_check) == 0) {
-							$x_frame_options = 'ALLOW-FROM '.$allowed_url;
+							$x_frame_options = $allowed_url;
 							break;
 						}
 					}
 				}
-			}
 
-			header('X-Frame-Options: '.$x_frame_options);
+				if ($x_frame_options == 'SAMEORIGIN') {
+					header('X-Frame-Options: '.$x_frame_options);
+				}
+				else {
+					header('Content-Security-Policy: frame-ancestors '.$x_frame_options);
+				}
+			}
 		}
 		break;
 }

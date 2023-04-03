@@ -28,10 +28,10 @@ function local_showHeader(array $data): void {
 	header('X-Content-Type-Options: nosniff');
 	header('X-XSS-Protection: 1; mode=block');
 
-	if ($data['config']['x_frame_options'] !== '') {
+	if (strcasecmp($data['config']['x_frame_options'], 'null') != 0) {
 		if (strcasecmp($data['config']['x_frame_options'], 'SAMEORIGIN') == 0
 				|| strcasecmp($data['config']['x_frame_options'], 'DENY') == 0) {
-			$x_frame_options = $data['config']['x_frame_options'];
+			header('X-Frame-Options: '.$data['config']['x_frame_options']);
 		}
 		else {
 			$x_frame_options = 'SAMEORIGIN';
@@ -43,14 +43,19 @@ function local_showHeader(array $data): void {
 			if ($url_to_check) {
 				foreach ($allowed_urls as $allowed_url) {
 					if (strcasecmp(trim($allowed_url), $url_to_check) == 0) {
-						$x_frame_options = 'ALLOW-FROM '.$allowed_url;
+						$x_frame_options = $allowed_url;
 						break;
 					}
 				}
 			}
-		}
 
-		header('X-Frame-Options: '.$x_frame_options);
+			if ($x_frame_options == 'SAMEORIGIN') {
+				header('X-Frame-Options: '.$x_frame_options);
+			}
+			else {
+				header('Content-Security-Policy: frame-ancestors '.$x_frame_options);
+			}
+		}
 	}
 
 	echo (new CPartial('layout.htmlpage.header', [
