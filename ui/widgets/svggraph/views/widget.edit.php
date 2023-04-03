@@ -66,7 +66,7 @@ $form
 	->addJavaScript('widget_svggraph_form.init('.json_encode([
 		'form_tabs_id' => $form_tabs->getId(),
 		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE,
-		'templateid' => $data['fields']['ds']->templateid
+		'templateid' => $data['templateid']
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 

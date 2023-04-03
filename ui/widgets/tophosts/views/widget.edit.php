@@ -67,8 +67,8 @@ $form
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_tophosts_form.init('.json_encode([
-		'templateid' => $data['fields']['columns']->templateid
-	]).');')
+		'templateid' => $data['templateid']
+	], JSON_THROW_ON_ERROR).');')
 	->show();
 
 function getColumnsField(CWidgetFormView $form, CWidgetFieldColumnsList $field): array {

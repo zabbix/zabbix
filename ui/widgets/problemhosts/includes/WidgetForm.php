@@ -43,17 +43,17 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
 				new CWidgetFieldTextBox('problem', _('Problem'))
@@ -73,9 +73,9 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems'))
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [

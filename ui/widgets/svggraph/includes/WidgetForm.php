@@ -250,8 +250,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initDataSetFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphDataSet('ds', _('Data set'), $this->templateid))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldGraphDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 
@@ -401,10 +400,10 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
-			->addField($this->templateid === null
-				? (new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
-				: null
 			)
 			->addField(
 				(new CWidgetFieldSeverities('severities', _('Severity')))
@@ -429,8 +428,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initOverridesFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphOverride('or', _('Overrides'), $this->templateid))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldGraphOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 

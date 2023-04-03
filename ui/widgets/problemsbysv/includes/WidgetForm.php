@@ -45,17 +45,17 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
 				new CWidgetFieldTextBox('problem', _('Problem'))
@@ -72,12 +72,12 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldTags('tags')
 			)
-			->addField($this->templateid === null
-				? (new CWidgetFieldRadioButtonList('show_type', _('Show'), [
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldRadioButtonList('show_type', _('Show'), [
 					Widget::SHOW_GROUPS => _('Host groups'),
 					Widget::SHOW_TOTALS => _('Totals')
 				]))->setDefault(Widget::SHOW_GROUPS)
-				: null
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('layout', _('Layout'), [
@@ -85,13 +85,9 @@ class WidgetForm extends CWidgetForm {
 					STYLE_VERTICAL => _('Vertical')
 				]))
 					->setDefault(STYLE_HORIZONTAL)
-					->setFlags(
-						$this->templateid === null
-						? !array_key_exists('show_type', $this->values)
-							|| !$this->values['show_type'] == Widget::SHOW_TOTALS
-							? CWidgetField::FLAG_DISABLED
-							: 0x00
-						: 0x00
+					->setFlags($this->isTemplateDashboard() || $this->values['show_type'] != Widget::SHOW_TOTALS
+						? 0x00
+						: CWidgetField::FLAG_DISABLED
 					)
 			)
 			->addField(
@@ -104,15 +100,15 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
-			->addField($this->templateid === null
-				? (new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems')))
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems')))
 					->setFlags(
 						array_key_exists('show_type', $this->values)
 							&& $this->values['show_type'] == Widget::SHOW_TOTALS
 						? CWidgetField::FLAG_DISABLED
 						: 0x00
 					)
-				: null
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [

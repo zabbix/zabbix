@@ -114,13 +114,14 @@ class ColumnEdit extends CController {
 
 		if (!$this->hasInput('update')) {
 			$this->setResponse(new CControllerResponseData([
-					'action' => $this->getAction(),
-					'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
-					'errors' => hasErrorMessages() ? getMessages() : null,
-					'user' => [
-						'debug_mode' => $this->getDebugMode()
-					]
-				] + $input + $this->column_defaults));
+				'action' => $this->getAction(),
+				'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
+				'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
+				'errors' => hasErrorMessages() ? getMessages() : null,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
+			] + $input + $this->column_defaults));
 
 			return;
 		}

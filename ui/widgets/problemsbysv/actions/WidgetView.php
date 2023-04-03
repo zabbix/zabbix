@@ -41,10 +41,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$this->setResponse(new CControllerResponseData([
 				'name' => $this->getInput('name', $this->widget->getDefaultName()),
 				'error' => _('No data.'),
@@ -55,19 +53,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		else {
 			$filter = [
-				'groupids' => !$is_template_dashboard ? getSubGroups($this->fields_values['groupids']) : null,
-				'exclude_groupids' => !$is_template_dashboard
+				'groupids' => !$this->isTemplateDashboard() ? getSubGroups($this->fields_values['groupids']) : null,
+				'exclude_groupids' => !$this->isTemplateDashboard()
 					? getSubGroups($this->fields_values['exclude_groupids'])
 					: null,
-				'hostids' => !$is_template_dashboard
+				'hostids' => !$this->isTemplateDashboard()
 					? $this->fields_values['hostids']
 					: [$this->getInput('dynamic_hostid')],
 				'problem' => $this->fields_values['problem'],
 				'severities' => $this->fields_values['severities'],
-				'show_type' => !$is_template_dashboard ? $this->fields_values['show_type'] : Widget::SHOW_TOTALS,
+				'show_type' => !$this->isTemplateDashboard() ? $this->fields_values['show_type'] : Widget::SHOW_TOTALS,
 				'layout' => $this->fields_values['layout'],
 				'show_suppressed' => $this->fields_values['show_suppressed'],
-				'hide_empty_groups' => !$is_template_dashboard ? $this->fields_values['hide_empty_groups'] : null,
+				'hide_empty_groups' => !$this->isTemplateDashboard() ? $this->fields_values['hide_empty_groups'] : null,
 				'show_opdata' => $this->fields_values['show_opdata'],
 				'ext_ack' => $this->fields_values['ext_ack'],
 				'show_timeline' => $this->fields_values['show_timeline'],

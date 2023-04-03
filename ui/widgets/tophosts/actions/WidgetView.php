@@ -46,8 +46,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'user' => [
@@ -56,7 +54,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$data['error'] = _('No data.');
 		}
 		else {
@@ -68,18 +66,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getData(): array {
-		$is_template_dashboard = $this->hasInput('templateid');
 		$configuration = $this->fields_values['columns'];
 
-		$groupids = !$is_template_dashboard && $this->fields_values['groupids']
+		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 			? getSubGroups($this->fields_values['groupids'])
 			: null;
 
-		if (!$is_template_dashboard) {
-			$hostids = $this->fields_values['hostids'] ?: null;
+		if ($this->isTemplateDashboard()) {
+			$hostids = [$this->getInput('dynamic_hostid')];
 		}
 		else {
-			$hostids = [$this->getInput('dynamic_hostid')];
+			$hostids = $this->fields_values['hostids'] ?: null;
 		}
 
 		if (array_key_exists('tags', $this->fields_values)) {
@@ -143,7 +140,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$count = !$is_template_dashboard ? $this->fields_values['count'] : 1;
+		$count = $this->isTemplateDashboard() ? 1 : $this->fields_values['count'];
 		$master_item_values = array_slice($master_item_values, 0, $count, true);
 		$master_items = array_intersect_key($master_items, $master_item_values);
 

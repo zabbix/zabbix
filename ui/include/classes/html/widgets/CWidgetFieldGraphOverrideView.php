@@ -268,8 +268,33 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			}
 		}
 
-		$host_pattern_field = $this->field->templateid === null
-			? (new CPatternSelect([
+		if ($this->field->isTemplateDashboard()) {
+			$host_pattern_field = null;
+
+			$item_pattern_field = (new CPatternSelect([
+				'name' => $this->field->getName().'['.$row_num.'][items][]',
+				'object_name' => 'items',
+				'data' => $value['items'],
+				'placeholder' => _('item pattern'),
+				'wildcard_allowed' => 1,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'hostid' => $this->field->getTemplateId(),
+						'hide_host_filter' => true,
+						'numeric' => 1,
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][items][]')
+					]
+				],
+				'add_post_js' => false
+			]))
+				->setEnabled(!$this->isDisabled())
+				->setAriaRequired($this->isRequired());
+		}
+		else {
+			$host_pattern_field = (new CPatternSelect([
 				'name' => $this->field->getName().'['.$row_num.'][hosts][]',
 				'object_name' => 'hosts',
 				'data' => $value['hosts'],
@@ -286,11 +311,9 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				'add_post_js' => false
 			]))
 				->setEnabled(!$this->isDisabled())
-				->setAriaRequired($this->isRequired())
-			: null;
+				->setAriaRequired($this->isRequired());
 
-		$item_pattern_field = $this->field->templateid === null
-			? new CPatternSelect([
+			$item_pattern_field = (new CPatternSelect([
 				'name' => $this->field->getName().'['.$row_num.'][items][]',
 				'object_name' => 'items',
 				'data' => $value['items'],
@@ -327,30 +350,10 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 					]
 				],
 				'add_post_js' => false
-			])
-			: new CPatternSelect([
-				'name' => $this->field->getName().'['.$row_num.'][items][]',
-				'object_name' => 'items',
-				'data' => $value['items'],
-				'placeholder' => _('item pattern'),
-				'wildcard_allowed' => 1,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'items',
-						'srcfld1' => 'itemid',
-						'hostid' => $this->field->templateid,
-						'template_dashboard_widget' => true,
-						'numeric' => 1,
-						'dstfrm' => $this->form_name,
-						'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][items][]')
-					]
-				],
-				'add_post_js' => false
-			]);
-
-		$item_pattern_field
-			->setEnabled(!$this->isDisabled())
-			->setAriaRequired($this->isRequired());
+			]))
+				->setEnabled(!$this->isDisabled())
+				->setAriaRequired($this->isRequired());
+		}
 
 		return (new CListItem([
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
@@ -371,6 +374,6 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				)
 		]))
 			->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM)
-			->addClass($this->field->templateid === null ? null : 'with-hosts-multiselect');
+			->addClass($this->field->isTemplateDashboard() ? 'with-hosts-multiselect' : null);
 	}
 }

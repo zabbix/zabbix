@@ -40,8 +40,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'user' => [
@@ -51,24 +49,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$data['error'] = _('No data.');
 		}
 		else {
-			$filter_groupids = !$is_template_dashboard && $this->fields_values['groupids']
+			$filter_groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 				? getSubGroups($this->fields_values['groupids'])
 				: null;
 
-			if (!$is_template_dashboard) {
-				$filter_hostids = $this->fields_values['hostids'] ?: null;
-			}
-			else {
+			if ($this->isTemplateDashboard()) {
 				$filter_hostids = [$this->getInput('dynamic_hostid')];
 			}
+			else {
+				$filter_hostids = $this->fields_values['hostids'] ?: null;
+			}
 
-			$filter_maintenance = ($this->fields_values['maintenance'] == 0) ? 0 : null;
+			$filter_maintenance = $this->fields_values['maintenance'] == 0 ? 0 : null;
 
-			if (!$is_template_dashboard && $this->fields_values['exclude_groupids']) {
+			if (!$this->isTemplateDashboard() && $this->fields_values['exclude_groupids']) {
 				$exclude_groupids = getSubGroups($this->fields_values['exclude_groupids']);
 
 				if ($filter_hostids === null) {

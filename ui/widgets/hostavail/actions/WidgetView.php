@@ -36,7 +36,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$is_template_dashboard = $this->hasInput('templateid');
 		$interface_types = CItemGeneral::INTERFACE_TYPES_BY_PRIORITY;
 
 		// Sanitize non-existing interface types.
@@ -44,7 +43,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			array_intersect($interface_types, $this->fields_values['interface_type'])
 		);
 
-		$groupids = !$is_template_dashboard && $this->fields_values['groupids']
+		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 			? getSubGroups($this->fields_values['groupids'])
 			: null;
 

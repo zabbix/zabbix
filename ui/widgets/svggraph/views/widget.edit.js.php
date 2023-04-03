@@ -30,7 +30,7 @@ window.widget_svggraph_form = new class {
 
 		this._$overlay_body = jQuery('.overlay-dialogue-body');
 		this._form = document.getElementById('widget-dialogue-form');
-		this.templateid = templateid;
+		this._templateid = templateid;
 
 		this._dataset_wrapper = document.getElementById('data_sets');
 
@@ -387,9 +387,12 @@ window.widget_svggraph_form = new class {
 			this._initSingleItemSortable(cloned_dataset);
 		}
 		else {
-			jQuery('.js-hosts-multiselect', cloned_dataset).multiSelect('addData',
-				jQuery('.js-hosts-multiselect', dataset).multiSelect('getData')
-			);
+			if (this._templateid === null) {
+				jQuery('.js-hosts-multiselect', cloned_dataset).multiSelect('addData',
+					jQuery('.js-hosts-multiselect', dataset).multiSelect('getData')
+				);
+			}
+
 			jQuery('.js-items-multiselect', cloned_dataset).multiSelect('addData',
 				jQuery('.js-items-multiselect', dataset).multiSelect('getData')
 			);
@@ -467,7 +470,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	_selectItems() {
-		if (this.templateid === null) {
+		if (this._templateid === null) {
 			PopUp('popup.generic', {
 				srctbl: 'items',
 				srcfld1: 'itemid',
@@ -490,8 +493,8 @@ window.widget_svggraph_form = new class {
 				writeonly: 1,
 				multiselect: 1,
 				with_webitems: 1,
-				hostid: this.templateid,
-				template_dashboard_widget: 1
+				hostid: this._templateid,
+				hide_host_filter: 1
 			});
 		}
 	}
@@ -598,7 +601,7 @@ window.widget_svggraph_form = new class {
 						ids.push(jQuery(`#items_${dataset_index}_${i}_input`).val());
 					}
 
-					if (this.templateid === null) {
+					if (this._templateid === null) {
 						PopUp('popup.generic', {
 							srctbl: 'items',
 							srcfld1: 'itemid',
@@ -625,8 +628,8 @@ window.widget_svggraph_form = new class {
 							numeric: 1,
 							writeonly: 1,
 							with_webitems: 1,
-							hostid: this.templateid,
-							template_dashboard_widget: 1,
+							hostid: this._templateid,
+							hide_host_filter: 1,
 							dialogue_class: 'modal-popup-generic',
 							excludeids: ids
 						});
@@ -837,8 +840,8 @@ window.widget_svggraph_form = new class {
 		}
 		data.fields = form_fields;
 
-		if (this.templateid !== null) {
-			data.templateid = this.templateid
+		if (this._templateid !== null) {
+			data.templateid = this._templateid
 		}
 
 		if (preview_data.xhr) {

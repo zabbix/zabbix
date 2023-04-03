@@ -110,4 +110,8 @@ class CControllerDashboardWidgetView extends CController {
 			]
 		]));
 	}
+
+	protected function isTemplateDashboard(): bool {
+		return $this->hasInput('templateid');
+	}
 }

@@ -38,17 +38,17 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('evaltype', _('Scenario tags'), [

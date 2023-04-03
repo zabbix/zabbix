@@ -90,11 +90,11 @@ $item_select = (new CPatternSelect([
 		'parameters' => [
 			'srctbl' => 'items',
 			'srcfld1' => 'itemid',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'item',
 			'real_hosts' => $data['templateid'] === '',
 			'hostid'=> $data['templateid'] !== '' ? $data['templateid'] : null,
-			'template_dashboard_widget' => $data['templateid'] !== '',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'item'
+			'hide_host_filter' => $data['templateid'] !== ''
 		]
 	],
 	'add_post_js' => false

@@ -38,8 +38,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'error' => null,
@@ -50,15 +48,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$data['error'] = _('No data.');
 		}
 		else {
-			$filter_groupids = !$is_template_dashboard && $this->fields_values['groupids']
+			$filter_groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 				? getSubGroups($this->fields_values['groupids'])
 				: null;
 
-			if ($is_template_dashboard) {
+			if ($this->isTemplateDashboard()) {
 				$filter_hostids = [$this->getInput('dynamic_hostid')];
 			}
 			else {
@@ -72,7 +70,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$filter_show_suppressed = $this->fields_values['show_suppressed'];
 			$filter_ext_ack = $this->fields_values['ext_ack'];
 
-			if (!$is_template_dashboard && $this->fields_values['exclude_groupids']) {
+			if (!$this->isTemplateDashboard() && $this->fields_values['exclude_groupids']) {
 				$exclude_groupids = getSubGroups($this->fields_values['exclude_groupids']);
 
 				if ($filter_hostids === null) {
@@ -260,13 +258,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$data += [
 				'filter' => [
-					'hostids' => $is_template_dashboard
+					'hostids' => $this->isTemplateDashboard()
 						? [$this->getInput('dynamic_hostid')]
 						: $this->fields_values['hostids'],
 					'problem' => $this->fields_values['problem'],
 					'severities' => $filter_severities,
 					'show_suppressed' => $this->fields_values['show_suppressed'],
-					'hide_empty_groups' => !$is_template_dashboard ? $this->fields_values['hide_empty_groups'] : null,
+					'hide_empty_groups' => !$this->isTemplateDashboard()
+						? $this->fields_values['hide_empty_groups']
+						: null,
 					'ext_ack' => $this->fields_values['ext_ack']
 				],
 				'hosts_data' => $hosts_data,

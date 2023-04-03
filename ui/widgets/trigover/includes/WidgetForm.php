@@ -45,13 +45,13 @@ class WidgetForm extends CWidgetForm {
 					TRIGGERS_OPTION_ALL => _('Any')
 				]))->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [

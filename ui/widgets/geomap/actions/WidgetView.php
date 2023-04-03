@@ -82,23 +82,22 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * Get hosts and their properties to show on the map as markers.
 	 */
 	private function getHosts(): array {
-		$is_template_dashboard = $this->hasInput('templateid');
-		$hosts = [];
-
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
-			return $hosts;
-		}
-		else if ($is_template_dashboard && $this->hasInput('dynamic_hostid')) {
-			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'selectInventory' => ['location_lat', 'location_lon'],
-				'hostids' => [$this->getInput('dynamic_hostid')],
-				'filter' => [
-					'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
-				],
-				'monitored_hosts' => true,
-				'preservekeys' => true
-			]);
+		if ($this->isTemplateDashboard()) {
+			if ($this->hasInput('dynamic_hostid')) {
+				$hosts = API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'selectInventory' => ['location_lat', 'location_lon'],
+					'hostids' => [$this->getInput('dynamic_hostid')],
+					'filter' => [
+						'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
+					],
+					'monitored_hosts' => true,
+					'preservekeys' => true
+				]);
+			}
+			else {
+				return [];
+			}
 		}
 		else {
 			$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;

@@ -415,10 +415,6 @@
 
 			$obj.append($selected_div.append($selected_ul));
 
-			if (ms.options.hidden) {
-				$obj.closest('li').attr('style', 'display: none');
-			}
-
 			if (ms.options.disabled) {
 				$obj.attr('aria-disabled', true);
 				$selected_ul.addClass('disabled');

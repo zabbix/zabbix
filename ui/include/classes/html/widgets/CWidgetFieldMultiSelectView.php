@@ -23,8 +23,6 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelect;
 
 abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 
-	protected const OBJECT_NAME = '';
-
 	protected ?CMultiSelect $multiselect = null;
 
 	protected array $data;
@@ -32,6 +30,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 	protected bool $custom_select = false;
 
 	protected array $filter_preselect = [];
+	protected array $popup_parameters = [];
 
 	public function __construct(CWidgetFieldMultiSelect $field, array $data) {
 		$this->field = $field;
@@ -68,9 +67,9 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 			else {
 				$options['popup'] = [
 					'parameters' => [
-							'dstfrm' => $this->form_name,
-							'dstfld1' => zbx_formatDomId($multiselect_name)
-						] + $this->getPopupParameters() + $this->field->getFilterParameters()
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($multiselect_name)
+					] + $this->getPopupParameters()
 				];
 
 				if ($this->filter_preselect) {
@@ -96,11 +95,17 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 		return $this;
 	}
 
-	protected function getObjectName(): string {
-		return '';
+	public function setPopupParameter(string $name, $value): self {
+		$this->popup_parameters[$name] = $value;
+
+		return $this;
 	}
 
 	protected function getPopupParameters(): array {
-		return [];
+		return $this->popup_parameters;
+	}
+
+	protected function getObjectName(): string {
+		return '';
 	}
 }

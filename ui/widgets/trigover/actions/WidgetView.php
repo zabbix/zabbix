@@ -36,8 +36,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'user' => [
@@ -46,7 +44,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$data['error'] = _('No data.');
 		}
 		else {
@@ -75,14 +73,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 					: TAG_EVAL_TYPE_AND_OR
 			];
 
-			if (!$is_template_dashboard) {
-				$host_options['hostids'] = $this->fields_values['hostids'] ?: null;
-			}
-			else {
+			if ($this->isTemplateDashboard()) {
+				$groupids = [];
 				$host_options['hostids'] = [$this->getInput('dynamic_hostid')];
 			}
-
-			$groupids = !$is_template_dashboard ? $this->fields_values['groupids'] : [];
+			else {
+				$groupids = $this->fields_values['groupids'];
+				$host_options['hostids'] = $this->fields_values['hostids'] ?: null;
+			}
 
 			[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 				$data['hosts_by_name'], $data['exceeded_limit']

@@ -40,10 +40,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$this->setResponse(new CControllerResponseData([
 				'name' => $this->getInput('name', $this->widget->getDefaultName()),
 				'error' => _('No data.'),
@@ -56,9 +54,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 			$data = CScreenProblem::getData([
 				'show' => $this->fields_values['show'],
-				'groupids' => !$is_template_dashboard ? $this->fields_values['groupids'] : null,
-				'exclude_groupids' => !$is_template_dashboard ? $this->fields_values['exclude_groupids'] : null,
-				'hostids' => !$is_template_dashboard
+				'groupids' => !$this->isTemplateDashboard() ? $this->fields_values['groupids'] : null,
+				'exclude_groupids' => !$this->isTemplateDashboard() ? $this->fields_values['exclude_groupids'] : null,
+				'hostids' => !$this->isTemplateDashboard()
 					? $this->fields_values['hostids']
 					: [$this->getInput('dynamic_hostid')],
 				'name' => $this->fields_values['problem'],

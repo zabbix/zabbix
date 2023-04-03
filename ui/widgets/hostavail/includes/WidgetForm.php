@@ -37,9 +37,9 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField($this->templateid === null
-				? new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
 			->addField(
 				new CWidgetFieldCheckBoxList('interface_type', _('Interface type'), [

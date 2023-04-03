@@ -35,8 +35,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'user' => [
@@ -45,18 +43,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$data['error'] = _('No data.');
 		}
 		else {
-			$groupids = !$is_template_dashboard && $this->fields_values['groupids']
-				? getSubGroups($this->fields_values['groupids'])
-				: null;
-			if (!$is_template_dashboard) {
-				$hostids = $this->fields_values['hostids'] ?: null;
+			if ($this->isTemplateDashboard()) {
+				$groupids = null;
+				$hostids = [$this->getInput('dynamic_hostid')];
 			}
 			else {
-				$hostids = [$this->getInput('dynamic_hostid')];
+				$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+				$hostids = $this->fields_values['hostids'] ?: null;
 			}
 
 			[$items, $hosts, $has_hidden_data] = getDataOverview($groupids, $hostids, $this->fields_values);

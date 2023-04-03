@@ -99,8 +99,31 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		];
 
 		if ($dataset_type == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
-			$host_pattern_field = $this->field->templateid === null
-				? (new CPatternSelect([
+			if ($this->field->isTemplateDashboard()) {
+				$host_pattern_field = null;
+
+				$item_pattern_field = (new CPatternSelect([
+					'name' => $field_name.'['.$row_num.'][items][]',
+					'object_name' => 'items',
+					'data' => $value['items'],
+					'placeholder' => _('item pattern'),
+					'wildcard_allowed' => 1,
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'items',
+							'srcfld1' => 'name',
+							'hostid' => $this->field->getTemplateId(),
+							'hide_host_filter' => true,
+							'numeric' => 1,
+							'dstfrm' => $this->form_name,
+							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
+						]
+					],
+					'add_post_js' => false
+				]))->addClass('js-items-multiselect');
+			}
+			else {
+				$host_pattern_field = (new CPatternSelect([
 					'name' => $field_name.'['.$row_num.'][hosts][]',
 					'object_name' => 'hosts',
 					'data' => $value['hosts'],
@@ -115,11 +138,9 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 						]
 					],
 					'add_post_js' => false
-				]))->addClass('js-hosts-multiselect')
-			: null;
+				]))->addClass('js-hosts-multiselect');
 
-			$item_pattern_field = $this->field->templateid === null
-				? new CPatternSelect([
+				$item_pattern_field = (new CPatternSelect([
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
 					'data' => $value['items'],
@@ -156,28 +177,8 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 						]
 					],
 					'add_post_js' => false
-				])
-				: new CPatternSelect([
-					'name' => $field_name.'['.$row_num.'][items][]',
-					'object_name' => 'items',
-					'data' => $value['items'],
-					'placeholder' => _('item pattern'),
-					'wildcard_allowed' => 1,
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'items',
-							'srcfld1' => 'name',
-							'hostid' => $this->field->templateid,
-							'template_dashboard_widget' => true,
-							'numeric' => 1,
-							'dstfrm' => $this->form_name,
-							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
-						]
-					],
-					'add_post_js' => false
-				]);
-
-			$item_pattern_field->addClass('js-items-multiselect');
+				]))->addClass('js-items-multiselect');
+			}
 
 			$dataset_head = array_merge($dataset_head, [
 				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
@@ -438,7 +439,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
 			->addClass(ZBX_STYLE_SORTABLE_ITEM)
 			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
-			->addClass($this->field->templateid === null ? null : 'with-hosts-multiselect')
+			->addClass($this->field->isTemplateDashboard() ? 'with-hosts-multiselect' : null)
 			->setAttribute('data-set', $row_num)
 			->setAttribute('data-type', $dataset_type);
 	}

@@ -47,6 +47,8 @@ abstract class CWidgetField {
 	protected ?array $strict_validation_rules = null;
 	protected array $ex_validation_rules = [];
 
+	private $templateid = null;
+
 	/**
 	 * @param string      $name   Field name in form.
 	 * @param string|null $label  Label for the field in form.
@@ -124,6 +126,23 @@ abstract class CWidgetField {
 		$this->flags = $flags;
 
 		return $this;
+	}
+
+	/**
+	 * @return int|string|null
+	 */
+	public function getTemplateId() {
+		return $this->templateid;
+	}
+
+	public function setTemplateId($templateid): self {
+		$this->templateid = $templateid;
+
+		return $this;
+	}
+
+	public function isTemplateDashboard(): bool {
+		return $this->templateid !== null;
 	}
 
 	/**
