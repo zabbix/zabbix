@@ -2657,11 +2657,9 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 		if (2 < token->opt)
 		{
-			zbx_variant_t	arg_tmp, *arg_operator;
+			zbx_variant_t	arg_tmp;
 
-			arg_operator = &output->values[output->values_num - token->opt + 2];
-
-			zbx_variant_copy(&arg_tmp, arg_operator);
+			zbx_variant_copy(&arg_tmp, &output->values[output->values_num - token->opt + 2]);
 
 			if (SUCCEED != zbx_variant_convert(&arg_tmp, ZBX_VARIANT_STR))
 			{
