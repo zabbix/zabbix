@@ -2425,7 +2425,7 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 	zbx_socket_set_deadline(s, timeout);
 
 	pd.fd = s->socket;
-	pd.events = POLLOUT;
+	pd.events = POLLIN;
 
 	zbx_socket_free(s);
 
@@ -2467,7 +2467,7 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 				}
 			}
 
-			if (0 == (pd.revents & POLLOUT))
+			if (0 == (pd.revents & POLLIN))
 			{
 				zbx_set_socket_strerror("connection error with poll events 0x%x", pd.revents);
 				return FAIL;
@@ -2488,6 +2488,7 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 
 	memcpy(s->buffer, buffer, (size_t)n);
 	s->buffer[n] = '\0';
+	s->read_bytes = (size_t)n;
 
 	return SUCCEED;
 }
