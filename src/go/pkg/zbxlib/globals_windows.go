@@ -33,6 +33,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/param.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/interval.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/common_str.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/common_log.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/components_strings_representations.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/libc_wrappers.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
