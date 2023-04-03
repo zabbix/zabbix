@@ -40,8 +40,7 @@ extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
 		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
-		const zbx_thread_info_t *thread_info, int config_timeout, int proxyconfig_frequency,
-		int proxydata_frequency)
+		const zbx_thread_info_t *thread_info, int config_timeout, int proxyconfig_frequency)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -124,8 +123,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &error)))
 	{
-		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, config_vault, proxyconfig_frequency,
-				proxydata_frequency);
+		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, config_vault, proxyconfig_frequency);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
@@ -265,7 +263,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault,
-			proxyconfig_args_in->proxyconfig_frequency, proxyconfig_args_in->proxydata_frequency);
+			proxyconfig_args_in->proxyconfig_frequency);
 
 	zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
 
@@ -298,8 +296,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 				zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL,
 						proxyconfig_args_in->config_vault,
-						proxyconfig_args_in->proxyconfig_frequency,
-						proxyconfig_args_in->proxydata_frequency);
+						proxyconfig_args_in->proxyconfig_frequency);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				zbx_dc_update_interfaces_availability();
 				zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
@@ -325,7 +322,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->config_tls,
 				proxyconfig_args_in->config_vault, info, proxyconfig_args_in->config_timeout,
-				proxyconfig_args_in->proxyconfig_frequency, proxyconfig_args_in->proxydata_frequency);
+				proxyconfig_args_in->proxyconfig_frequency);
 
 		interval = zbx_time() - sec;
 

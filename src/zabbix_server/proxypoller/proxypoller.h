@@ -36,7 +36,7 @@ typedef struct
 	int				config_timeout;
 	const zbx_events_funcs_t	*events_cbs;
 	int				proxyconfig_frequency;
-	int				proxydata_frequency
+	int				proxydata_frequency;
 }
 zbx_thread_proxy_poller_args;
 

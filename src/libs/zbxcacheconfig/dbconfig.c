@@ -1226,8 +1226,7 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid,
 
 
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *active_avail_diff,
-		zbx_hashset_t *activated_hosts, const zbx_config_vault_t *config_vault, int proxyconfig_frequency,
-		int proxydata_frequency)
+		zbx_hashset_t *activated_hosts, const zbx_config_vault_t *config_vault, int proxyconfig_frequency)
 {
 	char				**row;
 	zbx_uint64_t			rowid;
@@ -6719,8 +6718,7 @@ static void	DCsync_connector_tags(zbx_dbsync_t *sync)
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
-		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault, int proxyconfig_frequency,
-		int proxydata_frequency)
+		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault, int proxyconfig_frequency)
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
@@ -6967,7 +6965,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
 	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts, config_vault,
-			proxyconfig_frequency, proxydata_frequency);
+			proxyconfig_frequency);
 	zbx_dbsync_clear_user_macros();
 	hsec2 = zbx_time() - sec;
 
