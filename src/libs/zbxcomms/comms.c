@@ -1078,15 +1078,14 @@ static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size)
 			}
 		}
 
-		if (0 >= rc)
+		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
-			if (SUCCEED != zbx_socket_check_deadline(s))
-			{
-				zbx_set_socket_strerror("read timeout");
-				return ZBX_PROTO_ERROR;
-			}
-			continue;
+			zbx_set_socket_strerror("read timeout");
+			return ZBX_PROTO_ERROR;
 		}
+
+		if (0 >= rc)
+			continue;
 
 		if (0 == (pd.revents & POLLIN))
 		{
@@ -2457,15 +2456,14 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 				}
 			}
 
-			if (0 >= rc)
+			if (SUCCEED != zbx_socket_check_deadline(s))
 			{
-				if (SUCCEED != zbx_socket_check_deadline(s))
-				{
-					zbx_set_socket_strerror("send timeout");
-					return FAIL;
-				}
-				continue;
+				zbx_set_socket_strerror("send timeout");
+				return FAIL;
 			}
+
+			if (0 >= rc)
+				continue;
 
 			if (0 == (pd.revents & POLLIN))
 			{
