@@ -45,7 +45,7 @@ int     vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			return SYSINFO_RET_FAIL;
 		}
 
-		zbx_get_GetPerformanceInfo()(&pfi, sizeof(PERFORMANCE_INFORMATION));
+		(*zbx_get_GetPerformanceInfo())(&pfi, sizeof(PERFORMANCE_INFORMATION));
 
 		SET_UI64_RESULT(result, (zbx_uint64_t)pfi.SystemCache * pfi.PageSize);
 
@@ -56,7 +56,7 @@ int     vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
-		zbx_get_GlobalMemoryStatusEx()(&ms_ex);
+		(*zbx_get_GlobalMemoryStatusEx())(&ms_ex);
 
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 		{

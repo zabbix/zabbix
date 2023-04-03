@@ -119,17 +119,17 @@ typedef enum {
 } zbx_file_info_by_handle_class_t;
 
 
-typedef DWORD	(__stdcall *GetGuiResources)(HANDLE, DWORD);
-typedef BOOL	(__stdcall *GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
-typedef BOOL	(__stdcall *GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
-typedef BOOL	(__stdcall *GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
-typedef BOOL	(__stdcall *GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
+typedef DWORD	(__stdcall *GetGuiResources_t)(HANDLE, DWORD);
+typedef BOOL	(__stdcall *GetProcessIoCounters_t)(HANDLE, PIO_COUNTERS);
+typedef BOOL	(__stdcall *GetPerformanceInfo_t)(PPERFORMANCE_INFORMATION, DWORD);
+typedef BOOL	(__stdcall *GlobalMemoryStatusEx_t)(LPMEMORYSTATUSEX);
+typedef BOOL	(__stdcall *GetFileInformationByHandleEx_t)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
 
-GetGuiResources			*zbx_get_GetGuidResources(void);
-GetProcessIoCounters		*zbx_get_GetProcessIoCounters(void);
-GetPerformanceInfo		*zbx_get_GetPerformanceInfo(void);
-GetGlobalMemoryStatusEx		*zbx_get_GetGlobalMemoryStatusEx(void);
-GetFileInformationByHandleEx	*zbx_get_GetFileInformationByHandleEx(void);
+GetGuiResources_t		zbx_get_GetGuidResources(void);
+GetProcessIoCounters_t		zbx_get_GetProcessIoCounters(void);
+GetPerformanceInfo_t		zbx_get_GetPerformanceInfo(void);
+GlobalMemoryStatusEx_t		zbx_get_GlobalMemoryStatusEx(void);
+GetFileInformationByHandleEx_t	zbx_get_GetFileInformationByHandleEx(void);
 
 void	zbx_import_symbols(void);
 

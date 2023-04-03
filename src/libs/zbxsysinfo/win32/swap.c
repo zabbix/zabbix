@@ -41,7 +41,7 @@ int	vm_vmemory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
-		zbx_get_GlobalMemoryStatusEx()(&ms_ex);
+		(*zbx_get_GlobalMemoryStatusEx())(&ms_ex);
 
 		ullTotalPageFile = ms_ex.ullTotalPageFile;
 		ullAvailPageFile = ms_ex.ullAvailPageFile;
@@ -134,7 +134,7 @@ int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
-		zbx_get_GlobalMemoryStatusEx()(&ms_ex);
+		(*zbx_get_GlobalMemoryStatusEx())(&ms_ex);
 
 		real_swap_total = ms_ex.ullTotalPageFile > ms_ex.ullTotalPhys ?
 				ms_ex.ullTotalPageFile - ms_ex.ullTotalPhys : 0;

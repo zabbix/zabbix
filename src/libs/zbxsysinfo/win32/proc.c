@@ -257,48 +257,48 @@ static int	GetProcessAttribute(HANDLE hProcess, int attr, int type, int count, d
 			if (NULL == zbx_get_GetGuiResources())
 				return SYSINFO_RET_FAIL;
 
-			value = (double)(zbx_get_GetGuiResources())(hProcess, 5 == attr ? 0 : 1);
+			value = (double)(*zbx_get_GetGuiResources())(hProcess, 5 == attr ? 0 : 1);
 			break;
 		case 7:        /* io_read_b */
 			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_get_GetProcessIoCounters()(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.ReadTransferCount);
 			break;
 		case 8:        /* io_read_op */
 			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_get_GetProcessIoCounters()(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.ReadOperationCount);
 			break;
 		case 9:        /* io_write_b */
 			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_get_GetProcessIoCounters()(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.WriteTransferCount);
 			break;
 		case 10:       /* io_write_op */
 			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_get_GetProcessIoCounters()(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.WriteOperationCount);
 			break;
 		case 11:       /* io_other_b */
 			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_get_GetProcessIoCounters()(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.OtherTransferCount);
 			break;
 		case 12:       /* io_other_op */
 			if (NULL == zbx_get_GetProcessIoCounters())
 				return SYSINFO_RET_FAIL;
 
-			zbx_get_GetProcessIoCounters()(hProcess, &ioCounters);
+			(*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters);
 			value = (double)((__int64)ioCounters.OtherOperationCount);
 			break;
 		default:       /* Unknown attribute */

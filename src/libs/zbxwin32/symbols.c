@@ -25,29 +25,30 @@ static DWORD	(__stdcall *GetGuiResources)(HANDLE, DWORD) = NULL;
 static BOOL	(__stdcall *GetProcessIoCounters)(HANDLE, PIO_COUNTERS) = NULL;
 static BOOL	(__stdcall *GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD) = NULL;
 static BOOL	(__stdcall *GlobalMemoryStatusEx)(LPMEMORYSTATUSEX) = NULL;
-static BOOL	(__stdcall *GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD) = NULL;
+static BOOL	(__stdcall *GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD) =
+			NULL;
 
-GetGuiResources*        zbx_get_GetGuidResources(void)
+GetGuiResources_t	zbx_get_GetGuidResources(void)
 {
-	return GetGuidResources; 
+	return GetGuidResources;
 }
 
-GetProcessIoCounters*   zbx_get_GetProcessIoCounters(void)
+GetProcessIoCounters_t	zbx_get_GetProcessIoCounters(void)
 {
 	return GetProcessIoCounters;
 }
 
-GetPerformanceInfo*     zbx_get_GetPerformanceInfo(void)
+GetPerformanceInfo_t	zbx_get_GetPerformanceInfo(void)
 {
 	return GetPerformanceInfo;
 }
 
-GetGlobalMemoryStatusEx*        zbx_get_GetGlobalMemoryStatusEx(void)
+GetGlobalMemoryStatusEx_t	zbx_get_GlobalMemoryStatusEx(void)
 {
 	return GetGlobalMemoryStatusEx;
 }
 
-GetFileInformationByHandleEx*   zbx_get_GetFileInformationByHandleEx(void)
+GetFileInformationByHandleEx_t	zbx_get_GetFileInformationByHandleEx(void)
 {
 	return GetFileInformationByHandleEx;
 }
