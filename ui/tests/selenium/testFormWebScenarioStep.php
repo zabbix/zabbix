@@ -34,6 +34,7 @@ class testFormWebScenarioStep extends CWebTest {
 	private static $hostid;
 	private static $templateid;
 	private static $update_step = 'step 2 of clone scenario';
+	private static $impactless_step = 'Первый этап вэб сценария';
 
 	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
 	const UPDATE_SCENARIO = 'Scenario for Clone';
@@ -890,6 +891,232 @@ class testFormWebScenarioStep extends CWebTest {
 		}
 	}
 
-	// Convert raw data to form fields + URL parse + Cancel create + Cancel update + Simple update + Remove
+	public function testFormWebScenarioStep_SimpleUpdate() {
+		$this->checkImpactlessAction('simple_update');
+	}
+
+	public function testFormWebScenarioStep_CancelCreate() {
+		$this->checkImpactlessAction('cancel_create');
+	}
+
+	public function testFormWebScenarioStep_CancelUpdate() {
+		$this->checkImpactlessAction('cancel_update');
+	}
+
+	public function testFormWebScenarioStep_CancelDelete() {
+		$this->checkImpactlessAction('cancel_delete');
+	}
+
+	private function checkImpactlessAction($action) {
+		$old_hash = CDBHelper::getHash(self::SQL);
+
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+		$this->query('link:'.self::UPDATE_SCENARIO)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$scenario_form = $this->query('id:httpForm')->asForm()->one();
+
+		$scenario_form->selectTab('Steps');
+		$steps = $scenario_form->getField('Steps')->asTable();
+
+		if ($action === 'cancel_delete') {
+			$steps->findRow('Name', self::$impactless_step)->query('button:Remove')->one()->click();
+			$scenario_form->query('button:Cancel')->one()->click();
+			$this->page->waitUntilReady();
+		}
+		else {
+			$open_step = ($action === 'cancel_create') ? 'button:Add' : 'link:'.self::$impactless_step;
+			$steps->query($open_step)->waitUntilClickable()->one()->click();
+
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$step_form = $dialog->asForm();
+
+			if ($action === 'simple_update') {
+				$step_form->submit();
+			}
+			else {
+				$values = [
+					'Name' => $action.' step',
+					'id:url' => 'http://'.$action.'.lv',
+					'Retrieve mode' => 'Headers'
+				];
+
+				$step_form->fill($values);
+				$dialog->query('button:Cancel')->one()->click();
+			}
+
+			$dialog->ensureNotPresent();
+
+			$scenario_form->submit();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Web scenario updated');
+		}
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	public function testFormWebScenarioStep_Remove() {
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+		$this->query('link:'.self::UPDATE_SCENARIO)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$form = $this->query('id:httpForm')->asForm()->one();
+
+		$form->selectTab('Steps');
+		$form->getField('Steps')->asTable()->findRow('Name', self::$impactless_step)->query('button:Remove')->one()->click();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
+
+		$sql = 'SELECT httpstepid FROM httpstep WHERE name='.zbx_dbstr(self::$impactless_step).
+				' AND httptestid IN (SELECT httptestid FROM httptest WHERE name='.zbx_dbstr(self::UPDATE_SCENARIO).')';
+		$this->assertEquals(0, CDBHelper::getCount($sql));
+	}
+
+	public static function getStepUrlData() {
+		return [
+			// Plain parsing of URL parameters.
+			[
+				[
+					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?login=admin&password=s00p3r%24ecr3%26',
+					'parsed_query' => [
+						['name' => 'login', 'value' => 'admin'],
+						['name' => 'password', 'value' => 's00p3r$ecr3&']
+					],
+					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
+				]
+			],
+			// Unrellated existing and parsed query parameters.
+			[
+				[
+					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?password=s00p3r%24ecr3%26',
+					'existing_query' => [
+						['name' => 'login', 'value' => 'admin']
+					],
+					'parsed_query' => [
+						['name' => 'login', 'value' => 'admin'],
+						['name' => 'password', 'value' => 's00p3r$ecr3&']
+					],
+					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
+				]
+			],
+			// Duplicate parameters should not be erased during parsing.
+			[
+				[
+					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?login=user&password=a123%24bcd4%26',
+					'existing_query' => [
+						['name' => 'login', 'value' => 'admin'],
+						['name' => 'login', 'value' => 'user'],
+						['name' => 'password', 'value' => 'password']
+					],
+					'parsed_query' => [
+						['name' => 'login', 'value' => 'admin'],
+						['name' => 'login', 'value' => 'user'],
+						['name' => 'password', 'value' => 'password'],
+						['name' => 'login', 'value' => 'user'],
+						['name' => 'password', 'value' => 'a123$bcd4&']
+					],
+					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
+				]
+			],
+			// Invalid URL part removed duting parsing
+			[
+				[
+					'url' => 'http://www.zabbix.com/enterprise_ready#test',
+					'parsed_query' => [
+						['name' => '', 'value' => '']
+					],
+					'resulting_url' => 'http://www.zabbix.com/enterprise_ready'
+				]
+			],
+			// Empty query parameter name or value.
+			[
+				[
+					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?=admin&password=',
+					'parsed_query' => [
+						['name' => '', 'value' => 'admin'],
+						['name' => 'password', 'value' => '']
+					],
+					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
+				]
+			],
+			// Improper query parameter in URL.
+			[
+				[
+					'expected' => TEST_BAD,
+					'url' => 'http://localhost/zabbix/index.php?test=%11',
+					'error' => "Failed to parse URL.\n\nURL is not properly encoded."
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getStepUrlData
+	 */
+	public function testFormWebScenarioStep_ParseUrl($data) {
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+		$this->query('link:'.self::UPDATE_SCENARIO)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$scenario_form = $this->query('id:httpForm')->asForm()->one();
+
+		$scenario_form->selectTab('Steps');
+		$scenario_form->getField('Steps')->query('button:Add')->one()->click();
+
+		$step_form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+		$url_field = $step_form->getField('id:url');
+		$url_field->fill($data['url']);
+
+		$query_table = $step_form->getField('Query fields');
+
+		// Fill in exising query fields if such are present in the data provider.
+		if (array_key_exists('existing_query', $data)) {
+			$add_button = $query_table->query('button:Add')->one();
+
+			$i = 1;
+			foreach ($data['existing_query'] as $existing_query) {
+				// Add row in Query fields tableif required
+				if (count($data['existing_query']) !== $query_table->query('xpath:.//tr[@class="sortable"]')->all()->count()) {
+					$add_button->click();
+				}
+
+				$query_table->query("xpath:(.//tr[".$i."]//input)[1]")->one()->fill($existing_query['name']);
+				$query_table->query("xpath:(.//tr[".$i."]//input)[2]")->one()->fill($existing_query['value']);
+
+				$i++;
+			}
+		}
+
+		$step_form->query('button:Parse')->one()->click();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			$query_table->invalidate();
+
+			foreach ($data['parsed_query'] as $resulting_name => $resulting_value) {
+
+				$obtained_qieries = [];
+				$i = 0;
+
+				foreach ($query_table->query('xpath:(.//tr[@class="sortable"])')->all() as $table_row) {
+					$obtained_qieries[$i]['name'] = $table_row->query('xpath:(.//input)[1]')->one()->getValue();
+					$obtained_qieries[$i]['value'] = $table_row->query('xpath:(.//input)[2]')->one()->getValue();
+
+					$i++;
+				}
+
+				$this->assertEquals($data['parsed_query'], $obtained_qieries);
+			}
+
+			$this->assertEquals($data['resulting_url'], $url_field->getValue());
+		}
+		else {
+			$error_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+
+			$this->assertEquals('Error', $error_dialog->getTitle());
+			$this->assertEquals($data['error'], $error_dialog->getContent()->getText());
+			$error_dialog->getFooter()->query('button:Ok')->one()->click();
+			$error_dialog->waitUntilNotPresent();
+		}
+
+	}
+
+	// Convert raw data to form fields
 }
 
