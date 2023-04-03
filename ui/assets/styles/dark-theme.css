@@ -1814,6 +1814,7 @@ form.dashboard-widget-svggraph .td-drag-icon .drag-icon {
   left: 9px;
   margin-right: 5px; }
 form.dashboard-widget-svggraph .list-item-actions {
+  grid-column: span 1 / -1;
   text-align: right; }
   form.dashboard-widget-svggraph .list-item-actions .btn-remove {
     top: 0;
@@ -1862,8 +1863,6 @@ form.dashboard-widget-svggraph .list-accordion-item {
     display: none; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
     padding-left: 0; }
-  form.dashboard-widget-svggraph .list-accordion-item .list-item-actions {
-    grid-column: 6; }
 form.dashboard-widget-svggraph .single-item-table .table-col-handle {
   width: 26px; }
 form.dashboard-widget-svggraph .single-item-table .table-col-no {
@@ -1896,8 +1895,6 @@ form.dashboard-widget-svggraph .overrides-list-item {
     margin-bottom: -5px; }
   form.dashboard-widget-svggraph .overrides-list-item .multiselect {
     width: 100%; }
-  form.dashboard-widget-svggraph .overrides-list-item .list-item-actions {
-    grid-column: 3; }
 form.dashboard-widget-svggraph .overrides-foot {
   padding: 5px 0; }
 form.dashboard-widget-svggraph .overrides-options-list {

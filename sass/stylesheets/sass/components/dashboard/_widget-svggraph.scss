@@ -82,6 +82,7 @@ form.dashboard-widget-svggraph {
 	}
 
 	.list-item-actions {
+		grid-column: span 1 / -1;
 		text-align: right;
 
 		.btn-remove {
@@ -163,10 +164,6 @@ form.dashboard-widget-svggraph {
 				padding-left: 0;
 			}
 		}
-
-		.list-item-actions {
-			grid-column: 6;
-		}
 	}
 
 	.single-item-table {
@@ -213,10 +210,6 @@ form.dashboard-widget-svggraph {
 
 		.multiselect {
 			width: 100%;
-		}
-
-		.list-item-actions {
-			grid-column: 3;
 		}
 	}
 
