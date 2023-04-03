@@ -79,6 +79,5 @@ zbx_db_table_changelog_t;
 const zbx_db_table_t		*zbx_dbschema_get_tables(void);
 const zbx_db_table_changelog_t	*zbx_dbschema_get_changelog_tables(void);
 const char			*zbx_dbschema_get_schema(void);
-const char			**zbx_dbschema_get_schema_fkeys(void);
 
 #endif

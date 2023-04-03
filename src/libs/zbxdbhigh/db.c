@@ -618,7 +618,7 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 
 const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
 {
-	const zbx_db_table_t*	tables = zbx_dbschema_get_tables();
+	const zbx_db_table_t	*tables = zbx_dbschema_get_tables();
 
 	for (int t = 0; NULL != tables[t].table; t++)
 	{
