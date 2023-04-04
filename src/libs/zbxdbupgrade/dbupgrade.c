@@ -22,6 +22,8 @@
 #include "zbxdbschema.h"
 
 #include "log.h"
+#include "zbxha.h"
+#include "zbxtime.h"
 
 typedef struct
 {
@@ -913,16 +915,73 @@ void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb)
 {
 	DBget_program_type_cb = get_program_type_cb;
 }
-
-int	DBcheck_version(void)
+#ifndef HAVE_SQLITE3
+static int	DBcheck_nodes(void)
 {
-	const char		*dbversion_table_name = "dbversion";
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED, db_time = 0, failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
+
+	zbx_db_begin();
+
+	result = zbx_db_select("select " ZBX_DB_TIMESTAMP() ",ha_failover_delay from config");
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		db_time = atoi(row[0]);
+
+		if (SUCCEED != zbx_is_time_suffix(row[1], &failover_delay, ZBX_LENGTH_UNLIMITED))
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve database time");
+
+	zbx_db_free_result(result);
+
+	/* check if there are recently accessed ZBX_NODE_STATUS_STANDBY or ZBX_NODE_STATUS_ACTIVE nodes */
+	result = zbx_db_select("select lastaccess,name"
+			" from ha_node"
+			" where status not in (%d,%d)"
+			" order by ha_nodeid" ZBX_FOR_UPDATE,
+			ZBX_NODE_STATUS_STOPPED, ZBX_NODE_STATUS_UNAVAILABLE);
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		int	lastaccess, age;
+
+		lastaccess = atoi(row[0]);
+
+		if ((age = lastaccess + failover_delay - db_time) <= 0)
+			continue;
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade: node \"%s\" is still running, if node"
+				" is unreachable it will be skipped in %s",
+				'\0' != *row[1] ? row[1] : "<standalone server>", zbx_age2str(age));
+
+		ret = FAIL;
+	}
+	zbx_db_free_result(result);
+
+	if (SUCCEED == ret)
+	{
+		if (ZBX_DB_OK != zbx_db_commit())
+			ret = FAIL;
+	}
+	else
+		zbx_db_rollback();
+
+	return ret;
+}
+#endif
+
+int	DBcheck_version(zbx_ha_mode_t ha_mode)
+{
+#define ZBX_DB_WAIT_UPGRADE	10
+	const char		*dbversion_table_name = "dbversion", *ha_node_table_name = "ha_node";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
 	zbx_db_version_t	*dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
-	int			total = 0, current = 0, completed, last_completed = -1, optional_num = 0;
+	int			total = 0, current = 0, completed, last_completed = -1, mandatory_num = 0;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -977,9 +1036,10 @@ int	DBcheck_version(void)
 		for (i = 0; 0 != patches[i].version; i++)
 		{
 			if (0 != patches[i].mandatory)
-				optional_num = 0;
-			else
-				optional_num++;
+			{
+				if (db_mandatory < patches[i].version)
+					mandatory_num++;
+			}
 
 			if (db_optional < patches[i].version)
 				total++;
@@ -1015,7 +1075,24 @@ int	DBcheck_version(void)
 	if (0 == total)
 		goto out;
 
-	if (0 != optional_num)
+	if (0 != mandatory_num)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "mandatory patches were found");
+		if (SUCCEED == zbx_db_table_exists(ha_node_table_name))
+			ret = DBcheck_nodes();
+
+		if (ZBX_HA_MODE_CLUSTER == ha_mode)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot perform database upgrade in HA mode: all nodes need to be"
+					" stopped and Zabbix server started in standalone mode for the time of"
+					" upgrade.");
+			ret = FAIL;
+		}
+
+		if (FAIL == ret)
+			goto out;
+	}
+	else
 		zabbix_log(LOG_LEVEL_INFORMATION, "optional patches were found");
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting automatic database upgrade");
@@ -1027,6 +1104,8 @@ int	DBcheck_version(void)
 		for (i = 0; 0 != patches[i].version; i++)
 		{
 			static sigset_t	orig_mask, mask;
+			DB_RESULT	result;
+			DB_ROW		row;
 
 			if (db_optional >= patches[i].version)
 				continue;
@@ -1042,11 +1121,26 @@ int	DBcheck_version(void)
 
 			zbx_db_begin();
 
-			/* skipping the duplicated patches */
-			if ((0 != patches[i].duplicates && patches[i].duplicates <= db_optional) ||
-					SUCCEED == (ret = patches[i].function()))
+			result = zbx_db_select("select optional,mandatory from dbversion" ZBX_FOR_UPDATE);
+			if (NULL != (row = zbx_db_fetch(result)))
+				db_optional = atoi(row[0]);
+
+			zbx_db_free_result(result);
+			if (db_optional >= patches[i].version)
 			{
-				ret = DBset_version(patches[i].version, patches[i].mandatory);
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot perform database upgrade:"
+						" patch with version %08d was already performed by other node",
+						patches[i].version);
+				ret = FAIL;
+			}
+			else
+			{
+				/* skipping the duplicated patches */
+				if ((0 != patches[i].duplicates && patches[i].duplicates <= db_optional) ||
+						SUCCEED == (ret = patches[i].function()))
+				{
+					ret = DBset_version(patches[i].version, patches[i].mandatory);
+				}
 			}
 
 			ret = zbx_db_end(ret);
@@ -1079,7 +1173,11 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_WARNING, "database upgrade fully completed");
 	}
 	else
-		zabbix_log(LOG_LEVEL_CRIT, "database upgrade failed");
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "database upgrade failed on patch %08d, exiting in %d seconds",
+				patches[i].version, ZBX_DB_WAIT_UPGRADE);
+		sleep(ZBX_DB_WAIT_UPGRADE);
+	}
 #endif	/* not HAVE_SQLITE3 */
 
 out:
@@ -1088,6 +1186,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef ZBX_DB_WAIT_UPGRADE
 }
 
 int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh)

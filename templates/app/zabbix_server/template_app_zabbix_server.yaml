@@ -36,6 +36,17 @@ zabbix_export:
               tag: component
               value: raw
         -
+          uuid: 1a185ce77d4e4dd49be5b9ded51c1460
+          name: 'Zabbix server: Connector queue'
+          type: INTERNAL
+          key: 'zabbix[connector_queue]'
+          history: 1w
+          description: 'The count of values enqueued in the connector queue.'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: d596a84dece14aa59ca53e9f53b21edb
           name: 'Zabbix server: LLD queue'
           type: INTERNAL
@@ -182,6 +193,58 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)<65'
               name: 'Zabbix server: Utilization of configuration syncer processes is high'
               event_name: 'Zabbix server: Utilization of configuration syncer processes over 75%'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 2fcfd911ae8647149bad91c883abf41d
+          name: 'Zabbix server: Utilization of connector manager internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,connector manager,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the connector manager processes have been busy for the last minute.'
+          tags:
+            -
+              tag: component
+              value: internal-process
+          triggers:
+            -
+              uuid: 5d72f9b951144e6797e19315b3a2da2b
+              expression: 'avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of connector manager processes is high'
+              event_name: 'Zabbix server: Utilization of connector manager processes over 75%'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 1c8c3b3045384a39af8baa9e40f2b487
+          name: 'Zabbix server: Utilization of connector worker internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,connector worker,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the connector worker processes have been busy for the last minute.'
+          tags:
+            -
+              tag: component
+              value: internal-process
+          triggers:
+            -
+              uuid: c6322f7a90d847b5a630bc9c64ce3c1b
+              expression: 'avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of connector worker processes is high'
+              event_name: 'Zabbix server: Utilization of connector worker processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -2336,6 +2399,18 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,lld manager,avg,busy]'
+        -
+          sortorder: '5'
+          color: CE93D8
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector worker,avg,busy]'
+        -
+          sortorder: '6'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector manager,avg,busy]'
     -
       uuid: df8944bf1e2f4149b5fbfe945548d1d8
       name: 'Zabbix server: Internal processes'
@@ -2709,6 +2784,18 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,trigger housekeeper,avg,busy]'
+        -
+          sortorder: '20'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector manager,avg,busy]'
+        -
+          sortorder: '21'
+          color: CE93D8
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector worker,avg,busy]'
     -
       uuid: b053dc416ee3422b94e46fb415ea87e6
       name: 'Zabbix server: Zabbix internal queues'
@@ -2724,6 +2811,12 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[lld_queue]'
+        -
+          sortorder: '2'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[connector_queue]'
     -
       uuid: 3d256a358da74f469700eea05173343a
       name: 'Zabbix server: Zabbix server performance'

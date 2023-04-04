@@ -25,6 +25,7 @@
 #include "zbxhttp.h"
 #include "duktape.h"
 #include "zbxalgo.h"
+#include "global.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -114,9 +115,16 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 
 	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
-	request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1);
-	if (NULL != request)
+
+	if (NULL != (request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1)))
 	{
+		zbx_es_env_t	*env;
+
+		if (NULL == (env = zbx_es_get_env(ctx)))
+			return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+		env->http_req_objects--;
+
 		if (NULL != request->headers)
 			curl_slist_free_all(request->headers);
 		if (NULL != request->handle)
@@ -280,6 +288,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	int			err_index = -1;
 	zbx_es_env_t		*env;
 	zbx_uint64_t		timeout_ms, elapsed_ms;
+	duk_size_t		contents_len = 0;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
@@ -301,10 +310,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
-		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &contents))
+		if (NULL == (contents = es_get_buffer_dyn(ctx, 1, &contents_len)))
 		{
-			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
-					"cannot convert request contents to utf8");
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot obtain second parameter");
 			goto out;
 		}
 	}
@@ -328,7 +336,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 			request->headers_sz = 0;
 		}
 
-		if (NULL != contents)
+		/* the post parameter will be converted to string and have terminating zero */
+		/* unless it had buffer or object type                                      */
+		if (NULL != contents && DUK_TYPE_STRING == duk_get_type(ctx, 1))
 		{
 			if (SUCCEED == zbx_json_open(contents, &jp))
 				request->headers = curl_slist_append(NULL, "Content-Type: application/json");
@@ -340,7 +350,10 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPHEADER, request->headers, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
+
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
+
 	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
