@@ -653,8 +653,8 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 				proc_data->cputime_system = proc_data->cputime_user = -1.0;
 
-			if (NULL != zbx_GetProcessIoCounters &&
-					FALSE != zbx_GetProcessIoCounters(hProcess, &ioCounters))
+			if (NULL != zbx_get_GetProcessIoCounters() &&
+					FALSE != (*zbx_get_GetProcessIoCounters())(hProcess, &ioCounters))
 			{
 				proc_data->io_read_b = (double)((__int64)ioCounters.ReadTransferCount);
 				proc_data->io_read_op = (double)((__int64)ioCounters.ReadOperationCount);
