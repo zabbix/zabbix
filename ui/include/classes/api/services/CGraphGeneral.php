@@ -750,7 +750,7 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function validateUuid(array $graphs, array $db_items): void {
+	private static function validateUuid(array &$graphs, array $db_items): void {
 		foreach ($graphs as &$graph) {
 			$gitem = reset($graph['gitems']);
 

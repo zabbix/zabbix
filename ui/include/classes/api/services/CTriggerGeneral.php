@@ -602,7 +602,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function validateUuid(array $triggers, array $descriptions): void {
+	private static function validateUuid(array &$triggers, array $descriptions): void {
 		foreach ($descriptions as $_triggers) {
 			foreach ($_triggers as $_trigger) {
 				$triggers[$_trigger['index']]['host_status'] = $_trigger['host']['status'];

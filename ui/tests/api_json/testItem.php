@@ -333,7 +333,7 @@ class testItem extends CAPITest {
 			],
 			'Reject item with empty UUID on template' => [
 				'request_data' => [
-					'hostid' => '50009',
+					'hostid' => '50010',
 					'uuid' => '',
 					'name' => 'UUIDItem4',
 					'key_' => 'UUIDItem4',
