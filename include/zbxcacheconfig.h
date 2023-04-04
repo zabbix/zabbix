@@ -618,15 +618,6 @@ typedef struct
 }
 zbx_connector_t;
 
-typedef struct
-{
-	zbx_uint64_t		connectorid;
-	int			tags_evaltype;
-	zbx_vector_match_tags_t	connector_tags;
-}
-zbx_connector_filter_t;
-
-ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 
 /* the configuration cache statistics */
 typedef struct
@@ -678,7 +669,7 @@ zbx_synced_new_config_t;
 void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault);
-int	zbx_init_configuration_cache(char **error);
+int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, char **error);
 void	zbx_free_configuration_cache(void);
 
 void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const zbx_uint64_t *triggerids,
@@ -1182,4 +1173,9 @@ zbx_maintenance_type_t;
 #define ZBX_CORR_CONDITION_EVENT_TAG_PAIR		3
 #define ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE		4
 #define ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE		5
+
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(int *ts_from, int table_group);
+
 #endif
