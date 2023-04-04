@@ -136,6 +136,7 @@ class CControllerModuleScan extends CController {
 			CMessageHelper::setSuccessTitle($message);
 		}
 
+		$response->setFormData(['uncheck' => '1']);
 		$this->setResponse($response);
 	}
 }

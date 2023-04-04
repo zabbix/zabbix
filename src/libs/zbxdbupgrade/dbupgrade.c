@@ -780,15 +780,14 @@ int	DBdrop_foreign_key(const char *table_name, int id)
 static int	DBcreate_dbversion_table(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"dbversion", "", 0,
-		{
-			{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{NULL}
-		},
-		NULL
-	};
+			{"dbversion", "", 0,
+				{
+					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
 	int		ret;
 
 	zbx_db_begin();
@@ -1258,7 +1257,7 @@ static int	DBget_changelog_table_by_name(const char *table_name)
 {
 	const zbx_db_table_changelog_t	*table;
 
-	for (table = changelog_tables; NULL != table->table; table++)
+	for (table = zbx_dbschema_get_changelog_tables(); NULL != table->table; table++)
 	{
 		if (0 == strcmp(table_name, table->table))
 			return table->object;

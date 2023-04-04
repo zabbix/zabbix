@@ -562,6 +562,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Module enabled');
 
 		foreach ([true, false] as $action_status) {
 			$page_number = $this->query('xpath://ul[@class="menu-main"]/li/a')->count();
