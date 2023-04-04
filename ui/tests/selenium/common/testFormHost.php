@@ -312,11 +312,11 @@ class testFormHost extends CWebTest {
 		}
 
 		// Check hintbox.
-		$form->query('class:icon-help-hint')->one()->click();
+		$form->query('class:icon-help-hint')->one()->waitUntilClickable()->click();
 		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 		// Assert text.
-		$this->assertEquals("Max repetition count is applicable to discovery and walk only.", $hint->one()->getText());
+		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
 		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
@@ -619,6 +619,25 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect arguments passed to function.'
 				]
 			],
+			// Zero in SNMP Max repetition count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Invalid snmp community',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => '0'
+						]
+					],
+					'error_title' => 'Cannot add host',
+					'error' => 'Incorrect arguments passed to function.'
+				]
+			],
 			// Host without interface.
 			[
 				[
@@ -714,7 +733,8 @@ class testFormHost extends CWebTest {
 							'action' => USER_ACTION_ADD,
 							'type' => 'SNMP',
 							'SNMP version' => 'SNMPv2',
-							'SNMP community' => '{$SNMP_TEST}'
+							'SNMP community' => '{$SNMP_TEST}',
+							'Max repetition count' => '20'
 						],
 						[
 							'action' => USER_ACTION_ADD,
