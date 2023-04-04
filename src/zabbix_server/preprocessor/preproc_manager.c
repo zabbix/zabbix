@@ -1175,7 +1175,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		zbx_free(request->value.error);
 
 		request->value.state = ITEM_STATE_NORMAL;
-		ret = FAIL;
+		ret = SUCCEED;
 
 		goto out;
 	}
