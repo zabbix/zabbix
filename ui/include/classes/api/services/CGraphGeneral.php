@@ -575,11 +575,17 @@ abstract class CGraphGeneral extends CApiService {
 				$item = $db_items[$gitem['itemid']];
 
 				if (!in_array($item['value_type'], $allowed_value_types)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-						$item['name'],
-						$graph['name']
-					));
+					switch (static::FLAGS) {
+						case ZBX_FLAG_DISCOVERY_NORMAL:
+							$error = _('Cannot add a non-numeric item "%1$s" to graph "%2$s".');
+							break;
+
+						case  ZBX_FLAG_DISCOVERY_PROTOTYPE:
+							$error = _('Cannot add a non-numeric item "%1$s" to graph prototype "%2$s".');
+							break;
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $item['name'], $graph['name']));
 				}
 
 				$hosts[$item['hostid']] = $item['hosts'][0];
