@@ -146,8 +146,9 @@ class CPopupMenuElement extends CElement {
 	}
 
 	/**
-	 * Get selected elements.
+	 * Get selected element.
 	 *
+	 * @return CElement
 	 */
 	public static function getSelected() {
 		$menu = self::find()->waitUntilVisible()->one();

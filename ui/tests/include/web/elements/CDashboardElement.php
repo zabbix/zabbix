@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * Dashboard element.
  */
@@ -178,7 +180,7 @@ class CDashboardElement extends CElement {
 			try {
 				$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible(2);
 			}
-			catch (\Exception $ex) {
+			catch (TimeoutException $ex) {
 				$button->click(true);
 			}
 
@@ -303,9 +305,13 @@ class CDashboardElement extends CElement {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @inheritdoc
 	 */
 	public function getReadyCondition() {
-		return ($this->getWidgets()->filter(CElementFilter::NOT_READY)->count() > 0);
+		$target = $this;
+
+		return function () use ($target) {
+			return ($target->getWidgets()->filter(CElementFilter::NOT_READY)->count() === 0);
+		};
 	}
 }

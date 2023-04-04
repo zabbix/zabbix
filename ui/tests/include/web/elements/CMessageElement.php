@@ -27,8 +27,8 @@ class CMessageElement extends CElement {
 	/**
 	 * Simplified selector for message element that can be located directly on page.
 	 *
-	 * @param string   $selector    message element search area
-	 * @param boolean  $strict      absolute or relative path to message element
+	 * @param string|CElement    $selector    message element search area
+	 * @param boolean            $strict      absolute or relative path to message element
 	 *
 	 * @return CMessageElement
 	 */
