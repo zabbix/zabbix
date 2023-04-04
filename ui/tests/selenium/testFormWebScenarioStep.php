@@ -1,4 +1,4 @@
-<<?php
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -307,8 +307,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'query fields' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '',
 							'value' => 'query field value'
 						]
@@ -327,8 +325,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'post fields' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '',
 							'value' => 'post field value'
 						]
@@ -346,8 +342,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '',
 							'value' => 'variable field value'
 						]
@@ -365,8 +359,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => 'name}'
 						]
 					],
@@ -383,8 +375,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '{name'
 						]
 					],
@@ -401,8 +391,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '{na}me'
 						]
 					],
@@ -419,8 +407,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '{{name}}'
 						]
 					],
@@ -437,8 +423,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '{}'
 						]
 					],
@@ -455,8 +439,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '{name}',
 							'value' => 'AAA'
 						],
@@ -478,8 +460,6 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'headers' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '',
 							'value' => 'AAA'
 						]
@@ -630,9 +610,8 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'query fields' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => '1st query name- 良い一日を'
+							'name' => '1st query name- 良い一日を',
+							'value' => ''
 						],
 						[
 							'name' => '2nd query name - 良い一日を',
@@ -641,9 +620,8 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => '{1st variable name - 良い一日を}'
+							'name' => '{1st variable name - 良い一日を}',
+							'value' => ''
 						],
 						[
 							'name' => '{the 2nd variable name - 良い一日を}',
@@ -652,13 +630,12 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'headers' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '1st header name - 良い一日を',
 							'value' => '1st header value - 良い一日を'
 						],
 						[
-							'name' => '2nd header name - 良い一日を'
+							'name' => '2nd header name - 良い一日を',
+							'value' => ''
 						]
 					]
 				]
@@ -676,34 +653,42 @@ class testFormWebScenarioStep extends CWebTest {
 					],
 					'query fields' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => STRING_255,
 							'value' => STRING_255
+						],
+						[
+							'name' => 'query_name',
+							'value' => 'query_value'
 						]
 					],
 					'post fields' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => STRING_255,
 							'value' => STRING_2000
+						],
+						[
+							'name' => 'post_field_name',
+							'value' => 'post_field_value'
 						]
 					],
 					'variables' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => '{'.substr(STRING_255, 0, 253).'}',
 							'value' => STRING_2000
+						],
+						[
+							'name' => '{variable_name}',
+							'value' => 'variable_value'
 						]
 					],
 					'headers' => [
 						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
 							'name' => STRING_255,
 							'value' => STRING_2000
+						],
+						[
+							'name' => 'header_name',
+							'value' => 'header_value'
 						]
 					]
 				]
@@ -746,14 +731,8 @@ class testFormWebScenarioStep extends CWebTest {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
-		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
-
 		$scenario = ($action === 'update') ? self::UPDATE_SCENARIO : self::CREATE_SCENARIO;
-		$this->query('link', $scenario)->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		$scenario_form = $this->query('id:httpForm')->asForm()->one();
-
-		$scenario_form->selectTab('Steps');
+		$scenario_form = $this->getScenarioFormOnStepsTab($scenario);
 		$steps_table = $scenario_form->getField('Steps')->asTable();
 
 		$open_step = ($action === 'create') ? 'button:Add' : 'link:'.self::$update_step;
@@ -860,32 +839,7 @@ class testFormWebScenarioStep extends CWebTest {
 				if (array_key_exists($field_name, $data)) {
 					// TODO: Replace the below workaround with a check via $table->checkValue() when ZBX-22433 is merged.
 					$field = $step_form->getField(ucfirst($field_name));
-
-					// Apart from field labels, field data types have underscores instead of spaces.
-					$data_type = in_array($field_name, ['query fields', 'post fields'])
-						? str_replace(' ', '_', $field_name)
-						: $field_name;
-
-					$i = 1;
-					$n = (in_array($field_name, ['variables', 'headers'])) ? 3 : 1;
-					foreach ($data[$field_name] as $field_pair) {
-						// Resetting 2nd row input element index as Variables Headers tables on Web scenario don't have 2nd rows.
-						if (array_search($field_pair, $data[$field_name]) > 0 && in_array($field_name, ['variables', 'headers'])) {
-							$n = 1;
-						}
-
-						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@data-type=".
-								CXPathHelper::escapeQuotes($data_type)."]//tr[".$i."]//input)[".$n."]")->one()->getValue()
-						);
-
-						if (array_key_exists('value', $field_pair)) {
-							$this->assertEquals($field_pair['value'], $field->query("xpath:(//table[@data-type=".
-									CXPathHelper::escapeQuotes($data_type)."]//tr[".$i."]//input)[".($n + 1)."]")->one()->getValue()
-							);
-						}
-
-						$i++;
-					}
+					$this->checkTableField($field, $data[$field_name]);
 				}
 			}
 		}
@@ -909,13 +863,7 @@ class testFormWebScenarioStep extends CWebTest {
 
 	private function checkImpactlessAction($action) {
 		$old_hash = CDBHelper::getHash(self::SQL);
-
-		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
-		$this->query('link:'.self::UPDATE_SCENARIO)->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		$scenario_form = $this->query('id:httpForm')->asForm()->one();
-
-		$scenario_form->selectTab('Steps');
+		$scenario_form = $this->getScenarioFormOnStepsTab(self::UPDATE_SCENARIO);
 		$steps = $scenario_form->getField('Steps')->asTable();
 
 		if ($action === 'cancel_delete') {
@@ -954,12 +902,8 @@ class testFormWebScenarioStep extends CWebTest {
 	}
 
 	public function testFormWebScenarioStep_Remove() {
-		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
-		$this->query('link:'.self::UPDATE_SCENARIO)->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		$form = $this->query('id:httpForm')->asForm()->one();
+		$form = $this->getScenarioFormOnStepsTab(self::UPDATE_SCENARIO);
 
-		$form->selectTab('Steps');
 		$form->getField('Steps')->asTable()->findRow('Name', self::$impactless_step)->query('button:Remove')->one()->click();
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -1052,15 +996,7 @@ class testFormWebScenarioStep extends CWebTest {
 	 * @dataProvider getStepUrlData
 	 */
 	public function testFormWebScenarioStep_ParseUrl($data) {
-		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
-		$this->query('link:'.self::UPDATE_SCENARIO)->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		$scenario_form = $this->query('id:httpForm')->asForm()->one();
-
-		$scenario_form->selectTab('Steps');
-		$scenario_form->getField('Steps')->query('button:Add')->one()->click();
-
-		$step_form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+		$step_form = $this->getStepForm(self::UPDATE_SCENARIO);
 		$url_field = $step_form->getField('id:url');
 		$url_field->fill($data['url']);
 
@@ -1089,34 +1025,229 @@ class testFormWebScenarioStep extends CWebTest {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			$query_table->invalidate();
 
-			foreach ($data['parsed_query'] as $resulting_name => $resulting_value) {
-
-				$obtained_qieries = [];
-				$i = 0;
-
-				foreach ($query_table->query('xpath:(.//tr[@class="sortable"])')->all() as $table_row) {
-					$obtained_qieries[$i]['name'] = $table_row->query('xpath:(.//input)[1]')->one()->getValue();
-					$obtained_qieries[$i]['value'] = $table_row->query('xpath:(.//input)[2]')->one()->getValue();
-
-					$i++;
-				}
-
-				$this->assertEquals($data['parsed_query'], $obtained_qieries);
-			}
-
+			$this->checkTableField($query_table, $data['parsed_query']);
 			$this->assertEquals($data['resulting_url'], $url_field->getValue());
 		}
 		else {
-			$error_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-
-			$this->assertEquals('Error', $error_dialog->getTitle());
-			$this->assertEquals($data['error'], $error_dialog->getContent()->getText());
-			$error_dialog->getFooter()->query('button:Ok')->one()->click();
-			$error_dialog->waitUntilNotPresent();
+			$this->checkErrorDialog($data['error']);
 		}
 
 	}
 
-	// Convert raw data to form fields
-}
+	public static function getStepPostData() {
+		return [
+			// Regular conversion to raw data.
+			[
+				[
+					'post' => [
+						['name' => 'zab bix', 'value' => 'tes&t']
+					],
+					'result_raw' => 'zab%20bix=tes%26t'
+				]
+			],
+			// Other languages to raw data.
+			[
+				[
+					'post' => [
+						['name' => 'тест', 'value' => '自分との戦い いつも負ける']
+					],
+					'result_raw' => '%D1%82%D0%B5%D1%81%D1%82=%E8%87%AA%E5%88%86%E3%81%A8%E3%81%AE%E6%88%A6%E3%81%84%20'.
+							'%E3%81%84%E3%81%A4%E3%82%82%E8%B2%A0%E3%81%91%E3%82%8B'
+				]
+			],
+			// Special symbols to raw data.
+			[
+				[
+					'post' => [
+						['name' => '!@#$%^&*()', 'value' => '!@#$%^&*()']
+					],
+					'result_raw' => '!%40%23%24%25%5E%26*()=!%40%23%24%25%5E%26*()'
+				]
+			],
+			// Converting 2 post fields to raw data.
+			[
+				[
+					'post' => [
+						['name' => 'zabbix', 'value' => 'test'],
+						['name' => '&Günter', 'value' => '']
+					],
+					'result_raw' => 'zabbix=test&%26G%C3%BCnter'
+				]
+			],
+			// Converting raw data to 2 post fields.
+			[
+				[
+					'raw_data' => 'login=Admin&password={{password}.urlencode()}',
+					'result_post' => [
+						['name' => 'login', 'value' => 'Admin'],
+						['name' => 'password', 'value' => '{{password}.urlencode()}']
+					]
+				]
+			],
+			// Converting raw data to post fields with encoding and without value.
+			[
+				[
+					'raw_data' => 'log+me+in%24&enter=Sign+in%26',
+					'result_post' => [
+						['name' => 'log me in$', 'value' => ''],
+						['name' => 'enter', 'value' => 'Sign in&']
+					]
+				]
+			],
+			// Other languages from raw to post fields.
+			[
+				[
+					'raw_data' => '%E0%A4%B9%E0%A4%B0%E0%A4%B5%E0%A4%B2%E0%A5%87=tap%C4%B1ld%C4%B1',
+					'result_post' => [
+						['name' => 'हरवले', 'value' => 'tapıldı']
+					]
+				]
+			],
+			// Missing name from raw data to form data.
+			[
+				[
+					'expected' => TEST_BAD,
+					'raw_data' => '=value',
+					'error' => "Cannot convert POST data:\n\nValues without names are not allowed in form fields."
+				]
+			],
+			// Post data validation percent encoding pair is malformed.
+			[
+				[
+					'expected' => TEST_BAD,
+					'raw_data' => 'test=%11',
+					'error' => "Cannot convert POST data:\n\nData is not properly encoded."
+				]
+			],
+			// Non-existing charracter when converting from rwa data to post data.
+			[
+				[
+					'expected' => TEST_BAD,
+					'raw_data' => 'value=%00',
+					'error' => "Cannot convert POST data:\n\nData is not properly encoded."
+				]
+			],
+			// Unnecessary "=" symbol in raw data when converting to form data.
+			[
+				[
+					'expected' => TEST_BAD,
+					'raw_data' => 'name=val=ue',
+					'error' => "Cannot convert POST data:\n\nData is not properly encoded."
+				]
+			],
+			// Non-unicode encodings when convertig raw data to post data.
+			[
+				[
+					'expected' => TEST_BAD,
+					'raw_data' => 'value=%EA%EE%EB%E1%E0%F1%EA%E8',
+					'error' => "Cannot convert POST data:\n\nURIError: URI malformed"
+				]
+			],
+			// Field name exceeds 255 symbols when converting raw data to post data.
+			[
+				[
+					'expected' => TEST_BAD,
+					'raw_data' => '123456789012345'.STRING_255,
+					'error' => "Cannot convert POST data:\n\nName of the form field should not exceed 255 characters."
+				]
+			],
+			// Missing name whrn converting post field to raw data.
+			[
+				[
+					'expected' => TEST_BAD,
+					'post' => [
+						['name' => '', 'value' => '!@#$%^&*()']
+					],
+					'error' => "Cannot convert POST data:\n\nValues without names are not allowed in form fields."
+				]
+			]
+		];
+	}
 
+	/**
+	 * @dataProvider getStepPostData
+	 */
+	public function testFormWebScenarioStep_ConvertPostData($data) {
+		$step_form = $this->getStepForm(self::UPDATE_SCENARIO);
+		$post_type = $step_form->getField('Post type');
+
+		if (array_key_exists('raw_data', $data)) {
+			$post_type->fill('Raw data');
+			$step_form->getField('Raw post')->fill($data['raw_data']);
+
+			$post_type->fill('Form data');
+		}
+		else {
+			$post_table = $step_form->getField('Post fields');
+
+			// Add row in Post fields table if required
+			if (count($data['post']) > 1) {
+				$post_table->query('button:Add')->one()->click();
+			}
+
+			$i = 1;
+			foreach ($data['post'] as $post) {
+				$post_table->query("xpath:(.//tr[".$i."]//input)[1]")->one()->fill($post['name']);
+				$post_table->query("xpath:(.//tr[".$i."]//input)[2]")->one()->fill($post['value']);
+
+				$i++;
+			}
+
+			$post_type->fill('Raw data');
+		}
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			if (array_key_exists('result_raw', $data)) {
+				$this->assertEquals($data['result_raw'], $step_form->getField('Raw post')->getValue());
+			}
+			else {
+				$post_fields = $step_form->getField('Post fields');
+				$this->checkTableField($post_fields, $data['result_post']);
+			}
+		}
+		else {
+			$this->checkErrorDialog($data['error']);
+		}
+	}
+
+	private function getStepForm($scenario) {
+		$scenario_form = $this->getScenarioFormOnStepsTab($scenario);
+		$scenario_form->getField('Steps')->query('button:Add')->one()->click();
+
+		return COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+	}
+
+	private function getScenarioFormOnStepsTab($scenario) {
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
+		$this->query('link:'.$scenario)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$scenario_form = $this->query('id:httpForm')->asForm()->one();
+		$scenario_form->selectTab('Steps');
+
+		return $scenario_form;
+	}
+
+	private function checkErrorDialog($error) {
+		$error_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+
+		$this->assertEquals('Error', $error_dialog->getTitle());
+		$this->assertEquals($error, $error_dialog->getContent()->getText());
+		$error_dialog->getFooter()->query('button:Ok')->one()->click();
+		$error_dialog->waitUntilNotPresent();
+	}
+
+	private function checkTableField($table_field, $expected) {
+		$obtained_fields = [];
+		$i = 0;
+
+		foreach ($table_field->query('xpath:(.//tr[@class="sortable"])')->all() as $table_row) {
+			$obtained_fields[$i]['name'] = $table_row->query('xpath:(.//input)[1]')->one()->getValue();
+			$obtained_fields[$i]['value'] = $table_row->query('xpath:(.//input)[2]')->one()->getValue();
+
+			$i++;
+		}
+
+		$this->assertEquals($expected, $obtained_fields);
+	}
+}
