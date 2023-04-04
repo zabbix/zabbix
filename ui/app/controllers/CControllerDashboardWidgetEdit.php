@@ -45,7 +45,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 	private ?CWidget $widget;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
@@ -438,8 +438,8 @@ class CControllerDashboardWidgetEdit extends CController {
 			'hosts' => _('Inaccessible host'),
 			'items' => _('Inaccessible item'),
 			'item_prototypes' => _('Inaccessible item prototype'),
-			'media_types' => _('Inaccessible media type'),
 			'maps' => _('Inaccessible map'),
+			'media_types' => _('Inaccessible media type'),
 			'services' => _('Inaccessible service'),
 			'slas' => _('Inaccessible SLA'),
 			'users' => _('Inaccessible user')
