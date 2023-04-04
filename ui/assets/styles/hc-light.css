@@ -1510,9 +1510,9 @@ footer {
   .dashboard-widget .msg-warning {
     margin: 0 10px; }
 
-.dashboard-grid-widget-content .list-table th:first-child, .dashboard-grid-widget-content .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
+.dashboard-grid-widget-content .list-table th:first-child, .dashboard-grid-widget-content .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child {
   padding-left: 10px; }
-.dashboard-grid-widget-content .list-table th:last-child, .dashboard-grid-widget-content .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+.dashboard-grid-widget-content .list-table th:last-child, .dashboard-grid-widget-content .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child {
   padding-right: 10px; }
 
 .dashboard-widget-head {
