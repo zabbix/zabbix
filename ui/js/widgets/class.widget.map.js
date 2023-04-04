@@ -88,7 +88,7 @@ class CWidgetMap extends CWidget {
 	}
 
 	updateProperties({name, view_mode, fields}) {
-		this._has_contents = null;
+		this._has_contents = false;
 
 		super.updateProperties({name, view_mode, fields});
 	}
