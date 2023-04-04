@@ -527,7 +527,25 @@ class testCSRF extends CWebTest {
 					'access_denied' => true,
 					'link' => 'zabbix.php?action=scheduledreport.edit&reportid=3'
 				]
-			]
+			],
+			// #60 Connector create.
+			[
+				[
+					'db' => 'SELECT * FROM connector',
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=connector.list',
+					'case' => 'popup create'
+				]
+			],
+			// #61 Connector update.
+			[
+				[
+					'db' => 'SELECT * FROM connector',
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=connector.list',
+					'case' => 'popup update'
+				]
+			],
 		];
 	}
 
