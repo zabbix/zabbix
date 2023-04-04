@@ -209,27 +209,16 @@ function createFontSelect(string $name): CSelect {
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 						'triggerSelectRow'
 					)
-					->addRow((new CLabel(_('Map'), 'elementName'))->setAsteriskMark(), [
-						(new CTextBox('elementName'))
-							->setReadonly(true)
-							->setId('elementNameMap')
+					->addRow((new CLabel(_('Map'), 'elementNameMap_ms'))->setAsteriskMark(),
+						(new CMultiSelect([
+							'name' => 'elementNameMap',
+							'object_name' => 'sysmaps',
+							'multiple' => false
+						]))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
-						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CButton(null, _('Select')))
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick(
-								'return PopUp("popup.generic", jQuery.extend('.json_encode([
-									'srctbl' => 'sysmaps',
-									'srcfld1' => 'sysmapid',
-									'srcfld2' => 'name',
-									'dstfrm' => 'selementForm',
-									'dstfld1' => 'sysmapid',
-									'dstfld2' => 'elementNameMap'
-								]).', {excludeids: [#{sysmapid}]}), {dialogue_class: "modal-popup-generic"});'
-							)
-					], 'mapSelectRow')
+						'mapSelectRow'
+					)
 					->addRow(_('Tags'),
 						(new CDiv([
 							(new CTable())
