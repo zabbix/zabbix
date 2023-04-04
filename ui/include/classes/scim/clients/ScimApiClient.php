@@ -68,8 +68,6 @@ class ScimApiClient extends CLocalApiClient {
 
 		$user = (new CUser())->checkAuthentication(['token' => $auth]);
 
-		if (array_key_exists('debug_mode', $user)) {
-			$this->debug = $user['debug_mode'];
-		}
+		$this->debug = $user['debug_mode'];
 	}
 }
