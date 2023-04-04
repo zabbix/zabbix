@@ -474,7 +474,7 @@ window.service_edit_popup = new class {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
 
 		this._post(curl.getUrl(), fields, (response) => {

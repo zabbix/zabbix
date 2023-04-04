@@ -51,7 +51,7 @@
 			const fields = getFormFields(this.form);
 			fields.name = fields.name.trim();
 
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', this.groupid !== null ? 'templategroup.update' : 'templategroup.create');
 
 			this._post(curl.getUrl(), fields, (response) => {
@@ -61,7 +61,7 @@
 					postMessageDetails('success', response.success.messages);
 				}
 
-				const url = new Curl('zabbix.php', false);
+				const url = new Curl('zabbix.php');
 				url.setArgument('action', 'templategroup.list');
 
 				location.href = url.getUrl();
@@ -70,7 +70,7 @@
 
 		_clone() {
 			const fields = getFormFields(this.form);
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'templategroup.edit');
 
 			post(curl.getUrl(), {name: fields.name});
@@ -83,7 +83,7 @@
 				return;
 			}
 
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'templategroup.delete');
 			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('templategroup')) ?>
@@ -96,7 +96,7 @@
 					postMessageDetails('success', response.success.messages);
 				}
 
-				const url = new Curl('zabbix.php', false);
+				const url = new Curl('zabbix.php');
 				url.setArgument('action', 'templategroup.list');
 
 				location.href = url.getUrl();
