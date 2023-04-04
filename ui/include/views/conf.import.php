@@ -28,8 +28,16 @@ include dirname(__FILE__).'/js/conf.import.js.php';
 $rulesTable = (new CTable())
 	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')]);
 
-$titles = [
-	'groups' => _('Groups'),
+$titles = [];
+$user_type = CWebUser::getType();
+
+if ($user_type == USER_TYPE_SUPER_ADMIN) {
+	$titles += [
+		'groups' => _('Groups')
+	];
+}
+
+$titles += [
 	'hosts' => _('Hosts'),
 	'templates' => _('Templates'),
 	'templateScreens' => _('Template screens'),
@@ -44,12 +52,12 @@ $titles = [
 	'maps' => _('Maps')
 ];
 
-$user_type = CWebUser::getType();
-
 if ($user_type == USER_TYPE_SUPER_ADMIN) {
-	$titles['images'] = _('Images');
-	$titles['mediaTypes'] = _('Media types');
-	$titles['valueMaps'] = _('Value mappings');
+	$titles += [
+		'images' => _('Images'),
+		'mediaTypes' => _('Media types'),
+		'valueMaps' => _('Value mappings')
+	];
 }
 
 foreach ($titles as $key => $title) {
