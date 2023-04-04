@@ -1,6 +1,8 @@
 Changes for 7.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-8237] changed module details view to a modal (popup) and updated module details (ddauksa)
+...G...... [ZBXNEXT-7132] added option of getting fully qualified domain name in system.hostname key to the Zabbix agent and Zabbix agent 2 (kprutkovs)
 ..F.I..... [ZBXNEXT-8226] fixed the problem of insufficient length of URL fields (dfofanovs, dgoloscapov)
 ........S. [ZBXNEXT-8312] increased TimescaleDB maximum supported version to 2.10 (mprihodko)
 .......PS. [ZBXNEXT-8317] increased MariaDB maximum supported version to 10.11 (mprihodko)
@@ -13,6 +15,11 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
+.........T [ZBX-22261] added value mapping in the template PostgreSQL by Zabbix agent 2 for item Checksum failures (ztielidze)
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out of bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
 .......PS. [ZBX-22471] fixed SNMP walk item returns units if MIB files are installed (akozlovs)
 .......PS. [ZBX-22513] fixed use of SourceIP option for vmware tags (MVekslers)
@@ -79,6 +86,24 @@ A......... [ZBX-21238] fixed inability to update status and other fields of disc
 A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
 
 --------------------------------------------------------------------------------
+Changes for 6.4.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.1
+
+6.4.1rc2 was released as 6.4.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.4.1rc2
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
+
+--------------------------------------------------------------------------------
 Changes for 6.4.1rc1
 
 New features:
@@ -93,6 +118,7 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 ........S. [ZBXNEXT-8105] fixed connector diagnostic information reporting in case there are no connectors (vso)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ..F....... [ZBX-22205] fixed the inability to update a dependent item that is inherited from a template (jfreibergs)
 .......PS. [ZBX-22310] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
 .......PS. [ZBX-22097] fixed exiting process when connection to the database is lost (askolmeisters)
@@ -489,9 +515,15 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.9
+
+6.2.9rc2 was released as 6.2.9 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.2.9rc2
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.9rc1
@@ -1143,6 +1175,24 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.16rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.15
+
+6.0.15rc2 was released as 6.0.15 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.15rc2
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.15rc1
 
 New features:
@@ -1154,6 +1204,7 @@ New features:
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 .......PS. [ZBX-22097] fixed exiting process when connection to the database is lost (askolmeisters)
 .........T [ZBX-21576] optimized preprocessing in ClickHouse by HTTP template and added lld rule (aiantsen)
 ..F....... [ZBX-21669] added the possibility to filter System user in the audit log (esekace)
@@ -3579,12 +3630,26 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.34rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.33
+
+5.0.33rc1 was released as 5.0.33 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.33rc1
 
 New features:
 ...G.....T [ZBXNEXT-8071] added sysdba, sysasm and sysoper login options to Zabbix agent 2 Oracle plugin and updated Oracle by Zabbix agent 2 template documentation (esneiders, knaglis)
 
 Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ..F....... [ZBX-22413] fixed autofocus for inherited web scenario edit (dfofanovs)
 .........T [ZBX-22520] fixed versions of integrations (aiantsen)
 .......PS. [ZBX-22490] fixed HttpRequest limit in JavaScript being reached even if all objects are destroyed (vso)
@@ -6332,6 +6397,24 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.46rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45
+
+4.0.45rc2 was released as 4.0.45 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45rc2
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45rc1

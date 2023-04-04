@@ -26,6 +26,9 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxversion.h"
+#include "zbxtime.h"
+
+#include "zbxtagfilter.h"
 
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
@@ -579,15 +582,57 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
+
+typedef struct
+{
+	zbx_uint64_t		connectorid;
+	int			tags_evaltype;
+	zbx_vector_match_tags_t	connector_tags;
+}
+zbx_connector_filter_t;
+
+ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
+
+/* events callbacks */
+typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *timespec, int value, const char *trigger_description,
+		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
+		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
+		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
+
+typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+typedef void	(*zbx_clean_events_func_t)(void);
+typedef void	(*zbx_reset_event_recovery_func_t)(void);
+typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
+		unsigned char **data, size_t *data_alloc, size_t *data_offset);
+typedef void	(*zbx_events_update_itservices_func_t)(void);
+
+typedef struct
+{
+	zbx_add_event_func_t			add_event_cb;
+	zbx_process_events_func_t		process_events_cb;
+	zbx_clean_events_func_t			clean_events_cb;
+	zbx_reset_event_recovery_func_t		reset_event_recovery_cb;
+	zbx_export_events_func_t		export_events_cb;
+	zbx_events_update_itservices_func_t	events_update_itservices_cb;
+} zbx_events_funcs_t;
+
+/* events callbacks end */
+
 int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
 
 void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now);
+		int now, const zbx_events_funcs_t *events_cbs);
+
 void	zbx_db_register_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
 		int now);
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid);
+
+void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
+		const zbx_events_funcs_t *events_cbs);
+
 void	zbx_db_register_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 
 void	zbx_db_proxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
@@ -896,9 +941,5 @@ typedef struct
 	unsigned int	connection_type;
 }
 zbx_autoreg_host_t;
-
-#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
-#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_recalc_time_period(int *ts_from, int table_group);
 
 #endif
