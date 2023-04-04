@@ -47,13 +47,13 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
