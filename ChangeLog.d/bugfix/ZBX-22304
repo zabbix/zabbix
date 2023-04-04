@@ -1,0 +1,1 @@
+.......PS. [ZBX-22304] fixed duplication in web scenario error message, when curl could not resolve host (mprihodko)
