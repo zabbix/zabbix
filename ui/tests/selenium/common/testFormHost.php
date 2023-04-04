@@ -330,13 +330,14 @@ class testFormHost extends CWebTest {
 
 	public static function getCreateData() {
 		return [
-			// Host form without mandatory values.
+			// #0 Host form without mandatory values.
 			[
 				[
 					'expected' => TEST_BAD,
 					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.']
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -346,6 +347,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect value for field "host": cannot be empty.'
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -355,7 +357,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Field "groups" is mandatory.'
 				]
 			],
-			// Existing host name and visible name.
+			// #3 Existing host name and visible name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -367,6 +369,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Host with the same name "Available host" already exists.'
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -378,6 +381,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Template with the same name "Empty template" already exists.'
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -390,7 +394,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Host with the same visible name "ЗАББИКС Сервер" already exists.'
 				]
 			],
-			// Host name field validation.
+			// #6 Host name field validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -402,7 +406,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect characters used for host name "@#$%^&*()_+".'
 				]
 			],
-			// UTF8MB4 check.
+			// #7 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -414,7 +418,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect characters used for host name "😀".'
 				]
 			],
-			// Interface fields validation.
+			// #8 Interface fields validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -433,6 +437,7 @@ class testFormHost extends CWebTest {
 					'error' => 'IP and DNS cannot be empty for host interface.'
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -452,6 +457,7 @@ class testFormHost extends CWebTest {
 					'error' => 'IP and DNS cannot be empty for host interface.'
 				]
 			],
+			// 10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -471,6 +477,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Interface with DNS "test" cannot have empty IP address.'
 				]
 			],
+			// 11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -490,6 +497,7 @@ class testFormHost extends CWebTest {
 						' "Use DNS" property on "Empty dns and filled in IP".'
 				]
 			],
+			// 12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -508,7 +516,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Port cannot be empty for host interface.'
 				]
 			],
-			// IP validation.
+			// #13 IP validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -527,6 +535,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Invalid IP address "test".'
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -545,7 +554,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Invalid IP address "127.0.0.".'
 				]
 			],
-			// Port validation.
+			// #15 Port validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -564,6 +573,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect interface port "100500" provided.'
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -582,6 +592,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect interface port "test" provided.'
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -600,7 +611,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect interface port "10.5" provided.'
 				]
 			],
-			// Empty SNMP community.
+			// #18 Empty SNMP community.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -619,7 +630,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect arguments passed to function.'
 				]
 			],
-			// Zero in SNMP Max repetition count.
+			// #19 Zero in SNMP Max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -638,7 +649,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect arguments passed to function.'
 				]
 			],
-			// Host without interface.
+			// #20 Host without interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -648,7 +659,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// UTF8MB4 check.
+			// #21 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -660,7 +671,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// Default values of all interfaces.
+			// #22 Default values of all interfaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -688,7 +699,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// Change default host interface.
+			// #23 Change default host interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -714,7 +725,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// Different versions of SNMP interface and encryption.
+			// #24 Different versions of SNMP interface and encryption.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -770,7 +781,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// All interfaces and all fields in form.
+			// #25 All interfaces and all fields in form.
 			[
 				[
 					'expected' => TEST_GOOD,
