@@ -128,6 +128,8 @@ class testItem extends CAPITest {
 			];
 		}
 
+		$uuid = generateUuidV4();
+
 		return [
 			[
 				'request_data' => [
@@ -286,6 +288,89 @@ class testItem extends CAPITest {
 					'url' => '192.168.0.1'
 				],
 				'expected_error' => 'No interface found.'
+			],
+			'Reject item with non-empty UUID on host' => [
+				'request_data' => [
+					'hostid' => '50009',
+					'uuid' => $uuid,
+					'name' => 'UUIDItem1',
+					'key_' => 'UUIDItem1',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => 'Invalid parameter "/1/uuid": value must be empty.'
+			],
+			'Accept item with empty UUID on host' => [
+				'request_data' => [
+					'hostid' => '50009',
+					'uuid' => '',
+					'name' => 'UUIDItem2',
+					'key_' => 'UUIDItem2',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			'Accept item with non-empty UUID on template' => [
+				'request_data' => [
+					'hostid' => '50010',
+					'uuid' => $uuid,
+					'name' => 'UUIDItem3',
+					'key_' => 'UUIDItem3',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			'Reject item with empty UUID on template' => [
+				'request_data' => [
+					'hostid' => '50009',
+					'uuid' => '',
+					'name' => 'UUIDItem4',
+					'key_' => 'UUIDItem4',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => 'Invalid parameter "/1/uuid": cannot be empty.'
+			],
+			'Reject same UUID for two template items' => [
+				'request_data' => [
+					[
+						'hostid' => '50010',
+						'uuid' => $uuid,
+						'name' => 'UUIDItem5',
+						'key_' => 'UUIDItem5',
+						'interfaceid' => 0,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => '30s',
+						'url' => '192.168.0.1'
+					],
+					[
+						'hostid' => '50010',
+						'uuid' => $uuid,
+						'name' => 'UUIDItem6',
+						'key_' => 'UUIDItem6',
+						'interfaceid' => 0,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => '30s',
+						'url' => '192.168.0.1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (uuid)=('.$uuid.') already exists.'
 			]
 		] + $item_type_tests;
 	}
@@ -302,9 +387,14 @@ class testItem extends CAPITest {
 			}
 
 			foreach ($result['result']['itemids'] as $id) {
-				$db_item = CDBHelper::getRow('SELECT hostid, name, key_, type, delay FROM items WHERE itemid='.zbx_dbstr($id));
+				$fields = ['uuid', 'hostid', 'name', 'key_', 'type', 'delay'];
+				$db_item = CDBHelper::getRow('SELECT '.implode(',', $fields).' FROM items WHERE itemid='.zbx_dbstr($id));
 
-				foreach (['hostid', 'name', 'key_', 'type', 'delay'] as $field) {
+				foreach ($fields as $field) {
+					if ($field === 'uuid' && !array_key_exists($field, $request_data)) {
+						continue;
+					}
+
 					$this->assertSame($db_item[$field], strval($request_data[$field]));
 				}
 
