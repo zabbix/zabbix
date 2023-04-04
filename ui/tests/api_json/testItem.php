@@ -317,6 +317,33 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => null
 			],
+			'Accept multiple items with empty UUID on host' => [
+				'request_data' => [
+					[
+						'hostid' => '50009',
+						'uuid' => '',
+						'name' => 'UUIDItem2.1',
+						'key_' => 'UUIDItem2.1',
+						'interfaceid' => 0,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => '30s',
+						'url' => '192.168.0.1'
+					],
+					[
+						'hostid' => '50009',
+						'uuid' => '',
+						'name' => 'UUIDItem2.2',
+						'key_' => 'UUIDItem2.2',
+						'interfaceid' => 0,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => '30s',
+						'url' => '192.168.0.1'
+					]
+				],
+				'expected_error' => null
+			],
 			'Accept item with non-empty UUID on template' => [
 				'request_data' => [
 					'hostid' => '50010',
@@ -381,33 +408,44 @@ class testItem extends CAPITest {
 	public function testItem_Create($request_data, $expected_error) {
 		$result = $this->call('item.create', $request_data, $expected_error);
 
-		if ($expected_error === null) {
-			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
+		if ($expected_error !== null) {
+			return;
+		}
+
+		$match_fields = ['uuid', 'hostid', 'name', 'key_', 'type', 'delay'];
+		$requests = zbx_toArray($request_data);
+
+		foreach ($requests as $request_data) {
+			$id = array_shift($result['result']['itemids']);
+
+			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE
+					&& substr($request_data['key_'], 0, 8) === 'mqtt.get') {
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
 			}
 
-			foreach ($result['result']['itemids'] as $id) {
-				$fields = ['uuid', 'hostid', 'name', 'key_', 'type', 'delay'];
-				$db_item = CDBHelper::getRow('SELECT '.implode(',', $fields).' FROM items WHERE itemid='.zbx_dbstr($id));
+			$db_item = CDBHelper::getRow(
+				'SELECT '.implode(',', $match_fields).' FROM items WHERE '.dbConditionId('itemid', [$id])
+			);
 
-				foreach ($fields as $field) {
-					if ($field === 'uuid' && !array_key_exists($field, $request_data)) {
-						continue;
-					}
-
-					$this->assertSame($db_item[$field], strval($request_data[$field]));
+			foreach ($match_fields as $field) {
+				if ($field === 'uuid' && !array_key_exists($field, $request_data)) {
+					continue;
 				}
 
-				if (array_key_exists('tags', $request_data)) {
-					$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM item_tag WHERE itemid='.zbx_dbstr($id)));
-					uasort($request_data['tags'], function ($a, $b) {
-						return strnatcasecmp($a['value'], $b['value']);
-					});
-					uasort($db_tags, function ($a, $b) {
-						return strnatcasecmp($a['value'], $b['value']);
-					});
-					$this->assertTrue(array_values($db_tags) === array_values($request_data['tags']));
-				}
+				$this->assertSame($db_item[$field], strval($request_data[$field]));
+			}
+
+			if (array_key_exists('tags', $request_data)) {
+				$db_tags = DBFetchArray(DBSelect(
+					'SELECT tag, value FROM item_tag WHERE '.dbConditionId('itemid', [$id])
+				));
+				uasort($request_data['tags'], function ($a, $b) {
+					return strnatcasecmp($a['value'], $b['value']);
+				});
+				uasort($db_tags, function ($a, $b) {
+					return strnatcasecmp($a['value'], $b['value']);
+				});
+				$this->assertEquals(array_values($db_tags), array_values($request_data['tags']), 'Tags should match');
 			}
 		}
 	}
