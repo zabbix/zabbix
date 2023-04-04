@@ -32,19 +32,18 @@ class API {
 	/**
 	 * Executes received request.
 	 *
-	 * @param ScimApiClient  $client   API client.
-	 * @param CHttpRequest   $request  Request received.
+	 * @param ScimApiClient    $client   API client.
+	 * @param ScimHttpRequest  $request  Request received.
 	 *
-	 * @return HttpResponse
+	 * @return ScimHttpResponse
 	 */
-	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
-		[, $class] = explode('/', $request->header('PATH-INFO'), 3) + ['', ''];
-		$class = strtolower($class);
-		$action = strtolower($request->method());
-		$input = $this->parseRequestData($request, $class);
+	public function execute(ScimApiClient $client, ScimHttpRequest $request): ScimHttpResponse {
+		$requestApi = $request->getRequestApi();
+		$requestMethod = strtolower($request->method());
+		$data = $request->getRequestData();
 
 		/** @var CApiClientResponse $response */
-		$response = $client->callMethod($class, $action, $input, [
+		$response = $client->callMethod($requestApi, $requestMethod, $data, [
 			'type' => CJsonRpc::AUTH_TYPE_HEADER,
 			'auth' => $request->getAuthBearerValue()
 		]);
@@ -53,48 +52,6 @@ class API {
 			throw new Exception($response->errorMessage, $response->errorCode);
 		}
 
-		return new HttpResponse($response->data);
-	}
-
-	/**
-	 * Parse request body data adding supported GET parameters, return parsed parameters as array.
-	 *
-	 * @param CHttpRequest $request
-	 * @param string       $class
-	 *
-	 * @return array
-	 */
-	private function parseRequestData(CHttpRequest $request, string $class): array {
-		$input = $request->body() === '' ? [] : json_decode($request->body(), true);
-		[, , $id] = explode('/', $request->header('PATH-INFO'), 3) + ['', '', ''];
-
-		if ($id !== '') {
-			$input['id'] = $id;
-		}
-
-		if (array_key_exists('filter', $_GET)) {
-			$class === 'users'
-				? preg_match('/^userName eq "(?<value>(?:[^"]|\\\\")*)"$/', $_GET['filter'], $filter_value)
-				: preg_match('/^displayName eq "(?<value>(?:[^"]|\\\\")*)"$/', $_GET['filter'], $filter_value);
-
-			if (array_key_exists('value', $filter_value)) {
-				$class === 'users'
-					? $input['userName'] = $filter_value['value']
-					: $input['displayName'] = $filter_value['value'];
-			}
-			else {
-				throw new Exception(_('This filter is not supported'), 400);
-			}
-		}
-
-		if (array_key_exists('startIndex', $_GET)) {
-			$input['startIndex'] = $_GET['startIndex'];
-		}
-
-		if (array_key_exists('count', $_GET)) {
-			$input['count'] = $_GET['count'];
-		}
-
-		return $input;
+		return new ScimHttpResponse($response->data);
 	}
 }

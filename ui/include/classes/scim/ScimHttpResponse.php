@@ -23,7 +23,7 @@ namespace SCIM;
 
 use Throwable;
 
-class HttpResponse {
+class ScimHttpResponse {
 
 	/** @var array $data  Array of response data to be sent. */
 	protected array $data = [];
