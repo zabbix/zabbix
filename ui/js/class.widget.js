@@ -48,7 +48,7 @@ class CWidget extends CBaseComponent {
 
 	constructor({
 		type,
-		name,
+		name = '',
 		view_mode,
 		fields,
 		defaults,
