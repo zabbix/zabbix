@@ -938,7 +938,8 @@ class CUserDirectory extends CApiService {
 		]);
 
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
-				&& ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED || $ldap_userdirectories_left > 0)) {
+				&& $auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED
+				&& $ldap_userdirectories_left == 0) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
 		}
 
