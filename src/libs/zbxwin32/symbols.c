@@ -43,9 +43,9 @@ GetPerformanceInfo_t	zbx_get_GetPerformanceInfo(void)
 	return zbx_GetPerformanceInfo;
 }
 
-GetGlobalMemoryStatusEx_t	zbx_get_GlobalMemoryStatusEx(void)
+GlobalMemoryStatusEx_t	zbx_get_GlobalMemoryStatusEx(void)
 {
-	return zbx_GetGlobalMemoryStatusEx;
+	return zbx_GlobalMemoryStatusEx;
 }
 
 GetFileInformationByHandleEx_t	zbx_get_GetFileInformationByHandleEx(void)
