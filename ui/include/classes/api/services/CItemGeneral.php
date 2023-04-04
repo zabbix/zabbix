@@ -139,8 +139,7 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
-			'uuid' => ['type' => API_UUID]
+			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
 		]];
 
 		if ($update) {
