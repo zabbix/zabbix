@@ -3794,6 +3794,8 @@ form.is-loading {
 .cell {
   display: table-cell;
   vertical-align: top; }
+  .cell.expression-cell {
+    line-height: 24px; }
   .cell:last-child .dashboard-widget {
     margin: 0 0 10px; }
 
@@ -5216,7 +5218,8 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
-    margin: 0 10px; }
+    margin: 0 10px;
+    padding: 13px 10px 10px; }
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
       .overlay-dialogue.modal .dashboard-widget-head .icon-doc-link {

@@ -123,21 +123,27 @@ $condition_tag_value_template = (new CTemplateTag('condition-tag-value-row-tmpl'
 $action_tab->addItem([
 	(new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'),
 	(new CFormField([
-		(new CSelect('evaltype'))
-			->setId('evaltype')
-			->setFocusableElementId('evaltype_select')
-			->setValue($data['action']['filter']['evaltype'])
-			->addOptions(CSelect::createOptionsFromArray([
-				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-				CONDITION_EVAL_TYPE_AND => _('And'),
-				CONDITION_EVAL_TYPE_OR => _('Or'),
-				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan(''))
-			->addStyle('white-space: normal;')
-			->setId('expression'),
-		$formula,
+		(new CDiv([
+			(new CSelect('evaltype'))
+				->setId('evaltype')
+				->setFocusableElementId('evaltype_select')
+				->setValue($data['action']['filter']['evaltype'])
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				])),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		]))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan(''))
+				->addStyle('white-space: normal;')
+				->setId('expression'),
+			$formula
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION),
 		$condition_suppressed_template,
 		$condition_template_default,
 		$condition_tag_value_template

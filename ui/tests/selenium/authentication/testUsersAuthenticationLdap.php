@@ -2076,12 +2076,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {
 				$success = (array_key_exists('mapping_error', $data)) ? false : true;
 
-				if (array_key_exists('User group mapping', $ldap)) {
-					$this->setMapping($ldap['User group mapping'], $ldap_form, 'User group mapping', $success);
-				}
-
 				if (array_key_exists('Media type mapping', $ldap)) {
 					$this->setMapping($ldap['Media type mapping'], $ldap_form, 'Media type mapping', $success);
+				}
+
+				if (array_key_exists('User group mapping', $ldap)) {
+					$this->setMapping($ldap['User group mapping'], $ldap_form, 'User group mapping', $success);
 				}
 			}
 

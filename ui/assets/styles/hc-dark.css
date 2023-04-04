@@ -3756,6 +3756,8 @@ form.is-loading {
 .cell {
   display: table-cell;
   vertical-align: top; }
+  .cell.expression-cell {
+    line-height: 24px; }
   .cell:last-child .dashboard-widget {
     margin: 0 0 10px; }
 
@@ -5178,7 +5180,8 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
-    margin: 0 10px; }
+    margin: 0 10px;
+    padding: 13px 10px 10px; }
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
       .overlay-dialogue.modal .dashboard-widget-head .icon-doc-link {
@@ -7812,11 +7815,6 @@ z-select button.focusable:focus,
     background-position: -361px -767px; }
   .list-table.compact-view td .icon-wizard-action {
     background: transparent url("../img/icon-sprite.svg?20230110") no-repeat -318px -624px; }
-
-.overlay-dialogue .list-table th:first-child {
-  padding-left: 0px; }
-.overlay-dialogue .list-table td:first-child {
-  padding-left: 42px; }
 
 .filter-highlight-row-cb {
   display: none; }
