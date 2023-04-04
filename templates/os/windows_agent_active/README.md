@@ -13,7 +13,7 @@ This template has been tested on:
 
 ## Requirements
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 

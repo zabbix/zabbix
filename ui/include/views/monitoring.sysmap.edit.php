@@ -288,7 +288,8 @@ foreach ($data['sysmap']['urls'] as $url) {
 	$url_table->addRow(
 		(new CRow([
 			(new CTextBox('urls['.$i.'][name]', $url['name']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			(new CTextBox('urls['.$i.'][url]', $url['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('urls['.$i.'][url]', $url['url'], false, DB::getFieldLength('sysmap_url','url')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CSelect('urls['.$i.'][elementtype]'))
 				->setValue($url['elementtype'])
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),

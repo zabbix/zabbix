@@ -51,7 +51,7 @@ $http_popup_form_list = (new CFormList())
 	->addRow(
 		(new CLabel(_('URL'), 'url'))->setAsteriskMark(),
 		new CDiv([
-			(new CTextBox('url', $options['url'], false, null))
+			(new CTextBox('url', $options['url'], false, DB::getFieldLength('httpstep','url')))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

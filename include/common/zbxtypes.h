@@ -32,14 +32,6 @@
 #	endif
 #endif
 
-#if defined(_WINDOWS) || defined(__MINGW32__)
-#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-#	define PATH_SEPARATOR	'\\'
-#else
-#	define zbx_open(pathname, flags)	open(pathname, flags)
-#	define PATH_SEPARATOR	'/'
-#endif
-
 #if defined(_WINDOWS)
 #	include <strsafe.h>
 

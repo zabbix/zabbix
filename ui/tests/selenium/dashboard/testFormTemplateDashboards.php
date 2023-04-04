@@ -403,7 +403,7 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'name' => 'URL',
 							'attributes' => [
-								'maxlength' => 255
+								'maxlength' => 2048
 							]
 						]
 					]

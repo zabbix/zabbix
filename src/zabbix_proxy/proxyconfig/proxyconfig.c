@@ -123,13 +123,13 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &error)))
 	{
-		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, config_vault);
+		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, config_vault);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-			DCsync_kvs_paths(&jp_kvs_paths, config_vault);
+			zbx_dc_sync_kvs_paths(&jp_kvs_paths, config_vault);
 
-		DCupdate_interfaces_availability();
+		zbx_dc_update_interfaces_availability();
 	}
 	else
 	{
@@ -158,8 +158,8 @@ static void	proxyconfig_remove_unused_templates(void)
 	zbx_vector_uint64_t	hostids, templateids;
 	zbx_hashset_t		templates;
 	int			removed_num;
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -262,7 +262,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault);
+	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault);
 
 	zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
 
@@ -293,9 +293,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			{
 				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL, proxyconfig_args_in->config_vault);
+				zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL, proxyconfig_args_in->config_vault);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
-				DCupdate_interfaces_availability();
+				zbx_dc_update_interfaces_availability();
 				zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
 
 				if (SEC_PER_HOUR < sec - last_template_cleanup_sec)

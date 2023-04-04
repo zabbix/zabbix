@@ -199,7 +199,7 @@ static void	vector_snmp_oid_free(zbx_snmp_oid_t *ptr)
 	zbx_free(ptr);
 }
 
-static char	*get_item_community_context(const DC_ITEM *item)
+static char	*get_item_community_context(const zbx_dc_item_t *item)
 {
 	if (ZBX_IF_SNMP_VERSION_1 == item->snmp_version || ZBX_IF_SNMP_VERSION_2 == item->snmp_version)
 		return item->snmp_community;
@@ -210,7 +210,7 @@ static char	*get_item_community_context(const DC_ITEM *item)
 	exit(EXIT_FAILURE);
 }
 
-static char	*get_item_security_name(const DC_ITEM *item)
+static char	*get_item_security_name(const zbx_dc_item_t *item)
 {
 	if (ZBX_IF_SNMP_VERSION_3 == item->snmp_version)
 		return item->snmpv3_securityname;
@@ -238,7 +238,8 @@ static char	*get_item_security_name(const DC_ITEM *item)
  *                         heap-(re)allocated idx                             *
  *                                                                            *
  ******************************************************************************/
-static int	cache_get_snmp_index(const DC_ITEM *item, const char *snmp_oid, const char *value, char **idx, size_t *idx_alloc)
+static int	cache_get_snmp_index(const zbx_dc_item_t *item, const char *snmp_oid, const char *value, char **idx,
+		size_t *idx_alloc)
 {
 	int			ret = FAIL;
 	zbx_snmpidx_main_key_t	*main_key, main_key_local;
@@ -284,7 +285,7 @@ end:
  *             value     - [IN] value part of the index-value pair            *
  *                                                                            *
  ******************************************************************************/
-static void	cache_put_snmp_index(const DC_ITEM *item, const char *snmp_oid, const char *index, const char *value)
+static void	cache_put_snmp_index(const zbx_dc_item_t *item, const char *snmp_oid, const char *index, const char *value)
 {
 	zbx_snmpidx_main_key_t	*main_key, main_key_local;
 	zbx_snmpidx_mapping_t	*mapping, mapping_local;
@@ -351,7 +352,7 @@ static void	cache_put_snmp_index(const DC_ITEM *item, const char *snmp_oid, cons
  *           contain the cache for the specified OID                          *
  *                                                                            *
  ******************************************************************************/
-static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *snmp_oid)
+static void	cache_del_snmp_index_subtree(const zbx_dc_item_t *item, const char *snmp_oid)
 {
 	zbx_snmpidx_main_key_t	*main_key, main_key_local;
 
@@ -375,7 +376,7 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session *session)
+static int	zbx_snmpv3_set_auth_protocol(const zbx_dc_item_t *item, struct snmp_session *session)
 {
 /* item snmpv3 authentication protocol */
 /* SYNC WITH PHP!                      */
@@ -444,7 +445,7 @@ static char	*zbx_get_snmp_type_error(u_char type)
 	}
 }
 
-static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_INTERFACE *interface, int status,
+static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const zbx_dc_interface_t *interface, int status,
 		const struct snmp_pdu *response, char *error, size_t max_error_len)
 {
 	int	ret;
@@ -476,7 +477,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 	return ret;
 }
 
-static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *error, size_t max_error_len,
+static struct snmp_session	*zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, size_t max_error_len,
 		int config_timeout)
 {
 /* item snmpv3 privacy protocol */
@@ -848,6 +849,10 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 				(unsigned int)var->val.string[2],
 				(unsigned int)var->val.string[3]));
 	}
+	else if (ASN_NULL == var->type)
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, "NULL"));
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
@@ -1088,7 +1093,7 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
  *               SUCCEED - if function successfully completed                 *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *snmp_oid, char *error,
+static int	zbx_snmp_walk(struct snmp_session *ss, const zbx_dc_item_t *item, const char *snmp_oid, char *error,
 		size_t max_error_len, int *max_succeed, int *min_fail, int max_vars, int bulk,
 		zbx_snmp_walk_cb_func walk_cb_func, void *walk_cb_arg)
 {
@@ -1331,15 +1336,15 @@ out:
 	return ret;
 }
 
-static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items,
+static int	zbx_snmp_get_values(struct snmp_session *ss, const zbx_dc_item_t *items,
 		char oids[][ZBX_ITEM_SNMP_OID_LEN_MAX], AGENT_RESULT *results, int *errcodes,
 		unsigned char *query_and_ignore_type, int num, int level, char *error, size_t max_error_len,
 		int *max_succeed, int *min_fail, unsigned char poller_type)
 {
 	int			i, j, status, ret = SUCCEED;
-	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
-	oid			parsed_oids[MAX_SNMP_ITEMS][MAX_OID_LEN];
-	size_t			parsed_oid_lens[MAX_SNMP_ITEMS];
+	int			mapping[ZBX_MAX_SNMP_ITEMS], mapping_num = 0;
+	oid			parsed_oids[ZBX_MAX_SNMP_ITEMS][MAX_OID_LEN];
+	size_t			parsed_oid_lens[ZBX_MAX_SNMP_ITEMS];
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*var;
 	unsigned char		val_type;
@@ -1835,7 +1840,7 @@ static void	zbx_snmp_walk_discovery_cb(void *arg, const char *snmp_oid, const ch
 	obj->values[data->num] = zbx_strdup(NULL, value);
 }
 
-static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
+static int	zbx_snmp_process_discovery(struct snmp_session *ss, const zbx_dc_item_t *item, AGENT_RESULT *result,
 		int *errcode, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int max_vars,
 		int bulk)
 {
@@ -1898,7 +1903,7 @@ out:
 
 static void	zbx_snmp_walk_cache_cb(void *arg, const char *snmp_oid, const char *index, const char *value)
 {
-	cache_put_snmp_index((const DC_ITEM *)arg, snmp_oid, index, value);
+	cache_put_snmp_index((const zbx_dc_item_t *)arg, snmp_oid, index, value);
 }
 
 typedef struct
@@ -1907,6 +1912,7 @@ typedef struct
 	int	numeric_enum;
 	int	numeric_ts;
 	int	oid_format;
+	int	no_print_units;
 }
 zbx_snmp_format_opts_t;
 
@@ -1916,6 +1922,7 @@ static void	snmp_bulkwalk_get_options(zbx_snmp_format_opts_t *opts)
 	opts->numeric_enum = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM);
 	opts->numeric_ts = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_NUMERIC_TIMETICKS);
 	opts->oid_format = netsnmp_ds_get_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT);
+	opts->no_print_units = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PRINT_UNITS);
 }
 
 static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
@@ -1924,28 +1931,30 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM, opts->numeric_enum);
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_NUMERIC_TIMETICKS, opts->numeric_ts);
 	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, opts->oid_format);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PRINT_UNITS, opts->no_print_units);
 }
 
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 {
-	size_t	len;
 	int	i;
 
 	zbx_vector_snmp_oid_sort(oids, (zbx_compare_func_t)zbx_snmp_oid_compare);
-	len = strlen(oids->values[0]->str_oid);
 
 	for (i = 1; i < oids->values_num; i++)
 	{
-		while (0 == memcmp(oids->values[i - 1]->str_oid, oids->values[i]->str_oid, len))
+		size_t len = strlen(oids->values[i - 1]->str_oid);
+
+		while (0 == strncmp(oids->values[i - 1]->str_oid, oids->values[i]->str_oid, len))
 		{
+			if ('.' != oids->values[i]->str_oid[len] && '\0' != oids->values[i]->str_oid[len])
+				break;
+
 			vector_snmp_oid_free(oids->values[i]);
 			zbx_vector_snmp_oid_remove(oids, i);
 
 			if (i == oids->values_num)
 				return;
 		}
-
-		len = strlen(oids->values[i]->str_oid);
 	}
 }
 
@@ -1989,7 +1998,7 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 	return SUCCEED;
 }
 
-static int	snmp_bulkwalk(struct snmp_session *ss, int pdu_type, const DC_ITEM *item, zbx_snmp_oid_t *p_oid,
+static int	snmp_bulkwalk(struct snmp_session *ss, int pdu_type, const zbx_dc_item_t *item, zbx_snmp_oid_t *p_oid,
 		char **results, size_t *results_alloc, size_t *results_offset, char *error, size_t max_error_len)
 {
 	struct snmp_pdu		*pdu, *response = NULL;
@@ -2096,7 +2105,7 @@ out:
 	return ret;
 }
 
-static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
+static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const zbx_dc_item_t *item, AGENT_RESULT *result,
 		int *errcode, char *error, size_t max_error_len)
 {
 	int			i, ret = SUCCEED, pdu_type;
@@ -2113,6 +2122,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 	bulk_opts.numeric_oids = 1;
 	bulk_opts.numeric_enum = 1;
 	bulk_opts.numeric_ts = 1;
+	bulk_opts.no_print_units = 1;
 	bulk_opts.oid_format = NETSNMP_OID_OUTPUT_NUMERIC;
 	snmp_bulkwalk_set_options(&bulk_opts);
 
@@ -2183,18 +2193,18 @@ out:
 	return ret;
 }
 
-static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
+static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const zbx_dc_item_t *items, AGENT_RESULT *results,
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk,
 		unsigned char poller_type)
 {
 	int		i, j, k, ret;
-	int		to_walk[MAX_SNMP_ITEMS], to_walk_num = 0;
-	int		to_verify[MAX_SNMP_ITEMS], to_verify_num = 0;
-	char		to_verify_oids[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
-	unsigned char	query_and_ignore_type[MAX_SNMP_ITEMS];
-	char		index_oids[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
-	char		index_values[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
-	char		oids_translated[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	int		to_walk[ZBX_MAX_SNMP_ITEMS], to_walk_num = 0;
+	int		to_verify[ZBX_MAX_SNMP_ITEMS], to_verify_num = 0;
+	char		to_verify_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	unsigned char	query_and_ignore_type[ZBX_MAX_SNMP_ITEMS];
+	char		index_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	char		index_values[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	char		oids_translated[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
 	char		*idx = NULL, *pl;
 	size_t		idx_alloc = 32;
 
@@ -2385,12 +2395,12 @@ exit:
 	return ret;
 }
 
-static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
+static int	zbx_snmp_process_standard(struct snmp_session *ss, const zbx_dc_item_t *items, AGENT_RESULT *results,
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail,
 		unsigned char poller_type)
 {
 	int	i, ret;
-	char	oids_translated[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	char	oids_translated[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2418,7 +2428,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 	return ret;
 }
 
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout)
+int	get_value_snmp(const zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout)
 {
 	int	errcode = SUCCEED;
 
@@ -2439,20 +2449,20 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	init_snmp(progname);
 	zbx_snmp_init_done = 1;
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type,
-		int config_timeout)
+void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
+		unsigned char poller_type, int config_timeout)
 {
 	struct snmp_session	*ss;
 	char			error[MAX_STRING_LEN];
-	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = MAX_SNMP_ITEMS + 1,
+	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = ZBX_MAX_SNMP_ITEMS + 1,
 				bulk = SNMP_BULK_ENABLED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
@@ -2479,7 +2489,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 	{
 		int	max_vars;
 
-		max_vars = DCconfig_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
+		max_vars = zbx_dc_config_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
 
 		err = zbx_snmp_process_discovery(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
@@ -2490,7 +2500,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{
-		(void)DCconfig_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
+		(void)zbx_dc_config_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
 
 		err = zbx_snmp_process_dynamic(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
 				&max_succeed, &min_fail, bulk, poller_type);
@@ -2516,9 +2526,9 @@ exit:
 			errcodes[i] = err;
 		}
 	}
-	else if (SNMP_BULK_ENABLED == bulk && (0 != max_succeed || MAX_SNMP_ITEMS + 1 != min_fail))
+	else if (SNMP_BULK_ENABLED == bulk && (0 != max_succeed || ZBX_MAX_SNMP_ITEMS + 1 != min_fail))
 	{
-		DCconfig_update_interface_snmp_stats(items[j].interface.interfaceid, max_succeed, min_fail);
+		zbx_dc_config_update_interface_snmp_stats(items[j].interface.interfaceid, max_succeed, min_fail);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2533,12 +2543,12 @@ static void	zbx_shutdown_snmp(void)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	snmp_shutdown(progname);
 	zbx_snmp_init_done = 0;
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)

@@ -584,7 +584,7 @@ FIELD		|media_type_test_timeout	|t_varchar(32)	|'65s'	|NOT NULL	|ZBX_NODATA
 FIELD		|script_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
 FIELD		|item_test_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
 FIELD		|session_key	|t_varchar(32)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|url			|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|report_test_timeout|t_varchar(32)|'60s'|NOT NULL	|ZBX_NODATA
 FIELD		|dbversion_status	|t_shorttext|''	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_service|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
@@ -593,7 +593,7 @@ FIELD		|passwd_check_rules	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
 FIELD		|auditlog_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|ha_failover_delay	|t_varchar(32)	|'1m'	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_tile_provider|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|geomaps_tile_url	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|geomaps_tile_url	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_max_zoom	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|vault_provider	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -896,14 +896,14 @@ TABLE|sysmap_element_url|sysmapelementurlid|ZBX_TEMPLATE
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
 FIELD		|selementid	|t_id		|	|NOT NULL	|0			|1|sysmaps_elements
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
 UNIQUE		|1		|selementid,name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_TEMPLATE
 FIELD		|sysmapurlid	|t_id		|	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|sysmapid,name
 
@@ -1255,9 +1255,9 @@ FIELD		|vendor		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|contract_number|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|installer_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|deployment_status|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|url_a		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|url_b		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|url_c		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_a		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_b		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_c		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|host_networks	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|host_netmask	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|host_router	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
@@ -1634,7 +1634,7 @@ FIELD		|widgetid	|t_id		|	|NOT NULL	|0			|1|widget
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value_str	|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|value_groupid	|t_id		|	|NULL		|0			|2|hstgrp	|groupid
 FIELD		|value_hostid	|t_id		|	|NULL		|0			|3|hosts	|hostid
 FIELD		|value_itemid	|t_id		|	|NULL		|0			|4|items	|itemid
@@ -2111,4 +2111,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030193	|6030193
+ROW		|1		|6050007	|6050007

@@ -42,8 +42,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->addValidationRules([
 			'edit_mode' => 'in 0,1',
-			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
-			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
+			'contents_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
+			'contents_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
 			'from' => 'string',
 			'to' => 'string'
@@ -52,8 +52,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
 		$edit_mode = $this->getInput('edit_mode', 0);
-		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
-		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
+		$width = (int) $this->getInput('contents_width', self::GRAPH_WIDTH_MIN);
+		$height = (int) $this->getInput('contents_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
 
 		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);

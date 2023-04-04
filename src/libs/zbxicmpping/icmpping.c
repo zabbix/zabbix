@@ -22,13 +22,12 @@
 #include <signal.h>
 
 #include "log.h"
-#include "zbxcommon.h"
 #include "zbxcomms.h"
 #include "zbxexec.h"
-#include "zbxip.h"
 #include "zbxstr.h"
+#include "zbxip.h"
 #include "zbxthreads.h"
-#include "zbxtypes.h"
+#include "zbxfile.h"
 
 static const zbx_config_icmpping_t	*config_icmpping;
 
@@ -554,8 +553,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	sigaddset(&mask, SIGINT);
 	sigaddset(&mask, SIGQUIT);
 
-	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-		zbx_error("cannot set sigprocmask to block the user signal");
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set signal mask to block the user signal");
 
 	if (NULL == (f = popen(tmp, "r")))
 	{
@@ -563,8 +562,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		unlink(filename);
 
-		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-			zbx_error("cannot restore sigprocmask");
+		if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+			zbx_error("cannot restore signal mask");
 
 		goto out;
 	}
@@ -699,8 +698,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 	rc = pclose(f);
 
-	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-		zbx_error("cannot restore sigprocmask");
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore signal mask");
 
 	unlink(filename);
 

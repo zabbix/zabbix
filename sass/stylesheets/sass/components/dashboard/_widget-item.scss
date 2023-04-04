@@ -74,145 +74,147 @@ form.dashboard-widget-item {
 // Widget view.
 
 div.dashboard-widget-item {
-	$line-height: 1.14;
-
-	> div {
-		box-sizing: border-box;
-		height: 100%;
-		padding: 10px;
-		overflow-x: hidden;
-
-		@extend %webkit-scrollbar;
-	}
-
-	a {
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		color: inherit;
-
-		&:focus,
-		&:hover,
-		&:visited {
-			border: none;
-		}
+	.dashboard-grid-widget-body {
+		$line-height: 1.14;
 
 		> div {
+			box-sizing: border-box;
+			height: 100%;
+			padding: 10px;
+			overflow-x: hidden;
+
+			@extend %webkit-scrollbar;
+		}
+
+		a {
+			box-sizing: border-box;
 			display: flex;
-			flex: 1 1 calc(100% / 3);
-		}
-	}
+			flex-direction: column;
+			height: 100%;
+			color: inherit;
 
-	.item-description,
-	.item-value,
-	.item-time {
-		flex: 1 1 auto;
-		max-width: 100%;
-	}
-
-	.item-value {
-		display: flex;
-		flex-wrap: wrap;
-		margin: 0 5px;
-
-		> .units {
-			&:first-child,
-			&:last-child {
-				flex: 0 0 100%;
+			&:focus,
+			&:hover,
+			&:visited {
+				border: none;
 			}
 
-			&:first-child {
-				margin-bottom: -0.07em;
-			}
-
-			&:last-child {
-				margin-top: -0.07em;
+			> div {
+				display: flex;
+				flex: 1 1 calc(100% / 3);
 			}
 		}
 
-		&.type-text {
-			min-width: 0;
+		.item-description,
+		.item-value,
+		.item-time {
+			flex: 1 1 auto;
+			max-width: 100%;
+		}
 
-			.item-value-content {
+		.item-value {
+			display: flex;
+			flex-wrap: wrap;
+			margin: 0 5px;
+
+			> .units {
+				&:first-child,
+				&:last-child {
+					flex: 0 0 100%;
+				}
+
+				&:first-child {
+					margin-bottom: -0.07em;
+				}
+
+				&:last-child {
+					margin-top: -0.07em;
+				}
+			}
+
+			&.type-text {
 				min-width: 0;
+
+				.item-value-content {
+					min-width: 0;
+				}
 			}
 		}
-	}
 
-	.item-value-content {
-		display: flex;
-		align-items: baseline;
-		overflow: hidden;
-	}
-
-	.item-description,
-	.item-time,
-	.type-text .value {
-		display: block;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.item-description,
-	.value,
-	.decimals,
-	.units,
-	.item-time {
-		font-size: calc(var(--content-height) * var(--widget-item-font) / #{$line-height});
-		line-height: $line-height;
-	}
-
-	.units,
-	.change-indicator {
-		&:not(:last-child) {
-			margin-right: 5px;
+		.item-value-content {
+			display: flex;
+			align-items: baseline;
+			overflow: hidden;
 		}
 
-		&:not(:first-child) {
-			margin-left: 5px;
+		.item-description,
+		.item-time,
+		.type-text .value {
+			display: block;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
-	}
 
-	.svg-arrow {
-		height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / #{$line-height});
-	}
+		.item-description,
+		.value,
+		.decimals,
+		.units,
+		.item-time {
+			font-size: calc(var(--content-height) * var(--widget-item-font) / #{$line-height});
+			line-height: $line-height;
+		}
 
-	.item-value-no-data {
-		color: $font-alt-color;
-	}
+		.units,
+		.change-indicator {
+			&:not(:last-child) {
+				margin-right: 5px;
+			}
 
-	.left {
-		justify-content: flex-start;
-		max-width: max-content;
-		margin-right: auto;
-	}
+			&:not(:first-child) {
+				margin-left: 5px;
+			}
+		}
 
-	.center {
-		justify-content: center;
-	}
+		.svg-arrow {
+			height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / #{$line-height});
+		}
 
-	.right {
-		justify-content: flex-end;
-		max-width: max-content;
-		margin-left: auto;
-	}
+		.item-value-no-data {
+			color: $font-alt-color;
+		}
 
-	.top {
-		align-self: flex-start;
-	}
+		.left {
+			justify-content: flex-start;
+			max-width: max-content;
+			margin-right: auto;
+		}
 
-	.middle {
-		align-self: center;
-	}
+		.center {
+			justify-content: center;
+		}
 
-	.bottom {
-		align-self: flex-end;
-	}
+		.right {
+			justify-content: flex-end;
+			max-width: max-content;
+			margin-left: auto;
+		}
 
-	.bold {
-		font-weight: bold;
+		.top {
+			align-self: flex-start;
+		}
+
+		.middle {
+			align-self: center;
+		}
+
+		.bottom {
+			align-self: flex-end;
+		}
+
+		.bold {
+			font-weight: bold;
+		}
 	}
 }
 

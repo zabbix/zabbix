@@ -41,7 +41,7 @@ COMMON_SRC_FILES = \
 COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
-	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
+	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
@@ -56,9 +56,9 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
-	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
+	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
-	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -94,6 +94,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
