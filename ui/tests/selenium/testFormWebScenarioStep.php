@@ -225,12 +225,12 @@ class testFormWebScenarioStep extends CWebTest {
 			$this->assertFalse($remove_button->isClickable());
 
 			// Check the presence of the draggable icon.
-			if ($table_name !== 'Variables') {
-				$drag_icon = $row->query('xpath:.//div[contains(@class,"drag-icon")]')->one();
-				$this->assertFalse($drag_icon->isEnabled());
+			if ($table_name === 'Variables') {
+				$this->assertFalse($row->query('xpath:.//div[contains(@class,"drag-icon")]')->one(false)->isValid());
 			}
 			else {
-				$this->assertFalse($row->query('xpath:.//div[contains(@class,"drag-icon")]')->one(false)->isValid());
+				$drag_icon = $row->query('xpath:.//div[contains(@class,"drag-icon")]')->one();
+				$this->assertFalse($drag_icon->isEnabled());
 			}
 
 			// Fill in some data in first for and check that Remove buttons and draggable icon became enabled.
@@ -748,35 +748,7 @@ class testFormWebScenarioStep extends CWebTest {
 				// TODO: Replace the below workaround with the commented line when ZBX-22433 is merged.
 //				$form->getField(ucfirst($field_name))->asMultifieldTable()->fill($data[$field_name]);
 				$field = $step_form->getField(ucfirst($field_name));
-
-				// Apart from field labels, field data types have underscores instead of spaces.
-				$data_type = in_array($field_name, ['query fields', 'post fields'])
-					? str_replace(' ', '_', $field_name)
-					: $field_name;
-
-				if (count($data[$field_name]) > 1) {
-					$field->query('button:Add')->one()->click();
-				}
-
-				$i = 1;
-				$n = (in_array($field_name, ['variables', 'headers'])) ? 3 : 1;
-				foreach ($data[$field_name] as $field_pair) {
-					// Resetting 2nd row input element index as Variables Headers tables on Web scenario don't have 2nd rows.
-					if (array_search($field_pair, $data[$field_name]) > 0 && in_array($field_name, ['variables', 'headers'])) {
-						$n = 1;
-					}
-
-					$this->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($data_type)."]//tr[".
-							$i."]//input)[".$n."]"
-					)->one()->fill($field_pair['name']);
-
-					if (array_key_exists('value', $field_pair)) {
-						$this->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($data_type)."]//tr[".
-								$i."]//input)[".($n + 1)."]"
-						)->one()->fill($field_pair['value']);
-					}
-					$i++;
-				}
+				$this->fillTableField($data[$field_name], $field);
 			}
 		}
 
@@ -1004,20 +976,7 @@ class testFormWebScenarioStep extends CWebTest {
 
 		// Fill in exising query fields if such are present in the data provider.
 		if (array_key_exists('existing_query', $data)) {
-			$add_button = $query_table->query('button:Add')->one();
-
-			$i = 1;
-			foreach ($data['existing_query'] as $existing_query) {
-				// Add row in Query fields tableif required
-				if (count($data['existing_query']) !== $query_table->query('xpath:.//tr[@class="sortable"]')->all()->count()) {
-					$add_button->click();
-				}
-
-				$query_table->query("xpath:(.//tr[".$i."]//input)[1]")->one()->fill($existing_query['name']);
-				$query_table->query("xpath:(.//tr[".$i."]//input)[2]")->one()->fill($existing_query['value']);
-
-				$i++;
-			}
+			$this->fillTableField($data['existing_query'], $query_table);
 		}
 
 		$step_form->query('button:Parse')->one()->click();
@@ -1179,20 +1138,7 @@ class testFormWebScenarioStep extends CWebTest {
 		}
 		else {
 			$post_table = $step_form->getField('Post fields');
-
-			// Add row in Post fields table if required
-			if (count($data['post']) > 1) {
-				$post_table->query('button:Add')->one()->click();
-			}
-
-			$i = 1;
-			foreach ($data['post'] as $post) {
-				$post_table->query("xpath:(.//tr[".$i."]//input)[1]")->one()->fill($post['name']);
-				$post_table->query("xpath:(.//tr[".$i."]//input)[2]")->one()->fill($post['value']);
-
-				$i++;
-			}
-
+			$this->fillTableField($data['post'], $post_table);
 			$post_type->fill('Raw data');
 		}
 
@@ -1243,11 +1189,35 @@ class testFormWebScenarioStep extends CWebTest {
 
 		foreach ($table_field->query('xpath:(.//tr[@class="sortable"])')->all() as $table_row) {
 			$obtained_fields[$i]['name'] = $table_row->query('xpath:(.//input)[1]')->one()->getValue();
-			$obtained_fields[$i]['value'] = $table_row->query('xpath:(.//input)[2]')->one()->getValue();
+
+			if (array_key_exists('value', $expected[$i])) {
+				$obtained_fields[$i]['value'] = $table_row->query('xpath:(.//input)[2]')->one()->getValue();
+			}
 
 			$i++;
 		}
 
 		$this->assertEquals($expected, $obtained_fields);
+	}
+
+	private function fillTableField($input_data, $table_field) {
+		$count = count($input_data);
+		$add_button = $table_field->query('button:Add')->one();
+
+		$i = 1;
+		foreach ($input_data as $row) {
+			// Add row in  field table if required
+			if ($table_field->query('xpath:.//tr[@class="sortable"]')->all()->count() !== $count) {
+				$add_button->click();
+			}
+
+			$table_field->query("xpath:(.//tr[".$i."]//input)[1]")->one()->fill($row['name']);
+
+			if (array_key_exists('value', $row)) {
+				$table_field->query("xpath:(.//tr[".$i."]//input)[2]")->one()->fill($row['value']);
+			}
+
+			$i++;
+		}
 	}
 }
