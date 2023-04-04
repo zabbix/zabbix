@@ -405,7 +405,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 		}
 	}
 
-	if (0 == (pd.revents & POLLOUT))
+	if (POLLOUT != (pd.revents & (POLLOUT | POLLERR | POLLHUP | POLLNVAL)))
 	{
 		*error = zbx_dsprintf(NULL, "connection error with poll events 0x%x", pd.revents);
 		return FAIL;

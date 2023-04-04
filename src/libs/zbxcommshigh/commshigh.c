@@ -41,8 +41,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		int loglevel)
 {
-	int		ret, i;
-	zbx_timespec_t	deadline;
+	int	ret, i;
 
 	for (i = 0; i < addrs->values_num; i++)
 	{
@@ -63,9 +62,6 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 
 		zbx_vector_ptr_remove(addrs, 0);
 		zbx_vector_ptr_append(addrs, addr);
-
-		if (0 != timeout && SUCCEED != zbx_ts_check_deadline(&deadline))
-			break;
 	}
 
 	return ret;
