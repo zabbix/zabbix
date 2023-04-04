@@ -466,7 +466,7 @@ class testUserDirectory extends CAPITest {
 						['name' => 'zabbix-devs', 'roleid' => 1, 'user_groups' => [['usrgrpid' => 7]]]
 					]
 				]],
-				'expected_error' => 'Invalid parameter "/1/provision_groups": value is too long.'
+				'expected_error' => 'Invalid parameter "/1/provision_groups": should be empty.'
 			],
 			'Enable provisioning without giving provision groups' => [
 				'userdirectories' => [[
