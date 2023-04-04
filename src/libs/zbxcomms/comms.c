@@ -757,6 +757,8 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 			ret = FAIL;
 			goto cleanup;
 		}
+
+		written -= (ssize_t)offset;
 	}
 
 	while (written < (ssize_t)send_len)
