@@ -36,9 +36,10 @@ waiting when a request has to be done.
 default hard-coded values will be used instead. 
   
 ## Supported keys
-**docker.container_info[\<Container\>]** — returns low-level information about a container.
+**docker.container_info[\<Container\>,\<Info\>]** — returns low-level information about a container.
 *Parameters:*  
 Container (required) — a container name.
+Info (not required; default: false) — returns all container info (true) or shortened version (false).
 
 **docker.container_stats[\<Container\>]** — returns near real-time statistics for a given container.
 *Parameters:*
