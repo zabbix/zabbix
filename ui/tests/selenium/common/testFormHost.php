@@ -1235,7 +1235,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Invalid snmp community'
+						'Host name' => 'Invalid max repetition count'
 					],
 					'interfaces' => [
 						[
