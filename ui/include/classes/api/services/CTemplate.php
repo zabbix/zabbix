@@ -362,7 +362,7 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$templates) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['host'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['host'], ['name']], 'fields' => [
 			'uuid' =>			['type' => API_UUID],
 			'host' =>			['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
