@@ -44,6 +44,9 @@ use Widgets\ProblemsBySv\Widget;
 class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
+		$is_show_type_totals = array_key_exists('show_type', $this->values)
+			&& $this->values['show_type'] == Widget::SHOW_TOTALS;
+
 		return $this
 			->addField($this->isTemplateDashboard()
 				? null
@@ -85,7 +88,7 @@ class WidgetForm extends CWidgetForm {
 					STYLE_VERTICAL => _('Vertical')
 				]))
 					->setDefault(STYLE_HORIZONTAL)
-					->setFlags($this->isTemplateDashboard() || $this->values['show_type'] != Widget::SHOW_TOTALS
+					->setFlags($this->isTemplateDashboard() || $is_show_type_totals
 						? 0x00
 						: CWidgetField::FLAG_DISABLED
 					)
@@ -103,12 +106,7 @@ class WidgetForm extends CWidgetForm {
 			->addField($this->isTemplateDashboard()
 				? null
 				: (new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems')))
-					->setFlags(
-						array_key_exists('show_type', $this->values)
-							&& $this->values['show_type'] == Widget::SHOW_TOTALS
-						? CWidgetField::FLAG_DISABLED
-						: 0x00
-					)
+					->setFlags($is_show_type_totals ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [
