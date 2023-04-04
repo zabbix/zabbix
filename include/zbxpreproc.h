@@ -81,6 +81,7 @@ typedef struct
 {
 	zbx_uint32_t		refcount;
 
+	zbx_uint64_t		hostid;
 	int			steps_num;
 	zbx_pp_step_t		*steps;
 
@@ -118,7 +119,6 @@ void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
 typedef struct
 {
 	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
 	zbx_uint64_t		revision;
 
 	zbx_pp_item_preproc_t	*preproc;
@@ -178,7 +178,8 @@ void	zbx_pp_test_task_get_data(zbx_pp_task_t *task, zbx_ipc_client_t **client, z
 		zbx_pp_result_t **results, int *results_num, zbx_pp_history_t **history);
 void	zbx_pp_tasks_clear(zbx_vector_pp_task_ptr_t *tasks);
 
-zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned char value_type, unsigned char flags);
+zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char type, unsigned char value_type,
+		unsigned char flags);
 void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc);
 int	zbx_pp_preproc_has_history(int type);
 

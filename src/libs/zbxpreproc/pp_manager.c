@@ -594,7 +594,7 @@ void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64
 				" type:%u value_type:%u mode:%u flags:%u",
-				item->itemid, item->hostid, item->revision, item->preproc->type,
+				item->itemid, item->preproc->hostid, item->revision, item->preproc->type,
 				item->preproc->value_type, item->preproc->mode, item->preproc->flags);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  preprocessing steps:");
@@ -918,7 +918,7 @@ static void	preprocessor_add_test_request(zbx_pp_manager_t *manager, zbx_ipc_cli
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	preproc = zbx_pp_item_preproc_create(0, 0, 0);
+	preproc = zbx_pp_item_preproc_create(0, 0, 0, 0);
 	zbx_preprocessor_unpack_test_request(preproc, &value, &ts, message->data);
 	zbx_pp_manager_queue_test(manager, preproc, &value, ts, client);
 	zbx_pp_item_preproc_release(preproc);

@@ -28,14 +28,16 @@ ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
  *                                                                            *
  * Purpose: create item preprocessing data                                    *
  *                                                                            *
- * Parameters: type       - [IN] item type                                    *
+ * Parameters: hostid     - [IN] item host id                                 *
+ *             type       - [IN] item type                                    *
  *             value_type - [IN] item value type                              *
  *             flags      - [IN] item flags                                   *
  *                                                                            *
  * Return value: The created item preprocessing data.                         *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned char value_type, unsigned char flags)
+zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char type, unsigned char value_type,
+		unsigned char flags)
 {
 	zbx_pp_item_preproc_t	*preproc = zbx_malloc(NULL, sizeof(zbx_pp_item_preproc_t));
 
@@ -45,6 +47,7 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned c
 	preproc->dep_itemids_num = 0;
 	preproc->dep_itemids = NULL;
 
+	preproc->hostid = hostid;
 	preproc->type = type;
 	preproc->value_type = value_type;
 	preproc->flags = flags;
