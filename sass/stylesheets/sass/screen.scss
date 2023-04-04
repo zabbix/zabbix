@@ -1434,6 +1434,16 @@ form {
 			&:last-child {
 				padding-right: 0;
 			}
+
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.average-bg,
+			&.warning-bg,
+			&.high-bg,
+			&.disaster-bg {
+				padding-left: 5px;
+			}
 		}
 
 		.wrap-multiple-controls {
@@ -3191,14 +3201,6 @@ $form-icon-btn: (
 	.list-table {
 		white-space: normal;
 		border: 0;
-
-		th {
-			@extend %dashboard-widget-td;
-		}
-
-		td {
-			@extend %dashboard-widget-td;
-		}
 	}
 
 	.table-paging {
