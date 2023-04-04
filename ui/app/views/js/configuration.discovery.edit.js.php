@@ -412,11 +412,12 @@
 		var $form = jQuery(document.forms['dcheck_form']),
 			dcheckid = jQuery('#dcheckid').val(),
 			dcheck = $form
-				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
+				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible,'
+					+ ' #allow_redirect')
 				.serializeJSON(),
 			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase'
+				'snmpv3_privpassphrase', 'allow_redirect'
 			];
 
 		dcheck['type'] = $form.find('z-select').val();
