@@ -1,0 +1,1 @@
+A......... [ZBX-22553] fixed authentication.update not allowing to remove deprovisioning group without unchecking inactive SAML/LDAP JIT provisioning (miks)
