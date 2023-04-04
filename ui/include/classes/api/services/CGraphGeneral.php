@@ -51,7 +51,7 @@ abstract class CGraphGeneral extends CApiService {
 		$graphids = array_column($graphs, 'graphid');
 
 		$graphs = $this->extendObjects($this->tableName(), $graphs,
-			['uuid', 'name', 'graphtype', 'ymin_type', 'ymin_itemid', 'ymax_type', 'ymax_itemid', 'yaxismin', 'yaxismax']
+			['name', 'graphtype', 'ymin_type', 'ymin_itemid', 'ymax_type', 'ymax_itemid', 'yaxismin', 'yaxismax']
 		);
 
 		$db_graphs = $this->get([
@@ -727,8 +727,7 @@ abstract class CGraphGeneral extends CApiService {
 
 		$colorValidator = new CColorValidator();
 
-		$api_input_rules = ['type' => API_OBJECT, 'uniq' => [['uuid']], 'fields' => [
-			'uuid' => ['type' => API_UUID],
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 		]];
 
@@ -954,7 +953,6 @@ abstract class CGraphGeneral extends CApiService {
 		$colorValidator = new CColorValidator();
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'uuid' => ['type' => API_UUID],
 			'name' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 		]];
 
