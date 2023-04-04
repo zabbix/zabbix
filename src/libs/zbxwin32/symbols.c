@@ -21,36 +21,36 @@
 
 #include "log.h"
 
-static DWORD	(__stdcall *GetGuiResources)(HANDLE, DWORD) = NULL;
-static BOOL	(__stdcall *GetProcessIoCounters)(HANDLE, PIO_COUNTERS) = NULL;
-static BOOL	(__stdcall *GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD) = NULL;
-static BOOL	(__stdcall *GlobalMemoryStatusEx)(LPMEMORYSTATUSEX) = NULL;
-static BOOL	(__stdcall *GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD) =
+static DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD) = NULL;
+static BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS) = NULL;
+static BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD) = NULL;
+static BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX) = NULL;
+static BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD) =
 			NULL;
 
 GetGuiResources_t	zbx_get_GetGuiResources(void)
 {
-	return GetGuiResources;
+	return zbx_GetGuiResources;
 }
 
 GetProcessIoCounters_t	zbx_get_GetProcessIoCounters(void)
 {
-	return GetProcessIoCounters;
+	return zbx_GetProcessIoCounters;
 }
 
 GetPerformanceInfo_t	zbx_get_GetPerformanceInfo(void)
 {
-	return GetPerformanceInfo;
+	return zbx_GetPerformanceInfo;
 }
 
 GetGlobalMemoryStatusEx_t	zbx_get_GlobalMemoryStatusEx(void)
 {
-	return GetGlobalMemoryStatusEx;
+	return zbx_GetGlobalMemoryStatusEx;
 }
 
 GetFileInformationByHandleEx_t	zbx_get_GetFileInformationByHandleEx(void)
 {
-	return GetFileInformationByHandleEx;
+	return zbx_GetFileInformationByHandleEx;
 }
 
 static FARPROC	GetProcAddressAndLog(HMODULE hModule, const char *procName)
@@ -68,22 +68,28 @@ void	zbx_import_symbols(void)
 	HMODULE	hModule;
 
 	if (NULL != (hModule = GetModuleHandle(TEXT("USER32.DLL"))))
-		GetGuiResources = (DWORD (__stdcall *)(HANDLE, DWORD))GetProcAddressAndLog(hModule, "GetGuiResources");
+		zbx_GetGuiResources = (DWORD (__stdcall *)(HANDLE, DWORD))GetProcAddressAndLog(hModule, "GetGuiResources");
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "unable to get handle to USER32.DLL");
 
 	if (NULL != (hModule = GetModuleHandle(TEXT("KERNEL32.DLL"))))
 	{
-		GetProcessIoCounters = (BOOL (__stdcall *)(HANDLE, PIO_COUNTERS))GetProcAddressAndLog(hModule, "GetProcessIoCounters");
-		GlobalMemoryStatusEx = (BOOL (__stdcall *)(LPMEMORYSTATUSEX))GetProcAddressAndLog(hModule, "GlobalMemoryStatusEx");
-		GetFileInformationByHandleEx = (BOOL (__stdcall *)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID,
+		zbx_GetProcessIoCounters = (BOOL (__stdcall *)(HANDLE, PIO_COUNTERS))GetProcAddressAndLog(hModule,
+				"GetProcessIoCounters");
+		zbx_GlobalMemoryStatusEx = (BOOL (__stdcall *)(LPMEMORYSTATUSEX))GetProcAddressAndLog(hModule,
+				"GlobalMemoryStatusEx");
+		zbx_GetFileInformationByHandleEx = (BOOL (__stdcall *)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID,
 				DWORD))GetProcAddressAndLog(hModule, "GetFileInformationByHandleEx");
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "unable to get handle to KERNEL32.DLL");
 
 	if (NULL != (hModule = GetModuleHandle(TEXT("PSAPI.DLL"))))
-		GetPerformanceInfo = (BOOL (__stdcall *)(PPERFORMANCE_INFORMATION, DWORD))GetProcAddressAndLog(hModule, "GetPerformanceInfo");
+	{
+		zbx_GetPerformanceInfo = (BOOL (__stdcall *)(PPERFORMANCE_INFORMATION, DWORD))
+				GetProcAddressAndLog(hModule, "GetPerformanceInfo");
+
+	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "unable to get handle to PSAPI.DLL");
 }
