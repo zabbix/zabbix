@@ -21,7 +21,6 @@
 #include "operations.h"
 
 #include "log.h"
-#include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"

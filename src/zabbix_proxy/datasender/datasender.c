@@ -27,7 +27,6 @@
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "zbxcompress.h"
-#include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "../taskmanager/taskmanager.h"

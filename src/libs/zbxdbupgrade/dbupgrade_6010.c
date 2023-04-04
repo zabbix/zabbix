@@ -22,7 +22,6 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
-#include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 
