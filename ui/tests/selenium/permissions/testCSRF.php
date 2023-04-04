@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup token
+ * @backup token, connector
  *
  * @dataSource ScheduledReports, Proxies
  *
@@ -42,11 +42,17 @@ class testCSRF extends CWebTest {
 	}
 
 	public function prepareApiTokenData() {
-		$response = CDataHelper::call('token.create', [
+		$tokens = CDataHelper::call('token.create', [
 			'name' => self::UPDATE_API_TOKEN,
 			'userid' => '1'
 		]);
-		$this->assertArrayHasKey('tokenids', $response);
+		$this->assertArrayHasKey('tokenids', $tokens);
+
+		$connectors = CDataHelper::call('connector.create', [
+			'name' => 'test_token_connector',
+			'url' => 'http://test.url'
+		]);
+		$this->assertArrayHasKey('connectorids', $connectors);
 	}
 
 	public static function getElementRemoveData() {
