@@ -11,19 +11,22 @@ zabbix_export:
       name: 'Veeam Backup Enterprise Manager by HTTP'
       description: |
         This template is designed to monitor Veeam Backup Enterprise Manager.
-        The Veeam Backup Enterprise Manager REST API enables the communication with Zabbix to query the information about Veeam Backup Enterprise Manager objects.
-        It works without any external scripts and uses the script item. 
+        
+        NOTE: The REST API may not be available for some editions, see (https://www.veeam.com/licensing-pricing.html) for more details.
         
         Setup:
           1. Create a user to monitor the service, or use an existing read-only account.
+             Similarly to the user authentication in the Veeam Backup Enterprise Manager Web UI, 
+             the client authentication in the REST API dictates which operations a client is allowed to perform when working with the REST API.
+             That is, if the client is authenticated using an account that does not have enough permissions to perform some actions, it will not be able to execute them.
              You can also obtain the collected jobs if you are logged in under an account having only `Portal Administrator` role.
-          See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
+          See (https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
           2. Link the template to a host.
-          3. Configure the following macros: `{$VEEAM.MANAGER.API.URL}`, `{$VEEAM.MANAGER.USER}`, `{$VEEAM.MANAGER.PASSWORD}`.
+          3. Configure the following macros: {$VEEAM.MANAGER.API.URL}, {$VEEAM.MANAGER.USER}, {$VEEAM.MANAGER.PASSWORD}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0

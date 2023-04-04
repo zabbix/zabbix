@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-07 04:10+0000\n"
-"Last-Translator: Kodai <kodai.terashima@zabbix.com>\n"
+"PO-Revision-Date: 2023-03-08 03:34+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -1544,6 +1544,10 @@ msgstr "属性"
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr "帰属表示"
+
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3626,6 +3630,11 @@ msgstr "ディスカバリされたグラフを更新できません。"
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "ディスカバリされたホストグループ\"%1$s\"を更新できません。"
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -3992,7 +4001,7 @@ msgstr "1秒あたりの差分"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
-msgstr "障害の順位の変更"
+msgstr "障害の種別の変更"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -12298,6 +12307,10 @@ msgstr "データ収集なしのメンテナンス"
 msgid "Maintenance: %1$s"
 msgstr "メンテナンス：%1$s"
 
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
+
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
 msgstr "ページを閉じた後は表示できなくなるため、必ず認証トークンをコピーしてください。"
@@ -17751,6 +17764,10 @@ msgstr "サービスの依存関係が循環設定されています。"
 msgid "Services updated"
 msgstr "サービスを更新しました"
 
+#: include/classes/api/services/CUser.php:1709
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -22418,6 +22435,14 @@ msgstr "[日の値が正しくありません: \"%1$s\"]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[月の値が正しくありません: \"%1$s\"]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"

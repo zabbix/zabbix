@@ -710,7 +710,8 @@ static void	diag_get_simple_values(const struct zbx_json_parse *jp, char **msg)
 	{
 		if (FAIL == zbx_json_brackets_open(pnext, &jp_value))
 		{
-			zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, &type);
+			if (NULL == zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, &type))
+				type = ZBX_JSON_TYPE_NULL;
 
 			if (0 != msg_offset)
 				zbx_chrcpy_alloc(msg, &msg_alloc, &msg_offset, ' ');

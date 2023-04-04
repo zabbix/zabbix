@@ -23,6 +23,27 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
+          uuid: 94235a52be114cb6a99cfc90834144e7
+          name: 'Remote Zabbix server: Connector queue'
+          type: DEPENDENT
+          key: connector_queue
+          delay: '0'
+          history: 1w
+          description: 'The count of values enqueued in the connector queue.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.connector_queue
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "connector" processes started. Please check "StartConnectors" parameter in the server configuration file.'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: adcf44e5179644b0bee34103d3d3688e
           name: 'Remote Zabbix server: LLD queue'
           type: DEPENDENT
@@ -235,6 +256,78 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix server health/process.configuration_syncer.avg.busy,10m)<65'
               name: 'Remote Zabbix server: Utilization of configuration syncer processes is high'
               event_name: 'Remote Zabbix server: Utilization of configuration syncer processes over 75%'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: b7564d4eb40848dbb299e74cd525a07d
+          name: 'Remote Zabbix server: Utilization of connector manager internal processes, in %'
+          type: DEPENDENT
+          key: process.connector_manager.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the connector manager processes have been busy for the last minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''connector manager''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "connector manager" processes started.'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: component
+              value: internal-process
+          triggers:
+            -
+              uuid: abe4c864b41a4a43b2ce963ed55a3f17
+              expression: 'avg(/Remote Zabbix server health/process.connector_manager.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server health/process.connector_manager.avg.busy,10m)<65'
+              name: 'Remote Zabbix server: Utilization of connector manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of connector manager processes over 75%'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 9a75eee4853a44b1b5087e0fea6c5bcb
+          name: 'Remote Zabbix server: Utilization of connector worker internal processes, in %'
+          type: DEPENDENT
+          key: process.connector_worker.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the connector worker processes have been busy for the last minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.data.process[''connector worker''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "connector worker" processes started.'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: component
+              value: internal-process
+          triggers:
+            -
+              uuid: ba984299c08f44b2a99c6fee187bcf01
+              expression: 'avg(/Remote Zabbix server health/process.connector_worker.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server health/process.connector_worker.avg.busy,10m)<65'
+              name: 'Remote Zabbix server: Utilization of connector worker processes is high'
+              event_name: 'Remote Zabbix server: Utilization of connector worker processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -2855,6 +2948,18 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server health'
             key: process.lld_manager.avg.busy
+        -
+          sortorder: '5'
+          color: CE93D8
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.connector_worker.avg.busy
+        -
+          sortorder: '6'
+          color: '274482'
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.connector_manager.avg.busy
     -
       uuid: d35b696819e3402e9a9f8bd98da01bde
       name: 'Remote Zabbix server: Internal processes'
@@ -3228,6 +3333,18 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server health'
             key: process.trigger_housekeeper.avg.busy
+        -
+          sortorder: '20'
+          color: '274482'
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.connector_manager.avg.busy
+        -
+          sortorder: '21'
+          color: CE93D8
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.connector_worker.avg.busy
     -
       uuid: 63004d5061324a90b247209977de9cbd
       name: 'Remote Zabbix server: Zabbix internal queues'
@@ -3243,6 +3360,12 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server health'
             key: lld_queue
+        -
+          sortorder: '2'
+          color: '274482'
+          item:
+            host: 'Remote Zabbix server health'
+            key: connector_queue
     -
       uuid: 954f8afba30d45b99e3404114f0fe3b0
       name: 'Remote Zabbix server: Zabbix server performance'

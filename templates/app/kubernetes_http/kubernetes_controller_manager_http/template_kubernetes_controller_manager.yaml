@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -861,7 +861,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
             -
               name: 'total item'
@@ -877,7 +876,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE
                   value: bucket
-                  status: ENABLED
                   discover: DISCOVER
       tags:
         -

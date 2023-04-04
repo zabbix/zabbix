@@ -33,17 +33,14 @@
 
 		_initActionButtons() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-templategroup')) {
-					this._submit(e.target);
-				}
-				else if (e.target.classList.contains('js-update-templategroup')) {
+				if (e.target.classList.contains('js-update-templategroup')) {
 					this._submit(e.target);
 				}
 				else if (e.target.classList.contains('js-clone-templategroup')) {
 					this._clone();
 				}
 				else if (e.target.classList.contains('js-delete-templategroup')) {
-					this._delete();
+					this._delete(e.target);
 				}
 			});
 		}
@@ -79,7 +76,13 @@
 			post(curl.getUrl(), {name: fields.name});
 		}
 
-		_delete() {
+		_delete(button) {
+			const confirm_text = button.getAttribute('confirm');
+
+			if (!confirm(confirm_text)) {
+				return;
+			}
+
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'templategroup.delete');
 			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
@@ -149,7 +152,8 @@
 
 					const message_box = makeMessageBox('bad', messages, title)[0];
 
-					this.form.parentNode.insertBefore(message_box, this.form);
+					clearMessages();
+					addMessage(message_box);
 				})
 				.finally(() => {
 					this._unsetLoading();
