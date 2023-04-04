@@ -1558,6 +1558,16 @@ form {
 			.icon-info {
 				margin-left: 5px;
 			}
+
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.average-bg,
+			&.warning-bg,
+			&.high-bg,
+			&.disaster-bg {
+				padding-left: 5px;
+			}
 		}
 
 		.wrap-multiple-controls {
