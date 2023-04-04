@@ -130,6 +130,9 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 // Monitoring.
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
+// Permissions.
+require_once dirname(__FILE__).'/permissions/testCSRF.php';
+
 // Preprocessing.
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneTemplate.php';
@@ -272,7 +275,6 @@ require_once dirname(__FILE__).'/testUrlParameters.php';
 require_once dirname(__FILE__).'/testUrlUserPermissions.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
-require_once dirname(__FILE__).'/testSID.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -384,6 +386,9 @@ class SeleniumTests {
 
 		// Monitoring.
 		$suite->addTestSuite('testPageMonitoringLatestData');
+
+		// Permissions.
+		$suite->addTestSuite('testCSRF');
 
 		// Preprocessing.
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
@@ -527,7 +532,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testUrlUserPermissions');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testSID');
 
 		return $suite;
 	}
