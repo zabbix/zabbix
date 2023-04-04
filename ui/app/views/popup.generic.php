@@ -450,11 +450,9 @@ switch ($data['popup_type']) {
 		foreach ($data['table_records'] as $d_rule) {
 			foreach ($d_rule['dchecks'] as $d_check) {
 				$name = $d_rule['name'].
-					NAME_DELIMITER.discovery_check2str($d_check['type'], $d_check['key_'], $d_check['ports']);
-
-				if ($d_check['allow_redirect'] == 1) {
-					$name .= ' "allow redirect"';
-				}
+					NAME_DELIMITER.discovery_check2str($d_check['type'], $d_check['key_'], $d_check['ports'],
+						$d_check['allow_redirect']
+					);
 
 				$values = [
 					$options['dstfld1'] => $d_check[$options['srcfld1']]
