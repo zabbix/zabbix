@@ -58,12 +58,10 @@ class CControllerWidgetMapView extends CControllerWidget {
 		}
 
 		if (array_key_exists('sysmapid', $fields)) {
-			$sysmapid = $fields['sysmapid'];
+			$sysmapid =  $fields['sysmapid'];
 		}
 
-		$sysmap_data = CMapHelper::get($sysmapid === null ? [] : [$sysmapid],
-			['unique_id' => $this->getInput('unique_id')])
-		;
+		$sysmap_data = CMapHelper::get(($sysmapid == null) ? [] : [$sysmapid], ['unique_id' => $this->getInput('unique_id')]);
 
 		if ($sysmapid === null || $sysmap_data['id'] < 0) {
 			$error = _('No permissions to referred object or it does not exist!');
