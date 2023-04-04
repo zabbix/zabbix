@@ -32,6 +32,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
+#include "zbxfile.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -70,6 +71,9 @@ static ZBX_METRIC		*commands = NULL;
 static ZBX_METRIC		*commands_local = NULL;
 zbx_vector_ptr_t		key_access_rules;
 static zbx_get_config_int_f	get_config_timeout_cb = NULL;
+static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
+static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
+static zbx_get_config_int_f	get_config_unsafe_user_parameters_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -143,9 +147,14 @@ static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error,
 	return SUCCEED;
 }
 
-void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f)
+void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
+		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
+		zbx_get_config_int_f get_config_unsafe_user_parameters_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
+	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
+	get_config_log_remote_commands_cb = get_config_log_remote_commands_f;
+	get_config_unsafe_user_parameters_cb = get_config_unsafe_user_parameters_f;
 }
 
 /******************************************************************************
@@ -270,6 +279,16 @@ void	zbx_set_metrics(ZBX_METRIC *metrics)
 int	sysinfo_get_config_timeout(void)
 {
 	return get_config_timeout_cb();
+}
+
+int	sysinfo_get_config_log_remote_commands(void)
+{
+	return get_config_log_remote_commands_cb();
+}
+
+int	sysinfo_get_config_unsafe_user_parameters(void)
+{
+	return get_config_unsafe_user_parameters_cb();
 }
 
 void	zbx_init_metrics(void)
@@ -1026,13 +1045,14 @@ void	zbx_test_parameters(void)
 	test_aliases();
 }
 
-static int	zbx_check_user_parameter(const char *param, char *error, int max_error_len)
+static int	zbx_check_user_parameter(const char *param, int config_unsafe_user_parameters, char *error,
+		int max_error_len)
 {
 	const char	suppressed_chars[] = "\\'\"`*?[]{}~$!&;()<>|#@\n", *c;
 	char		*buf = NULL;
 	size_t		buf_alloc = 128, buf_offset = 0;
 
-	if (0 != CONFIG_UNSAFE_USER_PARAMETERS)
+	if (0 != config_unsafe_user_parameters)
 		return SUCCEED;
 
 	for (c = suppressed_chars; '\0' != *c; c++)
@@ -1063,7 +1083,8 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 	return SUCCEED;
 }
 
-static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **out, char *error, int max_error_len)
+static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int config_user_parameters,
+		char **out, char *error, int max_error_len)
 {
 	const char	*pl = cmd, *pr, *tmp;
 	size_t		out_alloc = 0, out_offset = 0;
@@ -1089,8 +1110,11 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
 			{
 				tmp = get_rparam(request, num - 1);
 
-				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, error, max_error_len)))
+				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, config_user_parameters, error,
+						max_error_len)))
+				{
 					break;
+				}
 
 				zbx_strcpy_alloc(out, &out_alloc, &out_offset, tmp);
 			}
@@ -1149,7 +1173,7 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 	}
 
 	/* system.run is not allowed by default except for getting hostname for daemons */
-	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) &&
+	if (1 != get_config_enable_remote_commands_cb() && 0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) &&
 			0 == strcmp(request.key, "system.run"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Remote commands are not enabled."));
@@ -1201,7 +1225,8 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 		{
 			char	*parameters = NULL, error[MAX_STRING_LEN];
 
-			if (FAIL == replace_param(command->test_param, &request, &parameters, error, sizeof(error)))
+			if (FAIL == replace_param(command->test_param, &request, get_config_unsafe_user_parameters_cb(),
+					&parameters, error, sizeof(error)))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 				goto notsupported;
@@ -2035,8 +2060,32 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 	zbx_free(mpoint);
 }
 
-#ifndef _WINDOWS
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+static void	get_fqdn(char **hostname)
+{
+	char			buffer[MAX_STRING_LEN];
+	struct addrinfo		hints = {0};
+	struct addrinfo*	res = NULL;
+
+	buffer[MAX_STRING_LEN - 1] = '\0';
+
+	/* check for successful call to the gethostname and check that data fits in the buffer */
+	if (0 == gethostname(buffer, MAX_STRING_LEN - 1) && MAX_STRING_LEN - 2 > strlen(buffer))
+		*hostname = zbx_strdup(*hostname, buffer);
+
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_flags = AI_CANONNAME;
+
+	if (0 == getaddrinfo(*hostname, 0, &hints, &res))
+		*hostname = zbx_strdup(*hostname, res->ai_canonname);
+
+	if (NULL != res)
+		freeaddrinfo(res);
+
+	zbx_rtrim(*hostname, " .\n\r");
+}
+
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char **hostname)
 {
 	char	*type, *transform;
 
@@ -2049,8 +2098,12 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		{
 			char	*dot;
 
-			if (NULL != (dot = strchr(hostname, '.')))
+			if (NULL != (dot = strchr(*hostname, '.')))
 				*dot = '\0';
+		}
+		else if (0 == strcmp(type, "fqdn"))
+		{
+			get_fqdn(hostname);
 		}
 		else if (0 == strcmp(type, "netbios"))
 		{
@@ -2068,7 +2121,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 	{
 		if (0 == strcmp(transform, "lower"))
 		{
-			zbx_strlower(hostname);
+			zbx_strlower(*hostname);
 		}
 		else
 		{
@@ -2077,7 +2130,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		}
 	}
 
-	SET_STR_RESULT(result, hostname);
+	SET_STR_RESULT(result, *hostname);
 
 	return SUCCEED;
 }

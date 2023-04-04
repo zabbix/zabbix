@@ -56,7 +56,7 @@ void	history_process_item_value_server(const zbx_history_recv_item_t *item, AGEN
 		}
 		else
 		{
-			dc_add_history(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
+			zbx_dc_add_history(item->itemid, item->value_type, item->flags, result, ts, item->state, error);
 			*h_num = 1;
 		}
 	}

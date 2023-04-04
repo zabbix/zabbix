@@ -33,7 +33,8 @@ typedef struct
 }
 zbx_dservice_t;
 
-void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now);
+void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now, zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_update_service(const zbx_db_drule *drule, zbx_uint64_t dcheckid, zbx_db_dhost *dhost,
-		const char *ip, const char *dns, int port, int status, const char *value, int now);
+		const char *ip, const char *dns, int port, int status, const char *value, int now,
+		zbx_add_event_func_t add_event_cb);
 #endif

@@ -77,7 +77,7 @@ static void	DBupdate_lastsize(void)
  ******************************************************************************/
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
-	DC_ITEM			*items = NULL;
+	zbx_dc_item_t		*items = NULL;
 	const char		*regex;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
@@ -92,7 +92,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	um_handle = zbx_dc_open_user_macros();
 
-	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
+	num = zbx_dc_config_get_snmp_items_by_interfaceid(interfaceid, &items);
 
 	itemids = (zbx_uint64_t *)zbx_malloc(itemids, sizeof(zbx_uint64_t) * num);
 	lastclocks = (int *)zbx_malloc(lastclocks, sizeof(int) * num);
@@ -134,7 +134,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		{
 			if ('@' == *regex)
 			{
-				DCget_expressions_by_name(&regexps, regex + 1);
+				zbx_dc_get_expressions_by_name(&regexps, regex + 1);
 
 				if (0 == regexps.values_num)
 				{
@@ -209,13 +209,13 @@ next:
 
 	zbx_free(results);
 
-	DCrequeue_items(itemids, lastclocks, errcodes, num);
+	zbx_dc_requeue_items(itemids, lastclocks, errcodes, num);
 
 	zbx_free(errcodes);
 	zbx_free(lastclocks);
 	zbx_free(itemids);
 
-	DCconfig_clean_items(items, NULL, num);
+	zbx_dc_config_clean_items(items, NULL, num);
 	zbx_free(items);
 
 	zbx_dc_close_user_macros(um_handle);
@@ -247,7 +247,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
 	zbx_timespec(&ts);
 	trap = zbx_dsprintf(trap, "%s%s", begin, end);
 
-	count = DCconfig_get_snmp_interfaceids_by_addr(addr, &interfaceids);
+	count = zbx_dc_config_get_snmp_interfaceids_by_addr(addr, &interfaceids);
 
 	for (i = 0; i < count; i++)
 	{

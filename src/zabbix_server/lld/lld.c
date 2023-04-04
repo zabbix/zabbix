@@ -113,7 +113,7 @@ static void	lld_filter_clean(zbx_lld_filter_t *filter)
 }
 
 static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id, const char *macro,
-		const char *regexp, const char *op, const DC_ITEM *item, char **error)
+		const char *regexp, const char *op, const zbx_dc_item_t *item, char **error)
 {
 	lld_condition_t	*condition;
 
@@ -129,7 +129,7 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
 
 	if ('@' == *condition->regexp)
 	{
-		DCget_expressions_by_name(&condition->regexps, condition->regexp + 1);
+		zbx_dc_get_expressions_by_name(&condition->regexps, condition->regexp + 1);
 
 		if (0 == condition->regexps.values_num)
 		{
@@ -157,7 +157,7 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
  *             error      - [OUT] error message                               *
  *                                                                            *
  ******************************************************************************/
-static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, const DC_ITEM *item, char **error)
+static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, const zbx_dc_item_t *item, char **error)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -475,7 +475,7 @@ static int	filter_evaluate(const zbx_lld_filter_t *filter, const struct zbx_json
 }
 
 static int	lld_override_conditions_load(zbx_vector_lld_override_t *overrides,
-		const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc, const DC_ITEM *item,
+		const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc, const zbx_dc_item_t *item,
 		char **error)
 {
 	size_t			sql_offset = 0;
@@ -609,7 +609,7 @@ static void	lld_dump_overrides(const zbx_vector_lld_override_t *overrides)
 	}
 }
 
-static int	lld_overrides_load(zbx_vector_lld_override_t *overrides, zbx_uint64_t lld_ruleid, const DC_ITEM *item,
+static int	lld_overrides_load(zbx_vector_lld_override_t *overrides, zbx_uint64_t lld_ruleid, const zbx_dc_item_t *item,
 		char **error)
 {
 	zbx_db_result_t		result;
@@ -1086,7 +1086,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	zbx_vector_ptr_t		lld_macro_paths;
 	zbx_lld_filter_t		filter;
 	time_t				now;
-	DC_ITEM				item;
+	zbx_dc_item_t			item;
 	zbx_config_t			cfg;
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_vector_lld_override_t	overrides;
@@ -1102,7 +1102,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 
 	lld_filter_init(&filter);
 
-	DCconfig_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
+	zbx_dc_config_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
 
 	if (SUCCEED != errcode)
 	{
@@ -1205,7 +1205,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 		*error = zbx_strdcat(*error, info);
 out:
 	zbx_audit_flush();
-	DCconfig_clean_items(&item, &errcode, 1);
+	zbx_dc_config_clean_items(&item, &errcode, 1);
 	zbx_free(info);
 	zbx_free(discovery_key);
 

@@ -1057,6 +1057,10 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
@@ -1920,10 +1924,6 @@ select {
 	}
 
 	&:focus + label span {
-		border-color: $form-border-focus-color;
-	}
-
-	&:checked:focus + label span {
 		border-color: $form-border-focus-color;
 	}
 
