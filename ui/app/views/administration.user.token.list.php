@@ -79,7 +79,7 @@ $html_page = (new CHtmlPage())
 	)
 	->addItem($filter);
 
-$token_form = (new CForm('get'))
+$token_form = (new CForm())
 	->addVar('action_src', 'user.token.list')
 	->setName('token_form');
 
