@@ -67,7 +67,8 @@ class testPageReportsActionLog extends CWebTest {
 		}
 
 		// Check that filter set to display Last hour data.
-		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
+		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()
+				->getAttribute('class'));
 
 		// Check data set values in input field.
 		foreach (['From' => 'now-1h', 'To' => 'now'] as $period => $time) {
@@ -113,7 +114,7 @@ class testPageReportsActionLog extends CWebTest {
 
 	public static function getCheckFilterData() {
 		return [
-			// #0
+			// #0.
 			[
 				[
 					'fields' => [
@@ -125,7 +126,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #1
+			// #1.
 			[
 				[
 					'fields' => [
@@ -142,7 +143,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #2
+			// #2.
 			[
 				[
 					'fields' => [
@@ -151,7 +152,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// #3
+			// #3.
 			[
 				[
 					'fields' => [
@@ -160,7 +161,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// #4
+			// #4.
 			[
 				[
 					'fields' => [
@@ -171,7 +172,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #5
+			// #5.
 			[
 				[
 					'fields' => [
@@ -184,7 +185,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #6
+			// #6.
 			[
 				[
 					'fields' => [
@@ -193,7 +194,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// #7
+			// #7.
 			[
 				[
 					'fields' => [
@@ -203,7 +204,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// #8
+			// #8.
 			[
 				[
 					'fields' => [
@@ -215,7 +216,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #9
+			// #9.
 			[
 				[
 					'fields' => [
@@ -227,7 +228,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #10
+			// #10.
 			[
 				[
 					'fields' => [
@@ -243,7 +244,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #11
+			// #11.
 			[
 				[
 					'fields' => [
@@ -295,7 +296,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #12
+			// #12.
 			[
 				[
 					'fields' => ['id:filter_statuses_2' => true],
@@ -304,7 +305,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #13
+			// #13.
 			[
 				[
 					'fields' => ['id:filter_statuses_1' => true],
@@ -320,7 +321,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #14
+			// #14.
 			[
 				[
 					'fields' => ['id:filter_statuses_0' => true],
@@ -329,7 +330,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #15
+			// #15.
 			[
 				[
 					'fields' => [
@@ -342,7 +343,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #16
+			// #16.
 			[
 				[
 					'fields' => [
@@ -364,7 +365,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #17
+			// #17.
 			[
 				[
 					'fields' => [
@@ -378,7 +379,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #18
+			// #18.
 			[
 				[
 					'fields' => [
@@ -388,7 +389,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// #19
+			// #19.
 			[
 				[
 					'fields' => [
@@ -403,7 +404,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #20
+			// #20.
 			[
 				[
 					'fields' => [
@@ -413,7 +414,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// #21
+			// #21.
 			[
 				[
 					'fields' => [
@@ -425,7 +426,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #22
+			// #22.
 			[
 				[
 					'fields' => [
@@ -439,7 +440,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #23
+			// #23.
 			[
 				[
 					'fields' => [
@@ -451,7 +452,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #24
+			// #24.
 			[
 				[
 					'fields' => [
@@ -476,7 +477,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #25
+			// #25.
 			[
 				[
 					'fields' => [
@@ -485,7 +486,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// #26
+			// #26.
 			[
 				[
 					'fields' => [
@@ -499,7 +500,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #27
+			// #27.
 			[
 				[
 					'fields' => [
@@ -529,7 +530,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #28
+			// #28.
 			[
 				[
 					'fields' => [
@@ -543,10 +544,9 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #29
+			// #29.
 			[
 				[
-					'fields' => '',
 					'result' => [
 						['Time' => '2012-02-20 10:01:30'],
 						['Time' => '2012-02-20 10:01:20'],
@@ -561,7 +561,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #30
+			// #30.
 			[
 				[
 					'fields' => [
@@ -603,7 +603,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// #31
+			// #31.
 			[
 				[
 					'fields' => [
@@ -612,7 +612,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// #32
+			// #32.
 			[
 				[
 					'fields' => [
@@ -627,7 +627,7 @@ class testPageReportsActionLog extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #33
+			// #33.
 			[
 				[
 					'fields' => [
@@ -636,10 +636,9 @@ class testPageReportsActionLog extends CWebTest {
 					'result' => []
 				]
 			],
-			// 34
+			// 34.
 			[
 				[
-					'fields' => '',
 					'time' => [
 						'from' => '2020-08-15 00:00:00',
 						'to' => '2020-08-15 01:0:00'
@@ -650,7 +649,7 @@ class testPageReportsActionLog extends CWebTest {
 					]
 				]
 			],
-			// 35
+			// 35.
 			[
 				[
 					'fields' => [
@@ -678,37 +677,42 @@ class testPageReportsActionLog extends CWebTest {
 				'filter_messages=&filter_set=1')->waitUntilReady();
 
 		// Filter by time.
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+
 		if (array_key_exists('time', $data)) {
-			if ($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists()) {
-				$this->query('id:ui-id-1')->one()->click();
+			// Enable time tab.
+			$time_tab = $this->query('xpath:.//li[@aria-labelledby="ui-id-1" and @aria-selected="false"]');
+			if ($time_tab->exists()) {
+				$time_tab->one()->click();
 			}
 
 			foreach ($data['time'] as $id => $value) {
-				$this->query("xpath://input[@id=".CXPathHelper::escapeQuotes($id)."]")->one()->fill($value);
+				$form->query('id', $id)->one()->fill($value);
 			}
 
-			$this->query('id:apply')->one()->click();
+			$form->query('id:apply')->one()->click();
 			$this->page->waitUntilReady();
 		}
 
-		// If the filter is not visible - enable it.
-		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
-		}
-
 		// Fill filter.
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$form->fill($data['fields'])->submit();
-		$this->page->waitUntilReady();
+		$filter_tab = $this->query('xpath:.//li[@aria-labelledby="ui-id-2" and @aria-selected="false"]');
 
-		// Check table result.
-		if (empty($data['result'])) {
-			$this->assertTableData();
-			$this->assertTableStats(0);
+		if (array_key_exists('fields', $data)) {
+			// If the filter is not visible - enable it.
+			if ($filter_tab->exists()) {
+				$filter_tab->one()->click();
+			}
+
+			$form->fill($data['fields'])->submit();
 		}
-		else {
-			$this->assertTableHasData($data['result']);
-			$this->assertTableStats(count($data['result']));
+
+		$this->page->waitUntilReady();
+		$this->assertTableHasData($data['result']);
+		$this->assertTableStats(count($data['result']));
+
+		// Reset filter for the next checks.
+		if ($filter_tab->exists()) {
+			$filter_tab->one()->click();
 		}
 
 		$form->query('button:Reset')->one()->click();
@@ -725,9 +729,9 @@ class testPageReportsActionLog extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$statuses = ['Executed' => 'green', 'In progress:' => 'yellow', 'Failed' => 'red', 'Sent' => 'green'];
 
-		foreach ( $statuses as $status => $color) {
-			$this->assertEquals($color,
-					$table->query("xpath:(//td/span[text()=".CXPathHelper::escapeQuotes($status)."])[1]")->one()->getAttribute('class')
+		foreach ($statuses as $status => $color) {
+			$this->assertEquals($color, $table->query("xpath:(//td/span[text()=".CXPathHelper::escapeQuotes($status)."])[1]")
+					->one()->getAttribute('class')
 			);
 		}
 
@@ -750,8 +754,9 @@ class testPageReportsActionLog extends CWebTest {
 				'filter_messages=&filter_set=1')->waitUntilReady();
 
 		// If the filter is not visible - enable it.
-		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
+		$filter_tab = $this->query('xpath:.//li[@aria-labelledby="ui-id-2" and @aria-selected="false"]');
+		if ($filter_tab->exists()) {
+			$filter_tab->one()->click();
 		}
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
