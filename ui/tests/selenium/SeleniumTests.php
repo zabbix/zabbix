@@ -132,6 +132,7 @@ require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
 // Permissions.
 require_once dirname(__FILE__).'/permissions/testCSRF.php';
+require_once dirname(__FILE__).'/permissions/testTagBasedPermissions.php';
 
 // Preprocessing.
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
@@ -265,7 +266,6 @@ require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
 require_once dirname(__FILE__).'/testMultiselect.php';
-require_once dirname(__FILE__).'/testTagBasedPermissions.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testTriggerDependencies.php';
@@ -389,6 +389,7 @@ class SeleniumTests {
 
 		// Permissions.
 		$suite->addTestSuite('testCSRF');
+		$suite->addTestSuite('testTagBasedPermissions');
 
 		// Preprocessing.
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
@@ -522,7 +523,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
 		$suite->addTestSuite('testMultiselect');
-		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testTemplateInheritance');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testTriggerDependencies');
