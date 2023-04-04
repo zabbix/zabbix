@@ -360,7 +360,7 @@ void	zbx_mock_test_entry(void **state)
 			else
 			{
 				/* history_value will contain duktape bytecode if step is a script */
-				if (ZBX_VARIANT_NONE != history_value.type && ZBX_PREPROC_SCRIPT != op.type)
+				if (ZBX_VARIANT_NONE != history_value.type && ZBX_PREPROC_SCRIPT != step.type)
 					fail_msg("expected empty history, but got %s", zbx_variant_value_desc(&history_value));
 			}
 		}
