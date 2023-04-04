@@ -26,6 +26,7 @@
 #include "zabbix.h"
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
+#define ZBX_ES_LOG_MSG_LIMIT	8000
 
 /******************************************************************************
  *                                                                            *
@@ -61,9 +62,9 @@ static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_zabbix_status                                                 *
+ * Function: es_zabbix_log                                                    *
  *                                                                            *
- * Purpose: Curlzabbix.Status method                                          *
+ * Purpose: Zabbix.log method                                                 *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_zabbix_log(duk_context *ctx)
@@ -81,10 +82,17 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 		zbx_replace_invalid_utf8(message);
 	}
 
-	zabbix_log(level, "%s", message);
-
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
+
+	if (ZBX_ES_LOG_MSG_LIMIT < env->logged_msgs)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,
+				"maximum count of logged messages was reached");
+		goto out;
+	}
+
+	zabbix_log(level, "%s", message);
 
 	if (NULL == env->json)
 		goto out;
@@ -102,6 +110,7 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 	zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(env->json);
 out:
+	env->logged_msgs++;
 	zbx_free(message);
 
 	if (-1 != err_index)
