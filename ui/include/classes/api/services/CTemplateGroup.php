@@ -410,7 +410,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		self::checkDuplicates($groups);
-		self::checkAndAddUuid($groups, []);
+		self::checkAndAddUuid($groups);
 	}
 
 	/**
@@ -422,7 +422,7 @@ class CTemplateGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['groupid'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
 			'uuid' => 		['type' => API_UUID],
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_TG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
@@ -433,7 +433,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		$db_groups = $this->get([
-			'output' => ['groupid', 'name', 'uuid'],
+			'output' => ['groupid', 'name'],
 			'groupids' => array_column($groups, 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -444,7 +444,6 @@ class CTemplateGroup extends CApiService {
 		}
 
 		self::checkDuplicates($groups, $db_groups);
-		self::checkAndAddUuid($groups, $db_groups);
 	}
 
 	/**
@@ -543,42 +542,28 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $groups  [IN/OUT]
-	 * @param array $db_groups
+	 * @param array $groups_to_create  [IN/OUT]
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$groups, array $db_groups): void {
-		$new_groups_uuids = [];
-
-		foreach ($groups as &$group) {
-			$db_uuid = array_key_exists('groupid', $group)
-					&& array_key_exists($group['groupid'], $db_groups)
-				? $db_groups[$group['groupid']]['uuid']
-				: '';
-
+	private static function checkAndAddUuid(array &$groups_to_create): void {
+		foreach ($groups_to_create as &$group) {
 			if (!array_key_exists('uuid', $group)) {
-				$group['uuid'] = $db_uuid !== '' ? $db_uuid : generateUuidV4();
-			}
-
-			if ($group['uuid'] !== $db_uuid) {
-				$new_groups_uuids[] = $group['uuid'];
+				$group['uuid'] = generateUuidV4();
 			}
 		}
 		unset($group);
 
-		if ($new_groups_uuids) {
-			$db_uuid = DB::select('hstgrp', [
-				'output' => ['uuid'],
-				'filter' => ['uuid' => $new_groups_uuids, 'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP],
-				'limit' => 1
-			]);
+		$db_uuid = DB::select('hstgrp', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => array_column($groups_to_create, 'uuid'), 'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP],
+			'limit' => 1
+		]);
 
-			if ($db_uuid) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-				);
-			}
+		if ($db_uuid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+			);
 		}
 	}
 
