@@ -28,9 +28,9 @@ static BOOL	(__stdcall *GlobalMemoryStatusEx)(LPMEMORYSTATUSEX) = NULL;
 static BOOL	(__stdcall *GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD) =
 			NULL;
 
-GetGuiResources_t	zbx_get_GetGuidResources(void)
+GetGuiResources_t	zbx_get_GetGuiResources(void)
 {
-	return GetGuidResources;
+	return GetGuiResources;
 }
 
 GetProcessIoCounters_t	zbx_get_GetProcessIoCounters(void)

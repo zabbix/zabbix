@@ -125,7 +125,7 @@ typedef BOOL	(__stdcall *GetPerformanceInfo_t)(PPERFORMANCE_INFORMATION, DWORD);
 typedef BOOL	(__stdcall *GlobalMemoryStatusEx_t)(LPMEMORYSTATUSEX);
 typedef BOOL	(__stdcall *GetFileInformationByHandleEx_t)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
 
-GetGuiResources_t		zbx_get_GetGuidResources(void);
+GetGuiResources_t		zbx_get_GetGuiResources(void);
 GetProcessIoCounters_t		zbx_get_GetProcessIoCounters(void);
 GetPerformanceInfo_t		zbx_get_GetPerformanceInfo(void);
 GlobalMemoryStatusEx_t		zbx_get_GlobalMemoryStatusEx(void);
