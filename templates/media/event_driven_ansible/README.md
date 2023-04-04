@@ -13,7 +13,7 @@ sources:
       host: 0.0.0.0
       port: 5001
 ```
-3\. Set necessary actions in rules section. As example you can use:
+3\. Set necessary actions in the rules section. As an example you can use:
 ```
 ---
 - name: Zabbix Test rulebook
@@ -39,19 +39,19 @@ ansible-rulebook --rulebook test-rulebook.yml -i inventory.yml --verbose
 ## Setting up Zabbix Webhook
 
 The configuration consists of a _media type_ in Zabbix which will invoke a webhook to send alerts to Event-Driven Ansible.
-To utilize the media type, we will create a Zabbix user to represent Event-Driven Ansible. We will then create an alert action to notify the user via this media type whenever a problem is detected.
+To utilize the media type, you need to create a Zabbix user to represent Event-Driven Ansible. Then, create an alert action to notify the user via this media type whenever a problem is detected.
 
 > Note: only trigger-based and only problem events are currently supported
 
 ## Create the Event-Driven Ansible media type
 
-1\. Go to **Alerts** tab.
+1\. In the *Alerts* menu section, select *Media types*.
 
-2\. Under Alerts, go to the **Media types** page and click the **Import** button.
+2\. Click on the **Import** button in the upper right corner.
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
-3\. Select the Import file [media_event_driven_ansible.yaml](media_event_driven_ansible.yaml) and click **Import** at the bottom to import the Event-Driven Ansible media type.
+3\. Select the file [media_event_driven_ansible.yaml](media_event_driven_ansible.yaml) and press **Import** at the bottom.
 
 ## Create the Event-Driven Ansible user for alerting
 
@@ -65,17 +65,23 @@ To utilize the media type, we will create a Zabbix user to represent Event-Drive
 
 3\. Navigate to the **Media** tab and click on the **Add** button inside of the Media box.
 
-4\. Add Media with the **Event-Driven Ansible**. The "Send to" field should be filled as a pair of ip and destination port in the format `xxx.xxx.xxx.xxx:port`. Save user setting.
+4\. Configure the media type:
+ - Set *Type* to *Event-Driven Ansible*
+ - In the *Send to* field, specify the IP address and destination port in the format `xxx.xxx.xxx.xxx:port`.
+ - Press Add to save the media type.
 
 [![](images/thumb.3.png?raw=true)](images/3.png)
 
+5\. Press Add in the User configuration form to save the user.
+
 > Note: Because each new rulebook requires a separate port, you have to create a separate user for each rulebook, specifying the ip:port.
 
-5\. Create action. Go to **Alerts**. Choose **Actions** > **Trigger actions** and create action for sending events to Event-Driven Ansible.
+6\. Create an action:
+ - in the *Alerts* menu, go to *Actions* -> *Trigger actions* and press **Create action** in the upper right corner.
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
-6\. Start getting alerts! You have made it!
+7\. Start getting alerts! You have made it!
 
 For more information see [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications), [Event-Driven Ansible](https://github.com/ansible/eda-server/blob/main/README.md) and [Ansible-Rulebook](https://ansible-rulebook.readthedocs.io/en/latest/getting_started.html) documentations.
 
