@@ -941,6 +941,10 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
