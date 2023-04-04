@@ -1,1 +1,1 @@
-A......... [ZBX-19375] fixed api validation of uuid field for graph, host, httptest, item, template and trigger create and update methods (miks)
+A......... [ZBX-19375] prevented the ability to set a duplicate value for the uuid parameter when updating any of template entities; added possibility to update the uuid parameter for the Service API (vmaksimovs)
