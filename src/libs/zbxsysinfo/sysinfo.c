@@ -293,8 +293,13 @@ int	sysinfo_get_config_unsafe_user_parameters(void)
 
 void	zbx_init_metrics(void)
 {
+#if (defined(WITH_AGENT_METRICS) || defined(WITH_COMMON_METRICS) || defined(WITH_HTTP_METRICS) ||	\
+	defined(WITH_SPECIFIC_METRICS) || defined(WITH_SIMPLE_METRICS))
 	int	i;
 	char	error[MAX_STRING_LEN];
+#elif (defined(WITH_HOSTNAME_METRIC))
+	char	error[MAX_STRING_LEN];
+#endif
 
 	zbx_init_key_access_rules();
 

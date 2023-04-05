@@ -53,7 +53,6 @@
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
 #include "rtc/rtc_proxy.h"
-#include "../zabbix_server/availability/avail_manager.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
@@ -337,7 +336,7 @@ static int	config_allow_root	= 0;
 
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
-zbx_vector_ptr_t	zbx_addrs;
+static zbx_vector_addr_ptr_t	config_server_addrs;
 
 /* proxy has no any events processing */
 static const zbx_events_funcs_t	events_cbs = {
@@ -722,12 +721,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		exit(EXIT_FAILURE);
 }
 
-static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	proxy_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	ZBX_UNUSED(hostnames);
 	ZBX_UNUSED(data);
 
-	zbx_addr_copy(&zbx_addrs, addrs);
+	zbx_addr_copy(&config_server_addrs, addrs);
 
 	return SUCCEED;
 }
@@ -963,7 +962,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	zbx_validate_config(task);
 
-	zbx_vector_ptr_create(&zbx_addrs);
+	zbx_vector_addr_ptr_create(&config_server_addrs);
 
 	if (ZBX_PROXYMODE_PASSIVE != config_proxymode)
 	{
@@ -1270,8 +1269,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 								config_startup_time, config_unavailable_delay};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
-								get_program_type, zbx_config_timeout};
-	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
+								get_program_type, zbx_config_timeout,
+								&config_server_addrs, CONFIG_HOSTNAME, CONFIG_SOURCE_IP,
+								CONFIG_PROXYCONFIG_FREQUENCY};
+	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+								&config_server_addrs, CONFIG_SOURCE_IP, CONFIG_HOSTNAME,
+								CONFIG_PROXYDATA_FREQUENCY};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands};
@@ -1588,7 +1591,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
-				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;

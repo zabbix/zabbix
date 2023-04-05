@@ -1532,9 +1532,9 @@ footer {
   .dashboard-widget .msg-warning {
     margin: 0 10px; }
 
-.dashboard-grid-widget-contents .list-table th:first-child, .dashboard-grid-widget-contents .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
+.dashboard-grid-widget-contents .list-table th:first-child, .dashboard-grid-widget-contents .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child {
   padding-left: 10px; }
-.dashboard-grid-widget-contents .list-table th:last-child, .dashboard-grid-widget-contents .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+.dashboard-grid-widget-contents .list-table th:last-child, .dashboard-grid-widget-contents .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child {
   padding-right: 10px; }
 
 .dashboard-widget-head {
@@ -3814,6 +3814,8 @@ form.is-loading {
 .cell {
   display: table-cell;
   vertical-align: top; }
+  .cell.expression-cell {
+    line-height: 24px; }
   .cell:last-child .dashboard-widget {
     margin: 0 0 10px; }
 
@@ -4143,6 +4145,8 @@ form.is-loading {
         padding-right: 0; }
       .table-forms .table-forms-td-right td .icon-info {
         margin-left: 5px; }
+      .table-forms .table-forms-td-right td.na-bg, .table-forms .table-forms-td-right td.normal-bg, .table-forms .table-forms-td-right td.info-bg, .table-forms .table-forms-td-right td.average-bg, .table-forms .table-forms-td-right td.warning-bg, .table-forms .table-forms-td-right td.high-bg, .table-forms .table-forms-td-right td.disaster-bg {
+        padding-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {

@@ -32,6 +32,7 @@
 #include "ipmi.h"
 #include "../poller/poller.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"

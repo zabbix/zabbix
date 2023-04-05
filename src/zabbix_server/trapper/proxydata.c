@@ -27,7 +27,6 @@
 #include "zbxnix.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
-#include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "../taskmanager/taskmanager.h"

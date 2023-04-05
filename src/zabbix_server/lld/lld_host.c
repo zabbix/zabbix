@@ -22,7 +22,7 @@
 
 #include "../db_lengths.h"
 #include "log.h"
-#include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
 #include "zbxnum.h"
@@ -2814,7 +2814,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, host->hostid, host->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host->hostid, parent_hostid, host_proto);
-			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, INTERFACE_AVAILABLE_UNKNOWN);
+			zbx_db_insert_add_values(&db_insert_host_rtdata, host->hostid, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
 
 			if (HOST_INVENTORY_DISABLED != host->inventory_mode)
 			{
