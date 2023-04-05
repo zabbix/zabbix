@@ -54,10 +54,14 @@ class WidgetForm extends CWidgetForm {
 				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
-					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
-					TAG_EVAL_TYPE_OR => _('Or')
-				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
+				(new CWidgetFieldRadioButtonList(
+					'evaltype',
+					$this->isTemplateDashboard() ? _('Problem tags') : _('Tags'),
+					[
+						TAG_EVAL_TYPE_AND_OR => _('And/Or'),
+						TAG_EVAL_TYPE_OR => _('Or')
+					]
+				))->setDefault(TAG_EVAL_TYPE_AND_OR)
 			)
 			->addField(
 				new CWidgetFieldTags('tags')
@@ -66,10 +70,14 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('style', _('Host location'), [
-					STYLE_LEFT => _('Left'),
-					STYLE_TOP => _('Top')
-				]))->setDefault(STYLE_LEFT)
+				(new CWidgetFieldRadioButtonList(
+					'style',
+					$this->isTemplateDashboard() ? _('Host location') : _('Hosts location'),
+					[
+						STYLE_LEFT => _('Left'),
+						STYLE_TOP => _('Top')
+					]
+				))->setDefault(STYLE_LEFT)
 			);
 	}
 }

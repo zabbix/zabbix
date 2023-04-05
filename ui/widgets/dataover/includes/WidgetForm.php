@@ -59,10 +59,14 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('style', _('Host location'), [
-					STYLE_LEFT => _('Left'),
-					STYLE_TOP => _('Top')
-				]))->setDefault(STYLE_LEFT)
+				(new CWidgetFieldRadioButtonList(
+					'style',
+					$this->isTemplateDashboard() ? _('Host location') : _('Hosts location'),
+					[
+						STYLE_LEFT => _('Left'),
+						STYLE_TOP => _('Top')
+					]
+				))->setDefault(STYLE_LEFT)
 			);
 	}
 }

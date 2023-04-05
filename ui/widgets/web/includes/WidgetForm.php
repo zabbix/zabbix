@@ -60,7 +60,10 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldTags('tags')
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('maintenance', _('Show data in maintenance')))->setDefault(1)
+				(new CWidgetFieldCheckBox(
+					'maintenance',
+					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
+				))->setDefault(1)
 			);
 	}
 }
