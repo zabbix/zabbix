@@ -82,8 +82,7 @@ int		zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value
 void		*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
 zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 
-int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, int dbl_precision,
-				char **errmsg);
+int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
 
 ZBX_VECTOR_DECL(var, zbx_variant_t)
 

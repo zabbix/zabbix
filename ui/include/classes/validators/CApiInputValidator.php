@@ -1855,8 +1855,6 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateNumeric($rule, &$data, $path, &$error) {
-		global $DB;
-
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (is_int($data)) {
@@ -1887,24 +1885,10 @@ class CApiInputValidator {
 
 		$value = $number_parser->calcValue();
 
-		if ($DB['DOUBLE_IEEE754']) {
-			if (abs($value) > ZBX_FLOAT_MAX) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+		if (abs($value) > ZBX_FLOAT_MAX) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 
-				return false;
-			}
-		}
-		else {
-			if (abs($value) >= 1E+16) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
-
-				return false;
-			}
-			elseif ($value != round($value, 4)) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number has too many fractional digits'));
-
-				return false;
-			}
+			return false;
 		}
 
 		// Remove leading zeros.
