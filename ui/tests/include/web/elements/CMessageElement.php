@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Global message element.
  */
@@ -26,8 +27,8 @@ class CMessageElement extends CElement {
 	/**
 	 * Simplified selector for message element that can be located directly on page.
 	 *
-	 * @param sting   $selector    message element search area
-	 * @param boolean $strict      absolute or relative path to message element
+	 * @param string|CElement    $selector    message element search area
+	 * @param boolean            $strict      absolute or relative path to message element
 	 *
 	 * @return CMessageElement
 	 */

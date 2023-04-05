@@ -188,7 +188,7 @@ class testDashboardURLWidget extends CWebTest {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form = $dialog->asForm();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -387,8 +387,7 @@ class testDashboardURLWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget(self::$update_widget)->edit();
-		$form->submit();
+		$form = $dashboard->getWidget(self::$update_widget)->edit()->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 
@@ -422,7 +421,7 @@ class testDashboardURLWidget extends CWebTest {
 				? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
 				: $dashboard->edit()->addWidget()->asForm();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -530,7 +529,7 @@ class testDashboardURLWidget extends CWebTest {
 		else {
 			$form = $dashboard->addWidget()->asForm();
 
-			if ($form->getField('Type') !== 'URL') {
+			if ($form->getField('Type')->getText() !== 'URL') {
 				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 			}
 		}
@@ -669,7 +668,7 @@ class testDashboardURLWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget(self::$default_widget)->edit();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -712,6 +711,7 @@ class testDashboardURLWidget extends CWebTest {
 
 			// Verifies that host in widget can or can't be updated regarding 'Use iframe sandboxing' state.
 			$this->assertFalse($this->query('class:msg-good')->one(false)->isVisible($state));
+
 			// After successful host update, the page is redirected to the list of hosts where Update button isn't visible.
 			$this->assertTrue($this->query('button:Update')->one(false)->isVisible($state));
 			$this->page->switchTo();
@@ -744,6 +744,7 @@ class testDashboardURLWidget extends CWebTest {
 
 	/**
 	 * Modify the URI scheme validation rules and check the result for the URL type in Widget form.
+	 * TODO: widget name should be changed after ZBX-22192 fix.
 	 */
 	public function testDashboardURLWidget_ValidateUriSchemes() {
 		$invalid_schemes = ['dns://zabbix.com', 'message://zabbix.com'];

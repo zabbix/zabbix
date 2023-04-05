@@ -79,6 +79,11 @@ class CElementQuery implements IWaitable {
 	const WAIT_ITERATION = 50;
 
 	/**
+	 * Timeout in seconds.
+	 */
+	const WAIT_TIMEOUT = 20;
+
+	/**
 	 * Element selector.
 	 *
 	 * @var WebDriverBy
@@ -313,12 +318,15 @@ class CElementQuery implements IWaitable {
 	 *
 	 * @return WebDriverWait
 	 */
-	public static function wait($timeout = 20, $iteration = null) {
+	public static function wait($timeout = null, $iteration = null) {
 		if ($iteration === null) {
 			$iteration = self::WAIT_ITERATION;
 		}
+		if ($timeout === null) {
+			$timeout = self::WAIT_TIMEOUT;
+		}
 
-		return static::getDriver()->wait($timeout, self::WAIT_ITERATION);
+		return static::getDriver()->wait($timeout, $iteration);
 	}
 
 	/**
@@ -336,8 +344,7 @@ class CElementQuery implements IWaitable {
 		}
 
 		$callable = call_user_func_array([$target, CElementFilter::getConditionCallable($condition)], $params);
-		$wait = forward_static_call_array([get_class(), 'wait'], $timeout !== null ? [$timeout] : []);
-		$wait->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
+		self::wait($timeout)->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
 	}
 
 	/**
