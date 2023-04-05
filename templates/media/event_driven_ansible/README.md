@@ -54,9 +54,9 @@ To utilize the media type, you need to create a Zabbix user to represent Event-D
 
 ## Create the Event-Driven Ansible user for alerting
 
-1\. Go to **Administration** tab.
+1\. In the *Administration* menu section, select *Users*.
 
-2\. Under Administration, go to the **Users** page and click **Create user**. Fill in the details of this new user.
+2\. Click on the **Create user** button in the upper right corner. Fill in the details of this new user.
 
 [![](images/thumb.2.png?raw=true)](images/2.png)
 
@@ -75,8 +75,7 @@ To utilize the media type, you need to create a Zabbix user to represent Event-D
 
 > Note: Because each new rulebook requires a separate port, you have to create a separate user for each rulebook, specifying the ip:port.
 
-6\. Create an action:
- - In the *Configuration* menu, go to *Actions* -> *Trigger actions* and press **Create action** in the upper right corner.
+6\. Use Event-Driven Ansible user in any [actions](https://www.zabbix.com/documentation/6.0/en/manual/config/notifications/action) of your choice.
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
