@@ -277,7 +277,8 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 static int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session, ssize_t err)
 {
 	zbx_pollfd_t	pd;
-	int		ret, event;
+	int		ret;
+	short		event;
 
 	ZBX_UNUSED(err);
 
@@ -318,7 +319,8 @@ static int	tls_is_nonblocking_error(ssize_t err)
 static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 {
 	zbx_pollfd_t	pd;
-	int		ret, event;
+	int		ret;
+	short		event;
 
 	ZBX_UNUSED(ctx);
 
