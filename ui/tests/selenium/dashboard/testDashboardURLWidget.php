@@ -387,7 +387,7 @@ class testDashboardURLWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget(self::$update_widget)->edit()->submit();
+		$dashboard->getWidget(self::$update_widget)->edit()->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 
