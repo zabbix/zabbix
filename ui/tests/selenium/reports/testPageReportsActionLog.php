@@ -136,7 +136,7 @@ class testPageReportsActionLog extends CWebTest {
 						['Action' => 'Trigger action 2'],
 						['Action' => 'Trigger action 2'],
 						['Action' => 'Trigger action 2'],
-						['Action' => 'Trigger action 2'],
+						['Action' => 'Trigger action 2']
 					]
 				]
 			],
@@ -289,7 +289,7 @@ class testPageReportsActionLog extends CWebTest {
 							'Action' => 'Trigger action 2',
 							'Media type' => 'Email',
 							'Recipient' => "Admin (Zabbix Administrator)\nigor.danoshaites@zabbix.com"
-						],
+						]
 					]
 				]
 			],
@@ -554,7 +554,7 @@ class testPageReportsActionLog extends CWebTest {
 						['Time' => '2012-02-20 10:00:30'],
 						['Time' => '2012-02-20 10:00:20'],
 						['Time' => '2012-02-20 10:00:10'],
-						['Time' => '2012-02-20 10:00:00'],
+						['Time' => '2012-02-20 10:00:00']
 					]
 				]
 			],
