@@ -532,7 +532,7 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n)
 }
 
 #ifdef HAVE_MYSQL
-static size_t	get_string_field_size(const ZBX_FIELD *field)
+static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
 	switch(field->type)
 	{
