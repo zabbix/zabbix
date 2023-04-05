@@ -147,7 +147,7 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 #undef HAVE_NO_SSH_OPTIONS
 
 /* example ssh.run["ls /"] */
-int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout)
 {
 	ssh_session	session;
 	ssh_channel	channel;
@@ -167,6 +167,8 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 
 		goto close;
 	}
+
+	zbx_alarm_on(timeout);
 
 	/* set blocking mode on session */
 	ssh_set_blocking(session, 1);
@@ -437,6 +439,9 @@ session_free:
 close:
 	zbx_free(publickey);
 	zbx_free(privatekey);
+
+	zbx_alarm_off();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

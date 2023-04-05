@@ -433,7 +433,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_dc_free_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);
@@ -836,7 +836,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_json_free(&json);
 
@@ -933,7 +933,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 		zbx_json_close(&json);
 	}
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_comms->config_timeout);
 	ret = SUCCEED;
 param_error:
 	zbx_json_free(&json);
@@ -1247,10 +1247,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
 		zbx_process_history_data(&item, &av, &errcode, 1, NULL);
 
-		zbx_alarm_on(config_comms->config_timeout);
-		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))
+		if (SUCCEED != zbx_tcp_send_ext(sock, "OK", ZBX_CONST_STRLEN("OK"), 0, 0, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
-		zbx_alarm_off();
 	}
 
 	return ret;

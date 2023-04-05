@@ -183,8 +183,6 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
 
-		zbx_alarm_on(config_timeout);
-
 		switch (dcheck->type)
 		{
 			/* simple checks */
@@ -246,7 +244,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, &result) &&
+					if (SUCCEED == get_value_agent(&item, config_timeout, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -324,6 +322,8 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 				}
 				break;
 			case SVC_ICMPPING:
+				zbx_alarm_on(config_timeout);
+
 				memset(&host, 0, sizeof(host));
 				host.addr = strdup(ip);
 
@@ -331,12 +331,12 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 					ret = FAIL;
 
 				zbx_free(host.addr);
+
+				zbx_alarm_off();
 				break;
 			default:
 				break;
 		}
-
-		zbx_alarm_off();
 	}
 	zbx_free_agent_result(&result);
 

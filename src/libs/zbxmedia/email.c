@@ -499,7 +499,7 @@ static int	send_smtp_helo_plain(const char *addr, const char *helo, zbx_socket_t
 		zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", helo_parsed);
 	}
 
-	if (-1 == write(s->socket, cmd, strlen(cmd)))
+	if (-1 == zbx_tcp_send_raw(s, cmd))
 	{
 		zbx_snprintf(*error, max_error_len, "error sending HELO to mailserver: %s",
 				zbx_strerror(errno));
@@ -543,11 +543,9 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	const char	*response;
 
-	zbx_alarm_on(timeout);
-
 	/* connect to and receive an initial greeting from SMTP server */
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, smtp_port, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL,
+	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, smtp_port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL,
 			NULL))
 	{
 		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
@@ -581,7 +579,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	{
 		zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", ((zbx_mailaddr_t *)from_mails->values[i])->addr);
 
-		if (-1 == write(s.socket, cmd, strlen(cmd)))
+		if (-1 == zbx_tcp_send_raw(&s, cmd))
 		{
 			zbx_snprintf(error, max_error_len, "error sending MAIL FROM to mailserver: %s", zbx_strerror(errno));
 			goto close;
@@ -606,7 +604,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	{
 		zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", ((zbx_mailaddr_t *)to_mails->values[i])->addr);
 
-		if (-1 == write(s.socket, cmd, strlen(cmd)))
+		if (-1 == zbx_tcp_send_raw(&s, cmd))
 		{
 			zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
 			goto close;
@@ -631,7 +629,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	zbx_snprintf(cmd, sizeof(cmd), "DATA\r\n");
 
-	if (-1 == write(s.socket, cmd, strlen(cmd)))
+	if (-1 == zbx_tcp_send_raw(&s, cmd))
 	{
 		zbx_snprintf(error, max_error_len, "error sending DATA to mailserver: %s", zbx_strerror(errno));
 		goto close;
@@ -664,7 +662,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	zbx_snprintf(cmd, sizeof(cmd), "\r\n.\r\n");
 
-	if (-1 == write(s.socket, cmd, strlen(cmd)))
+	if (-1 == zbx_tcp_send_raw(&s, cmd))
 	{
 		zbx_snprintf(error, max_error_len, "error sending . to mailserver: %s", zbx_strerror(errno));
 		goto close;
@@ -686,7 +684,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	zbx_snprintf(cmd, sizeof(cmd), "QUIT\r\n");
 
-	if (-1 == write(s.socket, cmd, strlen(cmd)))
+	if (-1 == zbx_tcp_send_raw(&s, cmd))
 	{
 		zbx_snprintf(error, max_error_len, "error sending QUIT to mailserver: %s", zbx_strerror(errno));
 		goto close;
@@ -696,8 +694,6 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 close:
 	zbx_tcp_close(&s);
 out:
-	zbx_alarm_off();
-
 	return ret;
 #undef OK_220
 #undef OK_251

@@ -1736,7 +1736,7 @@ out:
 	return line;
 }
 
-static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
+ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	ssize_t	res;

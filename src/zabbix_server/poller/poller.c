@@ -298,8 +298,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_agent(item, result);
+			res = get_value_agent(item, config_comms->config_timeout, result);
 			zbx_alarm_off();
 			break;
 		case ITEM_TYPE_SIMPLE:
@@ -324,18 +323,14 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_ssh(item, result);
-			zbx_alarm_off();
+			res = get_value_ssh(item, config_comms->config_timeout, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_telnet(item, result);
-			zbx_alarm_off();
+			res = get_value_telnet(item, config_comms->config_timeout, result);
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);

@@ -39,7 +39,7 @@ static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 #define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(proxy_lock)
 
 int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
-		int upload_status)
+		int upload_status, int config_timeout)
 {
 	struct zbx_json		json;
 	zbx_vector_tm_task_t	tasks;
@@ -78,7 +78,7 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 	if (0 != proxy->auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
 
-	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), 0, flags, 0)))
+	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), 0, flags, config_timeout)))
 	{
 		if (0 != tasks.values_num)
 			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_INPROGRESS);
@@ -191,7 +191,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zb
 		goto out;
 	}
 reply:
-	zbx_send_proxy_data_response(&proxy, sock, error, ret, upload_status);
+	zbx_send_proxy_data_response(&proxy, sock, error, ret, upload_status, config_timeout);
 	responded = 1;
 out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */

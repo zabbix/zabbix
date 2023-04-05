@@ -225,7 +225,7 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 }
 
 /* example ssh.run["ls /"] */
-int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout)
 {
 	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
@@ -250,12 +250,14 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 		goto session_free;
 	}
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, timeout,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));
 		goto session_free;
 	}
+
+	zbx_alarm_on(timeout);
 
 	/* set blocking mode on session */
 	libssh2_session_set_blocking(session, 1);
@@ -473,6 +475,9 @@ session_free:
 ret_label:
 	zbx_free(publickey);
 	zbx_free(privatekey);
+
+	zbx_alarm_off();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
