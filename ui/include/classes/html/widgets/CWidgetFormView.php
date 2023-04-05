@@ -153,10 +153,6 @@ class CWidgetFormView {
 	 * @throws JsonException
 	 */
 	public function show(): void {
-		$doc_url = CHtmlUrlValidator::validate($this->data['url'], ['allow_scripts'=> false]) === false
-			? CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT)
-			: $this->data['url'];
-
 		$output = [
 			'header' => $this->data['unique_id'] !== null ? _('Edit widget') : _('Add widget'),
 			'body' => implode('', [
@@ -181,7 +177,9 @@ class CWidgetFormView {
 					'action' => 'ZABBIX.Dashboard.applyWidgetProperties();'
 				]
 			],
-			'doc_url' => $doc_url,
+			'doc_url' => $this->data['url'] === ''
+				? CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT)
+				: $this->data['url'],
 			'data' => [
 				'original_properties' => [
 					'type' => $this->data['type'],

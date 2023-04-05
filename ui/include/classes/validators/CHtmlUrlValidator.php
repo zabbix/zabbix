@@ -50,8 +50,7 @@ class CHtmlUrlValidator {
 			'allow_user_macro' => true,
 			'allow_event_tags_macro' => false,
 			'allow_inventory_macro' => INVENTORY_URL_MACRO_NONE,
-			'validate_uri_schemes' => (bool) CSettingsHelper::get(CSettingsHelper::VALIDATE_URI_SCHEMES),
-			'allow_scripts' => true
+			'validate_uri_schemes' => (bool) CSettingsHelper::get(CSettingsHelper::VALIDATE_URI_SCHEMES)
 		];
 
 		if ($options['validate_uri_schemes'] === false) {
@@ -98,14 +97,6 @@ class CHtmlUrlValidator {
 		$url_parts = parse_url($url);
 		if (!$url_parts) {
 			return false;
-		}
-
-		if ($options['allow_scripts'] == false) {
-			$path = preg_replace('/\".*/', '', $url_parts['path']);
-
-			if ($url_parts['path'] !== $path) {
-				return false;
-			}
 		}
 
 		if (array_key_exists('scheme', $url_parts)) {
