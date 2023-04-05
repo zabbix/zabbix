@@ -165,8 +165,9 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		zbx_block_signals(&orig_mask);
+
 		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
-		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+		zbx_sync_history_cache(dbsyncer_args->events_cbs, &values_num, &triggers_num, &more);
 		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())

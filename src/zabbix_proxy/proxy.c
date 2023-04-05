@@ -22,6 +22,7 @@
 #include "cfg.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
@@ -52,7 +53,6 @@
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
 #include "rtc/rtc_proxy.h"
-#include "../zabbix_server/availability/avail_manager.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
@@ -331,14 +331,22 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
-
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
-zbx_vector_ptr_t	zbx_addrs;
+static zbx_vector_addr_ptr_t	config_server_addrs;
+
+/* proxy has no any events processing */
+static const zbx_events_funcs_t	events_cbs = {
+	.add_event_cb			= NULL,
+	.process_events_cb		= NULL,
+	.clean_events_cb		= NULL,
+	.reset_event_recovery_cb	= NULL,
+	.export_events_cb		= NULL,
+	.events_update_itservices_cb	= NULL
+};
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -713,12 +721,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		exit(EXIT_FAILURE);
 }
 
-static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	proxy_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	ZBX_UNUSED(hostnames);
 	ZBX_UNUSED(data);
 
-	zbx_addr_copy(&zbx_addrs, addrs);
+	zbx_addr_copy(&config_server_addrs, addrs);
 
 	return SUCCEED;
 }
@@ -954,7 +962,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	zbx_validate_config(task);
 
-	zbx_vector_ptr_create(&zbx_addrs);
+	zbx_vector_addr_ptr_create(&config_server_addrs);
 
 	if (ZBX_PROXYMODE_PASSIVE != config_proxymode)
 	{
@@ -1014,7 +1022,7 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	zbx_free_database_cache(ZBX_SYNC_ALL);
+	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 	zbx_free_configuration_cache();
 	zbx_db_close();
 
@@ -1245,6 +1253,13 @@ static void	proxy_db_init(void)
 		exit(EXIT_FAILURE);
 #endif
 	}
+
+#ifdef HAVE_ORACLE
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_table_prepare("items", NULL);
+	zbx_db_table_prepare("item_preproc", NULL);
+	zbx_db_close();
+#endif
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1261,14 +1276,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 								config_startup_time, config_unavailable_delay};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
-								get_program_type, zbx_config_timeout};
-	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
+								get_program_type, zbx_config_timeout,
+								&config_server_addrs, CONFIG_HOSTNAME, CONFIG_SOURCE_IP,
+								CONFIG_PROXYCONFIG_FREQUENCY};
+	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+								&config_server_addrs, CONFIG_SOURCE_IP, CONFIG_HOSTNAME,
+								CONFIG_PROXYDATA_FREQUENCY};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+								&events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
-								&listen_sock, config_startup_time};
+								&events_cbs, &listen_sock, config_startup_time};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
@@ -1277,7 +1297,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
-	zbx_thread_dbsyncer_args		dbsyncer_args = {config_histsyncer_frequency};
+	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 
@@ -1389,7 +1409,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(get_program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -1403,7 +1423,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_configuration_cache(&error))
+	if (SUCCEED != zbx_init_configuration_cache(get_program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1578,7 +1598,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
-				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;

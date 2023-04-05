@@ -25,7 +25,12 @@
 
 /* unresolved symbols needed for linking */
 
-unsigned char	program_type	= 0;
+static unsigned char	program_type	= 0;
+
+unsigned char	get_program_type(void)
+{
+	return program_type;
+}
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
@@ -148,8 +153,6 @@ int	CONFIG_BUFFER_SIZE		= 100;
 int	CONFIG_BUFFER_SEND		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND	= 20;
-
-int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
 char	**CONFIG_ALIASES		= NULL;
 char	**CONFIG_USER_PARAMETERS	= NULL;
