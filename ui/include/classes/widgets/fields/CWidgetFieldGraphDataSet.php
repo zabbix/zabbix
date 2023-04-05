@@ -95,7 +95,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
 
-			if (!$this->isTemplateDashboard()) {
+			if ($this->isTemplateDashboard()) {
 				self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
 			}
 
