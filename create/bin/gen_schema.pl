@@ -79,7 +79,7 @@ $c{"before"} = "/*
 #define ZBX_TYPE_LONGTEXT_LEN	0
 #define ZBX_TYPE_TEXT_LEN	65535
 
-static const zbx_db_table_t\ttables[] = {
+static zbx_db_table_t\ttables[] = {
 ";
 
 my %mysql = (
@@ -1052,7 +1052,7 @@ sub main()
 		print "#else\t/* HAVE_SQLITE3 */\n";
 		print "static const char\t*db_schema = NULL;\n";
 		print "#endif\t/* not HAVE_SQLITE3 */\n";
-		print "\nconst zbx_db_table_t\t*zbx_dbschema_get_tables(void)\n{\n\treturn tables;\n}\n";
+		print "\nzbx_db_table_t\t*zbx_dbschema_get_tables(void)\n{\n\treturn tables;\n}\n";
 		print "\nconst zbx_db_table_changelog_t\t*zbx_dbschema_get_changelog_tables(void)\n" .
 				"{\n\treturn changelog_tables;\n}\n";
 		print "\nconst char\t*zbx_dbschema_get_schema(void)\n{\n\treturn db_schema;\n}\n";
