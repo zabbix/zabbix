@@ -61,6 +61,11 @@ class testPageReportsActionLog extends CWebTest {
 	public function testPageReportsActionLog_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=actionlog.list')->waitUntilReady();
 
+		// Check header and title.
+		$this->page->assertHeader('Action log');
+		$this->page->assertTitle('Action log');
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+
 		// If the time selector is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists()) {
 			$this->query('id:ui-id-1')->one()->click();
@@ -71,19 +76,10 @@ class testPageReportsActionLog extends CWebTest {
 				->getAttribute('class'));
 
 		// Check data set values in input field.
-		foreach (['From' => 'now-1h', 'To' => 'now'] as $period => $time) {
-			$this->assertEquals($time, $this->query("xpath://*[@class='time-input']//label[text()=".
-					CXPathHelper::escapeQuotes($period)."]/../..//input")->one()->getAttribute('value')
-			);
-		}
+		$form->checkValue(['id:from' => 'now-1h', 'id:to' => 'now']);
 
 		// Press to display filter.
 		$this->query('id:ui-id-2')->one()->click();
-
-		// Check header and title.
-		$this->page->assertHeader('Action log');
-		$this->page->assertTitle('Action log');
-		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Check filter buttons.
 		foreach (['Apply', 'Reset'] as $button) {
@@ -299,7 +295,7 @@ class testPageReportsActionLog extends CWebTest {
 			// #12.
 			[
 				[
-					'fields' => ['id:filter_statuses_2' => true],
+					'fields' => ['Failed' => true],
 					'result' => [
 						['Status' => 'Failed']
 					]
@@ -308,7 +304,7 @@ class testPageReportsActionLog extends CWebTest {
 			// #13.
 			[
 				[
-					'fields' => ['id:filter_statuses_1' => true],
+					'fields' => ['Sent/Executed' => true],
 					'result' => [
 						['Status' => 'Sent'],
 						['Status' => 'Sent'],
@@ -324,7 +320,7 @@ class testPageReportsActionLog extends CWebTest {
 			// #14.
 			[
 				[
-					'fields' => ['id:filter_statuses_0' => true],
+					'fields' => ['In progress' => true],
 					'result' => [
 						['Status' => "In progress:\n3 retries left"]
 					]
@@ -334,8 +330,8 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'id:filter_statuses_2' => true,
-						'id:filter_statuses_0' => true
+						'Failed' => true,
+						'In progress' => true
 					],
 					'result' => [
 						['Status' => "In progress:\n3 retries left"],
@@ -347,9 +343,9 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'id:filter_statuses_0' => true,
-						'id:filter_statuses_1' => true,
-						'id:filter_statuses_2' => true
+						'In progress' => true,
+						'Sent/Executed' => true,
+						'Failed' => true
 					],
 					'result' => [
 						['Status' => 'Sent'],
@@ -370,7 +366,7 @@ class testPageReportsActionLog extends CWebTest {
 				[
 					'fields' => [
 						'Actions' => ['Trigger action 3'],
-						'id:filter_statuses_1' => true
+						'Sent/Executed' => true
 					],
 					'result' => [
 						['Action' => 'Trigger action 3', 'Status' => 'Sent'],
@@ -384,7 +380,7 @@ class testPageReportsActionLog extends CWebTest {
 				[
 					'fields' => [
 						'Actions' => ['Trigger action 3'],
-						'id:filter_statuses_0' => true
+						'In progress' => true
 					],
 					'result' => []
 				]
@@ -394,7 +390,7 @@ class testPageReportsActionLog extends CWebTest {
 				[
 					'fields' => [
 						'Recipients' => ['Administrator', 'test-timezone'],
-						'id:filter_statuses_0' => true
+						'In progress' => true
 					],
 					'result' => [
 						[
@@ -409,7 +405,7 @@ class testPageReportsActionLog extends CWebTest {
 				[
 					'fields' => [
 						'Recipients' => ['test-timezone'],
-						'id:filter_statuses_0' => true
+						'In progress' => true
 					],
 					'result' => []
 				]
@@ -419,7 +415,7 @@ class testPageReportsActionLog extends CWebTest {
 				[
 					'fields' => [
 						'Media types' => ['Email'],
-						'id:filter_statuses_0' => true
+						'In progress' => true
 					],
 					'result' => [
 						['Media type' => 'Email', 'Status' => "In progress:\n3 retries left"]
@@ -431,7 +427,7 @@ class testPageReportsActionLog extends CWebTest {
 				[
 					'fields' => [
 						'Media types' => ['Email'],
-						'id:filter_statuses_1' => true
+						'Sent/Executed' => true
 					],
 					'result' => [
 						['Media type' => 'Email', 'Status' => 'Sent'],
@@ -445,7 +441,7 @@ class testPageReportsActionLog extends CWebTest {
 				[
 					'fields' => [
 						'Media types' => ['Email'],
-						'id:filter_statuses_2' => true
+						'Failed' => true
 					],
 					'result' => [
 						['Media type' => 'Email', 'Status' => 'Failed']
@@ -459,7 +455,7 @@ class testPageReportsActionLog extends CWebTest {
 						'Media types' => ['Email'],
 						'Actions' => ['Trigger action 2'],
 						'Recipients' => ['Administrator'],
-						'id:filter_statuses_1' => true
+						'Sent/Executed' => true
 					],
 					'result' => [
 						[
@@ -640,8 +636,8 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'time' => [
-						'from' => '2020-08-15 00:00:00',
-						'to' => '2020-08-15 01:0:00'
+						'id:from' => '2020-08-15 00:00:00',
+						'id:to' => '2020-08-15 01:0:00'
 					],
 					'result' => [
 						['Time' => '2020-08-15 00:20:00'],
@@ -656,8 +652,8 @@ class testPageReportsActionLog extends CWebTest {
 						'Actions' => 'Trigger action 2'
 					],
 					'time' => [
-						'from' => '2020-08-15 00:00:00',
-						'to' => '2020-08-15 01:0:00'
+						'id:from' => '2020-08-15 00:00:00',
+						'id:to' => '2020-08-15 01:0:00'
 					],
 					'result' => [
 						['Time' => '2020-08-15 00:20:00', 'Action' => 'Trigger action 2']
@@ -686,11 +682,8 @@ class testPageReportsActionLog extends CWebTest {
 				$time_tab->one()->click();
 			}
 
-			foreach ($data['time'] as $id => $value) {
-				$form->query('id', $id)->one()->fill($value);
-			}
-
-			$form->query('id:apply')->one()->click();
+			$form->fill($data['time']);
+			$form->query('button:Apply')->one()->click();
 			$this->page->waitUntilReady();
 		}
 
@@ -765,18 +758,18 @@ class testPageReportsActionLog extends CWebTest {
 			'Actions' => '',
 			'Media types' => '',
 			'Search string' => '',
-			'id:filter_statuses_0' => false,
-			'id:filter_statuses_1' => false,
-			'id:filter_statuses_2' => false
+			'In progress' => false,
+			'Sent/Executed' => false,
+			'Failed' => false
 		];
 		$filled_form = [
 			'Recipients' => 'test-timezone',
 			'Actions' => 'Trigger action 3',
 			'Media types' => 'SMS',
 			'Search string' => 'test',
-			'id:filter_statuses_0' => true,
-			'id:filter_statuses_1' => true,
-			'id:filter_statuses_2' => true
+			'In progress' => true,
+			'Sent/Executed' => true,
+			'Failed' => true
 		];
 
 		// Check reset button with/without filter submit.
