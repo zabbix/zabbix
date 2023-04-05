@@ -31,6 +31,8 @@
 
 #define MAX_NAME			256
 
+extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
+
 static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Provider/@Name",
 	L"/Event/System/Provider/@EventSourceName",

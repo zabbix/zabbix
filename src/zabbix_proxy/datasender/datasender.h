@@ -21,7 +21,7 @@
 #define ZABBIX_DATASENDER_H
 
 #include "zbxthreads.h"
-
+#include "cfg.h"
 #include "zbxcomms.h"
 
 typedef struct
@@ -29,7 +29,10 @@ typedef struct
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
-	int			proxydata_frequency;
+	zbx_vector_addr_ptr_t	*config_server_addrs;
+	const char		*config_source_ip;
+	const char		*config_hostname;
+	int			config_proxydata_frequency;
 }
 zbx_thread_datasender_args;
 
