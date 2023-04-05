@@ -475,55 +475,47 @@ class testPageConnectors extends CWebTest {
 				[
 					'link_button' => true,
 					'action' => 'Disable',
-					'name' => self::$update_connector,
-					'message' => 'Disable selected connector?'
+					'name' => self::$update_connector
 				]
 			],
 			[
 				[
 					'link_button' => true,
 					'action' => 'Enable',
-					'name' =>'Disabled connector',
-					'message' => 'Enable selected connector?'
+					'name' =>'Disabled connector'
+				]
+			],
+			[
+				[
+					'action' => 'Enable'
 				]
 			],
 			[
 				[
 					'action' => 'Enable',
-					'message' => 'Enable selected connectors?'
+					'name' => 'Disabled connector'
 				]
 			],
 			[
 				[
-					'action' => 'Enable',
-					'name' => 'Disabled connector',
-					'message' => 'Enable selected connector?'
-				]
-			],
-			[
-				[
-					'action' => 'Disable',
-					'message' => 'Disable selected connectors?'
+					'action' => 'Disable'
 				]
 			],
 			[
 				[
 					'action' => 'Disable',
-					'name' => self::$update_connector,
-					'message' => 'Disable selected connector?'
+					'name' => self::$update_connector
+				]
+			],
+			[
+				[
+					'action' => 'Delete'
 				]
 			],
 			[
 				[
 					'action' => 'Delete',
-					'message' => 'Delete selected connectors?'
-				]
-			],
-			[
-				[
-					'action' => 'Delete',
-					'name' => self::$delete_connector,
-					'message' => 'Delete selected connector?'
+					'name' => self::$delete_connector
 				]
 			]
 		];
@@ -534,26 +526,26 @@ class testPageConnectors extends CWebTest {
 	 */
 	public function testPageConnectors_CancelAction($data) {
 		$old_hash = CDBHelper::getHash(self::$connector_sql);
+		if (!is_array(CTestArrayHelper::get($data, 'name', []))){
+			$data['name'] = [$data['name']];
+		}
 
 		$this->page->login()->open('zabbix.php?action=connector.list');
-
-		// Connectors count that will be selected before Enable/Disable/Delete action.
-		$selected_count = (!array_key_exists('name', $data))
-				? CDBHelper::getCount(self::$connector_sql)
-				: CDBHelper::getCount('SELECT NULL FROM connector WHERE name IN ('. CDBHelper::escape($data['name']).')');
-
 		if (array_key_exists('link_button', $data)) {
 			// Disable or enable Connector via Enabled/Disabled button.
-			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
-			$status = $row->getColumn('Status')->query('xpath:.//a')->one()->click();
+			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name'][0]);
+			$row->getColumn('Status')->query('xpath:.//a')->one()->click();
 		}
 		else {
+			// Connectors count that will be selected before Enable/Disable/Delete action.
+			$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::$connector_sql);
 			$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
 			$this->assertSelectedCount($selected_count);
 			$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
 		}
 
-		$this->assertEquals($data['message'], $this->page->getAlertText());
+		$message = $data['action'].' selected connector'.(count(CTestArrayHelper::get($data, 'name', [])) === 1 ? '?' : 's?' );
+		$this->assertEquals($message, $this->page->getAlertText());
 		$this->page->dismissAlert();
 		$this->page->waitUntilReady();
 
@@ -567,78 +559,54 @@ class testPageConnectors extends CWebTest {
 				[
 					'link_button' => true,
 					'action' => 'Disable',
-					'name' => self::$update_connector,
-					'message' => 'Connector disabled',
-					'alert_message' => 'Disable selected connector?',
-					'db_status' => ZBX_CONNECTOR_STATUS_DISABLED
+					'name' => self::$update_connector
 				]
 			],
 			[
 				[
 					'link_button' => true,
 					'action' => 'Enable',
-					'name' => 'Disabled connector',
-					'message' => 'Connector enabled',
-					'alert_message' => 'Enable selected connector?',
-					'db_status' => ZBX_CONNECTOR_STATUS_ENABLED
+					'name' => 'Disabled connector'
 				]
 			],
 			[
 				[
-					'message' => 'Connector enabled',
 					'action' => 'Enable',
-					'name' => 'ZABBIX',
-					'alert_message' => 'Enable selected connector?',
-					'db_status' => ZBX_CONNECTOR_STATUS_ENABLED
+					'name' => 'ZABBIX'
 				]
 			],
 			[
 				[
-					'message' => 'Connector disabled',
 					'action' => 'Disable',
-					'name' => 'Enabled connector',
-					'alert_message' => 'Disable selected connector?',
-					'db_status' => ZBX_CONNECTOR_STATUS_DISABLED
+					'name' => 'Enabled connector'
 				]
 			],
 			[
 				[
-					'message' => 'Connectors disabled',
 					'action' => 'Disable',
 					'name' => [
 						'Events connector',
 						'Item value connector'
-					],
-					'alert_message' => 'Disable selected connectors?',
-					'db_status' => ZBX_CONNECTOR_STATUS_DISABLED
+					]
 				]
 			],
 			[
 				[
-					'message' => 'Connectors disabled',
-					'action' => 'Disable',
-					'alert_message' => 'Disable selected connectors?',
-					'db_status' => ZBX_CONNECTOR_STATUS_DISABLED
+					'action' => 'Disable'
 				]
 			],
 			[
 				[
-					'message' => 'Connectors enabled',
 					'action' => 'Enable',
 					'name' => [
 						self::$update_connector,
 						self::$delete_connector
-					],
-					'alert_message' => 'Enable selected connectors?',
-					'db_status' => ZBX_CONNECTOR_STATUS_ENABLED
+					]
 				]
 			],
 			[
 				[
-					'message' => 'Connectors enabled',
-					'action' => 'Enable',
-					'alert_message' => 'Enable selected connectors?',
-					'db_status' => ZBX_CONNECTOR_STATUS_ENABLED
+					'action' => 'Enable'
 				]
 			]
 		];
@@ -651,14 +619,16 @@ class testPageConnectors extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=connector.list');
 
 		// Connectors count that will be enabled or disabled via button.
-		$selected_count = (!array_key_exists('name', $data))
-				? CDBHelper::getCount(self::$connector_sql)
-				: CDBHelper::getCount('SELECT NULL FROM connector WHERE name IN ('.CDBHelper::escape($data['name']).')');
+		if (!is_array(CTestArrayHelper::get($data, 'name', []))){
+			$data['name'] = [$data['name']];
+		}
+		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::$connector_sql);
+		$plural = count(CTestArrayHelper::get($data, 'name', [])) === 1 ? '' : 's';
 
 		if (array_key_exists('link_button', $data)) {
 			// Disable or enable Connector via Enabled/Disabled button.
-			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
-			$status = $row->getColumn('Status')->query('xpath:.//a')->one()->click();
+			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name'][0]);
+			$row->getColumn('Status')->query('xpath:.//a')->one()->click();
 		}
 		else {
 			$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
@@ -667,10 +637,10 @@ class testPageConnectors extends CWebTest {
 		}
 
 		// Check alert and success message.
-		$this->assertEquals($data['alert_message'], $this->page->getAlertText());
+		$this->assertEquals($data['action'].' selected connector'.$plural.'?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, $data['message']);
+		$this->assertMessage(TEST_GOOD, 'Connector'.$plural.' '.lcfirst($data['action']).'d');
 		CMessageElement::find()->one()->close();
 
 		// Check that status in 'Status' column is correct.
@@ -679,15 +649,14 @@ class testPageConnectors extends CWebTest {
 		}
 
 		// Check status in database.
+		$status = ($data['action'] === 'Enable') ? ZBX_CONNECTOR_STATUS_ENABLED : ZBX_CONNECTOR_STATUS_DISABLED;
 		if (array_key_exists('name', $data)) {
-			$this->assertEquals($data['db_status'], CDBHelper::getValue('SELECT status FROM connector WHERE name IN ('.
+			$this->assertEquals($status, CDBHelper::getValue('SELECT status FROM connector WHERE name IN ('.
 					CDBHelper::escape($data['name']).')')
 			);
 		}
 		else {
-			$this->assertEquals($selected_count, CDBHelper::getCount('SELECT NULL FROM connector WHERE status IN ('.
-					CDBHelper::escape($data['db_status']).')')
-			);
+			$this->assertEquals($selected_count, CDBHelper::getCount('SELECT NULL FROM connector WHERE status='.$status));
 		}
 
 		// Verify that there is no selected connectors.
@@ -695,7 +664,7 @@ class testPageConnectors extends CWebTest {
 	}
 
 	public function testPageConnectors_Delete() {
-		$this->deleteAction(self::$delete_connector);
+		$this->deleteAction([self::$delete_connector]);
 	}
 
 	public function testPageConnectors_MassDelete() {
@@ -705,24 +674,26 @@ class testPageConnectors extends CWebTest {
 	/**
 	 * Function for delete action.
 	 *
-	 * @param array $name	connector name, if empty delete will perform for all connectors
+	 * @param array $names	connector names, if empty delete will perform for all connectors
 	 */
-	private function deleteAction($name = []) {
+	private function deleteAction($names = []) {
+		$plural = (count($names) === 1) ? '' : 's';
+		$all = CDBHelper::getCount(self::$connector_sql);
 		$this->page->login()->open('zabbix.php?action=connector.list');
 
 		// Delete Connector(s).
-		$this->selectTableRows($name);
-
+		$this->selectTableRows($names);
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
-		$this->assertEquals('Delete selected connector'.($name ? '' : 's').'?', $this->page->getAlertText());
+		$this->assertEquals('Delete selected connector'.$plural.'?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
 		// Check that Connector(s) is/are deleted.
-		$this->assertMessage(TEST_GOOD, 'Connector'.($name ? '' : 's').' deleted');
+		$this->assertMessage(TEST_GOOD, 'Connector'.$plural.' deleted');
 		$this->assertSelectedCount(0);
-		$this->assertEquals(0, $name === null ? CDBHelper::getCount(self::$connector_sql)
-				: CDBHelper::getCount('SELECT connectorid FROM connector WHERE name='.zbx_dbstr(self::$delete_connector))
+		$this->assertTableStats($names === [] ? 0 : $all - count($names));
+		$this->assertEquals(0, ($names === []) ? CDBHelper::getCount(self::$connector_sql)
+				: CDBHelper::getCount('SELECT NULL FROM connector WHERE name IN ('.CDBHelper::escape($names).')')
 		);
 	}
 }
