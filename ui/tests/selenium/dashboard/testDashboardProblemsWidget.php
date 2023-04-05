@@ -127,7 +127,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		$dialog->waitUntilReady();
 
 		$this->assertEquals(['Type', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Exclude host groups', 'Hosts', 'Problem',
-				'Severity', 'Tags', 'Show tags', 'Tag name', 'Tag display priority', 'Show operational data', 'Show symptoms',
+				'Severity', 'Problem tags', 'Show tags', 'Tag name', 'Tag display priority', 'Show operational data', 'Show symptoms',
 				'Show suppressed problems', 'Show unacknowledged only', 'Sort entries by', 'Show timeline', 'Show lines'],
 				$form->getLabels()->asText()
 		);
@@ -212,7 +212,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		// Check segmented radiobuttons labels.
 		$radios = [
 			'Show' => ['Recent problems', 'Problems', 'History'],
-			'Tags' => ['And/Or', 'Or'],
+			'Problem tags' => ['And/Or', 'Or'],
 			'Show tags' => ['None', '1', '2', '3'],
 			'Tag name' => ['Full', 'Shortened', 'None'],
 			'Show operational data' => ['None', 'Separately', 'With problem name']
@@ -323,7 +323,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'id:severities_3' => true,
 						'id:severities_4' => true,
 						'id:severities_5' => true,
-						'Tags' => 'Or',
+						'Problem tags' => 'Or',
 						'Show tags' => 1,
 						'Tag name' => 'Shortened',
 						'Tag display priority' => 'tag, tag2, tag4',
