@@ -3,26 +3,30 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
 The template to monitor Elasticsearch by Zabbix that work without any external scripts.
 It works with both standalone and cluster instances.
 The metrics are collected in one pass remotely using an HTTP agent.
 They are getting values from REST API _cluster/health, _cluster/stats, _nodes/stats requests.
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Elasticsearch, version 6.5..7.6
 
+## Requirements
+
+For Zabbix version: 6.4 and higher.
+
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You can set {$ELASTICSEARCH.USERNAME} and {$ELASTICSEARCH.PASSWORD} macros in the template for using on the host level.
 If you use an atypical location ES API, don't forget to change the macros {$ELASTICSEARCH.SCHEME},{$ELASTICSEARCH.PORT}.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -42,17 +46,17 @@ No specific Zabbix configuration is required.
 |{$ELASTICSEARCH.SCHEME} |<p>The scheme of the Elasticsearch (http/https).</p> |`http` |
 |{$ELASTICSEARCH.USERNAME} |<p>The username of the Elasticsearch.</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Cluster nodes discovery |<p>Discovery ES cluster nodes.</p> |HTTP_AGENT |es.nodes.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.nodes.[*]`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -76,56 +80,57 @@ There are no template links in this template.
 |ES cluster |ES: Nodes with the data role |<p>The number of selected nodes with the data role.</p> |DEPENDENT |es.nodes.count.data<p>**Preprocessing**:</p><p>- JSONPATH: `$.nodes.count.data`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |ES cluster |ES: Nodes with the ingest role |<p>The number of selected nodes with the ingest role.</p> |DEPENDENT |es.nodes.count.ingest<p>**Preprocessing**:</p><p>- JSONPATH: `$.nodes.count.ingest`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |ES cluster |ES: Nodes with the master role |<p>The number of selected nodes with the master role.</p> |DEPENDENT |es.nodes.count.master<p>**Preprocessing**:</p><p>- JSONPATH: `$.nodes.count.master`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|ES cluster |ES {#ES.NODE}: Total size |<p>Total size (in bytes) of all file stores.</p> |DEPENDENT |es.node.fs.total.total_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].fs.total.total_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|ES cluster |ES {#ES.NODE}: Total available size |<p>The total number of bytes available to this Java virtual machine on all file stores.</p><p>Depending on OS or process level restrictions, this might appear less than fs.total.free_in_bytes.</p><p>This is the actual amount of free disk space the Elasticsearch node can utilize.</p> |DEPENDENT |es.node.fs.total.available_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].fs.total.available_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|ES cluster |ES {#ES.NODE}: Node uptime |<p>JVM uptime in seconds.</p> |DEPENDENT |es.node.jvm.uptime[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].jvm.uptime_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p> |
-|ES cluster |ES {#ES.NODE}: Maximum JVM memory available for use |<p>The maximum amount of memory, in bytes, available for use by the heap.</p> |DEPENDENT |es.node.jvm.mem.heap_max_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_max_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|ES cluster |ES {#ES.NODE}: Amount of JVM heap currently in use |<p>The memory, in bytes, currently in use by the heap.</p> |DEPENDENT |es.node.jvm.mem.heap_used_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_used_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|ES cluster |ES {#ES.NODE}: Percent of JVM heap currently in use |<p>The percentage of memory currently in use by the heap.</p> |DEPENDENT |es.node.jvm.mem.heap_used_percent[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_used_percent.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|ES cluster |ES {#ES.NODE}: Amount of JVM heap committed |<p>The amount of memory, in bytes, available for use by the heap.</p> |DEPENDENT |es.node.jvm.mem.heap_committed_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].jvm.mem.heap_committed_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|ES cluster |ES {#ES.NODE}: Number of open HTTP connections |<p>The number of currently open HTTP connections for the node.</p> |DEPENDENT |es.node.http.current_open[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].http.current_open.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|ES cluster |ES {#ES.NODE}: Rate of HTTP connections opened |<p>The number of HTTP connections opened for the node per second.</p> |DEPENDENT |es.node.http.opened.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].http.total_opened.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Time spent throttling operations |<p>Time in seconds spent throttling operations for the last measuring span.</p> |DEPENDENT |es.node.indices.indexing.throttle_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.indexing.throttle_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
-|ES cluster |ES {#ES.NODE}: Time spent throttling recovery operations |<p>Time in seconds spent throttling recovery operations for the last measuring span.</p> |DEPENDENT |es.node.indices.recovery.throttle_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.recovery.throttle_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
-|ES cluster |ES {#ES.NODE}: Time spent throttling merge operations |<p>Time in seconds spent throttling merge operations for the last measuring span.</p> |DEPENDENT |es.node.indices.merges.total_throttled_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.merges.total_throttled_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
-|ES cluster |ES {#ES.NODE}: Rate of queries |<p>The number of query operations per second.</p> |DEPENDENT |es.node.indices.search.query.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.query_total.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Time spent performing query |<p>Time in seconds spent performing query operations for the last measuring span.</p> |DEPENDENT |es.node.indices.search.query_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.query_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
+|ES cluster |ES {#ES.NODE}: Get data |<p>Total size (in bytes) of all file stores.</p> |DEPENDENT |es.node.get.data[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|ES cluster |ES {#ES.NODE}: Total size |<p>Total size (in bytes) of all file stores.</p> |DEPENDENT |es.node.fs.total.total_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..fs.total.total_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|ES cluster |ES {#ES.NODE}: Total available size |<p>The total number of bytes available to this Java virtual machine on all file stores.</p><p>Depending on OS or process level restrictions, this might appear less than fs.total.free_in_bytes.</p><p>This is the actual amount of free disk space the Elasticsearch node can utilize.</p> |DEPENDENT |es.node.fs.total.available_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..fs.total.available_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|ES cluster |ES {#ES.NODE}: Node uptime |<p>JVM uptime in seconds.</p> |DEPENDENT |es.node.jvm.uptime[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..jvm.uptime_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p> |
+|ES cluster |ES {#ES.NODE}: Maximum JVM memory available for use |<p>The maximum amount of memory, in bytes, available for use by the heap.</p> |DEPENDENT |es.node.jvm.mem.heap_max_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..jvm.mem.heap_max_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|ES cluster |ES {#ES.NODE}: Amount of JVM heap currently in use |<p>The memory, in bytes, currently in use by the heap.</p> |DEPENDENT |es.node.jvm.mem.heap_used_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..jvm.mem.heap_used_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|ES cluster |ES {#ES.NODE}: Percent of JVM heap currently in use |<p>The percentage of memory currently in use by the heap.</p> |DEPENDENT |es.node.jvm.mem.heap_used_percent[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..jvm.mem.heap_used_percent.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|ES cluster |ES {#ES.NODE}: Amount of JVM heap committed |<p>The amount of memory, in bytes, available for use by the heap.</p> |DEPENDENT |es.node.jvm.mem.heap_committed_in_bytes[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..jvm.mem.heap_committed_in_bytes.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|ES cluster |ES {#ES.NODE}: Number of open HTTP connections |<p>The number of currently open HTTP connections for the node.</p> |DEPENDENT |es.node.http.current_open[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..http.current_open.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|ES cluster |ES {#ES.NODE}: Rate of HTTP connections opened |<p>The number of HTTP connections opened for the node per second.</p> |DEPENDENT |es.node.http.opened.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..http.total_opened.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Time spent throttling operations |<p>Time in seconds spent throttling operations for the last measuring span.</p> |DEPENDENT |es.node.indices.indexing.throttle_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.indexing.throttle_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
+|ES cluster |ES {#ES.NODE}: Time spent throttling recovery operations |<p>Time in seconds spent throttling recovery operations for the last measuring span.</p> |DEPENDENT |es.node.indices.recovery.throttle_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.recovery.throttle_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
+|ES cluster |ES {#ES.NODE}: Time spent throttling merge operations |<p>Time in seconds spent throttling merge operations for the last measuring span.</p> |DEPENDENT |es.node.indices.merges.total_throttled_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.merges.total_throttled_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
+|ES cluster |ES {#ES.NODE}: Rate of queries |<p>The number of query operations per second.</p> |DEPENDENT |es.node.indices.search.query.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.query_total.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Time spent performing query |<p>Time in seconds spent performing query operations for the last measuring span.</p> |DEPENDENT |es.node.indices.search.query_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.query_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
 |ES cluster |ES {#ES.NODE}: Query latency |<p>The average query latency calculated by sampling the total number of queries and the total elapsed time at regular intervals.</p> |CALCULATED |es.node.indices.search.query_latency[{#ES.NODE}]<p>**Expression**:</p>`change(//es.node.indices.search.query_time_in_millis[{#ES.NODE}]) /  ( change(//es.node.indices.search.query_total[{#ES.NODE}]) + (change(//es.node.indices.search.query_total[{#ES.NODE}]) = 0) ) ` |
-|ES cluster |ES {#ES.NODE}: Current query operations |<p>The number of query operations currently running.</p> |DEPENDENT |es.node.indices.search.query_current[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.query_current.first()`</p> |
-|ES cluster |ES {#ES.NODE}: Rate of fetch |<p>The number of fetch operations per second.</p> |DEPENDENT |es.node.indices.search.fetch.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_total.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Time spent performing fetch |<p>Time in seconds spent performing fetch operations for the last measuring span.</p> |DEPENDENT |es.node.indices.search.fetch_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
+|ES cluster |ES {#ES.NODE}: Current query operations |<p>The number of query operations currently running.</p> |DEPENDENT |es.node.indices.search.query_current[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.query_current.first()`</p> |
+|ES cluster |ES {#ES.NODE}: Rate of fetch |<p>The number of fetch operations per second.</p> |DEPENDENT |es.node.indices.search.fetch.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.fetch_total.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Time spent performing fetch |<p>Time in seconds spent performing fetch operations for the last measuring span.</p> |DEPENDENT |es.node.indices.search.fetch_time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.fetch_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
 |ES cluster |ES {#ES.NODE}: Fetch latency |<p>The average fetch latency calculated by sampling the total number of fetches and the total elapsed time at regular intervals.</p> |CALCULATED |es.node.indices.search.fetch_latency[{#ES.NODE}]<p>**Expression**:</p>`change(//es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(//es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )` |
-|ES cluster |ES {#ES.NODE}: Current fetch operations |<p>The number of fetch operations currently running.</p> |DEPENDENT |es.node.indices.search.fetch_current[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_current.first()`</p> |
-|ES cluster |ES {#ES.NODE}: Write thread pool executor tasks completed |<p>The number of tasks completed by the write thread pool executor.</p> |DEPENDENT |es.node.thread_pool.write.completed.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.write.completed.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Write thread pool active threads |<p>The number of active threads in the write thread pool.</p> |DEPENDENT |es.node.thread_pool.write.active[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.write.active.first()`</p> |
-|ES cluster |ES {#ES.NODE}: Write thread pool tasks in queue |<p>The number of tasks in queue for the write thread pool.</p> |DEPENDENT |es.node.thread_pool.write.queue[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.write.queue.first()`</p> |
-|ES cluster |ES {#ES.NODE}: Write thread pool executor tasks rejected |<p>The number of tasks rejected by the write thread pool executor.</p> |DEPENDENT |es.node.thread_pool.write.rejected.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.write.rejected.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Search thread pool executor tasks completed |<p>The number of tasks completed by the search thread pool executor.</p> |DEPENDENT |es.node.thread_pool.search.completed.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.search.completed.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Search thread pool active threads |<p>The number of active threads in the search thread pool.</p> |DEPENDENT |es.node.thread_pool.search.active[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.search.active.first()`</p> |
-|ES cluster |ES {#ES.NODE}: Search thread pool tasks in queue |<p>The number of tasks in queue for the search thread pool.</p> |DEPENDENT |es.node.thread_pool.search.queue[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.search.queue.first()`</p> |
-|ES cluster |ES {#ES.NODE}: Search thread pool executor tasks rejected |<p>The number of tasks rejected by the search thread pool executor.</p> |DEPENDENT |es.node.thread_pool.search.rejected.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.search.rejected.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Refresh thread pool executor tasks completed |<p>The number of tasks completed by the refresh thread pool executor.</p> |DEPENDENT |es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.completed.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Refresh thread pool active threads |<p>The number of active threads in the refresh thread pool.</p> |DEPENDENT |es.node.thread_pool.refresh.active[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.active.first()`</p> |
-|ES cluster |ES {#ES.NODE}: Refresh thread pool tasks in queue |<p>The number of tasks in queue for the refresh thread pool.</p> |DEPENDENT |es.node.thread_pool.refresh.queue[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.queue.first()`</p> |
-|ES cluster |ES {#ES.NODE}: Refresh thread pool executor tasks rejected |<p>The number of tasks rejected by the refresh thread pool executor.</p> |DEPENDENT |es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].thread_pool.refresh.rejected.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Current fetch operations |<p>The number of fetch operations currently running.</p> |DEPENDENT |es.node.indices.search.fetch_current[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.fetch_current.first()`</p> |
+|ES cluster |ES {#ES.NODE}: Write thread pool executor tasks completed |<p>The number of tasks completed by the write thread pool executor.</p> |DEPENDENT |es.node.thread_pool.write.completed.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.write.completed.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Write thread pool active threads |<p>The number of active threads in the write thread pool.</p> |DEPENDENT |es.node.thread_pool.write.active[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.write.active.first()`</p> |
+|ES cluster |ES {#ES.NODE}: Write thread pool tasks in queue |<p>The number of tasks in queue for the write thread pool.</p> |DEPENDENT |es.node.thread_pool.write.queue[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.write.queue.first()`</p> |
+|ES cluster |ES {#ES.NODE}: Write thread pool executor tasks rejected |<p>The number of tasks rejected by the write thread pool executor.</p> |DEPENDENT |es.node.thread_pool.write.rejected.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.write.rejected.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Search thread pool executor tasks completed |<p>The number of tasks completed by the search thread pool executor.</p> |DEPENDENT |es.node.thread_pool.search.completed.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.search.completed.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Search thread pool active threads |<p>The number of active threads in the search thread pool.</p> |DEPENDENT |es.node.thread_pool.search.active[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.search.active.first()`</p> |
+|ES cluster |ES {#ES.NODE}: Search thread pool tasks in queue |<p>The number of tasks in queue for the search thread pool.</p> |DEPENDENT |es.node.thread_pool.search.queue[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.search.queue.first()`</p> |
+|ES cluster |ES {#ES.NODE}: Search thread pool executor tasks rejected |<p>The number of tasks rejected by the search thread pool executor.</p> |DEPENDENT |es.node.thread_pool.search.rejected.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.search.rejected.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Refresh thread pool executor tasks completed |<p>The number of tasks completed by the refresh thread pool executor.</p> |DEPENDENT |es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.refresh.completed.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Refresh thread pool active threads |<p>The number of active threads in the refresh thread pool.</p> |DEPENDENT |es.node.thread_pool.refresh.active[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.refresh.active.first()`</p> |
+|ES cluster |ES {#ES.NODE}: Refresh thread pool tasks in queue |<p>The number of tasks in queue for the refresh thread pool.</p> |DEPENDENT |es.node.thread_pool.refresh.queue[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.refresh.queue.first()`</p> |
+|ES cluster |ES {#ES.NODE}: Refresh thread pool executor tasks rejected |<p>The number of tasks rejected by the refresh thread pool executor.</p> |DEPENDENT |es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..thread_pool.refresh.rejected.first()`</p><p>- CHANGE_PER_SECOND</p> |
 |ES cluster |ES {#ES.NODE}: Indexing latency |<p>The average indexing latency calculated from the available index_total and index_time_in_millis metrics.</p> |CALCULATED |es.node.indices.indexing.index_latency[{#ES.NODE}]<p>**Expression**:</p>`change(//es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(//es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )` |
-|ES cluster |ES {#ES.NODE}: Current indexing operations |<p>The number of indexing operations currently running.</p> |DEPENDENT |es.node.indices.indexing.index_current[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_current.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|ES cluster |ES {#ES.NODE}: Current indexing operations |<p>The number of indexing operations currently running.</p> |DEPENDENT |es.node.indices.indexing.index_current[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.indexing.index_current.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |ES cluster |ES {#ES.NODE}: Flush latency |<p>The average flush latency calculated from the available flush.total and flush.total_time_in_millis metrics.</p> |CALCULATED |es.node.indices.flush.latency[{#ES.NODE}]<p>**Expression**:</p>`change(//es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.flush.total[{#ES.NODE}]) + (change(//es.node.indices.flush.total[{#ES.NODE}]) = 0) )` |
-|ES cluster |ES {#ES.NODE}: Rate of index refreshes |<p>The number of refresh operations per second.</p> |DEPENDENT |es.node.indices.refresh.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.refresh.total.first()`</p><p>- CHANGE_PER_SECOND</p> |
-|ES cluster |ES {#ES.NODE}: Time spent performing refresh |<p>Time in seconds spent performing refresh operations for the last measuring span.</p> |DEPENDENT |es.node.indices.refresh.time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.refresh.total_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
+|ES cluster |ES {#ES.NODE}: Rate of index refreshes |<p>The number of refresh operations per second.</p> |DEPENDENT |es.node.indices.refresh.rate[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.refresh.total.first()`</p><p>- CHANGE_PER_SECOND</p> |
+|ES cluster |ES {#ES.NODE}: Time spent performing refresh |<p>Time in seconds spent performing refresh operations for the last measuring span.</p> |DEPENDENT |es.node.indices.refresh.time[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.refresh.total_time_in_millis.first()`</p><p>- MULTIPLIER: `0.001`</p><p>- SIMPLE_CHANGE</p> |
 |Zabbix raw items |ES: Get cluster health |<p>Returns the health status of a cluster.</p> |HTTP_AGENT |es.cluster.get_health |
 |Zabbix raw items |ES: Get cluster stats |<p>Returns cluster statistics.</p> |HTTP_AGENT |es.cluster.get_stats |
 |Zabbix raw items |ES: Get nodes stats |<p>Returns cluster nodes statistics.</p> |HTTP_AGENT |es.nodes.get_stats |
-|Zabbix raw items |ES {#ES.NODE}: Total number of query |<p>The total number of query operations.</p> |DEPENDENT |es.node.indices.search.query_total[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.query_total.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |ES {#ES.NODE}: Total time spent performing query |<p>Time in milliseconds spent performing query operations.</p> |DEPENDENT |es.node.indices.search.query_time_in_millis[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.query_time_in_millis.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |ES {#ES.NODE}: Total number of fetch |<p>The total number of fetch operations.</p> |DEPENDENT |es.node.indices.search.fetch_total[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_total.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |ES {#ES.NODE}: Total time spent performing fetch |<p>Time in milliseconds spent performing fetch operations.</p> |DEPENDENT |es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.search.fetch_time_in_millis.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |ES {#ES.NODE}: Total number of indexing |<p>The total number of indexing operations.</p> |DEPENDENT |es.node.indices.indexing.index_total[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_total.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |ES {#ES.NODE}: Total time spent performing indexing |<p>Total time in milliseconds spent performing indexing operations.</p> |DEPENDENT |es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.indexing.index_time_in_millis.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |ES {#ES.NODE}: Total number of index flushes to disk |<p>The total number of flush operations.</p> |DEPENDENT |es.node.indices.flush.total[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.flush.total.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |ES {#ES.NODE}: Total time spent on flushing indices to disk |<p>Total time in milliseconds spent performing flush operations.</p> |DEPENDENT |es.node.indices.flush.total_time_in_millis[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..[?(@.name=='{#ES.NODE}')].indices.flush.total_time_in_millis.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |ES {#ES.NODE}: Total number of query |<p>The total number of query operations.</p> |DEPENDENT |es.node.indices.search.query_total[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.query_total.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |ES {#ES.NODE}: Total time spent performing query |<p>Time in milliseconds spent performing query operations.</p> |DEPENDENT |es.node.indices.search.query_time_in_millis[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.query_time_in_millis.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |ES {#ES.NODE}: Total number of fetch |<p>The total number of fetch operations.</p> |DEPENDENT |es.node.indices.search.fetch_total[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.fetch_total.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |ES {#ES.NODE}: Total time spent performing fetch |<p>Time in milliseconds spent performing fetch operations.</p> |DEPENDENT |es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.search.fetch_time_in_millis.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |ES {#ES.NODE}: Total number of indexing |<p>The total number of indexing operations.</p> |DEPENDENT |es.node.indices.indexing.index_total[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.indexing.index_total.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |ES {#ES.NODE}: Total time spent performing indexing |<p>Total time in milliseconds spent performing indexing operations.</p> |DEPENDENT |es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.indexing.index_time_in_millis.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |ES {#ES.NODE}: Total number of index flushes to disk |<p>The total number of flush operations.</p> |DEPENDENT |es.node.indices.flush.total[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.flush.total.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |ES {#ES.NODE}: Total time spent on flushing indices to disk |<p>Total time in milliseconds spent performing flush operations.</p> |DEPENDENT |es.node.indices.flush.total_time_in_millis[{#ES.NODE}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..indices.flush.total_time_in_millis.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -154,9 +159,9 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch).
 
 
 ## References
