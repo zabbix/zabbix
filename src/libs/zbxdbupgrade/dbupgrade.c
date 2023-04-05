@@ -882,7 +882,6 @@ static zbx_dbpatch_t *dbversions[] = {
 	NULL
 };
 
-
 static void	DBget_version(int *mandatory, int *optional)
 {
 	zbx_db_result_t	result;
