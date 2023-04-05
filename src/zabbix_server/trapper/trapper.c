@@ -35,6 +35,7 @@
 #include "trapper_item_test.h"
 #include "trapper_request.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxxml.h"
 #include "zbxcrypto.h"
 #include "zbxtime.h"
