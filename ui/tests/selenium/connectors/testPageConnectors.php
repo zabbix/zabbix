@@ -526,7 +526,7 @@ class testPageConnectors extends CWebTest {
 	 */
 	public function testPageConnectors_CancelAction($data) {
 		$old_hash = CDBHelper::getHash(self::$connector_sql);
-		if (!is_array(CTestArrayHelper::get($data, 'name', []))){
+		if (!is_array(CTestArrayHelper::get($data, 'name', []))) {
 			$data['name'] = [$data['name']];
 		}
 
@@ -619,7 +619,7 @@ class testPageConnectors extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=connector.list');
 
 		// Connectors count that will be enabled or disabled via button.
-		if (!is_array(CTestArrayHelper::get($data, 'name', []))){
+		if (!is_array(CTestArrayHelper::get($data, 'name', []))) {
 			$data['name'] = [$data['name']];
 		}
 		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::$connector_sql);
