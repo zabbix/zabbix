@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -723,10 +723,14 @@ class CDashboardPage extends CBaseComponent {
 			}
 			while (!element.classList.contains('wrapper'));
 
-			height = Math.max(height, min_height);
+			height = Math.min(Math.max(height, min_height), this._cell_height * this._max_rows);
 		}
 
-		this._dashboard_grid.style.height = `${height}px`;
+		this._dashboard_grid.style.height = '';
+
+		if (num_rows !== 0) {
+			this._dashboard_grid.style.height = `${height}px`;
+		}
 	}
 
 	_getNumOccupiedRows() {

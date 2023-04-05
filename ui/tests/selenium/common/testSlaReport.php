@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -481,9 +481,12 @@ class testSlaReport extends CWebTest {
 						$uptime_seconds = $uptime_seconds + timeUnitToSeconds($time_unit);
 					}
 
-					$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
-						- $uptime_seconds
-					);
+					// In rare cases expected and actual error budget can slightly differ due to calculation precision.
+					foreach([-1, 0, 1] as $delta) {
+						$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
+							- $uptime_seconds + $delta
+						);
+					}
 
 					$this->assertTrue(in_array($row->getColumn('Error budget')->getText(), $error_budget));
 				}

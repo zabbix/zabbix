@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -722,7 +722,7 @@ static unsigned int	zbx_hex2num(char c)
  *               0 on error (invalid escape sequence)                         *
  *                                                                            *
  ******************************************************************************/
-static unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
+unsigned int	zbx_json_decode_character(const char **p, unsigned char *bytes)
 {
 	bytes[0] = '\0';
 

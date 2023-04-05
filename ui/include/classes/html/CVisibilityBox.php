@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 
 class CVisibilityBox extends CCheckBox {
+
+	private $object_id;
+	private $replace_to;
 
 	public function __construct($name = 'visibilitybox', $object_id = null, $replace_to = null) {
 		$this->object_id = $object_id;

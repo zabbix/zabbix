@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ $table = (new CTableInfo())
 $url_group = $data['allowed_ui_problems']
 	?  (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
-		->setArgument('filter_name', '')
+		->setArgument('filter_set', '1')
 		->setArgument('show', TRIGGERS_OPTION_RECENT_PROBLEM)
 		->setArgument('hostids', $data['filter']['hostids'])
 		->setArgument('name', $data['filter']['problem'])
@@ -50,7 +50,7 @@ $url_group = $data['allowed_ui_problems']
 $url_host = $data['allowed_ui_problems']
 	? (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
-		->setArgument('filter_name', '')
+		->setArgument('filter_set', '1')
 		->setArgument('show', TRIGGERS_OPTION_RECENT_PROBLEM)
 		->setArgument('name', $data['filter']['problem'])
 		->setArgument('show_suppressed', ($data['filter']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
