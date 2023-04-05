@@ -21,6 +21,7 @@
 #include "dbupgrade.h"
 
 #include "zbxdb.h"
+#include "zbxdbhigh.h"
 
 int	delete_problems_with_nonexistent_object(void)
 {
