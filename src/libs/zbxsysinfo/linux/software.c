@@ -544,6 +544,79 @@ out:
 	zbx_free(out);
 }
 
+static void	portage_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	int		rv;
+	static char	pkginfo_fmt[128] = "";
+	char		sizeinfo_fmt[128] = "", *pkginfo, *sizeinfo, *saveptr, *l;
+	char		category[DETAIL_BUF] = "", name[DETAIL_BUF] = "", version[DETAIL_BUF] = "",
+			revision[DETAIL_BUF] = "", repo[DETAIL_BUF] = "";
+	size_t		files, nonfiles, size;
+
+	l = zbx_strdup(NULL, line);
+
+	pkginfo = strtok_r(l, ":", &saveptr);
+	sizeinfo = strtok_r(NULL, ":", &saveptr);
+
+	/*
+	 * e.g. "dev-lang,tcl,8.6.12,r1,gentoo: 1104 files, 25 non-files, 10871914 bytes"
+	 *  or  "dev-lang,perl,5.36.0,r1,gentoo: 1920 files (1919 unique), 326 non-files, 58056025 bytes"
+	 */
+	if ('\0' == *pkginfo_fmt)
+	{
+		zbx_snprintf(pkginfo_fmt, sizeof(pkginfo_fmt),
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* category */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* name */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* version */
+				"%%" ZBX_FS_SIZE_T "[^,],"	/* revision */
+				"%%" ZBX_FS_SIZE_T "[^ ]"	/* repo */
+				,
+				(zbx_fs_size_t)(sizeof(category) - 1),
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(revision) - 1),
+				(zbx_fs_size_t)(sizeof(repo) - 1));
+	}
+
+	/* NOTE: as sizeinfo may differ in format, we can't make sizeinfo_fmt static */
+	zbx_snprintf(sizeinfo_fmt, sizeof(sizeinfo_fmt),
+			"%" ZBX_FS_UI64 " files%s, "
+			"%" ZBX_FS_UI64 " non-files, "
+			"%" ZBX_FS_SIZE_T " bytes"
+			,
+			(NULL != strchr(sizeinfo, '('))
+				? " (%*lu unique)"
+				: "");
+
+#define PKGINFO_NUM_FIELDS 5
+	if (PKGINFO_NUM_FIELDS != (rv = sscanf(pkginfo, pkginfo_fmt, category, name, version, revision, repo)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				pkginfo, rv, PKGINFO_NUM_FIELDS);
+		goto out;
+	}
+#undef PKGINFO_NUM_FIELDS
+#define SIZEINFO_NUM_FIELDS 3
+	if (SIZEINFO_NUM_FIELDS != (rv = sscanf(sizeinfo, sizeinfo_fmt, &files, &nonfiles, &size)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				sizeinfo, rv, SIZEINFO_NUM_FIELDS);
+		goto out;
+	}
+#undef SIZEINFO_NUM_FIELDS
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		goto out;
+
+	/*
+	 * XXX: due to the rigidity of the add_package_to_json() interface, we can't report file counts.
+	 * We should make it easier to add arbitrary data items to the package object.
+	 */
+
+	add_package_to_json(json, name, manager, version, size, "", 0, "", 0, "");
+out:
+	zbx_free(l);
+}
+
 static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
 {
 	size_t	offset = 0;
@@ -612,6 +685,14 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		NULL,
 		pacman_details
 	},
+	{
+		"portage",
+		"qsize --version 2> /dev/null",
+		"qlist -C -I -F '%{PN},%{PV},%{PR}'",
+		"qsize -C --bytes -F '%{CATEGORY},%{PN},%{PV},%{PR},%{REPO}'",
+		NULL,
+		portage_details
+	},
 	{NULL}
 };
 
@@ -620,7 +701,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 	size_t			offset = 0;
 	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
 	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
-				*package;
+				*package, *saveptr;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
 
@@ -653,6 +734,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
+		saveptr = NULL;
 
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
@@ -669,7 +751,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			ret = SYSINFO_RET_OK;
 
-			package = strtok(buf, "\n");
+			package = strtok_r(buf, "\n", &saveptr);
 
 			while (NULL != package)
 			{
@@ -686,7 +768,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				zbx_vector_str_append(&packages, zbx_strdup(NULL, package));
 next:
-				package = strtok(NULL, "\n");
+				package = strtok_r(NULL, "\n", &saveptr);
 			}
 
 			if (1 == show_pm)
@@ -824,7 +906,7 @@ out:
 int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
-	char			*regex, *manager, *line, *buf = NULL, error[MAX_STRING_LEN];
+	char			*regex, *manager, *line, *saveptr, *buf = NULL, error[MAX_STRING_LEN];
 	ZBX_PACKAGE_MANAGER	*mng;
 	struct zbx_json		json;
 
@@ -845,6 +927,7 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
+		saveptr = NULL;
 
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
@@ -861,13 +944,13 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			ret = SYSINFO_RET_OK;
 
-			line = strtok(buf, "\n");
+			line = strtok_r(buf, "\n", &saveptr);
 
 			while (NULL != line)
 			{
 				mng->details_parser(mng->name, line, (1 == check_regex ? regex : NULL), &json);
 
-				line = strtok(NULL, "\n");
+				line = strtok_r(NULL, "\n", &saveptr);
 			}
 		}
 	}

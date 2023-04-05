@@ -336,7 +336,7 @@ class testDashboardItemValueWidget extends CWebTest {
 				// Check fields' lengths.
 				$field_lenghts = [
 					'Name' =>  255,
-					'id:description' => 255,
+					'id:description' => 2048,
 					'id:desc_size' => 3,
 					'id:decimal_places' => 2,
 					'id:decimal_size' => 3,

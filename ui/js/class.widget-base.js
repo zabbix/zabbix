@@ -133,7 +133,7 @@ class CWidgetBase {
 	 */
 	constructor({
 		type,
-		name,
+		name = '',
 		view_mode,
 		fields,
 		defaults,

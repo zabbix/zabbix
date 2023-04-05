@@ -86,6 +86,13 @@ A......... [ZBX-21238] fixed inability to update status and other fields of disc
 A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
 
 --------------------------------------------------------------------------------
+Changes for 6.4.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 6.4.1
 
 6.4.1rc2 was released as 6.4.1 without any changes
@@ -1166,6 +1173,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.16rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 6.0.15
@@ -3617,6 +3631,8 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 
 --------------------------------------------------------------------------------
 Changes for 5.0.34rc1
+
+New features:
 
 Bug fixes:
 ........S. [ZBX-22622] fixed alert script path validation (vso)
@@ -6381,6 +6397,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.46rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45
