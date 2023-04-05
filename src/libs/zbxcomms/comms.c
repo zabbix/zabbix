@@ -359,6 +359,42 @@ static void	zbx_socket_free(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: create socket poll error message                                  *
+ *                                                                            *
+ ******************************************************************************/
+static char 	*socket_poll_error(short revents)
+{
+	char	*str = NULL;
+	size_t	str_alloc = 0, str_offset = 0;
+	char	delim = '(';
+
+	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, "connection error ");
+
+	if (0 != (revents & POLLERR))
+	{
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%c%s", delim, "POLLERR");
+		delim = ',';
+	}
+
+	if (0 != (revents & POLLHUP))
+	{
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%c%s", delim, "POLLHUP");
+		delim = ',';
+	}
+
+	if (0 != (revents & POLLNVAL))
+	{
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%c%s", delim, "POLLNVAL");
+		delim = ',';
+	}
+
+	zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, ')');
+
+	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: connect to the specified address with an optional timeout value   *
  *                                                                            *
  * Parameters: s       - [IN] socket descriptor                               *
@@ -407,7 +443,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 
 	if (POLLOUT != (pd.revents & (POLLOUT | POLLERR | POLLHUP | POLLNVAL)))
 	{
-		*error = zbx_dsprintf(NULL, "connection error with poll events 0x%x", pd.revents);
+		*error = socket_poll_error(pd.revents);
 		return FAIL;
 	}
 
@@ -616,7 +652,12 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 			}
 			else if (0 != rc && 0 == (pd.revents & POLLOUT))
 			{
-				zbx_set_socket_strerror("connection error with poll events 0x%x", pd.revents);
+				char	*errmsg;
+
+				errmsg = socket_poll_error(pd.revents);
+				zbx_set_socket_strerror("%s", errmsg);
+				zbx_free(errmsg);
+
 				return ZBX_PROTO_ERROR;
 			}
 		}
@@ -1092,7 +1133,12 @@ static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size)
 
 		if (0 == (pd.revents & POLLIN))
 		{
-			zbx_set_socket_strerror("connection error with poll events 0x%x", pd.revents);
+			char	*errmsg;
+
+			errmsg = socket_poll_error(pd.revents);
+			zbx_set_socket_strerror("%s", errmsg);
+			zbx_free(errmsg);
+
 			return ZBX_PROTO_ERROR;
 		}
 
@@ -2399,7 +2445,12 @@ int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout
 
 			if (0 != rc && 0 == (pd.revents & POLLOUT))
 			{
-				zbx_set_socket_strerror("connection error with poll events 0x%x", pd.revents);
+				char	*errmsg;
+
+				errmsg = socket_poll_error(pd.revents);
+				zbx_set_socket_strerror("%s", errmsg);
+				zbx_free(errmsg);
+
 				return FAIL;
 			}
 		}
@@ -2470,7 +2521,12 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 
 			if (0 == (pd.revents & POLLIN))
 			{
-				zbx_set_socket_strerror("connection error with poll events 0x%x", pd.revents);
+				char	*errmsg;
+
+				errmsg = socket_poll_error(pd.revents);
+				zbx_set_socket_strerror("%s", errmsg);
+				zbx_free(errmsg);
+
 				return FAIL;
 			}
 		}
