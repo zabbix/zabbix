@@ -1689,7 +1689,7 @@ jQuery(function($) {
 			// Need to be postponed.
 			setTimeout(function() {
 				$(document)
-					.on('click dragstart contextmenu', {menu: $menu_popup, opener: $opener},
+					.on('click dragstart', {menu: $menu_popup, opener: $opener},
 						menuPopupDocumentCloseHandler
 					)
 					.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
@@ -1710,7 +1710,7 @@ jQuery(function($) {
 				$('[aria-expanded="true"]', menu_popup).attr({'aria-expanded': 'false'});
 
 				$(document)
-					.off('click dragstart contextmenu', menuPopupDocumentCloseHandler)
+					.off('click dragstart', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
