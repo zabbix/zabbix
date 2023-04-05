@@ -2035,7 +2035,7 @@ static int	zbx_match_log_rec(const zbx_vector_expression_t *regexps, const char 
 static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
 		const int *mtime, int *big_rec, const char *encoding, zbx_vector_expression_t *regexps,
 		const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_process_value_func_t process_value, zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout, char **err_msg)
@@ -2432,7 +2432,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, zbx_vector_expression_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
+		zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset, const char *persistent_file_name,
 		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *config_tls, int config_timeout,
 		char **err_msg)
@@ -3300,7 +3300,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_expression_t *regexps, const char *pattern, const char *output_template, int *p_count,
-		int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
+		int *s_count, zbx_process_value_func_t process_value, zbx_vector_addr_ptr_t *addrs,
 		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, int *jumped, float max_delay,
 		double *start_time, zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
@@ -3847,9 +3847,9 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  *           comments.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
+int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	AGENT_REQUEST			request;
