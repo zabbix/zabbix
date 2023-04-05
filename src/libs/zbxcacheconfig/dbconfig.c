@@ -15715,3 +15715,40 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 #	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
 #endif
 
+void	zbx_recalc_time_period(int *ts_from, int table_group)
+{
+#define HK_CFG_UPDATE_INTERVAL	5
+	time_t			least_ts = 0, now;
+	zbx_config_t		cfg;
+	static time_t		last_cfg_retrieval = 0;
+	static zbx_config_hk_t	hk;
+
+	now = time(NULL);
+
+	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
+	{
+		last_cfg_retrieval = now;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk = cfg.hk;
+	}
+
+	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
+	{
+		if (1 != hk.history_global)
+			return;
+
+		least_ts = now - hk.history;
+	}
+	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
+	{
+		if (1 != hk.trends_global)
+			return;
+
+		least_ts = now - hk.trends + 1;
+	}
+
+	if (least_ts > *ts_from)
+		*ts_from = (int)least_ts;
+#undef HK_CFG_UPDATE_INTERVAL
+}
