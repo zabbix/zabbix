@@ -671,7 +671,7 @@ abstract class CItemGeneralOld extends CApiService {
 		$item_indexes = [];
 
 		foreach ($items as $i => $item) {
-			if (!array_key_exists('uuid', $item)) {
+			if (!array_key_exists('uuid', $item) || $item['uuid'] === '') {
 				continue;
 			}
 

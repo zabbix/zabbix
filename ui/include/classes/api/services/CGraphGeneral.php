@@ -839,7 +839,7 @@ abstract class CGraphGeneral extends CApiService {
 		$graph_indexes = [];
 
 		foreach ($graphs as $i => $graph) {
-			if (!array_key_exists('uuid', $graph)) {
+			if (!array_key_exists('uuid', $graph) || $graph['uuid'] === '') {
 				continue;
 			}
 
