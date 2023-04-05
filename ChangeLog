@@ -1113,24 +1113,22 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 --------------------------------------------------------------------------------
 Changes for 6.0.16rc1
 
-New features:
-
 Bug fixes:
-...G...... [ZBX-22306] fixed crash in Zabbix agent 2 when running out of available file descriptors (vso)
-..F....... [ZBX-21013] hid option "Create new groups" for unprivileged users in the Import form (Sasha)
-...G...... [ZBX-22219] added validation to the "Server" ip/dns option in configuration configuration of the Zabbix Agent 2 (kprutkovs)
+...G...... [ZBX-22306] fixed the crash in Zabbix agent 2 when running out of available file descriptors (vso)
+..F....... [ZBX-21013] hid the option "Create new groups" for unprivileged users in the Import form (Sasha)
+...G...... [ZBX-22219] added validation to the "Server" IP/DNS option in the Zabbix agent 2 configuration (kprutkovs)
 ........S. [ZBX-22627] fixed loss of preprocessing result when step with delta is used (dgoloscapov, wiper)
-.......PS. [ZBX-22304] fixed duplication in web scenario error message, when curl could not resolve host (mprihodko)
-.........T [ZBX-21577] added extra master item prototype to reduce preprocessing worker utilization (ztielidze)
+.......PS. [ZBX-22304] fixed duplication in web scenario error messages when curl cannot resolve host (mprihodko)
+.........T [ZBX-21577] added an extra master item prototype to the Elasticsearch Cluster by HTTP template to reduce preprocessing worker utilization (ztielidze)
 ..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
-A.F....... [ZBX-20699] fixed inability to import host prototypes containing SNMPv3 interface; allowed to supply conditional parameters with default values to hostprototype.create and hostprototype.update API methods when the parameters have no effect; added audit logging of changes to host prototypes when unlinking a template; fixed inability to remove group links or group prototypes from a host prototype of a linked template (jfreibergs, vmaksimovs)
-..F....... [ZBX-22432] fixed different severity paddings in triggers popups and maps triggers (dfofanovs)
-..F....... [ZBX-22210] fixed selected count when using filter and filtered parameter is changed in popup (esekace)
-..F....... [ZBX-22533] fixed debug section overlapping with 'Add new widget' placeholder in dashboard (esekace)
+A.F....... [ZBX-20699] fixed the inability to import host prototypes containing SNMPv3 interface; allowed to supply conditional parameters with default values to hostprototype.create and hostprototype.update API methods when the parameters have no effect; added audit logging of changes to host prototypes when unlinking a template; fixed the inability to remove group links or group prototypes from a host prototype of a linked template (jfreibergs, vmaksimovs)
+..F....... [ZBX-22432] fixed different severity paddings in trigger popups and maps triggers (dfofanovs)
+..F....... [ZBX-22210] fixed selected count when using filter and filtered parameter is changed in a popup (esekace)
+..F....... [ZBX-22533] fixed debug section overlapping with 'Add new widget' placeholder in the dashboard (esekace)
 ..F....... [ZBX-22331] fixed messages when updating graph prototype discovery (ddauksa)
-..F....... [ZBX-22455] added check for numeric value in value mapping (esekace)
+..F....... [ZBX-22455] added a check for numeric value in value mapping (esekace)
 ..F....... [ZBX-22206] fixed incorrect padding in multiselect popup contrast dark and light stylesheets (dfofanovs)
-..F....... [ZBX-18527] fixed markup for Type of calculation expression field (dpetra)
+..F....... [ZBX-18527] fixed the markup for Type of calculation expression field (dpetra)
 A.F.I..PS. [ZBX-22363] added support for item and item_preproc table fields to be either nvarchar or nclob (agriscenko, vso)
 
 --------------------------------------------------------------------------------
