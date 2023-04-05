@@ -285,7 +285,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 			continue
 		}
 
-		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str}
+		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str, a.Value, a.Id}
 	}
 
 	return
