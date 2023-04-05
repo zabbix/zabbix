@@ -3635,6 +3635,10 @@ Changes for 5.0.34rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21013] hid option "Groups" for unprivileged users in the Import form (Sasha)
+...G...... [ZBX-22219] added validation to the "Server" ip/dns option in configuration configuration of the Zabbix Agent 2 (kprutkovs)
+..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
+..F....... [ZBX-18527] fixed markup for Type of calculation expression field (dpetra)
 ........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
