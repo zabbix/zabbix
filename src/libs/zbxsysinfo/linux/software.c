@@ -559,7 +559,11 @@ static void	portage_details(const char *manager, const char *line, const char *r
 	sizeinfo = strtok_r(NULL, ":", &saveptr);
 
 	if (NULL == pkginfo || NULL == sizeinfo)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "failed to find package version or size information (%s)",
+				line);
 		goto out;
+	}
 
 	/*
 	 * e.g. "dev-lang,tcl,8.6.12,r1,gentoo: 1104 files, 25 non-files, 10871914 bytes"
