@@ -91,11 +91,11 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	public function setFlags($flags): self {
 		parent::setFlags($flags);
 
-		if ($flags & self::FLAG_NOT_EMPTY) {
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
 
-			if ($this->isTemplateDashboard()) {
+			if (!$this->isTemplateDashboard()) {
 				self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
 			}
 
@@ -108,6 +108,12 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		}
 
 		return $this;
+	}
+
+	public function setTemplateId($templateid): self {
+		parent::setTemplateId($templateid);
+
+		return $this->setFlags($this->getFlags());
 	}
 
 	public static function getDefaults(): array {

@@ -94,6 +94,12 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		return $this;
 	}
 
+	public function setTemplateId($templateid): self {
+		parent::setTemplateId($templateid);
+
+		return $this->setFlags($this->getFlags());
+	}
+
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 		$value = $this->getValue();
