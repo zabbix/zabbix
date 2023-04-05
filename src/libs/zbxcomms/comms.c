@@ -444,7 +444,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	if (POLLOUT != (pd.revents & (POLLOUT | POLLERR | POLLHUP | POLLNVAL)))
 	{
 		*error = socket_poll_error(pd.revents);
-		zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x", pd.revents);
+		zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x", (unsigned)pd.revents);
 		return FAIL;
 	}
 
@@ -659,7 +659,8 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 				zbx_set_socket_strerror("%s", errmsg);
 				zbx_free(errmsg);
 
-				zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x", pd.revents);
+				zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x",
+						(unsigned)pd.revents);
 
 				return ZBX_PROTO_ERROR;
 			}
@@ -1142,7 +1143,7 @@ static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size)
 			zbx_set_socket_strerror("%s", errmsg);
 			zbx_free(errmsg);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLIN) failed with revents 0x%x", pd.revents);
+			zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLIN) failed with revents 0x%x", (unsigned)pd.revents);
 
 			return ZBX_PROTO_ERROR;
 		}
@@ -2456,7 +2457,8 @@ int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout
 				zbx_set_socket_strerror("%s", errmsg);
 				zbx_free(errmsg);
 
-				zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x", pd.revents);
+				zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x",
+						(unsigned)pd.revents);
 
 				return FAIL;
 			}
@@ -2534,7 +2536,8 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 				zbx_set_socket_strerror("%s", errmsg);
 				zbx_free(errmsg);
 
-				zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLIN) failed with revents 0x%x", pd.revents);
+				zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLIN) failed with revents 0x%x",
+						(unsigned)pd.revents);
 
 				return FAIL;
 			}
