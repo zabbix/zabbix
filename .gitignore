@@ -3,6 +3,9 @@
 !/src/modules/dummy/Makefile
 *.a
 *.o
+*.gcda
+*.gcno
+/tests_results
 .cproject
 .deps
 .dirstamp

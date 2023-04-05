@@ -64,10 +64,8 @@ if (!empty($this->data['templates'])) {
 // Name
 $name_text_box = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAriaRequired();
-if (!$this->data['templated']) {
-	$name_text_box->setAttribute('autofocus', 'autofocus');
-}
+	->setAriaRequired()
+	->setAttribute('autofocus', 'autofocus');
 
 $http_form_list
 	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), $name_text_box)

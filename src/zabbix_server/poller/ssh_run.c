@@ -19,13 +19,12 @@
 
 #include "ssh_run.h"
 
-#include "zbxcommon.h"
-
 #include <libssh/libssh.h>
 
 #include "zbxcomms.h"
 #include "log.h"
 #include "zbxnum.h"
+#include "zbxfile.h"
 
 #if !defined(HAVE_SSH_OPTIONS_KEY_EXCHANGE) && !defined(HAVE_SSH_OPTIONS_HOSTKEYS) && \
 		!defined(HAVE_SSH_OPTIONS_CIPHERS_C_S) && !defined(HAVE_SSH_OPTIONS_CIPHERS_S_C) && \
@@ -148,7 +147,7 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 #undef HAVE_NO_SSH_OPTIONS
 
 /* example ssh.run["ls /"] */
-int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
 {
 	ssh_session	session;
 	ssh_channel	channel;

@@ -1057,6 +1057,10 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
@@ -1554,6 +1558,16 @@ form {
 			.icon-info {
 				margin-left: 5px;
 			}
+
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.average-bg,
+			&.warning-bg,
+			&.high-bg,
+			&.disaster-bg {
+				padding-left: 5px;
+			}
 		}
 
 		.wrap-multiple-controls {
@@ -1920,10 +1934,6 @@ select {
 	}
 
 	&:focus + label span {
-		border-color: $form-border-focus-color;
-	}
-
-	&:checked:focus + label span {
 		border-color: $form-border-focus-color;
 	}
 
@@ -3195,7 +3205,7 @@ $form-icon-btn: (
 	display: table;
 	position: absolute;
 	z-index: 1000;
-	padding: 13px 10px 10px;
+	padding: 17px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
@@ -3221,6 +3231,7 @@ $form-icon-btn: (
 		position: fixed;
 		overflow: hidden;
 		margin: 0 10px;
+		padding: 13px 10px 10px;
 
 		.dashboard-widget-head {
 			margin-bottom: 12px;
@@ -3367,14 +3378,6 @@ $form-icon-btn: (
 	.list-table {
 		white-space: normal;
 		border: 0;
-
-		th {
-			@extend %dashboard-widget-td;
-		}
-
-		td {
-			@extend %dashboard-widget-td;
-		}
 	}
 
 	.table-paging {

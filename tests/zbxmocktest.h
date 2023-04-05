@@ -34,7 +34,12 @@
 #	define ZBX_NO_RETURN
 #endif
 
-int	get_config_timeout(void);
+unsigned char get_program_type(void);
+
+int	get_zbx_config_timeout(void);
+int	get_zbx_config_enable_remote_commands(void);
+int	get_zbx_config_log_remote_commands(void);
+int	get_zbx_config_unsafe_user_parameters(void);
 
 void	zbx_mock_test_entry(void **state);
 

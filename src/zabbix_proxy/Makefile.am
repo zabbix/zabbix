@@ -16,7 +16,6 @@ sbin_PROGRAMS = zabbix_proxy
 noinst_LIBRARIES = libzbxproxy.a
 
 libzbxproxy_a_SOURCES = \
-	events.c \
 	proxy_lld.c
 
 libzbxproxy_a_CFLAGS = \
@@ -27,7 +26,7 @@ zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
-	$(top_builddir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
+	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
 	$(top_builddir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
@@ -38,10 +37,10 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper_proxy.a \
 	$(top_builddir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
-	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \
 	preproc/libpreproc_proxy.a \
+	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
@@ -51,7 +50,6 @@ zabbix_proxy_LDADD = \
 	taskmanager/libzbxtaskmanager.a \
 	$(top_builddir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_builddir)/src/zabbix_server/scripts/libzbxscripts.a \
-	$(top_builddir)/src/zabbix_server/availability/libavailability.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
@@ -107,6 +105,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_builddir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_builddir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \

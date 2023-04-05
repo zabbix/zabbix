@@ -24,6 +24,7 @@
 #include "zbxcomms.h"
 #include "log.h"
 #include "zbxnum.h"
+#include "zbxfile.h"
 
 #if !defined(HAVE_LIBSSH2_METHOD_KEX) && !defined(HAVE_LIBSSH2_METHOD_HOSTKEY) && \
 		!defined(HAVE_LIBSSH2_METHOD_CRYPT_CS) && !defined(HAVE_LIBSSH2_METHOD_CRYPT_SC) && \
@@ -224,7 +225,7 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 }
 
 /* example ssh.run["ls /"] */
-int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
 {
 	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;

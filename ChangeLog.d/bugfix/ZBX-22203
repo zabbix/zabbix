@@ -1,1 +1,0 @@
-..F....... [ZBX-22203] fixed tabfilter item click event being executed at the end of tabfilter sorting event in Firefox (miks)
