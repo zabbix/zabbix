@@ -57,7 +57,6 @@ static char		*sql = NULL;
 static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
-extern int		CONFIG_DOUBLE_PRECISION;
 
 #define ZBX_IDS_SIZE	10
 
@@ -2061,7 +2060,7 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 {
 	char	*errmsg = NULL;
 
-	if (FAIL == zbx_variant_to_value_type(value, value_type, CONFIG_DOUBLE_PRECISION, &errmsg))
+	if (FAIL == zbx_variant_to_value_type(value, value_type, &errmsg))
 	{
 		dc_history_set_error(hdata, errmsg);
 		return;
@@ -2141,7 +2140,7 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
+				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl))
 				{
 					char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
