@@ -30,8 +30,6 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testPermissionsCSRF extends CWebTest {
 
-	const UPDATE_API_TOKEN = 'api_token_update';
-
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -43,7 +41,7 @@ class testPermissionsCSRF extends CWebTest {
 
 	public function prepareApiTokenData() {
 		$tokens = CDataHelper::call('token.create', [
-			'name' => self::UPDATE_API_TOKEN,
+			'name' => 'api_token_update',
 			'userid' => '1'
 		]);
 		$this->assertArrayHasKey('tokenids', $tokens);
@@ -61,21 +59,28 @@ class testPermissionsCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM sysmaps',
-					'link' => 'sysmaps.php?form=Create+map'
+					'link' => 'sysmaps.php?form=Create+map',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #1 Map update.
 			[
 				[
 					'db' => 'SELECT * FROM sysmaps',
-					'link' => 'sysmaps.php?form=update&sysmapid=3'
+					'link' => 'sysmaps.php?form=update&sysmapid=3',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #2 Host group create.
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=hostgroup.edit'
 				]
 			],
@@ -83,7 +88,6 @@ class testPermissionsCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=hostgroup.edit&groupid=50012'
 				]
 			],
@@ -91,7 +95,6 @@ class testPermissionsCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=templategroup.edit'
 				]
 			],
@@ -99,7 +102,6 @@ class testPermissionsCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=templategroup.edit&groupid=14'
 				]
 			],
@@ -107,21 +109,28 @@ class testPermissionsCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=create'
+					'link' => 'templates.php?form=create',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #7 Template update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=update&templateid=10169'
+					'link' => 'templates.php?form=update&templateid=10169',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #8 Host create.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=host.edit'
 				]
 			],
@@ -129,7 +138,6 @@ class testPermissionsCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=host.edit&hostid=99062'
 				]
 			],
@@ -137,421 +145,448 @@ class testPermissionsCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=update&hostid=50011&itemid=99086&context=host'
+					'link' => 'items.php?form=update&hostid=50011&itemid=99086&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #11 Item create.
 			[
 				[
 					'db' => 'SELECT * FROM items',
-					'link' => 'items.php?form=create&hostid=50011&context=host'
+					'link' => 'items.php?form=create&hostid=50011&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #12 Trigger update.
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'triggers.php?form=update&triggerid=100034&context=host'
+					'link' => 'triggers.php?form=update&triggerid=100034&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #13 Trigger create.
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'triggers.php?hostid=50011&form=create&context=host'
+					'link' => 'triggers.php?hostid=50011&form=create&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #14 Graph update.
 			[
 				[
 					'db' => 'SELECT * FROM graphs',
-					'link' => 'graphs.php?form=update&graphid=700026&filter_hostids%5B0%5D=99202&context=host'
+					'link' => 'graphs.php?form=update&graphid=700026&filter_hostids%5B0%5D=99202&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #15 Graph create.
 			[
 				[
 					'db' => 'SELECT * FROM graphs',
-					'link' => 'graphs.php?hostid=50011&form=create&context=host'
+					'link' => 'graphs.php?hostid=50011&form=create&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #16 Discovery rule update.
 			[
 				[
 					'db' => 'SELECT * FROM drules',
-					'link' => 'host_discovery.php?form=update&itemid=99107&context=host'
+					'link' => 'host_discovery.php?form=update&itemid=99107&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #17 Discovery rule create.
 			[
 				[
 					'db' => 'SELECT * FROM drules',
-					'link' => 'host_discovery.php?form=create&hostid=99202&context=host'
+					'link' => 'host_discovery.php?form=create&hostid=99202&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #18 Web scenario update.
 			[
 				[
 					'db' => 'SELECT * FROM httptest',
-					'link' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host'
+					'link' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #19 Web scenario create.
 			[
 				[
 					'db' => 'SELECT * FROM httptest',
-					'link' => 'httpconf.php?form=create&hostid=50001&context=host'
+					'link' => 'httpconf.php?form=create&hostid=50001&context=host',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
 				]
 			],
 			// #20 Maintenance create.
 			[
 				[
 					'db' => 'SELECT * FROM maintenances',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=maintenance.list',
-					'case' => 'popup create'
+					'overlay' => 'create'
 				]
 			],
 			// #21 Maintenance update.
 			[
 				[
 					'db' => 'SELECT * FROM maintenances',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=maintenance.list',
-					'case' => 'popup update'
+					'overlay' => 'update'
 				]
 			],
 			// #22 Action create.
 			[
 				[
 					'db' => 'SELECT * FROM actions',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=action.list&eventsource=0',
-					'case' => 'popup create'
+					'overlay' => 'create'
 				]
 			],
 			// #23 Action update.
 			[
 				[
 					'db' => 'SELECT * FROM actions',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=action.list&eventsource=0',
-					'case' => 'popup update'
+					'overlay' => 'update'
 				]
 			],
 			// #24 Event correlation create.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=correlation.edit'
+					'link' => 'zabbix.php?action=correlation.edit',
+					'return_button' => true
 				]
 			],
 			// #25 Event correlation update.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'access_denied' => true,
-					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit'
+					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit',
+					'return_button' => true
 				]
 			],
 			// #26 Discovery create.
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=discovery.edit'
+					'link' => 'zabbix.php?action=discovery.edit',
+					'return_button' => true
 				]
 			],
 			// #27 Discovery update.
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=discovery.edit&druleid=5'
+					'link' => 'zabbix.php?action=discovery.edit&druleid=5',
+					'return_button' => true
 				]
 			],
 			// #28 GUI update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=gui.edit'
+					'link' => 'zabbix.php?action=gui.edit',
+					'return_button' => true
 				]
 			],
 			// #29 Autoregistration update.
 			[
 				[
 					'db' => 'SELECT * FROM autoreg_host',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=autoreg.edit'
+					'link' => 'zabbix.php?action=autoreg.edit',
+					'return_button' => true
 				]
 			],
 			// #30 Housekeeping update.
 			[
 				[
 					'db' => 'SELECT * FROM housekeeper',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=housekeeping.edit'
+					'link' => 'zabbix.php?action=housekeeping.edit',
+					'return_button' => true
 				]
 			],
 			// #31 Image update.
 			[
 				[
 					'db' => 'SELECT * FROM images',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=image.edit&imageid=1'
+					'link' => 'zabbix.php?action=image.edit&imageid=1',
+					'return_button' => true
 				]
 			],
 			// #32 Image create.
 			[
 				[
 					'db' => 'SELECT * FROM images',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=image.edit&imagetype=1'
+					'link' => 'zabbix.php?action=image.edit&imagetype=1',
+					'return_button' => true
 				]
 			],
 			// #33 Icon map update.
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
+					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101',
+					'return_button' => true
 				]
 			],
 			// #34 Icon map create.
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=iconmap.edit'
+					'link' => 'zabbix.php?action=iconmap.edit',
+					'return_button' => true
 				]
 			],
 			// #35 Regular expression update.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=regex.edit&regexid=20'
+					'link' => 'zabbix.php?action=regex.edit&regexid=20',
+					'return_button' => true
 				]
 			],
 			// #36 Regular expression create.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=regex.edit'
+					'link' => 'zabbix.php?action=regex.edit',
+					'return_button' => true
 				]
 			],
 			// #37 Macros update.
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=macros.edit'
+					'link' => 'zabbix.php?action=macros.edit',
+					'return_button' => true
 				]
 			],
 			// #38 Trigger displaying options update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=trigdisplay.edit'
+					'link' => 'zabbix.php?action=trigdisplay.edit',
+					'return_button' => true
 				]
 			],
 			// #39 API token create.
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=token.list',
-					'case' => 'token create'
+					'overlay' => 'create'
 				]
 			],
 			// #40 API token update.
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=token.list',
-					'case' => 'token update'
+					'overlay' => 'update'
 				]
 			],
 			// #41 Other parameters update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=miscconfig.edit'
+					'link' => 'zabbix.php?action=miscconfig.edit',
+					'return_button' => true
 				]
 			],
 			// #42 Proxy update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=proxy.list',
-					'case' => 'proxy update',
-					'proxy' => 'Active proxy 1'
+					'overlay' => 'update'
 				]
 			],
 			// #43 Proxy create.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=proxy.list',
-					'case' => 'proxy create'
+					'overlay' => 'create'
 				]
 			],
 			// #44 Authentication update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=authentication.edit'
+					'link' => 'zabbix.php?action=authentication.edit',
+					'return_button' => true
 				]
 			],
 			//#45 User group update.
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7'
+					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7',
+					'return_button' => true
 				]
 			],
 			// #46 User group create.
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=usergroup.edit'
+					'link' => 'zabbix.php?action=usergroup.edit',
+					'return_button' => true
 				]
 			],
 			// #47 User update.
 			[
 				[
 					'db' => 'SELECT * FROM users',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=user.edit&userid=1'
+					'link' => 'zabbix.php?action=user.edit&userid=1',
+					'return_button' => true
 				]
 			],
 			// #48 User create.
 			[
 				[
 					'db' => 'SELECT * FROM users',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=user.edit'
+					'link' => 'zabbix.php?action=user.edit',
+					'return_button' => true
 				]
 			],
 			// #49 Media update.
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1'
+					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
+					'return_button' => true
 				]
 			],
 			// #50 create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=mediatype.edit'
+					'link' => 'zabbix.php?action=mediatype.edit',
+					'return_button' => true
 				]
 			],
 			// #51 Script update.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=script.edit&scriptid=1'
+					'link' => 'zabbix.php?action=script.edit&scriptid=1',
+					'return_button' => true
 				]
 			],
 			// #52 Script create.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=script.edit'
+					'link' => 'zabbix.php?action=script.edit',
+					'return_button' => true
 				]
 			],
 			// #53 User profile update.
 			[
 				[
 					'db' => 'SELECT * FROM profiles',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=userprofile.edit'
+					'link' => 'zabbix.php?action=userprofile.edit',
+					'return_button' => true
 				]
 			],
 			// #54 User role update.
 			[
 				[
 					'db' => 'SELECT * FROM role',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=userrole.edit&roleid=2'
+					'link' => 'zabbix.php?action=userrole.edit&roleid=2',
+					'return_button' => true
 				]
 			],
 			// #55 User role create.
 			[
 				[
 					'db' => 'SELECT * FROM role',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=userrole.edit'
+					'link' => 'zabbix.php?action=userrole.edit',
+					'return_button' => true
 				]
 			],
 			// #56 User API token create.
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=user.token.list',
-					'case' => 'token create'
+					'overlay' => 'create'
 				]
 			],
 			// #57 User API token update.
 			[
 				[
 					'db' => 'SELECT * FROM token',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=user.token.list',
-					'case' => 'token update'
+					'overlay' => 'update'
 				]
 			],
 			// #58 Scheduled report create.
 			[
 				[
 					'db' => 'SELECT * FROM report',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=scheduledreport.edit'
+					'link' => 'zabbix.php?action=scheduledreport.edit',
+					'return_button' => true
 				]
 			],
 			// #59 Scheduled report update.
 			[
 				[
 					'db' => 'SELECT * FROM report',
-					'access_denied' => true,
-					'link' => 'zabbix.php?action=scheduledreport.edit&reportid=3'
+					'link' => 'zabbix.php?action=scheduledreport.edit&reportid=3',
+					'return_button' => true
 				]
 			],
 			// #60 Connector create.
 			[
 				[
 					'db' => 'SELECT * FROM connector',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=connector.list',
-					'case' => 'popup create'
+					'overlay' => 'create'
 				]
 			],
 			// #61 Connector update.
 			[
 				[
 					'db' => 'SELECT * FROM connector',
-					'access_denied' => true,
 					'link' => 'zabbix.php?action=connector.list',
-					'case' => 'popup update'
+					'overlay' => 'update'
 				]
-			],
+			]
 		];
 	}
 
@@ -562,80 +597,52 @@ class testPermissionsCSRF extends CWebTest {
 		$old_hash = CDBHelper::getHash($data['db']);
 		$this->page->login()->open($data['link'])->waitUntilReady();
 
-		if (array_key_exists('case', $data)) {
-			switch ($data['case']) {
-				case 'token create':
-					$this->query('button:Create API token')->waitUntilClickable()->one()->click();
-					$element = COverlayDialogElement::find()->waitUntilReady()->one();
-					$fill_data = ['Name' => 'test', 'User' => 'admin-zabbix', 'Expires at' => '2037-12-31 00:00:00'];
-
-					if (strpos($data['link'], 'user')) {
-						unset($fill_data['User']);
-					}
-
-					$element->asForm()->fill($fill_data);
-					break;
-
-				case 'token update':
-				case 'proxy update':
-					$name = ($data['case'] === 'token update') ? self::UPDATE_API_TOKEN : $data['proxy'];
-					$this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()
-							->findRow('Name', $name)->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
-					$element = COverlayDialogElement::find()->waitUntilReady()->one();
-					break;
-
-				case 'proxy create':
-					$this->query('button:Create proxy')->waitUntilClickable()->one()->click();
-					$element = COverlayDialogElement::find()->waitUntilReady()->one();
-					$element->asForm()->fill(['Proxy name' => 'test remove sid']);
-					break;
-
-				case 'popup create':
-					$this->query('xpath://div[@class="header-controls"]//button')->one()->waitUntilClickable()->click();
-					$element = COverlayDialogElement::find()->waitUntilReady()->one();
-					break;
-
-				case 'popup update':
-					$this->query('xpath://table[@class="list-table"]//tr[1]/td[2]/a')->one()->waitUntilClickable()->click();
-					$element = COverlayDialogElement::find()->waitUntilReady()->one();
-					break;
-			}
+		// If form opens in the overlay dialog - open that dialog.
+		if (array_key_exists('overlay', $data)) {
+			$clickable_element =  ($data['overlay'] === 'create')
+				? $this->query("xpath://div[@class=\"header-controls\"]//button")->one()->waitUntilClickable()
+				: $this->query('xpath://table[@class="list-table"]//tr[1]/td[2]/a')->one()->waitUntilClickable();
+			$clickable_element->click();
+			$element = COverlayDialogElement::find()->waitUntilReady()->one();
 		}
 		else {
 			$element = $this;
 		}
 
+		// Delete hidden input with CSRF token.
 		$element->query('xpath:.//input[@name="_csrf_token"]')->one()->delete();
 
+		// Submit Update or CReate form.
 		$query = ($this->query('button:Update')->exists())
 			? 'button:Update'
 			: 'xpath://button[text()="Add" and @type="submit"] | //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
 		$this->query($query)->waitUntilClickable()->one()->click();
 
-		if (CTestArrayHelper::get($data, 'access_denied')) {
-			$message = 'Access denied';
-			$details = 'You are logged in as "Admin". You have no permissions to access this page.';
-		}
-		elseif (CTestArrayHelper::get($data, 'server_error')) {
-			$message = 'Unexpected server error.';
-			$details = null;
-		}
-		else {
-			$message = 'Zabbix has received an incorrect request.';
-			$details = 'Operation cannot be performed due to unauthorized request.';
-		}
+		// Check the error message depending on case.
+		$error = CTestArrayHelper::get($data, 'error',
+			[
+				'message' => 'Access denied',
+				'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
+			]
+		);
+		$this->assertMessage(TEST_BAD, $error['message'], $error['details']);
 
-		$this->assertMessage(TEST_BAD, $message, $details);
-
-		if (CTestArrayHelper::get($data, 'incorrect_request')) {
-			$this->query('button:Go to "Dashboards"')->one()->waitUntilClickable()->click();
+		// Check 'Go to "Dashboards"' button, if it exists, or make sure that it is absent.
+		$return_button = 'Go to "Dashboards"';
+		if (CTestArrayHelper::get($data, 'return_button')) {
+			$this->query('button', $return_button)->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}
+		else {
+			$this->assertFalse($this->query('button', $return_button)->exists());
+		}
 
+		// Compare db hashes to check that form didn't make any changes.
 		$this->assertEquals($old_hash, CDBHelper::getHash($data['db']));
 
-		if (CTestArrayHelper::get($data, 'case')) {
+		// Close overlay if it is necessary.
+		if (CTestArrayHelper::get($data, 'overlay')) {
 			$element->close();
 		}
 	}
