@@ -44,6 +44,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "version.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -95,7 +96,8 @@ zbx_section_entry_t;
 typedef enum
 {
 	ZBX_SECTION_ENTRY_THE_ONLY,
-	ZBX_SECTION_ENTRY_PER_PROXY
+	ZBX_SECTION_ENTRY_PER_PROXY,
+	ZBX_SECTION_ENTRY_SERVER_STATS
 }
 zbx_entry_type_t;
 
@@ -665,6 +667,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
+	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,	NULL},
 	{NULL}
 };
 
@@ -732,6 +735,14 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 		if (NULL != section->res && SUCCEED != *section->res)	/* skip section we have no information for */
 			continue;
+
+		if (ZBX_SECTION_ENTRY_SERVER_STATS == section->entry_type)
+		{
+			zbx_json_addobject(json, section->name);
+			zbx_json_addstring(json, "server version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(json);
+			continue;
+		}
 
 		zbx_json_addarray(json, section->name);
 
