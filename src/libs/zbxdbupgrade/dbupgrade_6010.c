@@ -22,7 +22,7 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
-#include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 
 /*
@@ -322,7 +322,7 @@ static int	DBpatch_6010023(void)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
-		zbx_db_insert_add_values(&insert, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+		zbx_db_insert_add_values(&insert, hostid, ZBX_INTERFACE_AVAILABLE_UNKNOWN);
 	}
 	zbx_db_free_result(result);
 

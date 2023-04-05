@@ -20,7 +20,6 @@
 #include "zbxdbhigh.h"
 
 #include "log.h"
-#include "events.h"
 #include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
@@ -261,7 +260,7 @@ int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char 
 	zbx_cb_nextid = cb_nextid;
 
 	if (ZBX_PROGRAM_TYPE_SERVER != program)
-		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, db_schema, error);
+		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(), error);
 
 	return SUCCEED;
 }
@@ -533,9 +532,9 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n)
 }
 
 #ifdef HAVE_MYSQL
-static size_t	get_string_field_size(unsigned char type)
+static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
-	switch(type)
+	switch(field->type)
 	{
 		case ZBX_TYPE_LONGTEXT:
 			return ZBX_SIZE_T_MAX;
@@ -551,16 +550,19 @@ static size_t	get_string_field_size(unsigned char type)
 	}
 }
 #elif defined(HAVE_ORACLE)
-static size_t	get_string_field_size(unsigned char type)
+static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
-	switch(type)
+	switch(field->type)
 	{
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
 			return ZBX_SIZE_T_MAX;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
-			return 4000u;
+			if (4000 < field->length)
+				return 32767u;
+			else
+				return 4000u;
 		case ZBX_TYPE_CUID:
 			return CUID_LEN - 1;
 		default:
@@ -569,6 +571,16 @@ static size_t	get_string_field_size(unsigned char type)
 	}
 }
 #endif
+
+static size_t	get_string_field_chars(const zbx_db_field_t *field)
+{
+	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+		return ZBX_SIZE_T_MAX;
+	else if (ZBX_TYPE_CUID == field->type)
+		return CUID_LEN - 1;
+	else
+		return field->length;
+}
 
 char	*zbx_db_dyn_escape_string_len(const char *src, size_t length)
 {
@@ -582,19 +594,10 @@ char	*zbx_db_dyn_escape_string(const char *src)
 
 static char	*DBdyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag)
 {
-	size_t	length;
-
-	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
-		length = ZBX_SIZE_T_MAX;
-	else if (ZBX_TYPE_CUID == field->type)
-		length = CUID_LEN;
-	else
-		length = field->length;
-
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
-	return zbx_db_dyn_escape_string_basic(src, get_string_field_size(field->type), length, flag);
+	return zbx_db_dyn_escape_string_basic(src, get_string_field_size(field), get_string_field_chars(field), flag);
 #else
-	return zbx_db_dyn_escape_string_basic(src, ZBX_SIZE_T_MAX, length, flag);
+	return zbx_db_dyn_escape_string_basic(src, ZBX_SIZE_T_MAX, get_string_field_chars(field), flag);
 #endif
 }
 
@@ -617,11 +620,11 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 	return zbx_db_dyn_escape_like_pattern_basic(src);
 }
 
-const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
+static zbx_db_table_t	*db_get_table(const char *tablename)
 {
-	int	t;
+	zbx_db_table_t	*tables = zbx_dbschema_get_tables();
 
-	for (t = 0; NULL != tables[t].table; t++)
+	for (int t = 0; NULL != tables[t].table; t++)
 	{
 		if (0 == strcmp(tables[t].table, tablename))
 			return &tables[t];
@@ -630,7 +633,7 @@ const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
 	return NULL;
 }
 
-const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname)
+static zbx_db_field_t	*db_get_field(zbx_db_table_t *table, const char *fieldname)
 {
 	int	f;
 
@@ -641,6 +644,47 @@ const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *
 	}
 
 	return NULL;
+}
+
+const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
+{
+	return db_get_table(tablename);
+}
+
+const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname)
+{
+	return db_get_field((zbx_db_table_t *)table, fieldname);
+}
+
+int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str)
+{
+	const zbx_db_table_t	*table;
+	const zbx_db_field_t	*field;
+	size_t			max_bytes, max_chars;
+
+	if (NULL == (table = zbx_db_get_table(tablename)) || NULL == (field = zbx_db_get_field(table, fieldname)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid table: \"%s\" field: \"%s\"", tablename, fieldname);
+		return FAIL;
+	}
+
+#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
+	max_bytes = get_string_field_size(field);
+#else
+	max_bytes = ZBX_SIZE_T_MAX;
+#endif
+	max_chars = get_string_field_chars(field);
+
+	if (max_bytes < strlen(str))
+		return FAIL;
+
+	if (ZBX_SIZE_T_MAX == max_chars)
+		return SUCCEED;
+
+	if (max_chars != max_bytes && max_chars < zbx_strlen_utf8(str))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1594,19 +1638,17 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  *                                                                            *
  * Purpose: register unknown host and generate event                          *
  *                                                                            *
- * Parameters: host - host name                                               *
- *                                                                            *
  ******************************************************************************/
 void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now)
+		int now, const zbx_events_funcs_t *events_cbs)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
 	zbx_vector_ptr_create(&autoreg_hosts);
 
 	zbx_db_register_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
-	zbx_db_register_host_flush(&autoreg_hosts, proxy_hostid);
+	zbx_db_register_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
 
 	zbx_db_register_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
@@ -1626,7 +1668,7 @@ void	zbx_db_register_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *h
 		int now)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	int 			i;
+	int			i;
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)	/* duplicate check */
 	{
@@ -1792,7 +1834,8 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 	return 0;
 }
 
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
+void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
+		const zbx_events_funcs_t *events_cbs)
 {
 	zbx_autoreg_host_t	*autoreg_host;
 	zbx_uint64_t		autoreg_hostid = 0;
@@ -1888,12 +1931,20 @@ void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t pr
 		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
 		ts.sec = autoreg_host->now;
-		zbx_add_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+
+		if (NULL != events_cbs->add_event_cb)
+		{
+			events_cbs->add_event_cb(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
+					autoreg_host->autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0,
+					0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+		}
 	}
 
-	zbx_process_events(NULL, NULL);
-	zbx_clean_events();
+	if (NULL != events_cbs->process_events_cb)
+		events_cbs->process_events_cb(NULL, NULL);
+
+	if (NULL != events_cbs->clean_events_cb)
+		events_cbs->clean_events_cb();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2257,6 +2308,119 @@ int	zbx_db_field_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+#if defined(HAVE_ORACLE)
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
+{
+#define ZBX_TYPE_CHAR_STR	"nvarchar2"
+#define ZBX_PROTO_TAG_FIELDS	"fields"
+#define ZBX_PROTO_TAG_LENGTH	"length"
+#define ZBX_PROTO_TAG_CHAR	"char"
+	zbx_db_table_t		*table;
+	int			i;
+	zbx_vector_str_t	names;
+	size_t			offset;
+
+	if (NULL != json)
+		offset = json->buffer_offset;
+
+	zbx_vector_str_create(&names);
+
+	if (NULL == (table = db_get_table(tablename)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, tablename);
+
+		goto cleanup;
+	}
+
+	for (i = 0; NULL != table->fields[i].name; i++)
+	{
+		switch (table->fields[i].type)
+		{
+			case ZBX_TYPE_TEXT:
+				zbx_vector_str_append(&names, (char *)table->fields[i].name);
+				break;
+			default:
+				break;
+		}
+	}
+
+	if (0 != names.values_num)
+	{
+		zbx_db_row_t	row;
+		zbx_db_result_t	result;
+		char		*table_name_esc;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+
+		table_name_esc = zbx_db_dyn_escape_string(table->table);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select column_name,data_type,char_length"
+				" from user_tab_columns"
+				" where lower(table_name)='%s'"
+					" and",
+				table_name_esc);
+
+		zbx_free(table_name_esc);
+
+		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "lower(column_name)",
+				(const char **)names.values, names.values_num);
+
+		result = zbx_db_select("%s", sql);
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_db_field_t	*field;
+
+			zbx_strlower(row[0]);
+			if (NULL == (field = db_get_field(table, row[0])))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s(): table '%s', cannot find field '%s'", __func__,
+						table->table, row[0]);
+				continue;
+			}
+
+			zbx_strlower(row[1]);
+			if (0 != strcmp(row[1], ZBX_TYPE_CHAR_STR))
+				continue;
+
+			field->type = ZBX_TYPE_CHAR;
+			field->length = (unsigned short)atoi(row[2]);
+
+			if (NULL != json)
+			{
+				if (offset == json->buffer_offset)
+				{
+					zbx_json_addobject(json, tablename);
+					zbx_json_addobject(json, ZBX_PROTO_TAG_FIELDS);
+				}
+
+				zbx_json_addobject(json, field->name);
+				zbx_json_addstring(json, ZBX_PROTO_TAG_TYPE, ZBX_PROTO_TAG_CHAR, ZBX_JSON_TYPE_STRING);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_LENGTH, field->length);
+				zbx_json_close(json);
+			}
+		}
+		zbx_db_free_result(result);
+
+		zbx_free(sql);
+	}
+cleanup:
+	zbx_vector_str_destroy(&names);
+
+	if (NULL != json)
+	{
+		if (offset != json->buffer_offset)
+		{
+			zbx_json_close(json);
+			zbx_json_close(json);
+		}
+	}
+#undef ZBX_TYPE_CHAR_STR
+#undef ZBX_PROTO_TAG_FIELDS
+#undef ZBX_PROTO_TAG_LENGTH
+#undef ZBX_PROTO_TAG_CHAR
+}
+#endif
 
 #ifndef HAVE_SQLITE3
 int	zbx_db_trigger_exists(const char *table_name, const char *trigger_name)

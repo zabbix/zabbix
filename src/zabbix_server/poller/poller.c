@@ -41,6 +41,7 @@
 #include "zbxhttp.h"
 #include "log.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -191,7 +192,7 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item,  unsig
 
 	interface_set_availability(&item->interface, &out);
 
-	if (INTERFACE_AVAILABLE_TRUE == in.agent.available)
+	if (ZBX_INTERFACE_AVAILABLE_TRUE == in.agent.available)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
 				item_type_agent_string(item->type), item->host.host);
@@ -256,9 +257,9 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsi
 				item_type_agent_string(item->type), item->key_orig, item->host.host,
 				out.agent.disable_until - ts->sec);
 	}
-	else if (INTERFACE_AVAILABLE_FALSE != in.agent.available)
+	else if (ZBX_INTERFACE_AVAILABLE_FALSE != in.agent.available)
 	{
-		if (INTERFACE_AVAILABLE_FALSE != out.agent.available)
+		if (ZBX_INTERFACE_AVAILABLE_FALSE != out.agent.available)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
 					" another network error, wait for %d seconds",
@@ -823,7 +824,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
 	int			errcodes[ZBX_MAX_POLLER_ITEMS];
 	zbx_timespec_t		timespec;
-	int			i, num, last_available = INTERFACE_AVAILABLE_UNKNOWN;
+	int			i, num, last_available = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
 	zbx_vector_ptr_t	add_results;
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
@@ -854,21 +855,21 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-				if (INTERFACE_AVAILABLE_TRUE != last_available)
+				if (ZBX_INTERFACE_AVAILABLE_TRUE != last_available)
 				{
 					zbx_activate_item_interface(&timespec, &items[i], &data, &data_alloc,
 							&data_offset);
-					last_available = INTERFACE_AVAILABLE_TRUE;
+					last_available = ZBX_INTERFACE_AVAILABLE_TRUE;
 				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
-				if (INTERFACE_AVAILABLE_FALSE != last_available)
+				if (ZBX_INTERFACE_AVAILABLE_FALSE != last_available)
 				{
 					zbx_deactivate_item_interface(&timespec, &items[i], &data, &data_alloc,
 							&data_offset, config_unavailable_delay, results[i].msg);
-					last_available = INTERFACE_AVAILABLE_FALSE;
+					last_available = ZBX_INTERFACE_AVAILABLE_FALSE;
 				}
 				break;
 			case CONFIG_ERROR:

@@ -1891,12 +1891,11 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
-			/** TODO: uncomment and change doc links after ZBXNEXT-2592
 			// #205 Template groups list view.
 			[
 				[
 					'url' => 'zabbix.php?action=templategroup.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hostgroups'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templategroups'
 				]
 			],
 			// #206 Create template group popup.
@@ -1910,7 +1909,7 @@ class testDocumentationLinks extends CWebTest {
 						]
 					],
 					'open_button' => 'button:Create template group',
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
 				]
 			],
 			// #207 Edit template group popup.
@@ -1923,18 +1922,16 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'xpath://a[text()="Templates"]'
 						]
 					],
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
 				]
 			],
 			// #208 Create template group form view (standalone).
 			[
 				[
 					'url' => 'zabbix.php?action=templategroup.edit',
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
 				]
 			]
-			 *
-			 */
 		];
 	}
 

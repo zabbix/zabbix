@@ -27,7 +27,6 @@
 #include "zbxnix.h"
 #endif
 
-#include "zbxalgo.h"
 #include "cfg.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -36,7 +35,7 @@ extern char	*config_tls_server_cert_subject;
 extern char	*config_tls_psk_identity;
 #endif
 
-static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
+static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_addr_ptr_t *addrs,
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		int loglevel)
 {
@@ -59,22 +58,21 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 				zbx_socket_strerror());
 
-		zbx_vector_ptr_remove(addrs, 0);
-		zbx_vector_ptr_append(addrs, addr);
+		zbx_vector_addr_ptr_remove(addrs, 0);
+		zbx_vector_addr_ptr_append(addrs, addr);
 	}
 
 	return ret;
 }
 
-int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
+int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
 		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls)
 {
 	int		res;
 	const char	*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:%d [timeout:%d, connection timeout:%d]", __func__,
-			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
-			connect_timeout);
+			addrs->values[0]->ip, addrs->values[0]->port, timeout, connect_timeout);
 
 	switch (config_tls->connect_mode)
 	{

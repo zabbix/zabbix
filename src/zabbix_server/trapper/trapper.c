@@ -35,6 +35,7 @@
 #include "trapper_item_test.h"
 #include "trapper_request.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxxml.h"
 #include "zbxcrypto.h"
 #include "zbxtime.h"
@@ -1071,7 +1072,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs)
 {
 	int	ret = SUCCEED;
 
@@ -1119,7 +1120,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				zbx_recv_proxy_data(sock, &jp, ts, config_comms->config_timeout);
+				zbx_recv_proxy_data(sock, &jp, ts, events_cbs, config_comms->config_timeout);
 			else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 				zbx_send_proxy_data(sock, ts, config_comms);
 		}
@@ -1130,7 +1131,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 		{
-			ret = send_list_of_active_checks_json(sock, &jp, config_comms->config_timeout);
+			ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 		{
@@ -1179,7 +1180,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
-		ret = send_list_of_active_checks(sock, s, config_comms->config_timeout);
+		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout);
 	}
 	else
 	{
@@ -1258,14 +1259,15 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs)
 {
 	ssize_t	bytes_received;
 
 	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
 		return;
 
-	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time);
+	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
+			events_cbs);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1355,7 +1357,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 #endif
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
-					trapper_args_in->config_startup_time);
+					trapper_args_in->config_startup_time, trapper_args_in->events_cbs);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

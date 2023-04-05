@@ -17,11 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AVAIL_MANAGER_H
-#define ZABBIX_AVAIL_MANAGER_H
+#ifndef ZABBIX_DBSYNCER_H
+#define ZABBIX_DBSYNCER_H
 
 #include "zbxthreads.h"
+#include "zbxdbhigh.h"
 
-ZBX_THREAD_ENTRY(availability_manager_thread, args);
+typedef struct
+{
+	const zbx_events_funcs_t	*events_cbs;
+	int				config_histsyncer_frequency;
+}
+zbx_thread_dbsyncer_args;
+
+ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args);
 
 #endif
