@@ -628,25 +628,9 @@ void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeou
 #if defined(_WINDOWS) || defined(__MINGW32__)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
-int	__zbx_open(const char *pathname, int flags);
 #else
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
-
-typedef struct
-{
-	zbx_fs_time_t	modification_time;	/* time of last modification */
-	zbx_fs_time_t	access_time;		/* time of last access */
-	zbx_fs_time_t	change_time;		/* time of last status change */
-}
-zbx_file_time_t;
-
-int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
-void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
-int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
-int	zbx_is_regular_file(const char *path);
-char	*zbx_fgets(char *buffer, int size, FILE *fp);
-int	zbx_write_all(int fd, const char *buf, size_t n);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 
@@ -801,5 +785,19 @@ char	*zbx_strerror(int errnum);
 #		define zbx_sigmask	sigprocmask
 #	endif
 #endif
+
+#define ZBX_PROPERTY_DECL(type, varname, defvalue) \
+static type	varname = defvalue; \
+static type	get_##varname(void) \
+{ \
+	return varname; \
+}
+
+#define ZBX_PROPERTY_DECL_CONST(type, varname, defvalue) \
+static type	varname = defvalue; \
+static const type	get_##varname(void) \
+{ \
+	return varname; \
+}
 
 #endif

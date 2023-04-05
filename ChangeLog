@@ -1,6 +1,7 @@
 Changes for 7.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-8237] changed module details view to a modal (popup) and updated module details (ddauksa)
 ...G...... [ZBXNEXT-7132] added option of getting fully qualified domain name in system.hostname key to the Zabbix agent and Zabbix agent 2 (kprutkovs)
 ..F.I..... [ZBXNEXT-8226] fixed the problem of insufficient length of URL fields (dfofanovs, dgoloscapov)
 ........S. [ZBXNEXT-8312] increased TimescaleDB maximum supported version to 2.10 (mprihodko)
@@ -14,6 +15,7 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
 .......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 .........T [ZBX-22261] added value mapping in the template PostgreSQL by Zabbix agent 2 for item Checksum failures (ztielidze)
 .......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
@@ -82,6 +84,24 @@ A......... [ZBX-21238] fixed inability to update status and other fields of disc
 ..F....... [ZBX-22320] fixed success message when disabling hosts in host groups (epulke)
 .......PS. [ZBX-22079] fixed "make clean" command when used from tar archive (arimdjonoks)
 A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.2rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.1
+
+6.4.1rc2 was released as 6.4.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.4.1rc2
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.1rc1
@@ -1153,6 +1173,24 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.16rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.15
+
+6.0.15rc2 was released as 6.0.15 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.15rc2
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.15rc1
@@ -3590,6 +3628,14 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.34rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.33
@@ -6351,6 +6397,24 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.46rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45
+
+4.0.45rc2 was released as 4.0.45 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45rc2
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45rc1

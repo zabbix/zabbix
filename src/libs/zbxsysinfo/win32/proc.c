@@ -20,11 +20,11 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxsymbols.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxwin32.h"
 
 #include <tlhelp32.h>
 #include "sddl.h"
