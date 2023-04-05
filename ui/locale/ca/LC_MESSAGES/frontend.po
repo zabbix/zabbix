@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-01-08 15:52+0000\n"
+"PO-Revision-Date: 2023-03-18 13:45+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -64,11 +64,11 @@ msgstr "S'espera la parella \"amfitrió:clau\"."
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr "\"hostid\" de l'Item dependent i l'Item principal han de coincidir"
+msgstr "\"hostid\" de l'element depenent i l'element mestre haurien de coincidir"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr "\"ruleid\" de l'Item dependent i l'Item principal han de coincidir"
+msgstr "\"ruleid\" de l'element depenent i l'element mestre haurien de coincidir"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:900
@@ -202,7 +202,7 @@ msgstr[1] "%1$s de %2$s element en estat problemàtic"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr "%1$s preseleccionats, utilitzeu les tecles de fletxa avall, amunt i Intro per seleccionar"
+msgstr "%1$s preseleccionats, empreu les tecles de fletxa avall, amunt i Intro per seleccionar"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
@@ -291,7 +291,7 @@ msgstr "(0 - infinitament)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr "(0 - utilitza l'acció per defecte)"
+msgstr "(0 - empra l'acció per defecte)"
 
 #: include/views/configuration.hostgroups.list.php:36
 msgid "(Only super admins can create groups)"
@@ -306,7 +306,7 @@ msgstr "(sense proxy)"
 
 #: include/classes/setup/CSetupWizard.php:494
 msgid "0 - use default port"
-msgstr "0: utilitza el port predeterminat"
+msgstr "0 - empra el port predeterminat"
 
 #: include/triggers.inc.php:1595
 msgid "0 or 1"
@@ -324,7 +324,7 @@ msgstr "10 segons"
 
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr "100 activadors més ocupats"
+msgstr "100 triggers més ocupats"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -1413,6 +1413,10 @@ msgstr "Intents"
 msgid "Attribution"
 msgstr "Atribució"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr "Atribucions HTML"
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -1905,7 +1909,7 @@ msgstr "No es pot pas afegir la dependència d'un equip a una plantilla."
 #: include/triggers.inc.php:371
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr "No es pot pas afegir la dependència de l'activador \"%1$s:%2$s\" a l'activador no existent \"%3$s:%4$s\"."
+msgstr "No es pot pas afegir la dependència del trigger \"%1$s:%2$s\" al trigger no existent \"%3$s:%4$s\"."
 
 #: host_discovery.php:726
 msgid "Cannot add discovery rule"
@@ -2355,7 +2359,7 @@ msgstr[1] "No es poden pas esborrar els scripts"
 #: include/classes/api/services/CScript.php:877
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr "No es poden pas esborrar els scripts. L'script \"%1$s\" s'utilitza en l'operació d'acció \"%2$s\"."
+msgstr "No es poden pas esborrar els scripts. L'script \"%1$s\" s'empra en l'operació d'acció \"%2$s\"."
 
 #: actionconf.php:510
 msgid "Cannot delete selected actions"
@@ -2623,17 +2627,17 @@ msgstr "No es poden pas ampliar les macros."
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr "No es pot pas trobar la imatge de fons \"%1$s\" utilitzada al mapa \"%2$s\"."
+msgstr "No es pot pas trobar la imatge de fons \"%1$s\" emprada al mapa \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:170
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "No es troba pas el gràfic \"%1$s\" utilitzat al tauler de control \"%2$s\"."
+msgstr "No es troba pas el gràfic \"%1$s\" emprat al tauler de control \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:152
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr "No es troba pas el grup \"%1$s\" utilitzat al mapa \"%2$s\"."
+msgstr "No es troba pas el grup \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:140
 #, c-format
@@ -2661,57 +2665,57 @@ msgstr "No es troba la interfície de l'equip a \"%1$s\" per a l'element clau \"
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr "No es pot pas trobar la icona \"%1$s\" utilitzada al mapa \"%2$s\"."
+msgstr "No es pot pas trobar la icona \"%1$s\" emprada al mapa \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:258
 #, c-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr "No es pot pas trobar el mapa d'icones \"%1$s\" utilitzat al mapa \"%2$s\"."
+msgstr "No es pot pas trobar el mapa d'icones \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:952
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr "No es pot pas trobar la interfície \"%1$s\" utilitzada per a la regla de descobriment \"%2$s\" a \"%3$s\"."
+msgstr "No es pot pas trobar la interfície \"%1$s\" emprada per a la regla de descobriment \"%2$s\" a \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr "No es pot pas trobar la interfície \"%1$s\" utilitzada per a l'element \"%2$s\" a \"%3$s\"."
+msgstr "No es pot pas trobar la interfície \"%1$s\" emprada per a l'element \"%2$s\" a \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1105
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "No es pot pas trobar la interfície \"%1$s\" utilitzada per al prototip d'element \"%2$s\" de la regla de descobriment \"%3$s\" a \"%4$s\"."
+msgstr "No es pot pas trobar la interfície \"%1$s\" emprada per al prototip d'element \"%2$s\" de la regla de descobriment \"%3$s\" a \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1601
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
-msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" utilitzat com a valor MAX de l'eix Y per al gràfic \"%3$s\"."
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MAX de l'eix Y per al gràfic \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1373
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" utilitzat com a valor MAX de l'eix Y per al prototip de gràfic \"%3$s\" de la regla de descobriment \"%4$s\" a \"%5$s\"."
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MAX de l'eix Y per al prototip de gràfic \"%3$s\" de la regla de descobriment \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1583
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
-msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" utilitzat com a valor MIN de l'eix Y per al gràfic \"%3$s\"."
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MIN de l'eix Y per al gràfic \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1352
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" utilitzat com a valor MIN de l'eix Y per al prototip de gràfic \"%3$s\" de la regla de descobriment \"%4$s\" a \"%5$s\"."
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat com a valor MIN de l'eix Y per al prototip de gràfic \"%3$s\" de la regla de descobriment \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1621
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" utilitzat al gràfic \"%3$s\"."
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat al gràfic \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1394
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" utilitzat al prototip de gràfic \"%3$s\" de la regla de descobriment \"%4$s\" a \"%5$s\"."
+msgstr "No es pot pas trobar l'element \"%1$s\" a \"%2$s\" emprat al prototip de gràfic \"%3$s\" de la regla de descobriment \"%4$s\" a \"%5$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:155
 #, c-format
@@ -2721,7 +2725,7 @@ msgstr "No es pot pas trobar l'element \"%1$s\" fet anar al tauler de control \"
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr "No es pot pas trobar el mapa \"%1$s\" utilitzat al mapa \"%2$s\"."
+msgstr "No es pot pas trobar el mapa \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
@@ -2737,17 +2741,17 @@ msgstr "No es pot pas trobar la plantilla \"%1$s\" per substituir \"%2$s\" de la
 #: include/classes/import/importers/CMapImporter.php:229
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr "No es pot pas trobar el trigger \"%1$s\" utilitzat al mapa \"%2$s\"."
+msgstr "No es pot pas trobar el trigger \"%1$s\" emprat al mapa \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr "No es pot pas trobar el mapa de valors \"%1$s\" utilitzat per a l'element \"%2$s\" a \"%3$s\"."
+msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat per a l'element \"%2$s\" a \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1121
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "No es pot pas trobar el mapa de valors \"%1$s\" utilitzat per al prototip d'element \"%2$s\" de la regla de descobriment \"%3$s\" a \"%4$s\"."
+msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat per al prototip d'element \"%2$s\" de la regla de descobriment \"%3$s\" a \"%4$s\"."
 
 #: include/classes/api/services/CRole.php:590
 #: include/classes/api/services/CRole.php:607
@@ -2788,12 +2792,12 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" perqu
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de la dependència de l'activador \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de la dependència del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió de l'activador \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
@@ -3099,7 +3103,7 @@ msgstr "No es pot pas actualitzar \"%1$s\" per a l'element \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1018
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr "No es pot pas actualitzar \"%1$s\" per a l'activador de plantilla \"%2$s\"."
+msgstr "No es pot pas actualitzar \"%1$s\" per al trigger de plantilla \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1029
 #, c-format
@@ -3136,6 +3140,11 @@ msgstr "No es pot pas actualitzar un gràfic descobert."
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "No es pot pas actualitzar un grup d'equips descobert \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "No es pot pas actualitzar una plantilla de gràfic \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -3289,7 +3298,7 @@ msgstr "No es pot pas actualitzar el proxy"
 #: include/classes/api/services/CProxy.php:654
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr "No es pot actualitzar el servidor intermediari per a l'equip descobert \"%1$s\"."
+msgstr "No es pot actualitzar el proxy per a l'equip descobert \"%1$s\"."
 
 #: include/classes/api/services/CRole.php:775
 #, c-format
@@ -3316,7 +3325,7 @@ msgstr "No es pot pas actualitzar l'script"
 #: include/classes/api/services/CScript.php:445
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
-msgstr "No es pot pas actualitzar l'abast de l'script. L'script \"%1$s\" s'utilitza a l'acció \"%2$s\"."
+msgstr "No es pot pas actualitzar l'abast de l'script. L'script \"%1$s\" s'empra a l'acció \"%2$s\"."
 
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
@@ -3833,22 +3842,22 @@ msgstr "Condició"
 #: include/classes/api/services/CDiscoveryRule.php:1813
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
-msgstr "La condició \"%2$s\" no s'utilitza a la fórmula \"%3$s\" per a la regla de descobriment \"%1$s\"."
+msgstr "La condició \"%2$s\" no s'empra a la fórmula \"%3$s\" per a la regla de descobriment \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1605
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
-msgstr "La condició \"%2$s\" no s'utilitza a la fórmula \"%3$s\" per substituir \"%1$s\"."
+msgstr "La condició \"%2$s\" no s'empra a la fórmula \"%3$s\" per substituir \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1812
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
-msgstr "La condició \"%2$s\" utilitzada a la fórmula \"%3$s\" per a la regla de descobriment \"%1$s\" no està definida."
+msgstr "La condició \"%2$s\" emprada a la fórmula \"%3$s\" per a la regla de descobriment \"%1$s\" no està definida."
 
 #: include/classes/api/services/CDiscoveryRule.php:1604
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
-msgstr "La condició \"%2$s\" utilitzada a la fórmula \"%3$s\" per substituir \"%1$s\" no està definida."
+msgstr "La condició \"%2$s\" emprada a la fórmula \"%3$s\" per substituir \"%1$s\" no està definida."
 
 #: app/partials/popup.operations.php:254
 #: app/views/configuration.correlation.edit.php:129
@@ -3931,7 +3940,7 @@ msgstr "Configuració de la neteja"
 #: app/controllers/CControllerIconMapEdit.php:98
 #: app/controllers/CControllerIconMapList.php:75
 msgid "Configuration of icon mapping"
-msgstr "Configuració del mapeig d'icones"
+msgstr "Configuració del mapatge d'icones"
 
 #: app/controllers/CControllerImageEdit.php:75
 #: app/controllers/CControllerImageList.php:57
@@ -4109,7 +4118,7 @@ msgstr "Ha fallat la connexió amb el servidor Zabbix. Configuració incorrecta.
 
 #: include/classes/setup/CSetupWizard.php:552
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
-msgstr "La connexió no es xifrarà pas perquè utilitza un fitxer de socket (a Unix) o memòria compartida (Windows)."
+msgstr "La connexió no es xifrarà pas perquè empra un fitxer de socket (a Unix) o memòria compartida (Windows)."
 
 #: app/views/popup.massupdate.host.php:276
 msgid "Connections"
@@ -4726,7 +4735,7 @@ msgstr "El tauler \"%1$s\" ja existeix."
 #: include/classes/api/services/CDashboardGeneral.php:91
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
-msgstr "El tauler de control \"%1$s\" s'utilitza a l'informe \"%2$s\"."
+msgstr "El tauler de control \"%1$s\" s'empra a l'informe \"%2$s\"."
 
 #: app/controllers/CControllerDashboardUpdate.php:145
 #: app/controllers/CControllerTemplateDashboardUpdate.php:139
@@ -5322,7 +5331,7 @@ msgstr "Vols esborrar els tipus de suports triats?"
 
 #: app/views/administration.proxy.list.php:189
 msgid "Delete selected proxies?"
-msgstr "Vols esborrar els servidors intermediaris triats?"
+msgstr "Vols esborrar els proxys triats?"
 
 #: app/views/administration.regex.list.php:81
 msgid "Delete selected regular expressions?"
@@ -5390,11 +5399,11 @@ msgstr "Vols esborrar la plantilla?"
 
 #: include/views/configuration.trigger.prototype.edit.php:660
 msgid "Delete trigger prototype?"
-msgstr "Vols esborrar el prototip d'activador?"
+msgstr "Vols esborrar el prototip d3 trigger?"
 
 #: include/views/configuration.triggers.edit.php:666
 msgid "Delete trigger?"
-msgstr "Vols esborrar l'activador?"
+msgstr "Vols esborrar el trigger?"
 
 #: include/views/configuration.httpconf.edit.php:266
 msgid "Delete web scenario?"
@@ -5584,7 +5593,7 @@ msgstr "Desactivar els equips del grup d'equips escollit?"
 
 #: app/views/administration.proxy.list.php:187
 msgid "Disable hosts monitored by selected proxies?"
-msgstr "Vols desactivar els amfitrions supervisats pels servidors intermediaris triats?"
+msgstr "Vols desactivar els equips supervisats pels proxys triats?"
 
 #: app/views/administration.token.list.php:200
 #: app/views/administration.user.token.list.php:152
@@ -5638,7 +5647,7 @@ msgstr "Vols desactivar els informes programats triats?"
 
 #: include/views/configuration.triggers.list.php:342
 msgid "Disable selected triggers?"
-msgstr "Vols desactivar els activadors triats?"
+msgstr "Vols desactivar els triggers triats?"
 
 #: include/views/configuration.httpconf.list.php:211
 msgid "Disable selected web scenarios?"
@@ -5844,7 +5853,7 @@ msgstr "La regla de descobriment \"%1$s\" no es pot copiar sense el seu element 
 #: include/classes/api/services/CDRule.php:864
 #, c-format
 msgid "Discovery rule \"%1$s\" is used in \"%2$s\" action."
-msgstr "La regla de descobriment \"%1$s\" s'utilitza a l'acció \"%2$s\"."
+msgstr "La regla de descobriment \"%1$s\" s'empra a l'acció \"%2$s\"."
 
 #: app/controllers/CControllerDiscoveryCreate.php:85 host_discovery.php:723
 msgid "Discovery rule created"
@@ -6319,7 +6328,7 @@ msgstr "Activar equips"
 
 #: app/views/administration.proxy.list.php:184
 msgid "Enable hosts monitored by selected proxies?"
-msgstr "Vols habilitar els equips supervisats pels servidors intermediaris triats?"
+msgstr "Vols habilitar els equips supervisats pels proxys triats?"
 
 #: app/views/administration.audit.settings.edit.php:47
 #: app/views/administration.housekeeping.edit.php:43
@@ -6383,7 +6392,7 @@ msgstr "Vols activar els informes programats triats?"
 
 #: include/views/configuration.triggers.list.php:341
 msgid "Enable selected triggers?"
-msgstr "Vols activar els activadors triats?"
+msgstr "Vols activar els triggers triats?"
 
 #: include/views/configuration.httpconf.list.php:210
 msgid "Enable selected web scenarios?"
@@ -7579,12 +7588,12 @@ msgstr "Grup"
 #: include/classes/api/services/CHostGroup.php:656
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè l'utilitza un prototip d'equip."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè l'empra un prototip d'equip."
 
 #: include/classes/api/services/CHostGroup.php:717
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'utilitza en una condició de correlació."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'empra en una condició de correlació."
 
 #: include/classes/import/importers/CTemplateImporter.php:399
 #, c-format
@@ -8030,7 +8039,7 @@ msgstr "El grup d'equips \"%1$s\" ja existeix."
 #: include/classes/api/services/CHostGroup.php:703
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'utilitza en una condició de correlació."
+msgstr "El grup \"%1$s\" no es pot pas esborrar perquè s'empra en una condició de correlació."
 
 #: include/classes/api/services/CHostGroup.php:642
 #, c-format
@@ -8445,7 +8454,7 @@ msgstr "El mapa d'icones \"%1$s\" ja existeix."
 #: include/classes/api/services/CIconMap.php:563
 #, c-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr "El mapa d'icones \"%1$s\" no es pot pas esborrar. S'utilitza al mapa \"%2$s\"."
+msgstr "El mapa d'icones \"%1$s\" no es pot pas esborrar. S'empra al mapa \"%2$s\"."
 
 #: app/controllers/CControllerIconMapCreate.php:49
 msgid "Icon map created"
@@ -8492,7 +8501,7 @@ msgstr "Els mòduls situats a %1$s fan anar accions idèntiques."
 #: include/classes/core/CModuleManager.php:162
 #, c-format
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
-msgstr "Els mòduls situats a %2$s utilitzen un espai de noms idèntic (%1$s)."
+msgstr "Els mòduls situats a %2$s empren un espai de noms idèntic (%1$s)."
 
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
@@ -8890,7 +8899,7 @@ msgstr "Acció de condició de gravetat del trigger incorrecta."
 
 #: include/classes/api/services/CAction.php:3238
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr "Activador de la condició de trigger incorrecta. El trigger no existeix o no hi teniu pas accés."
+msgstr "Acció de la condició de trigger incorrecta. El trigger no existeix o no hi teniu pas accés."
 
 #: include/classes/validators/CActionCondValidator.php:211
 msgid "Incorrect action condition type."
@@ -8983,7 +8992,7 @@ msgstr "Valor massiu incorrecte per a la interfície."
 #: include/classes/api/services/CHost.php:2241
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr "S'utilitzen caràcters incorrectes per al nom d'equip \"%1$s\"."
+msgstr "S'empren caràcters incorrectes per al nom d'equip \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
@@ -9067,7 +9076,7 @@ msgstr "Operador de condició de filtre incorrecte per a la regla de descobrimen
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
 #: include/triggers.inc.php:1145
 msgid "Incorrect function is used"
-msgstr "S'utilitza una funció incorrecta"
+msgstr "S'empra una funció incorrecta"
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -9269,7 +9278,7 @@ msgstr "Valor \"%1$s\" incorrecte per al camp \"%2$s\"."
 #: include/validate.inc.php:336
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point."
-msgstr "El valor \"%1$s\" per al camp \"%2$s\" és incorrecte: ha d'ésser entre %3$s i %4$s i no tintre més de %5$s dígits després del punt decimal."
+msgstr "El valor \"%1$s\" per al camp \"%2$s\" és incorrecte: ha d'ésser entre %3$s i %4$s i no tindre més de %5$s dígits després del punt decimal."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:153
 #: include/validate.inc.php:341
@@ -9703,7 +9712,7 @@ msgstr "La interfície amb DNS \"%1$s\" no pot pas tindre una adreça IP buida."
 #: include/classes/api/services/CHostInterface.php:350
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
-msgstr "La interfície amb IP \"%1$s\" no ha de tindre un nom DNS buit mentre té la propietat \"Utilitza DNS\" a \"%2$s\"."
+msgstr "La interfície amb IP \"%1$s\" no ha de tindre un nom DNS buit mentre té la propietat \"Emprar DNS\" a \"%2$s\"."
 
 #: include/classes/api/services/CHostInterface.php:356
 #, c-format
@@ -10350,7 +10359,7 @@ msgstr "Etiquetes d'elements"
 
 #: jsLoader.php:397
 msgid "Item type does not use interface"
-msgstr "El tipus d'element no utilitza la interfície"
+msgstr "El tipus d'element no empra la interfície"
 
 #: items.php:879
 msgid "Item updated"
@@ -10362,7 +10371,7 @@ msgstr "L'element fa ús d'una interfície d'equip d'un equip no pare."
 
 #: include/classes/api/services/CItemGeneral.php:426
 msgid "Item uses incorrect interface type."
-msgstr "L'element utilitza un tipus d'interfície incorrecta."
+msgstr "L'element empra un tipus d'interfície incorrecta."
 
 #: app/views/popup.tophosts.column.edit.php:63
 #: include/classes/widgets/CWidgetConfig.php:59
@@ -10383,7 +10392,7 @@ msgstr "L'element no s'actualitzarà pas. L'interval d'actualització especifica
 
 #: include/items.inc.php:2095
 msgid "Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used."
-msgstr "L'element no s'actualitzarà pas. L'interval d'actualització ha d'estar entre 1 s i 1 d. També es poden utilitzar intervals programats/flexibles."
+msgstr "L'element no s'actualitzarà pas. L'interval d'actualització ha d'estar entre 1 s i 1 d. També es poden emprar intervals programats/flexibles."
 
 #: include/classes/api/services/CDashboardGeneral.php:447
 #: include/classes/api/services/CDashboardGeneral.php:454
@@ -11204,6 +11213,10 @@ msgstr "Manteniment sense recull de dades"
 msgid "Maintenance: %1$s"
 msgstr "Manteniment: %1$s"
 
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr "Assegureu-vos que el codi prové d'una font fiable o no conté pas scripts maliciosos."
+
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -11557,7 +11570,7 @@ msgstr "Tipus de suport"
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
 msgid "Media types used by action \"%1$s\"."
-msgstr "Tipus de suport utilitzats per l'acció \"%1$s\"."
+msgstr "Tipus de suport emprats per l'acció \"%1$s\"."
 
 #: app/views/administration.usergroup.list.php:75
 #: include/views/configuration.hostgroups.list.php:69
@@ -11575,7 +11588,7 @@ msgstr "Mida de la memòria en octets o en percentatge respecte al total. Retorn
 
 #: include/classes/data/CItemData.php:1005
 msgid "Memory used by process in bytes. Returns integer"
-msgstr "Memòria utilitzada pel procés, en octets. Retorna un nombre enter"
+msgstr "Memòria emprada pel procés, en octets. Retorna un nombre enter"
 
 #: app/views/administration.mediatype.edit.php:255
 msgid "Menu entry URL"
@@ -11840,24 +11853,24 @@ msgstr "Dilluns"
 
 #: app/views/configuration.host.list.php:128
 msgid "Monitored by"
-msgstr "Monitoritzat per"
+msgstr "Monitorat per"
 
 #: app/partials/configuration.host.edit.html.php:269
 #: app/views/popup.massupdate.host.php:128
 #: include/views/configuration.host.prototype.edit.php:279
 msgid "Monitored by proxy"
-msgstr "Monitoritzat per proxy"
+msgstr "Monitorat per proxy"
 
 #: include/classes/screens/CScreenDiscovery.php:119
 msgid "Monitored host"
-msgstr "Equip monitoritzat"
+msgstr "Equip monitorat"
 
 #: app/views/search.php:36 app/views/search.php:192
 #: include/classes/helpers/CMenuHelper.php:69
 #: include/classes/helpers/CRoleHelper.php:305
 #: include/views/inventory.host.view.php:135
 msgid "Monitoring"
-msgstr "Monitoritzant"
+msgstr "Monitorant"
 
 #: include/views/js/monitoring.sysmaps.js.php:70
 msgid "Monospace"
@@ -12788,11 +12801,11 @@ msgstr "No s'han triat pas objectius per a l'script global d'operacions d'acció
 #: include/triggers.inc.php:91
 #, c-format
 msgid "No trigger with trigger ID \"%1$s\"."
-msgstr "No hi ha activador amb l'identificador d'activador \"%1$s\"."
+msgstr "No hi ha trigger amb l'identificador de trigger \"%1$s\"."
 
 #: chart4.php:42
 msgid "No triggers defined."
-msgstr "No s'han definit pas activadors."
+msgstr "No s'han definit pas triggers."
 
 #: app/views/js/popup.itemtestedit.view.js.php:41
 msgid "No value"
@@ -14459,7 +14472,7 @@ msgstr "L'URL donat \"%1$s\" no és vàlid."
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:423
 msgid "Proxies"
-msgstr "Servidors intermediaris"
+msgstr "Proxys"
 
 #: app/controllers/CControllerAuditLogList.php:233
 #: app/views/administration.proxy.edit.php:89
@@ -14473,53 +14486,53 @@ msgstr "Servidors intermediaris"
 #: app/views/popup.condition.common.php:520
 #: app/views/popup.itemtestedit.view.php:237 include/actions.inc.php:62
 msgid "Proxy"
-msgstr "Servidor intermediari"
+msgstr "Proxy"
 
 #: include/classes/api/services/CProxy.php:606
 #, c-format
 msgid "Proxy \"%1$s\" already exists."
-msgstr "El servidor intermediari \"%1$s\" ja existeix."
+msgstr "El proxy \"%1$s\" ja existeix."
 
 #: include/classes/import/importers/CHostImporter.php:313
 #, c-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
-msgstr "El servidor intermediari \"%1$s\" per a l'equip \"%2$s\" no existeix."
+msgstr "El proxy \"%1$s\" per a l'equip \"%2$s\" no existeix."
 
 #: include/classes/api/services/CProxy.php:471
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
-msgstr "El servidor intermediari \"%1$s\" s'utilitza per l'acció \"%2$s\"."
+msgstr "El proxy \"%1$s\" s'empra per l'acció \"%2$s\"."
 
 #: include/classes/api/services/CProxy.php:428
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr "El servidor intermediari \"%1$s\" s'utilitza per la regla de descobriment \"%2$s\"."
+msgstr "El proxy \"%1$s\" s'empra per la regla de descobriment \"%2$s\"."
 
 #: app/controllers/CControllerProxyCreate.php:115
 msgid "Proxy added"
-msgstr "S'ha afegit un servidor intermediari"
+msgstr "S'ha afegit un proxy"
 
 #: app/views/administration.proxy.edit.php:81
 msgid "Proxy address"
-msgstr "Adreça del servidor intermediari"
+msgstr "Adreça del proxy"
 
 #: app/controllers/CControllerProxyDelete.php:66
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
-msgstr[0] "S'ha esborrat el servidor intermediari"
-msgstr[1] "S'han esborrat els servidors intermediaris"
+msgstr[0] "S'ha esborrat el proxy"
+msgstr[1] "S'han esborrat els proxys"
 
 #: app/views/administration.proxy.edit.php:70
 msgid "Proxy mode"
-msgstr "Mode del servidor intermediari"
+msgstr "Mode del proxy"
 
 #: app/views/administration.proxy.edit.php:64
 msgid "Proxy name"
-msgstr "Nom del servidor intermediari"
+msgstr "Nom del proxy"
 
 #: app/controllers/CControllerProxyUpdate.php:109
 msgid "Proxy updated"
-msgstr "S'ha actualitzat el servidor intermediari"
+msgstr "S'ha actualitzat el proxy"
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:399
@@ -14587,7 +14600,7 @@ msgstr "Visió general de la cua"
 #: app/views/administration.queue.overview.proxy.php:36
 #: include/classes/helpers/CMenuHelper.php:321
 msgid "Queue overview by proxy"
-msgstr "Visió general de la cua per servidor intermediari"
+msgstr "Visió general de la cua per proxy"
 
 #: app/views/hintbox.eventlist.php:100
 #: app/views/monitoring.widget.problems.view.php:93
@@ -15284,11 +15297,11 @@ msgstr "Torna-ho a provar"
 
 #: include/classes/data/CItemData.php:869
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "Retorna una matriu JSON amb macros LLD que descriuen els objectes MBean o els seus atributs. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON amb macros LLD que descriuen els objectes MBean o els seus atributs. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:873
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
-msgstr "Retorna una matriu JSON amb objectes MBean o els seus atributs. En comparació amb jmx.discovery, aquest no defineix macros LLD. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON amb objectes MBean o els seus atributs. En comparació amb jmx.discovery, aquest no defineix macros LLD. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:845
 msgid "Return first column of the first row of the SQL query result."
@@ -15308,12 +15321,12 @@ msgstr "Retorna el temps de resposta de ping ICMP en segons. Exemple: 0,02"
 
 #: include/classes/data/CItemData.php:1645
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr "Retorna una matriu JSON que descriu les interfícies de xarxa de l'equip configurades a Zabbix. Es pot utilitzar per a LLD."
+msgstr "Retorna una matriu JSON que descriu les interfícies de xarxa de l'equip configurades a Zabbix. Es pot emprar per a LLD."
 
 #: include/classes/data/CItemData.php:1601
 #: include/classes/data/CItemData.php:1701
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
-msgstr "Retorna un objecte JSON que conté mètriques internes del servidor Zabbix o del servidor intermediari."
+msgstr "Retorna un objecte JSON que conté mètriques internes del servidor Zabbix o del proxy."
 
 #: include/classes/data/CItemData.php:1641
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -16091,11 +16104,11 @@ msgstr "Setembre"
 
 #: include/hosts.inc.php:134 include/views/inventory.host.list.php:89
 msgid "Serial number A"
-msgstr "Número de sèrie A"
+msgstr "Nombre de sèrie A"
 
 #: include/hosts.inc.php:139
 msgid "Serial number B"
-msgstr "Número de sèrie B"
+msgstr "Nombre de sèrie B"
 
 #: include/views/js/monitoring.sysmaps.js.php:55
 msgid "Serif"
@@ -16229,6 +16242,10 @@ msgstr "Els serveis formen una dependència circular."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "Serveis actualitzats"
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr "S'espera un ID o token de sessió."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
@@ -17376,7 +17393,7 @@ msgstr "Nom de la plantilla"
 
 #: report2.php:394
 msgid "Template trigger"
-msgstr "Activador de la plantilla"
+msgstr "Trigger de la plantilla"
 
 #: templates.php:208
 msgid "Template updated"
@@ -17546,7 +17563,7 @@ msgstr "El mètode \"%1$s.%2$s\" s'ha de cridar sense el paràmetre \"auth\"."
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
-msgstr "La plantilla d'URL s'utilitza per carregar i mostrar la capa de mosaic als mapes geogràfics."
+msgstr "La plantilla d'URL s'empra per carregar i mostrar la capa de mosaic als mapes geogràfics."
 
 #: include/classes/db/DbBackend.php:130
 #, c-format
@@ -17623,15 +17640,15 @@ msgstr "L'equip ja no es troba pas i s'esborrarà el proper cop que es processi 
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
-msgstr[0] "La imatge s'utilitza al mapa d'icones %1$s."
-msgstr[1] "La imatge s'utilitza als mapes d'icones %1$s."
+msgstr[0] "La imatge s'empra al mapa d'icones %1$s."
+msgstr[1] "La imatge s'empra als mapes d'icones %1$s."
 
 #: include/classes/api/services/CImage.php:591
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
-msgstr[0] "La imatge s'utilitza al mapa %1$s."
-msgstr[1] "La imatge s'utilitza als mapes %1$s."
+msgstr[0] "La imatge s'empra al mapa %1$s."
+msgstr[1] "La imatge s'empra als mapes %1$s."
 
 #: include/html.inc.php:745
 #, c-format
@@ -17667,16 +17684,16 @@ msgstr "El procediment remot sol·licitat no existeix / no és pas disponible"
 #: app/views/administration.token.view.php:52
 #: app/views/administration.user.token.view.php:51
 msgid "The token has expired. Please update the expiry date to use the token."
-msgstr "El token ha caducat. Actualitzeu la data de caducitat per utilitzar el token."
+msgstr "El token ha caducat. Actualitzeu la data de caducitat per emprar el token."
 
 #: include/html.inc.php:718
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "L'activador ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
+msgstr "El trigger ja no es troba pas i s'esborrarà a %1$s (el %2$s a %3$s)."
 
 #: include/html.inc.php:713
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "L'activador ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
+msgstr "El trigger ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
 
 #: app/views/administration.user.edit.php:251
 msgid "Theme"
@@ -18061,7 +18078,7 @@ msgstr "El trigger \"%1$s\" no pot pas dependre del trigger \"%2$s\", doncs es p
 #: include/classes/api/services/CTriggerGeneral.php:2349
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr "El trigger \"%1$s\" no pot dependre pas de l'activador \"%2$s\", doncs es produiria un enllaç circular (%3$s) per a la plantilla \"%4$s\"."
+msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs es produiria un enllaç circular (%3$s) per a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2365
 #, c-format
@@ -18071,7 +18088,7 @@ msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs es p
 #: include/classes/api/services/CTriggerGeneral.php:2472
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs no es permeten les dependències dels activadors de l'equip a les plantilles de triggers."
+msgstr "El trigger \"%1$s\" no pot dependre pas del trigger \"%2$s\", doncs no es permeten les dependències dels triggers de l'equip a les plantilles de triggers."
 
 #: include/classes/api/services/CTriggerGeneral.php:2857
 #, c-format
@@ -18298,7 +18315,7 @@ msgstr "Actualitzats els prototips de triggers"
 
 #: app/views/administration.user.edit.php:739 include/actions.inc.php:45
 msgid "Trigger severity"
-msgstr "Gravitat del trigger"
+msgstr "Gravetat del trigger"
 
 #: jsLoader.php:367
 msgid "Trigger status \"OK\""
@@ -18947,11 +18964,11 @@ msgstr "Temps d'activitat/temps d'inactivitat"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
-msgstr "Utilitzeu sol·licituds massives"
+msgstr "Empreu sol·licituds massives"
 
 #: app/views/administration.trigdisplay.edit.php:35
 msgid "Use custom event status colors"
-msgstr "Utilitzeu colors d'estat d'esdeveniment personalitzats"
+msgstr "Empreu colors d'estat d'esdeveniment personalitzats"
 
 #: jsLoader.php:402
 msgid "Use default"
@@ -18959,20 +18976,20 @@ msgstr "Ús per defecte"
 
 #: app/partials/configuration.host.edit.html.php:216
 msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
-msgstr "Utilitzeu el formulari de configuració del prototip d'amfitrió per eliminar les plantilles enllaçades automàticament al proper descobriment."
+msgstr "Empreu el formulari de configuració del prototip d'amfitrió per eliminar les plantilles enllaçades automàticament al proper descobriment."
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
 msgid "Use if severity"
-msgstr "Utilitzeu si és greu"
+msgstr "Empreu si és greu"
 
 #: app/views/administration.miscconfig.edit.php:119
 msgid "Use iframe sandboxing"
-msgstr "Utilitzeu el sandboxing iframe"
+msgstr "Empreu el sandboxing iframe"
 
 #: app/views/administration.mediatype.list.php:85
 #: app/views/administration.script.list.php:76
 msgid "Used in actions"
-msgstr "S'utilitza en accions"
+msgstr "S'empra en accions"
 
 #: app/controllers/CControllerAuditLogList.php:244
 #: app/partials/js/scheduledreport.subscription.js.php:78
@@ -19017,7 +19034,7 @@ msgstr "L'usuari \"%1$s\" és el destinatari de l'informe \"%2$s\"."
 #: include/classes/api/services/CUser.php:1302
 #, c-format
 msgid "User \"%1$s\" is used in \"%2$s\" action."
-msgstr "L'usuari \"%1$s\" s'utilitza a l'acció \"%2$s\"."
+msgstr "L'usuari \"%1$s\" s'empra a l'acció \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:1375
 #, c-format
@@ -19084,17 +19101,17 @@ msgstr "El grup d'usuaris \"%1$s\" és el destinatari de l'informe \"%2$s\"."
 #: include/classes/api/services/CUserGroup.php:942
 #, c-format
 msgid "User group \"%1$s\" is used in \"%2$s\" action."
-msgstr "El grup d'usuaris \"%1$s\" s'utilitza a l'acció \"%2$s\"."
+msgstr "El grup d'usuaris \"%1$s\" s'empra a l'acció \"%2$s\"."
 
 #: include/classes/api/services/CUserGroup.php:963
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
-msgstr "El grup d'usuaris \"%1$s\" s'utilitza a la configuració per als missatges de baixa de la base de dades."
+msgstr "El grup d'usuaris \"%1$s\" s'empra a la configuració per als missatges de baixa de la base de dades."
 
 #: include/classes/api/services/CUserGroup.php:955
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
-msgstr "El grup d'usuaris \"%1$s\" s'utilitza a l'script \"%2$s\"."
+msgstr "El grup d'usuaris \"%1$s\" s'empra a l'script \"%2$s\"."
 
 #: app/controllers/CControllerUsergroupCreate.php:95
 msgid "User group added"
@@ -19428,7 +19445,7 @@ msgstr "Temps d'activitat de l'hipervisor de VMware, <url> - URL del servei de V
 
 #: include/classes/data/CItemData.php:1361
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Mida de memòria utilitzada de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
+msgstr "Mida de memòria emprada de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
 
 #: include/classes/data/CItemData.php:1349
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19685,7 +19702,7 @@ msgstr "Mapes de valors"
 
 #: include/classes/data/CItemData.php:913
 msgid "Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON"
-msgstr "Valor del tema MQTT. El format de les dades retornades dependrà del contingut del tema. Si s'utilitzen comodins, retorna els valors del tema en format JSON"
+msgstr "Valor del tema MQTT. El format de les dades retornades dependrà del contingut del tema. Si s'empren comodins, retorna els valors del tema en format JSON"
 
 #: include/classes/data/CItemData.php:989
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
@@ -19905,7 +19922,7 @@ msgstr "Web"
 #: include/views/configuration.httpconf.edit.php:26
 #: include/views/configuration.httpconf.list.php:92
 msgid "Web monitoring"
-msgstr "Monitorització web"
+msgstr "Monitoratge web"
 
 #: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
@@ -20843,7 +20860,7 @@ msgstr "calculat"
 
 #: app/views/administration.geomaps.edit.php:52
 msgid "can be used to add \"@2x\" to the URL to load retina tiles."
-msgstr "es pot utilitzar per afegir \"@2x\" a l'URL per carregar fitxes de retina."
+msgstr "es pot emprar per afegir \"@2x\" a l'URL per carregar fitxes de retina."
 
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
@@ -22334,11 +22351,11 @@ msgstr "l'expressió del trigger ha de contindre almenys una referència a /host
 
 #: include/classes/api/services/CTriggerGeneral.php:1723
 msgid "trigger prototype cannot be moved to another template or host"
-msgstr "el prototip del disparador no es pot pas moure a una altra plantilla o equip"
+msgstr "el prototip del trigger no es pot pas moure a una altra plantilla o equip"
 
 #: include/classes/api/services/CTriggerGeneral.php:1889
 msgid "trigger with linkages cannot be moved to another template or host"
-msgstr "l'activador amb enllaços no es pot pas moure a una altra plantilla o equip"
+msgstr "el trigger amb enllaços no es pot pas moure a una altra plantilla o equip"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -22458,7 +22475,7 @@ msgstr "sufix de temps no compatible"
 
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"
-msgstr "número de versió no compatible"
+msgstr "nombre de versió no compatible"
 
 #: include/classes/validators/CApiInputValidator.php:509
 msgid "uppercase identifier expected"

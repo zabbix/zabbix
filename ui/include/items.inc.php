@@ -1426,56 +1426,100 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 }
 
 /**
- * Format history value.
- * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
- * value.
+ * Prepare item value for displaying, apply value map and/or convert units.
  *
- * @param mixed     $value
- * @param array     $item
- * @param int       $item['value_type']  type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param string    $item['units']       units of item
- * @param array     $item['valuemap']
- * @param bool      $trim
+ * @see formatHistoryValueRaw
+ *
+ * @param int|float|string  $value
+ * @param array             $item
+ * @param bool              $trim      Whether to trim non-numeric value to a length of 20 characters.
+ * @param int|null          $decimals  Force exact decimals and do not use scientific notation for small numbers.
  *
  * @return string
  */
-function formatHistoryValue($value, array $item, $trim = true) {
-	$mapping = false;
+function formatHistoryValue($value, array $item, bool $trim = true, int $decimals = null): string {
+	$formatted_value = formatHistoryValueRaw($value, $item, $trim, $decimals);
 
-	// format value
-	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convertUnits([
-			'value' => $value,
-			'units' => $item['units']
-		]);
-	}
-	elseif (!in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG])) {
-		$value = _('Unknown value type');
-	}
+	return $formatted_value['value'].($formatted_value['units'] !== '' ? ' '.$formatted_value['units'] : '');
+}
 
-	// apply value mapping
+/**
+ * Prepare item value for displaying, apply value map and/or convert units.
+ *
+ * @param int|float|string  $value
+ * @param array             $item
+ * @param bool              $trim      Whether to trim non-numeric value to a length of 20 characters.
+ * @param int|null          $decimals  Force exact decimals and do not use scientific notation for small numbers.
+ *
+ * $item = [
+ *     'value_type' => (int)     ITEM_VALUE_TYPE_FLOAT | ITEM_VALUE_TYPE_UINT64, ...
+ *     'units' =>      (string)  Item units.
+ *     'valuemap' =>   (array)   Item value map.
+ * ]
+ *
+ * @return array
+ */
+function formatHistoryValueRaw($value, array $item, bool $trim = true, int $decimals = null): array {
+	$mapped_value = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR])
+		? CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap'])
+		: false;
+
 	switch ($item['value_type']) {
-		case ITEM_VALUE_TYPE_STR:
-			$mapping = CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap']);
-			// break; is not missing here
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+			if ($mapped_value !== false) {
+				return [
+					'value' => $mapped_value.' ('.$value.')',
+					'units' => '',
+					'is_mapped' => true
+				];
+			}
 
+			$convert_options = [
+				'value' => $value,
+				'units' => $item['units']
+			];
+
+			if ($decimals !== null) {
+				$convert_options += [
+					'decimals' => $decimals,
+					'decimals_exact' => true,
+					'small_scientific' => false
+				];
+			}
+
+			$converted_value = convertUnitsRaw($convert_options);
+
+			return [
+				'value' => $converted_value['value'],
+				'units' => $converted_value['units'],
+				'is_mapped' => false
+			];
+
+		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
 			if ($trim && mb_strlen($value) > 20) {
 				$value = mb_substr($value, 0, 20).'...';
 			}
 
-			if ($mapping !== false) {
-				$value = $mapping.' ('.$value.')';
+			if ($mapped_value !== false) {
+				$value = $mapped_value.' ('.$value.')';
 			}
 
-			break;
+			return [
+				'value' => $value,
+				'units' => '',
+				'is_mapped' => $mapped_value !== false
+			];
 
 		default:
-			$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
+			return [
+				'value' => _('Unknown value type'),
+				'units' => '',
+				'is_mapped' => false
+			];
 	}
-
-	return $value;
 }
 
 /**

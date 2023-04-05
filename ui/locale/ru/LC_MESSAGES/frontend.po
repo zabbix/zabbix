@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-01-07 12:23+0000\n"
-"Last-Translator: spbima <spbima@mail.ru>\n"
+"PO-Revision-Date: 2023-03-22 08:30+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -1437,6 +1437,10 @@ msgstr "Попыток"
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr "Атрибуция"
+
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr "HTML код авторства"
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3210,6 +3214,11 @@ msgstr "Невозможно обновить обнаруженный граф�
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "Не удалось обновить обнаруженную группу узлов сети \"%1$s\"."
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr "Не удалось обновить \"%1$s\" график из шаблона."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -8593,7 +8602,7 @@ msgstr "Идентификация системы. Возвращает стро
 
 #: app/views/administration.authentication.edit.php:113
 msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
-msgstr ""
+msgstr "Если активирована HTTP аутентификация, все пользователи  (даже с доступом к веб-интерфейсу LDAP / внутренний) будут аутентифицироваться веб-сервером, не Zabbix."
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -11308,6 +11317,10 @@ msgstr "Обслуживание без сбора данных"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "Обслуживание: %1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr "Убедитесь, что код получен из надежного источника и не содержит вредоносных скриптов."
 
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
@@ -16354,6 +16367,10 @@ msgstr "Услуги образуют круговую зависимость."
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
 msgstr "Услуги обновлены"
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
+msgstr "Ожидается ID сессии или токен."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249

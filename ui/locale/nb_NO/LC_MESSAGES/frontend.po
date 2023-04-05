@@ -1415,6 +1415,10 @@ msgstr "Forsøk"
 msgid "Attribution"
 msgstr ""
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -3140,6 +3144,11 @@ msgstr "Kan ikke oppdatere en oppdaget graf."
 #: include/classes/api/services/CHostGroup.php:809
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:514
@@ -11202,6 +11211,10 @@ msgstr "Vedlikehold uten datainnsamling"
 msgid "Maintenance: %1$s"
 msgstr ""
 
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
+
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -16227,6 +16240,10 @@ msgstr "Tjenester danner en sirkulær avhengighet."
 
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:1693
+msgid "Session ID or token is expected."
 msgstr ""
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
