@@ -1,9 +1,59 @@
-Changes for 5.0.32rc1
+Changes for 5.0.34rc1
 
 New features:
 
 Bug fixes:
+..F....... [ZBX-21013] hid option "Groups" for unprivileged users in the Import form (Sasha)
+...G...... [ZBX-22219] added validation to the "Server" ip/dns option in configuration configuration of the Zabbix Agent 2 (kprutkovs)
+..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
+..F....... [ZBX-18527] fixed markup for Type of calculation expression field (dpetra)
+........S. [ZBX-22622] fixed alert script path validation (vso)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.33
+
+5.0.33rc1 was released as 5.0.33 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.33rc1
+
+New features:
+...G.....T [ZBXNEXT-8071] added sysdba, sysasm and sysoper login options to Zabbix agent 2 Oracle plugin and updated Oracle by Zabbix agent 2 template documentation (esneiders, knaglis)
+
+Bug fixes:
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
+..F....... [ZBX-22413] fixed autofocus for inherited web scenario edit (dfofanovs)
+.........T [ZBX-22520] fixed versions of integrations (aiantsen)
+.......PS. [ZBX-22490] fixed HttpRequest limit in JavaScript being reached even if all objects are destroyed (vso)
+.D.G...... [ZBX-21723] removed syslog LogType from config file for Zabbix agent 2 on Windows (dgoloscapov)
+..F....... [ZBX-22068] fixed graphs (dynamic item) links and host displayed (ddauksa)
+.......PS. [ZBX-22026] fixed SNMP agent item going to unsupported state on NULL result (vso)
+..F....... [ZBX-18288] fixed undefined offset runtime error in Graph prototype preview (esekace)
+..F....... [ZBX-22411] fixed incorrect time in the dashboard Graph widget hintbox (dfofanovs)
+..F....... [ZBX-22056] fixed "No data found" message style in the Monitoring->Problems (esekace)
+A......... [ZBX-19339] fixed import and export of dependent LLD rules if the master item is a web item (Ivo)
+..F....... [ZBX-22188] changed parameters of wmi.get and wmi.getall keys to mandatory (esekace)
+...G...... [ZBX-22452] fixed item keys web.page.* in Zabbix agent for Microsoft Windows (akozlovs)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32
+
+5.0.32rc2 was released as 5.0.32 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32rc2
+
+Bug fixes:
+........S. [ZBX-22240] fixed invalid memory access during retrieval of historical data (dgoloscapov)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.32rc1
+
+Bug fixes:
+........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
+A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 .......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
+...G...... [ZBX-22402] fixed data sending to Zabbix server from Zabbix agent2 persistent buffer (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.31
@@ -2721,12 +2771,30 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.45rc1
+Changes for 4.0.46rc1
 
 New features:
 
 Bug fixes:
-..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45
+
+4.0.45rc2 was released as 4.0.45 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45rc2
+
+Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45rc1
+
+Bug fixes:
+.........T [ZBX-22520] fixed versions of integrations (aiantsen)
+.......PS. [ZBX-22026] fixed SNMP agent item going to unsupported state on NULL result (vso)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allowing to access Zabbix frontend in maintenance mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44

@@ -6,7 +6,7 @@
 For Zabbix version: 5.0 and higher.  
 The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2.
 
-This template was tested on:
+This template has been tested on:
 
 - Zabbix, version 5.0
 - Oracle Database, version 12c2, 18c, 19c
@@ -19,11 +19,13 @@ This template was tested on:
 2. Set the {$ORACLE.CONNSTRING} macro value using either <protocol(host:port)> or named session.
 3. If you want to override parameters from Zabbix agent configuration file, set the user name, password and service name in host macros ({$ORACLE.USER}, {$ORACLE.PASSWORD}, and {$ORACLE.SERVICE}).
 
+   User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
+
 Test availability:
  ```zabbix_get -s oracle-host -k  oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]```
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -57,11 +59,11 @@ No specific Zabbix configuration is required.
 |{$ORACLE.TBS.UTIL.PCT.MAX.WARN} |<p>Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</p> |`80` |
 |{$ORACLE.USER} |<p>Oracle username.</p> |`zabbix` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
@@ -71,7 +73,7 @@ There are no template links in this template.
 |Archive log discovery |<p>Destinations of the log archive.</p> |ZABBIX_PASSIVE |oracle.archive.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |ASM disk groups discovery |<p>The ASM disk groups.</p> |ZABBIX_PASSIVE |oracle.diskgroups.discovery["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -171,7 +173,7 @@ There are no template links in this template.
 |Zabbix_raw_items |Archivelog '{#DEST_NAME}': Get archive log info |<p>It gets the archivelog statistics.</p> |ZABBIX_PASSIVE |oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"] |
 |Zabbix_raw_items |ASM '{#DGNAME}': Get ASM stats |<p>It gets the ASM disk group statistics.</p> |ZABBIX_PASSIVE |oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
