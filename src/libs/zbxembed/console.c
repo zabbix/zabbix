@@ -87,7 +87,7 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
 
-	if (ZBX_ES_LOG_MSG_LIMIT < env->logged_msgs)
+	if (ZBX_ES_LOG_MSG_LIMIT <= env->logged_msgs)
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,
 				"maximum count of logged messages was reached");
