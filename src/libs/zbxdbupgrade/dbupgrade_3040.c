@@ -18,9 +18,9 @@
 **/
 
 #include "dbupgrade.h"
+#include "dbupgrade_common.h"
 
-#include "zbxcommon.h"
-#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
 
 /*
  * 3.4 maintenance database patches
@@ -62,7 +62,7 @@ static int	DBpatch_3040005(void)
 
 static int	DBpatch_3040006(void)
 {
-	return create_problem3_index();
+	return create_problem_3_index();
 }
 
 static int	DBpatch_3040007(void)

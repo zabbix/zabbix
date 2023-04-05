@@ -24,13 +24,9 @@
 #include "log.h"
 #include "../../zabbix_server/ha/ha.h"
 #include "zbxtime.h"
-
-typedef struct
-{
-	zbx_dbpatch_t	*patches;
-	const char	*description;
-}
-zbx_db_version_t;
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -823,68 +819,69 @@ static int	DBset_version(int version, unsigned char mandatory)
 
 zbx_get_program_type_f	DBget_program_type_cb;
 
-extern zbx_dbpatch_t	DBPATCH_VERSION(2010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6050)[];
+DBPATCH_VERSION_EXTERN(2010);
+DBPATCH_VERSION_EXTERN(2020);
+DBPATCH_VERSION_EXTERN(2030);
+DBPATCH_VERSION_EXTERN(2040);
+DBPATCH_VERSION_EXTERN(2050);
+DBPATCH_VERSION_EXTERN(3000);
+DBPATCH_VERSION_EXTERN(3010);
+DBPATCH_VERSION_EXTERN(3020);
+DBPATCH_VERSION_EXTERN(3030);
+DBPATCH_VERSION_EXTERN(3040);
+DBPATCH_VERSION_EXTERN(3050);
+DBPATCH_VERSION_EXTERN(4000);
+DBPATCH_VERSION_EXTERN(4010);
+DBPATCH_VERSION_EXTERN(4020);
+DBPATCH_VERSION_EXTERN(4030);
+DBPATCH_VERSION_EXTERN(4040);
+DBPATCH_VERSION_EXTERN(4050);
+DBPATCH_VERSION_EXTERN(5000);
+DBPATCH_VERSION_EXTERN(5010);
+DBPATCH_VERSION_EXTERN(5020);
+DBPATCH_VERSION_EXTERN(5030);
+DBPATCH_VERSION_EXTERN(5040);
+DBPATCH_VERSION_EXTERN(5050);
+DBPATCH_VERSION_EXTERN(6000);
+DBPATCH_VERSION_EXTERN(6010);
+DBPATCH_VERSION_EXTERN(6020);
+DBPATCH_VERSION_EXTERN(6030);
+DBPATCH_VERSION_EXTERN(6040);
+DBPATCH_VERSION_EXTERN(6050);
 
-static zbx_db_version_t dbversions[] = {
-	{DBPATCH_VERSION(2010), "2.2 development"},
-	{DBPATCH_VERSION(2020), "2.2 maintenance"},
-	{DBPATCH_VERSION(2030), "2.4 development"},
-	{DBPATCH_VERSION(2040), "2.4 maintenance"},
-	{DBPATCH_VERSION(2050), "3.0 development"},
-	{DBPATCH_VERSION(3000), "3.0 maintenance"},
-	{DBPATCH_VERSION(3010), "3.2 development"},
-	{DBPATCH_VERSION(3020), "3.2 maintenance"},
-	{DBPATCH_VERSION(3030), "3.4 development"},
-	{DBPATCH_VERSION(3040), "3.4 maintenance"},
-	{DBPATCH_VERSION(3050), "4.0 development"},
-	{DBPATCH_VERSION(4000), "4.0 maintenance"},
-	{DBPATCH_VERSION(4010), "4.2 development"},
-	{DBPATCH_VERSION(4020), "4.2 maintenance"},
-	{DBPATCH_VERSION(4030), "4.4 development"},
-	{DBPATCH_VERSION(4040), "4.4 maintenance"},
-	{DBPATCH_VERSION(4050), "5.0 development"},
-	{DBPATCH_VERSION(5000), "5.0 maintenance"},
-	{DBPATCH_VERSION(5010), "5.2 development"},
-	{DBPATCH_VERSION(5020), "5.2 maintenance"},
-	{DBPATCH_VERSION(5030), "5.4 development"},
-	{DBPATCH_VERSION(5040), "5.4 maintenance"},
-	{DBPATCH_VERSION(5050), "6.0 development"},
-	{DBPATCH_VERSION(6000), "6.0 maintenance"},
-	{DBPATCH_VERSION(6010), "6.2 development"},
-	{DBPATCH_VERSION(6020), "6.2 maintenance"},
-	{DBPATCH_VERSION(6030), "6.4 development"},
-	{DBPATCH_VERSION(6040), "6.4 maintenance"},
-	{DBPATCH_VERSION(6050), "7.0 development"},
-	{NULL}
+static zbx_dbpatch_t *dbversions[] = {
+	DBPATCH_VERSION(2010), /* 2.2 development */
+	DBPATCH_VERSION(2020), /* 2.2 maintenance */
+	DBPATCH_VERSION(2030), /* 2.4 development */
+	DBPATCH_VERSION(2040), /* 2.4 maintenance */
+	DBPATCH_VERSION(2050), /* 3.0 development */
+	DBPATCH_VERSION(3000), /* 3.0 maintenance */
+	DBPATCH_VERSION(3010), /* 3.2 development */
+	DBPATCH_VERSION(3020), /* 3.2 maintenance */
+	DBPATCH_VERSION(3030), /* 3.4 development */
+	DBPATCH_VERSION(3040), /* 3.4 maintenance */
+	DBPATCH_VERSION(3050), /* 4.0 development */
+	DBPATCH_VERSION(4000), /* 4.0 maintenance */
+	DBPATCH_VERSION(4010), /* 4.2 development */
+	DBPATCH_VERSION(4020), /* 4.2 maintenance */
+	DBPATCH_VERSION(4030), /* 4.4 development */
+	DBPATCH_VERSION(4040), /* 4.4 maintenance */
+	DBPATCH_VERSION(4050), /* 5.0 development */
+	DBPATCH_VERSION(5000), /* 5.0 maintenance */
+	DBPATCH_VERSION(5010), /* 5.2 development */
+	DBPATCH_VERSION(5020), /* 5.2 maintenance */
+	DBPATCH_VERSION(5030), /* 5.4 development */
+	DBPATCH_VERSION(5040), /* 5.4 maintenance */
+	DBPATCH_VERSION(5050), /* 6.0 development */
+	DBPATCH_VERSION(6000), /* 6.0 maintenance */
+	DBPATCH_VERSION(6010), /* 6.2 development */
+	DBPATCH_VERSION(6020), /* 6.2 maintenance */
+	DBPATCH_VERSION(6030), /* 6.4 development */
+	DBPATCH_VERSION(6040), /* 6.4 maintenance */
+	DBPATCH_VERSION(6050), /* 7.0 development */
+	NULL
 };
+
 
 static void	DBget_version(int *mandatory, int *optional)
 {
@@ -976,12 +973,12 @@ static int	DBcheck_nodes(void)
 }
 #endif
 
-int	zbx_db_check_version(zbx_ha_mode_t ha_mode)
+int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode)
 {
 #define ZBX_DB_WAIT_UPGRADE	10
 	const char		*dbversion_table_name = "dbversion", *ha_node_table_name = "ha_node";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
-	zbx_db_version_t	*dbversion;
+	zbx_dbpatch_t		**dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
@@ -993,10 +990,10 @@ int	zbx_db_check_version(zbx_ha_mode_t ha_mode)
 
 	/* find out the required version number by getting the last mandatory version */
 	/* of the last version patch array                                            */
-	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
+	for (dbversion = dbversions; NULL != *dbversion; dbversion++)
 		;
 
-	patches = (--dbversion)->patches;
+	patches = *(--dbversion);
 
 	for (i = 0; 0 != patches[i].version; i++)
 	{
@@ -1035,7 +1032,7 @@ int	zbx_db_check_version(zbx_ha_mode_t ha_mode)
 	DBget_version(&db_mandatory, &db_optional);
 
 #ifndef HAVE_SQLITE3
-	for (dbversion = dbversions; NULL != (patches = dbversion->patches); dbversion++)
+	for (dbversion = dbversions; NULL != (patches = *dbversion); dbversion++)
 	{
 		for (i = 0; 0 != patches[i].version; i++)
 		{
@@ -1101,9 +1098,9 @@ int	zbx_db_check_version(zbx_ha_mode_t ha_mode)
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting automatic database upgrade");
 
-	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
+	for (dbversion = dbversions; NULL != *dbversion; dbversion++)
 	{
-		patches = dbversion->patches;
+		patches = *dbversion;
 
 		for (i = 0; 0 != patches[i].version; i++)
 		{
@@ -1533,81 +1530,4 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 	return ret;
 }
 
-int	delete_problems_with_nonexistent_object(void)
-{
-	zbx_db_result_t		result;
-	zbx_vector_uint64_t	eventids;
-	zbx_db_row_t		row;
-	zbx_uint64_t		eventid;
-	int			sources[] = {EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL};
-	int			objects[] = {EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE}, i;
-
-	zbx_vector_uint64_create(&eventids);
-
-	for (i = 0; i < (int)ARRSIZE(sources); i++)
-	{
-		result = zbx_db_select(
-				"select p.eventid"
-				" from problem p"
-				" where p.source=%d and p.object=%d and not exists ("
-					"select null"
-					" from triggers t"
-					" where t.triggerid=p.objectid"
-				")",
-				sources[i], EVENT_OBJECT_TRIGGER);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			ZBX_STR2UINT64(eventid, row[0]);
-			zbx_vector_uint64_append(&eventids, eventid);
-		}
-		zbx_db_free_result(result);
-	}
-
-	for (i = 0; i < (int)ARRSIZE(objects); i++)
-	{
-		result = zbx_db_select(
-				"select p.eventid"
-				" from problem p"
-				" where p.source=%d and p.object=%d and not exists ("
-					"select null"
-					" from items i"
-					" where i.itemid=p.objectid"
-				")",
-				EVENT_SOURCE_INTERNAL, objects[i]);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			ZBX_STR2UINT64(eventid, row[0]);
-			zbx_vector_uint64_append(&eventids, eventid);
-		}
-		zbx_db_free_result(result);
-	}
-
-	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	if (0 != eventids.values_num)
-		zbx_db_execute_multiple_query("delete from problem where", "eventid", &eventids);
-
-	zbx_vector_uint64_destroy(&eventids);
-
-	return SUCCEED;
-}
-
-int	create_problem3_index(void)
-{
-	if (FAIL == zbx_db_index_exists("problem", "problem_3"))
-		return DBcreate_index("problem", "problem_3", "r_eventid", 0);
-
-	return SUCCEED;
-}
-
-int	drop_c_problem_2_index(void)
-{
-#ifdef HAVE_MYSQL	/* MySQL automatically creates index and might not remove it on some conditions */
-	if (SUCCEED == zbx_db_index_exists("problem", "c_problem_2"))
-		return DBdrop_index("problem", "c_problem_2");
-#endif
-	return SUCCEED;
-}
 #endif

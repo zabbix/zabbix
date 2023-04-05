@@ -18,6 +18,7 @@
 **/
 
 #include "dbupgrade.h"
+#include "dbupgrade_common.h"
 
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
@@ -25,6 +26,10 @@
 #include "log.h"
 #include "zbxexpr.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 
 /*
  * 4.0 development database patches
@@ -378,7 +383,7 @@ static int	DBpatch_3050028(void)
 
 static int	DBpatch_3050029(void)
 {
-	return create_problem3_index();
+	return create_problem_3_index();
 }
 
 static int	DBpatch_3050030(void)

@@ -18,10 +18,7 @@
 **/
 
 #include "dbupgrade.h"
-
-#include "zbxnum.h"
-#include "zbxdbhigh.h"
-
+#include "dbupgrade_common.h"
 /*
  * 3.2 maintenance database patches
  */
