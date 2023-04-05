@@ -474,7 +474,7 @@ class CValueMap extends CApiService {
 		$valuemap_indexes = [];
 
 		foreach ($valuemaps as $i => $valuemap) {
-			if (!array_key_exists('uuid', $valuemap)) {
+			if (!array_key_exists('uuid', $valuemap) || $valuemap['uuid'] === '') {
 				continue;
 			}
 

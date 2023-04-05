@@ -651,7 +651,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$trigger_indexes = [];
 
 		foreach ($triggers as $i => $trigger) {
-			if (!array_key_exists('uuid', $trigger)) {
+			if (!array_key_exists('uuid', $trigger) || $trigger['uuid'] === '') {
 				continue;
 			}
 

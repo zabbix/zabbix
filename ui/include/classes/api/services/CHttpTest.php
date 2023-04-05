@@ -411,7 +411,7 @@ class CHttpTest extends CApiService {
 		$httptest_indexes = [];
 
 		foreach ($httptests as $i => $httptest) {
-			if (!array_key_exists('uuid', $httptest)) {
+			if (!array_key_exists('uuid', $httptest) || $httptest['uuid'] === '') {
 				continue;
 			}
 
