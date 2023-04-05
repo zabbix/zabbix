@@ -1389,7 +1389,7 @@ class testFormHost extends CWebTest {
 							'Security level' => 'authNoPriv',
 							'Authentication protocol' => 'SHA384',
 							'Authentication passphrase' => 'new-test123',
-							'Use combined requests' => true,
+							'Use combined requests' => true
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1491,7 +1491,7 @@ class testFormHost extends CWebTest {
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'noAuthNoPriv',
-							'Use combined requests' => true,
+							'Use combined requests' => true
 						],
 						[
 							'action' => USER_ACTION_REMOVE,
