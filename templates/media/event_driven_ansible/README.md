@@ -75,7 +75,7 @@ To utilize the media type, you need to create a Zabbix user to represent Event-D
 
 > Note: Because each new rulebook requires a separate port, you have to create a separate user for each rulebook, specifying the ip:port.
 
-6\. Use Event-Driven Ansible user in any [actions](https://www.zabbix.com/documentation/6.0/en/manual/config/notifications/action) of your choice.
+6\. Use Event-Driven Ansible user in any [actions](https://www.zabbix.com/documentation/6.0/manual/config/notifications/action) of your choice.
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
