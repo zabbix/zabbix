@@ -28,6 +28,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxfile.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
@@ -334,7 +335,7 @@ static char	*config_file = NULL;
 
 typedef struct
 {
-	zbx_vector_ptr_t	addrs;
+	zbx_vector_addr_ptr_t	addrs;
 	ZBX_THREAD_HANDLE	*thread;
 }
 zbx_send_destinations_t;
@@ -390,7 +391,7 @@ static void	main_signal_handler(int sig)
 
 typedef struct
 {
-	zbx_vector_ptr_t		*addrs;
+	zbx_vector_addr_ptr_t		*addrs;
 	struct zbx_json			json;
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
@@ -430,8 +431,8 @@ static void	zbx_thread_handle_pipe_response(zbx_thread_sendval_args *sendval_arg
 	{
 		zbx_addr_t	*addr = sendval_args->addrs->values[0];
 
-		zbx_vector_ptr_remove(sendval_args->addrs, 0);
-		zbx_vector_ptr_append(sendval_args->addrs, addr);
+		zbx_vector_addr_ptr_remove(sendval_args->addrs, 0);
+		zbx_vector_addr_ptr_append(sendval_args->addrs, addr);
 	}
 }
 #endif
@@ -485,9 +486,8 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 			{
 				if (destinations[j].thread == &threads[i])
 				{
-					zbx_vector_ptr_clear_ext(&destinations[j].addrs,
-							(zbx_clean_func_t)zbx_addr_free);
-					zbx_vector_ptr_destroy(&destinations[j].addrs);
+					zbx_vector_addr_ptr_clear_ext(&destinations[j].addrs, zbx_addr_free);
+					zbx_vector_addr_ptr_destroy(&destinations[j].addrs);
 					destinations[j] = destinations[--destinations_count];
 					break;
 				}
@@ -845,7 +845,8 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+		void *data)
 {
 	ZBX_UNUSED(hostnames);
 	ZBX_UNUSED(data);
@@ -862,7 +863,7 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_ve
 	destinations = (zbx_send_destinations_t *)zbx_realloc(destinations,
 			sizeof(zbx_send_destinations_t) * destinations_count);
 
-	zbx_vector_ptr_create(&destinations[destinations_count - 1].addrs);
+	zbx_vector_addr_ptr_create(&destinations[destinations_count - 1].addrs);
 
 	zbx_addr_copy(&destinations[destinations_count - 1].addrs, addrs);
 

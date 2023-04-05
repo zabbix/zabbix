@@ -52,10 +52,36 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	const INACCESSIBLE_XPATH = 'xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]';
 	const HOSTNAME = 'Host for widget module test';
 
-	private static $widget_names = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs',
-		'Favorite maps','Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value',
-		'Map', 'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
-		'System information', 'Top hosts', 'Trigger overview', 'URL', 'Web monitoring'
+	private static $widget_descriptions = [
+		'Action log' => 'Displays records about executed action operations (notifications, remote commands).',
+		'Clock' => 'Displays local, server, or specified host time.',
+		'Data overview' => 'Displays the latest item data and current status of each item for selected hosts.',
+		'Discovery status' => 'Displays the status summary of the active network discovery rules.',
+		'Favorite graphs' => 'Displays shortcuts to the most needed graphs (marked as favorite).',
+		'Favorite maps' => 'Displays shortcuts to the most needed network maps (marked as favorite).',
+		'Geomap' => 'Displays hosts as markers on a geographical map.',
+		'Graph' => 'Displays data of up to 50 items as line, points, staircase, or bar charts.',
+		'Graph (classic)' => 'Displays a single custom graph or a simple graph.',
+		'Graph prototype' => 'Displays a grid of graphs created by low-level discovery from either a graph prototype or '.
+				'an item prototype.',
+		'Host availability' => 'Displays the host count by status (available/unavailable/unknown).',
+		'Item value' => 'Displays the value of a single item prominently.',
+		'Map' => 'Displays either a single configured network map or one of the configured network maps in the map '.
+				'navigation tree.',
+		'Map navigation tree' => 'Allows to build a hierarchy of existing maps and display problem statistics for each '.
+				'included map and map group.',
+		'Plain text' => 'Displays the latest data for the selected items in plain text.',
+		'Problem hosts' => 'Displays the problem count by host group and the highest problem severity within a group.',
+		'Problems' => 'Displays currently open problems with quick access links to the problem details.',
+		'Problems by severity' => 'Displays the problem count by severity.',
+		'SLA report' => 'Displays SLA reports.',
+		'System information' => 'Displays the current status and system statistics of the Zabbix server and its '.
+				'associated components.',
+		'Top hosts' => 'Displays top N hosts that have the highest or the lowest item value (for example, CPU load) '.
+				'with an option to add progress-bar visualizations and customize report columns.',
+		'Trigger overview' => 'Displays trigger states for selected hosts.',
+		'URL' => 'Displays the content retrieved from the specified URL.',
+		'Web monitoring' => 'Displays the status summary of the active web monitoring scenarios.'
 	];
 
 	/**
@@ -346,13 +372,16 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Create an array with widgt modules that should be present by default.
 		$widget_modules = [];
+		$i = 0;
 
-		foreach (self::$widget_names as $i => $name) {
+		foreach (self::$widget_descriptions as $name => $description) {
 			$widget_modules[$i]['Name'] = $name;
 			$widget_modules[$i]['Version'] = '1.0';
-			$widget_modules[$i]['Author'] = 'Zabbix SIA';
-			$widget_modules[$i]['Description'] = '';
+			$widget_modules[$i]['Author'] = 'Zabbix';
+			$widget_modules[$i]['Description'] = $description;
 			$widget_modules[$i]['Status'] = 'Enabled';
+
+			$i++;
 		}
 
 		// Open modules page and check header.
@@ -413,7 +442,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => '1st Module description',
 					'Directory' => 'modules/module_number_1',
 					'Namespace' => 'Modules\Example_A',
-					'Homepage' => '1st module URL',
+					'URL' => '1st module URL',
 					'Enabled' => false
 				]
 			],
@@ -426,7 +455,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => 'Module description !@#$%^&*()_+',
 					'Directory' => 'modules/module_number_2',
 					'Namespace' => 'Modules\Example_B',
-					'Homepage' => '!@#$%^&*()_+',
+					'URL' => '!@#$%^&*()_+',
 					'Enabled' => false
 				]
 			],
@@ -439,7 +468,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => '-',
 					'Directory' => 'modules/module_number_4',
 					'Namespace' => 'Modules\Example_A',
-					'Homepage' => '-',
+					'URL' => '-',
 					'Enabled' => false
 				]
 			],
@@ -452,7 +481,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => 'Adding top-level and sub-level menu',
 					'Directory' => 'modules/module_number_5',
 					'Namespace' => 'Modules\Example_E',
-					'Homepage' => '-',
+					'URL' => '-',
 					'Enabled' => false
 				]
 			],
@@ -465,7 +494,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => '-',
 					'Directory' => 'modules/clock32',
 					'Namespace' => 'Modules\Clock2',
-					'Homepage' => '-',
+					'URL' => '-',
 					'Enabled' => false
 				]
 			],
@@ -478,7 +507,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => '-',
 					'Directory' => 'modules/emptyWidget',
 					'Namespace' => 'Modules\emptyWidget',
-					'Homepage' => '-',
+					'URL' => '-',
 					'Enabled' => false
 				]
 			],
@@ -491,7 +520,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
 					'Directory' => 'modules/module_number_6',
 					'Namespace' => 'Modules\Example_F',
-					'Homepage' => '-',
+					'URL' => '-',
 					'Enabled' => false
 				]
 			]
@@ -506,12 +535,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		// Open corresponding module from the modules table.
 		$this->page->login()->open('zabbix.php?action=module.list');
 		$this->query('link', $data['Name'])->waitUntilVisible()->one()->click();
-		$this->page->waitUntilReady();
-		$form = $this->query('name:module-form')->asForm()->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 		// Check value af every field in Module details form.
 		foreach ($data as $key => $value) {
 			$this->assertEquals($value, $form->getFieldContainer($key)->getText());
 		}
+
+		$dialog->close();
 	}
 
 	public function getModuleData() {
@@ -733,7 +764,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'expected' => array_merge(['2nd Module name !@#$%^&*()_+'], self::$widget_names)
+					'expected' => array_merge(['2nd Module name !@#$%^&*()_+'], array_keys(self::$widget_descriptions))
 				]
 			],
 			// Retrieve only Disabled modules.
@@ -807,7 +838,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('button:Update')->one()->click();
 
-		$this->assertMessage(TEST_GOOD, 'Module updated: 1st Module name.');
+		$this->assertMessage(TEST_GOOD, 'Module updated');
 		// Check that Module has been updated and that there are no changes took place.
 		$this->assertEquals($initial_hash, CDBHelper::getHash($sql));
 	}
@@ -1031,9 +1062,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->acceptAlert();
 
 		// Wait for the Success message to confirm that modules were disabled before heading to the dashboard.
-		$message = CMessageElement::find()->waitUntilVisible()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertStringStartsWith('Modules disabled:', $message->getText());
+		$this->assertMessage(TEST_GOOD, 'Modules disabled');
 
 		// Open dashboard and check that all widgets are inaccessible.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
@@ -1285,24 +1314,32 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 * @param string	$view	view from which the module should be enabled - module list or module details form.
 	 */
 	private function enableModule($module, $view) {
+		$expected = CTestArrayHelper::get($module, 'expected', TEST_GOOD);
+
 		// Change module status from Disabled to Enabled.
 		if ($view === 'form') {
-			$this->changeModuleStatusFromForm($module['module_name'], true);
+			$this->changeModuleStatusFromForm($module['module_name'], true, $expected);
 		}
 		else {
 			$this->changeModuleStatusFromPage($module['module_name'], 'Disabled');
 		}
 		// In case of negative test check error message and confirm that module wasn't applied.
-		if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
-			$title = ($view === 'form') ? 'Cannot update module: ' : 'Cannot enable module: ';
-			$this->assertMessage($module['expected'], $title.$module['module_name'].'.', $module['error_details']);
+		if ($expected === TEST_BAD) {
+			$title = ($view === 'form') ? 'Cannot update module' : 'Cannot enable module';
+			$this->assertMessage($module['expected'], $title, $module['error_details']);
+
+			if ($view === 'form') {
+				COverlayDialogElement::find()->one()->close();
+			}
+
 			$this->assertModuleDisabled($module);
 
 			return;
 		}
 		// Check message and confirm that changes, made by the enabled module, took place.
-		$message = ($view === 'form') ? 'Module updated: ' : 'Module enabled: ';
-		$this->assertMessage(CTestArrayHelper::get($module, 'expected', TEST_GOOD), $message.$module['module_name'].'.');
+		$message = ($view === 'form') ? 'Module updated' : 'Module enabled';
+		$this->assertMessage($expected, $message);
+		CMessageElement::find()->one()->close();
 	}
 
 	/**
@@ -1312,22 +1349,24 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 * @param string	$view	view from which the module should be enabled - module list or module details form.
 	 */
 	private function disableModule($module, $view) {
+		$expected = CTestArrayHelper::get($module, 'expected', TEST_GOOD);
+
 		// In case of negative test do nothing.
-		if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 
 			return;
 		}
 
 		// Change module status from Enabled to Disabled.
 		if ($view === 'form') {
-			$this->changeModuleStatusFromForm($module['module_name'], false);
+			$this->changeModuleStatusFromForm($module['module_name'], false, $expected);
 		}
 		else {
 			$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
 		}
 		// Check message and confirm that changes, made by the module, were reversed.
-		$message = ($view === 'form') ? 'Module updated: ' : 'Module disabled: ';
-		$this->assertMessage(TEST_GOOD, $message.$module['module_name'].'.');
+		$message = ($view === 'form') ? 'Module updated' : 'Module disabled';
+		$this->assertMessage(TEST_GOOD, $message);
 	}
 
 	/**
@@ -1348,14 +1387,18 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 *
 	 * @param string	$name			module name
 	 * @param bool		$enabled		boolean value to be set in "Enabled" checkbox in module details form.
+	 * @param constant	$expected		flag that determines whether the module update should succeed or fail.
 	 */
-	private function changeModuleStatusFromForm($name, $enabled) {
+	private function changeModuleStatusFromForm($name, $enabled, $expected) {
 		$this->query('link', $name)->waitUntilVisible()->one()->click();
-		$this->page->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Edit module status and press update.
-		$this->query('id:status')->asCheckbox()->one()->set($enabled);
+		$dialog->query('id:status')->asCheckbox()->one()->set($enabled);
 		$this->query('button:Update')->one()->click();
-		$this->page->waitUntilReady();
+
+		if ($expected === TEST_GOOD) {
+			$dialog->ensureNotPresent();
+		}
 	}
 }
