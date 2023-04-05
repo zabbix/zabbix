@@ -1254,7 +1254,7 @@ class testFormHost extends CWebTest {
 							'index' => 1,
 							'SNMP version' => 'SNMPv2',
 							'SNMP community' => '{$SNMP_COMMUNITY}',
-							'Max repetition count' => 0
+							'Max repetition count' => '0'
 						]
 					],
 					'error_title' => 'Cannot update host',
@@ -1383,14 +1383,13 @@ class testFormHost extends CWebTest {
 							'port' => '122',
 							'Connect to' => 'DNS',
 							'SNMP version' => 'SNMPv3',
-							'Max repetition count' => '1000',
+							'Max repetition count' => '90',
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'authNoPriv',
 							'Authentication protocol' => 'SHA384',
 							'Authentication passphrase' => 'new-test123',
 							'Use combined requests' => true,
-							'Max repetition count' => 10
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1493,7 +1492,6 @@ class testFormHost extends CWebTest {
 							'Security name' => 'new-selenium',
 							'Security level' => 'noAuthNoPriv',
 							'Use combined requests' => true,
-							'Max repetition count' => 10
 						],
 						[
 							'action' => USER_ACTION_REMOVE,
