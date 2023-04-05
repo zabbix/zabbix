@@ -349,7 +349,7 @@ class CHttpTest extends CApiService {
 
 		self::validateUuid($httptests, $db_hosts + $db_templates);
 
-		self::addUuid($httptests, $db_hosts);
+		self::addUuid($httptests, $db_templates);
 
 		self::checkUuidDuplicates($httptests);
 		$this->checkDuplicates($names_by_hostid);
@@ -390,12 +390,11 @@ class CHttpTest extends CApiService {
 	 * set.
 	 *
 	 * @param array $httptests
-	 * @param array $db_hosts
+	 * @param array $db_templates
 	 */
-	private static function addUuid(array &$httptests, array $db_hosts): void {
+	private static function addUuid(array &$httptests, array $db_templates): void {
 		foreach ($httptests as &$httptest) {
-			if ($db_hosts[$httptest['hostid']]['status'] == HOST_STATUS_TEMPLATE
-					&& !array_key_exists('uuid', $httptest)) {
+			if (array_key_exists($httptest['hostid'], $db_templates) && !array_key_exists('uuid', $httptest)) {
 				$httptest['uuid'] = generateUuidV4();
 			}
 		}
