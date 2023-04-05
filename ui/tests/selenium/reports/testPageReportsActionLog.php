@@ -73,7 +73,8 @@ class testPageReportsActionLog extends CWebTest {
 
 		// Check that filter set to display Last hour data.
 		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()
-				->getAttribute('class'));
+			->getAttribute('class')
+		);
 
 		// Check data set values in input field.
 		$form->checkValue(['id:from' => 'now-1h', 'id:to' => 'now']);
