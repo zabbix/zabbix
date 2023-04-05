@@ -628,7 +628,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function validateUuid(array &$items, array $db_hosts): void {
+	private static function validateUuid(array $items, array $db_hosts): void {
 		foreach ($items as &$item) {
 			$item['host_status'] = $db_hosts[$item['hostid']]['status'];
 		}

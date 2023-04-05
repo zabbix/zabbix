@@ -427,7 +427,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function validateUuid(array &$valuemaps, array $db_hosts): void {
+	private static function validateUuid(array $valuemaps, array $db_hosts): void {
 		foreach ($valuemaps as &$valuemap) {
 			$valuemap['host_status'] = $db_hosts[$valuemap['hostid']]['status'];
 		}
