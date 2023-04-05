@@ -21,12 +21,19 @@ package remotecontrol
 
 import (
 	"bufio"
+	"errors"
 	"net"
+	"os"
+	"time"
+
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 type Conn struct {
 	listener net.Listener
 	sink     chan *Client
+	last_err string
+	stopped  bool
 }
 
 type Client struct {
@@ -54,23 +61,66 @@ func (c *Client) Close() {
 }
 
 func (c *Conn) Stop() {
+	c.stopped = true
 	if c.listener != nil {
 		c.listener.Close()
 	}
 }
 
+func (c *Conn) handleError(err error) error {
+	var netErr net.Error
+
+	if !errors.As(err, &netErr) {
+		log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+		return nil
+	}
+
+	if netErr.Timeout() {
+		log.Debugf("failed to accept an incoming connection: %s", err.Error())
+
+		return nil
+	}
+
+	if c.stopped {
+		return err
+	}
+
+	log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+	var se *os.SyscallError
+
+	if !errors.As(err, &se) {
+		return nil
+	}
+
+	/* sleep to avoid high CPU usage on surprising temporary errors */
+	if c.last_err == se.Err.Error() {
+		time.Sleep(time.Second)
+	}
+	c.last_err = se.Err.Error()
+
+	return nil
+}
+
 func (c *Conn) run() {
 	for {
-		if conn, err := c.listener.Accept(); err != nil && !err.(net.Error).Temporary() {
-			break
-		} else {
-			scanner := bufio.NewScanner(conn)
-			if scanner.Scan() {
-				// accept single command line, the connection will be closed after sending reply
-				c.sink <- &Client{request: scanner.Text(), conn: conn}
-			} else {
-				conn.Close()
+		conn, err := c.listener.Accept()
+
+		if err != nil {
+			if c.handleError(err) == nil {
+				continue
 			}
+
+			break
+		}
+
+		scanner := bufio.NewScanner(conn)
+		if scanner.Scan() {
+			// accept single command line, the connection will be closed after sending reply
+			c.sink <- &Client{request: scanner.Text(), conn: conn}
+		} else {
+			conn.Close()
 		}
 	}
 }

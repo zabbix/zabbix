@@ -406,7 +406,8 @@ abstract class CController {
 	 * @return bool
 	 */
 	private function checkCsrfToken(): bool {
-		if (!is_array($this->raw_input) || !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
+		if (!isRequestMethod('post') || !is_array($this->raw_input)
+				|| !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
 			return false;
 		}
 

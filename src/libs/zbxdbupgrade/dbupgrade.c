@@ -1189,60 +1189,6 @@ out:
 #undef ZBX_DB_WAIT_UPGRADE
 }
 
-int	zbx_db_check_double_type(zbx_config_dbhigh_t *config_dbhigh)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	char		*sql = NULL;
-	const int	total_dbl_cols = 4;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
-#if defined(HAVE_MYSQL)
-	sql = zbx_db_dyn_escape_string(config_dbhigh->config_dbname);
-	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
-			" where table_schema='%s' and column_type='double'", sql);
-#elif defined(HAVE_POSTGRESQL)
-	sql = zbx_db_dyn_escape_string(NULL == config_dbhigh->config_dbschema ||
-			'\0' == *config_dbhigh->config_dbschema ? "public" : config_dbhigh->config_dbschema);
-	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
-			" where table_schema='%s' and data_type='double precision'", sql);
-#elif defined(HAVE_ORACLE)
-	ZBX_UNUSED(config_dbhigh);
-	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
-			" where data_type='BINARY_DOUBLE'");
-#elif defined(HAVE_SQLITE3)
-	ZBX_UNUSED(config_dbhigh);
-	/* upgrade patch is not required for sqlite3 */
-	ret = SUCCEED;
-	goto out;
-#endif
-
-	if (NULL == (result = zbx_db_select("%s"
-			" and ((lower(table_name)='trends'"
-					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
-			" or (lower(table_name)='history' and lower(column_name)='value'))", sql)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot select records with columns information");
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)) && total_dbl_cols == atoi(row[0]))
-		ret = SUCCEED;
-
-	zbx_db_free_result(result);
-out:
-	zbx_db_close();
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
-}
-
 #ifndef HAVE_SQLITE3
 
 #define ZBX_CHANGELOG_OP_INSERT	1
@@ -1253,7 +1199,7 @@ static int	DBget_changelog_table_by_name(const char *table_name)
 {
 	const zbx_db_table_changelog_t	*table;
 
-	for (table = changelog_tables; NULL != table->table; table++)
+	for (table = zbx_dbschema_get_changelog_tables(); NULL != table->table; table++)
 	{
 		if (0 == strcmp(table_name, table->table))
 			return table->object;

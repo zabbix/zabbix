@@ -50,7 +50,6 @@
 #include "proxypoller/proxypoller.h"
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
-#include "availability/avail_manager.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
 #include "zbxconnector.h"
@@ -81,6 +80,7 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "preproc/preproc_server.h"
+#include "zbxavailability.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -385,8 +385,6 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
-int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
 char	*CONFIG_WEBSERVICE_URL	= NULL;
 
@@ -1655,7 +1653,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
-				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
@@ -2012,14 +2010,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_db_check_character_set();
 	zbx_check_db();
 	zbx_db_save_server_status();
-
-	if (SUCCEED != zbx_db_check_double_type(zbx_config_dbhigh))
-	{
-		CONFIG_DOUBLE_PRECISION = ZBX_DB_DBL_PRECISION_DISABLED;
-		zbx_update_epsilon_to_float_precision();
-		zabbix_log(LOG_LEVEL_WARNING, "Database is not upgraded to use double precision values. Support for the"
-				" old numeric type will be removed in the future versions.");
-	}
 
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
