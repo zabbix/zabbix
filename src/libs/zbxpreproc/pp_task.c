@@ -19,8 +19,7 @@
 
 #include "pp_task.h"
 #include "pp_error.h"
-#include "pp_item.h"
-#include "zbxalgo.h"
+#include "zbxpreprocbase.h"
 #include "zbxsysinc.h"
 #include "zbxipcservice.h"
 
@@ -73,7 +72,7 @@ zbx_pp_task_t	*pp_task_test_create(zbx_pp_item_preproc_t *preproc, zbx_variant_t
 	d->results_num = 0;
 	zbx_variant_set_none(&d->result);
 
-	d->preproc = pp_item_preproc_copy(preproc);
+	d->preproc = zbx_pp_item_preproc_copy(preproc);
 
 	d->client = client;
 	zbx_ipc_client_addref(client);
@@ -137,7 +136,7 @@ zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *
 	else
 		d->opt.flags = ZBX_PP_VALUE_OPT_NONE;
 
-	d->preproc = pp_item_preproc_copy(preproc);
+	d->preproc = zbx_pp_item_preproc_copy(preproc);
 
 	return task;
 }
@@ -206,7 +205,7 @@ zbx_pp_task_t	*pp_task_dependent_create(zbx_uint64_t itemid, zbx_pp_item_preproc
 	d->primary = NULL;
 	d->cache = NULL;
 
-	d->preproc = pp_item_preproc_copy(preproc);
+	d->preproc = zbx_pp_item_preproc_copy(preproc);
 
 	return task;
 }

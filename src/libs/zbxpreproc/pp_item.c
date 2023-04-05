@@ -17,10 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "pp_item.h"
-
-#include "pp_history.h"
-#include "zbxalgo.h"
+#include "zbxpreprocbase.h"
 
 ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
 
@@ -84,7 +81,7 @@ static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
 	zbx_free(preproc->dep_itemids);
 
 	if (NULL != preproc->history)
-		pp_history_free(preproc->history);
+		zbx_pp_history_free(preproc->history);
 
 	zbx_free(preproc);
 }
@@ -98,7 +95,7 @@ static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
  * Return value: The copied preprocessing data.                               *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc)
+zbx_pp_item_preproc_t	*zbx_pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc)
 {
 	if (NULL == preproc)
 		return NULL;
@@ -149,7 +146,7 @@ int	zbx_pp_preproc_has_history(int type)
 	}
 }
 
-void	pp_item_clear(zbx_pp_item_t *item)
+void	zbx_pp_item_clear(zbx_pp_item_t *item)
 {
 	zbx_pp_item_preproc_release(item->preproc);
 }

@@ -42,7 +42,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxpreproc.h"
+#include "zbxpreprocbase.h"
 #include "zbxcachehistory.h"
 #include "zbxconnector.h"
 

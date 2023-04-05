@@ -22,12 +22,12 @@
 #include "pp_error.h"
 #include "log.h"
 #include "item_preproc.h"
+#include "zbxpreprocbase.h"
 #include "zbxprometheus.h"
 #include "zbxxml.h"
 #include "preproc_snmp.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
-#include "pp_history.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
@@ -1079,7 +1079,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		action = ZBX_PREPROC_FAIL_DEFAULT;
 		quote_error = 0;
 
-		pp_history_pop(preproc->history, i, &history_value, &history_ts);
+		zbx_pp_history_pop(preproc->history, i, &history_value, &history_ts);
 
 		if (SUCCEED != pp_execute_step(ctx, cache, preproc->value_type, value_out, ts, preproc->steps + i,
 				&history_value, &history_ts))
@@ -1115,7 +1115,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		/* reset preprocessing history in the case of error */
 		if (NULL != history)
 		{
-			pp_history_free(history);
+			zbx_pp_history_free(history);
 			history = NULL;
 		}
 
@@ -1132,7 +1132,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	/* replace preprocessing history */
 
 	if (NULL != preproc->history)
-		pp_history_free(preproc->history);
+		zbx_pp_history_free(preproc->history);
 
 	preproc->history = history;
 

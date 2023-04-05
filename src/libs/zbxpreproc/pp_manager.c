@@ -20,7 +20,6 @@
 #include "pp_manager.h"
 #include "pp_worker.h"
 #include "pp_queue.h"
-#include "pp_item.h"
 #include "pp_task.h"
 #include "preproc_snmp.h"
 #include "zbxpreproc.h"
@@ -154,7 +153,7 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t fini
 	}
 
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)pp_item_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			(zbx_clean_func_t)zbx_pp_item_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	/* wait for threads to start */

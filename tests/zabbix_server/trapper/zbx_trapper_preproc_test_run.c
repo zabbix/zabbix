@@ -58,7 +58,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 	else
 		zbx_variant_set_error(&value_in, zbx_strdup(NULL, value));
 
-	preproc = zbx_pp_item_preproc_create(ITEM_TYPE_TRAPPER, value_type, 0);
+	preproc = zbx_pp_item_preproc_create(0, ITEM_TYPE_TRAPPER, value_type, 0);
 
 	preproc->steps = zbx_malloc(NULL, (size_t)steps->values_num * sizeof(zbx_pp_step_t));
 	for (i = 0; i < steps->values_num; i++)
