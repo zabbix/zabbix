@@ -187,7 +187,7 @@ class testDashboardURLWidget extends CWebTest {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form = $dialog->asForm();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -387,8 +387,7 @@ class testDashboardURLWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget(self::$update_widget)->edit();
-		$form->submit();
+		$dashboard->getWidget(self::$update_widget)->edit()->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 
@@ -422,7 +421,7 @@ class testDashboardURLWidget extends CWebTest {
 				? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
 				: $dashboard->edit()->addWidget()->asForm();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -530,7 +529,7 @@ class testDashboardURLWidget extends CWebTest {
 		else {
 			$form = $dashboard->addWidget()->asForm();
 
-			if ($form->getField('Type') !== 'URL') {
+			if ($form->getField('Type')->getText() !== 'URL') {
 				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 			}
 		}
@@ -669,7 +668,7 @@ class testDashboardURLWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget(self::$default_widget)->edit();
 
-		if ($form->getField('Type') !== 'URL') {
+		if ($form->getField('Type')->getText() !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
@@ -680,6 +679,7 @@ class testDashboardURLWidget extends CWebTest {
 
 		// Select host.
 		$host = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()->fill($data['fields']['Name']);
+		$this->page->waitUntilReady();
 
 		// Check widget content when the host match dynamic option criteria.
 		$widget = $dashboard->getWidget($data['fields']['Name'])->getContent();

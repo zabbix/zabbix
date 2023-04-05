@@ -144,4 +144,14 @@ class CPopupMenuElement extends CElement {
 		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
 		(new CElementQuery('xpath://ul['.CXPathHelper::fromClass('menu-popup-top').']'))->waitUntilNotVisible();
 	}
+
+	/**
+	 * Get selected element.
+	 *
+	 * @return CElement
+	 */
+	public static function getSelected() {
+		$menu = self::find()->waitUntilVisible()->one();
+		return $menu->query('xpath:.//a[contains(@aria-label, "selected")]')->one();
+	}
 }
