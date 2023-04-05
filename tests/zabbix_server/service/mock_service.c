@@ -38,18 +38,6 @@ int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_
 void	__wrap_zbx_clean_events(void);
 int	__wrap_zbx_interface_availability_is_set(const void *ia);
 
-void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
-{
-	ZBX_UNUSED(tm_start);
-	ZBX_UNUSED(table_group);
-}
-
-void	__wrap_zbx_config_get(void *cfg, int flags)
-{
-	ZBX_UNUSED(cfg);
-	ZBX_UNUSED(flags);
-}
-
 /* stubs to satisfy hard link dependenceies */
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
