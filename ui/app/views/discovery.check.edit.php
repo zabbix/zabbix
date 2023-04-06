@@ -21,14 +21,16 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $discovery_check_types = discovery_check_type2str();
 order_result($discovery_check_types);
+$inline_js = getPagePostJs().$this->readJsFile('discovery.check.edit.js.php');
 
 $form = (new CForm())
 	->setName('dcheck_form')
-	->addVar('action', 'popup.discovery.check')
+	->addVar('action', 'discovery.check.edit')
 	->addVar('validate', 1);
 
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
@@ -124,12 +126,13 @@ $form_list = (new CFormList())
 
 $form->addItem([
 	$form_list,
-	(new CInput('submit', 'submit'))->addStyle('display: none;')
+	(new CInput('submit', 'submit'))->addStyle('display: none;'),
+	(new CScriptTag('check_popup.init();'))->setOnDocumentReady()
 ]);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('popup.discovery.check.js.php'),
+	'script_inline' => getPagePostJs().$this->readJsFile('discovery.check.edit.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
@@ -137,7 +140,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return submitDCheck(overlay);'
+			'action' => 'check_popup.submit()'
 		]
 	]
 ];

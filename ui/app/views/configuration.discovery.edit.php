@@ -141,15 +141,8 @@ $discoveryFormGrid->addItem([
 	)
 ]);
 
-// Append buttons to form.
-$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-	->setArgument('action', 'discovery.list')
-	->setArgument('page', CPagerHelper::loadPage('discovery.list', null))
-))->setId('cancel');
-
-$form->addItem($discoveryFormGrid);
-
 $form
+	->addItem($discoveryFormGrid)
 	->addItem(
 		(new CScriptTag('
 			drule_edit_popup.init('.json_encode([

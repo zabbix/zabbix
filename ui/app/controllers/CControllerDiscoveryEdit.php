@@ -160,7 +160,7 @@ class CControllerDiscoveryEdit extends CController {
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 				$dcheck['snmp_community'] = $db_dcheck['snmp_community'];
-			// break; is not missing here
+				// break; is not missing here
 			case SVC_AGENT:
 				$dcheck['key_'] = $db_dcheck['key_'];
 				break;
@@ -173,7 +173,7 @@ class CControllerDiscoveryEdit extends CController {
 				];
 
 				if ($db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
-					|| $db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+						|| $db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					$dcheck += [
 						'snmpv3_authprotocol' => $db_dcheck['snmpv3_authprotocol'],
 						'snmpv3_authpassphrase' => $db_dcheck['snmpv3_authpassphrase']

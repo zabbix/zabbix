@@ -22,7 +22,7 @@
 /**
  * Controller class containing operations for adding and updating discovery checks.
  */
-class CControllerPopupDiscoveryCheck extends CController {
+class CControllerDiscoveryCheckEdit extends CController {
 
 	/**
 	 * Default discovery check type.

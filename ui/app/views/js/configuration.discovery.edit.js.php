@@ -35,8 +35,20 @@ window.drule_edit_popup = new class {
 	_initActionButtons() {
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-check-add')) {
-				// todo: open check popup
+				this._editCheck();
 			}
+		});
+	}
+
+	_editCheck() {
+		const overlay = PopUp('discovery.check.edit', {}, {
+			dialogueid: 'discovery-check',
+			dialogue_class: 'modal-popup-medium',
+			trigger_element: this
+		});
+
+		overlay.$dialogue[0].addEventListener('check.submit', (e) => {
+
 		});
 	}
 
