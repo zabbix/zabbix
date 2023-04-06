@@ -53,7 +53,7 @@ final class CMathFunctionData {
 		'cos' =>				[['count' => 1]],
 		'cosh' =>				[['count' => 1]],
 		'cot' =>				[['count' => 1]],
-		'count' =>				[['count' => 1]],
+		'count' =>				[['min' => 1, 'max' => 3]],
 		'date' =>				[['count' => 0]],
 		'dayofmonth' =>			[['count' => 0]],
 		'dayofweek' =>			[['count' => 0]],
@@ -101,18 +101,39 @@ final class CMathFunctionData {
 	 * @var array
 	 */
 	private const EXPRESSION_RULES = [
-		'count' => [[
-			'if' => [
-				'parameters' => ['count' => 1]
-			],
-			'rules' => [[
-				'type' => 'require_history_child',
-				'in' => ['avg_foreach', 'bucket_rate_foreach', 'count_foreach', 'exists_foreach', 'last_foreach',
-					'max_foreach', 'min_foreach', 'sum_foreach'
+		'count' => [
+			[
+				'if' => [
+					'parameters' => ['min' => 2, 'max' => 3]
 				],
-				'position' => 0
-			]]
-		]],
+				'rules' => [
+					[
+						'type' => 'require_history_child',
+						'in' => ['avg_foreach', 'count_foreach', 'exists_foreach', 'last_foreach',
+							'max_foreach', 'min_foreach', 'sum_foreach'],
+						'position' => 0
+					],
+					[
+						'type' => 'regexp',
+						'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/',
+						'position' => 1
+					]
+				]
+			],
+			[
+				'if' => [
+					'parameters' => ['count' => 1]
+				],
+				'rules' => [
+					[
+						'type' => 'require_history_child',
+						'in' => ['avg_foreach', 'count_foreach', 'exists_foreach', 'last_foreach',
+							'max_foreach', 'min_foreach', 'sum_foreach'],
+						'position' => 0
+					]
+				]
+			]
+		],
 		'histogram_quantile' => [[
 			'if' => [
 				'parameters' => ['count' => 2]

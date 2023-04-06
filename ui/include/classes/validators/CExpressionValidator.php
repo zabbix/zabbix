@@ -251,7 +251,14 @@ class CExpressionValidator extends CValidator {
 						}
 
 						break;
+					case 'regexp':
+						$tokens = $token['data']['parameters'][$rule['position']]['data']['tokens'];
 
+						if (preg_match($rule['pattern'], CHistFunctionParser::unquoteParam($tokens[0]['match'])) != 1) {
+							return false;
+						}
+
+						break;
 					default:
 						return false;
 				}
@@ -273,47 +280,54 @@ class CExpressionValidator extends CValidator {
 			return true;
 		}
 
+		$is_valid = false;
+
 		foreach ($this->hist_function_expression_rules[$token['data']['function']] as $rule) {
 			switch ($rule['type']) {
 				case 'require_math_parent':
 					if ($parent_token === null
 							|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION) {
-						return false;
+						break;
 					}
 
 					if (array_key_exists('in', $rule) && !in_array($parent_token['data']['function'], $rule['in'])) {
-						return false;
+						break;
 					}
 
 					if (array_key_exists('parameters', $rule)) {
 						if (array_key_exists('count', $rule['parameters'])
 								&& count($parent_token['data']['parameters']) != $rule['parameters']['count']) {
-							return false;
+							break;
 						}
 
 						if (array_key_exists('min', $rule['parameters'])
 								&& count($parent_token['data']['parameters']) < $rule['parameters']['min']) {
-							return false;
+							break;
 						}
 
 						if (array_key_exists('max', $rule['parameters'])
 								&& count($parent_token['data']['parameters']) > $rule['parameters']['max']) {
-							return false;
+							break;
 						}
 					}
 
 					if (array_key_exists('position', $rule) && $position != $rule['position']) {
-						return false;
+						break;
 					}
 
+					$is_valid = true;
 					break;
 
 				default:
-					return false;
+					break;
+			}
+
+			if ($is_valid) {
+				return true;
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
