@@ -21,37 +21,35 @@
 
 class CControllerDiscoveryCreate extends CController {
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'name'                => 'required|db drules.name|not_empty',
-			'proxy_hostid'        => 'db drules.proxy_hostid',
-			'iprange'             => 'required|db drules.iprange|not_empty|flags '.P_CRLF,
-			'delay'               => 'required|db drules.delay|not_empty',
-			'status'              => 'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
-			'uniqueness_criteria' => 'string',
-			'host_source'         => 'string',
-			'name_source'         => 'string',
-			'dchecks'             => 'required|array',
-			'form_refresh'        => 'int32'
+			'name' =>					'required|db drules.name|not_empty',
+			'proxy_hostid'  =>			'db drules.proxy_hostid',
+			'iprange' =>				'required|db drules.iprange|not_empty|flags '.P_CRLF,
+			'delay' =>					'required|db drules.delay|not_empty',
+			'status' =>					'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
+			'uniqueness_criteria' =>	'string',
+			'host_source' =>			'string',
+			'name_source' =>			'string',
+			'dchecks' =>				'required|array',
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			switch ($this->getValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'discovery.edit')
-					);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot create discovery rule'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot create discovery rule'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;

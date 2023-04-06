@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('configuration.discovery.list.js.php');
 
 if ($data['uncheck']) {
 	uncheckTableRows('discovery');
@@ -32,10 +35,9 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_DISCOVERY_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem(new CRedirectButton(_('Create discovery rule'),
-					(new CUrl('zabbix.php'))->setArgument('action', 'discovery.edit')
-				))
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create discovery rule')))->setId('js-create')
+			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
@@ -43,23 +45,22 @@ $html_page = (new CHtmlPage())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
+			(new CFormGrid())->addItem([_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
 					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
-			),
-			(new CFormList())->addRow(_('Status'),
+			]),
+			(new CFormGrid())->addItem([_('Status'),
 				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
 					->addValue(_('Any'), -1)
 					->addValue(_('Enabled'), DRULE_STATUS_ACTIVE)
 					->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
 					->setModern(true)
-			)
+			])
 		])
 		->addVar('action', 'discovery.list')
 	);
 
-// create form
 $discoveryForm = (new CForm())->setName('druleForm');
 
 // create table
@@ -80,28 +81,23 @@ $discoveryTable = (new CTableInfo())
 	]);
 
 foreach ($data['drules'] as $drule) {
-	$status = new CCol(
-		(new CLink(
-			discovery_status2str($drule['status']),
-			(new CUrl('zabbix.php'))
-				->setArgument('druleids', (array) $drule['druleid'])
-				->setArgument('action', $drule['status'] == DRULE_STATUS_ACTIVE
-					? 'discovery.disable'
-					: 'discovery.enable'
-				)
-				->getUrl()
-		))
-			->addCsrfToken(CCsrfTokenHelper::get('discovery'))
+	$status = $drule['status'] == DRULE_STATUS_ACTIVE
+		? (new CLink(_('Enabled')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(discovery_status2style($drule['status']))
-	);
+			->addClass(ZBX_STYLE_GREEN)
+			->addClass('js-disable-drule')
+			->setAttribute('data-druleid', (int) $drule['druleid'])
+		: (new CLink(_('Disabled')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_RED)
+			->addClass('js-enable-drule')
+			->setAttribute('data-druleid', (int) $drule['druleid']);
 
 	$discoveryTable->addRow([
 		new CCheckBox('druleids['.$drule['druleid'].']', $drule['druleid']),
-		new CLink($drule['name'], (new CUrl('zabbix.php'))
-			->setArgument('action', 'discovery.edit')
-			->setArgument('druleid', $drule['druleid'])
-		),
+		(new CLink($drule['name']))
+			->addClass('js-discovery-edit')
+			->setAttribute('data-druleid',$drule['druleid']),
 		$drule['iprange'],
 		$drule['proxy'],
 		$drule['delay'],
@@ -110,25 +106,35 @@ foreach ($data['drules'] as $drule) {
 	]);
 }
 
-$csrf_token = CCsrfTokenHelper::get('discovery');
-
-// append table to form
 $discoveryForm->addItem([
 	$discoveryTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'druleids', [
-		'discovery.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?'),
-			'csrf_token' => $csrf_token
+		'discovery.enable' => [
+			'content' => (new CSimpleButton(_('Enable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massenable')
+				->addClass('no-chkbxrange')
 		],
-		'discovery.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?'),
-			'csrf_token' => $csrf_token
+		'discovery.disable' => [
+			'content' => (new CSimpleButton(_('Disable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdisable')
+				->addClass('no-chkbxrange')
 		],
-		'discovery.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'),
-			'csrf_token' => $csrf_token
+		'discovery.delete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdelete')
+				->addClass('no-chkbxrange')
 		]
 	], 'discovery')
 ]);
 
 $html_page
 	->addItem($discoveryForm)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

@@ -21,42 +21,41 @@
 
 class CControllerDiscoveryEdit extends CController {
 
+	/**
+	 * @var mixed
+	 */
 	private $drule = [];
 
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'druleid'             => 'db drules.druleid',
-			'name'                => 'db drules.name',
-			'proxy_hostid'        => 'db drules.proxy_hostid',
-			'iprange'             => 'db drules.iprange',
-			'delay'               => 'db drules.delay',
-			'status'              => 'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
-			'uniqueness_criteria' => 'string',
-			'host_source'         => 'string',
-			'name_source'         => 'string',
-			'dchecks'             => 'array',
-			'form_refresh'        => 'int32'
+			'druleid' =>	'db drules.druleid'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)) {
 			return false;
 		}
 
-		if ($this->hasInput('druleid') && !$this->hasInput('form_refresh')) {
+		if ($this->hasInput('druleid')) {
 			$drules = API::DRule()->get([
 				'output' => ['name', 'proxy_hostid', 'iprange', 'delay', 'status'],
 				'druleids' => $this->getInput('druleid'),
@@ -77,6 +76,7 @@ class CControllerDiscoveryEdit extends CController {
 			$name_source = DB::getDefault('dchecks', 'name_source');
 
 			$drule = $drules[0];
+
 			if ($drule['dchecks']) {
 				[['host_source' => $host_source, 'name_source' => $name_source]] = $drule['dchecks'];
 
@@ -102,11 +102,7 @@ class CControllerDiscoveryEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
-		$this->getInputs($this->drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks',
-			'uniqueness_criteria', 'host_source', 'name_source'
-		]);
-
+	protected function doAction(): void {
 		$this->drule += [
 			'name' => DB::getDefault('drules', 'name'),
 			'dchecks' => [],
@@ -122,7 +118,7 @@ class CControllerDiscoveryEdit extends CController {
 		CArrayHelper::sort($this->drule['dchecks'], ['name']);
 
 		$data = [
-			'druleid' => $this->getInput('druleid', 0),
+			'druleid' => $this->getInput('druleid', null),
 			'drule' => $this->drule,
 			'form_refresh' => $this->getInput('form_refresh', 0)
 		];
@@ -131,6 +127,8 @@ class CControllerDiscoveryEdit extends CController {
 			'output' => ['proxyid', 'host']
 		]);
 		CArrayHelper::sort($data['proxies'], ['host']);
+
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));
@@ -162,7 +160,7 @@ class CControllerDiscoveryEdit extends CController {
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 				$dcheck['snmp_community'] = $db_dcheck['snmp_community'];
-				// break; is not missing here
+			// break; is not missing here
 			case SVC_AGENT:
 				$dcheck['key_'] = $db_dcheck['key_'];
 				break;
@@ -175,7 +173,7 @@ class CControllerDiscoveryEdit extends CController {
 				];
 
 				if ($db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
-						|| $db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					|| $db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					$dcheck += [
 						'snmpv3_authprotocol' => $db_dcheck['snmpv3_authprotocol'],
 						'snmpv3_authpassphrase' => $db_dcheck['snmpv3_authpassphrase']
