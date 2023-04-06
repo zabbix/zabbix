@@ -1408,7 +1408,6 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  *                                                                            *
  * Parameters: s              - [IN/OUT] socket to listen                     *
  *             tls_accept     - [IN] TLS configuration                        *
- *             timeout        - [IN] handshake timeout                        *
  *             poll_timeout   - [IN] milliseconds to wait for connection      *
  *                                  (0 - don't wait, -1 - wait forever        *
  *                                                                            *
@@ -1417,7 +1416,7 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  *               TIMEOUT_ERROR - no connections for the timeout period        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, int poll_timeout)
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 {
 	ZBX_SOCKADDR	serv_addr;
 	ZBX_SOCKET	accepted_socket;
@@ -1498,9 +1497,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, int po
 		goto out;
 	}
 
-	/* set default socket timeout, used when socket is closed */
-	s->timeout = timeout;
-	zbx_socket_set_deadline(s, timeout);
+	zbx_socket_set_deadline(s, s->timeout);
 
 	if (FAIL == (res = tcp_peek(s, &buf, 1)) || TIMEOUT_ERROR == res)
 	{
