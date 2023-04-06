@@ -823,8 +823,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		// Get the correct token from form and put it to the direct URL.
 		if (CTestArrayHelper::get($data, 'token')) {
 			$this->page->open('items.php?form=update&hostid=99134&itemid=99114&context=host')->waitUntilReady();
-			$url = $data['link'].$this->query('xpath:.//input[@name="_csrf_token"]')->one()->getAttribute('value');
-			$this->page->open($url)->waitUntilReady();
+			$this->page->open($data['link'].$this->query('xpath:.//input[@name="_csrf_token"]')
+					->one()->getAttribute('value'))->waitUntilReady();
 		}
 
 		$this->page->open($data['link'])->waitUntilReady();
