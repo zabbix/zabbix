@@ -316,7 +316,7 @@ static int	config_histsyncer_frequency	= 1;
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
-char	*config_server			= NULL;		/* not used in zabbix_server, required for linking */
+static char	*config_server		= NULL;		/* not used in zabbix_server, required for linking */
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
@@ -353,7 +353,7 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
-int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
+static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
 
 /* how often Zabbix server sends configuration data to passive proxy, in seconds */
 static int	config_proxyconfig_frequency	= 10;

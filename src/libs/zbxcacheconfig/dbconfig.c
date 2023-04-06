@@ -8007,7 +8007,7 @@ static int	__config_session_compare(const void *d1, const void *d2)
 	return strcmp(s1->token, s2->token);
 }
 
-int	get_dc_config_forks(unsigned char proc_type)
+int	cacheconfig_get_config_forks(unsigned char proc_type)
 {
 	return get_config_forks_cb(proc_type);
 }

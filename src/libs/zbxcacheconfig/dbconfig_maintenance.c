@@ -694,7 +694,7 @@ void	zbx_dc_maintenance_set_update_flags(void)
 
 	memset(config->maintenance_update_flags, 0xff, sizeof(zbx_uint64_t) * slots_num);
 
-	if (0 != (timers_left = ((size_t)get_dc_config_forks(ZBX_PROCESS_TYPE_TIMER) % (sizeof(uint64_t) * 8))))
+	if (0 != (timers_left = ((size_t)cacheconfig_get_config_forks(ZBX_PROCESS_TYPE_TIMER) % (sizeof(uint64_t) * 8))))
 		config->maintenance_update_flags[slots_num - 1] >>= (sizeof(zbx_uint64_t) * 8 - timers_left);
 
 	UNLOCK_CACHE;

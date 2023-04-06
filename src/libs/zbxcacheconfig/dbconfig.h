@@ -1050,7 +1050,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
 /* maintenance support */
 
 /* number of slots to store maintenance update flags */
-int	get_dc_config_forks(unsigned char proc_type);
+int	cacheconfig_get_config_forks(unsigned char proc_type);
 size_t	zbx_maintenance_update_flags_num(void);
 
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);

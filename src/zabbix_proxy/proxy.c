@@ -305,7 +305,7 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
-int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
+static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;

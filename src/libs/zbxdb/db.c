@@ -886,7 +886,7 @@ out:
 	return ret;
 }
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, const int log_slow_queries, char **error)
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error)
 {
 #ifdef HAVE_SQLITE3
 	zbx_stat_t	buf;
