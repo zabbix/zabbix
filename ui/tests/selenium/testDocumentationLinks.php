@@ -106,14 +106,14 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/action_log'
 				]
 			],
 			// #4 Widget edit form.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_hosts',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -687,19 +687,18 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// #68 Template dashboard widget create popup.
-			// TODO: Uncomment the below case when ZBX-21929 will be merged.
-//			[
-//				[
-//					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
-//					'actions' => [
-//						[
-//							'callback' => 'openFormWithLink',
-//							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
-//						]
-//					],
-//					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
-//				]
-//			],
+			[
+				[
+				'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
+						]
+					],
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph_classic'
+				]
+			],
 			// #69 Template dashboard widget edit popup.
 			[
 				[
@@ -710,7 +709,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/clock'
 				]
 			],
 			// #70 Add Template dashboard page configuration popup.
@@ -1699,7 +1698,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'link:Active proxy 1'
+							'element' => 'link:Proxy for Actions'
 						]
 					],
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
@@ -1891,15 +1890,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
-			/** TODO: uncomment and change doc links after ZBXNEXT-2592
-			// #205 Template groups list view.
+/*			// #205 Template groups list view.
 			[
 				[
 					'url' => 'zabbix.php?action=templategroup.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hostgroups'
 				]
-			],
-			// #206 Create template group popup.
+			],*/
+			/*// #206 Create template group popup.
 			[
 				[
 					'url' => 'zabbix.php?action=templategroup.list',
@@ -1912,9 +1910,9 @@ class testDocumentationLinks extends CWebTest {
 					'open_button' => 'button:Create template group',
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
-			],
+			],*/
 			// #207 Edit template group popup.
-			[
+		/*	[
 				[
 					'url' => 'zabbix.php?action=templategroup.list',
 					'actions' => [
@@ -1925,16 +1923,410 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
-			],
+			],*/
 			// #208 Create template group form view (standalone).
-			[
+/*			[
 				[
 					'url' => 'zabbix.php?action=templategroup.edit',
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
+			],*/
+			// #209
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Discovery status',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/discovery_status'
+				]
+			],
+			// #210
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Favorite graphs',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/favorite_graphs'
+				]
+			],
+			// #211
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Favorite maps',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/favorite_maps'
+				]
+			],
+			// #212
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Geomap',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/geomap'
+				]
+			],
+			// #213
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Graph',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph'
+				]
+			],
+			// #214
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Graph (classic)',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph_classic'
+				]
+			],
+			// #215
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Graph prototype',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph_prototype'
+				]
+			],
+			// #216
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Host availability',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_availability'
+				]
+			],
+			// #217
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Item value',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_value'
+				]
+			],
+			// #219
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Map',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/map'
+				]
+			],
+			// #220
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Map navigation tree',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/map_tree'
+				]
+			],
+			// #221
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Plain text',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/plain_text'
+				]
+			],
+			// #222
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Problem hosts',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problem_hosts'
+				]
+			],
+			// #223
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Problems',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problems'
+				]
+			],
+			// #225
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Problems by severity',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problems_severity'
+				]
+			],
+			// #226
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'SLA report',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/sla_report'
+				]
+			],
+			// #227
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'System information',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/system'
+				]
+			],
+			// #228
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Top hosts',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_hosts'
+				]
+			],
+			// #229
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Trigger overview',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/trigger_overview'
+				]
+			],
+			// #230
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'URL',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/url'
+				]
+			],
+			// #230
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Web monitoring',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring'
+				]
+			],
+			// #231
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Data overview',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/data_overview'
+				]
 			]
-			 *
-			 */
 		];
 	}
 
@@ -1953,6 +2345,12 @@ class testDocumentationLinks extends CWebTest {
 
 		$dialog = COverlayDialogElement::find()->one(false);
 		$location = ($dialog->isValid()) ? $dialog->waitUntilReady() : $this;
+
+		// Check all widget documentation links.
+		if (array_key_exists('widget_type', $data)) {
+			$form = $dialog->asForm();
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL($data['widget_type'])]);
+		}
 
 		// Get the documentation link and compare it with expected result.
 		$link = $location->query('class:icon-doc-link')->one();
