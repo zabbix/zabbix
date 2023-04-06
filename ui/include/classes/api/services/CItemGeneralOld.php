@@ -2897,9 +2897,7 @@ abstract class CItemGeneralOld extends CApiService {
 
 		// Select tags from database.
 		$db_tags = DBselect(
-			'SELECT itemtagid, itemid, tag, value'.
-			' FROM item_tag'.
-			' WHERE '.dbConditionInt('itemid', array_keys($items))
+			'SELECT itemtagid,itemid,tag,value FROM item_tag WHERE '.dbConditionInt('itemid', array_keys($items))
 		);
 
 		array_walk($items, function (&$item) {
