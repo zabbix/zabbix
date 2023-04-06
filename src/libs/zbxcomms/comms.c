@@ -1498,6 +1498,8 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, int po
 		goto out;
 	}
 
+	/* set default socket timeout, used when socket is closed */
+	s->timeout = timeout;
 	zbx_socket_set_deadline(s, timeout);
 
 	if (FAIL == (res = tcp_peek(s, &buf, 1)) || TIMEOUT_ERROR == res)
