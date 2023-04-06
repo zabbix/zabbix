@@ -40,28 +40,34 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
 	struct timeval	tv;
 	int		rc;
 	fd_set		fd, *readfd = NULL, *writefd = NULL;
+	zbx_pollfd_t	pd;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	tv.tv_sec = 0;
-	tv.tv_usec = 100000;	/* 1/10 sec */
+	pd.fd = socket_fd;
+	pd.events = POLLIN;
 
-	FD_ZERO(&fd);
-	FD_SET(socket_fd, &fd);
-
-	if (WAIT_READ == mode)
-		readfd = &fd;
-	else
-		writefd = &fd;
-
-	rc = select(ZBX_SOCKET_TO_INT(socket_fd) + 1, readfd, writefd, NULL, &tv);
-
-	if (ZBX_PROTO_ERROR == rc)
+	if (0 > (rc = socket_poll(&pd, 1, 100)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __func__, rc, zbx_socket_last_error(),
-				strerror_from_system(zbx_socket_last_error()));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() poll() error rc:%d errno:%d error:[%s]", __func__, rc,
+				zbx_socket_last_error(), strerror_from_system(zbx_socket_last_error()));
+		goto out;
 	}
 
+	if (0 < rc && POLLIN != (pd.revents & (POLLIN | POLLERR | POLLHUP | POLLNVAL)))
+	{
+		char	*errmsg;
+
+		errmsg = socket_poll_error(pd.revents);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, errmsg);
+		zbx_free(errmsg);
+		rc = ZBX_PROTO_ERROR;
+
+		goto out;
+	}
+
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, rc);
 
 	return rc;
