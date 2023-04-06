@@ -88,8 +88,7 @@ class CControllerPopupDiscoveryCheck extends CController {
 	protected function doAction() {
 		$data = array_merge([
 			'type' => self::DEFAULT_TYPE,
-			'ports' => svc_default_port(self::DEFAULT_TYPE),
-			'allow_redirect' => 0
+			'ports' => svc_default_port(self::DEFAULT_TYPE)
 		], $this->getInputAll());
 
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);

@@ -343,8 +343,8 @@
 		]);
 
 		var data = $form
-				.find('#type, #ports, input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible,'
-					+ ' input[type=checkbox]:checked:visible')
+				.find('#ports, >input[type=hidden], :visible>input[type=hidden], input[type=text]:visible,'
+					+ ' input[type=radio]:checked:visible, input[type=checkbox]:checked:visible')
 				.serialize(),
 			dialogueid = $form
 				.closest("[data-dialogueid]")
@@ -412,15 +412,14 @@
 		var $form = jQuery(document.forms['dcheck_form']),
 			dcheckid = jQuery('#dcheckid').val(),
 			dcheck = $form
-				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible,'
-					+ ' #allow_redirect')
+				.find('#ports, >input[type=hidden], :visible>input[type=hidden], input[type=text]:visible,'
+					+ ' input[type=radio]:checked:visible, input[type=checkbox]:checked:visible')
 				.serializeJSON(),
 			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase', 'allow_redirect'
 			];
 
-		dcheck['type'] = $form.find('z-select').val();
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
 		if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
@@ -429,16 +428,16 @@
 		}
 
 		for (var zbx_dcheckid in ZBX_CHECKLIST) {
-			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] !== dcheck['type']) {
+			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] != dcheck['type']) {
 				continue;
 			}
 
 			if (typeof dcheckid === 'undefined' || dcheckid != zbx_dcheckid) {
 				var duplicate_fields = fields
 					.map(function(value) {
-						return typeof dcheck[value] === 'undefined'
-							|| dcheck[value] === ''
-							|| ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value];
+						return (typeof dcheck[value] === 'undefined'
+								&& typeof ZBX_CHECKLIST[zbx_dcheckid][value] === 'undefined')
+							|| ZBX_CHECKLIST[zbx_dcheckid][value] == dcheck[value];
 					})
 					.filter(function(value) {
 						return !!value;
