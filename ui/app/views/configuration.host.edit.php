@@ -41,9 +41,6 @@ $data += [
 			(new CSubmit('update', _('Update')))
 				->removeAttribute('id'),
 			(new CSimpleButton(_('Clone')))
-				->onClick('view.clone();')
-				->removeAttribute('id'),
-			(new CSimpleButton(_('Full clone')))
 				->onClick('view.fullClone();')
 				->removeAttribute('id'),
 			(new CSimpleButton(_('Delete')))

@@ -38,9 +38,6 @@ if ($data['hostid'] == 0) {
 		if ($data['full_clone'] === 1) {
 			$popup_url->setArgument('full_clone', 1);
 		}
-		else {
-			$popup_url->setArgument('clone', 1);
-		}
 	}
 
 	$buttons = [
@@ -66,13 +63,6 @@ else {
 		],
 		[
 			'title' => _('Clone'),
-			'class' => 'btn-alt',
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'host_edit_popup.clone();'
-		],
-		[
-			'title' => _('Full clone'),
 			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,

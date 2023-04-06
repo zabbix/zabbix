@@ -85,19 +85,6 @@ window.host_edit_popup = {
 			});
 	},
 
-	clone() {
-		this.overlay.setLoading();
-		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);
-		delete parameters.sid;
-		parameters.clone = 1;
-
-		PopUp('popup.host.edit', parameters, {
-			dialogueid: 'host_edit',
-			dialogue_class: 'modal-popup-large',
-			prevent_navigation: true
-		});
-	},
-
 	fullClone() {
 		this.overlay.setLoading();
 		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);

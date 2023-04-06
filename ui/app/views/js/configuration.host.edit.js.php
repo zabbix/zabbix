@@ -69,16 +69,6 @@
 				});
 		},
 
-		clone() {
-			const url = new Curl('');
-			url.setArgument('clone', 1);
-
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
-			delete fields.sid;
-
-			post(url.getUrl(), fields);
-		},
-
 		fullClone() {
 			const url = new Curl('');
 			url.setArgument('full_clone', 1);

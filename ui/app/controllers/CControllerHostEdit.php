@@ -41,7 +41,6 @@ class CControllerHostEdit extends CController {
 		$fields = [
 			'hostid'			=> 'db hosts.hostid',
 			'groupids'			=> 'array_db hosts_groups.groupid',
-			'clone'				=> 'in 1',
 			'full_clone'		=> 'in 1',
 			'host'				=> 'db hosts.host',
 			'visiblename'		=> 'db hosts.name',
@@ -98,7 +97,7 @@ class CControllerHostEdit extends CController {
 	 * @return bool
 	 */
 	protected function checkCloneSourceHostId(): bool {
-		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
+		if ($this->hasInput('full_clone')) {
 			return $this->hasInput('hostid');
 		}
 
@@ -130,7 +129,7 @@ class CControllerHostEdit extends CController {
 		$clone_hostid = null;
 
 		if ($this->hasInput('hostid')) {
-			if ($this->hasInput('full_clone') || $this->hasInput('clone')) {
+			if ($this->hasInput('full_clone')) {
 				$clone_hostid = $this->getInput('hostid');
 				$this->host = ['hostid' => null];
 			}
@@ -444,7 +443,7 @@ class CControllerHostEdit extends CController {
 	protected function getInputValues(): array {
 		$inputs = [];
 
-		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
+		if ($this->hasInput('full_clone')) {
 			$inputs['groups'] = [];
 			foreach ($this->getInput('groups', []) as $group) {
 				if (is_array($group) && array_key_exists('new', $group)) {
