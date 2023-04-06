@@ -39,6 +39,51 @@
 #endif
 
 #ifdef _WINDOWS
+#	if !defined(POLLIN)
+#		define POLLIN	0x001
+#	endif
+#	if !defined(POLLPRI)
+#		define POLLPRI	0x002
+#	endif
+#	if !defined(POLLOUT)
+#		define POLLOUT	0x004
+#	endif
+#	if !defined(POLLERR)
+#		define POLLERR	0x008
+#	endif
+#	if !defined(POLLHUP)
+#		define POLLHUP	0x010
+#	endif
+#	if !defined(POLLNVAL)
+#		define POLLNVAL	0x020
+#	endif
+#	if !defined(POLLRDNORM)
+#		define POLLRDNORM	0x040
+#	endif
+#	if !defined(POLLWRNORM)
+#		define POLLWRNORM	0x100
+#	endif
+
+typedef struct
+{
+	SOCKET	fd;
+	short	events;
+	short	revents;
+}
+zbx_pollfd_t;
+
+int	zbx_socket_poll(zbx_pollfd_t* fds, unsigned long fds_num, int timeout);
+
+#else
+#	define zbx_socket_poll(x, y, z)		poll(x, y, z)
+
+typedef struct pollfd zbx_pollfd_t;
+
+#endif
+
+int	zbx_socket_had_nonblocking_error(void);
+
+#ifdef _WINDOWS
 typedef SOCKET	ZBX_SOCKET;
 #else
 typedef int	ZBX_SOCKET;

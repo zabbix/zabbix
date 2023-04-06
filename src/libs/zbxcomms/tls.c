@@ -285,9 +285,9 @@ static int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session, ssize_t err)
 	pd.fd = s;
 	pd.events = event = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
 
-	if (0 > (ret = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+	if (0 > (ret = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 	{
-		if (SUCCEED != socket_had_nonblocking_error())
+		if (SUCCEED != zbx_socket_had_nonblocking_error())
 			return FAIL;
 
 		return SUCCEED;
@@ -339,9 +339,9 @@ static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 
 	event = pd.events;
 
-	if (0 > (ret = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+	if (0 > (ret = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 	{
-		if (SUCCEED != socket_had_nonblocking_error())
+		if (SUCCEED != zbx_socket_had_nonblocking_error())
 			return FAIL;
 
 		return SUCCEED;

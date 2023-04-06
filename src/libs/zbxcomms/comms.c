@@ -416,7 +416,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	int		rc;
 	zbx_pollfd_t	pd;
 
-	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen) && SUCCEED != socket_had_nonblocking_error())
+	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen) && SUCCEED != zbx_socket_had_nonblocking_error())
 	{
 		*error = zbx_dsprintf(*error, "cannot connect to address: %s",
 				strerror_from_system(zbx_socket_last_error()));
@@ -426,9 +426,9 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
 
-	while (0 >= (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+	while (0 >= (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 	{
-		if (-1 == rc && SUCCEED != socket_had_nonblocking_error())
+		if (-1 == rc && SUCCEED != zbx_socket_had_nonblocking_error())
 		{
 			*error = zbx_strdup(NULL, "cannot wait for connection");
 			return FAIL;
@@ -635,16 +635,16 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 		{
 			int	rc;
 
-			if (SUCCEED != socket_had_nonblocking_error())
+			if (SUCCEED != zbx_socket_had_nonblocking_error())
 			{
 				zbx_set_socket_strerror("cannot write data: %s",
 						strerror_from_system(zbx_socket_last_error()));
 				return n;
 			}
 
-			if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+			if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 			{
-				if (SUCCEED != socket_had_nonblocking_error())
+				if (SUCCEED != zbx_socket_had_nonblocking_error())
 				{
 					zbx_set_socket_strerror("cannot wait for socket: %s",
 							strerror_from_system(zbx_socket_last_error()));
@@ -950,7 +950,7 @@ static int	socket_set_nonblocking(ZBX_SOCKET s)
  * Purpose: check if the last socket error was because of non-blocking socket *
  *                                                                            *
  ******************************************************************************/
-int	socket_had_nonblocking_error(void)
+int	zbx_socket_had_nonblocking_error(void)
 {
 #ifndef _WINDOWS
 	switch (errno)
@@ -985,7 +985,7 @@ int	socket_had_nonblocking_error(void)
  *           supported on older (xp64/server2003) systems                     *
  *                                                                            *
  ******************************************************************************/
-int	socket_poll(zbx_pollfd_t* fds, unsigned long fds_num, int timeout)
+int	zbx_socket_poll(zbx_pollfd_t* fds, unsigned long fds_num, int timeout)
 {
 	fd_set		fds_read;
 	fd_set		fds_write;
@@ -1052,7 +1052,7 @@ static ssize_t	tcp_peek(zbx_socket_t *s, char *buffer, size_t size)
 	if (0 <= (n = ZBX_TCP_RECV(s->socket, buffer, size, MSG_PEEK)))
 		return n;
 
-	if (SUCCEED != socket_had_nonblocking_error())
+	if (SUCCEED != zbx_socket_had_nonblocking_error())
 		return FAIL;
 
 	pd.fd = s->socket;
@@ -1062,9 +1062,9 @@ static ssize_t	tcp_peek(zbx_socket_t *s, char *buffer, size_t size)
 	{
 		int	rc;
 
-		if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+		if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 		{
-			if (SUCCEED != socket_had_nonblocking_error())
+			if (SUCCEED != zbx_socket_had_nonblocking_error())
 				return FAIL;
 		}
 
@@ -1082,7 +1082,7 @@ static ssize_t	tcp_peek(zbx_socket_t *s, char *buffer, size_t size)
 		if (0 <= (n = ZBX_TCP_RECV(s->socket, buffer, size, MSG_PEEK)))
 			break;
 
-		if (SUCCEED != socket_had_nonblocking_error())
+		if (SUCCEED != zbx_socket_had_nonblocking_error())
 			return FAIL;
 	}
 
@@ -1102,7 +1102,7 @@ static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size)
 	if (0 <= (n = ZBX_TCP_READ(s->socket, buffer, size)))
 		return n;
 
-	if (SUCCEED != socket_had_nonblocking_error())
+	if (SUCCEED != zbx_socket_had_nonblocking_error())
 	{
 		zbx_set_socket_strerror("cannot read from socket: %s",
 				strerror_from_system(zbx_socket_last_error()));
@@ -1116,9 +1116,9 @@ static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size)
 	{
 		int	rc;
 
-		if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+		if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 		{
-			if (SUCCEED != socket_had_nonblocking_error())
+			if (SUCCEED != zbx_socket_had_nonblocking_error())
 			{
 				zbx_set_socket_strerror("cannot wait for socket: %s",
 						strerror_from_system(zbx_socket_last_error()));
@@ -1151,7 +1151,7 @@ static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size)
 		if (0 <= (n = ZBX_TCP_READ(s->socket, buffer, size)))
 			break;
 
-		if (SUCCEED != socket_had_nonblocking_error())
+		if (SUCCEED != zbx_socket_had_nonblocking_error())
 		{
 			zbx_set_socket_strerror("cannot read from socket: %s",
 					strerror_from_system(zbx_socket_last_error()));
@@ -1436,9 +1436,9 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		pds[i].events = POLLIN;
 	}
 
-	if (ZBX_PROTO_ERROR == (ret = socket_poll(pds, (unsigned long)s->num_socks, poll_timeout * 1000)))
+	if (ZBX_PROTO_ERROR == (ret = zbx_socket_poll(pds, (unsigned long)s->num_socks, poll_timeout * 1000)))
 	{
-		if (SUCCEED == socket_had_nonblocking_error())
+		if (SUCCEED == zbx_socket_had_nonblocking_error())
 			ret = TIMEOUT_ERROR;
 		else
 			zbx_set_socket_strerror("poll() failed: %s", strerror_from_system(zbx_socket_last_error()));
@@ -1470,7 +1470,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 	if (ZBX_SOCKET_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->sockets[i], (struct sockaddr *)&serv_addr,
 			&nlen)))
 	{
-		if (SUCCEED == socket_had_nonblocking_error())
+		if (SUCCEED == zbx_socket_had_nonblocking_error())
 			ret = TIMEOUT_ERROR;
 		else
 			zbx_set_socket_strerror("accept() failed: %s", strerror_from_system(zbx_socket_last_error()));
@@ -2432,16 +2432,16 @@ int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout
 		{
 			int	rc;
 
-			if (SUCCEED != socket_had_nonblocking_error())
+			if (SUCCEED != zbx_socket_had_nonblocking_error())
 			{
 				zbx_set_socket_strerror("sendto() failed: %s",
 						strerror_from_system(zbx_socket_last_error()));
 				return FAIL;
 			}
 
-			if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+			if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 			{
-				if (SUCCEED == socket_had_nonblocking_error())
+				if (SUCCEED == zbx_socket_had_nonblocking_error())
 					continue;
 
 				zbx_set_socket_strerror("cannot wait for socket: %s",
@@ -2502,16 +2502,16 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 		{
 			int	rc;
 
-			if (SUCCEED != socket_had_nonblocking_error())
+			if (SUCCEED != zbx_socket_had_nonblocking_error())
 			{
 				zbx_set_socket_strerror("recvfrom() failed: %s",
 						strerror_from_system(zbx_socket_last_error()));
 				return FAIL;
 			}
 
-			if (-1 == (rc = socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+			if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 			{
-				if (SUCCEED != socket_had_nonblocking_error())
+				if (SUCCEED != zbx_socket_had_nonblocking_error())
 				{
 					zbx_set_socket_strerror("cannot wait for socket: %s",
 							strerror_from_system(zbx_socket_last_error()));

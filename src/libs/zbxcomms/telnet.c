@@ -23,9 +23,6 @@
 #include "log.h"
 #include "zbxstr.h"
 
-#define WAIT_READ	0
-#define WAIT_WRITE	1
-
 #define CMD_IAC		255
 #define CMD_WILL	251
 #define CMD_WONT	252
@@ -35,19 +32,17 @@
 
 static char	prompt_char = '\0';
 
-static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
+static int	telnet_waitsocket(ZBX_SOCKET socket_fd, short mode)
 {
-	struct timeval	tv;
 	int		rc;
-	fd_set		fd, *readfd = NULL, *writefd = NULL;
 	zbx_pollfd_t	pd;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pd.fd = socket_fd;
-	pd.events = POLLIN;
+	pd.events = mode;
 
-	if (0 > (rc = socket_poll(&pd, 1, 100)))
+	if (0 > (rc = zbx_socket_poll(&pd, 1, 100)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() poll() error rc:%d errno:%d error:[%s]", __func__, rc,
 				zbx_socket_last_error(), strerror_from_system(zbx_socket_last_error()));
@@ -99,7 +94,7 @@ static ssize_t	telnet_socket_read(zbx_socket_t *s, void *buf, size_t count)
 
 			/* wait and if there is still an error or no input available */
 			/* we assume the other side has nothing more to say */
-			if (1 > (rc = telnet_waitsocket(s->socket, WAIT_READ)))
+			if (1 > (rc = telnet_waitsocket(s->socket, POLLIN)))
 				goto ret;
 
 			continue;
@@ -142,7 +137,7 @@ static ssize_t	telnet_socket_write(zbx_socket_t *s, const void *buf, size_t coun
 				break;
 			}
 
-			telnet_waitsocket(s->socket, WAIT_WRITE);
+			telnet_waitsocket(s->socket, POLLOUT);
 			continue;
 		}
 
@@ -526,7 +521,7 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 		offset--;
 	buf[offset] = '\0';
 
-	SET_STR_RESULT(result, zbx_convert_to_utf8(buf, offset, encoding));
+	SET_TEXT_RESULT(result, zbx_convert_to_utf8(buf, offset, encoding));
 	ret = SUCCEED;
 fail:
 	zbx_free(command_lf);
