@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -533,6 +533,7 @@ void	zbx_db_validate_config(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *j);
 #endif
 int		DBexecute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		DBexecute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
@@ -548,6 +549,7 @@ int		DBend(int ret);
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
+int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
@@ -984,5 +986,9 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(int *ts_from, int table_group);
 
 #endif

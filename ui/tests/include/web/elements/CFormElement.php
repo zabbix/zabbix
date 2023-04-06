@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -570,8 +570,10 @@ class CFormElement extends CElement {
 	 * @return array
 	 */
 	public function getRequiredLabels() {
-		return $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
+		$labels = $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
 				->filter(CElementFilter::VISIBLE)->asText();
+
+		return array_values($labels);
 	}
 
 	/**

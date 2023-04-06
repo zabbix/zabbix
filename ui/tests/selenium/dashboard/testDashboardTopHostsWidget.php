@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -201,7 +201,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Aggregation interval' => '20y',
 							'Item' => 'Available memory'
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			// #4 several item columns with different display, time shift, min/max and history data.
@@ -820,6 +821,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 		if (array_key_exists('tags', $data)) {
 			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
+		}
+
+		// Take a screenshot to test draggable object position of columns.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top hosts columns');
 		}
 
 		$form->fill($data['main_fields']);
