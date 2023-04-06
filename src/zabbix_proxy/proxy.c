@@ -281,7 +281,6 @@ static zbx_uint64_t	config_conf_cache_size		= 8 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_history_cache_size	= 16 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_history_index_cache_size	= 4 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_trends_cache_size	= 0;
-static zbx_uint64_t	config_value_cache_size		= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 
 static int	config_unreachable_period	= 45;
