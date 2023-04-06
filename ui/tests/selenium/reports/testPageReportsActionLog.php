@@ -33,27 +33,27 @@ class testPageReportsActionLog extends CWebTest {
 
 	public static function prepareInsertActionsData() {
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (8, 13, 1, 1, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (130, 13, 1, 1, ".
 				"1329724870, 10, 'test.test@zabbix.com', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
 		);
 
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (9, 13, 1, 9, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (131, 13, 1, 9, ".
 				"1329724880, 3, '77777777', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
 		);
 
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (10, 13, 1, 9, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (132, 13, 1, 9, ".
 				"1329724890, 3, '77777777', 'subject_no_space', 'message_no_space', 1, 0, '', 1, 0, '');"
 		);
 
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (11, 13, 1, 1, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (133, 13, 1, 1, ".
 				"1597439400, 3, 'igor.danoshaites@zabbix.com', 'time_subject_1', 'time_message_1', 1, 0, '', 1, 0, '');"
 		);
 
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (12, 12, 1, 9, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (134, 12, 1, 9, ".
 				"1597440000, 3, 'igor.danoshaites@zabbix.com', 'time_subject_2', 'time_message_', 1, 0, '', 1, 0, '');"
 		);
 	}
