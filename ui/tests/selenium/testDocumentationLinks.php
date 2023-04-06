@@ -1919,7 +1919,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[text()="Templates"]'
+							'element' => 'xpath://a[text()="Templates/Applications"]'
 						]
 					],
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
