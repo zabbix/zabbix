@@ -658,13 +658,13 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
  * Purpose: tries to deactivate item's interface after receiving              *
  *          host level error                                                  *
  *                                                                            *
- * Parameters: manager - [IN] the IPMI manager                                *
- *             itemid  - [IN] the item identifier                             *
- *             ts      - [IN] the deactivation timestamp                      *
+ * Parameters: manager            - [IN] the IPMI manager                     *
+ *             itemid             - [IN] the item identifier                  *
+ *             ts                 - [IN] the deactivation timestamp           *
  *             unavailable_delay  - [IN]                                      *
  *             unreachable_period - [IN]                                      *
  *             unreachable_delay  - [IN]                                      *
- *             error   - [IN] the error                                       *
+ *             error              - [IN] the error                            *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_uint64_t itemid, zbx_timespec_t *ts,
@@ -852,10 +852,10 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
  *                                                                                    *
  * Purpose: processes IPMI check result received from IPMI poller                     *
  *                                                                                    *
- * Parameters: manager           - [IN] IPMI manager                                  *
- *             client            - [IN] client (IPMI poller)                          *
- *             message           - [IN] received ZBX_IPC_IPMI_VALUE_RESULT message    *
- *             now               - [IN] current time                                  *
+ * Parameters: manager            - [IN] IPMI manager                                 *
+ *             client             - [IN] client (IPMI poller)                         *
+ *             message            - [IN] received ZBX_IPC_IPMI_VALUE_RESULT message   *
+ *             now                - [IN] current time                                 *
  *             unavailable_delay  - [IN]                                              *
  *             unreachable_period - [IN]                                              *
  *             unreachable_delay  - [IN]                                              *

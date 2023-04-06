@@ -376,13 +376,13 @@ out:
  *                                                                            *
  * Purpose: processes proxy data request                                      *
  *                                                                            *
- * Parameters: proxy      - [IN/OUT] proxy data                               *
- *             answer     - [IN] data received from proxy                     *
- *             ts         - [IN] timestamp when the proxy connection was      *
- *                           established                                      *
- *             events_cbs - [IN]                                              *
+ * Parameters: proxy               - [IN/OUT] proxy data                      *
+ *             answer              - [IN] data received from proxy            *
+ *             ts                  - [IN] timestamp when the proxy connection *
+ *                                        was established                     *
+ *             events_cbs          - [IN]                                     *
  *             proxydata_frequency - [IN]                                     *
- *             more       - [OUT] available data flag                         *
+ *             more                - [OUT] available data flag                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -447,11 +447,11 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy          - [IN/OUT] proxy data                           *
- *             config_timeout - [IN]                                          *
- *             events_cbs     - [IN]                                          *
+ * Parameters: proxy               - [IN/OUT] proxy data                      *
+ *             config_timeout      - [IN]                                     *
+ *             events_cbs          - [IN]                                     *
  *             proxydata_frequency - [IN]                                     *
- *             more           - [OUT] available data flag                     *
+ *             more                - [OUT] available data flag                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               other code - an error occurred                               *
@@ -498,9 +498,9 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy          - [IN/OUT] proxy data                           *
- *             config_timeout - [IN]                                          *
- *             events_cbs     - [IN]                                          *
+ * Parameters: proxy               - [IN/OUT] proxy data                      *
+ *             config_timeout      - [IN]                                     *
+ *             events_cbs          - [IN]                                     *
  *             proxydata_frequency - [IN]                                     *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *

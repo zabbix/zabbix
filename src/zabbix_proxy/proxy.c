@@ -277,11 +277,11 @@ int	CONFIG_VMWARE_FREQUENCY		= 60;
 int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 int	CONFIG_VMWARE_TIMEOUT		= 10;
 
-zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
-zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
+static zbx_uint64_t	config_conf_cache_size		= 8 * ZBX_MEBIBYTE;
+static zbx_uint64_t	config_history_cache_size	= 16 * ZBX_MEBIBYTE;
+static zbx_uint64_t	config_history_index_cache_size	= 4 * ZBX_MEBIBYTE;
+static zbx_uint64_t	config_trends_cache_size	= 0;
+static zbx_uint64_t	config_value_cache_size		= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 
 static int	config_unreachable_period	= 45;
@@ -294,7 +294,7 @@ ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 0)
 ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
 ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 
-char	*CONFIG_SERVER			= NULL;
+static char	*config_server		= NULL;
 int	CONFIG_SERVER_PORT;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
@@ -306,7 +306,7 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
-int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
+int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
@@ -613,13 +613,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (ZBX_PROXYMODE_ACTIVE == config_proxymode)
 	{
-		if (NULL != strchr(CONFIG_SERVER, ','))
+		if (NULL != strchr(config_server, ','))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter must not contain comma");
 			err = 1;
 		}
 	}
-	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode && FAIL == zbx_validate_peer_list(CONFIG_SERVER,
+	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode && FAIL == zbx_validate_peer_list(config_server,
 			&ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
@@ -748,7 +748,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			MANDATORY,	MIN,			MAX */
 		{"ProxyMode",			&config_proxymode,			TYPE_INT,
 			PARM_OPT,	ZBX_PROXYMODE_ACTIVE,	ZBX_PROXYMODE_PASSIVE},
-		{"Server",			&CONFIG_SERVER,				TYPE_STRING,
+		{"Server",			&config_server,				TYPE_STRING,
 			PARM_MAND,	0,			0},
 		{"ServerPort",			&CONFIG_SERVER_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
@@ -782,11 +782,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"StartSNMPTrapper",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMPTRAPPER],		TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_UINT64,
+		{"CacheSize",			&config_conf_cache_size,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
-		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
+		{"HistoryCacheSize",		&config_history_cache_size,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"HistoryIndexCacheSize",	&CONFIG_HISTORY_INDEX_CACHE_SIZE,	TYPE_UINT64,
+		{"HistoryIndexCacheSize",	&config_history_index_cache_size,	TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
 			PARM_OPT,	0,			24},
@@ -878,7 +878,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogSlowQueries",		&CONFIG_LOG_SLOW_QUERIES,		TYPE_INT,
+		{"LogSlowQueries",		&config_log_slow_queries,		TYPE_INT,
 			PARM_OPT,	0,			3600000},
 		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -970,7 +970,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	{
 		char	*error;
 
-		if (FAIL == zbx_set_data_destination_hosts(CONFIG_SERVER, (unsigned short)CONFIG_SERVER_PORT, "Server",
+		if (FAIL == zbx_set_data_destination_hosts(config_server, (unsigned short)CONFIG_SERVER_PORT, "Server",
 				proxy_add_serveractive_host_cb, NULL, NULL, &error))
 		{
 			zbx_error("%s", error);
@@ -1208,7 +1208,7 @@ static void	proxy_db_init(void)
 	zbx_stat_t	db_stat;
 #endif
 
-	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, CONFIG_LOG_SLOW_QUERIES, &error))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, config_log_slow_queries, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -1265,7 +1265,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t				rtc;
 	zbx_timespec_t				rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_SERVER,
+	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, config_server,
 								config_proxymode, zbx_config_timeout};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
@@ -1405,8 +1405,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_database_cache(get_program_type, CONFIG_HISTORY_CACHE_SIZE,
-			CONFIG_HISTORY_INDEX_CACHE_SIZE, CONFIG_TRENDS_CACHE_SIZE,&error))
+	if (SUCCEED != zbx_init_database_cache(get_program_type, config_history_cache_size,
+			config_history_index_cache_size, config_trends_cache_size,&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -1420,7 +1420,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_configuration_cache(get_program_type, get_config_forks, CONFIG_CONF_CACHE_SIZE, &error))
+	if (SUCCEED != zbx_init_configuration_cache(get_program_type, get_config_forks, config_conf_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);

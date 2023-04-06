@@ -97,11 +97,6 @@ int	CONFIG_VMWARE_FREQUENCY		= 60;
 int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 int	CONFIG_VMWARE_TIMEOUT		= 10;
 
-zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * 0;
-zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * 0;
-zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * 0;
-zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * 0;
-
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
 
 zbx_uint64_t	get_zbx_config_value_cache_size(void)
@@ -126,8 +121,6 @@ char	*CONFIG_JAVA_GATEWAY		= NULL;
 int	CONFIG_JAVA_GATEWAY_PORT	= 0;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
-
-int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 

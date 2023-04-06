@@ -31,7 +31,6 @@ typedef struct
 	zbx_config_vault_t	*config_vault;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
-	////AKDBGint			proxydata_frequency;
 	zbx_vector_addr_ptr_t	*config_server_addrs;
 	const char		*config_hostname;
 	const char		*config_source_ip;

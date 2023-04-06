@@ -122,11 +122,11 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *                                                                            *
  * Purpose: receive 'proxy data' request from proxy                           *
  *                                                                            *
- * Parameters: sock           - [IN] connection socket                        *
- *             jp             - [IN] received JSON data                       *
- *             ts             - [IN] connection timestamp                     *
- *             events_cbs     - [IN]                                          *
- *             config_timeout - [IN]                                          *
+ * Parameters: sock                - [IN] connection socket                   *
+ *             jp                  - [IN] received JSON data                  *
+ *             ts                  - [IN] connection timestamp                *
+ *             events_cbs          - [IN]                                     *
+ *             config_timeout      - [IN]                                     *
  *             proxydata_frequency - [IN]                                     *
  *                                                                            *
  ******************************************************************************/

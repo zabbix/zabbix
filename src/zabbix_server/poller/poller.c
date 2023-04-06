@@ -804,25 +804,25 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve values of metrics from monitored hosts                   *
- *                                                                            *
- * Parameters: poller_type         - [IN] poller type (ZBX_POLLER_TYPE_...)   *
- *             nextcheck           - [OUT] item nextcheck                     *
- *             config_comms        - [IN] server/proxy configuration for      *
- *                                      communication                         *
- *             config_startup_time - [IN] program startup time                *
- *             config_unavailable_delay   - [IN]                              *
- *             config_unreachable_period  - [IN]                              *
- *             config_unreachable_delay   - [IN]                              *
- *                                                                            *
- * Return value: number of items processed                                    *
- *                                                                            *
- * Comments: processes single item at a time except for Java, SNMP items,     *
- *           see zbx_dc_config_get_poller_items()                             *
- *                                                                            *
- ******************************************************************************/
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: retrieve values of metrics from monitored hosts                        *
+ *                                                                                 *
+ * Parameters: poller_type                - [IN] poller type (ZBX_POLLER_TYPE_...) *
+ *             nextcheck                  - [OUT] item nextcheck                   *
+ *             config_comms               - [IN] server/proxy configuration for    *
+ *                                               communication                     *
+ *             config_startup_time        - [IN] program startup time              *
+ *             config_unavailable_delay   - [IN]                                   *
+ *             config_unreachable_period  - [IN]                                   *
+ *             config_unreachable_delay   - [IN]                                   *
+ *                                                                                 *
+ * Return value: number of items processed                                         *
+ *                                                                                 *
+ * Comments: processes single item at a time except for Java, SNMP items,          *
+ *           see zbx_dc_config_get_poller_items()                                  *
+ *                                                                                 *
+ **********************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
 		int config_unreachable_delay)

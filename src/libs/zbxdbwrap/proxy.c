@@ -2825,18 +2825,18 @@ static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_off
 	zbx_strcpy_alloc(info, info_alloc, info_offset, text);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: detect lost connection with proxy and calculate suppression       *
- *          window if possible                                                *
- *                                                                            *
- * Parameters: ts          - [IN] timestamp when the proxy connection was     *
- *                                established                                 *
- *             proxy_staus - [IN] - active or passive proxy                   *
- *             proxydata_frequency - [IN]                                     *
- *             diff        - [IN/OUT] the properties to update                *
- *                                                                            *
- ******************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: detect lost connection with proxy and calculate suppression           *
+ *          window if possible                                                    *
+ *                                                                                *
+ * Parameters: ts                  - [IN] timestamp when the proxy connection was *
+ *                                        established                             *
+ *             proxy_staus         - [IN] - active or passive proxy               *
+ *             proxydata_frequency - [IN]                                         *
+ *             diff                - [IN/OUT] the properties to update            *
+ *                                                                                *
+ *********************************************************************************/
 static void	check_proxy_nodata(const zbx_timespec_t *ts, unsigned char proxy_status, int proxydata_frequency,
 		zbx_proxy_diff_t *diff)
 {
@@ -2891,25 +2891,25 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: process 'proxy data' request                                      *
- *                                                                            *
- * Parameters: proxy        - [IN] source proxy                               *
- *             jp           - [IN] JSON with proxy data                       *
- *             ts           - [IN] timestamp when the proxy connection was    *
- *                                 established                                *
- *             proxy_status - [IN] active or passive proxy mode               *
- *             events_cbs   - [IN]                                            *
- *             proxydata_frequency - [IN]                                     *
- *             more         - [OUT] available data flag                       *
- *             error        - [OUT] address of a pointer to the info string   *
- *                                  (should be freed by the caller)           *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: process 'proxy data' request                                           *
+ *                                                                                 *
+ * Parameters: proxy               - [IN] source proxy                             *
+ *             jp                  - [IN] JSON with proxy data                     *
+ *             ts                  - [IN] timestamp when the proxy connection was  *
+ *                                        established                              *
+ *             proxy_status        - [IN] active or passive proxy mode             *
+ *             events_cbs          - [IN]                                          *
+ *             proxydata_frequency - [IN]                                          *
+ *             more                - [OUT] available data flag                     *
+ *             error               - [OUT] address of a pointer to the info string *
+ *                                         (should be freed by the caller)         *
+ *                                                                                 *
+ * Return value:  SUCCEED - processed successfully                                 *
+ *                FAIL - an error occurred                                         *
+ *                                                                                 *
+ ***********************************************************************************/
 int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
 		char **error)
