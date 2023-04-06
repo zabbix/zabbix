@@ -1311,7 +1311,7 @@ static void	zbx_check_db(void)
 		else
 			ha_mode = ZBX_HA_MODE_STANDALONE;
 
-		if (SUCCEED != (result = DBcheck_version(ha_mode)))
+		if (SUCCEED != (result = zbx_db_check_version_and_upgrade(ha_mode)))
 			goto out;
 	}
 

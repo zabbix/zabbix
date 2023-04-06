@@ -17,20 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_UPGRADE_H
-#define ZABBIX_UPGRADE_H
+#ifndef ZABBIX_DBUPGRADE_COMMON_H
+#define ZABBIX_DBUPGRADE_COMMON_H
 
-#include "zbxcommon.h"
-#include "zbxdbhigh.h"
-
-typedef enum {
-	ZBX_HA_MODE_STANDALONE,
-	ZBX_HA_MODE_CLUSTER
-}
-zbx_ha_mode_t;
-
-void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb);
-
-int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode);
-
+int	delete_problems_with_nonexistent_object(void);
+int	create_problem_3_index(void);
+int	drop_c_problem_2_index(void);
 #endif
