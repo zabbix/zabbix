@@ -61,10 +61,6 @@
 #	define ZBX_ROW_DL	";\n"
 #endif
 
-#if defined(HAVE_POSTGRESQL)
-extern char	ZBX_PG_ESCAPE_BACKSLASH;
-#endif
-
 static int	connection_failure;
 
 static const zbx_config_dbhigh_t	*zbx_cfg_dbhigh = NULL;
@@ -255,12 +251,15 @@ int	zbx_db_connect(int flag)
 	return err;
 }
 
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error)
+int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, int log_slow_queries, char **error)
 {
 	zbx_cb_nextid = cb_nextid;
 
 	if (ZBX_PROGRAM_TYPE_SERVER != program)
-		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(), error);
+	{
+		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(),
+				log_slow_queries, error);
+	}
 
 	return SUCCEED;
 }
