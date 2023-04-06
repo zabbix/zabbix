@@ -633,7 +633,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// Submit Update or Create form.
 		$update_button = 'xpath://div[contains(@class, "tfoot-buttons")]//button[text()="Update"] |'.
-			'//div[@class="overlay-dialogue-footer"]//button[text()="Update"] | //div[@class="form-actions"]//button[text()="Update"]';
+				'//div[@class="overlay-dialogue-footer"]//button[text()="Update"] |'.
+				' //div[contains(@class, "form-actions")]//button[text()="Update"]';
 		$add_button = 'xpath://button[text()="Add" and @type="submit"] | '.
 				' //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
 		$query = ($this->query($update_button)->exists())
