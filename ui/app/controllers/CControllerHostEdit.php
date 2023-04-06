@@ -41,7 +41,7 @@ class CControllerHostEdit extends CController {
 		$fields = [
 			'hostid'			=> 'db hosts.hostid',
 			'groupids'			=> 'array_db hosts_groups.groupid',
-			'full_clone'		=> 'in 1',
+			'clone'		=> 'in 1',
 			'host'				=> 'db hosts.host',
 			'visiblename'		=> 'db hosts.name',
 			'description'		=> 'db hosts.description',
@@ -97,7 +97,7 @@ class CControllerHostEdit extends CController {
 	 * @return bool
 	 */
 	protected function checkCloneSourceHostId(): bool {
-		if ($this->hasInput('full_clone')) {
+		if ($this->hasInput('clone')) {
 			return $this->hasInput('hostid');
 		}
 
@@ -129,7 +129,7 @@ class CControllerHostEdit extends CController {
 		$clone_hostid = null;
 
 		if ($this->hasInput('hostid')) {
-			if ($this->hasInput('full_clone')) {
+			if ($this->hasInput('clone')) {
 				$clone_hostid = $this->getInput('hostid');
 				$this->host = ['hostid' => null];
 			}
@@ -182,7 +182,7 @@ class CControllerHostEdit extends CController {
 		$data = [
 			'form_action' => $this->host['hostid'] ? 'host.update' : 'host.create',
 			'hostid' => $this->host['hostid'],
-			'full_clone' => $this->hasInput('full_clone') ? 1 : null,
+			'clone' => $this->hasInput('clone') ? 1 : null,
 			'clone_hostid' => $clone_hostid,
 			'host' => $this->host,
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
@@ -443,7 +443,7 @@ class CControllerHostEdit extends CController {
 	protected function getInputValues(): array {
 		$inputs = [];
 
-		if ($this->hasInput('full_clone')) {
+		if ($this->hasInput('clone')) {
 			$inputs['groups'] = [];
 			foreach ($this->getInput('groups', []) as $group) {
 				if (is_array($group) && array_key_exists('new', $group)) {

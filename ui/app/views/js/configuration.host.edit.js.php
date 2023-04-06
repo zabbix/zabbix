@@ -69,9 +69,9 @@
 				});
 		},
 
-		fullClone() {
+		clone() {
 			const url = new Curl('');
-			url.setArgument('full_clone', 1);
+			url.setArgument('clone', 1);
 
 			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
 			delete fields.sid;

@@ -85,11 +85,11 @@ window.host_edit_popup = {
 			});
 	},
 
-	fullClone() {
+	clone() {
 		this.overlay.setLoading();
 		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);
 		delete parameters.sid;
-		parameters.full_clone = 1;
+		parameters.clone = 1;
 
 		PopUp('popup.host.edit', parameters, {
 			dialogueid: 'host_edit',
