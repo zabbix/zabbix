@@ -35,18 +35,78 @@
 
 static char	prompt_char = '\0';
 
-static ssize_t	telnet_socket_read(zbx_socket_t *s, void *buf, size_t count)
+static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
 {
-	ssize_t	rc;
+	struct timeval	tv;
+	int		rc;
+	fd_set		fd, *readfd = NULL, *writefd = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_PROTO_ERROR == (rc = zbx_tcp_read(s, buf, count)))
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() error reading from socket:%s", __func__, zbx_socket_strerror());
+	tv.tv_sec = 0;
+	tv.tv_usec = 100000;	/* 1/10 sec */
 
+	FD_ZERO(&fd);
+	FD_SET(socket_fd, &fd);
+
+	if (WAIT_READ == mode)
+		readfd = &fd;
+	else
+		writefd = &fd;
+
+	rc = select(ZBX_SOCKET_TO_INT(socket_fd) + 1, readfd, writefd, NULL, &tv);
+
+	if (ZBX_PROTO_ERROR == rc)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __func__, rc, zbx_socket_last_error(),
+				strerror_from_system(zbx_socket_last_error()));
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, rc);
+
+	return rc;
+}
+
+static ssize_t	telnet_socket_read(zbx_socket_t *s, void *buf, size_t count)
+{
+	ssize_t	rc;
+	int	error;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_READ(s->socket, buf, count)))
+	{
+		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
+				__func__, (long int)rc, error, strerror_from_system(error));
+#ifdef _WINDOWS
+		if (WSAEWOULDBLOCK == error)
+#else
+		if (EAGAIN == error)
+#endif
+		{
+			if (SUCCEED != zbx_socket_check_deadline(s))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() timeout error", __func__);
+				goto ret;
+			}
+
+			/* wait and if there is still an error or no input available */
+			/* we assume the other side has nothing more to say */
+			if (1 > (rc = telnet_waitsocket(s->socket, WAIT_READ)))
+				goto ret;
+
+			continue;
+		}
+
+		break;
+	}
+
+	/* when ZBX_TCP_READ returns 0, it means EOF - let's consider it a permanent error */
+	/* note that if telnet_waitsocket() is zero, it is not a permanent condition */
 	if (0 == rc)
 		rc = ZBX_PROTO_ERROR;
-
+ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%ld", __func__, (long int)rc);
 
 	return rc;
@@ -55,11 +115,33 @@ static ssize_t	telnet_socket_read(zbx_socket_t *s, void *buf, size_t count)
 static ssize_t	telnet_socket_write(zbx_socket_t *s, const void *buf, size_t count)
 {
 	ssize_t	rc;
+	int	error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_PROTO_ERROR == (rc = zbx_tcp_send_ext(s, buf, count, 0, 0, 0)))
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() error reading from socket:%s", __func__, zbx_socket_strerror());
+	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_WRITE(s->socket, buf, count)))
+	{
+		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
+				__func__, (long int)rc, error, strerror_from_system(error));
+#ifdef _WINDOWS
+		if (WSAEWOULDBLOCK == error)
+#else
+		if (EAGAIN == error)
+#endif
+		{
+			if (SUCCEED != zbx_socket_check_deadline(s))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() timeout error", __func__);
+				break;
+			}
+
+			telnet_waitsocket(s->socket, WAIT_WRITE);
+			continue;
+		}
+
+		break;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%ld", __func__, (long int)rc);
 
@@ -266,7 +348,6 @@ int	zbx_telnet_test_login(zbx_socket_t *s)
 
 	sz = sizeof(buf);
 	offset = 0;
-
 	while (ZBX_PROTO_ERROR != (rc = telnet_read(s, buf, &sz, &offset)))
 	{
 		if (':' == telnet_lastchar(buf, offset))
@@ -294,7 +375,6 @@ int	zbx_telnet_login(zbx_socket_t *s, const char *username, const char *password
 
 	sz = sizeof(buf);
 	offset = 0;
-
 	while (ZBX_PROTO_ERROR != (rc = telnet_read(s, buf, &sz, &offset)))
 	{
 		if (':' == telnet_lastchar(buf, offset))
@@ -398,8 +478,15 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
-				strerror_from_system(zbx_socket_last_error())));
+		const char	*errmsg;
+
+		if (SUCCEED == zbx_socket_check_deadline(s))
+			errmsg = strerror_from_system(zbx_socket_last_error());
+		else
+			errmsg = "timeout occurred";
+
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s", errmsg));
+
 		goto fail;
 	}
 

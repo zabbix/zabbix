@@ -603,7 +603,7 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
 }
 
-static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
+ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 {
 	zbx_pollfd_t	pd;
 	ssize_t		n, offset = 0;

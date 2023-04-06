@@ -31,7 +31,7 @@ extern char    *CONFIG_SOURCE_IP;
 int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, int timeout)
 {
 	zbx_socket_t	s;
-	int		ret = NOTSUPPORTED, flags;
+	int		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -41,20 +41,6 @@ int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, 
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to TELNET server: %s",
 				zbx_socket_strerror()));
 		goto close;
-	}
-
-	flags = fcntl(s.socket, F_GETFL);
-
-	if (-1 == flags)
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in getting the status flag: %s",
-				zbx_strerror(errno)));
-	}
-
-	if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in setting the status flag: %s",
-				zbx_strerror(errno)));
 	}
 
 	if (FAIL == zbx_telnet_login(&s, item->username, item->password, result))
