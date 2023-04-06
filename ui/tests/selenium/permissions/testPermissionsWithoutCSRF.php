@@ -586,6 +586,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'link' => 'zabbix.php?action=connector.list',
 					'overlay' => 'update'
 				]
+			],
+			// #62 Problem update.
+			[
+				[
+					'db' => 'SELECT * FROM problem, events, acknowledges',
+					'link' => 'zabbix.php?&action=problem.view&filter_set=1',
+					'overlay' => 'problem'
+				]
 			]
 		];
 	}
@@ -599,10 +607,21 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// If form opens in the overlay dialog - open that dialog.
 		if (array_key_exists('overlay', $data)) {
-			$clickable_element =  ($data['overlay'] === 'create')
-				? $this->query("xpath://div[@class=\"header-controls\"]//button")->one()->waitUntilClickable()
-				: $this->query('xpath://table[@class="list-table"]//tr[1]/td[2]/a')->one()->waitUntilClickable();
-			$clickable_element->click();
+			switch ($data['overlay']) {
+				case 'create':
+					$clickable_element = $this->query("xpath://div[@class=\"header-controls\"]//button");
+					break;
+
+				case 'update':
+					$clickable_element = $this->query('xpath://table[@class="list-table"]//tr[1]/td[2]/a');
+					break;
+
+				case 'problem':
+					$clickable_element = $this->query('xpath://table[@class="list-table"]//tr[1]//a[text()="Update"]') ;
+					break;
+			}
+
+			$clickable_element->one()->waitUntilClickable()->click();
 			$element = COverlayDialogElement::find()->waitUntilReady()->one();
 		}
 		else {
@@ -612,10 +631,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		// Delete hidden input with CSRF token.
 		$element->query('xpath:.//input[@name="_csrf_token"]')->one()->delete();
 
-		// Submit Update or CReate form.
-		$query = ($this->query('button:Update')->exists())
-			? 'button:Update'
-			: 'xpath://button[text()="Add" and @type="submit"] | //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
+		// Submit Update or Create form.
+		$update_button = 'xpath://div[contains(@class, "tfoot-buttons")]//button[text()="Update"] |'.
+			'//div[@class="overlay-dialogue-footer"]//button[text()="Update"] | //div[@class="form-actions"]//button[text()="Update"]';
+		$add_button = 'xpath://button[text()="Add" and @type="submit"] | '.
+				' //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
+		$query = ($this->query($update_button)->exists())
+			? $update_button
+			: $add_button;
 		$this->query($query)->waitUntilClickable()->one()->click();
 
 		// Check the error message depending on case.
