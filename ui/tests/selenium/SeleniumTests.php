@@ -132,7 +132,7 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
 // Permissions.
-require_once dirname(__FILE__).'/permissions/testPermissionsCSRF.php';
+require_once dirname(__FILE__).'/permissions/testPermissionsWithoutCSRF.php';
 require_once dirname(__FILE__).'/permissions/testTagBasedPermissions.php';
 require_once dirname(__FILE__).'/permissions/testUrlUserPermissions.php';
 
@@ -390,7 +390,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
 		// Permissions.
-		$suite->addTestSuite('testPermissionsCSRF');
+		$suite->addTestSuite('testPermissionsWithoutCSRF');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testUrlUserPermissions');
 

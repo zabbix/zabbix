@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareApiTokenData
  */
-class testPermissionsCSRF extends CWebTest {
+class testPermissionsWithoutCSRF extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -593,7 +593,7 @@ class testPermissionsCSRF extends CWebTest {
 	/**
 	 * @dataProvider getElementRemoveData
 	 */
-	public function testCSRF_ElementRemove($data) {
+	public function testPermissionsWithoutCSRF_ElementRemove($data) {
 		$old_hash = CDBHelper::getHash($data['db']);
 		$this->page->login()->open($data['link'])->waitUntilReady();
 
