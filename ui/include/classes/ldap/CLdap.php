@@ -262,7 +262,7 @@ class CLdap {
 
 		if (!$this->bind($user, $pass)) {
 			if ($this->bind_type == static::BIND_DNSTRING) {
-				$this->serror = static::ERR_USER_NOT_FOUND;
+				$this->error = static::ERR_USER_NOT_FOUND;
 			}
 
 			return false;
