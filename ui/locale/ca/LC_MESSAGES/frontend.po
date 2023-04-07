@@ -5252,28 +5252,56 @@ msgid "Discovery object"
 msgstr "Objecte de descoberta"
 
 #: include/classes/items/CHelpItems.php:787
+msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr "Descobriment de clústers de VMware, <url> - URL del servei de VMware. Retorna un JSON"
+
+#: include/classes/items/CHelpItems.php:795
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr "Descoberta de magatzems de dades de VMware, <url> - URL del servei de VMware. Retorna un JSON"
 
 #: include/classes/items/CHelpItems.php:839
+msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Descoberta de magatzems de dades de l'hipervisor VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de VMware. Retorna un JSON"
+
+#: include/classes/items/CHelpItems.php:859
+msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr "Descoberta d'hipervisors de VMware, <url> - URL del servei de VMware. Retorna un JSON"
 
 #: include/classes/items/CHelpItems.php:1047
+msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Descoberta de dispositius de disc de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware. Retorna un JSON"
 
 #: include/classes/items/CHelpItems.php:1059
+msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Descoberta dels sistemes de fitxers de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware. Retorna un JSON"
+
+#: include/classes/items/CHelpItems.php:971
+msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:971
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
@@ -12571,12 +12599,24 @@ msgid "Number of problems and expand most critical one"
 msgstr "Nombre de problemes i ampliar el més crític"
 
 #: include/classes/items/CHelpItems.php:875
+msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifiere"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nombre de nuclis de processador a l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
 
 #: include/classes/items/CHelpItems.php:879
+msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nombre de fils de processador a l'equip VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
+
+#: include/classes/items/CHelpItems.php:955
+msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -12655,6 +12695,10 @@ msgstr "Nombre de valors emmagatzemats a la taula de tendències (TRENDS)."
 #: include/classes/items/CHelpItems.php:1183
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Nombre de valors emmagatzemats a la taula TRENDS_UINT."
+
+#: include/classes/items/CHelpItems.php:943
+msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18346,6 +18390,10 @@ msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pu
 msgstr "Estadístiques de la memòria cau de VMware. Els modes vàlids són: total, free, pfree, used i puses."
 
 #: include/classes/items/CHelpItems.php:791
+msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Estat del clúster de VMware, <url>: URL del servei de VMware, <name>: nom del clúster de VMware"
 
@@ -18359,216 +18407,432 @@ msgid "VMware datastore capacity statistics in bytes or in percentage from total
 msgstr "Estadístiques de capacitat del magatzem de dades de VMware en octets o en percentatge del total. Retorna els octets en enters, i els percentatges en flotants"
 
 #: include/classes/items/CHelpItems.php:799
+msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Llista d'hipervisors del magatzem de dades de VMware, <url> - URL del servei de VMware, <datastore> - nom del magatzem de dades"
+
+#: include/classes/items/CHelpItems.php:803
+msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Estadístiques de lectura del magatzem de dades de VMware, <url> - URL del servei de VMware, <datastore> - nom del magatzem de dades, <mode> - latència / latència màxima: mitjana o màxima"
 
 #: include/classes/items/CHelpItems.php:811
+msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Estadístiques d'escriptura del magatzem de dades de VMware, <url> - URL del servei de VMware, <datastore> - nom del magatzem de dades, <mode> - latència / latència màxima - mitjana o màxima"
+
+#: include/classes/items/CHelpItems.php:819
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - all (default), skip - skip processing of older data"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:819
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "Registre d'esdeveniments de VMware, <url> - URL del servei de VMware, <mode> - tot (per defecte), omet - omet el processament de dades antigues"
 
 #: include/classes/items/CHelpItems.php:891
+msgid "VMware hypervisor BIOS uuid, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "UUID de la BIOS de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
+
+#: include/classes/items/CHelpItems.php:923
+msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Sensors d'estat del proveïdor de maquinari de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware. Retorna un JSON"
 
 #: include/classes/items/CHelpItems.php:903
+msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mida de memòria en globus de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
+
+#: include/classes/items/CHelpItems.php:827
+msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nom del clúster de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:835
+msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr "Nom del centre de dades de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware. Retorna una cadena"
+
+#: include/classes/items/CHelpItems.php:847
+msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Estadístiques de lectura del magatzem de dades de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware, <datastore> - nom del magatzem de dades, <mode> - latència"
 
 #: include/classes/items/CHelpItems.php:855
+msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Estadístiques d'escriptura del magatzem de dades de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware, <datastore> - nom del magatzem de dades, <mode> - latència"
+
+#: include/classes/items/CHelpItems.php:843
+msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Llista de magatzems de dades de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:927
+msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Sensor acumulatiu d'estat de salut de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware. Retorna 0 - gris; 1 - verd; 2 - groc; 3 - vermell"
+
+#: include/classes/items/CHelpItems.php:899
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Estat del manteniment de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:887
+msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Model d'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
+
+#: include/classes/items/CHelpItems.php:863
+msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nom de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:911
+msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Estadístiques d'entrada de xarxa de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware, <mode> - bps"
+
+#: include/classes/items/CHelpItems.php:915
+msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Estadístiques de sortida de la xarxa de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware, <mode> - bps"
 
 #: include/classes/items/CHelpItems.php:919
+msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Comptador de rendiment de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware, <path> - camí del comptador de rendiment, <instance> - instància del comptador de rendiment"
+
+#: include/classes/items/CHelpItems.php:867
+msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Freqüència del processador de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:871
+msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Model de processador de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
+
+#: include/classes/items/CHelpItems.php:831
+msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Ús del processador de l'hipervisor VMware en Hz, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
 
 #: include/classes/items/CHelpItems.php:931
+msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Estat de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
+
+#: include/classes/items/CHelpItems.php:883
+msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mida total de memòria de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:935
+msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Temps d'activitat de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
+
+#: include/classes/items/CHelpItems.php:907
+msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mida de memòria emprada de l'hipervisor VMware, <url> - URL del servei VMware, <uuid> - nom d'equip de l'hipervisor VMware"
 
 #: include/classes/items/CHelpItems.php:895
+msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:895
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nom del proveïdor de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
+
+#: include/classes/items/CHelpItems.php:939
+msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Versió de l'hipervisor de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de l'hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:823
+msgid "VMware service full name, \"url\" - VMware service URL"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Nom complet del servei VMware, <url> - URL del servei VMware"
+
+#: include/classes/items/CHelpItems.php:947
+msgid "VMware service version, \"url\" - VMware service URL"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Versió del servei de VMware, <url> - URL del servei de VMware"
 
 #: include/classes/items/CHelpItems.php:983
+msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Mida de memòria en globus de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:1031
+msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espai d'emmagatzematge compromès de la màquina virtual de VMware, <url>: URL del servei de VMware, <uuid>: nom d'equip de la màquina virtual de VMware"
 
 #: include/classes/items/CHelpItems.php:987
+msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Mida de memòria comprimida de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:967
+msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr "Nom del centre de dades de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware. Retorna una cadena"
 
 #: include/classes/items/CHelpItems.php:1051
+msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Estadístiques de lectura del dispositiu de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'amfitrió de la màquina virtual de VMware, <instance> - instància del dispositiu de disc, <mode> - oct/ops - octets/operacions per segon"
+
+#: include/classes/items/CHelpItems.php:1055
+msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1055
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Estadístiques d'escriptura del dispositiu de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'amfitrió de la màquina virtual de VMware, <instance> - instància del dispositiu de disc, <mode> - oct/ops - octets/operacions per segon"
 
 #: include/classes/items/CHelpItems.php:1063
+msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\" - total/free/used/pfree/pused"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Estadístiques del sistema de fitxers de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'amfitrió de la màquina virtual de VMware, <fsname> - nom del sistema de fitxers, <mode> - total/free/used/pfree/pused"
+
+#: include/classes/items/CHelpItems.php:1003
+msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1003
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Ús de memòria convidada de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
 
 #: include/classes/items/CHelpItems.php:1007
+msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Ús de memòria de l'equip de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom de l'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:975
+msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:975
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nom de l'hipervisor de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
 
 #: include/classes/items/CHelpItems.php:951
+msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nom de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:1015
+msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Estadístiques d'entrada de la interfície de xarxa de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'amfitrió de la màquina virtual de VMware, <instance> - instància de la interfície de xarxa, <mode> - oct/pps - octets/paquets per segon"
 
 #: include/classes/items/CHelpItems.php:1019
+msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Estadístiques de sortida de la interfície de xarxa de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'amfitrió de la màquina virtual de VMware, <instance> - instància de la interfície de xarxa, <mode> - oct/pps - octets/paquets per segon"
+
+#: include/classes/items/CHelpItems.php:1023
+msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Comptador de rendiment de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware, <path> - camí del comptador de rendiment, <instance> - instància del comptador de rendiment"
 
 #: include/classes/items/CHelpItems.php:1027
+msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Estat d'alimentació de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:991
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Mida de memòria privada de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
 
 #: include/classes/items/CHelpItems.php:959
+msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Temps de preparació del processador de la màquina virtual de VMware ms, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:963
+msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Ús del processador de la màquina virtual de VMware en Hz, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
 
 #: include/classes/items/CHelpItems.php:995
+msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Mida de memòria compartida de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:999
+msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Mida de memòria intercanviada de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
 
 #: include/classes/items/CHelpItems.php:979
+msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Mida total de memòria de la màquina virtual de VMware, <url> - URL del servei de VMware, <uuid> - nom d'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:1035
+msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espai d'emmagatzematge no compromès de la màquina virtual de VMware, <url>: URL del servei de VMware, <uuid>: nom d'equip de la màquina virtual de VMware"
 
 #: include/classes/items/CHelpItems.php:1039
+msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Espai d'emmagatzematge no compartit de la màquina virtual de VMware, <url>: URL del servei de VMware, <uuid>: nom d'equip de la màquina virtual de VMware"
+
+#: include/classes/items/CHelpItems.php:1043
+msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"

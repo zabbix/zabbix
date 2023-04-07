@@ -5253,28 +5253,56 @@ msgid "Discovery object"
 msgstr "Objeto de descubrimiento"
 
 #: include/classes/items/CHelpItems.php:787
+msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr "Descubrimiento de clústeres de VMware, <url> - URL de servicio de VMware. Devuelve JSON"
+
+#: include/classes/items/CHelpItems.php:795
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr "Descubrimiento de almacenes de datos de VMware, <url> - URL de servicio de VMware. Devuelve JSON"
 
 #: include/classes/items/CHelpItems.php:839
+msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Descubrimiento de almacenes de datos de hipervisor de VMware, <url> - URL de servicio de VMware, <uuid> - Nombre del equipo del hipervisor VMware. Devuelve JSON"
+
+#: include/classes/items/CHelpItems.php:859
+msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr "Descubrimiento de hipervisores de VMware, <url> - URL de servicio de VMware. Devuelve JSON"
 
 #: include/classes/items/CHelpItems.php:1047
+msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Descubrimiento discos de máquinas virtuales, <url> - URL de servicio de VMware, <uuid> - Nombre de equipo de la máquina virtual. Devuelve JSON"
 
 #: include/classes/items/CHelpItems.php:1059
+msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Descubrimiento de sistemas de archivos de máquinas virtuales, <url> - URL de servicio de VMware, <uuid> - Nombre de equipo de la máquina virtual. Devuelve JSON"
+
+#: include/classes/items/CHelpItems.php:971
+msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:971
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
@@ -12572,12 +12600,24 @@ msgid "Number of problems and expand most critical one"
 msgstr "Número de problemas y expandir el más crítico"
 
 #: include/classes/items/CHelpItems.php:875
+msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifiere"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Número de núcleos del procesador en el hipervisor VMware, <url> - URL de servicio VMware, <uuid> - nombre de equipo del hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:879
+msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Número de hilos del procesador en el hipervisor VMware hypervisor, <url> - URL de servicio VMware, <uuid> - nombre de equipo del hipervisor de VMware"
+
+#: include/classes/items/CHelpItems.php:955
+msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -12655,6 +12695,10 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:1183
 msgid "Number of values stored in table TRENDS_UINT."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:943
+msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:943
@@ -18347,6 +18391,10 @@ msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pu
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:791
+msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr ""
 
@@ -18360,7 +18408,15 @@ msgid "VMware datastore capacity statistics in bytes or in percentage from total
 msgstr "Estadísticas de capacidad del almacén de datos de VMware en octetos o porcentaje del total. Devuelve entero para bytes/octetos; decimal para percentage/porcentaje"
 
 #: include/classes/items/CHelpItems.php:799
+msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:803
+msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:803
@@ -18368,7 +18424,15 @@ msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore>
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:811
+msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:819
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - all (default), skip - skip processing of older data"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:819
@@ -18376,7 +18440,15 @@ msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), ski
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:891
+msgid "VMware hypervisor BIOS uuid, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:923
+msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:923
@@ -18384,7 +18456,15 @@ msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <u
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:903
+msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:827
+msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:827
@@ -18392,11 +18472,23 @@ msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMwa
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:835
+msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr "Nombre del centro de datos del hipervisor VMware, <url> - URL de servicio de VMware, <uuid> - Nombre del equipo del hipervisor de VMware. Devuelve cadena"
 
 #: include/classes/items/CHelpItems.php:847
+msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:855
+msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:855
@@ -18404,7 +18496,15 @@ msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL,
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:843
+msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:927
+msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:927
@@ -18412,7 +18512,15 @@ msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL,
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:899
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:887
+msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:887
@@ -18420,7 +18528,15 @@ msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hype
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:863
+msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:911
+msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:911
@@ -18428,7 +18544,15 @@ msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:915
+msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:919
+msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:919
@@ -18436,7 +18560,15 @@ msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid>
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:867
+msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:871
+msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:871
@@ -18444,7 +18576,15 @@ msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - V
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:831
+msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:931
+msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:931
@@ -18452,7 +18592,15 @@ msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hyp
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:883
+msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:935
+msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:935
@@ -18460,7 +18608,15 @@ msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hyp
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:907
+msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:895
+msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:895
@@ -18468,7 +18624,15 @@ msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMwar
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:939
+msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:823
+msgid "VMware service full name, \"url\" - VMware service URL"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:823
@@ -18476,11 +18640,23 @@ msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Nombre completo del servicio VMWare, <url> - URL de servicio de VMware"
 
 #: include/classes/items/CHelpItems.php:947
+msgid "VMware service version, \"url\" - VMware service URL"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Versión del servicio VMware , <url> - URL de servicio de VMware"
 
 #: include/classes/items/CHelpItems.php:983
+msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1031
+msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1031
@@ -18488,7 +18664,15 @@ msgid "VMware virtual machine committed storage space, <url> - VMware service UR
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:987
+msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:967
+msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:967
@@ -18496,7 +18680,15 @@ msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid
 msgstr "Nombre de la máquina virtual del centro de datos VMware, <url> - URL de servicio de VMware, <uuid> - Nombre del equipo de la máquina virtual de VMware. Devuelve cadena"
 
 #: include/classes/items/CHelpItems.php:1051
+msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1055
+msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1055
@@ -18504,7 +18696,15 @@ msgid "VMware virtual machine disk device write statistics, <url> - VMware servi
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1063
+msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\" - total/free/used/pfree/pused"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1003
+msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1003
@@ -18512,7 +18712,15 @@ msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <u
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1007
+msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:975
+msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:975
@@ -18520,7 +18728,15 @@ msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:951
+msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1015
+msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1015
@@ -18528,7 +18744,15 @@ msgid "VMware virtual machine network interface input statistics, <url> - VMware
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1019
+msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1023
+msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1023
@@ -18536,7 +18760,15 @@ msgid "VMware virtual machine performance counter, <url> - VMware service URL, <
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1027
+msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:991
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:991
@@ -18544,7 +18776,15 @@ msgid "VMware virtual machine private memory size, <url> - VMware service URL, <
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:959
+msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:963
+msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:963
@@ -18552,7 +18792,15 @@ msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL,
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:995
+msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:999
+msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:999
@@ -18560,7 +18808,15 @@ msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:979
+msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1035
+msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1035
@@ -18568,7 +18824,15 @@ msgid "VMware virtual machine uncommitted storage space, <url> - VMware service 
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1039
+msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1043
+msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1043
