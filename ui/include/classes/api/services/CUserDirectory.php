@@ -937,9 +937,14 @@ class CUserDirectory extends CApiService {
 			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_auth_enabled']
 		]);
 
+		// Default LDAP server cannot be removed if there are remaining LDAP servers.
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
-				&& $auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED
-				&& $ldap_userdirectories_left == 0) {
+				&& ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED || $ldap_userdirectories_left > 0)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
+		}
+
+		// Cannot remove the last remaining LDAP server if LDAP authentication is on.
+		if ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED && $ldap_userdirectories_left == 0) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
 		}
 

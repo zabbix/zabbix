@@ -281,17 +281,11 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 
 			if ($result) {
-				$result = $this->processGeneralAuthenticationSettings();
+				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid);
 			}
 
 			if ($result && $this->hasInput('ldap_removed_userdirectoryids')) {
 				$result = (bool) API::UserDirectory()->delete($this->getInput('ldap_removed_userdirectoryids'));
-			}
-
-			if ($result) {
-				$result = (bool) API::Authentication()->update([
-					'ldap_userdirectoryid' => $ldap_userdirectoryid
-				]);
 			}
 
 			if (!$result) {
@@ -317,11 +311,12 @@ class CControllerAuthenticationUpdate extends CController {
 		$this->setResponse($this->response);
 	}
 
-	private function processGeneralAuthenticationSettings(): bool {
+	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid): bool {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
 			'disabled_usrgrpid' => 0,
 			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+			'ldap_userdirectoryid' => $ldap_userdirectoryid,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
@@ -362,6 +357,7 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
 			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_AUTH_ENABLED,
+			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_JIT_STATUS,
 			CAuthenticationHelper::JIT_PROVISION_INTERVAL,
