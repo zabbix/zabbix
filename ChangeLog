@@ -113,6 +113,7 @@ Changes for 6.4.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
 A.F.I..PS. [ZBX-22363] added support for item and item_preproc table fields to be either nvarchar or nclob (agriscenko, vso)
 ...G...... [ZBX-22306] fixed crash in Zabbix agent 2 when running out of available file descriptors (vso)
 ..F....... [ZBX-21013] hid options "Create new template/host groups" for unprivileged users in the Import form (Sasha)
