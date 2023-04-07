@@ -960,7 +960,7 @@ zabbix_export:
             conditions:
               -
                 macro: '{#CARTRIDGE_STATUS}'
-                value: ^$
+                value: ^1
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
           item_prototypes:
