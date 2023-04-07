@@ -301,7 +301,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 	switch (item->authtype)
 	{
 		case ITEM_AUTHTYPE_PASSWORD:
-			if (0 && 0 != (userauth & SSH_AUTH_METHOD_PASSWORD))
+			if (0 != (userauth & SSH_AUTH_METHOD_PASSWORD))
 			{
 				/* we could authenticate via password */
 				while (SSH_AUTH_SUCCESS != (rc = ssh_userauth_password(session, NULL, item->password)))
