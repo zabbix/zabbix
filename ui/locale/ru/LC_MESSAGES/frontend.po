@@ -9424,6 +9424,16 @@ msgstr "Прототип узла сети с именем \"%1$s\" уже су�
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
+#: include/classes/api/services/CHostPrototype.php:1127
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1124
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
@@ -24193,6 +24203,10 @@ msgstr "группа узла сети"
 msgid "host pattern"
 msgstr "шаблон узла сети"
 
+#: include/classes/api/services/CHostPrototype.php:1190
+msgid "host prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -24584,6 +24598,11 @@ msgstr "max() - Максимальное значение за период Т"
 msgid "maximum dependent items count reached"
 msgstr "достигнуто максимальное количество зависимых элементов данных"
 
+#: include/classes/validators/CApiInputValidator.php:1726
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -24733,6 +24752,11 @@ msgstr "нет серверов LDAP"
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
 msgstr "нет данных"
+
+#: include/classes/api/services/CHostPrototype.php:1360
+#, c-format
+msgid "no default interface for \"%1$s\" type"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
