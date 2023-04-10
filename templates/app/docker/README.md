@@ -23,7 +23,8 @@ This template has been tested on:
 
 ## Setup
 
-Setup and configure zabbix-agent2 compiled with the Docker monitoring plugin.
+Setup and configure Zabbix agent 2 compiled with the Docker monitoring plugin. 
+The user by which the Zabbix agent 2 is running should have access permissions to the Docker socket.
 
 Test availability: `zabbix_get -s docker-host -k docker.info`
 
