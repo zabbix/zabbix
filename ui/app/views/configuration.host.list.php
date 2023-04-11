@@ -510,7 +510,7 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
-		(new CUrl('zabbix.php', false))
+		(new CUrl('zabbix.php'))
 			->setArgument('action', 'host.list')
 			->setArgument('page', CPagerHelper::loadPage('host.list', null))
 			->getUrl()

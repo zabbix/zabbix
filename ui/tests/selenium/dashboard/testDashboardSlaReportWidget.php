@@ -147,11 +147,11 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'value' => 20
 			],
 			'id:date_from' => [
-				'maxlength' => 255,
+				'maxlength' => 2048,
 				'placeholder' => 'YYYY-MM-DD'
 			],
 			'id:date_to' => [
-				'maxlength' => 255,
+				'maxlength' => 2048,
 				'placeholder' => 'YYYY-MM-DD'
 			]
 		];

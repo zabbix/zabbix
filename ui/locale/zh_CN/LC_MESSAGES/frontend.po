@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-27 00:48+0000\n"
+"PO-Revision-Date: 2023-04-06 03:55+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -2767,7 +2767,7 @@ msgstr[0] "无法禁用消息介质类型"
 #: app/controllers/CControllerModuleDisable.php:75
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] ""
+msgstr[0] "无法禁用模块"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
@@ -2849,7 +2849,7 @@ msgstr[0] "无法启用消息介质类型"
 #: app/controllers/CControllerModuleEnable.php:99
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
-msgstr[0] ""
+msgstr[0] "无法启用模块"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3837,7 +3837,7 @@ msgstr "无法更新媒介类型"
 
 #: app/controllers/CControllerModuleUpdate.php:102
 msgid "Cannot update module"
-msgstr ""
+msgstr "无法更新模块"
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -6472,7 +6472,7 @@ msgstr "禁用所选的报警媒介类型?"
 
 #: app/views/js/module.list.js.php:91
 msgid "Disable selected module?"
-msgstr ""
+msgstr "禁用所选的组件?"
 
 #: app/views/administration.module.list.php:125
 msgid "Disable selected modules?"
@@ -7318,7 +7318,7 @@ msgstr "启用所选的报警媒介类型?"
 
 #: app/views/js/module.list.js.php:74
 msgid "Enable selected module?"
-msgstr ""
+msgstr "启用所选的组件?"
 
 #: app/views/administration.module.list.php:124
 msgid "Enable selected modules?"
@@ -9211,6 +9211,16 @@ msgstr "主机名为“%1$s”的主机原型已存在于模板“%3$s”的发�
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "主机名称为 \"%1$s\" 的主机模板已经存在于自动发现规则 \"%2$s\"中."
+
+#: include/classes/api/services/CHostPrototype.php:1127
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1124
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
@@ -13089,7 +13099,7 @@ msgstr[0] "已删除模块: %1$s。"
 #: app/controllers/CControllerModuleDisable.php:67
 msgid "Module disabled"
 msgid_plural "Modules disabled"
-msgstr[0] ""
+msgstr[0] "模块已禁用"
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -13100,7 +13110,7 @@ msgstr[0] "已禁用模块：%1$s。"
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
 msgid_plural "Modules enabled"
-msgstr[0] ""
+msgstr[0] "模块已启用"
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
@@ -13110,7 +13120,7 @@ msgstr[0] "已启用模块：%1$s。"
 
 #: app/controllers/CControllerModuleUpdate.php:94
 msgid "Module updated"
-msgstr ""
+msgstr "模块已更新"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -23881,6 +23891,10 @@ msgstr "主机群组"
 msgid "host pattern"
 msgstr "主机样式"
 
+#: include/classes/api/services/CHostPrototype.php:1190
+msgid "host prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -24272,6 +24286,11 @@ msgstr "max() - 周期 T 内的最大值"
 msgid "maximum dependent items count reached"
 msgstr "达到最大依赖项数"
 
+#: include/classes/validators/CApiInputValidator.php:1726
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -24421,6 +24440,11 @@ msgstr "无 LDAP 服务器"
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
 msgstr "没有数据"
+
+#: include/classes/api/services/CHostPrototype.php:1360
+#, c-format
+msgid "no default interface for \"%1$s\" type"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format

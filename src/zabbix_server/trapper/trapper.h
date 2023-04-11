@@ -39,6 +39,7 @@ typedef struct
 	const zbx_events_funcs_t	*events_cbs;
 	zbx_socket_t			*listen_sock;
 	int				config_startup_time;
+	int				proxydata_frequency;
 }
 zbx_thread_trapper_args;
 
