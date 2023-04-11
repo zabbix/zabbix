@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #include "threads.h"
 #include "dbcache.h"
 #include "cfg.h"
+#include "zbx_dbversion_constants.h"
+#include "common.h"
 
 typedef struct
 {
@@ -576,9 +578,9 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 }
 
 #ifdef HAVE_MYSQL
-static size_t	get_string_field_size(unsigned char type)
+static size_t	get_string_field_size(const ZBX_FIELD *field)
 {
-	switch(type)
+	switch(field->type)
 	{
 		case ZBX_TYPE_LONGTEXT:
 			return ZBX_SIZE_T_MAX;
@@ -594,16 +596,20 @@ static size_t	get_string_field_size(unsigned char type)
 	}
 }
 #elif defined(HAVE_ORACLE)
-static size_t	get_string_field_size(unsigned char type)
+static size_t	get_string_field_size(const ZBX_FIELD *field)
 {
-	switch(type)
+	switch(field->type)
 	{
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
 			return ZBX_SIZE_T_MAX;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
-			return 4000u;
+			if (4000 < field->length)
+				return 32767u;
+			else
+				return 4000u;
+
 		case ZBX_TYPE_CUID:
 			return CUID_LEN - 1;
 		default:
@@ -612,6 +618,16 @@ static size_t	get_string_field_size(unsigned char type)
 	}
 }
 #endif
+
+static size_t	get_string_field_chars(const ZBX_FIELD *field)
+{
+	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+		return ZBX_SIZE_T_MAX;
+	else if (ZBX_TYPE_CUID == field->type)
+		return CUID_LEN - 1;
+	else
+		return field->length;
+}
 
 char	*DBdyn_escape_string_len(const char *src, size_t length)
 {
@@ -625,19 +641,10 @@ char	*DBdyn_escape_string(const char *src)
 
 static char	*DBdyn_escape_field_len(const ZBX_FIELD *field, const char *src, zbx_escape_sequence_t flag)
 {
-	size_t	length;
-
-	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
-		length = ZBX_SIZE_T_MAX;
-	else if (ZBX_TYPE_CUID == field->type)
-		length = CUID_LEN;
-	else
-		length = field->length;
-
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
-	return zbx_db_dyn_escape_string(src, get_string_field_size(field->type), length, flag);
+	return zbx_db_dyn_escape_string(src, get_string_field_size(field), get_string_field_chars(field), flag);
 #else
-	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, length, flag);
+	return zbx_db_dyn_escape_string(src, ZBX_SIZE_T_MAX, get_string_field_chars(field), flag);
 #endif
 }
 
@@ -660,7 +667,7 @@ char	*DBdyn_escape_like_pattern(const char *src)
 	return zbx_db_dyn_escape_like_pattern(src);
 }
 
-const ZBX_TABLE	*DBget_table(const char *tablename)
+static ZBX_TABLE	*db_get_table(const char *tablename)
 {
 	int	t;
 
@@ -673,7 +680,7 @@ const ZBX_TABLE	*DBget_table(const char *tablename)
 	return NULL;
 }
 
-const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
+static ZBX_FIELD	*db_get_field(ZBX_TABLE *table, const char *fieldname)
 {
 	int	f;
 
@@ -684,6 +691,47 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	}
 
 	return NULL;
+}
+
+const ZBX_TABLE	*DBget_table(const char *tablename)
+{
+	return db_get_table(tablename);
+}
+
+const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname)
+{
+	return db_get_field((ZBX_TABLE *)table, fieldname);
+}
+
+int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str)
+{
+	const ZBX_TABLE	*table;
+	const ZBX_FIELD	*field;
+	size_t		max_bytes, max_chars;
+
+	if (NULL == (table = DBget_table(tablename)) || NULL == (field = DBget_field(table, fieldname)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid table: \"%s\" field: \"%s\"", tablename, fieldname);
+		return FAIL;
+	}
+
+#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
+	max_bytes = get_string_field_size(field);
+#else
+	max_bytes = ZBX_SIZE_T_MAX;
+#endif
+	max_chars = get_string_field_chars(field);
+
+	if (max_bytes < strlen(str))
+		return FAIL;
+
+	if (ZBX_SIZE_T_MAX == max_chars)
+		return SUCCEED;
+
+	if (max_chars != max_bytes && max_chars < zbx_strlen_utf8(str))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -851,7 +899,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
 
 	version_info->extension = zbx_strdup(NULL, row[0]);
@@ -1012,8 +1060,8 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 	if (DB_VERSION_LOWER_THAN_MINIMUM == db_version_info->ext_flag)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Version must be at least %d. Recommended version should be at least"
-				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY,
-				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+				" %s %s.", ZBX_TIMESCALE_MIN_VERSION, ZBX_TIMESCALE_LICENSE_COMMUNITY_STR,
+				ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM;
 		ret = FAIL;
 		goto out;
@@ -1023,7 +1071,7 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %u is not officially supported. Recommended version"
 				" should be at least %s %s.", db_version_info->ext_current_version,
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
 
 		if (0 == allow_unsupported_ver)
@@ -1038,7 +1086,7 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info->ext_flag)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should not be higher than %s %s.",
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MAX_VERSION_FRIENDLY);
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MAX_VERSION_STR);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM;
 
 		if (0 == allow_unsupported_ver)
@@ -1064,13 +1112,13 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
 				" supported in %s.", ZBX_NULL2EMPTY_STR(db_version_info->ext_lic),
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
-			ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+			ZBX_TIMESCALE_LICENSE_COMMUNITY_STR);
 
 	if (ZBX_EXT_ERR_UNDEFINED == db_version_info->ext_err_code)
 		db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
@@ -2327,6 +2375,119 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+#if defined(HAVE_ORACLE)
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
+{
+#define ZBX_TYPE_CHAR_STR	"nvarchar2"
+#define ZBX_PROTO_TAG_FIELDS	"fields"
+#define ZBX_PROTO_TAG_LENGTH	"length"
+#define ZBX_PROTO_TAG_CHAR	"char"
+	ZBX_TABLE		*table;
+	int			i;
+	zbx_vector_str_t	names;
+	size_t			offset;
+
+	if (NULL != json)
+		offset = json->buffer_offset;
+
+	zbx_vector_str_create(&names);
+
+	if (NULL == (table = db_get_table(tablename)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, tablename);
+
+		goto cleanup;
+	}
+
+	for (i = 0; NULL != table->fields[i].name; i++)
+	{
+		switch (table->fields[i].type)
+		{
+			case ZBX_TYPE_TEXT:
+				zbx_vector_str_append(&names, (char *)table->fields[i].name);
+				break;
+			default:
+				break;
+		}
+	}
+
+	if (0 != names.values_num)
+	{
+		DB_ROW		row;
+		DB_RESULT	result;
+		char		*table_name_esc;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+
+		table_name_esc = DBdyn_escape_string(table->table);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select column_name,data_type,char_length"
+				" from user_tab_columns"
+				" where lower(table_name)='%s'"
+					" and",
+				table_name_esc);
+
+		zbx_free(table_name_esc);
+
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "lower(column_name)",
+				(const char **)names.values, names.values_num);
+
+		result = DBselect("%s", sql);
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_FIELD	*field;
+
+			zbx_strlower(row[0]);
+			if (NULL == (field = db_get_field(table, row[0])))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s(): table '%s', cannot find field '%s'", __func__,
+						table->table, row[0]);
+				continue;
+			}
+
+			zbx_strlower(row[1]);
+			if (0 != strcmp(row[1], ZBX_TYPE_CHAR_STR))
+				continue;
+
+			field->type = ZBX_TYPE_CHAR;
+			field->length = (unsigned short)atoi(row[2]);
+
+			if (NULL != json)
+			{
+				if (offset == json->buffer_offset)
+				{
+					zbx_json_addobject(json, tablename);
+					zbx_json_addobject(json, ZBX_PROTO_TAG_FIELDS);
+				}
+
+				zbx_json_addobject(json, field->name);
+				zbx_json_addstring(json, ZBX_PROTO_TAG_TYPE, ZBX_PROTO_TAG_CHAR, ZBX_JSON_TYPE_STRING);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_LENGTH, field->length);
+				zbx_json_close(json);
+			}
+		}
+		DBfree_result(result);
+
+		zbx_free(sql);
+	}
+cleanup:
+	zbx_vector_str_destroy(&names);
+
+	if (NULL != json)
+	{
+		if (offset != json->buffer_offset)
+		{
+			zbx_json_close(json);
+			zbx_json_close(json);
+		}
+	}
+#undef ZBX_TYPE_CHAR_STR
+#undef ZBX_PROTO_TAG_FIELDS
+#undef ZBX_PROTO_TAG_LENGTH
+#undef ZBX_PROTO_TAG_CHAR
+}
+#endif
 
 #ifndef HAVE_SQLITE3
 int	DBtrigger_exists(const char *table_name, const char *trigger_name)
@@ -3907,3 +4068,42 @@ char	*zbx_db_get_schema_esc(void)
 	return name;
 }
 #endif
+
+void	zbx_recalc_time_period(int *ts_from, int table_group)
+{
+#define HK_CFG_UPDATE_INTERVAL	5
+	int			least_ts, now;
+	zbx_config_t		cfg;
+	static int		last_cfg_retrieval = 0;
+	static zbx_config_hk_t	hk;
+
+	now = (int)time(NULL);
+
+	if (HK_CFG_UPDATE_INTERVAL < now - last_cfg_retrieval)
+	{
+		last_cfg_retrieval = now;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk = cfg.hk;
+	}
+
+	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
+	{
+		if (1 != hk.history_global)
+			return;
+
+		least_ts = now - hk.history;
+	}
+	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
+	{
+		if (1 != hk.trends_global)
+			return;
+
+		least_ts = now - hk.trends + 1;
+	}
+
+
+	if (least_ts > *ts_from)
+		*ts_from = least_ts;
+#undef HK_CFG_UPDATE_INTERVAL
+}

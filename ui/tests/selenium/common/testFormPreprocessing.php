@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-require_once 'vendor/autoload.php';
+
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
@@ -844,7 +844,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
 								'parameter_3' => 'label_name']
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			[
@@ -2087,6 +2088,13 @@ abstract class testFormPreprocessing extends CWebTest {
 		}
 
 		$form = $this->addItemWithPreprocessing($data, $lld);
+
+		// Take a screenshot to test draggable object position of preprocessing steps.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:preprocessing')->one(), 'Preprocessing'.$this->link);
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 

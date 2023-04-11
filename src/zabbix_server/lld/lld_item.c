@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1163,6 +1163,17 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 
 	*err = '\0';
 
+	if (FAIL == zbx_db_validate_field_size("item_preproc", "params", pp->params))
+	{
+		const char	*err_val;
+		char		key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		err_val = zbx_truncate_value(pp->params, VALUE_ERRMSG_MAX, key_short, sizeof(key_short));
+		zbx_snprintf(err, sizeof(err), "parameter \"%s\" is too long.", err_val);
+		ret = FAIL;
+		goto out;
+	}
+
 	if (0 == (pp->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE)
 			|| (SUCCEED == zbx_token_find(pp->params, 0, &token, ZBX_TOKEN_SEARCH_BASIC)
 			&& 0 != (token.type & ZBX_TOKEN_USER_MACRO)))
@@ -1330,7 +1341,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			}
 			break;
 	}
-
+out:
 	if (SUCCEED != ret)
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s item: invalid value for preprocessing step #%d: %s.\n",

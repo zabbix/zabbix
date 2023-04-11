@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,6 +82,8 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_CSV_TO_JSON;
 	if (0 == strcmp(str, "ZBX_PREPROC_STR_REPLACE"))
 		return ZBX_PREPROC_STR_REPLACE;
+	if (0 == strcmp(str, "ZBX_PREPROC_SCRIPT"))
+		return ZBX_PREPROC_SCRIPT;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;
@@ -188,6 +190,11 @@ void	zbx_mock_test_entry(void **state)
 	read_value("in.value", &value_type, &value, &ts);
 	read_step("in.step", &op);
 
+#if !defined(HAVE_OPENSSL) && !defined(HAVE_GNUTLS)
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.encryption_required"))
+		skip();
+#endif
+
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
 		read_history_value("in.history", &history_value, &history_ts);
@@ -260,7 +267,8 @@ void	zbx_mock_test_entry(void **state)
 			}
 			else
 			{
-				if (ZBX_VARIANT_NONE != history_value.type)
+				/* history_value will contain duktape bytecode if step is a script */
+				if (ZBX_VARIANT_NONE != history_value.type && ZBX_PREPROC_SCRIPT != op.type)
 					fail_msg("expected empty history, but got %s", zbx_variant_value_desc(&history_value));
 			}
 		}

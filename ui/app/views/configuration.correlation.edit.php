@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ $this->includeJsFile('configuration.correlation.edit.js.php');
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
 	->setAction((new CUrl('zabbix.php'))
@@ -108,22 +109,28 @@ $condition_table->addRow([
 
 $form_list
 	->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
-		(new CSelect('evaltype'))
-			->setId('evaltype')
-			->setValue($data['evaltype'])
-			->setFocusableElementId('label-evaltype')
-			->addOptions(CSelect::createOptionsFromArray([
-				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-				CONDITION_EVAL_TYPE_AND => _('And'),
-				CONDITION_EVAL_TYPE_OR => _('Or'),
-				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())->setId('condition_label'),
-		(new CTextBox('formula', $data['formula']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		(new CDiv(
+			(new CSelect('evaltype'))
+				->setId('evaltype')
+				->setValue($data['evaltype'])
+				->setFocusableElementId('label-evaltype')
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				]))
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan())->setId('condition_label'),
+			(new CTextBox('formula', $data['formula']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('formula')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION)
 	])
 	->addRow(
 		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),

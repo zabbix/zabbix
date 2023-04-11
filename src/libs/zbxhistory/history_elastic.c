@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
+#include "zbx_dbversion_constants.h"
 #include "zbxhistory.h"
 
 #include "history.h"
@@ -396,6 +397,16 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 		goto out;
 	}
 
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS,
+			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+#endif
+
 	*page_w[hist->value_type].errbuf = '\0';
 
 	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PRIVATE, &page_w[hist->value_type])))
@@ -707,6 +718,16 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		goto out;
 	}
 
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS,
+			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+#endif
+
 	zabbix_log(LOG_LEVEL_DEBUG, "sending query to %s; post data: %s", data->post_url, query.buffer);
 
 	page_r.offset = 0;
@@ -1011,7 +1032,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE];
 	int				major_num, minor_num, increment_num, ret = FAIL;
 	zbx_uint32_t			version;
-	struct zbx_db_version_info_t	db_version_info;
+	struct zbx_db_version_info_t	db_version_info = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1042,6 +1063,16 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
+
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_PROTOCOLS,
+			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		goto clean;
+	}
+#endif
 
 	*errbuf = '\0';
 
@@ -1090,8 +1121,8 @@ out:
 
 	db_version_info.database = "ElasticDB";
 	db_version_info.friendly_current_version = version_friendly;
-	db_version_info.friendly_min_version = ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY;
-	db_version_info.friendly_max_version = ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY;
+	db_version_info.friendly_min_version = ZBX_ELASTIC_MIN_VERSION_STR;
+	db_version_info.friendly_max_version = ZBX_ELASTIC_MAX_VERSION_STR;
 	db_version_info.friendly_min_supported_version = NULL;
 
 	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,

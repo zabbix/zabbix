@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ class CControllerAuditLogList extends CController {
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
 		$users = [];
-		$non_existent_userids = [];
+		$non_existent_userids = [0];
 
 		$filter = [
 			'action' => $data['auditlog_actions']
@@ -123,21 +123,22 @@ class CControllerAuditLogList extends CController {
 				'preservekeys' => true
 			]);
 
+			if (in_array('0', $data['userids'])) {
+				$users[0] = ['userid' => '0', 'username' => 'System', 'name' => '', 'surname' => ''];
+			}
+
 			$data['userids'] = $this->sanitizeUsersForMultiselect($users);
 
 			if ($users) {
 				$params['userids'] = array_column($users, 'userid');
-				$data['auditlogs'] = API::AuditLog()->get($params);
 			}
 
 			$users = array_map(function(array $value): string {
 				return $value['username'];
 			}, $users);
 		}
-		else {
-			$data['auditlogs'] = API::AuditLog()->get($params);
-		}
 
+		$data['auditlogs'] = API::AuditLog()->get($params);
 		$data['paging'] = CPagerHelper::paginate($data['page'], $data['auditlogs'], ZBX_SORT_UP,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);

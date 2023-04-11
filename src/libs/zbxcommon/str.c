@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2022 Zabbix SIA\n"
+	"Copyright (C) 2023 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -326,7 +326,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
 	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
 }
 
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
+void	zbx_strquote_alloc_opt(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str, int option)
 {
 	size_t		size;
 	const char	*src;
@@ -337,6 +337,9 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+					break;
+				ZBX_FALLTHROUGH;
 			case '"':
 				size++;
 		}
@@ -365,6 +368,9 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+					break;
+				ZBX_FALLTHROUGH;
 			case '"':
 				*dst++ = '\\';
 				break;
@@ -2957,7 +2963,13 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 	if ('"' == *ptr)	/* quoted parameter */
 	{
 		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
-			;
+		{
+			if ('\0' == *ptr)
+			{
+				*length = ptr - expr - *param_pos;
+				goto out;
+			}
+		}
 
 		*length = ++ptr - expr - *param_pos;
 
@@ -2972,7 +2984,7 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 
 		*length = ptr - expr - *param_pos;
 	}
-
+out:
 	*sep_pos = ptr - expr;
 }
 
@@ -5707,14 +5719,15 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  *                                                                            *
  * Purpose: unquotes valid substring at the specified location                *
  *                                                                            *
- * Parameters: src   - [IN] the source string                                 *
- *             left  - [IN] the left substring position 9start)               *
- *             right - [IN] the right substirng position (end)                *
+ * Parameters: src    - [IN] source string                                    *
+ *             left   - [IN] left substring position start)                   *
+ *             right  - [IN] right substring position (end)                   *
+ *             option - [IN] whether to unquote baskslash or not              *
  *                                                                            *
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
+char	*zbx_substr_unquote_opt(const char *src, size_t left, size_t right, int option)
 {
 	char	*str, *ptr;
 
@@ -5732,6 +5745,8 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 				{
 					case '\\':
 						*ptr++ = '\\';
+						if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+							continue;
 						break;
 					case '"':
 						*ptr++ = '"';
@@ -5740,6 +5755,12 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 						THIS_SHOULD_NEVER_HAPPEN;
 						*ptr = '\0';
 						return str;
+					default:
+						if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+						{
+							*ptr++ = '\\';
+							*ptr++ = *src;
+						}
 				}
 			}
 			else
@@ -5756,6 +5777,22 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 	}
 
 	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unquotes valid substring at the specified location                *
+ *                                                                            *
+ * Parameters: src   - [IN] source string                                     *
+ *             left  - [IN] left substring position start)                    *
+ *             right - [IN] right substring position (end)                    *
+ *                                                                            *
+ * Return value: The unquoted and copied substring.                           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
+{
+	return zbx_substr_unquote_opt(src, left, right, ZBX_STRQUOTE_DEFAULT);
 }
 
 /******************************************************************************

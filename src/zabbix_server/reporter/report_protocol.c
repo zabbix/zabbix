@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -416,7 +416,9 @@ void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struc
 			size_t		value_alloc = 0;
 			zbx_ptr_pair_t	pair;
 
-			zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, NULL);
+			if (NULL == zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, NULL))
+				continue;
+
 			pair.first = zbx_strdup(NULL, key);
 			pair.second = value;
 			zbx_vector_ptr_pair_append(&params, pair);

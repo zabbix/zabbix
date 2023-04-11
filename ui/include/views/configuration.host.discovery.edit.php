@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ $url = (new CUrl('host_discovery.php'))
 	->getUrl();
 
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('host-discovery-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -742,23 +743,29 @@ $condition_tab = new CFormGrid();
 $condition_tab->addItem([
 	(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('js-item-condition-label'),
 	(new CFormField([
-		(new CSelect('evaltype'))
-			->setFocusableElementId('label-evaltype')
-			->setId('evaltype')
-			->setValue($data['evaltype'])
-			->addOptions(CSelect::createOptionsFromArray([
-				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-				CONDITION_EVAL_TYPE_AND => _('And'),
-				CONDITION_EVAL_TYPE_OR => _('Or'),
-				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan(''))
-			->setId('expression'),
-		(new CTextBox('formula', $data['formula']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		(new CDiv(
+			(new CSelect('evaltype'))
+				->setFocusableElementId('label-evaltype')
+				->setId('evaltype')
+				->setValue($data['evaltype'])
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				]))
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan(''))
+				->setId('expression'),
+			(new CTextBox('formula', $data['formula']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('formula')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION)
 	]))->setId('js-item-condition-field')
 ]);
 
@@ -872,7 +879,7 @@ if (!$lld_macro_paths) {
 		'path' => ''
 	]];
 }
-elseif (!hasRequest('form_refresh')) {
+elseif ($data['form_refresh'] == 0) {
 	CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
 }
 
@@ -969,7 +976,7 @@ $tab = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $data['limited'], $data['preprocessing_types'])
 				)
 			]),
 		TAB_INDICATOR_PREPROCESSING
@@ -978,7 +985,7 @@ $tab = (new CTabView())
 	->addTab('macroTab', _('Filters'), $condition_tab, TAB_INDICATOR_FILTERS)
 	->addTab('overridesTab', _('Overrides'), $overrides_tab, TAB_INDICATOR_OVERRIDES);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tab->setSelected(0);
 }
 

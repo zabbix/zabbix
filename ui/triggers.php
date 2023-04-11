@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,12 +60,12 @@ $fields = [
 	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Target')],
 	'recovery_expr_temp' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_recovery_expression}) || isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Recovery expression')],
 	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Target')],
-	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0',	'isset({add_dependency})'],
-	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'copy_targetids' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
-	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
+	'dependencies' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'new_dependency' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID.'{}>0',	'isset({add_dependency})'],
+	'g_triggerid' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'copy_targetids' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,			null],
+	'visible' =>								[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,			null],
+	'tags' =>									[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),		null],
 	'manual_close' =>							[T_ZBX_INT, O_OPT, null,
 													IN([ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
@@ -77,7 +77,7 @@ $fields = [
 	// Filter related fields.
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'filter_priority' =>						[T_ZBX_INT, O_OPT, null,
+	'filter_priority' =>						[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,
 													IN([
 														TRIGGER_SEVERITY_NOT_CLASSIFIED,
 														TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
@@ -85,8 +85,8 @@ $fields = [
 														TRIGGER_SEVERITY_DISASTER
 													]), null
 												],
-	'filter_groupids' =>						[T_ZBX_INT, O_OPT, null, DB_ID, null],
-	'filter_hostids' =>							[T_ZBX_INT, O_OPT, null, DB_ID, null],
+	'filter_groupids' =>						[T_ZBX_INT, O_OPT, P_ONLY_ARRAY, DB_ID, null],
+	'filter_hostids' =>							[T_ZBX_INT, O_OPT, P_ONLY_ARRAY, DB_ID, null],
 	'filter_inherited' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_discovered' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_dependent' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
@@ -103,7 +103,7 @@ $fields = [
 	'filter_evaltype' =>						[T_ZBX_INT, O_OPT, null,
 													IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null
 												],
-	'filter_tags' =>							[T_ZBX_STR, O_OPT, null,	null,			null],
+	'filter_tags' =>							[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	// Action related fields.
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
@@ -135,7 +135,7 @@ $fields = [
 	'delete' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>							[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'checkbox_hash' =>							[T_ZBX_STR, O_OPT, null,	null,		null],
 	'backurl' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// Sort and sortorder.
@@ -207,6 +207,12 @@ foreach ($tags as $key => $tag) {
 /*
  * Actions
  */
+$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+$filter_hostids = getRequest('filter_set')
+	? getRequest('filter_hostids', [])
+	: CProfile::getArray($prefix.'triggers.filter_hostids', []);
+$checkbox_hash = crc32(implode('', $filter_hostids));
+
 $expression_action = '';
 if (hasRequest('add_expression')) {
 	$_REQUEST['expression'] = getRequest('expr_temp');
@@ -490,7 +496,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 		: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
 
 	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 		unset($_REQUEST['g_triggerid']);
 	}
 
@@ -546,7 +552,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
 
 	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
@@ -558,7 +564,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'parent_discoveryid' => null,
 		'dependencies' => getRequest('dependencies', []),
 		'db_dependencies' => [],
@@ -961,7 +967,6 @@ else {
 	}
 
 	sort($filter_hostids);
-	$checkbox_hash = crc32(implode('', $filter_hostids));
 
 	$data += [
 		'triggers' => $triggers,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,9 +36,27 @@ class CLdap {
 	 */
 	public $error;
 
-	public function __construct($arg = []) {
-		$this->ds = false;
-		$this->info = [];
+	/**
+	 * @var mixed
+	 */
+	private $ds = false;
+
+	/**
+	 * @var mixed
+	 */
+	private $info = [];
+
+	/**
+	 * @var array
+	 */
+	private $cnf = [];
+
+	/**
+	 * @var int
+	 */
+	private $bound = 0;
+
+	public function __construct(array $arg = []) {
 		$this->cnf = [
 			'host' => 'ldap://localhost',
 			'port' => '389',

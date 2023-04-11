@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,14 +146,14 @@ $overviewFormList->addRow(_('Monitoring'),
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['host']['hostid'])
 				->setArgument('show_details', '1')
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 			)
 			: _('Latest data'),
 		$data['allowed_ui_problems']
 			? new CLink(_('Problems'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
-				->setArgument('filter_name', '')
 				->setArgument('hostids', [$data['host']['hostid']])
+				->setArgument('filter_set', '1')
 			)
 			: _('Problems'),
 		$data['allowed_ui_hosts']
@@ -264,6 +264,7 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
 	->addItem((new CForm())
+		->cleanItems()
 		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem($hostInventoriesTab)
 	)
