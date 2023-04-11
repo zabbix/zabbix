@@ -1,1 +1,1 @@
-A......... [ZBX-21871] made audit logging of changes via usergroup.users match that of user.usrgrps (jfreibergs)
+A......... [ZBX-21871] modified audit logging of changes in usergroup users to be written as updates to user groups (jfreibergs)
