@@ -762,6 +762,65 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Check that no items with repeating keys would be inherited to a single host or template.
+	 *
+	 * @param array $tpl_items
+	 * @param array $chd_hosts
+	 *
+	 * @throws APIException
+	 */
+	private function checkDoubleInheritedNames(array $tpl_items, array $chd_hosts): void {
+		$templateids = array_unique(array_column($tpl_items, 'hostid'));
+
+		$tpl_links = [];
+
+		foreach ($chd_hosts as $chd_host) {
+			foreach ($chd_host['parentTemplates'] as $template) {
+				if (!in_array($template['templateid'], $templateids)) {
+					continue;
+				}
+
+				$tpl_links[$template['templateid']][] = $chd_host['hostid'];
+			}
+		}
+
+		$item_indexes = [];
+
+		foreach ($tpl_items as $i => $tpl_item) {
+			if (!array_key_exists($tpl_item['hostid'], $tpl_links)) {
+				continue;
+			}
+
+			$item_indexes[$tpl_item['key_']][] = $i;
+		}
+
+		foreach ($item_indexes as $key => $indexes) {
+			$template_count = count($indexes);
+
+			if ($template_count == 1) {
+				continue;
+			}
+
+			for ($i = 0; $i < $template_count - 1; $i++) {
+				for ($j = $i + 1; $j < $template_count; $j++) {
+					$templateid_i = $tpl_items[$indexes[$i]]['hostid'];
+					$templateid_j = $tpl_items[$indexes[$j]]['hostid'];
+
+					$same_hosts = array_intersect($tpl_links[$templateid_i], $tpl_links[$templateid_j]);
+
+					if ($same_hosts) {
+						$hostid = reset($same_hosts);
+
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							sprintf($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $key, $chd_hosts[$hostid]['host'])
+						);
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Prepares and returns an array of child items, inherited from items $tpl_items on the given hosts.
 	 *
 	 * @param array      $tpl_items
@@ -804,37 +863,7 @@ abstract class CItemGeneral extends CApiService {
 			return [];
 		}
 
-		// Check if duplicates do not exist among inherited template item keys.
-		if ($hostids === null) {
-			$duplicate_item = CArrayHelper::findDuplicate($tpl_items, 'key_', 'hostid');
-			if ($duplicate_item) {
-				$host = API::Host()->get([
-					'output' => ['host'],
-					'hostids' => $duplicate_item['hostid']
-				]);
-
-				if (!$host) {
-					$host = API::Template()->get([
-						'output' => ['host'],
-						'templateids' => $duplicate_item['hostid']
-					]);
-				}
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, _params(
-					$this->getErrorMsg(self::ERROR_EXISTS), [$duplicate_item['key_'], $host[0]['host']]
-				));
-			}
-		}
-		else {
-			$duplicate_item = CArrayHelper::findDuplicate($tpl_items, 'key_');
-			if ($duplicate_item !== null) {
-				$host = reset($chd_hosts);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, _params(
-					$this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), [$duplicate_item['key_'], $host['host']]
-				));
-			}
-		}
+		$this->checkDoubleInheritedNames($tpl_items, $chd_hosts);
 
 		$chd_items_tpl = [];
 		$chd_items_key = [];
