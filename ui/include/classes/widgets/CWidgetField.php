@@ -40,6 +40,8 @@ abstract class CWidgetField {
 	protected $value;
 	protected $default;
 
+	protected int $max_length;
+
 	protected ?string $action = null;
 
 	protected int $flags = 0x00;
@@ -107,6 +109,18 @@ abstract class CWidgetField {
 	 */
 	public function setAction(string $action): self {
 		$this->action = $action;
+
+		return $this;
+	}
+
+	public function getMaxLength(): int {
+		return $this->max_length;
+	}
+
+	public function setMaxLength(int $max_length): self {
+		$this->max_length = $max_length;
+
+		$this->validation_rules['length'] = $this->max_length;
 
 		return $this;
 	}
@@ -196,9 +210,11 @@ abstract class CWidgetField {
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_STR:
+				$this->max_length = DB::getFieldLength('widget_field', 'value_str');
+
 				$this->validation_rules = [
 					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('widget_field', 'value_str')
+					'length' => $this->max_length
 				];
 				break;
 
