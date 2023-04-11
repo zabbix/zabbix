@@ -482,7 +482,9 @@ class testFormGraphs extends CWebTest {
 						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
 						'Field "yaxismin" is not correct: a number is expected',
-						'Field "yaxismax" is not correct: a number is expected'
+						'Field "yaxismax" is not correct: a number is expected',
+						'Field "Percentile line (left)" is not correct: a number is expected',
+						'Field "Percentile line (right)" is not correct: a number is expected'
 					]
 				]
 			],
