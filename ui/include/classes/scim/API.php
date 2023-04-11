@@ -52,6 +52,6 @@ class API {
 			throw new Exception($response->errorMessage, $response->errorCode);
 		}
 
-		return new ScimHttpResponse($response->data);
+		return new ScimHttpResponse($requestApi, $requestMethod, $data, $response->data);
 	}
 }

@@ -27,12 +27,13 @@ require_once __DIR__.'/include/debug.inc.php';
 
 use SCIM\API as SCIM;
 use SCIM\clients\ScimApiClient;
-use SCIM\HttpResponse;
+use SCIM\ScimHttpResponse;
+use SCIM\ScimHttpRequest;
 use SCIM\services\Group;
 use SCIM\services\ServiceProviderConfig;
 use SCIM\services\User;
 
-$request = new CHttpRequest(['PATH_INFO', 'QUERY_STRING']);
+$request = new ScimHttpRequest(['PATH_INFO', 'QUERY_STRING']);
 
 try {
 	APP::getInstance()->run(APP::EXEC_MODE_API);
@@ -48,7 +49,7 @@ try {
 	$response = $scim->execute($client, $request);
 }
 catch (Throwable $e) {
-	$response = new HttpResponse();
+	$response = new ScimHttpResponse();
 
 	if (!$e->getCode() || $e instanceof APIException) {
 		$e = new Exception($e->getMessage(), 500);

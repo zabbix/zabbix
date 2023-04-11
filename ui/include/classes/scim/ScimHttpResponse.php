@@ -25,8 +25,11 @@ use Throwable;
 
 class ScimHttpResponse {
 
-	/** @var array $data  Array of response data to be sent. */
-	protected array $data = [];
+	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
+	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
+
+	/** @var array $response_data  Array of response data to be sent. */
+	protected array $response_data = [];
 
 	/** @var Throwable $exception */
 	protected $exception = null;
@@ -34,18 +37,30 @@ class ScimHttpResponse {
 	/** @var int $response_code  HTTP response status code. */
 	protected $response_code = 200;
 
-	public function __construct(array $data = []) {
-		$this->data = $data;
+	/** @var string $class  Name of the class that response is received from */
+	protected string $class;
+
+	/** @var string $method  Name of the method that response is received from */
+	protected string $method;
+
+	/** @var array $request_data Array of request data that was sent */
+	protected array $request_data;
+
+	public function __construct(string $class = '', string $method = '', array $request_data = [], array $response_data = []) {
+		$this->class = $class;
+		$this->method = $method;
+		$this->request_data = $request_data;
+		$this->response_data = $response_data;
 	}
 
-	public function setData(array $data) {
-		$this->data = $data;
+	public function setResponseData(array $data) {
+		$this->response_data = $data;
 
 		return $this;
 	}
 
-	public function getData(): array {
-		return $this->data;
+	public function getResponseData(): array {
+		return $this->response_data;
 	}
 
 	public function setException(Throwable $e) {
@@ -68,15 +83,82 @@ class ScimHttpResponse {
 	 */
 	public function send(): void {
 		if ($this->exception instanceof Throwable) {
-			$this->setData([
+			$this->setResponseData([
 				'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
 				'detail' => $this->exception->getMessage(),
 				'status' => $this->exception->getCode()
 			]);
 		}
+		else {
+			$this->setResponseData($this->prepareUsersResponse());
+		}
 
 		header('Content-Type: application/json', true, $this->response_code);
-		echo json_encode($this->data);
+		echo json_encode($this->getResponseData());
 		exit;
+	}
+
+	/**
+	 * Prepares Users request response based on the data provided.
+	 *
+	 * @return array
+	 */
+	private function prepareUsersResponse(): array {
+		if ($this->method !== 'delete'
+				&& (array_key_exists('userName', $this->request_data) || array_key_exists('id', $this->request_data))) {
+			if ($this->response_data === []) {
+				return [
+					'schemas' => [self::SCIM_USER_SCHEMA],
+					'totalResults' => 0,
+					'Resources' => $this->response_data
+				];
+			}
+
+			return $this->wrapUserData($this->response_data);
+		}
+		elseif ($this->method === 'delete' ) {
+			return ['schemas'	=> [self::SCIM_USER_SCHEMA]];
+		}
+		else {
+			$total_users = count($this->response_data);
+
+			$resources = [];
+			foreach ($this->response_data as $resource) {
+				$user = $this->wrapUserData($resource);
+				unset($user['schemas']);
+
+				$resources[] = $user;
+			}
+
+			return [
+				'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+				'totalResults' => $total_users,
+				'startIndex' => max($this->request_data['startIndex'], 1),
+				'itemsPerPage' => min($total_users, max($total_users, 0)),
+				'Resources' => $resources
+			];
+		}
+	}
+
+	/**
+	 * Adds schema and key names that are necessary for Users response.
+	 *
+	 * @param array $user_data  User data returned from User SCIM class.
+	 *
+	 * @return array
+	 */
+	private function wrapUserData(array $user_data): array {
+		$data = [
+			'schemas'	=> [self::SCIM_USER_SCHEMA],
+			'id' 		=> $user_data['userid'],
+		];
+
+		if (array_key_exists('username', $user_data)) {
+			$data['userName'] = $user_data['username'];
+		}
+
+		unset($user_data['userid'], $user_data['username']);
+
+		return $data + $user_data;
 	}
 }
