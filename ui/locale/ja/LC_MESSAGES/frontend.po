@@ -9208,6 +9208,16 @@ msgstr "テンプレート\"%3$s\"のディスカバリルール\"%2$s\"内に�
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "ホスト名\"%1$s\"を持つホストのプロトタイプはディスカバリルール\"%2$s\"にすでに存在しています。"
 
+#: include/classes/api/services/CHostPrototype.php:1127
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1124
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
@@ -23877,6 +23887,10 @@ msgstr "ホストグループ"
 msgid "host pattern"
 msgstr "ホストパターン"
 
+#: include/classes/api/services/CHostPrototype.php:1190
+msgid "host prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -24268,6 +24282,11 @@ msgstr "max() - 期間Tでの最大値"
 msgid "maximum dependent items count reached"
 msgstr "依存アイテムの数が最大数に達しました"
 
+#: include/classes/validators/CApiInputValidator.php:1726
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -24417,6 +24436,11 @@ msgstr "LDAPサーバーがありません"
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
 msgstr "データなし"
+
+#: include/classes/api/services/CHostPrototype.php:1360
+#, c-format
+msgid "no default interface for \"%1$s\" type"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
