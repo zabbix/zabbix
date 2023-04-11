@@ -76,9 +76,17 @@ class testFormConnectors extends CWebTest {
 				'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password'
 			],
 			'required' => ['Name', 'URL', 'Max records per message', 'Concurrent sessions', 'Attempts', 'Timeout'],
-			'default' => ['Data type' => 'Item values', 'Tag filter' => 'And/Or', 'HTTP authentication' => 'None',
-				'Max records per message' => 'Unlimited', 'Concurrent sessions' => '1', 'Attempts' => '1',
-				'Timeout' => '5s', 'SSL verify peer' => true, 'SSL verify host' => true, 'Enabled' => true
+			'default' => [
+				'Data type' => 'Item values',
+				'Tag filter' => 'And/Or',
+				'HTTP authentication' => 'None',
+				'Max records per message' => 'Unlimited',
+				'Concurrent sessions' => '1',
+				'Attempts' => '1',
+				'Timeout' => '5s',
+				'SSL verify peer' => true,
+				'SSL verify host' => true,
+				'Enabled' => true
 			]
 		];
 
@@ -720,21 +728,9 @@ class testFormConnectors extends CWebTest {
 						'SSL key file' => '  {$SSL_KEY}  ',
 						'Description' => '  trim check  '
 					],
-					'trim' => [
-						'fields' => [
-							'Name',
-							'URL',
-							'id:tags_0_tag',
-							'id:tags_0_value',
-							'Username',
-							'id:max_records',
-							'Concurrent sessions',
-							'Timeout',
-							'HTTP proxy',
-							'SSL certificate file',
-							'SSL key file',
-							'Description'
-						]
+					'trim' => ['Name', 'URL', 'id:tags_0_tag', 'id:tags_0_value', 	'Username', 'id:max_records',
+						'Concurrent sessions', 'Timeout', 'HTTP proxy', 'SSL certificate file', 'SSL key file',
+						'Description'
 					]
 				]
 			],
@@ -829,11 +825,7 @@ class testFormConnectors extends CWebTest {
 						'Bearer token' => '  {$TOKEN}  ',
 						'Description' => 'bearer token'
 					],
-					'trim' => [
-						'fields' => [
-							'Bearer token'
-						]
-					]
+					'trim' => ['Bearer token']
 				]
 			]
 		];
@@ -910,10 +902,8 @@ class testFormConnectors extends CWebTest {
 
 			// Trim leading and trailing spaces from expected results if necessary.
 			if (array_key_exists('trim', $data)) {
-				foreach ($data['trim'] as $trim => $fields) {
-					foreach ($fields as $field) {
-						$data[$trim][$field] = trim($data[$trim][$field]);
-					}
+				foreach ($data['trim'] as $field) {
+					$data['fields'][$field] = trim($data['fields'][$field]);
 				}
 			}
 
@@ -984,10 +974,8 @@ class testFormConnectors extends CWebTest {
 	public function testFormConnectors_CancelAction($data) {
 		$old_hash = CDBHelper::getHash(self::$connector_sql);
 
-		$location = ($data['action'] === 'Create') ? 'button:Create connector' : 'link:'.$data['name'];
-
 		$this->page->login()->open('zabbix.php?action=connector.list');
-		$this->query($location)->one()->click();
+		$this->query(($data['action'] === 'Create') ? 'button:Create connector' : 'link:'.$data['name'])->one()->click();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
@@ -1040,16 +1028,15 @@ class testFormConnectors extends CWebTest {
 	 */
 	public function testFormConnectors_Clone($data) {
 		$this->page->login()->open('zabbix.php?action=connector.list');
-		$new_name = 'Cloned_'.$data['Name'];
 		$this->query('link', $data['Name'])->one()->click();
 
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$values = $form->getValues();
-		$values['Name'] = $new_name;
 
 		$this->query('button:Clone')->waitUntilClickable()->one()->click();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			$new_name = 'Cloned_'.$data['Name'];
 			$form->invalidate();
 			$form->fill(['Name' => $new_name]);
 			$form->submit();
@@ -1058,6 +1045,7 @@ class testFormConnectors extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr($data['Name'])));
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr($new_name)));
 
+			$values['Name'] = $new_name;
 			$this->query('link', $new_name)->one()->click();
 			$this->assertEquals($values, $form->getValues());
 		}
