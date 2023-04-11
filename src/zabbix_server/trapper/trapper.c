@@ -671,6 +671,13 @@ const zbx_status_section_t	status_sections[] = {
 	{NULL}
 };
 
+static void	server_stats_entry_export(struct zbx_json *json, const zbx_status_section_t *section)
+{
+	zbx_json_addobject(json, section->name);
+	zbx_json_addstring(json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(json);
+}
+
 static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t *entry,
 		zbx_counter_value_t counter_value, const zbx_uint64_t *proxyid)
 {
@@ -738,9 +745,7 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 		if (ZBX_SECTION_ENTRY_SERVER_STATS == section->entry_type)
 		{
-			zbx_json_addobject(json, section->name);
-			zbx_json_addstring(json, "server version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(json);
+			server_stats_entry_export(json, section);
 			continue;
 		}
 
