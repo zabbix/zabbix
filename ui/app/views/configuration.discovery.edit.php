@@ -33,8 +33,8 @@ $form = (new CForm())
 	->setId('discoveryForm')
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if (!empty($this->data['druleid'])) {
-	$form->addVar('druleid', $this->data['druleid']);
+if (!empty($this->data['drule']['druleid'])) {
+	$form->addVar('druleid', $this->data['drule']['druleid']);
 }
 
 // Create form grid.
@@ -77,16 +77,17 @@ $discoveryFormGrid->addItem([
 			(new CTable())
 				->setAttribute('style', 'width: 100%;')
 				->setHeader([_('Type'), _('Actions')])
-				->setFooter(
-					(new CRow(
-						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->setAttribute('data-action', 'add')
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('js-check-add')
-						))->setColSpan(2)
-					))->setId('dcheckListFooter')
-				)
+				->addItem(
+					(new CTag('tfoot', true))
+						->addItem(
+							(new CCol(
+								(new CSimpleButton(_('Add')))
+									->setAttribute('data-action', 'add')
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-check-add')
+							))->setColSpan(2)
+						)
+				)->setId('dcheckListFooter')
 		))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
@@ -99,12 +100,23 @@ $discoveryFormGrid->addItem([
 	new CLabel(_('Device uniqueness criteria')),
 	(new CDiv(
 		(new CRadioButtonList('uniqueness_criteria', (int) $this->data['drule']['uniqueness_criteria']))
+			->setId('device-uniqueness-list')
 			->makeVertical()
 			->addValue(_('IP address'), -1, zbx_formatDomId('uniqueness_criteria_ip'))
 	))
 		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 ]);
+
+$uniqueness_template = (new CTemplateTag('unique-row-tmpl'))->addItem(
+	(new CListItem([
+		(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
+			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setId('uniqueness_criteria_#{dcheckid}'),
+		(new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
+	]))
+		->setId('uniqueness_criteria_row_#{dcheckid}')
+);
 
 // Append host source to form list.
 $discoveryFormGrid->addItem([
@@ -114,10 +126,22 @@ $discoveryFormGrid->addItem([
 			->makeVertical()
 			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, 'host_source_chk_dns')
 			->addValue(_('IP address'), ZBX_DISCOVERY_IP, 'host_source_chk_ip')
+			->setId('host_source')
 	))
 		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 ]);
+
+$host_source_template = (new CTemplateTag('host-source-row-tmpl'))->addItem(
+	(new CListItem([
+		(new CInput('radio', 'host_source', '_#{dcheckid}'))
+			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setAttribute('data-id', '#{dcheckid}')
+			->setId('host_source_#{dcheckid}'),
+		(new CLabel([new CSpan(), '#{name}'], 'host_source_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
+	]))
+		->setId('host_source_row_#{dcheckid}')
+);
 
 // Append name source to form list.
 $discoveryFormGrid->addItem([
@@ -128,10 +152,22 @@ $discoveryFormGrid->addItem([
 			->addValue(_('Host name'), ZBX_DISCOVERY_UNSPEC, 'name_source_chk_host')
 			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, 'name_source_chk_dns')
 			->addValue(_('IP address'), ZBX_DISCOVERY_IP, 'name_source_chk_ip')
+			->setId('name_source')
 	))
 		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 ]);
+
+$name_source_template = (new CTemplateTag('name-source-row-tmpl'))->addItem(
+	(new CListItem([
+		(new CInput('radio', 'name_source', '_#{dcheckid}'))
+			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setAttribute('data-id', '#{dcheckid}')
+			->setId('name_source_#{dcheckid}'),
+		(new CLabel([new CSpan(), '#{name}'], 'name_source_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
+	]))
+		->setId('name_source_row_#{dcheckid}')
+);
 
 $discoveryFormGrid->addItem([
 	new CLabel(_('Enabled'), 'status'),
@@ -141,17 +177,36 @@ $discoveryFormGrid->addItem([
 	)
 ]);
 
+$check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{name}'))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH)
+			->setId('dcheckCell_#{dcheckid}'), // todo - check why necessary
+		new CHorList([
+			(new CButton(null, _('Edit')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('js-edit'),
+			(new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('js-remove')
+		])
+	]))->setId('dcheckRow_#{dcheckid}')
+);
+
 $form
 	->addItem($discoveryFormGrid)
+	->addItem($check_template_default)
 	->addItem(
 		(new CScriptTag('
 			drule_edit_popup.init('.json_encode([
-				'druleid' => $data['druleid'],
+				'druleid' => $data['drule']['druleid'],
+				'dchecks' => $data['drule']['dchecks']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
 
-if ($data['druleid']) {
+if ($data['drule']['druleid']) {
 	$buttons = [
 		[
 			'title' => _('Update'),
@@ -188,7 +243,7 @@ else {
 }
 
 $output = [
-	'header' => $data['druleid'] ? _('Discovery rule') : _('New discovery rule'),
+	'header' => $data['drule']['druleid'] ? _('Discovery rule') : _('New discovery rule'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_DISCOVERY_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,

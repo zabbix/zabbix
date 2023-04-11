@@ -35,8 +35,7 @@ class CControllerDiscoveryCreate extends CController {
 			'uniqueness_criteria' =>	'string',
 			'host_source' =>			'string',
 			'name_source' =>			'string',
-			'dchecks' =>				'required|array',
-			'form_refresh' =>			'int32'
+			'dchecks' =>				'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -74,22 +73,22 @@ class CControllerDiscoveryCreate extends CController {
 
 		$result = API::DRule()->create($drule);
 
+		$output = [];
+
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'discovery.list')
-				->setArgument('page', CPagerHelper::loadPage('discovery.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Discovery rule created'));
+			$output['success']['title'] = _('Discovery rule created');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'discovery.edit')
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot create discovery rule'));
+			$output['error'] = [
+				'title' => _('Cannot create discovery rule'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

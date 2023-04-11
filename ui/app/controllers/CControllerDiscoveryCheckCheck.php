@@ -1,0 +1,147 @@
+<?php declare(strict_types = 0);
+/*
+** Zabbix
+** Copyright (C) 2001-2023 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+class CControllerDiscoveryCheckCheck extends CController {
+
+	/**
+	 * Default discovery check type.
+	 */
+	const DEFAULT_TYPE = SVC_FTP;
+
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableCsrfValidation();
+	}
+
+	protected function checkInput(): bool {
+		// todo - fix 'not empty' param
+		$fields = [
+			'update' =>					'in 1', // todo - can remove this later from here and from form fields?
+			'dcheckid' =>				'string',
+			'type' =>					'in '.implode(',', array_keys(discovery_check_type2str())),
+			'ports' =>					'string|not_empty|db dchecks.ports',
+
+			//'snmp_community' =>			'string|not_empty|db dchecks.snmp_community',
+			//'key_' =>					'string|not_empty|db dchecks.key_',
+			//'snmp_oid' =>				'string|not_empty|db dchecks.key_',
+
+			'snmp_community' =>			'string|db dchecks.snmp_community',
+			'key_' =>					'string|db dchecks.key_',
+			'snmp_oid' =>				'string|db dchecks.key_',
+
+			'snmpv3_contextname' =>		'string|db dchecks.snmpv3_contextname',
+			'snmpv3_securityname' =>	'string|db dchecks.snmpv3_securityname',
+			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel|in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
+			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.implode(',', array_keys(getSnmpV3AuthProtocols())),
+			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
+			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
+
+			//'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase'
+			'snmpv3_privpassphrase' =>	'string|db dchecks.snmpv3_privpassphrase',
+			'dchecks' => 'array',
+
+			// todo - fix this
+			'host_source' => '',
+			'name_source' => '',
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->hasInput('ports') && !validate_port_list($this->getInput('ports'))) {
+			info(_('Incorrect port range.'));
+			$ret = false;
+		}
+
+		if ($ret && $this->hasInput('type') && $this->getInput('type') == SVC_AGENT) {
+			$item_key_parser = new CItemKey();
+			if ($item_key_parser->parse($this->getInput('key_')) != CParser::PARSE_SUCCESS) {
+				info(_s('Invalid key "%1$s": %2$s.', $this->getInput('key_'), $item_key_parser->getError()));
+				$ret = false;
+			}
+		}
+
+		if (!$ret) {
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
+	}
+
+	/**
+	 * @throws JsonException
+	 */
+	protected function doAction(): void {
+		$data = array_merge([
+			'type' => self::DEFAULT_TYPE,
+			'ports' => svc_default_port(self::DEFAULT_TYPE)
+		], $this->getInputAll());
+
+		// todo - fix in JS (add id creation) Ask, if really should be 1,3,5 etc, not 1234
+		$data['dcheckid'] = 'new1';
+
+		if ($data['type'] == 10 || $data['type'] == 11) {
+			$type_to_string = discovery_check_type2str($data['type']);
+			$data['name'] = $type_to_string.' "'.$data['snmp_oid'].'"';
+		}
+		elseif ($data['type'] == 13) {
+			$type_to_string = discovery_check_type2str($data['type']);
+			$data['name'] = $type_to_string.' ('.$data['ports'].') "'.$data['snmp_oid'].'"';
+		}
+		elseif ($data['type'] == 9) {
+			$type_to_string = discovery_check_type2str($data['type']);
+			$data['name'] = $type_to_string.' "'.$data['key_'].'"';
+		}
+		else {
+			$data['name'] = discovery_check2str(
+				$data['type'],
+				array_key_exists('key_', $data) ?  $data['key_'] : '',
+				array_key_exists('ports',  $data) ?  $data['ports'] : ''
+			);
+		}
+
+		$dchecks = $this->getInput('dchecks', []);
+
+		foreach ($dchecks as $dcheck) {
+			if ($data['name'] === $dcheck) {
+				$data['error'] = [
+					'title' => _('Check already exists.'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				];
+			}
+		}
+
+		if ($data['type'] == SVC_SNMPv1 || $data['type'] == SVC_SNMPv2c || $data['type'] == SVC_SNMPv3) {
+			$data['key_'] = $data['snmp_oid'];
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));
+	}
+}

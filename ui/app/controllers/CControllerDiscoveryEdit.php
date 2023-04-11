@@ -104,6 +104,7 @@ class CControllerDiscoveryEdit extends CController {
 
 	protected function doAction(): void {
 		$this->drule += [
+			'druleid' => null,
 			'name' => DB::getDefault('drules', 'name'),
 			'dchecks' => [],
 			'iprange' => '192.168.0.1-254',
@@ -116,19 +117,17 @@ class CControllerDiscoveryEdit extends CController {
 		];
 
 		CArrayHelper::sort($this->drule['dchecks'], ['name']);
+		$this->drule['dchecks'] = array_values($this->drule['dchecks']);
 
 		$data = [
-			'druleid' => $this->getInput('druleid', null),
 			'drule' => $this->drule,
-			'form_refresh' => $this->getInput('form_refresh', 0)
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', 'host']
 		]);
 		CArrayHelper::sort($data['proxies'], ['host']);
-
-		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));

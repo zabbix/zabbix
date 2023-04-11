@@ -104,12 +104,35 @@ window.check_popup = new class {
 		}
 	}
 
+	/**
+	 * Get check table data to check if row with the same data already exists.
+	 */
+	_addCheckTableData() {
+		// todo - fix and compare all data from popup with all hidden data
+		const table = document.getElementById('dcheckList');
+		const tbody = table.getElementsByTagName('tbody')[0];
+		const trList = tbody.getElementsByTagName('tr');
+		let dchecks = [];
+
+		[...trList].map(element => {
+			const table_row = element.getElementsByTagName('td')
+
+			if (table_row.length > 0) {
+				dchecks.push(table_row[0].innerHTML)
+			}
+		});
+
+		return dchecks;
+	}
+
 	submit() {
 		const curl = new Curl('zabbix.php');
 		const fields = getFormFields(this.form);
 
-		curl.setArgument('action', 'discovery.check.check');
+		const dchecks = this._addCheckTableData()
+		fields.dchecks = dchecks;
 
+		curl.setArgument('action', 'discovery.check.check');
 		this._post(curl.getUrl(), fields);
 	}
 
@@ -124,10 +147,9 @@ window.check_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				//document.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
 				this.dialogue.dispatchEvent(new CustomEvent('check.submit', {detail: response}));
+				overlayDialogueDestroy(this.overlay.dialogueid);
 			})
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
@@ -158,23 +180,31 @@ window.check_popup = new class {
 	 * Resets fields of the discovery check form to default values.
 	 */
 	_clearDCheckForm() {
-		// todo - rewrite jqueries to vanilla js
+		const elementsToClear = document.querySelectorAll('#key_, #snmp_community, #snmp_oid, #snmpv3_contextname, #snmpv3_securityname, #snmpv3_authpassphrase, #snmpv3_privpassphrase');
+		elementsToClear.forEach(function(element) {
+			element.value = '';
+		});
 
-		jQuery('#key_, #snmp_community, #snmp_oid, #snmpv3_contextname, #snmpv3_securityname, #snmpv3_authpassphrase, ' +
-			'#snmpv3_privpassphrase').val('');
-		jQuery('#snmpv3-securitylevel').val(<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>);
-		jQuery('#snmpv3_authprotocol_0, #snmpv3_privprotocol_0').prop('checked', true);
+		if (document.querySelector('#snmpv3-securitylevel')) {
+			document.querySelector('#snmpv3-securitylevel').value = <?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>;
+		}
+
+		if (document.querySelector('#snmpv3_authprotocol_0')) {
+			document.querySelector('#snmpv3_authprotocol_0').checked = true;
+		}
+
+		if (document.querySelector('#snmpv3_privprotocol_0')) {
+			document.querySelector('#snmpv3_privprotocol_0').checked = true;
+		}
 	}
 
 	/**
 	 * Set default discovery check port to input.
-	 *
-	 * @return {object}
 	 */
 	_setDCheckDefaultPort() {
-		// todo - rewrite jqueries to vanilla js
-
-		return jQuery('#ports').val(this._getDCheckDefaultPort(jQuery('#type-select').val()));
+		document.querySelector('#ports').value = this._getDCheckDefaultPort(
+			document.querySelector('#type-select').value
+		);
 	}
 
 	/**

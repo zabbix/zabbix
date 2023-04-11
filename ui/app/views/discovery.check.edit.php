@@ -30,7 +30,6 @@ $inline_js = getPagePostJs().$this->readJsFile('discovery.check.edit.js.php');
 
 $form = (new CForm())
 	->setName('dcheck_form')
-	->addVar('action', 'discovery.check.edit')
 	->addVar('validate', 1);
 
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {

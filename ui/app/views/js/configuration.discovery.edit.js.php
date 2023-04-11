@@ -22,12 +22,21 @@
 
 window.drule_edit_popup = new class {
 
-	init({druleid}) {
+	init({druleid, dchecks}) {
 		this.overlay = overlays_stack.getById('discoveryForm');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this.druleid = druleid;
+		this.dchecks = dchecks;
+
+		// append existing discovery checks to Check table\
+		if (typeof(dchecks) === 'object') {
+			dchecks = Object.values(dchecks);
+		}
+		for (const dcheck of dchecks) {
+			this._addCheck(dcheck);
+		}
 
 		this._initActionButtons();
 	}
@@ -37,22 +46,200 @@ window.drule_edit_popup = new class {
 			if (e.target.classList.contains('js-check-add')) {
 				this._editCheck();
 			}
+			else if (e.target.classList.contains('js-remove')) {
+				this._removeDCheckRow(e.target.closest('tr').id);
+				e.target.closest('tr').remove();
+			}
+			else if (e.target.classList.contains('js-edit')) {
+				this._editCheck(e.target.closest('tr'));
+			}
 		});
 	}
 
-	_editCheck() {
-		const overlay = PopUp('discovery.check.edit', {}, {
+	_updateCheck(row, input) {
+		this.ZBX_CHECKLIST[input.dcheckid] = input.value;
+		input.host_source = this._getSourceValue('host_source');
+		input.name_source = this._getSourceValue('name_source');
+
+		this._addCheck(input, row);
+		row.remove();
+	}
+
+	_editCheck(btn = null) {
+		let params = {};
+		row = null;
+
+		// todo - add row index
+
+		if (btn !== null) {
+			var row = btn.closest('tr');
+
+			params = {
+				update: 1
+			};
+
+			var hiddenInputs = row.querySelectorAll('input[type="hidden"]');
+			for (var i = 0; i < hiddenInputs.length; i++) {
+				var input = hiddenInputs[i];
+				var name = input.getAttribute('name').match(/\[([^\]]+)]$/);
+
+				if (name) {
+					params[name[1]] = input.value;
+				}
+			}
+		}
+
+		const overlay = PopUp('discovery.check.edit', params, {
 			dialogueid: 'discovery-check',
 			dialogue_class: 'modal-popup-medium',
 			trigger_element: this
 		});
 
-		overlay.$dialogue[0].addEventListener('check.submit', (e) => {
+		this.ZBX_CHECKLIST = {};
 
+		overlay.$dialogue[0].addEventListener('check.submit', (e) => {
+			if (row !== null) {
+				this._updateCheck(row, e.detail)
+			}
+			else {
+				this._addCheck(e.detail);
+			}
+		});
+	}
+
+	_addCheck(input, row = null) {
+	//	this.ZBX_CHECKLIST[input.dcheckid] = input.value;
+		this.ZBX_CHECKLIST = [];
+
+		input.host_source = this._getSourceValue('host_source');
+		input.name_source = this._getSourceValue('name_source');
+
+		let template;
+
+		template = new Template(document.getElementById('dcheck-row-tmpl').innerHTML);
+
+		if (row) {
+			row.insertAdjacentHTML('afterend', template.evaluate(input))
+		}
+		else {
+			document
+				.querySelector('#dcheckList tbody')
+				.insertAdjacentHTML('beforeend', template.evaluate(input));
+		}
+
+		for (var field_name in input) {
+			if (input.hasOwnProperty(field_name)) {
+
+				var $input = jQuery('<input>', {
+					name: 'dchecks[' + input.dcheckid + '][' + field_name + ']',
+					type: 'hidden',
+					value: input[field_name]
+				});
+
+				jQuery('#dcheckCell_' + input.dcheckid).append($input);
+			}
+		}
+
+		var available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
+
+		if (available_device_types.includes(parseInt(input.type))) {
+			this._addRadioButtonRows(input);
+		}
+	}
+
+	_addRadioButtonRows(input) {
+		const templates = {
+			unique_template: ['#unique-row-tmpl', '#device-uniqueness-list'],
+			host_template: ['#host-source-row-tmpl', '#host_source'],
+			name_template: ['#name-source-row-tmpl', '#name_source']
+		};
+
+		for (const [template, element] of Object.values(templates)) {
+			const templateHtml = document.querySelector(template).innerHTML;
+			document.querySelector(element).insertAdjacentHTML('beforeend', new Template(templateHtml).evaluate(input));
+		}
+	}
+
+	_removeDCheckRow(dcheckid) {
+		dcheckid = dcheckid.substring(dcheckid.indexOf("_") + 1);
+
+		delete this.ZBX_CHECKLIST[dcheckid];
+
+		const elements = {
+			uniqueness_criteria_: 'ip',
+			host_source_: 'chk_dns',
+			name_source_: 'chk_host'
+		};
+
+		for (const [key, def] of Object.entries(elements)) {
+			const obj = document.querySelector(`#${key}${dcheckid}`);
+
+			if (obj !== null) {
+				if (obj.checked) {
+					document.querySelector(`#${key}${def}`).checked = true;
+				}
+				document.querySelector(`#${key}row_${dcheckid}`).remove();
+			}
+		}
+	}
+
+
+	_getSourceValue(source) {
+		const radioButtons = document.getElementsByName(source);
+
+		let checkedButton = null;
+
+		for (let i = 0; i < radioButtons.length; i++) {
+			if (radioButtons[i].checked) {
+				checkedButton = radioButtons[i];
+				break;
+			}
+		}
+
+		if (checkedButton !== null) {
+			return checkedButton.value
+		}
+	}
+
+	clone() {
+		this.druleid = null;
+		const title = <?= json_encode(_('New discovery rule')) ?>;
+		const buttons = [
+			{
+				title: <?= json_encode(_('Add')) ?>,
+				class: '',
+				keepOpen: true,
+				isSubmit: true,
+				action: () => this.submit()
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				class: 'btn-alt',
+				cancel: true,
+				action: () => ''
+			}
+		];
+
+		this.overlay.unsetLoading();
+		this.overlay.setProperties({title, buttons});
+	}
+
+	delete() {
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'discovery.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('discovery'), JSON_THROW_ON_ERROR) ?>
+		);
+
+		this._post(curl.getUrl(), {druleids: [this.druleid]}, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
 		});
 	}
 
 	submit() {
+
 		const fields = getFormFields(this.form);
 
 		const curl = new Curl('zabbix.php');
@@ -104,42 +291,5 @@ window.drule_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
-	}
-
-	clone() {
-		this.druleid = null;
-		const title = <?= json_encode(_('New discovery rule')) ?>;
-		const buttons = [
-			{
-				title: <?= json_encode(_('Add')) ?>,
-				class: '',
-				keepOpen: true,
-				isSubmit: true,
-				action: () => this.submit()
-			},
-			{
-				title: <?= json_encode(_('Cancel')) ?>,
-				class: 'btn-alt',
-				cancel: true,
-				action: () => ''
-			}
-		];
-
-		this.overlay.unsetLoading();
-		this.overlay.setProperties({title, buttons});
-	}
-
-	delete() {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'discovery.delete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('discovery'), JSON_THROW_ON_ERROR) ?>
-		);
-
-		this._post(curl.getUrl(), {discoveryids: [this.druleid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
-		});
 	}
 }
