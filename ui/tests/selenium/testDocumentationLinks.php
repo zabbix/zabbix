@@ -1890,14 +1890,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
-/*			// #205 Template groups list view.
+			// #205 Template groups list view.
 			[
 				[
 					'url' => 'zabbix.php?action=templategroup.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/configuration/hostgroups'
 				]
-			],*/
-			/*// #206 Create template group popup.
+			],
+			// #206 Create template group popup.
 			[
 				[
 					'url' => 'zabbix.php?action=templategroup.list',
@@ -1910,9 +1910,9 @@ class testDocumentationLinks extends CWebTest {
 					'open_button' => 'button:Create template group',
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
-			],*/
+			],
 			// #207 Edit template group popup.
-		/*	[
+			[
 				[
 					'url' => 'zabbix.php?action=templategroup.list',
 					'actions' => [
@@ -1923,14 +1923,14 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
-			],*/
+			],
 			// #208 Create template group form view (standalone).
-/*			[
+			[
 				[
 					'url' => 'zabbix.php?action=templategroup.edit',
 					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
 				]
-			],*/
+			],
 			// #209
 			[
 				[
