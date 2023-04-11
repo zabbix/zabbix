@@ -28,10 +28,10 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  */
 class testFormTemplateGroupSearchPage extends testFormGroups {
 
-	public $link = 'zabbix.php?action=search&search=group';
-	public $object = 'template';
-	public $search = 'true';
-	public static $update_group = 'Group for Update test';
+	protected $link = 'zabbix.php?action=search&search=group';
+	protected $object = 'template';
+	protected $search = 'true';
+	protected static $update_group = 'Group for Update test';
 
 	public function testFormTemplateGroupSearchPage_Layout() {
 		$this->link = 'zabbix.php?action=search&search=Templates';
@@ -112,7 +112,7 @@ class testFormTemplateGroupSearchPage extends testFormGroups {
 		$this->delete($data);
 	}
 
-	public static function getSubgoupsPermissionsData() {
+	public static function getSubgroupPermissionsData() {
 		return [
 			[
 				[
@@ -139,7 +139,7 @@ class testFormTemplateGroupSearchPage extends testFormGroups {
 
 	/**
 	 * @onBeforeOnce prepareSubgroupData
-	 * @dataProvider getSubgoupsPermissionsData
+	 * @dataProvider getSubgroupPermissionsData
 	 */
 	public function testFormTemplateGroupSearchPage_ApplyPermissionsToSubgroups($data) {
 		$this->link = 'zabbix.php?action=search&search=europe';

@@ -30,9 +30,9 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  */
 class testFormHostGroup extends testFormGroups {
 
-	public $link = 'zabbix.php?action=hostgroup.list';
-	public $object = 'host';
-	public static $update_group = 'Group for Update test';
+	protected $link = 'zabbix.php?action=hostgroup.list';
+	protected $object = 'host';
+	protected static $update_group = 'Group for Update test';
 
 	public function testFormHostGroup_Layout() {
 		$this->layout('Zabbix servers');
@@ -214,7 +214,7 @@ class testFormHostGroup extends testFormGroups {
 
 	/**
 	 * @onBeforeOnce prepareSubgroupData
-	 * @dataProvider getSubgoupsData
+	 * @dataProvider getSubgroupsData
 	 */
 	public function testFormHostGroup_ApplyPermissionsToSubgroups($data) {
 		$this->checkSubgroupsPermissions($data);

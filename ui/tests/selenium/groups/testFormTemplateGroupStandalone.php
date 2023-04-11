@@ -28,10 +28,10 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  */
 class testFormTemplateGroupStandalone extends testFormGroups {
 
-	public $standalone = true;
-	public $link = 'zabbix.php?action=templategroup.edit&groupid=';
-	public $object = 'template';
-	public static $update_group = 'Group for Update test';
+	protected $standalone = true;
+	protected $link = 'zabbix.php?action=templategroup.edit&groupid=';
+	protected $object = 'template';
+	protected static $update_group = 'Group for Update test';
 
 	public function testFormTemplateGroupStandalone_Layout() {
 		$this->layout('Templates');
@@ -138,7 +138,7 @@ class testFormTemplateGroupStandalone extends testFormGroups {
 
 	/**
 	 * @onBeforeOnce prepareSubgroupData
-	 * @dataProvider getSubgoupsData
+	 * @dataProvider getSubgroupsData
 	 */
 	public function testFormTemplateGroupStandalone_ApplyPermissionsToSubgroups($data) {
 		$this->checkSubgroupsPermissions($data);
