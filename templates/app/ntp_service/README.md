@@ -1,39 +1,21 @@
 
 # NTP Service
 
-## Overview
 
-For Zabbix version: 6.0 and higher  
+### Items
 
-## Setup
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|NTP service is running| |Simple check|net.udp.service[ntp]|
 
-Refer to the vendor documentation.
-
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
-
-
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
-
-
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-|Services |NTP service is running |<p>-</p> |SIMPLE |net.udp.service[ntp] |
-
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
-|NTP service is down on {HOST.NAME} |<p>-</p> |`max(/NTP Service/net.udp.service[ntp],#3)=0` |AVERAGE | |
+|----|-----------|----------|--------|--------------------------------|
+|NTP service is down on {HOST.NAME}||`max(/NTP Service/net.udp.service[ntp],#3)=0`|Average||
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at `https://support.zabbix.com`.
 
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).

@@ -1,39 +1,21 @@
 
 # FTP Service
 
-## Overview
 
-For Zabbix version: 6.0 and higher  
+### Items
 
-## Setup
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|FTP service is running| |Simple check|net.tcp.service[ftp]|
 
-Refer to the vendor documentation.
-
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
-
-
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
-
-
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-|Services |FTP service is running |<p>-</p> |SIMPLE |net.tcp.service[ftp] |
-
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
-|FTP service is down on {HOST.NAME} |<p>-</p> |`max(/FTP Service/net.tcp.service[ftp],#3)=0` |AVERAGE | |
+|----|-----------|----------|--------|--------------------------------|
+|FTP service is down on {HOST.NAME}||`max(/FTP Service/net.tcp.service[ftp],#3)=0`|Average||
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at `https://support.zabbix.com`.
 
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).

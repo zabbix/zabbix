@@ -6,101 +6,123 @@
 The template to monitor Kubernetes Controller manager by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Kubernetes Controller manager by HTTP` — collects metrics by HTTP agent from Controller manager /metrics endpoint.
+Template `Kubernetes Controller manager by HTTP` - collects metrics by HTTP agent from Controller manager /metrics endpoint.
 
 Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
+
 *NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.
 
+## Requirements
+
+Zabbix version: 6.0 and higher.
 
 ## Tested versions
 
 This template has been tested on:
+- Kubernetes 1.19.10
 
-- Kubernetes, version 1.19
+## Configuration
 
-## Requirements
-
-For Zabbix version: 6.0 and higher.
+> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
-
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Internal service metrics are collected from /metrics endpoint.
 Template needs to use Authorization via API token. 
 
 Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
+
 *NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.
-
-
-## Configuration
-
-No specific Zabbix configuration is required.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.TOKEN} |<p>Service account bearer token</p> |`` |
-|{$KUBE.KUBELET.CADVISOR.ENDPOINT} |<p>cAdvisor metrics from Kubelet /metrics/cadvisor endpoint</p> |`/metrics/cadvisor` |
-|{$KUBE.KUBELET.METRIC.ENDPOINT} |<p>Kubelet /metrics endpoint</p> |`/metrics` |
-|{$KUBE.KUBELET.PODS.ENDPOINT} |<p>Kubelet /pods endpoint</p> |`/pods` |
-|{$KUBE.KUBELET.URL} |<p>Instance URL</p> |`https://localhost:10250` |
+|{$KUBE.API.TOKEN}|<p>Service account bearer token</p>||
+|{$KUBE.KUBELET.URL}|<p>Instance URL</p>|`https://localhost:10250`|
+|{$KUBE.KUBELET.METRIC.ENDPOINT}|<p>Kubelet /metrics endpoint</p>|`/metrics`|
+|{$KUBE.KUBELET.CADVISOR.ENDPOINT}|<p>cAdvisor metrics from Kubelet /metrics/cadvisor endpoint</p>|`/metrics/cadvisor`|
+|{$KUBE.KUBELET.PODS.ENDPOINT}|<p>Kubelet /pods endpoint</p>|`/pods`|
 
-### Template links
-
-There are no template links in this template.
-
-### Discovery rules
+### Items
 
 |Name|Description|Type|Key and additional info|
-|----|-----------|----|----|
-|Container memory discovery | |DEPENDENT |kube.kubelet.container.memory.cache.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Pods discovery | |DEPENDENT |kube.kubelet.pods.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|REST client requests discovery | |DEPENDENT |kube.kubelet.rest.requests.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Runtime operations discovery | |DEPENDENT |kube.kubelet.runtime_operations_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "kubelet_runtime_operations_*", operation_type =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
+|----|-----------|----|-----------------------|
+|Kubernetes: Get kubelet metrics|<p>Collecting raw Kubelet metrics from /metrics endpoint.</p>|HTTP agent|kube.kubelet.metrics|
+|Kubernetes: Get cadvisor metrics|<p>Collecting raw Kubelet metrics from /metrics/cadvisor endpoint.</p>|HTTP agent|kube.cadvisor.metrics|
+|Kubernetes: Get pods|<p>Collecting raw Kubelet metrics from /pods endpoint.</p>|HTTP agent|kube.pods|
+|Kubernetes: Pods running|<p>The number of running pods.</p>|Dependent item|kube.kubelet.pods.running<p>**Preprocessing**</p><ul><li>JSON Path: `$.items[?(@.status.phase == "Running")].length()`</li></ul>|
+|Kubernetes: Containers running|<p>The number of running containers.</p>|Dependent item|kube.kubelet.containers.running<p>**Preprocessing**</p><ul><li>JSON Path: `$.items[*].status.containerStatuses[*].restartCount.sum()`</li></ul>|
+|Kubernetes: Containers last state terminated|<p>The number of containers that were previously terminated.</p>|Dependent item|kube.kublet.containers.terminated<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|Kubernetes: Containers restarts|<p>The number of times the container has been restarted.</p>|Dependent item|kube.kubelet.containers.restarts<p>**Preprocessing**</p><ul><li>JSON Path: `$.items[*].status.containerStatuses[*].restartCount.sum()`</li></ul>|
+|Kubernetes: CPU cores, total|<p>The number of cores in this machine (available until kubernetes v1.18).</p>|Dependent item|kube.kubelet.cpu.cores<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(machine_cpu_cores)`</li></ul>|
+|Kubernetes: Machine memory, bytes|<p>Resident memory size in bytes.</p>|Dependent item|kube.kubelet.machine.memory<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_resident_memory_bytes)`</li></ul>|
+|Kubernetes: Virtual memory, bytes|<p>Virtual memory size in bytes.</p>|Dependent item|kube.kubelet.virtual.memory<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_virtual_memory_bytes)`</li></ul>|
+|Kubernetes: File descriptors, max|<p>Maximum number of open file descriptors.</p>|Dependent item|kube.kubelet.process_max_fds<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_max_fds)`</li></ul>|
+|Kubernetes: File descriptors, open|<p>Number of open file descriptors.</p>|Dependent item|kube.kubelet.process_open_fds<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_open_fds)`</li></ul>|
 
-### Items collected
+### LLD rule Runtime operations discovery
 
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-|Kubernetes |Kubernetes: Get kubelet metrics |<p>Collecting raw Kubelet metrics from /metrics endpoint.</p> |HTTP_AGENT |kube.kubelet.metrics |
-|Kubernetes |Kubernetes: Get cadvisor metrics |<p>Collecting raw Kubelet metrics from /metrics/cadvisor endpoint.</p> |HTTP_AGENT |kube.cadvisor.metrics |
-|Kubernetes |Kubernetes: Get pods |<p>Collecting raw Kubelet metrics from /pods endpoint.</p> |HTTP_AGENT |kube.pods |
-|Kubernetes |Kubernetes: Pods running |<p>The number of running pods.</p> |DEPENDENT |kube.kubelet.pods.running<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[?(@.status.phase == "Running")].length()`</p> |
-|Kubernetes |Kubernetes: Containers running |<p>The number of running containers.</p> |DEPENDENT |kube.kubelet.containers.running<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[*].status.containerStatuses[*].restartCount.sum()`</p> |
-|Kubernetes |Kubernetes: Containers last state terminated |<p>The number of containers that were previously terminated.</p> |DEPENDENT |kube.kublet.containers.terminated<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[*].status.containerStatuses[?(@.lastState.terminated.exitCode > 0)].length()`</p> |
-|Kubernetes |Kubernetes: Containers restarts |<p>The number of times the container has been restarted.</p> |DEPENDENT |kube.kubelet.containers.restarts<p>**Preprocessing**:</p><p>- JSONPATH: `$.items[*].status.containerStatuses[*].restartCount.sum()`</p> |
-|Kubernetes |Kubernetes: CPU cores, total |<p>The number of cores in this machine (available until kubernetes v1.18).</p> |DEPENDENT |kube.kubelet.cpu.cores<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `machine_cpu_cores`</p> |
-|Kubernetes |Kubernetes: Machine memory, bytes |<p>Resident memory size in bytes.</p> |DEPENDENT |kube.kubelet.machine.memory<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_resident_memory_bytes`</p> |
-|Kubernetes |Kubernetes: Virtual memory, bytes |<p>Virtual memory size in bytes.</p> |DEPENDENT |kube.kubelet.virtual.memory<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_virtual_memory_bytes`</p> |
-|Kubernetes |Kubernetes: File descriptors, max |<p>Maximum number of open file descriptors.</p> |DEPENDENT |kube.kubelet.process_max_fds<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_max_fds`</p> |
-|Kubernetes |Kubernetes: File descriptors, open |<p>Number of open file descriptors.</p> |DEPENDENT |kube.kubelet.process_open_fds<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_open_fds`</p> |
-|Kubernetes |Kubernetes: [{#OP_TYPE}] Runtime operations bucket: {#LE} |<p>Duration in seconds of runtime operations. Broken down by operation type.</p> |DEPENDENT |kube.kublet.runtime_ops_duration_seconds_bucket[{#LE},"{#OP_TYPE}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kubelet_runtime_operations_duration_seconds_bucket{le="{#LE}",operation_type="{#OP_TYPE}"}`: `function`: `sum`</p> |
-|Kubernetes |Kubernetes: [{#OP_TYPE}] Runtime operations total, rate |<p>Cumulative number of runtime operations by operation type.</p> |DEPENDENT |kube.kublet.runtime_ops_total.rate["{#OP_TYPE}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `kubelet_runtime_operations_total{operation_type="{#OP_TYPE}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Kubernetes |Kubernetes: [{#OP_TYPE}] Operations, p90 |<p>90 percentile of operation latency distribution in seconds for each verb.</p> |CALCULATED |kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]<p>**Expression**:</p>`bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,90)` |
-|Kubernetes |Kubernetes: [{#OP_TYPE}] Operations, p95 |<p>95 percentile of operation latency distribution in seconds for each verb.</p> |CALCULATED |kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]<p>**Expression**:</p>`bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,95)` |
-|Kubernetes |Kubernetes: [{#OP_TYPE}] Operations, p99 |<p>99 percentile of operation latency distribution in seconds for each verb.</p> |CALCULATED |kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]<p>**Expression**:</p>`bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,99)` |
-|Kubernetes |Kubernetes: [{#OP_TYPE}] Operations, p50 |<p>50 percentile of operation latency distribution in seconds for each verb.</p> |CALCULATED |kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]<p>**Expression**:</p>`bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,50)` |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s |<p>Pods cpu load average over the last 10 seconds.</p> |DEPENDENT |kube.pod.container_cpu_load_average_10s[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_cpu_load_average_10s{pod="{#NAME}", namespace="{#NAMESPACE}"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total |<p>The number of cores used for system time.</p> |DEPENDENT |kube.pod.container_cpu_system_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_cpu_system_seconds_total{pod="{#NAME}", namespace="{#NAMESPACE}"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total |<p>The number of cores used for user time.</p> |DEPENDENT |kube.pod.container_cpu_user_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_cpu_user_seconds_total{pod="{#NAME}", namespace="{#NAMESPACE}"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Host [{#HOST}] Request method [{#METHOD}] Code:[{#CODE}] |<p>Number of HTTP requests, partitioned by status code, method, and host.</p> |DEPENDENT |kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code="{#CODE}", host="{#HOST}", method="{#METHOD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory page cache |<p>Number of bytes of page cache memory.</p> |DEPENDENT |kube.kubelet.container.memory.cache["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_cache{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage |<p>Maximum memory usage recorded in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.max_usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_max_usage_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS |<p>Size of RSS in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.rss["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_rss{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Swap |<p>Container swap usage in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.swap["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_swap{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage |<p>Current memory usage in bytes, including all memory regardless of when it was accessed.</p> |DEPENDENT |kube.kubelet.container.memory.usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_usage_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set |<p>Current working set in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.working_set["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_working_set_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Runtime operations discovery||Dependent item|kube.kubelet.runtime_operations_bucket.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `The text is too long. Please see the template.`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
 
-### Triggers
+### Item prototypes for Runtime operations discovery
 
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Kubernetes: [{#OP_TYPE}] Runtime operations bucket: {#LE}|<p>Duration in seconds of runtime operations. Broken down by operation type.</p>|Dependent item|kube.kublet.runtime_ops_duration_seconds_bucket[{#LE},"{#OP_TYPE}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li></ul>|
+|Kubernetes: [{#OP_TYPE}] Runtime operations total, rate|<p>Cumulative number of runtime operations by operation type.</p>|Dependent item|kube.kublet.runtime_ops_total.rate["{#OP_TYPE}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Kubernetes: [{#OP_TYPE}] Operations, p90|<p>90 percentile of operation latency distribution in seconds for each verb.</p>|Calculated|kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]|
+|Kubernetes: [{#OP_TYPE}] Operations, p95|<p>95 percentile of operation latency distribution in seconds for each verb.</p>|Calculated|kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]|
+|Kubernetes: [{#OP_TYPE}] Operations, p99|<p>99 percentile of operation latency distribution in seconds for each verb.</p>|Calculated|kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]|
+|Kubernetes: [{#OP_TYPE}] Operations, p50|<p>50 percentile of operation latency distribution in seconds for each verb.</p>|Calculated|kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]|
+
+### LLD rule Pods discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Pods discovery||Dependent item|kube.kubelet.pods.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+
+### Item prototypes for Pods discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s|<p>Pods cpu load average over the last 10 seconds.</p>|Dependent item|kube.pod.container_cpu_load_average_10s[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total|<p>The number of cores used for system time.</p>|Dependent item|kube.pod.container_cpu_system_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total|<p>The number of cores used for user time.</p>|Dependent item|kube.pod.container_cpu_user_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### LLD rule REST client requests discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|REST client requests discovery||Dependent item|kube.kubelet.rest.requests.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `The text is too long. Please see the template.`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+
+### Item prototypes for REST client requests discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Kubernetes: Host [{#HOST}] Request method [{#METHOD}] Code:[{#CODE}]|<p>Number of HTTP requests, partitioned by status code, method, and host.</p>|Dependent item|kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+
+### LLD rule Container memory discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Container memory discovery||Dependent item|kube.kubelet.container.memory.cache.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `The text is too long. Please see the template.`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+
+### Item prototypes for Container memory discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory page cache|<p>Number of bytes of page cache memory.</p>|Dependent item|kube.kubelet.container.memory.cache["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage|<p>Maximum memory usage recorded in bytes.</p>|Dependent item|kube.kubelet.container.memory.max_usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS|<p>Size of RSS in bytes.</p>|Dependent item|kube.kubelet.container.memory.rss["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Swap|<p>Container swap usage in bytes.</p>|Dependent item|kube.kubelet.container.memory.swap["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage|<p>Current memory usage in bytes, including all memory regardless of when it was accessed.</p>|Dependent item|kube.kubelet.container.memory.usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set|<p>Current working set in bytes.</p>|Dependent item|kube.kubelet.container.memory.working_set["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com.
+Please report any issues with the template at `https://support.zabbix.com`.
 
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
-
