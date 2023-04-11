@@ -22,6 +22,7 @@
 #include "cfg.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
@@ -52,7 +53,6 @@
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
 #include "rtc/rtc_proxy.h"
-#include "../zabbix_server/availability/avail_manager.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
@@ -268,8 +268,8 @@ int	CONFIG_TRAPPER_TIMEOUT		= 300;
 int	CONFIG_HEARTBEAT_FREQUENCY	= -1;
 
 /* how often active Zabbix proxy requests configuration data from server, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;	/* will be set to default 5 seconds if not configured */
-int	CONFIG_PROXYDATA_FREQUENCY	= 1;
+static int	config_proxyconfig_frequency	= 0;	/* will be set to default 5 seconds if not configured */
+static int	config_proxydata_frequency	= 1;
 
 int	CONFIG_CONFSYNCER_FREQUENCY	= 0;
 
@@ -277,15 +277,14 @@ int	CONFIG_VMWARE_FREQUENCY		= 60;
 int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 int	CONFIG_VMWARE_TIMEOUT		= 10;
 
-zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
-zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
+static zbx_uint64_t	config_conf_cache_size		= 8 * ZBX_MEBIBYTE;
+static zbx_uint64_t	config_history_cache_size	= 16 * ZBX_MEBIBYTE;
+static zbx_uint64_t	config_history_index_cache_size	= 4 * ZBX_MEBIBYTE;
+static zbx_uint64_t	config_trends_cache_size	= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 
-int	CONFIG_UNREACHABLE_PERIOD	= 45;
-int	CONFIG_UNREACHABLE_DELAY	= 15;
+static int	config_unreachable_period	= 45;
+static int	config_unreachable_delay	= 15;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
@@ -294,7 +293,7 @@ ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 0)
 ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
 ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 
-char	*CONFIG_SERVER			= NULL;
+static char	*config_server		= NULL;
 int	CONFIG_SERVER_PORT;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
@@ -306,7 +305,7 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
-int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
+static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
@@ -331,14 +330,22 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
-
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
-zbx_vector_ptr_t	zbx_addrs;
+static zbx_vector_addr_ptr_t	config_server_addrs;
+
+/* proxy has no any events processing */
+static const zbx_events_funcs_t	events_cbs = {
+	.add_event_cb			= NULL,
+	.process_events_cb		= NULL,
+	.clean_events_cb		= NULL,
+	.reset_event_recovery_cb	= NULL,
+	.export_events_cb		= NULL,
+	.events_update_itservices_cb	= NULL
+};
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -603,13 +610,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (ZBX_PROXYMODE_ACTIVE == config_proxymode)
 	{
-		if (NULL != strchr(CONFIG_SERVER, ','))
+		if (NULL != strchr(config_server, ','))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter must not contain comma");
 			err = 1;
 		}
 	}
-	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode && FAIL == zbx_validate_peer_list(CONFIG_SERVER,
+	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode && FAIL == zbx_validate_peer_list(config_server,
 			&ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
@@ -689,7 +696,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #endif
 	if (0 != CONFIG_CONFSYNCER_FREQUENCY)
 	{
-		if (0 != CONFIG_PROXYCONFIG_FREQUENCY)
+		if (0 != config_proxyconfig_frequency)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Deprecated \"ConfigFrequency\" configuration parameter cannot"
 					" be used together with \"ProxyConfigFrequency\" parameter");
@@ -697,15 +704,15 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 		else
 		{
-			CONFIG_PROXYCONFIG_FREQUENCY = CONFIG_CONFSYNCER_FREQUENCY;
+			config_proxyconfig_frequency = CONFIG_CONFSYNCER_FREQUENCY;
 			zabbix_log(LOG_LEVEL_WARNING, "\"ConfigFrequency\" configuration parameter is deprecated, "
 					"use \"ProxyConfigFrequency\" instead");
 		}
 	}
 
 	/* assign default ProxyConfigFrequency value if not configured */
-	if (0 == CONFIG_PROXYCONFIG_FREQUENCY)
-		CONFIG_PROXYCONFIG_FREQUENCY = 10;
+	if (0 == config_proxyconfig_frequency)
+		config_proxyconfig_frequency = 10;
 
 	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
 
@@ -713,12 +720,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		exit(EXIT_FAILURE);
 }
 
-static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	proxy_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	ZBX_UNUSED(hostnames);
 	ZBX_UNUSED(data);
 
-	zbx_addr_copy(&zbx_addrs, addrs);
+	zbx_addr_copy(&config_server_addrs, addrs);
 
 	return SUCCEED;
 }
@@ -738,7 +745,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			MANDATORY,	MIN,			MAX */
 		{"ProxyMode",			&config_proxymode,			TYPE_INT,
 			PARM_OPT,	ZBX_PROXYMODE_ACTIVE,	ZBX_PROXYMODE_PASSIVE},
-		{"Server",			&CONFIG_SERVER,				TYPE_STRING,
+		{"Server",			&config_server,				TYPE_STRING,
 			PARM_MAND,	0,			0},
 		{"ServerPort",			&CONFIG_SERVER_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
@@ -772,11 +779,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"StartSNMPTrapper",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMPTRAPPER],		TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_UINT64,
+		{"CacheSize",			&config_conf_cache_size,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(64) * ZBX_GIBIBYTE},
-		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
+		{"HistoryCacheSize",		&config_history_cache_size,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"HistoryIndexCacheSize",	&CONFIG_HISTORY_INDEX_CACHE_SIZE,	TYPE_UINT64,
+		{"HistoryIndexCacheSize",	&config_history_index_cache_size,	TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
 			PARM_OPT,	0,			24},
@@ -788,9 +795,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX},
 		{"ConfigFrequency",		&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_WEEK},
-		{"ProxyConfigFrequency",	&CONFIG_PROXYCONFIG_FREQUENCY,		TYPE_INT,
+		{"ProxyConfigFrequency",	&config_proxyconfig_frequency,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_WEEK},
-		{"DataSenderFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		TYPE_INT,
+		{"DataSenderFrequency",		&config_proxydata_frequency,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"TmpDir",			&CONFIG_TMPDIR,				TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -802,9 +809,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
 			PARM_OPT,	1,			300},
-		{"UnreachablePeriod",		&CONFIG_UNREACHABLE_PERIOD,		TYPE_INT,
+		{"UnreachablePeriod",		&config_unreachable_period,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"UnreachableDelay",		&CONFIG_UNREACHABLE_DELAY,		TYPE_INT,
+		{"UnreachableDelay",		&config_unreachable_delay,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnavailableDelay",		&config_unavailable_delay,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
@@ -868,7 +875,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogSlowQueries",		&CONFIG_LOG_SLOW_QUERIES,		TYPE_INT,
+		{"LogSlowQueries",		&config_log_slow_queries,		TYPE_INT,
 			PARM_OPT,	0,			3600000},
 		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -954,13 +961,13 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	zbx_validate_config(task);
 
-	zbx_vector_ptr_create(&zbx_addrs);
+	zbx_vector_addr_ptr_create(&config_server_addrs);
 
 	if (ZBX_PROXYMODE_PASSIVE != config_proxymode)
 	{
 		char	*error;
 
-		if (FAIL == zbx_set_data_destination_hosts(CONFIG_SERVER, (unsigned short)CONFIG_SERVER_PORT, "Server",
+		if (FAIL == zbx_set_data_destination_hosts(config_server, (unsigned short)CONFIG_SERVER_PORT, "Server",
 				proxy_add_serveractive_host_cb, NULL, NULL, &error))
 		{
 			zbx_error("%s", error);
@@ -1014,7 +1021,7 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	zbx_free_database_cache(ZBX_SYNC_ALL);
+	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 	zbx_free_configuration_cache();
 	zbx_db_close();
 
@@ -1198,7 +1205,7 @@ static void	proxy_db_init(void)
 	zbx_stat_t	db_stat;
 #endif
 
-	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, &error))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, config_log_slow_queries, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -1223,7 +1230,7 @@ static void	proxy_db_init(void)
 	zbx_db_check_character_set();
 	zbx_check_db();
 
-	if (SUCCEED != (version_check = DBcheck_version(ZBX_HA_MODE_STANDALONE)))
+	if (SUCCEED != (version_check = zbx_db_check_version_and_upgrade(ZBX_HA_MODE_STANDALONE)))
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
@@ -1245,6 +1252,13 @@ static void	proxy_db_init(void)
 		exit(EXIT_FAILURE);
 #endif
 	}
+
+#ifdef HAVE_ORACLE
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_table_prepare("items", NULL);
+	zbx_db_table_prepare("item_preproc", NULL);
+	zbx_db_close();
+#endif
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1255,20 +1269,26 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t				rtc;
 	zbx_timespec_t				rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, config_proxymode,
-								zbx_config_timeout};
+	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, config_server,
+								config_proxymode, zbx_config_timeout};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 								config_startup_time, config_unavailable_delay};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
-								get_program_type, zbx_config_timeout};
-	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
+								get_program_type, zbx_config_timeout,
+								&config_server_addrs, CONFIG_HOSTNAME, CONFIG_SOURCE_IP,
+								config_proxyconfig_frequency};
+	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+								&config_server_addrs, CONFIG_SOURCE_IP, CONFIG_HOSTNAME,
+								config_proxydata_frequency};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+								&events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
-								&listen_sock, config_startup_time};
+								&events_cbs, &listen_sock, config_startup_time,
+								config_proxydata_frequency};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
@@ -1277,7 +1297,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args =
 						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
-	zbx_thread_dbsyncer_args		dbsyncer_args = {config_histsyncer_frequency};
+	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 
@@ -1389,7 +1409,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_database_cache(&error))
+	if (SUCCEED != zbx_init_database_cache(get_program_type, config_history_cache_size,
+			config_history_index_cache_size, config_trends_cache_size,&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -1403,7 +1424,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_configuration_cache(&error))
+	if (SUCCEED != zbx_init_configuration_cache(get_program_type, get_config_forks, config_conf_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1578,7 +1599,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
-				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;

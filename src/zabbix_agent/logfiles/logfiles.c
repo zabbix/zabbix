@@ -27,10 +27,11 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_item_constants.h"
+#include "zbxfile.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#	include "zbxsymbols.h"
 #	include "zbxtypes.h"	/* ssize_t */
+#	include "zbxwin32.h"
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */
@@ -143,7 +144,7 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 	/* special processing for Windows, since directory name cannot be simply separated from file name regexp */
 	for (sz = strlen(filename) - 1, separator = &filename[sz]; separator >= filename; separator--)
 	{
-		if (PATH_SEPARATOR != *separator)
+		if (ZBX_PATH_SEPARATOR != *separator)
 			continue;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, filename);
@@ -152,7 +153,7 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 		/* separator must be relative delimiter of the original filename */
 		if (FAIL == split_string(filename, separator, directory, filename_regexp))
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "Cannot split path by \"%c\".", PATH_SEPARATOR);
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot split path by \"%c\".", ZBX_PATH_SEPARATOR);
 			goto out;
 		}
 
@@ -172,13 +173,13 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 		if (0 == zbx_stat(*directory, &buf) && S_ISDIR(buf.st_mode))
 			break;
 
-		if (sz > 0 && PATH_SEPARATOR == (*directory)[sz - 1])
+		if (sz > 0 && ZBX_PATH_SEPARATOR == (*directory)[sz - 1])
 		{
 			(*directory)[sz - 1] = '\0';
 
 			if (0 == zbx_stat(*directory, &buf) && S_ISDIR(buf.st_mode))
 			{
-				(*directory)[sz - 1] = PATH_SEPARATOR;
+				(*directory)[sz - 1] = ZBX_PATH_SEPARATOR;
 				break;
 			}
 		}
@@ -194,15 +195,15 @@ static int	split_filename(const char *filename, char **directory, char **filenam
 		goto out;
 	}
 #else	/* not _WINDOWS */
-	if (NULL == (separator = strrchr(filename, PATH_SEPARATOR)))
+	if (NULL == (separator = strrchr(filename, ZBX_PATH_SEPARATOR)))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot find separator \"%c\" in path.", PATH_SEPARATOR);
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot find separator \"%c\" in path.", ZBX_PATH_SEPARATOR);
 		goto out;
 	}
 
 	if (SUCCEED != split_string(filename, separator, directory, filename_regexp))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot split path by \"%c\".", PATH_SEPARATOR);
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot split path by \"%c\".", ZBX_PATH_SEPARATOR);
 		goto out;
 	}
 
@@ -292,6 +293,16 @@ static int	file_part_md5(int f, size_t offset, int length, md5_byte_t *md5buf, c
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+typedef struct {
+	ULONGLONG	LowPart;
+	ULONGLONG	HighPart;
+} ext_file_id_128_t;
+
+typedef struct {
+	ULONGLONG		VolumeSerialNumber;
+	ext_file_id_128_t	FileId;
+} file_id_info_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get Microsoft Windows file device ID, 64-bit FileIndex or         *
@@ -315,7 +326,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 	int				ret = FAIL;
 	intptr_t			h;	/* file HANDLE */
 	BY_HANDLE_FILE_INFORMATION	hfi;
-	ZBX_FILE_ID_INFO		fid;
+	file_id_info_t		fid;
 
 	if (-1 == (h = _get_osfhandle(f)))
 	{
@@ -2024,7 +2035,7 @@ static int	zbx_match_log_rec(const zbx_vector_expression_t *regexps, const char 
 static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
 		const int *mtime, int *big_rec, const char *encoding, zbx_vector_expression_t *regexps,
 		const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_process_value_func_t process_value, zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout, char **err_msg)
@@ -2048,7 +2059,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 	if (NULL == buf)
 		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
-	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
+	zbx_find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
 	for (;;)
 	{
@@ -2382,7 +2393,7 @@ out:
  *     big_rec         - [IN/OUT] state variable to remember whether a long   *
  *                       record is being processed                            *
  *     encoding        - [IN] text string describing encoding.                *
- *                       See function find_cr_lf_szbyte() for supported       *
+ *                       See function zbx_find_cr_lf_szbyte() for supported   *
  *                       encodings.                                           *
  *                       "" (empty string) means a single-byte character set  *
  *                       (e.g. ASCII).                                        *
@@ -2421,7 +2432,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, zbx_vector_expression_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
+		zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset, const char *persistent_file_name,
 		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *config_tls, int config_timeout,
 		char **err_msg)
@@ -2879,7 +2890,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 	if (-1 == (fd = open_file_helper(logfile->filename, err_msg)))
 		return FAIL;
 
-	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
+	zbx_find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
 	/* For multibyte character encodings 'lastlogsize' needs to be aligned to character border. */
 	/* Align it towards smaller offset. We assume that log file contains no corrupted data stream. */
@@ -3251,7 +3262,7 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     logfiles_new     - [OUT] new array of logfiles                         *
  *     logfiles_num_new - [OUT] number of elements in "logfiles_new"          *
  *     encoding         - [IN] text string describing encoding.               *
- *                        See function find_cr_lf_szbyte() for supported      *
+ *                        See function zbx_find_cr_lf_szbyte() for supported  *
  *                        encodings.                                          *
  *                        "" (empty string) means a single-byte character set *
  *                        (e.g. ASCII).                                       *
@@ -3289,7 +3300,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_expression_t *regexps, const char *pattern, const char *output_template, int *p_count,
-		int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
+		int *s_count, zbx_process_value_func_t process_value, zbx_vector_addr_ptr_t *addrs,
 		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, int *jumped, float max_delay,
 		double *start_time, zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
@@ -3836,9 +3847,9 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  *           comments.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
+int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	AGENT_REQUEST			request;

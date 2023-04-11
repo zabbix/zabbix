@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	logfiles
+	logfiles \
+	active_checks
 
 EXTRA_DIST = \
 	eventlog.c \
@@ -14,8 +15,6 @@ sbin_PROGRAMS = zabbix_agentd
 noinst_LIBRARIES = libzbxagent.a
 
 libzbxagent_a_SOURCES = \
-	active.c \
-	active.h \
 	cpustat.c \
 	cpustat.h \
 	diskdevices.c \
@@ -42,6 +41,7 @@ zabbix_agentd_SOURCES = zabbix_agentd.c
 
 zabbix_agentd_LDADD = \
 	libzbxagent.a \
+	active_checks/libzbxactive_checks.a \
 	logfiles/libzbxlogfiles.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
@@ -72,6 +72,7 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_builddir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_builddir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
 	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \

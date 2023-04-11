@@ -21,11 +21,9 @@
 #define ZABBIX_PROXYCONFIG_H
 
 #include "zbxthreads.h"
-
+#include "cfg.h"
 #include "zbxvault.h"
 #include "zbxcomms.h"
-
-extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 
 typedef struct
 {
@@ -33,6 +31,10 @@ typedef struct
 	zbx_config_vault_t	*config_vault;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
+	zbx_vector_addr_ptr_t	*config_server_addrs;
+	const char		*config_hostname;
+	const char		*config_source_ip;
+	int			config_proxyconfig_frequency;
 }
 zbx_thread_proxyconfig_args;
 

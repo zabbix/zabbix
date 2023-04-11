@@ -41,7 +41,7 @@ typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t 
 		const zbx_timespec_t *, char **);
 
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *config_tls, int config_timeout);
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *server);
 
 int	zbx_get_active_proxy_from_request(const struct zbx_json_parse *jp, zbx_dc_proxy_t *proxy, char **error);
 int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t *sock, char **error);
@@ -67,8 +67,9 @@ void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version
 
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
-int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		unsigned char proxy_status, int *more, char **error);
+int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
+		char **error);
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
