@@ -192,9 +192,9 @@ class CUserGroup extends CApiService {
 		}
 		unset($usrgrp);
 
-		self::updateRights($usrgrps, __FUNCTION__);
-		self::updateTagFilters($usrgrps, __FUNCTION__);
-		self::updateGroups($usrgrps);
+		self::updateRights($usrgrps);
+		self::updateTagFilters($usrgrps);
+		self::updateUsers($usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
@@ -641,23 +641,18 @@ class CUserGroup extends CApiService {
 			DB::update('usrgrp', $upd_usrgrps);
 		}
 
-		self::updateRights($usrgrps, 'update', $db_usrgrps);
-		self::updateTagFilters($usrgrps, 'update', $db_usrgrps);
-		self::updateGroups($usrgrps, $db_usrgrps);
+		self::updateRights($usrgrps, $db_usrgrps);
+		self::updateTagFilters($usrgrps, $db_usrgrps);
+		self::updateUsers($usrgrps, $db_usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 	}
 
 	/**
-	 * Update table "rights".
-	 *
-	 * @static
-	 *
 	 * @param array      $usrgrps
-	 * @param string     $method
 	 * @param null|array $db_usrgrps
 	 */
-	private static function updateRights(array &$usrgrps, string $method, array $db_usrgrps = null): void {
+	private static function updateRights(array &$usrgrps, array $db_usrgrps = null): void {
 		$ins_rights = [];
 		$upd_rights = [];
 		$del_rightids = [];
@@ -667,7 +662,7 @@ class CUserGroup extends CApiService {
 				continue;
 			}
 
-			$db_rights = ($method === 'update')
+			$db_rights = $db_usrgrps !== null
 				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['rights'], null, 'id')
 				: [];
 
@@ -729,15 +724,10 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Update table "tag_filter".
-	 *
-	 * @static
-	 *
 	 * @param array      $usrgrps
-	 * @param string     $method
 	 * @param null|array $db_usrgrps
 	 */
-	private static function updateTagFilters(array &$usrgrps, string $method, array $db_usrgrps = null): void {
+	private static function updateTagFilters(array &$usrgrps, array $db_usrgrps = null): void {
 		$ins_tag_filters = [];
 		$del_tag_filterids = [];
 
@@ -747,7 +737,7 @@ class CUserGroup extends CApiService {
 			}
 
 			$db_tag_filterids_by_tag_value = [];
-			$db_tag_filters = ($method === 'update')
+			$db_tag_filters = $db_usrgrps !== null
 				? $db_usrgrps[$usrgrp['usrgrpid']]['tag_filters']
 				: [];
 
@@ -809,41 +799,30 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Update table "users_groups" relations.
-	 *
-	 * @static
-	 *
 	 * @param array      $groups
 	 * @param null|array $db_groups
 	 */
-	private static function updateGroups(array &$groups, array $db_groups = null): void {
+	private static function updateUsers(array &$groups, array $db_groups = null): void {
 		$changes = [];
 
-		foreach ($groups as $i => &$group) {
+		foreach ($groups as &$group) {
 			if (!array_key_exists('users', $group)) {
 				continue;
 			}
 
 			$db_userids = $db_groups !== null
-				? array_column($db_groups[$group['usrgrpid']]['users'], 'userid', 'userid')
+				? array_column($db_groups[$group['usrgrpid']]['users'], null, 'userid')
 				: [];
-			$userids = array_column($group['users'], 'userid', 'userid');
+			$userids = array_column($group['users'], null, 'userid');
 
 			$ins_userids = array_diff_key($userids, $db_userids);
 			$del_userids = array_diff_key($db_userids, $userids);
 
-			if (!$del_userids && !$ins_userids) {
-				unset($group['users']);
-				continue;
-			}
-
-			$changes += array_fill_keys($db_userids + $ins_userids, []);
-
-			foreach ($ins_userids as $userid) {
+			foreach ($ins_userids as $userid => $foo) {
 				$changes[$userid]['ins_groups'][$group['usrgrpid']] = ['usrgrpid' => $group['usrgrpid']];
 			}
 
-			foreach ($del_userids as $userid) {
+			foreach ($del_userids as $userid => $foo) {
 				$changes[$userid]['del_groupids'][$group['usrgrpid']] = true;
 			}
 
@@ -856,45 +835,36 @@ class CUserGroup extends CApiService {
 		}
 
 		$users = [];
-		$db_users = array_fill_keys(array_keys($changes), ['usrgrps' => []]);
+		$db_users = [];
 
-		$db_user_groups = DBselect(
-			'SELECT u.userid,u.username,ug.id,ug.usrgrpid'.
-			' FROM users u,users_groups ug'.
-			' WHERE u.userid=ug.userid'.
-				' AND '.dbConditionId('u.userid', array_keys($changes))
-		);
-		$user_fields = array_flip(['userid', 'username']);
-
-		while ($db_user_group = DBfetch($db_user_groups)) {
-			$userid = $db_user_group['userid'];
-
-			if (!array_key_exists('username', $db_users[$userid])) {
-				$db_users[$userid] += array_intersect_key($db_user_group, $user_fields);
-			}
-
-			$db_users[$userid]['usrgrps'][$db_user_group['usrgrpid']] = array_diff_key($db_user_group, $user_fields);
+		foreach ($changes as $userid => $foo) {
+			$users[$userid] = [
+				'userid' => $userid,
+				'usrgrps' => []
+			];
 		}
 
+		CUser::addAffectedObjects($users, $db_users);
+
 		foreach ($db_users as $userid => $db_user) {
-			$user = [
-				'userid' => $userid,
-				'usrgrps' => $db_user['usrgrps']
-			];
+			$user_groups = [];
+
+			foreach ($db_user['usrgrps'] as $user_group) {
+				$user_groups[$user_group['usrgrpid']] = ['usrgrpid' => $user_group['usrgrpid']];
+			}
 
 			if (array_key_exists('ins_groups', $changes[$userid])) {
-				$user['usrgrps'] += $changes[$userid]['ins_groups'];
+				$user_groups += $changes[$userid]['ins_groups'];
 			}
 
 			if (array_key_exists('del_groupids', $changes[$userid])) {
-				$user['usrgrps'] = array_diff_key($user['usrgrps'], $changes[$userid]['del_groupids']);
+				$user_groups = array_diff_key($user_groups, $changes[$userid]['del_groupids']);
 			}
 
-			$user['usrgrps'] = array_values($user['usrgrps']);
-			$users[] = $user;
+			$users[$userid]['usrgrps'] = array_values($user_groups);
 		}
 
-		CUser::updateForce($users, $db_users);
+		CUser::updateForce(array_values($users), $db_users);
 	}
 
 	/**

@@ -423,11 +423,8 @@ class CUser extends CApiService {
 			DB::update('users', $upd_users);
 		}
 
-		self::updateGroups($users, $db_users, $upd_userids);
-		self::updateMedias($users, $db_users, $upd_userids);
-
-		$users = array_intersect_key($users, $upd_userids);
-		$db_users = array_intersect_key($db_users, array_flip($upd_userids));
+		self::updateGroups($users, $db_users);
+		self::updateMedias($users, $db_users);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
 	}
@@ -629,14 +626,10 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Add the existing medias and user groups to $db_users whether these are affected by the update.
-	 *
-	 * @static
-	 *
 	 * @param array $users
 	 * @param array $db_users
 	 */
-	private static function addAffectedObjects(array $users, array &$db_users): void {
+	public static function addAffectedObjects(array $users, array &$db_users): void {
 		$userids = ['usrgrps' => [], 'medias' => []];
 
 		foreach ($users as $user) {
@@ -652,15 +645,17 @@ class CUser extends CApiService {
 		}
 
 		if ($userids['usrgrps']) {
-			$options = [
-				'output' => ['id', 'usrgrpid', 'userid'],
-				'filter' => ['userid' => $userids['usrgrps']]
-			];
-			$db_usrgrps = DBselect(DB::makeSql('users_groups', $options));
+			$db_usrgrps = DBselect(
+				'SELECT ug.id,ug.usrgrpid,ug.userid,u.username'.
+				' FROM users_groups ug,users u'.
+				' WHERE ug.userid=u.userid'.
+					' AND '.dbConditionId('ug.userid', $userids['usrgrps'])
+			);
+			$user_fields = array_flip(['userid', 'username']);
 
 			while ($db_usrgrp = DBfetch($db_usrgrps)) {
-				$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] =
-					array_diff_key($db_usrgrp, array_flip(['userid']));
+				$db_users[$db_usrgrp['userid']] += array_intersect_key($db_usrgrp, $user_fields);
+				$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] = array_diff_key($db_usrgrp, $user_fields);
 			}
 		}
 
@@ -1014,24 +1009,18 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update table "users_groups" and populate users.usrgrps by "id" property.
-	 *
-	 * @static
-	 *
 	 * @param array      $users
 	 * @param null|array $db_users
-	 * @param array|null $upd_userids
 	 */
-	private static function updateGroups(array &$users, array $db_users = null, array &$upd_userids = null): void {
+	private static function updateGroups(array &$users, array $db_users = null): void {
 		$ins_groups = [];
 		$del_groupids = [];
 
-		foreach ($users as $i => &$user) {
+		foreach ($users as &$user) {
 			if (!array_key_exists('usrgrps', $user)) {
 				continue;
 			}
 
-			$changed = false;
 			$db_groups = $db_users !== null
 				? array_column($db_users[$user['userid']]['usrgrps'], null, 'usrgrpid')
 				: [];
@@ -1046,24 +1035,11 @@ class CUser extends CApiService {
 						'userid' => $user['userid'],
 						'usrgrpid' => $group['usrgrpid']
 					];
-					$changed = true;
 				}
 			}
 			unset($group);
 
-			if ($db_groups) {
-				$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
-				$changed = true;
-			}
-
-			if ($db_users !== null) {
-				if ($changed) {
-					$upd_userids[$i] = $user['userid'];
-				}
-				else {
-					unset($user['usrgrps']);
-				}
-			}
+			$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
 		}
 		unset($user);
 
@@ -1112,23 +1088,19 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update table "media" and populate users.medias by "mediaid" property.
-	 *
 	 * @param array      $users
 	 * @param null|array $db_users
-	 * @param array|null $upd_itemids
 	 */
-	private static function updateMedias(array &$users, array $db_users = null, array &$upd_userids = null): void {
+	private static function updateMedias(array &$users, array $db_users = null): void {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
 
-		foreach ($users as $i => &$user) {
+		foreach ($users as &$user) {
 			if (!array_key_exists('medias', $user)) {
 				continue;
 			}
 
-			$changed = false;
 			$db_medias = $db_users !== null ? $db_users[$user['userid']]['medias'] : [];
 
 			foreach ($user['medias'] as &$media) {
@@ -1145,7 +1117,6 @@ class CUser extends CApiService {
 							'values' => $upd_media,
 							'where' => ['mediaid' => $db_media['mediaid']]
 						];
-						$changed = true;
 					}
 
 					$media['mediaid'] = $db_media['mediaid'];
@@ -1153,24 +1124,11 @@ class CUser extends CApiService {
 				}
 				else {
 					$ins_medias[] = ['userid' => $user['userid']] + $media;
-					$changed = true;
 				}
 			}
 			unset($media);
 
-			if ($db_medias) {
-				$del_mediaids = array_merge($del_mediaids, array_column($db_medias, 'mediaid'));
-				$changed = true;
-			}
-
-			if ($db_users !== null) {
-				if ($changed) {
-					$upd_userids[$i] = $user['userid'];
-				}
-				else {
-					unset($user['medias']);
-				}
-			}
+			$del_mediaids = array_merge($del_mediaids, array_column($db_medias, 'mediaid'));
 		}
 		unset($user);
 

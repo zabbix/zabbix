@@ -51,6 +51,8 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.zbx_dbstr($resourceid));
 		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.zbx_dbstr($resourceid));
 
+		$this->assertNotFalse($id, 'User group record expected');
+
 		$created = json_encode([
 			'usergroup.name' => ['add', 'Audit user groups'],
 			'usergroup.rights['.$rights['rightid'].']' => ['add'],
