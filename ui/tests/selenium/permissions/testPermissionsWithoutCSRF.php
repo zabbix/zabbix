@@ -723,7 +723,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 	public static function getCheckTokenData() {
 		return [
-			// #0 Correct token. Even if CSRF token is correct, it should not work by direct URL.
+			// #0 Correct token. Even if CSRF token is correct, it should not work by direct URL (update item).
 			[
 				[
 					'token' => true,
@@ -738,7 +738,35 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #1 No token.
+			// #1 Correct token (update global macros).
+			[
+				[
+					'token' => true,
+					'token_url' => 'zabbix.php?action=macros.edit',
+					'db' => 'SELECT * FROM globalmacro',
+					'link' => 'zabbix.php?macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0'
+						.'&macros%5B0%5D%5Bdescription%5D=&update=Update&_csrf_token=',
+					'error' => [
+						'message' => 'Page not found',
+						'details' => null
+					]
+				]
+			],
+			// #2 Correct token (create graph).
+			[
+				[
+					'token' => true,
+					'token_url' => 'graphs.php?hostid=50013&form=create&context=host',
+					'db' => 'SELECT * FROM graphs',
+					'link' => 'graphs.php?&form_refresh=1&form=create&hostid=99015&yaxismin=0&yaxismax=100'
+						.'&name=Test&width=900&height=200&graphtype=0&context=host&add=Add&_csrf_token=',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
+				]
+			],
+			// #3 No token.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -763,7 +791,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #2 Empty token.
+			// #4 Empty token.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -798,7 +826,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #3 Incorrect token.
+			// #5 Incorrect token.
 			[
 				[
 					'db' => 'SELECT * FROM config',
@@ -809,34 +837,6 @@ class testPermissionsWithoutCSRF extends CWebTest {
 						'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
 					],
 					'return_button' => true
-				]
-			],
-			// #4 GET form (Update global macros).
-			[
-				[
-					'token' => true,
-					'token_url' => 'zabbix.php?action=macros.edit',
-					'db' => 'SELECT * FROM globalmacro',
-					'link' => 'zabbix.php?macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0'
-							.'&macros%5B0%5D%5Bdescription%5D=&update=Update&_csrf_token=',
-					'error' => [
-						'message' => 'Page not found',
-						'details' => null
-					]
-				]
-			],
-			// #5 GET form (Create graph).
-			[
-				[
-					'token' => true,
-					'token_url' => 'graphs.php?hostid=50013&form=create&context=host',
-					'db' => 'SELECT * FROM graphs',
-					'link' => 'graphs.php?&form_refresh=1&form=create&hostid=99015&yaxismin=0&yaxismax=100'
-							.'&name=Test&width=900&height=200&graphtype=0&context=host&add=Add&_csrf_token=',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
 				]
 			]
 		];
