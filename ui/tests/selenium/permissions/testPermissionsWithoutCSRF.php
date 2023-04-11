@@ -727,6 +727,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'token' => true,
+					'token_url' => 'items.php?form=update&hostid=99134&itemid=99114&context=host',
 					'db' => 'SELECT * FROM items',
 					'link' => 'items.php?form=update&hostid=99134&itemid=99114&context=host&name=4_item&description='.
 							'&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT&update=Update'.
@@ -809,6 +810,34 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					],
 					'return_button' => true
 				]
+			],
+			// #4 GET form (Update global macros).
+			[
+				[
+					'token' => true,
+					'token_url' => 'zabbix.php?action=macros.edit',
+					'db' => 'SELECT * FROM globalmacro',
+					'link' => 'zabbix.php?macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0'
+							.'&macros%5B0%5D%5Bdescription%5D=&update=Update&_csrf_token=',
+					'error' => [
+						'message' => 'Page not found',
+						'details' => null
+					]
+				]
+			],
+			// #5 GET form (Create graph).
+			[
+				[
+					'token' => true,
+					'token_url' => 'graphs.php?hostid=50013&form=create&context=host',
+					'db' => 'SELECT * FROM graphs',
+					'link' => 'graphs.php?&form_refresh=1&form=create&hostid=99015&yaxismin=0&yaxismax=100'
+							.'&name=Test&width=900&height=200&graphtype=0&context=host&add=Add&_csrf_token=',
+					'error' => [
+						'message' => 'Zabbix has received an incorrect request.',
+						'details' => 'Operation cannot be performed due to unauthorized request.'
+					]
+				]
 			]
 		];
 	}
@@ -822,7 +851,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// Get the correct token from form and put it to the direct URL.
 		if (CTestArrayHelper::get($data, 'token')) {
-			$this->page->open('items.php?form=update&hostid=99134&itemid=99114&context=host')->waitUntilReady();
+			$this->page->open($data['token_url'])->waitUntilReady();
 			$this->page->open($data['link'].$this->query('xpath:.//input[@name="_csrf_token"]')
 					->one()->getAttribute('value'))->waitUntilReady();
 		}
