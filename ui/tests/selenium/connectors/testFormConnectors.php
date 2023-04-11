@@ -728,7 +728,7 @@ class testFormConnectors extends CWebTest {
 						'SSL key file' => '  {$SSL_KEY}  ',
 						'Description' => '  trim check  '
 					],
-					'trim' => ['Name', 'URL', 'id:tags_0_tag', 'id:tags_0_value', 	'Username', 'id:max_records',
+					'trim' => ['Name', 'URL', 'id:tags_0_tag', 'id:tags_0_value', 'Username', 'id:max_records',
 						'Concurrent sessions', 'Timeout', 'HTTP proxy', 'SSL certificate file', 'SSL key file',
 						'Description'
 					]
