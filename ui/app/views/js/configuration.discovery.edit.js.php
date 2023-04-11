@@ -343,11 +343,15 @@
 		]);
 
 		var data = $form
-				.find('#type, #ports, input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
-				.serialize(),
+				.find('#ports, >input[type=hidden], input:visible')
+				.serializeJSON(),
 			dialogueid = $form
 				.closest("[data-dialogueid]")
 				.data('dialogueid');
+
+		$form.find('z-select:visible').each((index, element) => {
+			data[element.name] = element.value;
+		});
 
 		if (!dialogueid) {
 			return false;
@@ -406,14 +410,17 @@
 		var $form = jQuery(document.forms['dcheck_form']),
 			dcheckid = jQuery('#dcheckid').val(),
 			dcheck = $form
-				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
+				.find('#ports, input:visible')
 				.serializeJSON(),
 			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 				'snmpv3_privpassphrase'
 			];
 
-		dcheck['type'] = $form.find('z-select').val();
+		$form.find('z-select:visible').each((index, element) => {
+			dcheck[element.name] = element.value;
+		});
+
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
 		if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
