@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -206,6 +206,16 @@ abstract class DbBackend {
 	* @return bool
 	*/
 	abstract public function isDoubleIEEE754();
+
+	/**
+	 * Check that a field is present in a database table.
+	 *
+	 * @param string $table_name
+	 * @param string $field_name
+	 *
+	 * @return bool
+	 */
+	abstract public function dbFieldExists($table_name, $field_name);
 
 	/**
 	 * Set warning message.

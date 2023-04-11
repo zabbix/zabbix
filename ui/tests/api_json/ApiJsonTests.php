@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testAuditLog');
 		$suite->addTestSuite('testConfiguration');
-//		$suite->addTestSuite('testDependentItems'); TODO: To be fix later
+		$suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testGraphPrototype');

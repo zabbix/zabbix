@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ require_once dirname(__FILE__).'/js/configuration.correlation.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('correlation.edit')
 	->setName('correlation.edit')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -103,22 +104,28 @@ $condition_table->addRow([
 
 $correlation_tab
 	->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
-		(new CSelect('evaltype'))
-			->setId('evaltype')
-			->setValue($data['correlation']['filter']['evaltype'])
-			->setFocusableElementId('label-evaltype')
-			->addOptions(CSelect::createOptionsFromArray([
-				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-				CONDITION_EVAL_TYPE_AND => _('And'),
-				CONDITION_EVAL_TYPE_OR => _('Or'),
-				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())->setId('condition_label'),
-		(new CTextBox('formula', $data['correlation']['filter']['formula']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		(new CDiv(
+			(new CSelect('evaltype'))
+				->setId('evaltype')
+				->setValue($data['correlation']['filter']['evaltype'])
+				->setFocusableElementId('label-evaltype')
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				]))
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan())->setId('condition_label'),
+			(new CTextBox('formula', $data['correlation']['filter']['formula']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('formula')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION)
 	])
 	->addRow(
 		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
@@ -158,7 +165,7 @@ $correlation_tabs = (new CTabView())
 	->addTab('correlationTab', _('Correlation'), $correlation_tab)
 	->addTab('operationTab', _('Operations'), $operation_tab);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$correlation_tabs->setSelected(0);
 }
 

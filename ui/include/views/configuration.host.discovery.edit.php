@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ $widget = (new CWidget())
 	));
 
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -565,23 +566,29 @@ $conditionFormList = new CFormList();
 // type of calculation
 $conditionFormList->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'),
 	[
-		(new CSelect('evaltype'))
-			->setFocusableElementId('label-evaltype')
-			->setId('evaltype')
-			->setValue($data['evaltype'])
-			->addOptions(CSelect::createOptionsFromArray([
-				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-				CONDITION_EVAL_TYPE_AND => _('And'),
-				CONDITION_EVAL_TYPE_OR => _('Or'),
-				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan(''))
-			->setId('expression'),
-		(new CTextBox('formula', $data['formula']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		(new CDiv(
+			(new CSelect('evaltype'))
+				->setFocusableElementId('label-evaltype')
+				->setId('evaltype')
+				->setValue($data['evaltype'])
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				]))
+				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan(''))
+				->setId('expression'),
+			(new CTextBox('formula', $data['formula']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('formula')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION)
 	],
 	'conditionRow'
 );
@@ -676,7 +683,7 @@ if (!$lld_macro_paths) {
 		'path' => ''
 	]];
 }
-elseif (!hasRequest('form_refresh')) {
+elseif ($data['form_refresh'] == 0) {
 	CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
 }
 
@@ -764,14 +771,14 @@ $tab = (new CTabView())
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
-				getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
+				getItemPreprocessing($data['preprocessing'], $data['limited'], $data['preprocessing_types'])
 			)
 	)
 	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)
 	->addTab('macroTab', _('Filters'), $conditionFormList)
 	->addTab('overridesTab', _('Overrides'), $overrides_form_list);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tab->setSelected(0);
 }
 

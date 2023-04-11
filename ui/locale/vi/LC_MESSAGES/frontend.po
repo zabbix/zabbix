@@ -2727,6 +2727,11 @@ msgstr "Không thể cập nhật một biểu đồ được phát hiê
 msgid "Cannot update a discovered host group."
 msgstr "Không thể cập nhật một nhóm host được phát hiện."
 
+#: include/classes/api/services/CGraphGeneral.php:69
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -5178,7 +5183,15 @@ msgid "Discovery object"
 msgstr "Đối tượng phát hiện"
 
 #: include/classes/items/CHelpItems.php:787
+msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:795
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:795
@@ -5186,7 +5199,15 @@ msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:839
+msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:859
+msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:859
@@ -5194,11 +5215,23 @@ msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1047
+msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1059
+msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:971
+msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:971
@@ -6302,6 +6335,11 @@ msgstr "Trường \"%1$s\" thiếu giá trị cho screen \"%2$s\"."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Trường \"%1$s\" không chính xác: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -12464,12 +12502,24 @@ msgid "Number of problems and expand most critical one"
 msgstr "Số lượng vấn đề và mở rộng nghiêm trọng nhất"
 
 #: include/classes/items/CHelpItems.php:875
+msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifiere"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng lõi bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:879
+msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+
+#: include/classes/items/CHelpItems.php:955
+msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -12548,6 +12598,10 @@ msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS."
 #: include/classes/items/CHelpItems.php:1183
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS_UNIT."
+
+#: include/classes/items/CHelpItems.php:943
+msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18224,6 +18278,10 @@ msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pu
 msgstr "Thống kê bộ nhớ VMware. Các chế độ hợp lệ: total, free, pfree, used và pused."
 
 #: include/classes/items/CHelpItems.php:791
+msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Trạng thái VMware cluster, <url> - Dịch vụ VMware URL, <name> - Tên VMware cluster"
 
@@ -18237,27 +18295,55 @@ msgid "VMware datastore capacity statistics in bytes or in percentage from total
 msgstr "Thống kê dung lượng kho dữ liệu VMware theo byte hoặc theo tỷ lệ phần trăm trên tổng số. Trả về kiểu integer cho byte; float cho tỷ lệ phần trăm"
 
 #: include/classes/items/CHelpItems.php:799
+msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Danh sách các kho lưu trữ dữ liệu của VMware, <url> -URL dịch vụ VMware, <datastore> -tên kho dữ liệu"
+
+#: include/classes/items/CHelpItems.php:803
+msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Kho dữ liệu VMware đọc số liệu thống kê, <url> - URL dịch vụ VMware,  <datastore> - tên kho dữ liệu, <mode> - độ trễ / tối đa - trung bình hoặc tối đa"
 
 #: include/classes/items/CHelpItems.php:811
+msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Kho dữ liệu VMware ghi số liệu thống kê, <url> - URL dịch vụ VMware, <datastore> - tên kho dữ liệu,<mode> - độ trễ / tối đa - trung bình hoặc tối đa"
+
+#: include/classes/items/CHelpItems.php:819
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - all (default), skip - skip processing of older data"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:819
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "Log sự kiện VMware, <url> - URL dịch vụ VMware, <mode> - tất cả (mặc định), bỏ qua - bỏ qua xử lý dữ liệu cũ hơn"
 
 #: include/classes/items/CHelpItems.php:891
+msgid "VMware hypervisor BIOS uuid, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor BIOS uuid, <url> - Dịch vụ VMwareURL, <uuid> - Tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:923
+msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:903
+msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:903
@@ -18265,11 +18351,23 @@ msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uui
 msgstr "Kích thước bộ nhớ VMware hypervisor thừa ra, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:827
+msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên VMware hypervisor cluster, <url> - Dịch vụ VMware hypervisor cluster VMware URL, <uuid> - Tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:835
+msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:847
+msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:847
@@ -18277,15 +18375,31 @@ msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, 
 msgstr "Kho dữ liệu đọc số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
 #: include/classes/items/CHelpItems.php:855
+msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Kho dữ liệu ghi số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
+
+#: include/classes/items/CHelpItems.php:843
+msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Danh sách kho dữ liệu của VMware hypervisor, <url> - URL dịch vụ VMware, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:927
+msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:899
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:899
@@ -18293,83 +18407,167 @@ msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> 
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:887
+msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mô hình VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+
+#: include/classes/items/CHelpItems.php:863
+msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:911
+msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
+
+#: include/classes/items/CHelpItems.php:915
+msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
 
 #: include/classes/items/CHelpItems.php:919
+msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Theo dõi hiệu suất VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor , <path> - đường dẫn theo dõi hiệu suất, <instance> - đếm số lần hiệu suất"
+
+#: include/classes/items/CHelpItems.php:867
+msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tần số bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:871
+msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mô hình bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+
+#: include/classes/items/CHelpItems.php:831
+msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Cách sử dụng bộ xử lý VMware hypervisor đơn vị là Hz, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:931
+msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Trạng thái VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+
+#: include/classes/items/CHelpItems.php:883
+msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ tổng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:935
+msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Thời gian chạy VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+
+#: include/classes/items/CHelpItems.php:907
+msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ đã sử dụng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:895
+msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:895
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên nhà sản xuất VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+
+#: include/classes/items/CHelpItems.php:939
+msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Phiên bản VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:823
+msgid "VMware service full name, \"url\" - VMware service URL"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Tên đầy đủ của dịch vụ VMware, <url> - dịch vụ VMware URL"
+
+#: include/classes/items/CHelpItems.php:947
+msgid "VMware service version, \"url\" - VMware service URL"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Phiên bản dịch vụ VMware, <url> - dịch vụ VMware URL"
 
 #: include/classes/items/CHelpItems.php:983
+msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware bị thừa ra, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+
+#: include/classes/items/CHelpItems.php:1031
+msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:987
+msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware được nén lại, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:967
+msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1051
+msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1051
@@ -18377,76 +18575,152 @@ msgid "VMware virtual machine disk device read statistics, <url> - VMware servic
 msgstr "Thiết bị đĩa máy ảo VMware đọc số liệu thống kê, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/số lần thao tác trên giây"
 
 #: include/classes/items/CHelpItems.php:1055
+msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1055
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Thiết bị đĩa máy ảo VMware ghi số liệu thống kê, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/số lần thao tác trên giây"
+
+#: include/classes/items/CHelpItems.php:1063
+msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\" - total/free/used/pfree/pused"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Hệ thống tập tin máy ảo thống kê VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <fsname> - tên hệ thống tập tin, <mode> - total/free/used/pfree/pused"
 
 #: include/classes/items/CHelpItems.php:1003
+msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1003
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ nhớ máy ảo VMware của khách, <url> - dịch vụ VMware URL, <uuid> - Tên host máy ảo VMware"
+
+#: include/classes/items/CHelpItems.php:1007
+msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ nhớ máy ảo VMware của host, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:975
+msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:975
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tên máy ảo VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+
+#: include/classes/items/CHelpItems.php:951
+msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tên máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:1015
+msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Thống kê interface mạng đầu vào máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
+
+#: include/classes/items/CHelpItems.php:1019
+msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Thống kê interface mạng đầu ra máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy áo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
 #: include/classes/items/CHelpItems.php:1023
+msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Hiệu suất truy cập máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <path> - đường dẫn hiệu suất truy cập, <instance> - Số lượng hiệu suất truy cập"
+
+#: include/classes/items/CHelpItems.php:1027
+msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tình trạng nguồn của máy ảo VMware, <url> - dich vụ VMware URL, <uuid> - Tên host máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:991
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ riêng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+
+#: include/classes/items/CHelpItems.php:959
+msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Bộ xử lý máy ảo VMware thời gian sẵn sàng ms, <url> - URL dịch vụ VMware, <uuid> - Tên máy chủ máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:963
+msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ xử lý máy ảo VMware đơn vị Hz, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+
+#: include/classes/items/CHelpItems.php:995
+msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ chia sẻ của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:999
+msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware được trao đổi, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+
+#: include/classes/items/CHelpItems.php:979
+msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ tổng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:1035
+msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware không được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
 #: include/classes/items/CHelpItems.php:1039
+msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware không được chia sẻ, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+
+#: include/classes/items/CHelpItems.php:1043
+msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20004,6 +20278,10 @@ msgstr "phạm vi địa chỉ không hợp lệ \"%1$s\""
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
 msgstr "chuỗi byte không hợp lệ trong UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"

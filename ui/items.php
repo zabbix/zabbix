@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ $fields = [
 											' && {type} != '.ITEM_TYPE_DEPENDENT,
 										_('Update interval')
 									],
-	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null, '(isset({add}) || isset({update}))'.
 										' && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
@@ -114,7 +114,8 @@ $fields = [
 										getParamFieldLabelByType(getRequest('type', 0))
 									],
 	'inventory_link' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
-										'(isset({add}) || isset({update})) && {value_type} != '.ITEM_VALUE_TYPE_LOG
+										'(isset({add}) || isset({update})) && isset({value_type})'.
+											' && {value_type} != '.ITEM_VALUE_TYPE_LOG
 									],
 	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
@@ -138,12 +139,12 @@ $fields = [
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
-	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'preprocessing' =>				[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'group_itemid' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'copy_targetids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'applications' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
+	'applications' =>				[null,      O_OPT, P_ONLY_ARRAY,	null,		null],
 	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
 										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null
@@ -162,7 +163,7 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
-	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
@@ -174,7 +175,7 @@ $fields = [
 										null
 									],
 	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -237,12 +238,12 @@ $fields = [
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_groupids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'filter_hostids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'filter_application' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
@@ -274,20 +275,20 @@ $fields = [
 									],
 	'filter_ipmi_sensor' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// subfilters
-	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_apps' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_types' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_state' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_templated_items' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_discovery' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_history' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
+	'subfilter_apps' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_types' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_status' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_state' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_templated_items' =>	[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_discovery' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_history' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	// sort and sortorder
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
 										IN('"delay","history","key_","name","status","trends","type"'),
@@ -1278,8 +1279,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 	}
 }
 // clean history for selected items
-elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
-		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
+elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory' && hasRequest('group_itemid')) {
 	$result = false;
 	$config = select_config();
 
@@ -1498,6 +1498,7 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform') || hasRequest('massupdate'))
 		&& hasRequest('group_itemid')) {
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'action' => 'item.massupdateform',
 		'hostid' => getRequest('hostid', 0),

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2025,7 +2025,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$items = API::Item()->get([
 				'output' => ['itemid', 'type', 'master_itemid', 'delay'],
-				'itemids' => $master_itemids
+				'itemids' => $master_itemids,
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+				]
 			]);
 		} while ($items);
 

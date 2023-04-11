@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -199,5 +199,14 @@ trait TableTrait {
 			$result[] = $row->getColumn($column)->getText();
 		}
 		return $result;
+	}
+
+	/**
+	 * Assert text of selected rows amount.
+	 *
+	 * @param integer $count	selected rows count
+	 */
+	public function assertSelectedCount($count) {
+		$this->assertEquals($count.' selected', $this->query('id:selected_count')->one()->getText());
 	}
 }

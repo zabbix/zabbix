@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -488,6 +488,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getClassesPresentCondition($classes) {
+		$target = $this;
+
+		return function () use ($target, $classes) {
+			return $target->hasClass($classes);
+		};
+	}
+
+	/**
 	 * Check if element is ready.
 	 *
 	 * @return boolean
@@ -500,7 +511,8 @@ class CElement extends CBaseElement implements IWaitable {
 	* @inheritdoc
 	*/
 	public function isEnabled($enabled = true) {
-		$classes = explode(' ', parent::getAttribute('class'));
+		$attribute = parent::getAttribute('class');
+		$classes = ($attribute !== null) ? explode(' ', $attribute) : [];
 
 		$is_enabled = parent::isEnabled()
 				&& (parent::getAttribute('disabled') === null)
@@ -533,7 +545,17 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function forceClick() {
-		CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		try {
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		}
+		catch (StaleElementReferenceException $exception) {
+			if (!$this->reload_staled) {
+				throw $exception;
+			}
+
+			$this->reload();
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		}
 
 		return $this;
 	}

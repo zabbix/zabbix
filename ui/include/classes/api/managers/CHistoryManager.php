@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,8 +56,14 @@ class CHistoryManager {
 	 */
 	private function getItemsHavingValuesFromSql(array $items, $period = null) {
 		$results = [];
+		$config = select_config();
 
-		if ($period) {
+		if ($config['hk_history_global'] == 1) {
+			$hk_history = timeUnitToSeconds($config['hk_history']);
+			$period = $period !== null ? min($period, $hk_history) : $hk_history;
+		}
+
+		if ($period !== null) {
 			$period = time() - $period;
 		}
 
@@ -74,7 +80,7 @@ class CHistoryManager {
 				'SELECT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-					($period ? ' AND clock>'.$period : '').
+					($period !== null ? ' AND clock>'.$period : '').
 				' GROUP BY itemid'
 			), 'itemid');
 
@@ -199,8 +205,14 @@ class CHistoryManager {
 	 */
 	private function getLastValuesFromSql($items, $limit, $period) {
 		$results = [];
+		$config = select_config();
 
-		if ($period) {
+		if ($config['hk_history_global'] == 1) {
+			$hk_history = timeUnitToSeconds($config['hk_history']);
+			$period = $period !== null ? min($period, $hk_history) : $hk_history;
+		}
+
+		if ($period !== null) {
 			$period = time() - $period;
 		}
 
@@ -212,7 +224,7 @@ class CHistoryManager {
 					'SELECT MAX(h.clock)'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-						($period ? ' AND h.clock>'.$period : '')
+						($period !== null ? ' AND h.clock>'.$period : '')
 				), false);
 
 				if ($clock_max) {
@@ -242,7 +254,7 @@ class CHistoryManager {
 					'SELECT *'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-						($period ? ' AND h.clock>'.$period : '').
+						($period !== null ? ' AND h.clock>'.$period : '').
 					' ORDER BY h.clock DESC',
 					$limit + 1
 				));
@@ -393,6 +405,12 @@ class CHistoryManager {
 	 * @see CHistoryManager::getValueAt
 	 */
 	private function getValueAtFromSql(array $item, $clock, $ns) {
+		$config = select_config();
+
+		if ($config['hk_history_global'] == 1 && $clock <= time() - timeUnitToSeconds($config['hk_history'])) {
+			return null;
+		}
+
 		$result = null;
 		$table = self::getTableName($item['value_type']);
 
@@ -422,11 +440,17 @@ class CHistoryManager {
 		}
 
 		if ($max_clock == 0) {
+			$time_from = ZBX_HISTORY_PERIOD ? $clock - ZBX_HISTORY_PERIOD : null;
+
+			if ($config['hk_history_global'] == 1) {
+				$time_from = max($time_from, time() - timeUnitToSeconds($config['hk_history']) + 1);
+			}
+
 			$sql = 'SELECT MAX(clock) AS clock'.
 					' FROM '.$table.
 					' WHERE itemid='.zbx_dbstr($item['itemid']).
 						' AND clock<'.zbx_dbstr($clock).
-						(ZBX_HISTORY_PERIOD ? ' AND clock>='.zbx_dbstr($clock - ZBX_HISTORY_PERIOD) : '');
+						($time_from !== null ? ' AND clock>='.zbx_dbstr($time_from) : '');
 
 			if (($row = DBfetch(DBselect($sql))) !== false) {
 				$max_clock = $row['clock'];
@@ -613,7 +637,7 @@ class CHistoryManager {
 	}
 
 	/**
-	 * SQL specific implementation of getGraphAggregationByWidth.
+	 * SQL specific implementation of getGraphAggregationByInterval.
 	 *
 	 * @see CHistoryManager::getGraphAggregationByInterval
 	 */
@@ -624,6 +648,7 @@ class CHistoryManager {
 		}
 
 		$result = [];
+		$config = select_config();
 
 		foreach ($items_by_table as $value_type => $items_by_source) {
 			foreach ($items_by_source as $source => $itemids) {
@@ -659,6 +684,10 @@ class CHistoryManager {
 							break;
 					}
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
+
+					$_time_from = $config['hk_history_global'] == 1
+						? max($time_from, time() - timeUnitToSeconds($config['hk_history']) + 1)
+						: $time_from;
 				}
 				else {
 					switch ($function) {
@@ -686,12 +715,16 @@ class CHistoryManager {
 							break;
 					}
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
+
+					$_time_from = $config['hk_trends_global'] == 1
+						? max($time_from, time() - timeUnitToSeconds($config['hk_trends']) + 1)
+						: $time_from;
 				}
 
 				$sql = 'SELECT '.implode(', ', $sql_select).
 					' FROM '.$sql_from.
 					' WHERE '.dbConditionInt('itemid', $itemids).
-					' AND clock >= '.zbx_dbstr($time_from).
+					' AND clock >= '.zbx_dbstr($_time_from).
 					' AND clock <= '.zbx_dbstr($time_to).
 					' GROUP BY '.implode(', ', $sql_group_by);
 
@@ -932,29 +965,41 @@ class CHistoryManager {
 		}
 
 		$results = [];
+		$config = select_config();
 
 		foreach ($items as $item) {
 			if ($item['source'] === 'history') {
 				$sql_select = 'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
+
+				$_time_from = $config['hk_history_global'] == 1
+					? max($time_from, time() - timeUnitToSeconds($config['hk_history']) + 1)
+					: $time_from;
 			}
 			else {
 				$sql_select = 'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
+
+				$_time_from = $config['hk_trends_global'] == 1
+					? max($time_from, time() - timeUnitToSeconds($config['hk_trends']) + 1)
+					: $time_from;
 			}
 
-			$result = DBselect(
-				'SELECT itemid,'.$sql_select.$sql_select_extra.',MAX(clock) AS clock'.
-				' FROM '.$sql_from.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-					' AND clock>='.zbx_dbstr($time_from).
-					' AND clock<='.zbx_dbstr($time_to).
-				' GROUP BY '.$group_by
-			);
-
 			$data = [];
-			while (($row = DBfetch($result)) !== false) {
-				$data[] = $row;
+
+			if ($_time_from <= $time_to) {
+				$result = DBselect(
+					'SELECT itemid,'.$sql_select.$sql_select_extra.',MAX(clock) AS clock'.
+					' FROM '.$sql_from.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock>='.zbx_dbstr($_time_from).
+						' AND clock<='.zbx_dbstr($time_to).
+					' GROUP BY '.$group_by
+				);
+
+				while (($row = DBfetch($result)) !== false) {
+					$data[] = $row;
+				}
 			}
 
 			$results[$item['itemid']]['source'] = $item['source'];
@@ -1040,6 +1085,12 @@ class CHistoryManager {
 	 * @see CHistoryManager::getAggregatedValue
 	 */
 	private function getAggregatedValueFromSql(array $item, $aggregation, $time_from) {
+		$config = select_config();
+
+		if ($config['hk_history_global'] == 1) {
+			$time_from = max($time_from, time() - timeUnitToSeconds($config['hk_history']));
+		}
+
 		$result = DBselect(
 			'SELECT '.$aggregation.'(value) AS value'.
 			' FROM '.self::getTableName($item['value_type']).

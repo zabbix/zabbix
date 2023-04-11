@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1282,7 +1282,7 @@ jQuery(function($) {
 			// Need to be postponed.
 			setTimeout(function() {
 				$(document)
-					.on('click dragstart contextmenu', {menu: $menu_popup, opener: $opener},
+					.on('click dragstart', {menu: $menu_popup, opener: $opener},
 						menuPopupDocumentCloseHandler
 					)
 					.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
@@ -1303,7 +1303,7 @@ jQuery(function($) {
 				$('[aria-expanded="true"]', menu_popup).attr({'aria-expanded': 'false'});
 
 				$(document)
-					.off('click dragstart contextmenu', menuPopupDocumentCloseHandler)
+					.off('click dragstart', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);

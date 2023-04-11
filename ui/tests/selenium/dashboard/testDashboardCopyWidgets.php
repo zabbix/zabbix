@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,6 +88,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// Get fields from widget form to compare them with new widget after copying.
 		$fields = $dashboard->getWidget($name)->edit()->getFields();
+
 		// Add tag fields mapping to form for problem widgets.
 		if (stristr($name, 'Problem')) {
 			$fields->set('', $fields->get('')->asMultifieldTable(['mapping' => $mapping]));

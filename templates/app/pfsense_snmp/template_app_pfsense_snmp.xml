@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-06-06T11:59:52Z</date>
+   <date>2023-01-10T16:29:33Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -476,7 +476,7 @@ Possible value:&#13;
                      </condition>
                      <condition>
                         <macro>{#IFNAME}</macro>
-                        <value>{$NET.IF.IFNAME.MATCHES}</value>
+                        <value>@Network interfaces for discovery</value>
                         <formulaid>G</formulaid>
                      </condition>
                      <condition>
@@ -1480,13 +1480,8 @@ and&#13;
                <description>This macro used in filters of network interfaces discovery rule.</description>
             </macro>
             <macro>
-               <macro>{$NET.IF.IFNAME.MATCHES}</macro>
-               <value>^em[0-9]+$</value>
-               <description>This macro used in filters of network interfaces discovery rule.</description>
-            </macro>
-            <macro>
                <macro>{$NET.IF.IFNAME.NOT_MATCHES}</macro>
-               <value>^$</value>
+               <value>(^pflog[0-9.]*$|^pfsync[0-9.]*$)</value>
                <description>This macro used in filters of network interfaces discovery rule.</description>
             </macro>
             <macro>

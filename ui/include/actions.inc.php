@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1638,7 +1638,8 @@ function getSingleEventActions(array $event, array $r_events, array $alerts) {
 	// Sort by action_type is done to put Recovery event before actions, resulted from it. Same for other action_type.
 	CArrayHelper::sort($actions, [
 		['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-		['field' => 'action_type', 'order' => ZBX_SORT_DOWN]
+		['field' => 'action_type', 'order' => ZBX_SORT_DOWN],
+		['field' => 'alertid', 'order' => ZBX_SORT_DOWN]
 	]);
 
 	return [

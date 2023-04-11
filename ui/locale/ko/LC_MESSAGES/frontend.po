@@ -2727,6 +2727,11 @@ msgstr "발견된 그래프를 갱신할 수 없습니다"
 msgid "Cannot update a discovered host group."
 msgstr "발견된 호스트 그룹을 갱신할 수 없습니다"
 
+#: include/classes/api/services/CGraphGeneral.php:69
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -5167,7 +5172,15 @@ msgid "Discovery object"
 msgstr "디스커버리 오브젝트"
 
 #: include/classes/items/CHelpItems.php:787
+msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:795
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:795
@@ -5175,7 +5188,15 @@ msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:839
+msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:859
+msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:859
@@ -5183,11 +5204,23 @@ msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1047
+msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1059
+msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:971
+msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:971
@@ -6292,6 +6325,11 @@ msgstr "스크린 \"%2$s\" 을 위한 필드 \"%1$s\" 가 설정되어 있지 �
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "항목 \"%1$s\"의 설정이 올바르지 않습니다: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -12454,12 +12492,24 @@ msgid "Number of problems and expand most critical one"
 msgstr "장애의 수와 가장 치명적인 1건을 전개"
 
 #: include/classes/items/CHelpItems.php:875
+msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifiere"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상의 프로세서 코어 수, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:879
+msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상의 프로세서 스레드 수, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저의 호스트 이름"
+
+#: include/classes/items/CHelpItems.php:955
+msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -12538,6 +12588,10 @@ msgstr "테이블 TRENDS내의 값 보존 수."
 #: include/classes/items/CHelpItems.php:1183
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "테이블 TRENDS_UINT내의 값 보존 수."
+
+#: include/classes/items/CHelpItems.php:943
+msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18214,6 +18268,10 @@ msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pu
 msgstr "VMware 캐쉬통계. 이용가능한 모드：total, free, pfree, used, pused."
 
 #: include/classes/items/CHelpItems.php:791
+msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware 클래스터의 상태, <url> - VMware서비스URL, <name> - VMware클래스터 이름"
 
@@ -18227,7 +18285,15 @@ msgid "VMware datastore capacity statistics in bytes or in percentage from total
 msgstr "VMware datastore의 바이트 단위 혹은 전체에서 퍼센트 용량에서의 통계치. 바이트 단위라면 integer, 퍼센트라면 float 로 리턴"
 
 #: include/classes/items/CHelpItems.php:799
+msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:803
+msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:803
@@ -18235,7 +18301,15 @@ msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore>
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:811
+msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:819
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - all (default), skip - skip processing of older data"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:819
@@ -18243,11 +18317,23 @@ msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), ski
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:891
+msgid "VMware hypervisor BIOS uuid, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 BIOS uuid, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:923
+msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:903
+msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:903
@@ -18255,11 +18341,23 @@ msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uui
 msgstr "VMware하이퍼바이저 벌루닝된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:827
+msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 클래스터 이름, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:835
+msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:847
+msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:847
@@ -18267,11 +18365,23 @@ msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, 
 msgstr "VMware하이퍼바이저 데이터스토어 읽기통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <datastore> - 데이터스토어 이름, <mode> - latency"
 
 #: include/classes/items/CHelpItems.php:855
+msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware하이퍼바이저 데이터스토어 쓰기통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <datastore> - 데이터스토어 이름, <mode> - latency"
 
 #: include/classes/items/CHelpItems.php:843
+msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:927
+msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:927
@@ -18279,7 +18389,15 @@ msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL,
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:899
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:887
+msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:887
@@ -18287,79 +18405,159 @@ msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hype
 msgstr "VMware하이퍼바이저 모델, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:863
+msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 이름, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
+
+#: include/classes/items/CHelpItems.php:911
+msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware하이퍼바이저 네트워크입력통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <mode> - bps"
 
 #: include/classes/items/CHelpItems.php:915
+msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware하이퍼바이저 네트워크출력통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <mode> - bps"
+
+#: include/classes/items/CHelpItems.php:919
+msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware하이퍼바이저 퍼포먼스 카운터, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저의 호스트 이름, <path> - 퍼포먼스 카운터의 패스, <instance> - 퍼포먼스 카운터의 인스턴스"
 
 #: include/classes/items/CHelpItems.php:867
+msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 주파수, <url> - VMware 서비스 URL, <uuid> -  VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/items/CHelpItems.php:871
+msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 모델, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
 #: include/classes/items/CHelpItems.php:831
+msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 사용량(Hz), <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/items/CHelpItems.php:931
+msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상태, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
 #: include/classes/items/CHelpItems.php:883
+msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 전체 메모리 사이즈, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/items/CHelpItems.php:935
+msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 가동시간(초), <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
 #: include/classes/items/CHelpItems.php:907
+msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 사용된 메모리 사이즈, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/items/CHelpItems.php:895
+msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:895
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 벤더 이름, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
 #: include/classes/items/CHelpItems.php:939
+msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 버전, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 이름"
+
+#: include/classes/items/CHelpItems.php:823
+msgid "VMware service full name, \"url\" - VMware service URL"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:823
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware서비스 풀네임, <url> - VMware서비스URL"
 
 #: include/classes/items/CHelpItems.php:947
+msgid "VMware service version, \"url\" - VMware service URL"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware서비스버전, <url> - VMware서비스URL"
+
+#: include/classes/items/CHelpItems.php:983
+msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신에서 발루닝된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
 #: include/classes/items/CHelpItems.php:1031
+msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 커밋된 저장용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
+
+#: include/classes/items/CHelpItems.php:987
+msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 압축된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
 #: include/classes/items/CHelpItems.php:967
+msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1051
+msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:1051
@@ -18367,76 +18565,152 @@ msgid "VMware virtual machine disk device read statistics, <url> - VMware servic
 msgstr "VMware가상 머신 디스크 디바이스 읽기 통계, <url> - VMware서비스 URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 디스크 디바이스 인스턴스, <mode> - bps/ops - 매 초 바이트 / 오퍼레이션"
 
 #: include/classes/items/CHelpItems.php:1055
+msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1055
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware 가상 머신 디스크 디바이스 쓰기 통계, <url> - VMware 서비스 URL, <uuid> - VMware 가상 머신호스트 이름, <instance> - 디스크 디바이스 인스턴스, <mode> - bps/ops - 매 초 바이트/오퍼레이션"
+
+#: include/classes/items/CHelpItems.php:1063
+msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\" - total/free/used/pfree/pused"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware가상 머신 파일 시스템통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <fsname> - 파일 시스템 이름, <mode> - total/free/used/pfree/pused"
 
 #: include/classes/items/CHelpItems.php:1003
+msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1003
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 게스트 메모리사용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
+
+#: include/classes/items/CHelpItems.php:1007
+msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 호스트 메모리사용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
 #: include/classes/items/CHelpItems.php:975
+msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:975
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 하이퍼바이저 이름, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
+
+#: include/classes/items/CHelpItems.php:951
+msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 이름, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
 #: include/classes/items/CHelpItems.php:1015
+msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware가상 머신네트워크인터페이스 입력통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 네트워크인터페이스인스턴스, <mode> - bps/pps - 매 초 바이트/패킷"
+
+#: include/classes/items/CHelpItems.php:1019
+msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware가상 머신네트워크인터페이스 출력통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 네트워크인터페이스인스턴스, <mode> - bps/pps - 매 초 바이트/패킷"
 
 #: include/classes/items/CHelpItems.php:1023
+msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware가상 머신의 퍼포먼스 카운터, <url> - VMware서비스URL, <uuid> - VMware가상 머신의 호스트 이름, <path> - 퍼포먼스 카운터의 패스, <instance> - 퍼포먼스 카운터의 인스턴스"
+
+#: include/classes/items/CHelpItems.php:1027
+msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 전원상태, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
 #: include/classes/items/CHelpItems.php:991
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 private 메모리 사이즈, <url> - VMware 서비스URL, <uuid> - VMware 가상 머신호스트 이름"
+
+#: include/classes/items/CHelpItems.php:959
+msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신의 프로세서 유효시간(ms)、<url> - VMware 서비스 URL、<uuid> - VMware 가상 머신 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:963
+msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신의 프로세서사용량(Hz), <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
+
+#: include/classes/items/CHelpItems.php:995
+msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 공유메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:999
+msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 스왑된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
+
+#: include/classes/items/CHelpItems.php:979
+msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 전체 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:1035
+msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 커밋되지 않은 저장용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
 #: include/classes/items/CHelpItems.php:1039
+msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신의 공유하지 않은 저장용량, <url> - VMware서비스 URL, <uuid> - VMware가상 머신 호스트명"
+
+#: include/classes/items/CHelpItems.php:1043
+msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19992,6 +20266,10 @@ msgstr "주소 범위 \"%1$s\"가 올바르지 않습니다"
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8의 바이트 시퀀스가 올바르지 않습니다"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"

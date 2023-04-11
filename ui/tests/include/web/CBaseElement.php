@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,6 +58,10 @@ abstract class CBaseElement extends RemoteWebElement {
 			}
 
 			$this->reload();
+		}
+		// Allow single communication timeout during test execution
+		catch (\Facebook\WebDriver\Exception\WebDriverCurlException $exception) {
+			// Code is not missing here
 		}
 		// Workaraund for communication errors present on Jenkins
 		catch (\Facebook\WebDriver\Exception\WebDriverException $exception) {
