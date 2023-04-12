@@ -83,8 +83,6 @@ static char	shortopts[] = "s:i:p:hVl:t:";
 
 /* end of COMMAND LINE OPTIONS */
 
-char	*CONFIG_SOURCE_IP 		= NULL;
-
 /* not related with tls from libzbxcomms.a */
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;

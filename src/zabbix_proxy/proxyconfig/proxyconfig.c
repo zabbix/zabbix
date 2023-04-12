@@ -124,7 +124,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-			zbx_dc_sync_kvs_paths(&jp_kvs_paths, args->config_vault);
+			zbx_dc_sync_kvs_paths(&jp_kvs_paths, args->config_vault, args->config_source_ip);
 
 		zbx_dc_update_interfaces_availability();
 	}

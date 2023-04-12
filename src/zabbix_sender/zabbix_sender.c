@@ -324,7 +324,7 @@ static int	WITH_TIMESTAMPS = 0;
 static int	WITH_NS = 0;
 static int	REAL_TIME = 0;
 
-char		*CONFIG_SOURCE_IP = NULL;
+char		*config_source_ip = NULL;
 static char	*ZABBIX_SERVER = NULL;
 static char	*ZABBIX_SERVER_PORT = NULL;
 static char	*ZABBIX_HOSTNAME = NULL;
@@ -700,7 +700,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	if (SUCCEED == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
+	if (SUCCEED == zbx_connect_to_server(&sock, config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
 			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
 	{
 		if (1 == sendval_args->sync_timestamp)
@@ -951,7 +951,7 @@ static void	zbx_load_config(const char *config_file_in)
 		zbx_free(cfg_hostname);
 	}
 
-	zbx_fill_from_config_file(&CONFIG_SOURCE_IP, cfg_source_ip);
+	zbx_fill_from_config_file(&config_source_ip, cfg_source_ip);
 
 	if (NULL == ZABBIX_SERVER)
 	{
@@ -1029,8 +1029,8 @@ static void	parse_commandline(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'I':
-				if (NULL == CONFIG_SOURCE_IP)
-					CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
+				if (NULL == config_source_ip)
+					config_source_ip = zbx_strdup(config_source_ip, zbx_optarg);
 				break;
 			case 'z':
 				if (NULL == ZABBIX_SERVER)

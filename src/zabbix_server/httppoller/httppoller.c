@@ -43,6 +43,9 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
+	zbx_thread_httppoller_args	*httppoller_args_in = (zbx_thread_httppoller_args *)
+							(((zbx_thread_args_t *)args)->args);
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
@@ -70,7 +73,8 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
-			httptests_count += process_httptests((int)sec, &nextcheck);
+			httptests_count += process_httptests((int)sec, &nextcheck,
+					httppoller_args_in->config_source_ip);
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)

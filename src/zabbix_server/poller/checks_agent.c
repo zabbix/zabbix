@@ -42,7 +42,7 @@ extern unsigned char	program_type;
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result)
+int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
@@ -83,7 +83,7 @@ int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result)
 			goto out;
 	}
 
-	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, 0,
 			item->host.tls_connect, tls_arg1, tls_arg2))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);

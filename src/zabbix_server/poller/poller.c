@@ -303,7 +303,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	{
 		case ITEM_TYPE_ZABBIX:
 			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_agent(item, result);
+			res = get_value_agent(item, result, config_comms->config_source_ip);
 			zbx_alarm_off();
 			break;
 		case ITEM_TYPE_SIMPLE:
@@ -329,7 +329,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_ssh(item, result);
+			res = get_value_ssh(item, result, config_comms->config_source_ip);
 			zbx_alarm_off();
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
@@ -338,7 +338,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_TELNET:
 			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_telnet(item, result);
+			res = get_value_telnet(item, result, config_comms->config_source_ip);
 			zbx_alarm_off();
 			break;
 		case ITEM_TYPE_CALCULATED:
@@ -346,7 +346,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 #ifdef HAVE_LIBCURL
-			res = get_value_http(item, result);
+			res = get_value_http(item, config_comms->config_source_ip, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTP agent checks was not compiled in."));
 			res = CONFIG_ERROR;
@@ -726,14 +726,15 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout);
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout,
+				config_comms->config_source_ip);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
 		zbx_alarm_on(config_comms->config_timeout);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num,
-				config_comms->config_timeout);
+				config_comms->config_timeout, config_comms->config_source_ip);
 		zbx_alarm_off();
 	}
 	else if (1 == num)

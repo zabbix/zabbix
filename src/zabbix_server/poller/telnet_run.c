@@ -23,19 +23,17 @@
 #include "log.h"
 #include "zbxnum.h"
 
-extern char    *CONFIG_SOURCE_IP;
-
 /*
  * Example: telnet.run["ls /"]
  */
-int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding)
+int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *config_source_ip)
 {
 	zbx_socket_t	s;
 	int		ret = NOTSUPPORTED, flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+	if (FAIL == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, 0,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to TELNET server: %s",

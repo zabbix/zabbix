@@ -24,8 +24,6 @@
 #include "module.h"
 #include "zbxcacheconfig.h"
 
-extern char	*CONFIG_SOURCE_IP;
-
 #ifdef HAVE_NETSNMP
 
 #define ZBX_SNMP_STR_HEX	1
@@ -35,9 +33,10 @@ extern char	*CONFIG_SOURCE_IP;
 #define ZBX_SNMP_STR_ASCII	5
 #define ZBX_SNMP_STR_UNDEFINED	255
 
-int	get_value_snmp(const zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout);
+int	get_value_snmp(const zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
+		const char *config_source_ip);
 void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		unsigned char poller_type, int config_timeout);
+		unsigned char poller_type, int config_timeout, const char *config_source_ip);
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 #endif
 

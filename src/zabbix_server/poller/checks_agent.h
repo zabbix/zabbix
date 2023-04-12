@@ -23,8 +23,6 @@
 #include "zbxcacheconfig.h"
 #include "module.h"
 
-extern char	*CONFIG_SOURCE_IP;
-
-int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result);
+int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip);
 
 #endif

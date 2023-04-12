@@ -35,7 +35,6 @@
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
 
-extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_SSH_KEY_LOCATION;
 
 static const char	*password;
@@ -225,7 +224,8 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 }
 
 /* example ssh.run["ls /"] */
-int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options
+		const char *config_source_ip)
 {
 	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
@@ -250,7 +250,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 		goto session_free;
 	}
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+	if (FAIL == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, 0,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));

@@ -150,7 +150,8 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
  *             ipc_message - [IN] ipc message with media type and alert data  *
  *                                                                            *
  ******************************************************************************/
-static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
+		const char *config_source_ip)
 {
 	zbx_uint64_t	alertid, mediatypeid, eventid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password,
@@ -167,7 +168,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
-			content_type, ALARM_ACTION_TIMEOUT, error, sizeof(error));
+			content_type, ALARM_ACTION_TIMEOUT, config_source_ip, error, sizeof(error));
 
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
@@ -301,6 +302,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_thread_alerter_args	*alerter_args_in = (zbx_thread_alerter_args *)(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -366,7 +368,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		switch (message.code)
 		{
 			case ZBX_IPC_ALERTER_EMAIL:
-				alerter_process_email(&alerter_socket, &message);
+				alerter_process_email(&alerter_socket, &message, alerter_args_in->config_source_ip);
 				break;
 			case ZBX_IPC_ALERTER_SMS:
 				alerter_process_sms(&alerter_socket, &message);

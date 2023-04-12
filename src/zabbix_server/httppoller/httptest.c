@@ -616,7 +616,8 @@ out:
  * Purpose: process single scenario of http test                              *
  *                                                                            *
  ******************************************************************************/
-static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int *delay)
+static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int *delay,
+		const char *config_source_ip)
 {
 	zbx_db_result_t	result;
 	zbx_db_httpstep	db_httpstep;
@@ -689,7 +690,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 
 	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, httptest->httptest.ssl_cert_file,
 			httptest->httptest.ssl_key_file, httptest->httptest.ssl_key_password,
-			httptest->httptest.verify_peer, httptest->httptest.verify_host, &err_str))
+			httptest->httptest.verify_peer, httptest->httptest.verify_host, config_source_ip, &err_str))
 	{
 		goto clean;
 	}
@@ -1034,7 +1035,7 @@ httptest_error:
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-int	process_httptests(int now, time_t *nextcheck)
+int	process_httptests(int now, time_t *nextcheck, const char *config_source_ip)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -1135,7 +1136,7 @@ int	process_httptests(int now, time_t *nextcheck)
 			/* add httptest variables to the current test macro cache */
 			http_process_variables(&httptest, &httptest.variables, NULL, NULL);
 
-			process_httptest(&host, &httptest, &delay);
+			process_httptest(&host, &httptest, &delay, config_source_ip);
 			zbx_dc_httptest_queue(now, httptestid, delay);
 
 			zbx_free(httptest.httptest.ssl_key_password);

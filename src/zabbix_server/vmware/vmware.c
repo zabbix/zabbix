@@ -63,7 +63,6 @@
 extern int		CONFIG_VMWARE_FREQUENCY;
 extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
 extern int		CONFIG_VMWARE_TIMEOUT;
-extern char		*CONFIG_SOURCE_IP;
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
 		__vm_shmem_realloc_func, __vm_shmem_free_func)
@@ -2731,25 +2730,26 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
 	zbx_free(counter);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: authenticates vmware service                                      *
- *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
- *             easyhandle - [IN] the CURL handle                              *
- *             page       - [IN] the CURL output buffer                       *
- *             error      - [OUT] the error message in the case of failure    *
- *                                                                            *
- * Return value: SUCCEED - the authentication was completed successfully      *
- *               FAIL    - the authentication process has failed              *
- *                                                                            *
- * Comments: If service type is unknown this function will attempt to         *
- *           determine the right service type by trying to login with vCenter *
- *           and vSphere session managers.                                    *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: authenticates vmware service                                         *
+ *                                                                               *
+ * Parameters: service          - [IN] vmware service                            *
+ *             easyhandle       - [IN] CURL handle                               *
+ *             page             - [IN] CURL output buffer                        *
+ *             config_source_ip - [IN]                                           *
+ *             error            - [OUT] error message in the case of failure     *
+ *                                                                               *
+ * Return value: SUCCEED - authentication was completed successfully             *
+ *               FAIL    - authentication process has failed                     *
+ *                                                                               *
+ * Comments: If service type is unknown this function will attempt to            *
+ *           determine the right service type by trying to login with vCenter    *
+ *           and vSphere session managers.                                       *
+ *                                                                               *
+ *********************************************************************************/
 static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
-		char **error)
+		const char *config_source_ip, char **error)
 {
 #	define ZBX_POST_VMWARE_AUTH						\
 		ZBX_POST_VSPHERE_HEADER						\
@@ -2795,9 +2795,9 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	}
 #endif
 
-	if (NULL != CONFIG_SOURCE_IP)
+	if (NULL != config_source_ip)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, config_source_ip)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
@@ -8535,10 +8535,11 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
  *                                                                            *
  * Purpose: updates object with a new data from vmware service                *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
+ * Parameters: service          - [IN]vmware service                          *
+ *             config_source_ip - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_update(zbx_vmware_service_t *service)
+int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip)
 {
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
@@ -8597,7 +8598,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &data->error))
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_source_ip, &data->error))
 		goto clean;
 
 	if (SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
@@ -9439,7 +9440,7 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service)
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip)
 {
 #	define INIT_PERF_XML_SIZE	200 * ZBX_KIBIBYTE
 
@@ -9482,7 +9483,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &error))
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_source_ip, &error))
 		goto clean;
 
 	/* update performance counter refresh rate for entities */

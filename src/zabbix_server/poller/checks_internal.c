@@ -495,7 +495,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 		zbx_alarm_on((unsigned int)config_comms->config_timeout);
 		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
-				config_comms->config_timeout);
+				config_comms->config_timeout, config_comms->config_source_ip);
 		zbx_alarm_off();
 
 		if (SUCCEED != res)

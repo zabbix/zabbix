@@ -478,7 +478,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const zbx_
 }
 
 static struct snmp_session	*zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, size_t max_error_len,
-		int config_timeout)
+		int config_timeout, const char *config_source_ip)
 {
 /* item snmpv3 privacy protocol */
 /* SYNC WITH PHP!               */
@@ -676,7 +676,7 @@ static struct snmp_session	*zbx_snmp_open_session(const zbx_dc_item_t *item, cha
 	}
 
 #ifdef HAVE_NETSNMP_SESSION_LOCALNAME
-	if (NULL != CONFIG_SOURCE_IP)
+	if (NULL != config_source_ip)
 	{
 		/* In some cases specifying just local host (without local port) is not enough. We do */
 		/* not care about the port number though so we let the OS select one by specifying 0. */
@@ -684,7 +684,7 @@ static struct snmp_session	*zbx_snmp_open_session(const zbx_dc_item_t *item, cha
 
 		static char	localname[64];
 
-		zbx_snprintf(localname, sizeof(localname), "%s:0", CONFIG_SOURCE_IP);
+		zbx_snprintf(localname, sizeof(localname), "%s:0", config_source_ip);
 		session.localname = localname;
 	}
 #endif
@@ -2428,11 +2428,12 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const zbx_dc_item_
 	return ret;
 }
 
-int	get_value_snmp(const zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout)
+int	get_value_snmp(const zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
+		const char *config_source_ip)
 {
 	int	errcode = SUCCEED;
 
-	get_values_snmp(item, result, &errcode, 1, poller_type, config_timeout);
+	get_values_snmp(item, result, &errcode, 1, poller_type, config_timeout, config_source_ip);
 
 	return errcode;
 }
@@ -2458,7 +2459,7 @@ static void	zbx_init_snmp(void)
 }
 
 void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		unsigned char poller_type, int config_timeout)
+		unsigned char poller_type, int config_timeout, const char *config_source_ip)
 {
 	struct snmp_session	*ss;
 	char			error[MAX_STRING_LEN];
@@ -2479,7 +2480,7 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 	if (j == num)	/* all items already NOTSUPPORTED (with invalid key, port or SNMP parameters) */
 		goto out;
 
-	if (NULL == (ss = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout)))
+	if (NULL == (ss = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout, config_source_ip)))
 	{
 		err = NETWORK_ERROR;
 		goto exit;

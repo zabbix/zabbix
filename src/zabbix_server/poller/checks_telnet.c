@@ -22,7 +22,7 @@
 
 #include "zbxsysinfo.h"
 
-int	get_value_telnet(zbx_dc_item_t *item, AGENT_RESULT *result)
+int	get_value_telnet(zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
@@ -76,7 +76,7 @@ int	get_value_telnet(zbx_dc_item_t *item, AGENT_RESULT *result)
 
 	encoding = get_rparam(&request, 3);
 
-	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
+	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding), config_source_ip);
 out:
 	zbx_free_agent_request(&request);
 

@@ -36,7 +36,7 @@ extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
@@ -79,7 +79,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 
 	zbx_alarm_on(config_timeout);
 
-	if (SUCCEED != (ret = get_value_agent(&item, &agent_result)))
+	if (SUCCEED != (ret = get_value_agent(&item, &agent_result, config_source_ip)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -103,12 +103,12 @@ fail:
 }
 
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
-		int config_timeout, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
 {
 	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
-	int             (*function)(zbx_dc_item_t *, AGENT_RESULT *);
+	int             (*function)(zbx_dc_item_t *, AGENT_RESULT *, const char*);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -171,7 +171,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 
 	zbx_alarm_on(config_timeout);
 
-	if (SUCCEED != (ret = function(&item, &agent_result)))
+	if (SUCCEED != (ret = function(&item, &agent_result, config_source_ip)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -424,26 +424,27 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: executing user scripts or remote commands                         *
- *                                                                            *
- * Parameters:  script         - [IN] the script to be executed               *
- *              host           - [IN] the host the script will be executed on *
- *              params         - [IN] parameters for the script               *
- *              config_timeout - [IN]                                         *
- *              result         - [OUT] the result of a script execution       *
- *              error          - [OUT] the error reported by the script       *
- *              max_error_len  - [IN] the maximum error length                *
- *              debug          - [OUT] the debug data (optional)              *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                TIMEOUT_ERROR - a timeout occurred                          *
- *                                                                            *
- ******************************************************************************/
+/****************************************************************************
+ *                                                                          *
+ * Purpose: executing user scripts or remote commands                       *
+ *                                                                          *
+ * Parameters:  script           - [IN] script to be executed               *
+ *              host             - [IN] host the script will be executed on *
+ *              params           - [IN] parameters for the script           *
+ *              config_timeout   - [IN]                                     *
+ *              config_source_ip - [IN]                                     *
+ *              result           - [OUT] result of a script execution       *
+ *              error            - [OUT] error reported by the script       *
+ *              max_error_len    - [IN] maximum error length                *
+ *              debug            - [OUT] debug data (optional)              *
+ *                                                                          *
+ * Return value:  SUCCEED - processed successfully                          *
+ *                FAIL - an error occurred                                  *
+ *                TIMEOUT_ERROR - a timeout occurred                        *
+ *                                                                          *
+ ****************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params, int config_timeout,
-		char **result, char *error, size_t max_error_len, char **debug)
+		const char *config_source_ip, char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -462,7 +463,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 					ret = zbx_execute_script_on_agent(host, script->command, result, config_timeout,
-							error, max_error_len);
+							config_source_ip, error, max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
@@ -501,8 +502,8 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, error,
-					max_error_len);
+			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, config_source_ip,
+					error, max_error_len);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);
