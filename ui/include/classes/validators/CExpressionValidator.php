@@ -288,13 +288,11 @@ class CExpressionValidator extends CValidator {
 					if ($parent_token === null
 							|| $parent_token['type'] != CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION) {
 						$is_valid = false;
-
 						break;
 					}
 
 					if (array_key_exists('in', $rule) && !in_array($parent_token['data']['function'], $rule['in'])) {
 						$is_valid = false;
-
 						break;
 					}
 
@@ -302,28 +300,24 @@ class CExpressionValidator extends CValidator {
 						if (array_key_exists('count', $rule['parameters'])
 								&& count($parent_token['data']['parameters']) != $rule['parameters']['count']) {
 							$is_valid = false;
-
 							break;
 						}
 
 						if (array_key_exists('min', $rule['parameters'])
 								&& count($parent_token['data']['parameters']) < $rule['parameters']['min']) {
 							$is_valid = false;
-
 							break;
 						}
 
 						if (array_key_exists('max', $rule['parameters'])
 								&& count($parent_token['data']['parameters']) > $rule['parameters']['max']) {
 							$is_valid = false;
-
 							break;
 						}
 					}
 
 					if (array_key_exists('position', $rule) && $position != $rule['position']) {
 						$is_valid = false;
-
 						break;
 					}
 
