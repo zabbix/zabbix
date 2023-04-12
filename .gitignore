@@ -188,7 +188,7 @@ tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxhistory/zbx_history_get_values
-tests/libs/zbxicmpping/process_fping_output_line
+tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn
 tests/libs/zbxjson/zbx_json_open_path

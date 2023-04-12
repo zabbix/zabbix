@@ -263,31 +263,29 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 		goto out;
 	}
 
-	if (ICMPPINGSEC == *icmpping)
+
+	if (ICMPPINGSEC != *icmpping || NULL == (tmp = get_rparam(&request, 5)) || '\0' == *tmp)
 	{
-		if (NULL == (tmp = get_rparam(&request, 5)) || '\0' == *tmp)
+		*type = ICMPPINGSEC_AVG;
+	}
+	else
+	{
+		if (0 == strcmp(tmp, "min"))
+		{
+			*type = ICMPPINGSEC_MIN;
+		}
+		else if (0 == strcmp(tmp, "avg"))
 		{
 			*type = ICMPPINGSEC_AVG;
 		}
+		else if (0 == strcmp(tmp, "max"))
+		{
+			*type = ICMPPINGSEC_MAX;
+		}
 		else
 		{
-			if (0 == strcmp(tmp, "min"))
-			{
-				*type = ICMPPINGSEC_MIN;
-			}
-			else if (0 == strcmp(tmp, "avg"))
-			{
-				*type = ICMPPINGSEC_AVG;
-			}
-			else if (0 == strcmp(tmp, "max"))
-			{
-				*type = ICMPPINGSEC_MAX;
-			}
-			else
-			{
-				zbx_snprintf(error, (size_t)max_error_len, "Mode \"%s\" is not supported.", tmp);
-				goto out;
-			}
+			zbx_snprintf(error, (size_t)max_error_len, "Mode \"%s\" is not supported.", tmp);
+			goto out;
 		}
 	}
 

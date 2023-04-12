@@ -71,7 +71,7 @@ typedef struct
 	char			*addr;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
-	unsigned char		allow_redirect;	/* treat redirected response as host up: 0 - no, 1 - yes */
+	unsigned char		allow_redirect;
 }
 icmpitem_t;
 

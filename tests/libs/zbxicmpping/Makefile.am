@@ -1,5 +1,5 @@
 if SERVER
-SERVER_tests = process_fping_output_line
+SERVER_tests = line_process
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -31,15 +31,15 @@ ICMPPING_LIBS = \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	-lz -lssl -lcrypto
 
-process_fping_output_line_SOURCES = \
-	process_fping_output_line.c \
+line_process_SOURCES = \
+	line_process.c \
 	../../zbxmocktest.h \
 	../../zbxmockexit.c \
 	../../zbxmockdir.c
 
-process_fping_output_line_LDADD = $(ICMPPING_LIBS)
-process_fping_output_line_LDFLAGS = @SERVER_LDFLAGS@
+line_process_LDADD = $(ICMPPING_LIBS)
+line_process_LDFLAGS = @SERVER_LDFLAGS@
 
-process_fping_output_line_CFLAGS = \
+line_process_CFLAGS = \
 	-I@top_srcdir@/tests
 endif

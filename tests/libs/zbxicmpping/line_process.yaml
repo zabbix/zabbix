@@ -31,7 +31,7 @@ out:
   max: 0.0
   rcv: 0
 ---
-test case: "Reply was received directly from the ping target host"
+test case: "Response was received directly from the ping target host"
 in:
   test_type: "process_response_to_individual_fping_request"
   ipaddr: "192.168.1.1"
@@ -42,7 +42,7 @@ in:
 out:
   host_up: 1
 ---
-test case: "Redirected reply was received in format before before fping 3.11 (allow_redirect=YES)"
+test case: "Redirected response fping v2.4 and from v3.0 till 3.10 inclusive (allow_redirect=YES)"
 in:
   test_type: "process_response_to_individual_fping_request"
   ipaddr: "192.168.202.10"
@@ -53,18 +53,7 @@ in:
 out:
   host_up: 1
 ---
-test case: "Redirected reply was received in format before since fping 3.11 (allow_redirect=YES)"
-in:
-  test_type: "process_response_to_individual_fping_request"
-  ipaddr: "192.168.202.10"
-  linebuf: " [<- 192.168.201.10]192.168.202.10 : [0], 1028 bytes, 0.64 ms (0.64 avg, 0% loss)"
-  requests_count: 1
-  allow_redirect: 1
-  fping_existence: 3
-out:
-  host_up: 1
----
-test case: "Redirected reply was received in format before before fping 3.11 (allow_redirect=NO)"
+test case: "Redirected response fping v2.4 and from v3.0 till 3.10 inclusive (allow_redirect=NO)"
 in:
   test_type: "process_response_to_individual_fping_request"
   ipaddr: "192.168.202.10"
@@ -75,7 +64,18 @@ in:
 out:
   host_up: 0
 ---
-test case: "Redirected reply was received in format before since fping 3.11 (allow_redirect=NO)"
+test case: "Redirected response fping from v3.11 till 5.1 inclusive (allow_redirect=YES)"
+in:
+  test_type: "process_response_to_individual_fping_request"
+  ipaddr: "192.168.202.10"
+  linebuf: " [<- 192.168.201.10]192.168.202.10 : [0], 1028 bytes, 0.64 ms (0.64 avg, 0% loss)"
+  requests_count: 1
+  allow_redirect: 1
+  fping_existence: 3
+out:
+  host_up: 1
+---
+test case: "Redirected response fping from v3.11 till 5.1 inclusive (allow_redirect=NO)"
 in:
   test_type: "process_response_to_individual_fping_request"
   ipaddr: "192.168.202.10"

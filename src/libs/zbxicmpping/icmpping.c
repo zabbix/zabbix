@@ -54,6 +54,26 @@ static int		fping_ipv6_supported;
 
 static time_t	fping_check_reset_at;	/* time of the last fping options expiration */
 
+typedef struct
+{
+	ZBX_FPING_HOST	*hosts;
+	int		hosts_count;
+	int		requests_count;
+	unsigned char	allow_redirect;
+#ifdef HAVE_IPV6
+	char		fping_existence;
+#endif
+}
+zbx_fping_args;
+
+typedef struct
+{
+	FILE	*input_pipe;
+	char	*linebuf;
+	size_t	linebuf_size;
+}
+zbx_fping_resp;
+
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
 	FILE	*f;
@@ -268,17 +288,32 @@ static int	get_ipv6_support(const char *fping, const char *dst)
 }
 #endif	/* HAVE_IPV6 */
 
-static int	process_fping_redirected_response(char *linebuf, unsigned char allow_redirect)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: detect if response was redirected or not and if redirected        *
+ *          response is treated as host down                                  *
+ *                                                                            *
+ * Parameters: args - [IN] host data and fping settings                       *
+ *             resp - [IN/OUT] fping output                                   *
+ *                                                                            *
+ * Return value: SUCCEED - no redirect was detected or                        *
+ *                         redirect was detected and redirect is allowed      *
+ *               FAIL    - redirect was detected and redirect is not allowed  *
+ *                         or invalid syntax was detected (host down)         *
+ *                                                                            *
+ * Comments: Redirected response is a situation when the target that is being *
+ *           ICMP pinged responds from a different IP address.                *
+ *                                                                            *
+ ******************************************************************************/
+static int	redirect_detect(zbx_fping_args *args, zbx_fping_resp *resp)
 {
 	int	ret = SUCCEED;
 	char	*p_start;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	/* There might be a situation when the target that is being ICMP pinged responds from a       */
-	/* different IP address (redirected response). Fping marks that in the output accordingly.    */
-	/* It would add the response IP address in square brackets with left triangular bracket and   */
-	/* a dash: '[<- AAA.BBB.CCC.DDD]'.                                                            */
+	/* In case of a redirected response, fping would add the response IP address in square        */
+	/* brackets with left triangular bracket and a dash: '[<- AAA.BBB.CCC.DDD]'.                  */
 	/*                                                                                            */
 	/* Before fping 3.11, fping appends response source address at the end of the line:           */
 	/* '192.168.1.1 : [0], 84 bytes, 0.61 ms (0.61 avg, 0% loss) [<- 192.168.1.2]'                */
@@ -286,27 +321,27 @@ static int	process_fping_redirected_response(char *linebuf, unsigned char allow_
 	/* Since fping 3.11, fping prepends response source address at the beginning of the line:     */
 	/* ' [<- 192.168.1.2]192.168.1.1 : [0], 84 bytes, 0.65 ms (0.65 avg, 0% loss)'                */
 
-	if (NULL != (p_start = strstr(linebuf, " [<-")))
+	if (NULL != (p_start = strstr(resp->linebuf, " [<-")))
 	{
 		char	*p_end;
+
+		if (0 == args->allow_redirect)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "treating redirected response as target host down: \"%s\"",
+					resp->linebuf);
+			ret = FAIL;
+			goto out;
+		}
 
 		if (NULL == (p_end = strchr(p_start, ']')))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "ignoring a response from fping with unexpected syntax: \"%s\";"
-					" \"]\" after \" [<-\" was expected", linebuf);
+					" \"]\" after \" [<-\" was expected", resp->linebuf);
 			ret = FAIL;
 			goto out;
 		}
 
-		if (0 == allow_redirect)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "treating redirected response as target host down: \"%s\"",
-					linebuf);
-			ret = FAIL;
-			goto out;
-		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "treating redirected response as target host up: \"%s\"", linebuf);
+		zabbix_log(LOG_LEVEL_DEBUG, "redirected response is allowed for host: \"%s\"", resp->linebuf);
 
 		p_end++;
 
@@ -318,8 +353,19 @@ out:
 	return ret;
 }
 
-static int	validate_host_address_in_fping_output(char *linebuf, ZBX_FPING_HOST *hosts, int hosts_count,
-		ZBX_FPING_HOST	**host)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get ICMP pinged host by host address in fping output line         *
+ *                                                                            *
+ * Parameters: resp - [IN] fping output                                       *
+ *             args - [IN] host data and fping settings                       *
+ *             host - [OUT]                                                   *
+ *                                                                            *
+ * Return value: SUCCEED - host was found                                     *
+ *               FAIL    - fping returned response for and unknown host       *
+ *                                                                            *
+ ******************************************************************************/
+static int	host_get(zbx_fping_resp *resp, zbx_fping_args *args, ZBX_FPING_HOST **host)
 {
 	int	i, ret;
 	char	*p_end;
@@ -328,15 +374,15 @@ static int	validate_host_address_in_fping_output(char *linebuf, ZBX_FPING_HOST *
 
 	*host = NULL;
 
-	if (NULL != (p_end = strchr(linebuf, ' ')))
+	if (NULL != (p_end = strchr(resp->linebuf, ' ')))
 	{
 		*p_end = '\0';
 
-		for (i = 0; i < hosts_count; i++)
+		for (i = 0; i < args->hosts_count; i++)
 		{
-			if (0 == strcmp(linebuf, hosts[i].addr))
+			if (0 == strcmp(resp->linebuf, args->hosts[i].addr))
 			{
-				*host = &hosts[i];
+				*host = &(args->hosts[i]);
 				break;
 			}
 		}
@@ -351,7 +397,17 @@ static int	validate_host_address_in_fping_output(char *linebuf, ZBX_FPING_HOST *
 	return ret;
 }
 
-static void	process_response_to_individual_fping_request(ZBX_FPING_HOST *host, char *linebuf_p, int requests_count)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process a line containing status of individual ICMP ping          *
+ *          response packet and set host status up or down                    *
+ *                                                                            *
+ * Parameters: linebuf_p - [IN]                                               *
+ *             host      - [IN/OUT]                                           *
+ *             args       -[IN/OUT] host data and fping settings              *
+ *                                                                            *
+ ******************************************************************************/
+static void	host_status_set(char *linebuf_p, ZBX_FPING_HOST *host, zbx_fping_args *args)
 {
 	int	response_idx;
 
@@ -359,7 +415,7 @@ static void	process_response_to_individual_fping_request(ZBX_FPING_HOST *host, c
 
 	response_idx = atoi(linebuf_p + 1);
 
-	if (0 > response_idx || response_idx >= requests_count)
+	if (0 > response_idx || response_idx >= args->requests_count)
 		return;
 
 	/* since 5.0 Fping outputs individual failed packages in additional to successful: */
@@ -385,11 +441,17 @@ static void	process_response_to_individual_fping_request(ZBX_FPING_HOST *host, c
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-#ifdef HAVE_IPV6
-static void	process_fping_statistics(ZBX_FPING_HOST *host, char *linebuf_p, int requests_count, int fping_existence)
-#else
-static void	process_fping_statistics(ZBX_FPING_HOST *host, char *linebuf_p, int requests_count)
-#endif
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process the status line containing response times for one target  *
+ *          host and one or more requests and calculate statistics            *
+ *                                                                            *
+ * Parameters: linebuf_p - [IN]                                               *
+ *             host      - [IN/OUT]                                           *
+ *             args       -[IN/OUT] host data and fping settings              *
+ *                                                                            *
+ ******************************************************************************/
+static void	stats_calc(char *linebuf_p, ZBX_FPING_HOST *host, zbx_fping_args *args)
 {
 	int	response_idx = 0;
 	double	sec;
@@ -415,48 +477,48 @@ static void	process_fping_statistics(ZBX_FPING_HOST *host, char *linebuf_p, int 
 			host->rcv++;
 		}
 	}
-	while (++response_idx < requests_count && NULL != (linebuf_p = strchr(linebuf_p + 1, ' ')));
+	while (++response_idx < args->requests_count && NULL != (linebuf_p = strchr(linebuf_p + 1, ' ')));
 
-	host->cnt += requests_count;
+	host->cnt += args->requests_count;
 #ifdef HAVE_IPV6
-	if (host->cnt == requests_count && NULL == config_icmpping->get_source_ip() &&
-			0 != (fping_existence & FPING_EXISTS) &&
-			0 != (fping_existence & FPING6_EXISTS))
+	if (host->cnt == args->requests_count && NULL == config_icmpping->get_source_ip() &&
+			0 != (args->fping_existence & FPING_EXISTS) &&
+			0 != (args->fping_existence & FPING6_EXISTS))
 	{
-		memset(host->status, 0, (size_t)requests_count);	/* reset response statuses for IPv6 */
+		memset(host->status, 0, (size_t)args->requests_count);	/* reset response statuses for IPv6 */
 	}
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
-#ifdef HAVE_IPV6
-static void	process_fping_output_line(char *linebuf, ZBX_FPING_HOST *hosts, int hosts_count, int requests_count,
-		unsigned char allow_redirect, int fping_existence)
-#else
-static void	process_fping_output_line(char *linebuf, ZBX_FPING_HOST *hosts, int hosts_count, int requests_count,
-		unsigned char allow_redirect)
-#endif
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process an individual fping output line                           *
+ *                                                                            *
+ * Parameters: resp - [IN] fping output                                       *
+ *             args - [IN/OUT] host data and fping settings                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 {
 	ZBX_FPING_HOST	*host;
 	char		*linebuf_p;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() linebuf = \"%s\"", __func__, linebuf);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() linebuf = \"%s\"", __func__, resp->linebuf);
 
-	if (SUCCEED != process_fping_redirected_response(linebuf, allow_redirect))
+	if (SUCCEED != redirect_detect(args, resp))
 		return;
 
-	if (SUCCEED != validate_host_address_in_fping_output(linebuf, hosts, hosts_count, &host))
+	if (SUCCEED != host_get(resp, args, &host))
 		return;
 
-
-	if (NULL == (linebuf_p = strstr(linebuf, " : ")))
+	if (NULL == (linebuf_p = strstr(resp->linebuf, " : ")))
 		return;
 
 	/* When NIC bonding is used, there are also lines like:                                          */
 	/* 192.168.1.2 : duplicate for [0], 96 bytes, 0.19 ms                                            */
 
-	if (NULL != strstr(linebuf, "duplicate for"))
+	if (NULL != strstr(resp->linebuf, "duplicate for"))
 		return;
 
 	linebuf_p += 3;
@@ -467,61 +529,57 @@ static void	process_fping_output_line(char *linebuf, ZBX_FPING_HOST *hosts, int 
 		/* no individual responses, but the final status line might contain a bogus value.        */
 		/* Because of this issue, we must monitor individual responses and mark the valid ones.   */
 		/*   8.8.8.8 : [0], 64 bytes, 9.37 ms (9.37 avg, 0% loss)                                 */
-		process_response_to_individual_fping_request(host, linebuf_p, requests_count);
+		host_status_set(linebuf_p, host, args);
 	}
 	else
 	{
 		/* Fping statistics may look like:                                                        */
 		/* 8.8.8.8 : 91.7 37.0 29.2 − 36.8                                                        */
-#ifdef HAVE_IPV6
-		process_fping_statistics(host, linebuf_p, requests_count, fping_existence);
-#else
-		process_fping_statistics(host, linebuf_p, requests_count);
-#endif
+		stats_calc(linebuf_p, host, args);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-#ifdef HAVE_IPV6
-static int	process_fping_output(FILE *input_pipe, char *linebuf, size_t linebuf_size, ZBX_FPING_HOST *hosts,
-		int hosts_count, int requests_count, unsigned char allow_redirect, int fping_existence)
-#else
-static int	process_fping_output(FILE *input_pipe, char *linebuf, size_t linebuf_size, ZBX_FPING_HOST *hosts,
-		int hosts_count, int requests_count, unsigned char allow_redirect)
-#endif
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process multiple-line fping output                                *
+ *                                                                            *
+ * Parameters: resp - [IN] fping output                                       *
+ *             args - [IN/OUT] host data and fping settings                   *
+ *                                                                            *
+ * Return value: SUCCEED      - fping output processed successfully           *
+ *               NOTSUPPORTED - unexpected error                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	int	i, ret = NOTSUPPORTED;
 
-	if (NULL == zbx_fgets(linebuf, (int)linebuf_size, input_pipe))
+	if (NULL == zbx_fgets(resp->linebuf, (int)resp->linebuf_size, resp->input_pipe))
 	{
-		zbx_snprintf(linebuf, linebuf_size, "no output");
+		zbx_snprintf(resp->linebuf, resp->linebuf_size, "no output");
 	}
 	else
 	{
-		for (i = 0; i < hosts_count; i++)
+		for (i = 0; i < args->hosts_count; i++)
 		{
-			hosts[i].status = (char *)zbx_malloc(NULL, (size_t)requests_count);
-			memset(hosts[i].status, 0, (size_t)requests_count);
+			args->hosts[i].status = (char *)zbx_malloc(NULL, (size_t)args->requests_count);
+			memset(args->hosts[i].status, 0, (size_t)args->requests_count);
 		}
 
 		do
 		{
-			zbx_rtrim(linebuf, "\n");
-#ifdef HAVE_IPV6
-			process_fping_output_line(linebuf, hosts, hosts_count, requests_count, allow_redirect,
-					fping_existence);
-#else
-			process_fping_output_line(linebuf, hosts, hosts_count, requests_count, allow_redirect);
-#endif
+			zbx_rtrim(resp->linebuf, "\n");
+			line_process(resp, args);
 			ret = SUCCEED;
 		}
-		while (NULL != zbx_fgets(linebuf, (int)linebuf_size, input_pipe));
+		while (NULL != zbx_fgets(resp->linebuf, (int)resp->linebuf_size, resp->input_pipe));
 
-		for (i = 0; i < hosts_count; i++)
-			zbx_free(hosts[i].status);
+		for (i = 0; i < args->hosts_count; i++)
+			zbx_free(args->hosts[i].status);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -529,7 +587,7 @@ static int	process_fping_output(FILE *input_pipe, char *linebuf, size_t linebuf_
 	return ret;
 }
 
-static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count, int interval, int size,
+static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count, int interval, int size,
 		int timeout, unsigned char allow_redirect, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
@@ -541,12 +599,14 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_cou
 	size_t		offset;
 	int 		i, ret = NOTSUPPORTED, rc;
 	sigset_t	mask, orig_mask;
+	zbx_fping_args	fping_args;
+	zbx_fping_resp	fping_resp;
 
 #ifdef HAVE_IPV6
 	int		family;
 	char		params6[70];
 	size_t		offset6;
-	int		fping_existence = 0;
+	char		fping_existence = 0;
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -830,12 +890,18 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_cou
 		goto out;
 	}
 
-	if (SUCCEED == process_fping_output(
+	fping_resp.input_pipe = f;
+	fping_resp.linebuf = linebuf;
+	fping_resp.linebuf_size = linebuf_size;
+
+	fping_args.hosts = hosts;
+	fping_args.hosts_count = hosts_count;
+	fping_args.requests_count = requests_count;
+	fping_args.allow_redirect = allow_redirect;
 #ifdef HAVE_IPV6
-			f, linebuf, linebuf_size, hosts, hosts_count, requests_count, allow_redirect, fping_existence))
-#else
-			f, linebuf, linebuf_size, hosts, hosts_count, requests_count, allow_redirect))
+	fping_args.fping_existence = fping_existence;
 #endif
+	if (SUCCEED == fping_output_process(&fping_resp, &fping_args))
 	{
 		ret = SUCCEED;
 	}
@@ -906,7 +972,7 @@ int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count, int per
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __func__, hosts_count);
 
-	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, requests_count, period, size, timeout,
+	if (NOTSUPPORTED == (ret = hosts_ping(hosts, hosts_count, requests_count, period, size, timeout,
 			allow_redirect, error, max_error_len)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
