@@ -182,7 +182,7 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 		(new CCol('#{name}'))
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH)
-			->setId('dcheckCell_#{dcheckid}'), // todo - check why necessary
+			->setId('dcheckCell_#{dcheckid}'),
 		new CHorList([
 			(new CButton(null, _('Edit')))
 				->addClass(ZBX_STYLE_BTN_LINK)
@@ -191,17 +191,23 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('js-remove')
 		])
-	]))->setId('dcheckRow_#{dcheckid}')
+	]))
+		->setId('dcheckRow_#{dcheckid}')
+		->setAttribute('dcheckRow', '#{dcheckid}')
 );
 
 $form
 	->addItem($discoveryFormGrid)
 	->addItem($check_template_default)
+	->addItem($uniqueness_template)
+	->addItem($host_source_template)
+	->addItem($name_source_template)
 	->addItem(
 		(new CScriptTag('
 			drule_edit_popup.init('.json_encode([
 				'druleid' => $data['drule']['druleid'],
-				'dchecks' => $data['drule']['dchecks']
+				'dchecks' => $data['drule']['dchecks'],
+				'drule' => $data['drule']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);

@@ -22,13 +22,15 @@
 
 window.drule_edit_popup = new class {
 
-	init({druleid, dchecks}) {
+	init({druleid, dchecks, drule}) {
 		this.overlay = overlays_stack.getById('discoveryForm');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this.druleid = druleid;
 		this.dchecks = dchecks;
+		this.drule = drule;
+		this.dcheckid = getUniqueId();
 
 		// append existing discovery checks to Check table\
 		if (typeof(dchecks) === 'object') {
@@ -38,6 +40,7 @@ window.drule_edit_popup = new class {
 			this._addCheck(dcheck);
 		}
 
+		this._addRadioButtonValues(drule);
 		this._initActionButtons();
 	}
 
@@ -57,24 +60,39 @@ window.drule_edit_popup = new class {
 	}
 
 	_updateCheck(row, input) {
-		this.ZBX_CHECKLIST[input.dcheckid] = input.value;
+		this.ZBX_CHECKLIST[this.dcheckid] = input.value;
 		input.host_source = this._getSourceValue('host_source');
 		input.name_source = this._getSourceValue('name_source');
 
 		this._addCheck(input, row);
+		this._removeDCheckRow(row.id);
 		row.remove();
+
+		for (var field_name in input) {
+			if (input.hasOwnProperty(field_name)) {
+				var $input = jQuery('<input>', {
+					name: 'dchecks[' + input.dcheckid + '][' + field_name + ']',
+					type: 'hidden',
+					value: input[field_name]
+				});
+
+				jQuery('#dcheckCell_' + input.dcheckid).append($input);
+			}
+		}
 	}
 
 	_editCheck(btn = null) {
-		let params = {};
 		row = null;
 
-		// todo - add row index
+		let params = {
+			dcheckid: this.dcheckid
+		};
 
 		if (btn !== null) {
 			var row = btn.closest('tr');
 
 			params = {
+				dcheckid: this.dcheckid,
 				update: 1
 			};
 
@@ -102,20 +120,53 @@ window.drule_edit_popup = new class {
 				this._updateCheck(row, e.detail)
 			}
 			else {
+				this.dcheckid = getUniqueId()
 				this._addCheck(e.detail);
 			}
 		});
 	}
 
+	_addRadioButtonValues(drule) {
+		let that = this;
+
+		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(drule.uniqueness_criteria)+']')
+			.attr('checked', 'checked');
+		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(drule.host_source)+']')
+			.attr('checked', 'checked');
+		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(drule.name_source)+']')
+			.attr('checked', 'checked');
+
+		document.querySelectorAll('#host_source, #name_source').forEach(function(element) {
+			element.addEventListener('change', function(e) {
+				that._updateRadioButtonValues(e);;
+			});
+		});
+	}
+
+	_updateRadioButtonValues(event) {
+		let target = event.target,
+			name = target.getAttribute('name');
+
+		if (target.dataset.id) {
+			document.querySelectorAll('[name^=dchecks][name$="[' + name + ']"]')
+				.forEach(function(dcheck) {
+					dcheck.value = (name === 'name_source') ? <?= ZBX_DISCOVERY_UNSPEC ?> : <?= ZBX_DISCOVERY_DNS ?>;
+				});
+			document.querySelector('[name="dchecks[' + target.dataset.id + '][' + name + ']"]').value = <?= ZBX_DISCOVERY_VALUE ?>;
+		}
+		else {
+			document.querySelectorAll('[name^=dchecks][name$="[' + name + ']"]')
+				.forEach(function(dcheck) {
+					dcheck.value = target.value;
+				});
+		}
+	}
+
 	_addCheck(input, row = null) {
-	//	this.ZBX_CHECKLIST[input.dcheckid] = input.value;
+		// todo - fix checklist
 		this.ZBX_CHECKLIST = [];
 
-		input.host_source = this._getSourceValue('host_source');
-		input.name_source = this._getSourceValue('name_source');
-
 		let template;
-
 		template = new Template(document.getElementById('dcheck-row-tmpl').innerHTML);
 
 		if (row) {
@@ -125,18 +176,18 @@ window.drule_edit_popup = new class {
 			document
 				.querySelector('#dcheckList tbody')
 				.insertAdjacentHTML('beforeend', template.evaluate(input));
-		}
 
-		for (var field_name in input) {
-			if (input.hasOwnProperty(field_name)) {
+			for (var field_name in input) {
 
-				var $input = jQuery('<input>', {
-					name: 'dchecks[' + input.dcheckid + '][' + field_name + ']',
-					type: 'hidden',
-					value: input[field_name]
-				});
+				if (input.hasOwnProperty(field_name)) {
+					var $input = jQuery('<input>', {
+						name: 'dchecks[' + input.dcheckid + '][' + field_name + ']',
+						type: 'hidden',
+						value: input[field_name]
+					});
 
-				jQuery('#dcheckCell_' + input.dcheckid).append($input);
+					jQuery('#dcheckCell_' + input.dcheckid).append($input);
+				}
 			}
 		}
 
@@ -163,7 +214,7 @@ window.drule_edit_popup = new class {
 	_removeDCheckRow(dcheckid) {
 		dcheckid = dcheckid.substring(dcheckid.indexOf("_") + 1);
 
-		delete this.ZBX_CHECKLIST[dcheckid];
+		delete this.ZBX_CHECKLIST[this.dcheckid];
 
 		const elements = {
 			uniqueness_criteria_: 'ip',
@@ -182,7 +233,6 @@ window.drule_edit_popup = new class {
 			}
 		}
 	}
-
 
 	_getSourceValue(source) {
 		const radioButtons = document.getElementsByName(source);
@@ -239,9 +289,8 @@ window.drule_edit_popup = new class {
 	}
 
 	submit() {
-
+		// todo - add trim fields
 		const fields = getFormFields(this.form);
-
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.druleid === null ? 'discovery.create' : 'discovery.update');
 

@@ -26,10 +26,12 @@
 
 window.check_popup = new class {
 
-	init() {
+	init({dcheckid}) {
 		this.overlay = overlays_stack.getById('discovery-check');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+
+		this.dcheckid = dcheckid;
 
 		this._loadViews();
 	}
@@ -108,7 +110,7 @@ window.check_popup = new class {
 	 * Get check table data to check if row with the same data already exists.
 	 */
 	_addCheckTableData() {
-		// todo - fix and compare all data from popup with all hidden data
+		// todo - fix and pass all hiddden input from row
 		const table = document.getElementById('dcheckList');
 		const tbody = table.getElementsByTagName('tbody')[0];
 		const trList = tbody.getElementsByTagName('tr');
@@ -128,6 +130,15 @@ window.check_popup = new class {
 	submit() {
 		const curl = new Curl('zabbix.php');
 		const fields = getFormFields(this.form);
+
+		// todo - check if this can be done differently
+		for (const key in fields) {
+			if (fields.hasOwnProperty(key) && fields[key].trim() === '') {
+				delete fields[key];
+			}
+		}
+
+		fields.dcheckid = this.dcheckid;
 
 		const dchecks = this._addCheckTableData()
 		fields.dchecks = dchecks;

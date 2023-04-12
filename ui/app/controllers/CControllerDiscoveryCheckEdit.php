@@ -80,19 +80,9 @@ class CControllerDiscoveryCheckEdit extends CController {
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
 		$params['name'] = discovery_check_type2str($data['type']);
 
-		if ($this->getInput('validate', 0)) {
-			if ($params['type'] == SVC_SNMPv1 || $params['type'] == SVC_SNMPv2c || $params['type'] == SVC_SNMPv3) {
-				$params['key_'] = $data['snmp_oid'];
-			}
-
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode(['params' => $params])]))->disableView()
-			);
-			return;
-		}
-
 		$output = [
 			'title' => _('Discovery check'),
+			'dcheckid' => $data['dcheckid'],
 			'params' => $params + DB::getDefaults('dchecks'),
 			'update' => $this->getInput('update', 0),
 			'user' => [

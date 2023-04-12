@@ -32,35 +32,24 @@ class CControllerDiscoveryCheckCheck extends CController {
 	}
 
 	protected function checkInput(): bool {
-		// todo - fix 'not empty' param
 		$fields = [
-			'update' =>					'in 1', // todo - can remove this later from here and from form fields?
 			'dcheckid' =>				'string',
 			'type' =>					'in '.implode(',', array_keys(discovery_check_type2str())),
 			'ports' =>					'string|not_empty|db dchecks.ports',
-
-			//'snmp_community' =>			'string|not_empty|db dchecks.snmp_community',
-			//'key_' =>					'string|not_empty|db dchecks.key_',
-			//'snmp_oid' =>				'string|not_empty|db dchecks.key_',
-
-			'snmp_community' =>			'string|db dchecks.snmp_community',
-			'key_' =>					'string|db dchecks.key_',
-			'snmp_oid' =>				'string|db dchecks.key_',
-
+			'snmp_community' =>			'string|not_empty|db dchecks.snmp_community',
+			'key_' =>					'string|not_empty|db dchecks.key_',
+			'snmp_oid' =>				'string|not_empty|db dchecks.key_',
 			'snmpv3_contextname' =>		'string|db dchecks.snmpv3_contextname',
 			'snmpv3_securityname' =>	'string|db dchecks.snmpv3_securityname',
 			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel|in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
 			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.implode(',', array_keys(getSnmpV3AuthProtocols())),
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
-
-			//'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase'
-			'snmpv3_privpassphrase' =>	'string|db dchecks.snmpv3_privpassphrase',
+			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
 			'dchecks' => 'array',
-
-			// todo - fix this
-			'host_source' => '',
-			'name_source' => '',
+			// todo - add stricter validation rules to these ?
+			'host_source' =>			'string',
+			'name_source' =>			'string',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -104,8 +93,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 			'ports' => svc_default_port(self::DEFAULT_TYPE)
 		], $this->getInputAll());
 
-		// todo - fix in JS (add id creation) Ask, if really should be 1,3,5 etc, not 1234
-		$data['dcheckid'] = 'new1';
+		$data['dcheckid'] =$this->getInput('dcheckid');
 
 		if ($data['type'] == 10 || $data['type'] == 11) {
 			$type_to_string = discovery_check_type2str($data['type']);
@@ -129,6 +117,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 
 		$dchecks = $this->getInput('dchecks', []);
 
+		// todo - update duplicate check
 		foreach ($dchecks as $dcheck) {
 			if ($data['name'] === $dcheck) {
 				$data['error'] = [

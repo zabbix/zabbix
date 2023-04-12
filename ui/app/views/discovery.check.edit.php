@@ -126,7 +126,10 @@ $form_list = (new CFormList())
 $form->addItem([
 	$form_list,
 	(new CInput('submit', 'submit'))->addStyle('display: none;'),
-	(new CScriptTag('check_popup.init();'))->setOnDocumentReady()
+	(new CScriptTag('check_popup.init('.json_encode([
+		'dcheckid' => $data['dcheckid']
+	]).');'))
+	->setOnDocumentReady()
 ]);
 
 $output = [
