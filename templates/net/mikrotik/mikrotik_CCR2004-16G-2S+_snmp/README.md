@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CCR2004-16G-2S monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik CCR2004-16G-2S+.
+
+This powerful and affordable router crushes all previous CCR models in single-core performance. 16x Gigabit Ethernet ports, 2x10G SFP+ cages, active cooling and the best single-core performance per watt & best overall performance per watt among all the CCR devices.
 
 ## Requirements
 

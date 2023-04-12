@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:37:38Z'
+  date: '2023-04-12T19:47:35Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -51,7 +51,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           url: '{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.PING.PAGE}'
-          status_codes: ''
           retrieve_mode: BOTH
           tags:
             -
@@ -66,7 +65,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           url: '{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.STATUS.PAGE}?json'
-          status_codes: ''
           tags:
             -
               tag: component

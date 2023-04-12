@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS309-1G-8SIN monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS309-1G-8S+IN.
+
+Desktop switch with one Gigabit Ethernet port and eight SFP+ 10Gbps ports
 
 ## Requirements
 

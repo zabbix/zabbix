@@ -12,11 +12,16 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- TODO
+- Mellanox
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+The template uses context macros for the temperature trigger
+expression. By default, it uses a macro value like {$TEMP.MAX.CRIT}. To adjust
+the threshold for a certain sensor you can define context macros on the host
+level, with a value corresponding to your device specifications, for example:
+{$TEMP.MAX.CRIT:"MGMT/BOARD_MONITOR"}. Please, read https://www.zabbix.com/documentation/6.0/manual/config/macros/user_macros_context
+for more detailed info on user context macros.
 
 ## Setup
 

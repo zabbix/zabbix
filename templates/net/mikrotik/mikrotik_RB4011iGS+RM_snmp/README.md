@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik RB4011iGSRM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik RB4011iGS+RM.
+
+Powerful 10xGigabit port router with a Quad-core 1.4Ghz CPU, 1GB RAM, SFP+ 10Gbps cage and desktop case with rack ears
 
 ## Requirements
 

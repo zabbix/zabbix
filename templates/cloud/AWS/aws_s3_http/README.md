@@ -3,7 +3,15 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of AWS S3 bucket monitoring by Zabbix via HTTP and doesn't require any external scripts.
+The template to monitor AWS S3 bucket by HTTP via Zabbix that works without any external scripts.  
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+*NOTE*
+This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+For more information, please refer to the (CloudWatch pricing)[https://aws.amazon.com/cloudwatch/pricing/] page.
+
+Additional information about metrics and used API methods:
+
+* Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
 
 ## Requirements
 
@@ -52,7 +60,6 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 Additional information about metrics and used API methods:
 * Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
-
 
 ### Macros used
 

@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS326-24G-2SRM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS326-24G-2S+RM.
+
+24 Gigabit port switch with 2 x SFP+ cages in 1U rackmount case, Dual boot (RouterOS or SwitchOS)        
 
 ## Requirements
 

@@ -3,7 +3,11 @@
 
 ## Overview
 
-The template to monitor Control-M by Zabbix that work without any external scripts.
+his template is designed to get metrics from the Control-M server using the Control-M Automation API with HTTP agent.
+
+This template monitors server statistics, discovers jobs and agents using Low Level Discovery.
+
+To use this template, macros {$API.TOKEN}, {$API.URI.ENDPOINT}, and {$SERVER.NAME} need to be set.
 
 
 ## Requirements

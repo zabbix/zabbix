@@ -3,7 +3,13 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of HashiCorp Consul Node monitoring by Zabbix via HTTP and doesn't require any external scripts.
+The template to monitor HashiCorp Consul by Zabbix that works without any external scripts.  
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
+Do not forget to enable Prometheus format for export metrics.
+See [documentation](https://www.consul.io/docs/agent/options#telemetry-prometheus_retention_time).  
+More information about metrics you can find in [official documentation](https://www.consul.io/docs/agent/telemetry).  
+
+Template `HashiCorp Consul Node by HTTP` — collects metrics by HTTP agent from /v1/agent/metrics endpoint.
 
 ## Requirements
 
@@ -25,14 +31,14 @@ Do not forget to enable Prometheus format for export metrics. See [documentation
 Template need to use Authorization via API token.
 
 Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.TOKEN}.  
-Also, see the Macros section for a list of macros used to set trigger values.  
+Also, see the Macros section for a list of macros used to set trigger values. 
+More information about metrics you can find in [official documentation](https://www.consul.io/docs/agent/telemetry). 
 
 This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macros {$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}, {$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES} if you want to filter discovered services by namespace.  
 In case of Open Source version service namespace will be set to 'None'.
 
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
 *NOTE.* You maybe are interested in Envoy Proxy by HTTP [template](../../envoy_proxy_http).
-
 
 ### Macros used
 

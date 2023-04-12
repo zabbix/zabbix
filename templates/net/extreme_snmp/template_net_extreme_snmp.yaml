@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:44:14Z'
+  date: '2023-04-12T19:54:07Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1501,7 +1501,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '5'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2507,6 +2507,8 @@ zabbix_export:
     -
       uuid: 9dc8bc10d4044889bd53c56f1da45c60
       name: 'Extreme EXOS: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
       graph_items:
         -
           drawtype: GRADIENT_LINE

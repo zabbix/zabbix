@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik netPower 16P monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik netPower 16P.
+
+An outdoor 18 port switch with 16 Gigabit PoE-out ports and 2 SFP+. Power all your access points anywhere!
 
 ## Requirements
 

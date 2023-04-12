@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:42:42Z'
+  date: '2023-04-12T19:52:37Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1465,7 +1465,7 @@ zabbix_export:
           value: '65'
       dashboards:
         -
-          uuid: 61d914d4532240ebbaa2e85171f35181
+          uuid: 2a5bbc386c5a4b04a0494455a6c9e1a7
           name: 'Alcatel Timetra TiMOS: General'
           pages:
             -

@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS328-24P-4SRM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS328-24P-4S+RM.
+
+24 port Gigabit Ethernet router/switch with four 10Gbps SFP+ ports in 1U rackmount case, Dual Boot and PoE output, 500W
 
 ## Requirements
 

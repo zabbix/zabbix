@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS305-1G-4SIN monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS305-1G-4S+IN.
+
+Five-port desktop switch with one Gigabit Ethernet port and four SFP+ 10Gbps ports
 
 ## Requirements
 

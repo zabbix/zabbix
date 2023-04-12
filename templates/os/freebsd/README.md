@@ -22,7 +22,6 @@ This template has been tested on:
 ## Setup
 
 Install Zabbix agent on FreeBSD according to Zabbix documentation.
-  text: Forum
 
 
 ### Macros used
@@ -35,9 +34,9 @@ Install Zabbix agent on FreeBSD according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Maximum number of opened files|<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p>|Zabbix agent|kernel.maxfiles|
+|Maximum number of opened files|<p>It could be increased by using the sysctl utility or modifying the file /etc/sysctl.conf.</p>|Zabbix agent|kernel.maxfiles|
 |Maximum number of processes|<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p>|Zabbix agent|kernel.maxproc|
-|Number of running processes|<p>Number of processes in running state.</p>|Zabbix agent|proc.num[,,run]|
+|Number of running processes|<p>The number of processes in a running state.</p>|Zabbix agent|proc.num[,,run]|
 |Number of processes|<p>Total number of processes in any state.</p>|Zabbix agent|proc.num[]|
 |Host boot time| |Zabbix agent|system.boottime|
 |Interrupts per second| |Zabbix agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second: ``</li></ul>|
@@ -59,12 +58,12 @@ Install Zabbix agent on FreeBSD according to Zabbix documentation.
 |System uptime| |Zabbix agent|system.uptime|
 |Number of logged in users|<p>Number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
 |Checksum of /etc/passwd| |Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Available memory|<p>Available memory is defined as free+cached+buffers memory.</p>|Zabbix agent|vm.memory.size[available]|
+|Available memory|<p>The available memory is defined as free+cached+buffers memory.</p>|Zabbix agent|vm.memory.size[available]|
 |Total memory| |Zabbix agent|vm.memory.size[total]|
-|UNDEFINED: Version of Zabbix agent running| |Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|FreeBSD: Version of Zabbix agent running| |Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Host name of Zabbix agent running| |Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Zabbix agent ping|<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p>|Zabbix agent|agent.ping|
-|UNDEFINED: Zabbix agent availability|<p>Monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
+|FreeBSD: Zabbix agent availability|<p>Monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
 
 ### Triggers
 
@@ -81,7 +80,7 @@ Install Zabbix agent on FreeBSD according to Zabbix documentation.
 |{HOST.NAME} has just been restarted||`change(/FreeBSD by Zabbix agent/system.uptime)<0`|Info||
 |/etc/passwd has been changed on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
 |Lack of available memory on server {HOST.NAME}||`last(/FreeBSD by Zabbix agent/vm.memory.size[available])<20M`|Average||
-|UNDEFINED: Zabbix agent is not available|<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p>|`max(/FreeBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
+|FreeBSD: Zabbix agent is not available|<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p>|`max(/FreeBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
 
 ### LLD rule Network interface discovery
 

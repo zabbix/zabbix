@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CCR1036-12G-4S monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik CCR1036-12G-4S.
+
+1U rackmount, 12x Gigabit Ethernet, 4xSFP cages, LCD, 36 cores x 1.2GHz CPU, 4GB RAM, 24 mpps fastpath, Up to 16Gbit/s throughput, RouterOS L6, Dual PSU
 
 ## Requirements
 

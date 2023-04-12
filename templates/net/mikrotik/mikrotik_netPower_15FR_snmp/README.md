@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik netPower 15FR monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik netPower 15FR.
+
+An outdoor 18 port switch with 15 reverse PoE ports and SFP. Cut costs, not speed - choose GPEN over GPON!
 
 ## Requirements
 

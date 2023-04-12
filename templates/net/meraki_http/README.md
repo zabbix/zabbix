@@ -1,4 +1,69 @@
 
+# Cisco Meraki dashboard by HTTP
+
+## Overview
+
+This template is designed for the effortless deployment of Cisco Meraki dashboard monitoring by Zabbix via HTTP and doesn't require any external scripts.
+
+## Requirements
+
+Zabbix version: 6.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Cisco Meraki API 1.24.0 
+
+## Configuration
+
+> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+You must set {$MERAKI.TOKEN} and {$MERAKI.API.URL} macros. 
+
+Create the token in the Meraki dashboard (see Meraki [documentation](https://developer.cisco.com/meraki/api-latest/#!authorization/authorization) for instructions). Set this token as {$MERAKI.TOKEN} macro value in Zabbix.
+
+Set your Meraki dashboard URl as {$MERAKI.API.URL} macro value in Zabbix (e.g., api.meraki.com/api/v1).
+
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$MERAKI.TOKEN}|<p>Cisco Meraki Dashboard API Token.</p>||
+|{$MERAKI.API.URL}|<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
+|{$MERAKI.ORGANIZATION.NAME.MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`.+`|
+|{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.DEVICE.NAME.MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`.+`|
+|{$MERAKI.DEVICE.NAME.NOT_MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p>||
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Meraki: Get data|<p>Item for gathering all the organizations and devices from Meraki API.</p>|Script|meraki.get.data|
+|Meraki: Data item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|meraki.get.data.errors<p>**Preprocessing**</p><ul><li>JSON Path: `$.error`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Meraki: There are errors in 'Get data' metric||`length(last(/Cisco Meraki dashboard by HTTP/meraki.get.data.errors))>0`|Warning||
+
+### LLD rule Organizations discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Organizations discovery| |Dependent item|meraki.organization.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.organizations`</li></ul>|
+
+### LLD rule Devices discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Devices discovery| |Dependent item|meraki.devices.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.devices`</li></ul>|
+
 # Cisco Meraki organization by HTTP
 
 ### Macros used
@@ -133,71 +198,6 @@
 |----|-----------|----------|--------|--------------------------------|
 |Uplink [{#IP}]: [{#UPLINK}]: loss > {$MERAKI.DEVICE.LOSS}%||`min(/Cisco Meraki device by HTTP/meraki.device.loss.pct[{#IP},{#UPLINK}],#3)>{$MERAKI.DEVICE.LOSS}`|Warning||
 |Uplink [{#IP}]: [{#UPLINK}]: latency > {$MERAKI.DEVICE.LATENCY}||`min(/Cisco Meraki device by HTTP/meraki.device.latency[{#IP},{#UPLINK}],#3)>{$MERAKI.DEVICE.LATENCY}`|Warning||
-
-# Cisco Meraki dashboard by HTTP
-
-## Overview
-
-This template is designed for the effortless deployment of Cisco Meraki dashboard monitoring by Zabbix via HTTP and doesn't require any external scripts.
-
-## Requirements
-
-Zabbix version: 6.0 and higher.
-
-## Tested versions
-
-This template has been tested on:
-- Cisco Meraki API 1.24.0 
-
-## Configuration
-
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
-
-## Setup
-
-You must set {$MERAKI.TOKEN} and {$MERAKI.API.URL} macros. 
-
-Create the token in the Meraki dashboard (see Meraki [documentation](https://developer.cisco.com/meraki/api-latest/#!authorization/authorization) for instructions). Set this token as {$MERAKI.TOKEN} macro value in Zabbix.
-
-Set your Meraki dashboard URl as {$MERAKI.API.URL} macro value in Zabbix (e.g., api.meraki.com/api/v1).
-
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$MERAKI.TOKEN}|<p>Cisco Meraki Dashboard API Token.</p>||
-|{$MERAKI.API.URL}|<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
-|{$MERAKI.ORGANIZATION.NAME.MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`.+`|
-|{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$MERAKI.DEVICE.NAME.MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`.+`|
-|{$MERAKI.DEVICE.NAME.NOT_MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p>||
-
-### Items
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Meraki: Get data|<p>Item for gathering all the organizations and devices from Meraki API.</p>|Script|meraki.get.data|
-|Meraki: Data item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|meraki.get.data.errors<p>**Preprocessing**</p><ul><li>JSON Path: `$.error`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-
-### Triggers
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|Meraki: There are errors in 'Get data' metric||`length(last(/Cisco Meraki dashboard by HTTP/meraki.get.data.errors))>0`|Warning||
-
-### LLD rule Organizations discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Organizations discovery| |Dependent item|meraki.organization.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.organizations`</li></ul>|
-
-### LLD rule Devices discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Devices discovery| |Dependent item|meraki.devices.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.devices`</li></ul>|
 
 ## Feedback
 

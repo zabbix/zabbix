@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik netPower Lite 7R monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik netPower Lite 7R.
+
+An outdoor reverse PoE switch with Gigabit Ethernet and 10G SFP+ ports.
 
 ## Requirements
 

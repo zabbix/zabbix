@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS354-48G-4S2QRM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS354-48G-4S+2Q+RM.
+
+Best price and best performance on the market – this 48 port switch will rock any setup, including 40 Gbps devices!
 
 ## Requirements
 

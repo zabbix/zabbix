@@ -3,7 +3,19 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of Nginx monitoring by Zabbix via HTTP and doesn't require any external scripts.
+The template to monitor Nginx by Zabbix that work without any external scripts.
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+
+Template `Nginx by HTTP` collects metrics by polling [ngx_http_stub_status_module](https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html) with HTTP agent remotely:
+
+```text
+Active connections: 291
+server accepts handled requests
+16630948 16630948 31070465
+Reading: 6 Writing: 179 Waiting: 106
+```
+
+Note that this solution supports https and redirects.
 
 ## Requirements
 

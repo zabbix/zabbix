@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CSS326-24G-2SRM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CSS326-24G-2S+RM.
+
+SwOS powered 24 port Gigabit Ethernet switch with two SFP+ ports in 1U rackmount case
 
 ## Requirements
 

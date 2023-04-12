@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:43:03Z'
+  date: '2023-04-12T19:52:58Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1358,7 +1358,7 @@ zabbix_export:
           value: '65'
       dashboards:
         -
-          uuid: 724dde1ca7624bc2a2f68eaf4c4ce44b
+          uuid: 881c7f5e3dc444f988b314bdb810cb6c
           name: 'Brocade: General'
           pages:
             -

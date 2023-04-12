@@ -1,4 +1,177 @@
 
+# Azure by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure by HTTP.
+It works without any external scripts and uses the script item.
+Currently the template supports the discovery of Virtual Machines (VMs), Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+
+## Requirements
+
+Zabbix version: 6.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Microsoft Azure
+
+## Configuration
+
+> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, and `{$AZURE.SUBSCRIPTION.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.VM.NAME.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
+|{$AZURE.VM.NAME.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VM.LOCATION.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
+|{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
+|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
+|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.AVAILABILITY}|<p>The warning threshold of the storage account availability.</p>|`70`|
+|{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY}|<p>The warning threshold of the storage account blob services availability.</p>|`70`|
+|{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY}|<p>The warning threshold of the storage account table services availability.</p>|`70`|
+|{$AZURE.RESOURCE_GROUP.MATCHES}|<p>This macro is used in discovery rules.</p>|`.*`|
+|{$AZURE.RESOURCE_GROUP.NOT.MATCHES}|<p>This macro is used in discovery rules.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MYSQL.DB.NAME.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
+|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MYSQL.DB.LOCATION.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
+|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.PGSQL.DB.NAME.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
+|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.PGSQL.DB.LOCATION.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
+|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.NAME.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
+|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
+|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`^System$`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure: Get resources|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.resources|
+|Azure: Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.errors<p>**Preprocessing**</p><ul><li>JSON Path: `$.errors`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Azure: Get storage accounts|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.storage.acc|
+|Azure: Get storage accounts errors|<p>The errors from API requests.</p>|Dependent item|azure.get.storage.acc.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure by HTTP/azure.get.errors))>0`|Average||
+|Azure: There are errors in storages requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure by HTTP/azure.get.storage.acc.errors))>0`|Average|**Depends on**:<br><ul><li>Azure: There are errors in requests to API</li></ul>|
+
+### LLD rule Storage accounts discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Storage accounts discovery|<p>The list of all storage accounts available under the subscription.</p>|Dependent item|azure.starage.acc.discovery<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+
+### Item prototypes for Storage accounts discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure: Storage account [{#NAME}]: Get data|<p>The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.</p>|Script|azure.get.storage.acc[{#NAME}]|
+|Azure: Storage account [{#NAME}]: Used Capacity|<p>The amount of storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.</p><p>For standard storage accounts, it's the sum of capacity used by blob, table, file, and queue. </p><p>For premium storage accounts and Blob storage accounts, it is the same as BlobCapacity or FileCapacity.</p>|Dependent item|azure.storage.used.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.UsedCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Availability|<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p>|Dependent item|azure.storage.availability[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.Availability.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Capacity|<p>The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes.</p>|Dependent item|azure.storage.blob.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.BlobCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Count|<p>The number of blob objects stored in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.blob.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.BlobCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Container Count|<p>The number of containers in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.blob.container.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.ContainerCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Index Capacity|<p>The amount of storage with the name `[{#NAME}]` used by the Azure Data Lake Storage Gen2 hierarchical index.</p>|Dependent item|azure.storage.blob.index.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.IndexCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.blob.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.blob.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.blob.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.blob.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.blob.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Blob Availability|<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p>|Dependent item|azure.storage.blob.availability[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.Availability.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Capacity|<p>The amount of storage used by the table service of the storage account with the name `[{#NAME}]`, expressed in bytes.</p>|Dependent item|azure.storage.table.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.TableCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Count|<p>The number of tables in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.table.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.TableCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Entity Count|<p>The number of table entities in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.table.entity.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.TableEntityCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.table.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.table.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.table.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.table.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.table.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Table Availability|<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p>|Dependent item|azure.storage.table.availability[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.Availability.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Capacity|<p>The amount of File storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.</p>|Dependent item|azure.storage.file.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Count|<p>The number of files in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.file.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Share Count|<p>The number of file shares in the storage account.</p>|Dependent item|azure.storage.file.share.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileShareCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Share Snapshot Count|<p>The number of snapshots present on the share in storage account's Files Service.</p>|Dependent item|azure.storage.file.shares.snapshot.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileShareSnapshotCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Share Snapshot Size|<p>The amount of storage used by the snapshots in storage account's File service in bytes.</p>|Dependent item|azure.storage.file.share.snapshot.size[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileShareSnapshotSize.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Share Capacity Quota|<p>The upper limit on the amount of storage that can be used by Azure Files Service in bytes.</p>|Dependent item|azure.storage.file.share.capacity.quota[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileShareCapacityQuota.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.file.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.file.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.file.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.file.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: File Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.file.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.file.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Queue Capacity|<p>The amount of Queue storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.</p>|Dependent item|azure.storage.queue.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.QueueCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Queue Count|<p>The number of queues in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.queue.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.QueueCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Queue Message Count|<p>The number of unexpired queue messages in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.queue.message.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.QueueMessageCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Queue Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.queue.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Queue Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.queue.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Queue Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.queue.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Queue Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.queue.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Azure: Storage account [{#NAME}]: Queue Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.queue.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.queue.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+
+### Trigger prototypes for Storage accounts discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure: Storage account [{#NAME}]: Availability is low||`(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}`|Warning||
+|Azure: Storage account [{#NAME}]: Blob Availability is low||`(min(/Azure by HTTP/azure.storage.blob.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}`|Warning||
+|Azure: Storage account [{#NAME}]: Table Availability is low||`(min(/Azure by HTTP/azure.storage.table.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}`|Warning||
+
+### LLD rule Virtual machines discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Virtual machines discovery|<p>The list of the virtual machines is provided by the subscription.</p>|Dependent item|azure.vm.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.resources.value`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+
+### LLD rule MySQL servers discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|MySQL servers discovery|<p>The list of the MySQL servers is provided by the subscription.</p>|Dependent item|azure.mysql.servers.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.resources.value`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+
+### LLD rule PostgreSQL servers discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|PostgreSQL servers discovery|<p>The list of the PostgreSQL servers is provided by the subscription.</p>|Dependent item|azure.pgsql.servers.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.resources.value`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+
+### LLD rule Microsoft SQL databases discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Microsoft SQL databases discovery|<p>The list of the Microsoft SQL databases is provided by the subscription.</p>|Dependent item|azure.mssql.databases.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.resources.value`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+
 # Azure virtual machine by HTTP
 
 ## Overview
@@ -631,179 +804,6 @@ This template has been tested on:
 |Azure Microsoft SQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
 |Azure Microsoft SQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
 |Azure Microsoft SQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
-
-# Azure by HTTP
-
-## Overview
-
-This template is designed to monitor Microsoft Azure by HTTP.
-It works without any external scripts and uses the script item.
-Currently the template supports the discovery of Virtual Machines (VMs), Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
-
-## Requirements
-
-Zabbix version: 6.0 and higher.
-
-## Tested versions
-
-This template has been tested on:
-- Microsoft Azure
-
-## Configuration
-
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
-
-## Setup
-
-1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
-
-      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
-
-> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
-
-2. Link the template to a host.
-3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, and `{$AZURE.SUBSCRIPTION.ID}`.
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
-|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
-|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
-|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
-|{$AZURE.VM.NAME.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
-|{$AZURE.VM.NAME.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VM.LOCATION.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
-|{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
-|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
-|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.AVAILABILITY}|<p>The warning threshold of the storage account availability.</p>|`70`|
-|{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY}|<p>The warning threshold of the storage account blob services availability.</p>|`70`|
-|{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY}|<p>The warning threshold of the storage account table services availability.</p>|`70`|
-|{$AZURE.RESOURCE_GROUP.MATCHES}|<p>This macro is used in discovery rules.</p>|`.*`|
-|{$AZURE.RESOURCE_GROUP.NOT.MATCHES}|<p>This macro is used in discovery rules.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MYSQL.DB.NAME.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
-|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MYSQL.DB.LOCATION.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
-|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.PGSQL.DB.NAME.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
-|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.PGSQL.DB.LOCATION.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
-|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.NAME.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
-|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
-|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`^System$`|
-
-### Items
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Azure: Get resources|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.resources|
-|Azure: Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.errors<p>**Preprocessing**</p><ul><li>JSON Path: `$.errors`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Azure: Get storage accounts|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.storage.acc|
-|Azure: Get storage accounts errors|<p>The errors from API requests.</p>|Dependent item|azure.get.storage.acc.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-
-### Triggers
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|Azure: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure by HTTP/azure.get.errors))>0`|Average||
-|Azure: There are errors in storages requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure by HTTP/azure.get.storage.acc.errors))>0`|Average|**Depends on**:<br><ul><li>Azure: There are errors in requests to API</li></ul>|
-
-### LLD rule Storage accounts discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Storage accounts discovery|<p>The list of all storage accounts available under the subscription.</p>|Dependent item|azure.starage.acc.discovery<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-
-### Item prototypes for Storage accounts discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Azure: Storage account [{#NAME}]: Get data|<p>The HTTP API endpoint that returns storage metrics with the name `[{#NAME}]`.</p>|Script|azure.get.storage.acc[{#NAME}]|
-|Azure: Storage account [{#NAME}]: Used Capacity|<p>The amount of storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.</p><p>For standard storage accounts, it's the sum of capacity used by blob, table, file, and queue. </p><p>For premium storage accounts and Blob storage accounts, it is the same as BlobCapacity or FileCapacity.</p>|Dependent item|azure.storage.used.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.UsedCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Availability|<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p>|Dependent item|azure.storage.availability[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.storageAccount.Availability.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Capacity|<p>The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes.</p>|Dependent item|azure.storage.blob.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.BlobCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Count|<p>The number of blob objects stored in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.blob.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.BlobCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Container Count|<p>The number of containers in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.blob.container.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.ContainerCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Index Capacity|<p>The amount of storage with the name `[{#NAME}]` used by the Azure Data Lake Storage Gen2 hierarchical index.</p>|Dependent item|azure.storage.blob.index.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.IndexCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.blob.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.blob.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.blob.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.blob.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.blob.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Blob Availability|<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p>|Dependent item|azure.storage.blob.availability[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blobServices.Availability.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Capacity|<p>The amount of storage used by the table service of the storage account with the name `[{#NAME}]`, expressed in bytes.</p>|Dependent item|azure.storage.table.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.TableCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Count|<p>The number of tables in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.table.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.TableCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Entity Count|<p>The number of table entities in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.table.entity.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.TableEntityCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.table.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.table.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.table.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.table.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.table.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Table Availability|<p>The percentage of availability for the storage service or a specified API operation.</p><p>Availability is calculated by taking the `TotalBillableRequests` value and dividing it by the number of applicable requests, including those that produced unexpected errors.</p><p>All unexpected errors result in reduced availability for the storage service or the specified API operation.</p>|Dependent item|azure.storage.table.availability[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tableServices.Availability.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Capacity|<p>The amount of File storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.</p>|Dependent item|azure.storage.file.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Count|<p>The number of files in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.file.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Share Count|<p>The number of file shares in the storage account.</p>|Dependent item|azure.storage.file.share.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileShareCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Share Snapshot Count|<p>The number of snapshots present on the share in storage account's Files Service.</p>|Dependent item|azure.storage.file.shares.snapshot.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileShareSnapshotCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Share Snapshot Size|<p>The amount of storage used by the snapshots in storage account's File service in bytes.</p>|Dependent item|azure.storage.file.share.snapshot.size[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileShareSnapshotSize.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Share Capacity Quota|<p>The upper limit on the amount of storage that can be used by Azure Files Service in bytes.</p>|Dependent item|azure.storage.file.share.capacity.quota[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.FileShareCapacityQuota.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.file.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.file.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.file.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.file.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: File Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.file.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fileServices.file.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Queue Capacity|<p>The amount of Queue storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.</p>|Dependent item|azure.storage.queue.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.QueueCapacity.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Queue Count|<p>The number of queues in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.queue.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.QueueCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Queue Message Count|<p>The number of unexpired queue messages in the storage account with the name `[{#NAME}]`.</p>|Dependent item|azure.storage.queue.message.count[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.QueueMessageCount.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Queue Transactions|<p>The number of requests made to the storage service or a specified API operation.</p><p>This number includes successful and failed requests and also requests, which produced errors.</p><p>Use `ResponseType` dimension for the number of different type of responses.</p>|Dependent item|azure.storage.queue.transactions[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.Transactions.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Queue Ingress|<p>The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.</p>|Dependent item|azure.storage.queue.ingress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.Ingress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Queue Egress|<p>The amount of egress data. This number includes egress to external client from Azure Storage and also egress within Azure.</p><p>As a result, this number does not reflect billable egress.</p>|Dependent item|azure.storage.queue.engress[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.Egress.total`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Queue Success Server Latency|<p>The average time used to process a successful request by Azure Storage.</p><p>This value does not include the network latency specified in `SuccessE2ELatency`.</p>|Dependent item|azure.storage.queue.success.server.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.SuccessServerLatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Azure: Storage account [{#NAME}]: Queue Success E2E Latency|<p>The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.</p><p>This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.</p>|Dependent item|azure.storage.queue.success.e2e.latency[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queueServices.queue.SuccessE2ELatency.average`</p><p>⛔️Custom on fail: Discard value</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-
-### Trigger prototypes for Storage accounts discovery
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|Azure: Storage account [{#NAME}]: Availability is low||`(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}`|Warning||
-|Azure: Storage account [{#NAME}]: Blob Availability is low||`(min(/Azure by HTTP/azure.storage.blob.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}`|Warning||
-|Azure: Storage account [{#NAME}]: Table Availability is low||`(min(/Azure by HTTP/azure.storage.table.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}`|Warning||
-
-### LLD rule Virtual machines discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Virtual machines discovery|<p>The list of the virtual machines is provided by the subscription.</p>|Dependent item|azure.vm.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.resources.value`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-
-### LLD rule MySQL servers discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|MySQL servers discovery|<p>The list of the MySQL servers is provided by the subscription.</p>|Dependent item|azure.mysql.servers.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.resources.value`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-
-### LLD rule PostgreSQL servers discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|PostgreSQL servers discovery|<p>The list of the PostgreSQL servers is provided by the subscription.</p>|Dependent item|azure.pgsql.servers.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.resources.value`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-
-### LLD rule Microsoft SQL databases discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Microsoft SQL databases discovery|<p>The list of the Microsoft SQL databases is provided by the subscription.</p>|Dependent item|azure.mssql.databases.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.resources.value`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
 
 ## Feedback
 

@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS317-1G-16SRM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS317-1G-16S+RM.
+
+Smart Switch, 1 x Gigabit LAN, 16 x SFP+ cages, Dual Core 800MHz CPU, 1GB RAM, 1U rackmount passive cooling case, Dual Power Supplies
 
 ## Requirements
 

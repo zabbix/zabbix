@@ -3,7 +3,18 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of AWS RDS instance monitoring by Zabbix via HTTP and doesn't require any external scripts.
+The template to monitor AWS RDS instance by HTTP via Zabbix that works without any external scripts.  
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+*NOTE*
+This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+For more information, please refer to the (CloudWatch pricing)[https://aws.amazon.com/cloudwatch/pricing/] page.
+
+Additional information about metrics and used API methods:
+
+* Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
+* Full metrics list related to Amazon Aurora: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
+* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
+
 
 ## Requirements
 

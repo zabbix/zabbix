@@ -5,6 +5,12 @@
 
 This template is designed for the effortless deployment of D-Link DES_DGS Switch monitoring by Zabbix via SNMP and doesn't require any external scripts.
 
+###  Known Issues:
+
+Description: D-Link reports missing PSU as fail(4)
+  - version: Firmware: 1.73R008,hardware revision: B1
+  - device: DGS-3420-26SC Gigabit Ethernet Switch
+
 ## Requirements
 
 Zabbix version: 6.0 and higher.

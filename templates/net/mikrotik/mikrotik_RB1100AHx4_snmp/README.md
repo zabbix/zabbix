@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik RB1100AHx4 monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik RB1100AHx4.
+
+Powerful 1U rackmount router with 13x Gigabit Ethernet ports
 
 ## Requirements
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:44:51Z'
+  date: '2023-04-12T19:54:44Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1457,7 +1457,7 @@ zabbix_export:
           value: '70'
       dashboards:
         -
-          uuid: 51b150c4dd9d4c72a1339a66e12971e4
+          uuid: 1276b12d41594e38afa2308925983a50
           name: 'Juniper: General'
           pages:
             -

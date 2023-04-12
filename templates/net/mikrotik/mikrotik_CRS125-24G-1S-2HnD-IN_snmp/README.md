@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS125-24G-1S-2HnD-IN monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS125-24G-1S-2HnD-IN.
+
+24x Gigabit Ethernet layer 3 Smart Switch, 1x SFP cage, LCD, 802.11b/g/n Dual Chain wireless, 600MHz CPU, 128MB RAM, Metal desktop case, RouterOS L5
 
 ## Requirements
 

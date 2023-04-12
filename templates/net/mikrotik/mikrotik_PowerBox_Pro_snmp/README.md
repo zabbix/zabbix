@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik PowerBox Pro monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik PowerBox Pro.
+
+Five Gigabit Ethernet Router with 4xPoE-out ports, SFP cage and outdoor enclosure
 
 ## Requirements
 

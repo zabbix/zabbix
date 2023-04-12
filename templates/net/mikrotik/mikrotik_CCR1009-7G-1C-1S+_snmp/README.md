@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CCR1009-7G-1C-1S monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik CCR1009-7G-1C-1S+.
+
+1U rackmount, 7x Gigabit Ethernet, 1x Combo port (SFP or Gigabit Ethernet), 1xSFP+ cage, 9 cores x 1.2GHz CPU, 2GB RAM, LCD panel, Dual Power supplies, SmartCard slot, RouterOS L6
 
 ## Requirements
 

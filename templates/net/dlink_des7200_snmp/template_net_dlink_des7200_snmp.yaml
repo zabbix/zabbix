@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:44:03Z'
+  date: '2023-04-12T19:53:57Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1294,7 +1294,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: rows
-                      value: '5'
+                      value: '1'
                     -
                       type: GRAPH_PROTOTYPE
                       name: graphid
@@ -2252,6 +2252,8 @@ zabbix_export:
     -
       uuid: 7d05108847574098a7a15db5faf12b7c
       name: 'D-Link DES 7200: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
       graph_items:
         -
           drawtype: GRADIENT_LINE

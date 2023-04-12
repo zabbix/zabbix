@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS326-24S2QRM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS326-24S+2Q+RM.
+
+Our fastest switch for the most demanding setups
 
 ## Requirements
 

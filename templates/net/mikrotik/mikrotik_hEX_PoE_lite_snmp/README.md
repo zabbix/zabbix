@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik hEX PoE lite monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik hEX PoE lite.
+
+5xEthernet with PoE output for four ports, USB, 650MHz CPU, 64MB RAM, RouterOS L4
 
 ## Requirements
 

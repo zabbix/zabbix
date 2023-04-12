@@ -5,6 +5,21 @@
 
 This template is designed for the effortless deployment of Ubiquiti AirOS monitoring by Zabbix via SNMP and doesn't require any external scripts.
 
+### Known issues
+
+- Description: 'UBNT unifi reports speed: like IF-MIB::ifSpeed.1 = Gauge32: 4294967295 for all interfaces'
+  - version: 'Firmware: BZ.ar7240.v3.7.51.6230.170322.1513'
+  - device: UBNT UAP-LR
+- Description: 'UBNT AirMax(NanoStation, NanoBridge etc) reports ifSpeed: as 0 for VLAN and wireless(ath0) interfaces'
+  - version: 'Firmware: XW.ar934x.v5.6-beta4.22359.140521.1836'
+  - device: NanoStation M5
+- Description: 'UBNT AirMax(NanoStation, NanoBridge etc) reports always return ifType: as ethernet(6) even for wifi,vlans and other types'
+  - version: 'Firmware: XW.ar934x.v5.6-beta4.22359.140521.1836'
+  - device: NanoStation M5
+- Description: ifXTable is not provided in IF-MIB. So Interfaces Simple Template is used instead
+  - version: all above
+  - device: NanoStation, UAP-LR
+
 ## Requirements
 
 Zabbix version: 6.0 and higher.

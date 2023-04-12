@@ -3,7 +3,12 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of PHP-FPM monitoring by Zabbix via HTTP and doesn't require any external scripts.
+The template to monitor PHP-FPM by Zabbix that work without any external scripts.
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+
+Template `PHP-FPM by HTTP` collects metrics by polling PHP-FPM status-page with HTTP agent remotely.
+
+Note that this solution supports https and redirects.
 
 ## Requirements
 

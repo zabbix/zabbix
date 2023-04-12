@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CCR1036-8G-2SEM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik CCR1036-8G-2S+EM.
+
+1U rackmount, 8x Gigabit Ethernet, 2xSFP+ cages, LCD, 36 cores x 1.2GHz CPU, 8GB RAM, 41.5mpps fastpath, Up to 28Gbit/s throughput, RouterOS L6, Dual PSU
 
 ## Requirements
 

@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik RB260GSP monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik RB260GSP.
+
+5x Gigabit PoE out Ethernet Smart Switch, SFP cage, plastic case, SwOS
 
 ## Requirements
 

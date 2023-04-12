@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:36:40Z'
+  date: '2023-04-12T19:46:31Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1237,7 +1237,7 @@ zabbix_export:
           key: jenkins.node.count
           delay: '0'
           history: 7d
-          description: 'The number of build nodes available to Jenkins, both online and off-line.'
+          description: 'The number of build nodes available to Jenkins, both on-line and off-line.'
           preprocessing:
             -
               type: JSONPATH

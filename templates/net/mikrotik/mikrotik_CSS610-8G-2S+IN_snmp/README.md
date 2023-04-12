@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CSS610-8G-2SIN monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CSS610-8G-2S+IN.
+
+Eight 1G Ethernet ports and two SFP+ ports for 10G fiber connectivity. Portable, powerful and extremely cost-effective - this switch is an instant classic!
 
 ## Requirements
 

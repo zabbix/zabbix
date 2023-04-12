@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik PowerBox monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik PowerBox.
+
+650MHz CPU, 64MB RAM, 5xEthernet with PoE output for four ports, RouterOS L4, outdoor case, PSU
 
 ## Requirements
 

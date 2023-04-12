@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:37:24Z'
+  date: '2023-04-12T19:47:19Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -331,8 +331,8 @@ zabbix_export:
             -
               uuid: 95622a29bd58444b9f0bd985db99f922
               expression: 'last(/NGINX Plus by HTTP/nginx.info.uptime)<10m'
-              name: 'Nginx: has been restarted'
-              event_name: 'Nginx: has been restarted (uptime < 10m)'
+              name: 'Nginx: Host has been restarted'
+              event_name: 'Nginx: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'

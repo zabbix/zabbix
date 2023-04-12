@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:39:56Z'
+  date: '2023-04-12T19:49:54Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -727,7 +727,6 @@ zabbix_export:
               parameters:
                 - 10m
           url: '{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/ping'
-          status_codes: ''
           tags:
             -
               tag: component

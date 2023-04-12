@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik FiberBox monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik FiberBox.
+
+An outdoor switch with five SFP ports
 
 ## Requirements
 

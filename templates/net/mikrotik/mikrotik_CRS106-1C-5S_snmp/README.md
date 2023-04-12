@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS106-1C-5S monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS106-1C-5S.
+
+Smart Switch, 5x SFP cages, 1x Combo port (SFP or Gigabit Ethernet), 400MHz CPU, 128MB RAM, desktop case, RouterOS L5
 
 ## Requirements
 

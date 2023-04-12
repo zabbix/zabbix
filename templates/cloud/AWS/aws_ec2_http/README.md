@@ -3,7 +3,18 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of AWS EC2 monitoring by Zabbix via HTTP and doesn't require any external scripts.
+The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.  
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+*NOTE*
+This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+For more information, please refer to the (CloudWatch pricing)[https://aws.amazon.com/cloudwatch/pricing/] page.
+
+Additional information about metrics and used API methods:
+* Full metrics list related to EBS: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html
+* Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
+* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
+* DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+
 
 ## Requirements
 

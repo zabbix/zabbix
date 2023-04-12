@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CCR2004-1G-12S2XS monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik CCR2004-1G-12S+2XS.
+
+The Connectivity Router - your best companion when it comes to SFP, SFP+ and SFP28 management! 1, 10 and 25 Gbps ports in a single device to make your life easier.
 
 ## Requirements
 

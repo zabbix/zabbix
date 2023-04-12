@@ -1,4 +1,94 @@
 
+# VMware FQDN
+
+## Overview
+
+This template is designed for the effortless deployment of both VMware vCenter and ESX hypervisor monitoring and doesn't require any external scripts.
+
+The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
+For additional information please check https://www.zabbix.com/documentation/6.0/manual/vm_monitoring
+
+## Requirements
+
+Zabbix version: 6.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- VMWare 6.0
+
+## Configuration
+
+> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Compile zabbix server with required options (--with-libxml2 and --with-libcurl)
+2. Set the StartVMwareCollectors option in Zabbix server configuration file to 1 or more
+3. Create a new host
+4. Set the host macros (on host or template level) required for VMware authentication:
+```text
+{$VMWARE.URL}
+{$VMWARE.USERNAME}
+{$VMWARE.PASSWORD}
+```
+5. Link the template to host created early
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p>||
+|{$VMWARE.USERNAME}|<p>VMware service user name</p>||
+|{$VMWARE.PASSWORD}|<p>VMware service {$USERNAME} user password</p>||
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|VMware: Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
+|VMware: Full name|<p>VMware service full name.</p>|Simple check|vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|VMware: Version|<p>VMware service version.</p>|Simple check|vmware.version[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+
+### LLD rule Discover VMware clusters
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Discover VMware clusters|<p>Discovery of clusters</p>|Simple check|vmware.cluster.discovery[{$VMWARE.URL}]|
+
+### Item prototypes for Discover VMware clusters
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|VMware: Status of "{#CLUSTER.NAME}" cluster|<p>VMware cluster status.</p>|Simple check|vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]|
+
+### LLD rule Discover VMware datastores
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Discover VMware datastores| |Simple check|vmware.datastore.discovery[{$VMWARE.URL}]|
+
+### Item prototypes for Discover VMware datastores
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|VMware: Average read latency of the datastore {#DATASTORE}|<p>Amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]|
+|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore space in percentage from total.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]|
+|VMware: Total size of datastore {#DATASTORE}|<p>VMware datastore space in bytes.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]|
+|VMware: Average write latency of the datastore {#DATASTORE}|<p>Amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]|
+
+### LLD rule Discover VMware hypervisors
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Discover VMware hypervisors|<p>Discovery of hypervisors.</p>|Simple check|vmware.hv.discovery[{$VMWARE.URL}]|
+
+### LLD rule Discover VMware VMs FQDN
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Discover VMware VMs FQDN|<p>Discovery of guest virtual machines.</p>|Simple check|vmware.vm.discovery[{$VMWARE.URL}]|
+
 # VMware Guest
 
 ### Macros used
@@ -187,96 +277,6 @@
 |----|-----------|----------|--------|--------------------------------|
 |VMware: The {$VMWARE.HV.UUID} health is Red|<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"`|High|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
 |VMware: The {$VMWARE.HV.UUID} health is Yellow|<p>One or more components in the appliance might become overloaded soon.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"`|Average|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li><li>VMware: The {$VMWARE.HV.UUID} health is Yellow</li><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
-
-# VMware FQDN
-
-## Overview
-
-This template is designed for the effortless deployment of both VMware vCenter and ESX hypervisor monitoring and doesn't require any external scripts.
-
-The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
-For additional information please check https://www.zabbix.com/documentation/6.0/manual/vm_monitoring
-
-## Requirements
-
-Zabbix version: 6.0 and higher.
-
-## Tested versions
-
-This template has been tested on:
-- VMWare 6.0
-
-## Configuration
-
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
-
-## Setup
-
-1. Compile zabbix server with required options (--with-libxml2 and --with-libcurl)
-2. Set the StartVMwareCollectors option in Zabbix server configuration file to 1 or more
-3. Create a new host
-4. Set the host macros (on host or template level) required for VMware authentication:
-```text
-{$VMWARE.URL}
-{$VMWARE.USERNAME}
-{$VMWARE.PASSWORD}
-```
-5. Link the template to host created early
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p>||
-|{$VMWARE.USERNAME}|<p>VMware service user name</p>||
-|{$VMWARE.PASSWORD}|<p>VMware service {$USERNAME} user password</p>||
-
-### Items
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|VMware: Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
-|VMware: Full name|<p>VMware service full name.</p>|Simple check|vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|VMware: Version|<p>VMware service version.</p>|Simple check|vmware.version[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-
-### LLD rule Discover VMware clusters
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Discover VMware clusters|<p>Discovery of clusters</p>|Simple check|vmware.cluster.discovery[{$VMWARE.URL}]|
-
-### Item prototypes for Discover VMware clusters
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|VMware: Status of "{#CLUSTER.NAME}" cluster|<p>VMware cluster status.</p>|Simple check|vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]|
-
-### LLD rule Discover VMware datastores
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Discover VMware datastores| |Simple check|vmware.datastore.discovery[{$VMWARE.URL}]|
-
-### Item prototypes for Discover VMware datastores
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|VMware: Average read latency of the datastore {#DATASTORE}|<p>Amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]|
-|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore space in percentage from total.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]|
-|VMware: Total size of datastore {#DATASTORE}|<p>VMware datastore space in bytes.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]|
-|VMware: Average write latency of the datastore {#DATASTORE}|<p>Amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]|
-
-### LLD rule Discover VMware hypervisors
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Discover VMware hypervisors|<p>Discovery of hypervisors.</p>|Simple check|vmware.hv.discovery[{$VMWARE.URL}]|
-
-### LLD rule Discover VMware VMs FQDN
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Discover VMware VMs FQDN|<p>Discovery of guest virtual machines.</p>|Simple check|vmware.vm.discovery[{$VMWARE.URL}]|
 
 ## Feedback
 

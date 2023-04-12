@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS112-8G-4S-IN monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS112-8G-4S-IN.
+
+8x Gigabit Ethernet Smart Switch, 4x SFP cages, 400MHz CPU, 128MB RAM, desktop case, RouterOS L5
 
 ## Requirements
 

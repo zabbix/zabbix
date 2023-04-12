@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik RB2011iL-IN monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Ethernet router MikroTik RB2011iL-IN.
+
+Desktop metal case, 5xEthernet, 5xGigabit Ethernet, PoE out on port 10, 600MHz CPU, 64MB RAM, RouterOS L4
 
 ## Requirements
 

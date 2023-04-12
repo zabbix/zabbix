@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:56:35Z'
+  date: '2023-04-12T20:06:22Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -505,6 +505,10 @@ zabbix_export:
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Dell iDRAC: System name has changed'
+                  expression: 'last(/Dell iDRAC by SNMP/system.name,#1)<>last(/Dell iDRAC by SNMP/system.name,#2) and length(last(/Dell iDRAC by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope

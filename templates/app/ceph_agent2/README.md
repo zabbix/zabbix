@@ -6,7 +6,7 @@
 The template to monitor Ceph cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Ceph by Zabbix agent 2` — collects metrics by polling zabbix-agent2.    
+Template `Ceph by Zabbix agent 2` — collects metrics by polling zabbix-agent2.
 
 
 ## Requirements

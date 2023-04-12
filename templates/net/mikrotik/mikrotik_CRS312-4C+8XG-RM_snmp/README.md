@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of MikroTik CRS312-4C8XG-RM monitoring by Zabbix via SNMP and doesn't require any external scripts.
+The template for monitoring Switch MikroTik CRS312-4C+8XG-RM.
+
+Switch of the future: the first MikroTik product with 10G RJ45 Ethernet ports and SFP+
 
 ## Requirements
 

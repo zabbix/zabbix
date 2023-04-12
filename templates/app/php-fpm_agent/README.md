@@ -3,7 +3,10 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of PHP-FPM monitoring by Zabbix via Zabbix agent and doesn't require any external scripts.
+\- This template to monitor PHP-FPM by Zabbix agent works without any external scripts. Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+Template `PHP-FPM by Zabbix agent` collects metrics by polling the PHP-FPM status-page locally using Zabbix agent.
+Note that this template doesn't support redirects (limitation of web.page.get).
+It also uses Zabbix agent to collect `php-fpm` Linux process stats, for example, CPU usage, memory usage, and also to find out whether the process is running or not.
 
 ## Requirements
 

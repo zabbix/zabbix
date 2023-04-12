@@ -3,11 +3,8 @@
 
 ## Overview
 
-Cisco UCS® Manager provides unified, embedded management of all software and hardware
-components of the Cisco Unified Computing System™ (Cisco UCS) across multiple chassis
-and rack servers. It enables server, fabric, and storage provisioning as well as,
-device discovery, inventory, configuration, diagnostics, monitoring, fault detection,
-auditing, and statistics collection.
+Cisco UCS® Manager provides unified, embedded management of all software and hardware components of the Cisco Unified Computing System™ (Cisco UCS) across multiple chassis and rack servers. It enables server, fabric, and storage provisioning as well as,
+device discovery, inventory, configuration, diagnostics, monitoring, fault detection, auditing, and statistics collection.
 This is a template for Cisco UCS Manager monitoring via Zabbix SNMP Agent that works without any external scripts.
 You can download UCS MIB files there ftp://ftp.cisco.com/pub/mibs/ucs-mibs/.
 

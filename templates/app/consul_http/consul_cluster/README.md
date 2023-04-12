@@ -3,7 +3,11 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of HashiCorp Consul Cluster monitoring by Zabbix via HTTP and doesn't require any external scripts.
+The template to monitor HashiCorp Consul by Zabbix that works without any external scripts.  
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+
+Template `HashiCorp Consul Cluster by HTTP` — collects metrics by HTTP agent from API endpoints.  
+More information about metrics you can find in [official documentation](https://www.consul.io/docs/agent/telemetry).
 
 ## Requirements
 

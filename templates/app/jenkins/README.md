@@ -3,7 +3,8 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of Jenkins monitoring by Zabbix via HTTP and doesn't require any external scripts.
+The template to monitor Apache Jenkins by Zabbix that work without any external scripts.
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 ## Requirements
 
@@ -61,7 +62,7 @@ Don't forget to change macros {$JENKINS.URL}.
 |Jenkins: Executors count|<p>The number of executors available to Jenkins. This is corresponds to the sum of all the executors of all the online nodes.</p>|Dependent item|jenkins.executor.count<p>**Preprocessing**</p><ul><li>JSON Path: `$.['jenkins.executor.count.value'].value`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
 |Jenkins: Executors free|<p>The number of executors available to Jenkins that are not currently in use.</p>|Dependent item|jenkins.executor.free<p>**Preprocessing**</p><ul><li>JSON Path: `$.['jenkins.executor.free.value'].value`</li></ul>|
 |Jenkins: Executors in use|<p>The number of executors available to Jenkins that are currently in use.</p>|Dependent item|jenkins.executor.in_use<p>**Preprocessing**</p><ul><li>JSON Path: `$.['jenkins.executor.in-use.value'].value`</li></ul>|
-|Jenkins: Nodes count|<p>The number of build nodes available to Jenkins, both online and off-line.</p>|Dependent item|jenkins.node.count<p>**Preprocessing**</p><ul><li>JSON Path: `$.['jenkins.node.count.value'].value`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Jenkins: Nodes count|<p>The number of build nodes available to Jenkins, both on-line and off-line.</p>|Dependent item|jenkins.node.count<p>**Preprocessing**</p><ul><li>JSON Path: `$.['jenkins.node.count.value'].value`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
 |Jenkins: Nodes offline|<p>The number of build nodes available to Jenkins but currently off-line.</p>|Dependent item|jenkins.node.offline<p>**Preprocessing**</p><ul><li>JSON Path: `$.['jenkins.node.offline.value'].value`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
 |Jenkins: Nodes online|<p>The number of build nodes available to Jenkins and currently online.</p>|Dependent item|jenkins.node.online<p>**Preprocessing**</p><ul><li>JSON Path: `$.['jenkins.node.online.value'].value`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
 |Jenkins: Plugins active|<p>The number of plugins in the Jenkins instance that started successfully.</p>|Dependent item|jenkins.plugins.active<p>**Preprocessing**</p><ul><li>JSON Path: `$.['jenkins.plugins.active'].value`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|

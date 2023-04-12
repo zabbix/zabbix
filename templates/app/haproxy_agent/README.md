@@ -3,7 +3,12 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of HAProxy monitoring by Zabbix via Zabbix agent and doesn't require any external scripts.
+The template to monitor HAProxy by Zabbix that works without any external scripts.
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+
+Template `HAProxy by Zabbix agent` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/) with Zabbix agent.
+
+Note that this solution supports https and redirects.
 
 ## Requirements
 
