@@ -546,24 +546,25 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		foreach ($item_indexes as $key => $indexes) {
-			if (count($indexes) == 1) {
+			$template_count = count($indexes);
+
+			if ($template_count == 1) {
 				continue;
 			}
 
-			$tpl_items = array_column(array_intersect_key($items, array_flip($indexes)), null, 'hostid');
-			$templateids = array_keys($tpl_items);
-			$template_count = count($templateids);
-
 			for ($i = 0; $i < $template_count - 1; $i++) {
 				for ($j = $i + 1; $j < $template_count; $j++) {
-					$same_hosts = array_intersect_key($tpl_links[$templateids[$i]], $tpl_links[$templateids[$j]]);
+					$templateid_i = $items[$indexes[$i]]['hostid'];
+					$templateid_j = $items[$indexes[$j]]['hostid'];
+
+					$same_hosts = array_intersect_key($tpl_links[$templateid_i], $tpl_links[$templateid_j]);
 
 					if ($same_hosts) {
 						$same_host = reset($same_hosts);
 
 						$hosts = DB::select('hosts', [
 							'output' => ['hostid', 'host'],
-							'hostids' => [$templateids[$i], $templateids[$j], $same_host['hostid']],
+							'hostids' => [$templateid_i, $templateid_j, $same_host['hostid']],
 							'preservekeys' => true
 						]);
 
@@ -571,7 +572,7 @@ abstract class CItemGeneral extends CApiService {
 							[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]
 						);
 
-						switch ($tpl_items[$templateids[$i]]['flags']) {
+						switch ($items[$indexes[$i]]['flags']) {
 							case ZBX_FLAG_DISCOVERY_NORMAL:
 									$error = $target_is_host
 									? _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
@@ -592,7 +593,7 @@ abstract class CItemGeneral extends CApiService {
 						}
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key,
-							$hosts[$templateids[$i]]['host'], $hosts[$templateids[$j]]['host'],
+							$hosts[$templateid_i]['host'], $hosts[$templateid_j]['host'],
 							$hosts[$same_host['hostid']]['host']
 						));
 					}
