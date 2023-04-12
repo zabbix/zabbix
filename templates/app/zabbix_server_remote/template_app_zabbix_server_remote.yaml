@@ -2214,7 +2214,14 @@ zabbix_export:
               key: 'zabbix.proxy.compatibility[{#PROXY.NAME}]'
               delay: '0'
               history: 1w
-              description: 'The compatibility of Zabbix proxy.'
+              description: |
+                Version of proxy compared to Zabbix server version.
+                
+                Possible values:
+                0 - Undefined;
+                1 - Current version (proxy and server have the same major version);
+                2 - Outdated version (proxy version is older than server version, but is partially supported);
+                3 - Unsupported version (proxy version is older than server previous LTS release version or server major version is older than proxy major version).
               valuemap:
                 name: Compatibility
               preprocessing:
@@ -2237,16 +2244,23 @@ zabbix_export:
                   value: '{#PROXY.NAME}'
               trigger_prototypes:
                 -
+                  uuid: 84365975ffa5450db47edd42adbae719
+                  expression: 'last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=3'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy is not supported'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Zabbix proxy version is older than server previous LTS release version or server major version is older than proxy major version.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
                   uuid: 53dbaf21b8934ea9bada97431d4b3e23
-                  expression: 'last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)<>1'
-                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy is incompatible'
+                  expression: 'last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=2'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy is outdated'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Zabbix proxy is incompatible with the server.'
-                  dependencies:
-                    -
-                      name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
-                      expression: 'last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
+                  description: 'Zabbix proxy version is older than server version, but is partially supported. Only data collection and remote execution is available.'
                   tags:
                     -
                       tag: scope
@@ -2369,10 +2383,6 @@ zabbix_export:
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Zabbix proxy is not updating the configuration data.'
-                  dependencies:
-                    -
-                      name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
-                      expression: 'last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
                   tags:
                     -
                       tag: scope
