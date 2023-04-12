@@ -90,9 +90,9 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Docker: Service is down||`last(/Docker by Zabbix agent 2/Docker: Ping)=0`|Average|**Manual close**: Yes|
-|Docker: Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes</p>|`nodata(/Docker by Zabbix agent 2/Docker: Name,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Docker: Service is down</li></ul>|
-|Docker: Version has changed|<p>Docker version has changed. Acknowledge to close manually.</p>|`last(/Docker by Zabbix agent 2/Docker: Server version,#1)<>last(/Docker by Zabbix agent 2/Docker: Server version,#2) and length(last(/Docker by Zabbix agent 2/Docker: Server version))>0`|Info|**Manual close**: Yes|
+|Docker: Service is down||`last(/Docker by Zabbix agent 2/docker.ping)=0`|Average|**Manual close**: Yes|
+|Docker: Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes</p>|`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Docker: Service is down</li></ul>|
+|Docker: Version has changed|<p>Docker version has changed. Acknowledge to close manually.</p>|`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Images discovery
 
@@ -131,6 +131,7 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Container {#NAME}: Memory commit bytes||Dependent item|docker.container_stats.memory.commit_bytes["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.memory_stats.commitbytes`</li></ul>|
 |Container {#NAME}: Memory commit peak bytes||Dependent item|docker.container_stats.memory.commit_peak_bytes["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.memory_stats.commitpeakbytes`</li></ul>|
 |Container {#NAME}: Memory private working set||Dependent item|docker.container_stats.memory.private_working_set["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.memory_stats.privateworkingset`</li></ul>|
+|Container {#NAME}: Current PIDs count|<p>Current number of PIDs the container has created.</p>|Dependent item|docker.container_stats.pids_stats.current["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.pids_stats.current`</li></ul>|
 |Container {#NAME}: Networks bytes received per second||Dependent item|docker.networks.rx_bytes["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].rx_bytes.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Networks packets received per second||Dependent item|docker.networks.rx_packets["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].rx_packets.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Networks errors received per second||Dependent item|docker.networks.rx_errors["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].rx_errors.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
@@ -140,7 +141,7 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Container {#NAME}: Networks errors sent per second||Dependent item|docker.networks.tx_errors["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_errors.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Networks outgoing packets dropped per second||Dependent item|docker.networks.tx_dropped["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_dropped.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Get info|<p>Return low-level information about a container</p>|Zabbix agent|docker.container_info["{#NAME}",full]|
-|Container {#NAME}: Created||Dependent item|docker.container_info.created["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Container {#NAME}: Created||Dependent item|docker.container_info.created["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li><p>Matches regular expression: `^[-+]?[0-9]+$`</p><p>⛔️Custom on fail: Set error to: `Problem with date parsing in JS`</p></li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Image||Dependent item|docker.container_info.image["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.Names[0] == "{#NAME}")].Image.first()`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Restart count||Dependent item|docker.container_info.restart_count["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.RestartCount`</li></ul>|
 |Container {#NAME}: Status||Dependent item|docker.container_info.state.status["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Status`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
@@ -154,14 +155,14 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Container {#NAME}: Pid||Dependent item|docker.container_info.state.pid["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Pid`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Exit code||Dependent item|docker.container_info.state.exitcode["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.ExitCode`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Error||Dependent item|docker.container_info.state.error["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Error`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Container {#NAME}: Started at||Dependent item|docker.container_info.started["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Container {#NAME}: Finished at||Dependent item|docker.container_info.finished["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Container {#NAME}: Started at||Dependent item|docker.container_info.started["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li><p>Matches regular expression: `^[-+]?[0-9]+$`</p><p>⛔️Custom on fail: Set error to: `Problem with date parsing in JS`</p></li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Container {#NAME}: Finished at||Dependent item|docker.container_info.finished["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li><p>Matches regular expression: `^[-+]?[0-9]+$`</p><p>⛔️Custom on fail: Set error to: `Problem with date parsing in JS`</p></li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 
 ### Trigger prototypes for Containers discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Container {#NAME}: Health state container is unhealthy|<p>The container health state is unhealthy.</p>|`count(/Docker by Zabbix agent 2/Container {#NAME}: Health status,2m,,2)>=2`|High||
+|Container {#NAME}: Health state container is unhealthy|<p>The container health state is unhealthy.</p>|`count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],2m,,2)>=2`|High||
 |Container {#NAME}: Container has been stopped with error code||`last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0`|Average|**Manual close**: Yes|
 |Container {#NAME}: An error has occurred in the container|<p>Container {#NAME} has an error. Ack to close.</p>|`last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0`|Warning|**Manual close**: Yes|
 
