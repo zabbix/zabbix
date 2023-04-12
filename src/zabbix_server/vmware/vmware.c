@@ -9437,7 +9437,8 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
  *                                                                            *
  * Purpose: updates vmware statistics data                                    *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
+ * Parameters: service          - [IN] vmware service                         *
+ *             config_source_ip - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip)

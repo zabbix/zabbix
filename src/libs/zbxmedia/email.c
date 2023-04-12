@@ -900,6 +900,7 @@ out:
 	ZBX_UNUSED(password);
 	ZBX_UNUSED(content_type);
 	ZBX_UNUSED(timeout);
+	ZBX_UNUSED(config_source_ip);
 
 	zbx_strlcpy(error, "Support for SMTP authentication was not compiled in", max_error_len);
 	return FAIL;

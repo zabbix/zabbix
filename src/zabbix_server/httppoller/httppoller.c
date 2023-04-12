@@ -73,8 +73,8 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
-			httptests_count += process_httptests((int)sec, &nextcheck,
-					httppoller_args_in->config_source_ip);
+			httptests_count += process_httptests((int)sec, httppoller_args_in->config_source_ip,
+					&nextcheck);
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)

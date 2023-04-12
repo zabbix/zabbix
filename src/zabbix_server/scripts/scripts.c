@@ -79,7 +79,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 
 	zbx_alarm_on(config_timeout);
 
-	if (SUCCEED != (ret = get_value_agent(&item, &agent_result, config_source_ip)))
+	if (SUCCEED != (ret = get_value_agent(&item, config_source_ip, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);

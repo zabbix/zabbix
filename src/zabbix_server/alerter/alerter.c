@@ -142,14 +142,15 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 	return str;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: processes email alert                                             *
- *                                                                            *
- * Parameters: socket      - [IN] connection socket                           *
- *             ipc_message - [IN] ipc message with media type and alert data  *
- *                                                                            *
- ******************************************************************************/
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: processes email alert                                                  *
+ *                                                                                 *
+ * Parameters: socket           - [IN] connection socket                           *
+ *             ipc_message      - [IN] ipc message with media type and alert data  *
+ *             config_source_ip - [IN]                                             *
+ *                                                                                 *
+ ***********************************************************************************/
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
 		const char *config_source_ip)
 {

@@ -303,7 +303,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	{
 		case ITEM_TYPE_ZABBIX:
 			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_agent(item, result, config_comms->config_source_ip);
+			res = get_value_agent(item, config_comms->config_source_ip, result);
 			zbx_alarm_off();
 			break;
 		case ITEM_TYPE_SIMPLE:

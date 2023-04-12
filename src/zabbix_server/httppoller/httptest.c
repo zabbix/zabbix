@@ -988,6 +988,7 @@ httpstep_error:
 clean:
 	curl_easy_cleanup(easyhandle);
 #else
+	ZBX_UNUSED(config_source_ip);
 	err_str = zbx_strdup(err_str, "cURL library is required for Web monitoring support");
 #endif	/* HAVE_LIBCURL */
 
@@ -1028,14 +1029,16 @@ httptest_error:
  *                                                                            *
  * Purpose: process httptests                                                 *
  *                                                                            *
- * Parameters: now - current timestamp                                        *
+ * Parameters: now              - [IN] current timestamp                      *
+ *             config_source_ip - [IN]                                        *
+ *             nextcheck        - [OUT]                                       *
  *                                                                            *
  * Return value: number of processed httptests                                *
  *                                                                            *
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-int	process_httptests(int now, time_t *nextcheck, const char *config_source_ip)
+int	process_httptests(int now, const char *config_source_ip, time_t *nextcheck)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;

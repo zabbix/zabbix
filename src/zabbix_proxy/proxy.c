@@ -174,12 +174,6 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-//char	*CONFIG_SOURCE_IP = NULL;
-//static const char	*get_source_ip(void)
-//{
-//	return CONFIG_SOURCE_IP;
-//}
-
 ZBX_PROPERTY_DECL_CONST(char*, zbx_config_source_ip, NULL)
 
 char	*CONFIG_TMPDIR	= NULL;

@@ -2416,6 +2416,7 @@ out:
  *                                persistent files                            *
  *     config_tls      - [IN]                                                 *
  *     config_timeout  - [IN]                                                 *
+ *     config_source_ip - [IN]                                                *
  *     err_msg         - [IN/OUT] error message why an item became            *
  *                       NOTSUPPORTED                                         *
  *                                                                            *

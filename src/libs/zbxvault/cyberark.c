@@ -31,6 +31,7 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *s
 	ZBX_UNUSED(token);
 	ZBX_UNUSED(ssl_cert_file);
 	ZBX_UNUSED(ssl_key_file);
+	ZBX_UNUSED(config_source_ip);
 	ZBX_UNUSED(path);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(kvs);

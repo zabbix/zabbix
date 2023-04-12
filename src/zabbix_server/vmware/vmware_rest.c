@@ -237,12 +237,13 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  *                                                                            *
  * Purpose: cURL handle prepare                                               *
  *                                                                            *
- * Parameters: url        - [IN] the vmware service url                       *
- *             is_new_api - [IN] flag to use new api version syntax           *
- *             easyhandle - [OUT] cURL handle                                 *
- *             page       - [OUT] the response buffer for cURL                *
- *             headers    - [OUT] the request headers for cURL                *
- *             error      - [OUT] the error message in the case of failure    *
+ * Parameters: url              - [IN] vmware service url                     *
+ *             is_new_api       - [IN] flag to use new api version syntax     *
+ *             config_source_ip - [IN]                                        *
+ *             easyhandle       - [OUT] cURL handle                           *
+ *             page             - [OUT] response buffer for cURL              *
+ *             headers          - [OUT] request headers for cURL              *
+ *             error            - [OUT] error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED if the cURL prepared, FAIL otherwise                 *
  *                                                                            *

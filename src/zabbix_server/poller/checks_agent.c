@@ -30,7 +30,9 @@ extern unsigned char	program_type;
  *                                                                            *
  * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item             - [IN] item we are interested in              *
+ *             config_source_ip - [IN]                                        *
+ *             result           - [OUT]                                       *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
@@ -42,7 +44,7 @@ extern unsigned char	program_type;
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip)
+int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;

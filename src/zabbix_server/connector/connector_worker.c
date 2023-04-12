@@ -104,6 +104,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		zbx_free(info);
 	}
 #else
+	ZBX_UNUSED(config_source_ip);
 	zabbix_log(LOG_LEVEL_WARNING, "Support for connectors was not compiled in: missing cURL library");
 #endif
 	zbx_free(str);

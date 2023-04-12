@@ -137,24 +137,25 @@ static void	disconnect_proxy(zbx_socket_t *sock)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: get historical data from proxy                                    *
- *                                                                            *
- * Parameters: proxy          - [IN/OUT] proxy data                           *
- *             request        - [IN] requested data type                      *
- *             config_timeout - [IN]                                          *
- *             data           - [OUT] data received from proxy                *
- *             ts             - [OUT] timestamp when the proxy connection was *
- *                                    established                             *
- *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
- *               other code - an error occurred                               *
- *                                                                            *
- * Comments: The proxy->compress property is updated depending on the         *
- *           protocol flags sent by proxy.                                    *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: get historical data from proxy                                      *
+ *                                                                              *
+ * Parameters: proxy            - [IN/OUT] proxy data                           *
+ *             request          - [IN] requested data type                      *
+ *             config_timeout   - [IN]                                          *
+ *             config_source_ip - [IN]                                          *
+ *             data             - [OUT] data received from proxy                *
+ *             ts               - [OUT] timestamp when the proxy connection was *
+ *                                    established                               *
+ *                                                                              *
+ * Return value: SUCCESS - processed successfully                               *
+ *               other code - an error occurred                                 *
+ *                                                                              *
+ * Comments: The proxy->compress property is updated depending on the           *
+ *           protocol flags sent by proxy.                                      *
+ *                                                                              *
+ ********************************************************************************/
 static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int config_timeout,
 		const char *config_source_ip, char **data, zbx_timespec_t *ts)
 {
@@ -455,6 +456,7 @@ out:
  *             config_timeout      - [IN]                                     *
  *             events_cbs          - [IN]                                     *
  *             proxydata_frequency - [IN]                                     *
+ *             config_source_ip    - [IN]                                     *
  *             more                - [OUT] available data flag                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
@@ -507,6 +509,7 @@ out:
  *                                                                            *
  * Parameters: proxy               - [IN/OUT] proxy data                      *
  *             config_timeout      - [IN]                                     *
+ *             config_source_ip    - [IN]                                     *
  *             events_cbs          - [IN]                                     *
  *             proxydata_frequency - [IN]                                     *
  *                                                                            *

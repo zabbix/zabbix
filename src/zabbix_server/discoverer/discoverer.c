@@ -247,7 +247,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, &result, config_source_ip) &&
+					if (SUCCEED == get_value_agent(&item, config_source_ip, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);

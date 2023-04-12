@@ -865,6 +865,7 @@ out:
  *                                     the server                             *
  *             config_tls       - [IN]                                        *
  *             config_timeout   - [IN]                                        *
+ *             config_source_ip - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *
  *                                      the server                            *
