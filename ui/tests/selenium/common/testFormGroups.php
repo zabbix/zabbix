@@ -52,6 +52,11 @@ class testFormGroups extends CWebTest {
 	const DELETE_GROUP = 'Group for Delete test';
 
 	/**
+	 * Host and template sub group name for clone test scenario.
+	 */
+	const SUBGROUP = 'Group1/Subgroup1/Subgroup2';
+
+	/**
 	 * SQL query to get groups to compare hash values.
 	 */
 	const GROUPS_SQL = 'SELECT * FROM hstgrp g INNER JOIN hosts_groups hg ON g.groupid=hg.groupid'.
@@ -106,6 +111,9 @@ class testFormGroups extends CWebTest {
 			],
 			[
 				'name' => 'Templates/Update'
+			],
+			[
+				'name' => 'Group1/Subgroup1/Subgroup2'
 			]
 		]);
 		$template_groupids = CDataHelper::getIds('name');
@@ -139,13 +147,16 @@ class testFormGroups extends CWebTest {
 				'name' => 'Group for Maintenance'
 			],
 			[
-				'name' => 'Group for Host prtotype'
+				'name' => 'Group for Host prototype'
 			],
 			[
 				'name' => 'Group for Correlation'
 			],
 			[
 				'name' => 'Hosts/Update'
+			],
+			[
+				'name' => 'Group1/Subgroup1/Subgroup2'
 			]
 		]);
 		$host_groupids = CDataHelper::getIds('name');
@@ -175,7 +186,7 @@ class testFormGroups extends CWebTest {
 			'ruleid' => $lldid,
 			'groupLinks' => [
 				[
-					'groupid' => $host_groupids['Group for Host prtotype']
+					'groupid' => $host_groupids['Group for Host prototype']
 				]
 			]
 		]);
@@ -246,11 +257,11 @@ class testFormGroups extends CWebTest {
 	/**
 	 * Test for checking group form layout.
 	 *
-	 * @param string   $name         host or template group name
-	 * @param boolean  $discovered   discovered host group or not
+	 * @param string  $name        host or template group name
+	 * @param boolean $discovered  discovered host group or not
 	 */
 	public function layout($name, $discovered = false) {
-		// Check existen group form.
+		// Check existing group form.
 		$form = $this->openForm($name, $discovered);
 		if ($this->standalone) {
 			$this->page->assertHeader(ucfirst($this->object).' group');
@@ -262,6 +273,7 @@ class testFormGroups extends CWebTest {
 			$footer = $dialog->getFooter();
 		}
 
+		$this->assertTrue($form->isRequired('Group name'));
 		$form->checkValue(['Group name' => $name]);
 		$this->assertEquals(['Update', 'Clone', 'Delete','Cancel'], $footer->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
@@ -280,18 +292,20 @@ class testFormGroups extends CWebTest {
 			}
 			$this->page->assertHeader('Host prototypes');
 			$this->query('id:host')->one()->checkValue(self::HOST_PROTOTYPE);
+
 			return;
 		}
 
 		$this->assertEquals(['Group name', ($this->object === 'host')
-				? 'Apply permissions and tag filters to all subgroups'
-				: 'Apply permissions to all subgroups'],
+			? 'Apply permissions and tag filters to all subgroups'
+			: 'Apply permissions to all subgroups'],
 				$form->getLabels(CElementFilter::VISIBLE)->asText()
 		);
 
 		// There is no group creation on the search page.
 		if ($this->search) {
 			$dialog->close();
+
 			return;
 		}
 
@@ -328,8 +342,8 @@ class testFormGroups extends CWebTest {
 	/**
 	 * Function for opening group form.
 	 *
-	 * @param string   $name         host or template group name to open
-	 * @param boolean  $discovered   discovered host group or not
+	 * @param string  $name        host or template group name to open
+	 * @param boolean $discovered  discovered host group or not
 	 *
 	 * @return CForm
 	 */
@@ -337,7 +351,8 @@ class testFormGroups extends CWebTest {
 		if ($this->standalone) {
 			if ($name) {
 				$groupid = CDBHelper::getValue('SELECT groupid FROM hstgrp WHERE name='.zbx_dbstr($name).
-						' AND type='.constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP'));
+						' AND type='.constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP')
+				);
 				$this->page->login()->open($this->link.$groupid)->waitUntilReady();
 			}
 			else {
@@ -355,7 +370,7 @@ class testFormGroups extends CWebTest {
 				$table = $this->query($table_selector)->asTable()->one();
 				$table->findRow($column_name, ($discovered && !$this->search) ? self::LLD.': '.$name : $name)
 						->getColumn($column_name)->query('link', $name)->one()->click();
-				}
+			}
 			else {
 				$this->query('button', 'Create '.$this->object.' group')->one()->click();
 			}
@@ -405,7 +420,15 @@ class testFormGroups extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Group name' => '~!@#$%^&*()_+=[]{}null☺æų'
+						'Group name' => '~!@#$%^&*()_+=[]{}null{$A}{#B}'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => 'æ㓴🙂'
 					]
 				]
 			],
@@ -429,15 +452,6 @@ class testFormGroups extends CWebTest {
 		];
 	}
 
-	/**
-	 * Test for checking new group creation form.
-	 *
-	 * @param array $data          data provider
-	 */
-	public function create($data) {
-		$this->checkForm($data, 'create');
-	}
-
 	public function getUpdateData() {
 		$data = [];
 
@@ -445,8 +459,8 @@ class testFormGroups extends CWebTest {
 		foreach ($this->getCreateData() as $group) {
 			if ($group[0]['expected'] === TEST_GOOD) {
 				$group[0]['fields']['Group name'] = CTestArrayHelper::get($group[0], 'trim', false)
-						? '   trim update    '
-						: $group[0]['fields']['Group name'].'update';
+					? '   trim update    '
+					: $group[0]['fields']['Group name'].'update';
 			}
 
 			$data[] = $group;
@@ -456,20 +470,12 @@ class testFormGroups extends CWebTest {
 	}
 
 	/**
-	 * Test for checking group form on update.
-	 *
-	 * @param array     $data          data provider
-	 */
-	public function update($data) {
-		$this->checkForm($data, 'update');
-	}
-
-	/**
 	 * Test for checking group creation and update.
 	 *
-	 * @param array     $data          data provider
+	 * @param array  $data    data provider
+	 * @param string $action  create or update action
 	 */
-	private function checkForm($data, $action) {
+	protected function checkForm($data, $action) {
 		$good_message = ucfirst($this->object).' group '.(($action === 'create') ? 'added' : 'updated');
 		$bad_message = 'Cannot '.(($action === 'create') ? 'add' : 'update').' '.$this->object.' group';
 
@@ -511,8 +517,8 @@ class testFormGroups extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
 			$this->assertEquals($permission_old_hash, CDBHelper::getHash(self::PERMISSION_SQL));
 			$error_details =  ($this->object == 'template')
-					? CTestArrayHelper::get($data, 'template_error', $data['error'])
-					: $data['error'];
+				? CTestArrayHelper::get($data, 'template_error', $data['error'])
+				: $data['error'];
 			$this->assertMessage(TEST_BAD, $bad_message, $error_details);
 		}
 
@@ -524,8 +530,8 @@ class testFormGroups extends CWebTest {
 	/**
 	 * Update group without changing data.
 	 *
-	 * @param string $name				group name to be opened for check
-	 * @param bollean $discovered		discovered host group or not
+	 * @param string  $name        group name to be opened for check
+	 * @param bollean $discovered  discovered host group or not
 	 */
 	public function simpleUpdate($name, $discovered = false) {
 		$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
@@ -560,6 +566,15 @@ class testFormGroups extends CWebTest {
 					'name' => self::DELETE_GROUP,
 					'fields'  => [
 						'Group name' => microtime().' cloned group'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => self::SUBGROUP,
+					'fields'  => [
+						'Group name' => microtime().'/cloned/subgroup'
 					]
 				]
 			]
@@ -604,7 +619,8 @@ class testFormGroups extends CWebTest {
 
 			foreach ([$data['name'], $data['fields']['Group name']] as $name) {
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hstgrp WHERE name='.zbx_dbstr($name).
-						' AND type='.constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP')));
+						' AND type='.constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP'))
+				);
 			}
 		}
 		else {
@@ -645,7 +661,7 @@ class testFormGroups extends CWebTest {
 	/**
 	 * Test for checking group actions cancelling.
 	 *
-	 * @param array $data		data provider with fields values
+	 * @param array $data  data provider with fields values
 	 */
 	public function cancel($data) {
 		// TODO: delete if() after fix ZBX-22376
@@ -676,7 +692,9 @@ class testFormGroups extends CWebTest {
 
 		// Refresh element after opening new form after cloning.
 		if ($data['action'] === 'Clone') {
-			$footer = ($this->standalone) ? $form->invalidate() : COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
+			$footer = ($this->standalone)
+				? $form->invalidate()
+				: COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 		}
 
 		$footer->query('button:Cancel')->waitUntilClickable()->one()->click();
@@ -706,7 +724,7 @@ class testFormGroups extends CWebTest {
 	/**
 	 * Test for checking group deletion.
 	 *
-	 * @param array     $data          data provider
+	 * @param array $data  data provider
 	 */
 	public function delete($data) {
 		if ($data['expected'] === TEST_BAD) {
@@ -729,7 +747,8 @@ class testFormGroups extends CWebTest {
 
 			$this->assertMessage(TEST_GOOD, ucfirst($this->object).' group deleted');
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hstgrp WHERE name='.zbx_dbstr($data['name']).
-					' AND type='.constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP')));
+					' AND type='.constant('HOST_GROUP_TYPE_'.strtoupper($this->object).'_GROUP'))
+			);
 		}
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
@@ -954,6 +973,8 @@ class testFormGroups extends CWebTest {
 
 	/**
 	 * Apply the same level of permissions/tag filters to all nested host groups.
+	 *
+	 * @param array $data  data provider
 	 */
 	public function checkSubgroupsPermissions($data) {
 		// Prepare groups array according framework function assertTableData().
@@ -982,17 +1003,17 @@ class testFormGroups extends CWebTest {
 			}
 
 			// Permission inheritance doesn't apply when changing the name of existing group, only when creating a new group.
-			$this->assertMessage(TEST_GOOD, ucfirst($this->object).' group '.(array_key_exists('open_form', $data)
-					? 'updated'
-					: 'added')
+			$this->assertMessage(TEST_GOOD,
+					ucfirst($this->object).' group '.(array_key_exists('open_form', $data) ? 'updated' : 'added')
 			);
 		}
 
 		// Apply permissions to subgroups.
 		$form = $this->openForm($data['apply_permissions']);
 		$form->fill([(($this->object === 'host')
-				? 'Apply permissions and tag filters to all subgroups'
-				: 'Apply permissions to all subgroups') => true]);
+			? 'Apply permissions and tag filters to all subgroups'
+			: 'Apply permissions to all subgroups') => true
+		]);
 		$form->submit();
 
 		if (!$this->standalone) {
@@ -1004,8 +1025,12 @@ class testFormGroups extends CWebTest {
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid='.self::$user_groupid)->waitUntilReady();
 		$group_form = $this->query('id:user-group-form')->asForm()->one();
 		$group_form->selectTab(ucfirst($this->object).' permissions');
-		$this->assertTableData($data['groups_after'], 'id:'.(($this->object === 'template') ? 'template' : '').'group-right-table');
+		$this->assertTableData($data['groups_after'],
+				'id:'.(($this->object === 'template') ? 'template' : '').'group-right-table'
+		);
 		$group_form->selectTab('Problem tag filter');
-		$this->assertTableData(($this->object === 'template') ? $data['tags_before'] : $data['tags_after'], 'id:tag-filter-table');
+		$this->assertTableData(($this->object === 'template') ? $data['tags_before'] : $data['tags_after'],
+				'id:tag-filter-table'
+		);
 	}
 }

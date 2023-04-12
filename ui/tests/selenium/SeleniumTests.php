@@ -80,13 +80,13 @@ require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
 
-// Groups.
-require_once dirname(__FILE__).'/groups/testFormHostGroup.php';
-require_once dirname(__FILE__).'/groups/testFormHostGroupSearchPage.php';
-require_once dirname(__FILE__).'/groups/testFormHostGroupStandalone.php';
-require_once dirname(__FILE__).'/groups/testFormTemplateGroup.php';
-require_once dirname(__FILE__).'/groups/testFormTemplateGroupSearchPage.php';
-require_once dirname(__FILE__).'/groups/testFormTemplateGroupStandalone.php';
+// Host and template groups.
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroup.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupSearchPage.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupStandalone.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroup.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupSearchPage.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupStandalone.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';

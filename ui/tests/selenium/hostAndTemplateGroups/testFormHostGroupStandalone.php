@@ -28,21 +28,19 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  *
  * @dataSource DiscoveredHosts
  */
-class testFormHostGroupSearchPage extends testFormGroups {
+class testFormHostGroupStandalone extends testFormGroups {
 
-	protected $link = 'zabbix.php?action=search&search=group';
+	protected $standalone = true;
+	protected $link = 'zabbix.php?action=hostgroup.edit&groupid=';
 	protected $object = 'host';
-	protected $search = 'true';
 	protected static $update_group = 'Group for Update test';
 
-	public function testFormHostGroupSearchPage_Layout() {
-		$this->link = 'zabbix.php?action=search&search=Zabbix+servers';
+	public function testFormHostGroupStandalone_Layout() {
 		$this->layout('Zabbix servers');
 	}
 
-	public function testFormHostGroupSearchPage_DiscoveredLayout() {
-		$this->link = 'zabbix.php?action=search&search='.self::DISCOVERED_GROUP;
-		$this->layout(self::DISCOVERED_GROUP, true);
+	public function testFormHostGroupStandalone_DiscoveredLayout() {
+		$this->layout(self::DISCOVERED_GROUP, self::LLD);
 	}
 
 	public static function getHostValidationData() {
@@ -57,6 +55,45 @@ class testFormHostGroupSearchPage extends testFormGroups {
 				]
 			]
 		];
+	}
+
+	public static function getHostCreateData() {
+		return [
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Group name' => 'Zabbix servers'
+					],
+					'error' => 'Host group "Zabbix servers" already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => 'Templates'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => STRING_255
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateData
+	 * @dataProvider getHostValidationData
+	 * @dataProvider getHostCreateData
+	 */
+	public function testFormHostGroupStandalone_Create($data) {
+		$this->checkForm($data, 'create');
 	}
 
 	public static function getHostUpdateData() {
@@ -75,7 +112,15 @@ class testFormHostGroupSearchPage extends testFormGroups {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Group name' => 'Templates/Update'
+						'Group name' => 'Templates/Applications'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => str_repeat('long_', 51)
 					]
 				]
 			]
@@ -87,16 +132,14 @@ class testFormHostGroupSearchPage extends testFormGroups {
 	 * @dataProvider getHostValidationData
 	 * @dataProvider getHostUpdateData
 	 */
-	public function testFormHostGroupSearchPage_Update($data) {
-		$this->link = 'zabbix.php?action=search&search=update';
-		$this->update($data);
+	public function testFormHostGroupStandalone_Update($data) {
+		$this->checkForm($data, 'update');
 	}
 
 	/**
 	 * Test group simple update without changing data.
 	 */
-	public function testFormHostGroupSearchPage_SimpleUpdate() {
-		$this->link = 'zabbix.php?action=search&search='.self::DISCOVERED_GROUP;
+	public function testFormHostGroupStandalone_SimpleUpdate() {
 		$this->simpleUpdate(self::DISCOVERED_GROUP, true);
 	}
 
@@ -119,14 +162,14 @@ class testFormHostGroupSearchPage extends testFormGroups {
 	 * @dataProvider getCloneData
 	 * @dataProvider getHostCloneData
 	 */
-	public function testFormHostGroupSearchPage_Clone($data) {
+	public function testFormHostGroupStandalone_Clone($data) {
 		$this->clone($data);
 	}
 
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testFormHostGroupSearchPage_Cancel($data) {
+	public function testFormHostGroupStandalone_Cancel($data) {
 		$this->cancel($data);
 	}
 
@@ -164,8 +207,15 @@ class testFormHostGroupSearchPage extends testFormGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Group for Host prtotype',
-					'error' => 'Group "Group for Host prtotype" cannot be deleted, because it is used by a host prototype.'
+					'name' => 'Group for Host prototype',
+					'error' => 'Group "Group for Host prototype" cannot be deleted, because it is used by a host prototype.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'Discovered hosts',
+					'error' => 'Host group "Discovered hosts" is group for discovered hosts and cannot be deleted.'
 				]
 			]
 		];
@@ -175,44 +225,15 @@ class testFormHostGroupSearchPage extends testFormGroups {
 	 * @dataProvider getDeleteData
 	 * @dataProvider getHostDeleteData
 	 */
-	public function testFormHostGroupSearchPage_Delete($data) {
+	public function testFormHostGroupStandalone_Delete($data) {
 		$this->delete($data);
-	}
-
-	public static function getSubgroupPermissionsData() {
-		return [
-			[
-				[
-					'apply_permissions' => 'Europe',
-					// Permission inheritance doesn't apply when changing the name of existing group.
-					'open_form' => 'Europe group for test on search page',
-					'create' => 'Streets/Dzelzavas',
-					'groups_after' => [
-						'Cities/Cesis' => 'Read',
-						'Europe (including subgroups)' => 'Deny',
-						'Streets' => 'Deny',
-						'Streets/Dzelzavas' => 'None'
-					],
-					'tags_after' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia/Riga/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Streets', 'Tags' => 'street']
-					]
-				]
-			]
-		];
 	}
 
 	/**
 	 * @onBeforeOnce prepareSubgroupData
-	 * @dataProvider getSubgroupPermissionsData
+	 * @dataProvider getSubgroupsData
 	 */
-	public function testFormHostGroupSearchPage_ApplyPermissionsToSubgroups($data) {
-		$this->link = 'zabbix.php?action=search&search=europe';
+	public function testFormHostGroupStandalone_ApplyPermissionsToSubgroups($data) {
 		$this->checkSubgroupsPermissions($data);
 	}
 }

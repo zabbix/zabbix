@@ -38,7 +38,7 @@ class testFormHostGroup extends testFormGroups {
 		$this->layout('Zabbix servers');
 	}
 
-	public function testFormHostGroups_DiscoveredLayout() {
+	public function testFormHostGroup_DiscoveredLayout() {
 		$this->layout(self::DISCOVERED_GROUP, true);
 	}
 
@@ -74,6 +74,14 @@ class testFormHostGroup extends testFormGroups {
 						'Group name' => 'Templates'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => STRING_255
+					]
+				]
 			]
 		];
 	}
@@ -84,7 +92,7 @@ class testFormHostGroup extends testFormGroups {
 	 * @dataProvider getHostCreateData
 	 */
 	public function testFormHostGroup_Create($data) {
-		$this->create($data);
+		$this->checkForm($data, 'create');
 	}
 
 	public static function getHostUpdateData() {
@@ -106,6 +114,14 @@ class testFormHostGroup extends testFormGroups {
 						'Group name' => 'Templates/Applications'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => str_repeat('long_', 51)
+					]
+				]
 			]
 		];
 	}
@@ -116,7 +132,7 @@ class testFormHostGroup extends testFormGroups {
 	 * @dataProvider getHostUpdateData
 	 */
 	public function testFormHostGroup_Update($data) {
-		$this->update($data);
+		$this->checkForm($data, 'update');
 	}
 
 	/**
@@ -190,8 +206,8 @@ class testFormHostGroup extends testFormGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Group for Host prtotype',
-					'error' => 'Group "Group for Host prtotype" cannot be deleted, because it is used by a host prototype.'
+					'name' => 'Group for Host prototype',
+					'error' => 'Group "Group for Host prototype" cannot be deleted, because it is used by a host prototype.'
 				]
 			],
 			[

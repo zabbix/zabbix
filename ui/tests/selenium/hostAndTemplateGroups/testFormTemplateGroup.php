@@ -26,16 +26,52 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  *
  * @onBefore prepareGroupData
  */
-class testFormTemplateGroupSearchPage extends testFormGroups {
+class testFormTemplateGroup extends testFormGroups {
 
-	protected $link = 'zabbix.php?action=search&search=group';
+	protected $link = 'zabbix.php?action=templategroup.list';
 	protected $object = 'template';
-	protected $search = 'true';
 	protected static $update_group = 'Group for Update test';
 
-	public function testFormTemplateGroupSearchPage_Layout() {
-		$this->link = 'zabbix.php?action=search&search=Templates';
+	public function testFormTemplateGroup_Layout() {
 		$this->layout('Templates');
+	}
+
+	public static function getTemplateCreateData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => 'Zabbix servers'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Group name' => 'Templates'
+					],
+					'error' => 'Template group "Templates" already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => STRING_255
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCreateData
+	 * @dataProvider getTemplateCreateData
+	 */
+	public function testFormTemplateGroup_Create($data) {
+		$this->checkForm($data, 'create');
 	}
 
 	public static function getTemplateUpdateData() {
@@ -44,7 +80,7 @@ class testFormTemplateGroupSearchPage extends testFormGroups {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Group name' => 'Hosts/Update'
+						'Group name' => 'Discovered hosts'
 					]
 				]
 			],
@@ -57,6 +93,14 @@ class testFormTemplateGroupSearchPage extends testFormGroups {
 					],
 					'error' => 'Template group "Templates" already exists.'
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => str_repeat('long_', 51)
+					]
+				]
 			]
 		];
 	}
@@ -65,30 +109,28 @@ class testFormTemplateGroupSearchPage extends testFormGroups {
 	 * @dataProvider getUpdateData
 	 * @dataProvider getTemplateUpdateData
 	 */
-	public function testFormTemplateGroupSearchPage_Update($data) {
-		$this->link = 'zabbix.php?action=search&search=update';
-		$this->update($data);
+	public function testFormTemplateGroup_Update($data) {
+		$this->checkForm($data, 'update');
 	}
 
 	/**
 	 * Test group simple update without changing data.
 	 */
-	public function testFormTemplateGroupSearchPage_SimpleUpdate() {
-		$this->link = 'zabbix.php?action=search&search=Templates';
+	public function testFormTemplateGroup_SimpleUpdate() {
 		$this->simpleUpdate('Templates');
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
-	public function ttestFormTemplateGroupSearchPage_Clone($data) {
+	public function testFormTemplateGroup_Clone($data) {
 		$this->clone($data);
 	}
 
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testFormTemplateGroupSearchPage_Cancel($data) {
+	public function testFormTemplateGroup_Cancel($data) {
 		$this->cancel($data);
 	}
 
@@ -108,41 +150,15 @@ class testFormTemplateGroupSearchPage extends testFormGroups {
 	 * @dataProvider getDeleteData
 	 * @dataProvider getTemplateDeleteData
 	 */
-	public function testFormTemplateGroupSearchPage_Delete($data) {
+	public function testFormTemplateGroup_Delete($data) {
 		$this->delete($data);
-	}
-
-	public static function getSubgroupPermissionsData() {
-		return [
-			[
-				[
-					'apply_permissions' => 'Europe',
-					// Permission inheritance doesn't apply when changing the name of existing group.
-					'open_form' => 'Europe group for test on search page',
-					'create' => 'Streets/Dzelzavas',
-					'groups_after' => [
-						'Cities/Cesis' => 'Read',
-						'Europe (including subgroups)' => 'Deny',
-						'Streets' => 'Deny',
-						'Streets/Dzelzavas' => 'None'
-					],
-					'tags_before' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'country: test'],
-						['Host group' => 'Streets', 'Tags' => 'street']
-					]
-				]
-			]
-		];
 	}
 
 	/**
 	 * @onBeforeOnce prepareSubgroupData
-	 * @dataProvider getSubgroupPermissionsData
+	 * @dataProvider getSubgroupsData
 	 */
-	public function testFormTemplateGroupSearchPage_ApplyPermissionsToSubgroups($data) {
-		$this->link = 'zabbix.php?action=search&search=europe';
+	public function testFormTemplateGroup_ApplyPermissionsToSubgroups($data) {
 		$this->checkSubgroupsPermissions($data);
 	}
 }

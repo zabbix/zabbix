@@ -60,6 +60,14 @@ class testFormTemplateGroupStandalone extends testFormGroups {
 						'Group name' => 'Zabbix servers'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => STRING_255
+					]
+				]
 			]
 		];
 	}
@@ -73,6 +81,14 @@ class testFormTemplateGroupStandalone extends testFormGroups {
 						'Group name' => 'Discovered hosts'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => str_repeat('long_', 51)
+					]
+				]
 			]
 		];
 	}
@@ -83,7 +99,7 @@ class testFormTemplateGroupStandalone extends testFormGroups {
 	 * @dataProvider getTemplateCreateData
 	 */
 	public function testFormTemplateGroupStandalone_Create($data) {
-		$this->create($data);
+		$this->checkForm($data, 'create');
 	}
 
 	/**
@@ -92,7 +108,7 @@ class testFormTemplateGroupStandalone extends testFormGroups {
 	 * @dataProvider getTemplateUpdateData
 	 */
 	public function testFormTemplateGroupStandalone_Update($data) {
-		$this->update($data);
+		$this->checkForm($data, 'update');
 	}
 
 	/**
