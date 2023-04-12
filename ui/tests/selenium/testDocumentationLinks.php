@@ -1957,7 +1957,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Create connector'
 						]
 					],
-					'doc_link' => 'en/manual/config/export/streaming#configuration'
+					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
 			// #211 Edit connectors popup.
@@ -1970,7 +1970,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'link:Default connector'
 						]
 					],
-					'doc_link' => 'en/manual/config/export/streaming#configuration'
+					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			]
 		];
