@@ -28,7 +28,8 @@
 #	include "../../../src/zabbix_server/poller/ssh2_run.c"
 #endif
 
-int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options);
+int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options,
+		const char *config_source_ip);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error)
@@ -51,7 +52,8 @@ int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error)
 }
 #endif
 
-int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options,
+		const char *config_source_ip)
 {
 	int	ret = SYSINFO_RET_OK;
 

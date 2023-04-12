@@ -146,7 +146,8 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 #undef HAVE_NO_SSH_OPTIONS
 
 /* example ssh.run["ls /"] */
-int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options,
+		const char *config_source_ip)
 {
 	ssh_session	session;
 	ssh_channel	channel;
@@ -157,6 +158,8 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 	size_t		offset = 0, buf_size = DATA_BUFFER_SIZE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ZBX_UNUSED(config_source_ip);
 
 	/* initializes an SSH session object */
 	if (NULL == (session = ssh_new()))
