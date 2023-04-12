@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-05T14:37:57Z'
+  date: '2023-04-12T10:40:28Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -1364,7 +1364,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1397,7 +1397,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -1472,8 +1472,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -1635,7 +1635,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1666,7 +1666,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'The upper limit on the amount of storage that can be used by Azure Files Service in bytes.'
+              description: 'The upper limit on the amount of storage that can be used by Azure Files Service, in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1727,7 +1727,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'The amount of storage used by the snapshots in storage account''s File service in bytes.'
+              description: 'The amount of storage used by the snapshots in storage account''s File service, in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1790,7 +1790,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -1865,8 +1865,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -1898,7 +1898,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2026,7 +2026,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2089,7 +2089,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -2164,8 +2164,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -2198,7 +2198,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -2446,7 +2446,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2479,7 +2479,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -2554,8 +2554,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -2587,8 +2587,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -3581,7 +3581,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The request Units consumed per minute.'
+          description: 'The request units consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -3704,12 +3704,12 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
-                      name: show
-                      value: '2'
-                    -
-                      type: INTEGER
                       name: adv_conf
                       value: '1'
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
                     -
                       type: ITEM
                       name: itemid
@@ -3726,11 +3726,15 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: adv_conf
+                      value: '1'
                     -
                       type: ITEM
                       name: itemid
@@ -3806,7 +3810,6 @@ zabbix_export:
                       value:
                         host: 'Azure Cosmos DB for MongoDB by HTTP'
                         key: azure.cosmosdb.service.availability
-
     -
       uuid: 2d8b9329b5d04cdf85bf17d2d0db2b29
       template: 'Azure Microsoft SQL Database by HTTP'
@@ -4662,7 +4665,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The space used in `tempdb` data files expressed in bytes. Not applicable to the data warehouses.'
+          description: 'The space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -4710,7 +4713,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The space used in `tempdb` transaction log file in bytes. Not applicable to the data warehouses.'
+          description: 'The space used in `tempdb` transaction log file, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -4769,19 +4772,19 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -5623,7 +5626,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Space used in `tempdb` data files expressed in bytes. Not applicable to the data warehouses.'
+          description: 'Space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -5671,7 +5674,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Space used in `tempdb` transaction log files expressed in bytes. Not applicable to the data warehouses.'
+          description: 'Space used in `tempdb` transaction log files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -5730,19 +5733,19 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -6323,7 +6326,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network egress of a host expressed in bytes.'
+          description: 'Network egress of a host, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6348,7 +6351,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network ingress of a host expressed in bytes.'
+          description: 'Network ingress of a host, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6393,7 +6396,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The replication lag expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -6415,7 +6418,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used backup storage expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6436,7 +6439,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6457,7 +6460,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization expressed in %.'
+          description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -6501,7 +6504,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6538,15 +6541,15 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization expressed in %.'
+          description: 'The critical threshold of the storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization expressed in %.'
+          description: 'The warning threshold of the storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -7129,7 +7132,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The replication lag expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -7151,7 +7154,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used backup storage expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7172,7 +7175,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7193,7 +7196,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization expressed in %.'
+          description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -7237,7 +7240,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit of a server log expressed in bytes.'
+          description: 'The storage limit of a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7258,7 +7261,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization by a server log expressed in %.'
+          description: 'The storage utilization by a server log, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -7279,7 +7282,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a server log expressed in bytes.'
+          description: 'The storage space used by a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7300,7 +7303,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7333,7 +7336,7 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.FAILED.CONN.MAX.WARN}'
           value: '25'
@@ -7341,15 +7344,15 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -8103,7 +8106,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used backup storage expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8125,7 +8128,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Free storage space expressed in bytes.'
+          description: 'Free storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8146,7 +8149,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization expressed in %.'
+          description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -8190,7 +8193,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a transaction log expressed in bytes.'
+          description: 'The storage space used by a transaction log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8211,7 +8214,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8264,19 +8267,19 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -8848,7 +8851,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The replication lag expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -8870,7 +8873,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Lag expressed in bytes for the most lagging replica.'
+          description: 'Lag for the most lagging replica, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8892,7 +8895,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used backup storage expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8913,7 +8916,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8934,7 +8937,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization expressed in %.'
+          description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -8978,7 +8981,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit of a server log expressed in bytes.'
+          description: 'The storage limit of a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8999,7 +9002,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization by a server log expressed in %.'
+          description: 'The storage utilization by a server log, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -9020,7 +9023,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a server log expressed in bytes.'
+          description: 'The storage space used by a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -9041,7 +9044,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -9074,19 +9077,19 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -9527,7 +9530,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Baseline bytes per second throughput Data Disk can achieve without bursting.'
+          description: 'Baseline bytes per second throughput that the data disk can achieve without bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -10003,7 +10006,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Inbound Flows are a number of the current flows in the inbound direction (the traffic going into the VM).'
+          description: 'The number of current flows in the inbound direction (the traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -10045,7 +10048,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Outbound Flows are a number of the current flows in the outbound direction (the traffic going out of the VM).'
+          description: 'The number of current flows in the outbound direction (the traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -10108,7 +10111,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'The number of bytes received on all network interfaces by the VMs (incoming traffic).'
+          description: 'The number of bytes received by the VMs via all network interfaces (incoming traffic).'
           preprocessing:
             -
               type: JSONPATH
@@ -10134,7 +10137,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'The number of bytes out on all network interfaces by the VMs (outgoing traffic).'
+          description: 'The number of bytes sent by the VMs via all network interfaces (outgoing traffic).'
           preprocessing:
             -
               type: JSONPATH
@@ -10204,7 +10207,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Maximum bytes per second throughput OS Disk can achieve with bursting.'
+          description: 'Maximum bytes per second throughput that the OS Disk can achieve with bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -10226,7 +10229,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Maximum IOPS OS Disk can achieve with bursting.'
+          description: 'Maximum IOPS that the OS Disk can achieve with bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -10313,7 +10316,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Baseline bytes per second throughput OS Disk can achieve without bursting.'
+          description: 'Baseline bytes per second throughput that the OS Disk can achieve without bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -10591,7 +10594,7 @@ zabbix_export:
         -
           macro: '{$AZURE.VM.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
       valuemaps:
         -
           uuid: 38c8ce1516704ec2a6f1ea9686db56b9
