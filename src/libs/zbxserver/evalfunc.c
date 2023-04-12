@@ -1148,15 +1148,15 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 	switch (op)
 	{
 		case OP_EQ:
-			if (0 == strcmp(value, pattern))
+			if (0 == strcmp(value, ZBX_NULL2EMPTY_STR(pattern)))
 				(*count)++;
 			break;
 		case OP_NE:
-			if (0 != strcmp(value, pattern))
+			if (0 != strcmp(value, ZBX_NULL2EMPTY_STR(pattern)))
 				(*count)++;
 			break;
 		case OP_LIKE:
-			if (NULL != strstr(value, pattern))
+			if (NULL != strstr(value, ZBX_NULL2EMPTY_STR(pattern)))
 				(*count)++;
 			break;
 		case OP_REGEXP:
@@ -1205,6 +1205,8 @@ int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char valu
 		pdata->op = OP_IREGEXP;
 	else if (0 == strcmp(operator, "bitand"))
 		pdata->op = OP_BITAND;
+	else
+		pdata->op = OP_UNKNOWN;
 
 	if (OP_UNKNOWN == pdata->op)
 	{
@@ -1457,7 +1459,9 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	ts_end.sec -= time_shift;
 
 	if (FAIL == zbx_validate_count_pattern(operator, pattern, item->value_type, &pdata, error))
+	{
 		goto out;
+	}
 
 	switch (arg1_type)
 	{

@@ -1583,7 +1583,6 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 	zbx_vector_history_record_t	values;
 	zbx_vector_dbl_t		*results_vector;
 	double				result;
-	zbx_variant_t			arg_tmp;
 	char				*operator = NULL, *pattern = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int)len, name,
