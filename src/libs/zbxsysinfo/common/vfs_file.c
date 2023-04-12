@@ -17,22 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "file.h"
-#include "zbxsysinfo.h"
+#include "vfs_file.h"
 #include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxparam.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
 #include "dir.h"
 #include "zbxalgo.h"
+#include "zbxfile.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
 #include "sddl.h"
+#include "zbxwin32.h"
 #endif
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */

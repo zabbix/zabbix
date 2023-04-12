@@ -55,7 +55,6 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
-	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
@@ -91,6 +90,7 @@ CACHE_LIBS = \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
@@ -223,7 +223,7 @@ dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue
-	
+
 dc_expand_user_macros_in_func_params_SOURCES = \
 	dc_expand_user_macros_in_func_params.c
 dc_expand_user_macros_in_func_params_LDADD = \
@@ -274,7 +274,7 @@ um_cache_resolve_cont_CFLAGS = \
 um_cache_resolve_cont_SOURCES = \
 	um_cache_resolve_cont.c \
 	um_cache_mock.c \
-	um_cache_mock.h 
+	um_cache_mock.h
 um_cache_resolve_cont_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 um_cache_resolve_cont_LDFLAGS = @SERVER_LDFLAGS@ \
