@@ -30,8 +30,8 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  */
 class testFormHostGroup extends testFormGroups {
 
-	public $link = 'hostgroups.php?form=update&groupid=';
-	public static $update_group = 'Group for Update test';
+	protected $link = 'hostgroups.php?form=update&groupid=';
+	protected static $update_group = 'Group for Update test';
 
 	public function testFormHostGroup_Layout() {
 		$this->layout('Zabbix servers');
@@ -41,18 +41,46 @@ class testFormHostGroup extends testFormGroups {
 		$this->layout(self::DISCOVERED_GROUP, true);
 	}
 
+	public static function getHostCreateData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => STRING_255
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider getCreateData
+	 * @dataProvider getHostCreateData
 	 */
 	public function testFormHostGroup_Create($data) {
-		$this->create($data);
+		$this->checkForm($data, 'create');
+	}
+
+	public static function getHostUpdateData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => str_repeat('long_', 51)
+					]
+				]
+			]
+		];
 	}
 
 	/**
 	 * @dataProvider getUpdateData
+	 * @dataProvider getHostUpdateData
 	 */
 	public function testFormHostGroup_Update($data) {
-		$this->update($data);
+		$this->checkForm($data, 'update');
 	}
 
 	public function testFormHostGroup_SimpleUpdate() {

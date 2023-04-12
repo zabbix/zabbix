@@ -30,9 +30,9 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  */
 class testFormHostGroupSearchPage extends testFormGroups {
 
-	public $link = 'zabbix.php?action=search&search=group';
-	public $search = 'true';
-	public static $update_group = 'Group for Update test';
+	protected $link = 'zabbix.php?action=search&search=group';
+	protected $search = 'true';
+	protected static $update_group = 'Group for Update test';
 
 	public function testFormHostGroupSearchPage_Layout() {
 		$this->link = 'zabbix.php?action=search&search=Zabbix+servers';
@@ -44,12 +44,26 @@ class testFormHostGroupSearchPage extends testFormGroups {
 		$this->layout(self::DISCOVERED_GROUP, true);
 	}
 
+	public static function getHostUpdateData() {
+		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Group name' => str_repeat('updat', 51)
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider getUpdateData
+	 * @dataProvider getHostUpdateData
 	 */
 	public function testFormHostGroupSearchPage_Update($data) {
-		$this->link = 'zabbix.php?action=search&search=update';
-		$this->update($data);
+		$this->link = 'zabbix.php?action=search&search=upd';
+		$this->checkForm($data, 'update');
 	}
 
 	/**
