@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ extern char	*CONFIG_HOSTNAMES;
 extern char	*CONFIG_HOSTNAME_ITEM;
 extern char	*CONFIG_HOST_METADATA;
 extern char	*CONFIG_HOST_METADATA_ITEM;
-extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
-extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 extern int	CONFIG_LISTEN_PORT;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern char	*CONFIG_LISTEN_IP;

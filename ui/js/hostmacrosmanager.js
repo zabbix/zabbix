@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -167,18 +167,22 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_value')
 						.closest('.macro-input-group')
 						.find('.btn-undo')
-						.hide();
+						.remove();
 					$('#macros_' + macro_num + '_value_btn').prop('disabled', true);
 					$('#macros_' + macro_num + '_change_inheritance').text(t('Change'));
+					$('#macros_' + macro_num + '_allow_revert').remove();
+					$('#macros_' + macro_num + '_hostmacroid').remove();
 				}
 				else {
 					// Switching from ZBX_PROPERTY_INHERITED to ZBX_PROPERTY_BOTH.
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type | HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_value')
+						.prop('disabled', false)
 						.prop('readonly', false)
+						.attr({'placeholder': t('value')})
+						.val('')
 						.focus();
-					$('#macros_' + macro_num + '_value_btn').prop('disabled', false);
 					$('#macros_' + macro_num + '_description').prop('readonly', false);
 					$('#macros_' + macro_num + '_type_button')
 						.prop('disabled', false)

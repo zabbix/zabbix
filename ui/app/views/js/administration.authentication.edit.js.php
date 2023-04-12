@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,8 +47,9 @@
 			this.ldap_provisioning_fields = this.form.querySelectorAll(
 				'[name="ldap_jit_status"],[name="ldap_case_sensitive"],[name="jit_provision_interval"]'
 			);
-			const saml_readonly = !this.form.querySelector('[name="saml_auth_enabled"]').checked;
-			const ldap_readonly = !this.form.querySelector('[name="ldap_auth_enabled"]').checked;
+			this.jit_provision_interval = this.form.querySelector('[name="jit_provision_interval"]');
+			const saml_readonly = !this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
+			const ldap_readonly = !this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').checked;
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
@@ -58,6 +59,9 @@
 			this._setTableVisiblityState(this.saml_provision_groups_table, saml_readonly);
 			this._renderProvisionMedia(saml_provision_media);
 			this._setTableVisiblityState(this.saml_media_type_mapping_table, saml_readonly);
+
+			this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').dispatchEvent(new Event('change'));
+			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
 		}
 
 		_addEventListeners() {
@@ -96,10 +100,10 @@
 				}
 			});
 
-			this.ldap_jit_status.addEventListener('change', (e) =>
-				this.form.querySelector('[name="jit_provision_interval"]')
-					.toggleAttribute('readonly', !e.target.checked)
-			);
+			this.ldap_jit_status.addEventListener('change', (e) => {
+				this.jit_provision_interval.toggleAttribute('readonly', !e.target.checked);
+				this.jit_provision_interval.toggleAttribute('disabled', !e.target.checked);
+			});
 
 			this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
@@ -108,13 +112,15 @@
 
 				this.ldap_provisioning_fields.forEach(field => {
 					field.toggleAttribute('readonly', is_readonly);
+					field.toggleAttribute('disabled', is_readonly);
 					field.setAttribute('tabindex', is_readonly ? -1 : 0);
 				});
 				this._setTableVisiblityState(this.ldap_servers_table, is_readonly);
 				this._disableRemoveLdapServersWithUserGroups();
 
 				if (!is_readonly && !this.ldap_jit_status.checked) {
-					this.form.querySelector('[name="jit_provision_interval"]').toggleAttribute('readonly', true);
+					this.jit_provision_interval.toggleAttribute('readonly', true);
+					this.jit_provision_interval.toggleAttribute('disabled', true);
 				}
 
 				if (is_readonly && default_index && ldap_default_row_index) {
@@ -128,13 +134,49 @@
 						field.disabled = !e.target.checked;
 					}
 				});
+
+				if (e.target.checked) {
+					let form_fields = this.form.querySelectorAll('[name^=http_]');
+
+					const http_auth_enabled = document.getElementById('http_auth_enabled');
+					overlayDialogue({
+						'title': <?= json_encode(_('Confirm changes')) ?>,
+						'class': 'position-middle',
+						'content': document.createElement('span').innerText = <?= json_encode(
+							_('Enable HTTP authentication for all users.')
+						) ?>,
+						'buttons': [
+							{
+								'title': <?= json_encode(_('Cancel')) ?>,
+								'cancel': true,
+								'class': '<?= ZBX_STYLE_BTN_ALT ?>',
+								'action': function () {
+									for (const form_field of form_fields) {
+										if (form_field !== http_auth_enabled) {
+											form_field.disabled = true;
+										}
+									}
+
+									http_auth_enabled.checked = false;
+									document.getElementById('tab_http').setAttribute('data-indicator-value', '0');
+								}
+							},
+							{
+								'title': <?= json_encode(_('Ok')) ?>,
+								'focused': true,
+								'action': function () {}
+							}
+						]
+					}, e.target);
+				}
 			});
 
-			document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
+			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
 
 				this.form.querySelectorAll('.saml-enabled').forEach(field => {
 					field.toggleAttribute('readonly', is_readonly);
+					field.toggleAttribute('disabled', is_readonly);
 					field.setAttribute('tabindex', is_readonly ? -1 : 0);
 				});
 				this._setTableVisiblityState(this.saml_provision_groups_table, is_readonly);

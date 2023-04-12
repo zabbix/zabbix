@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -308,6 +308,24 @@ class CElementCollection implements Iterator {
 	}
 
 	/**
+	 * Apply element query to every element of a collection.
+	 *
+	 * @param mixed  $type     selector type (method) or selector
+	 * @param string $locator  locator part of selector
+	 *
+	 * @return CElementCollection
+	 */
+	public function query($type, $locator = null) {
+		$values = [];
+
+		foreach ($this->elements as $element) {
+			$values = array_merge($values, $element->query($type, $locator)->all()->asArray());
+		}
+
+		return new CElementCollection($values);
+	}
+
+	/**
 	 * Get elements as array.
 	 *
 	 * @return array
@@ -329,14 +347,19 @@ class CElementCollection implements Iterator {
 	 * Filter element collection based on a specified condition and parameters.
 	 *
 	 * @param CElementFilter $filter    condition to be filtered by
+	 * @param array          $params    filter parameters
 	 *
 	 * @return CElementCollection
 	 * @throws Exception
 	 */
-	public function filter($filter) {
+	public function filter($filter, $params = []) {
+		if (!($filter instanceof CElementFilter)) {
+			$filter = new CElementFilter($filter, $params);
+		}
+
 		$elements = [];
 		foreach ($this->elements as $key => $element) {
-			if ($filter->match($element)) {
+			if ($filter->match($element, $key)) {
 				$elements[$key] = $element;
 			}
 		}

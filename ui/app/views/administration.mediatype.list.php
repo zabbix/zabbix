@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.mediatype.list.js.php');
+
 if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
 }
@@ -36,9 +38,13 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CButton('', _('Import')))
 					->onClick(
-						'return PopUp("popup.import", {rules_preset: "mediatype"},
-							{dialogue_class: "modal-popup-generic"}
-						);'
+						'return PopUp("popup.import", {
+							rules_preset: "mediatype", '.
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+						'"},{
+							dialogueid: "popup_import",
+							dialogue_class: "modal-popup-generic"
+						});'
 					)
 					->removeId()
 			)
@@ -88,6 +94,8 @@ $mediaTypeTable = (new CTableInfo())
 		_('Action')
 	]);
 
+$csrf_token = CCsrfTokenHelper::get('mediatype');
+
 foreach ($data['mediatypes'] as $mediaType) {
 	switch ($mediaType['typeid']) {
 		case MEDIA_TYPE_EMAIL:
@@ -121,13 +129,11 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$actionLinks = [];
 	if (!empty($mediaType['listOfActions'])) {
 		foreach ($mediaType['listOfActions'] as $action) {
-			$actionLinks[] = new CLink($action['name'],
-				(new CUrl('actionconf.php'))
-					->setArgument('eventsource', $action['eventsource'])
-					->setArgument('form', 'update')
-					->setArgument('actionid', $action['actionid'])
-					->getUrl()
-			);
+			$actionLinks[] = (new CLink($action['name']))
+				->addClass('js-action-edit')
+				->setAttribute('data-actionid', $action['actionid'])
+				->setAttribute('data-eventsource', $action['eventsource']);
+
 			$actionLinks[] = ', ';
 		}
 		array_pop($actionLinks);
@@ -146,14 +152,14 @@ foreach ($data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? (new CLink(_('Enabled'), $statusLink))
+		? (new CLink(_('Enabled'), (new CUrl($statusLink))->getUrl()))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addSID()
-		: (new CLink(_('Disabled'), $statusLink))
+		: (new CLink(_('Disabled'), (new CUrl($statusLink))->getUrl()))
+			->addCsrfToken($csrf_token)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_RED)
-			->addSID();
+			->addClass(ZBX_STYLE_RED);
 
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
@@ -186,8 +192,12 @@ $mediaTypeForm->addItem([
 	$mediaTypeTable,
 	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
-		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?')],
-		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?')],
+		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?'),
+			'csrf_token' => $csrf_token
+		],
+		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?'),
+			'csrf_token' => $csrf_token
+		],
 		'mediatype.export' => [
 			'content' => new CButtonExport('export.mediatypes',
 				(new CUrl('zabbix.php'))
@@ -196,11 +206,17 @@ $mediaTypeForm->addItem([
 					->getUrl()
 			)
 		],
-		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?')]
+		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?'),
+			'csrf_token' => $csrf_token
+		]
 	], 'mediatype')
 ]);
 
 // append form to widget
 $html_page
 	->addItem($mediaTypeForm)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

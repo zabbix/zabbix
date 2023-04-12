@@ -18,7 +18,8 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
-	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
+	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
+	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
@@ -58,6 +59,7 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -66,12 +68,12 @@ COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 SERVICE_WRAP_FUNCS = \
-	-Wl,--wrap=DCget_nextid \
+	-Wl,--wrap=zbx_dc_get_nextid \
 	-Wl,--wrap=zbx_add_event \
 	-Wl,--wrap=zbx_process_events \
 	-Wl,--wrap=zbx_clean_events \
 	-Wl,--wrap=zbx_interface_availability_is_set
-
+	
 # service_get_rootcause_eventids
 
 service_get_rootcause_eventids_SOURCES = \

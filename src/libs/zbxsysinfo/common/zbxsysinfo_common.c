@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 #include "zbxsysinfo_common.h"
 #include "zbxsysinfo.h"
 
+#include "../sysinfo.h"
 #include "log.h"
-#include "file.h"
+#include "vfs_file.h"
 #include "dir.h"
 #include "net.h"
 #include "dns.h"
@@ -39,8 +40,6 @@
 #	define VFS_TEST_REGEXP "fonts"
 #	define VFS_TEST_DIR  "c:\\windows"
 #endif
-
-extern int	CONFIG_TIMEOUT;
 
 static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -115,7 +114,7 @@ static int	execute_str_local(const char *command, AGENT_RESULT *result, const ch
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
-	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT,
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), sysinfo_get_config_timeout(),
 			ZBX_EXIT_CODE_CHECKS_DISABLED, dir))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
@@ -236,7 +235,7 @@ static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	level = LOG_LEVEL_DEBUG;
 
-	if (0 != CONFIG_LOG_REMOTE_COMMANDS)
+	if (0 != sysinfo_get_config_log_remote_commands())
 		level = LOG_LEVEL_WARNING;
 
 	return system_run_local(request, result, level);

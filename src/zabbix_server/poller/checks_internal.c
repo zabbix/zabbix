@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 
 #include "checks_java.h"
 #include "zbxself.h"
-#include "preproc.h"
 #include "zbxtrends.h"
 #include "../vmware/vmware.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
@@ -36,7 +35,7 @@ extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
-	const DC_INTERFACE2	*i1 = (DC_INTERFACE2 *)p1, *i2 = (DC_INTERFACE2 *)p2;
+	const zbx_dc_interface2_t	*i1 = (const zbx_dc_interface2_t *)p1, *i2 = (const zbx_dc_interface2_t *)p2;
 
 	if (i1->type > i2->type)		/* 1st criterion: 'type' in ascending order */
 		return 1;
@@ -77,9 +76,9 @@ static int	compare_interfaces(const void *p1, const void *p2)
  ******************************************************************************/
 static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j, char **error)
 {
-	DC_INTERFACE2	*interfaces = NULL;
-	int		n = 0;			/* number of interfaces */
-	int		i;
+	zbx_dc_interface2_t	*interfaces = NULL;
+	int			n = 0;			/* number of interfaces */
+	int			i;
 
 	/* get interface data from configuration cache */
 
@@ -93,7 +92,7 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 	/* sort results in a predictable order */
 
 	if (1 < n)
-		qsort(interfaces, (size_t)n, sizeof(DC_INTERFACE2), compare_interfaces);
+		qsort(interfaces, (size_t)n, sizeof(zbx_dc_interface2_t), compare_interfaces);
 
 	/* repair 'addr' pointers broken by sorting */
 
@@ -171,19 +170,84 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 	return SUCCEED;
 }
 
+static double	get_selfmon_stat(double busy, unsigned char state)
+{
+	return (ZBX_PROCESS_STATE_BUSY == state ? busy : 100.0 - busy);
+}
+
+static int	get_preprocessor_selfmon_stats(unsigned char aggr_func, int proc_num, unsigned char state,
+		double *value, char **error)
+{
+	zbx_vector_dbl_t	usage;
+	int			ret, count;
+
+	zbx_vector_dbl_create(&usage);
+
+	if (SUCCEED != (ret = zbx_preprocessor_get_usage_stats(&usage, &count, error)))
+		goto out;
+
+	if (0 == usage.values_num)
+	{
+		*value = 0;
+		goto out;
+	}
+
+	if (ZBX_SELFMON_AGGR_FUNC_ONE == aggr_func)
+	{
+		*value = get_selfmon_stat(usage.values[proc_num - 1], state);
+	}
+	else
+	{
+		double	min, max, total;
+
+		min = max = total = usage.values[0];
+
+		for (int i = 1; i < usage.values_num; i++)
+		{
+			if (usage.values[i] < min)
+				min = usage.values[i];
+
+			if (usage.values[i] > max)
+				max = usage.values[i];
+
+			total += usage.values[i];
+		}
+
+		switch (aggr_func)
+		{
+			case ZBX_SELFMON_AGGR_FUNC_AVG:
+				*value = get_selfmon_stat(total / usage.values_num, state);
+				break;
+			case ZBX_SELFMON_AGGR_FUNC_MIN:
+				*value = get_selfmon_stat(min, state);
+				break;
+			case ZBX_SELFMON_AGGR_FUNC_MAX:
+				*value = get_selfmon_stat(max, state);
+				break;
+		}
+	}
+out:
+	zbx_vector_dbl_destroy(&usage);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
- * Parameters: item       - [IN] item we are interested in                    *
- *             result     - [OUT] value of the requested item                 *
- *             zbx_config - [IN] Zabbix server/proxy config                   *
+ * Parameters: item                - [IN] item we are interested in           *
+ *             result              - [OUT] value of the requested item        *
+ *             config_comms        - [IN] Zabbix server/proxy configuration   *
+ *                        for communication                                   *
+ *             config_startup_time - [IN] program startup time                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config)
+int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
+		int config_startup_time)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -223,7 +287,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_item_count(0));
+		SET_UI64_RESULT(result, zbx_dc_get_item_count(0));
 	}
 	else if (0 == strcmp(tmp, "version"))			/* zabbix["version"] */
 	{
@@ -243,7 +307,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_item_unsupported_count(0));
+		SET_UI64_RESULT(result, zbx_dc_get_item_unsupported_count(0));
 	}
 	else if (0 == strcmp(tmp, "hosts"))			/* zabbix["hosts"] */
 	{
@@ -253,7 +317,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_host_count());
+		SET_UI64_RESULT(result, zbx_dc_get_host_count());
 	}
 	else if (0 == strcmp(tmp, "queue"))			/* zabbix["queue",<from>,<to>] */
 	{
@@ -285,7 +349,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_item_queue(NULL, from, to));
+		SET_UI64_RESULT(result, zbx_dc_get_item_queue(NULL, from, to));
 	}
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
 	{
@@ -295,7 +359,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_DBL_RESULT(result, DCget_required_performance());
+		SET_DBL_RESULT(result, zbx_dc_get_required_performance());
 	}
 	else if (0 == strcmp(tmp, "uptime"))			/* zabbix["uptime"] */
 	{
@@ -305,7 +369,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, time(NULL) - CONFIG_SERVER_STARTUP_TIME);
+		SET_UI64_RESULT(result, time(NULL) - config_startup_time);
 	}
 	else if (0 == strcmp(tmp, "boottime"))			/* zabbix["boottime"] */
 	{
@@ -315,7 +379,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, CONFIG_SERVER_STARTUP_TIME);
+		SET_UI64_RESULT(result, config_startup_time);
 	}
 	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",*] */
 	{
@@ -384,7 +448,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				goto out;
 			}
 
-			SET_UI64_RESULT(result, DCget_item_count(item->host.hostid));
+			SET_UI64_RESULT(result, zbx_dc_get_item_count(item->host.hostid));
 		}
 		else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
 		{
@@ -395,7 +459,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				goto out;
 			}
 
-			SET_UI64_RESULT(result, DCget_item_unsupported_count(item->host.hostid));
+			SET_UI64_RESULT(result, zbx_dc_get_item_unsupported_count(item->host.hostid));
 		}
 		else if (0 == strcmp(tmp, "interfaces"))	/* zabbix["host","discovery","interfaces"] */
 		{
@@ -429,8 +493,9 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 	{
 		int	res;
 
-		zbx_alarm_on(CONFIG_TIMEOUT);
-		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result);
+		zbx_alarm_on((unsigned int)config_comms->config_timeout);
+		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
+				config_comms->config_timeout);
 		zbx_alarm_off();
 
 		if (SUCCEED != res)
@@ -454,7 +519,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		process_type = get_process_type_by_name(get_rparam(&request, 1));
+		process_type = (unsigned char)get_process_type_by_name(get_rparam(&request, 1));
 
 		switch (process_type)
 		{
@@ -535,7 +600,21 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				goto out;
 			}
 
-			zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			if (ZBX_PROCESS_TYPE_PREPROCESSOR != process_type)
+			{
+				zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			}
+			else
+			{
+				char	*error = NULL;
+
+				if (SUCCEED != get_preprocessor_selfmon_stats(aggr_func, process_num, state, &value,
+						&error))
+				{
+					SET_MSG_RESULT(result, error);
+					goto out;
+				}
+			}
 
 			SET_DBL_RESULT(result, value);
 		}
@@ -554,19 +633,19 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		if (0 == strcmp(tmp, "values"))
 		{
 			if (NULL == tmp1 || '\0' == *tmp1 || 0 == strcmp(tmp1, "all"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_COUNTER));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_COUNTER));
 			else if (0 == strcmp(tmp1, "float"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_FLOAT_COUNTER));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_FLOAT_COUNTER));
 			else if (0 == strcmp(tmp1, "uint"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_UINT_COUNTER));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_UINT_COUNTER));
 			else if (0 == strcmp(tmp1, "str"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_STR_COUNTER));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_STR_COUNTER));
 			else if (0 == strcmp(tmp1, "log"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_LOG_COUNTER));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_LOG_COUNTER));
 			else if (0 == strcmp(tmp1, "text"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_TEXT_COUNTER));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_TEXT_COUNTER));
 			else if (0 == strcmp(tmp1, "not supported"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_NOTSUPPORTED_COUNTER));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_NOTSUPPORTED_COUNTER));
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -576,15 +655,15 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		else if (0 == strcmp(tmp, "history"))
 		{
 			if (NULL == tmp1 || '\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
-				SET_DBL_RESULT(result, *(double *)DCget_stats(ZBX_STATS_HISTORY_PFREE));
+				SET_DBL_RESULT(result, *(double *)zbx_dc_get_stats(ZBX_STATS_HISTORY_PFREE));
 			else if (0 == strcmp(tmp1, "total"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_TOTAL));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_TOTAL));
 			else if (0 == strcmp(tmp1, "used"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_USED));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_USED));
 			else if (0 == strcmp(tmp1, "free"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_FREE));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_FREE));
 			else if (0 == strcmp(tmp1, "pused"))
-				SET_DBL_RESULT(result, *(double *)DCget_stats(ZBX_STATS_HISTORY_PUSED));
+				SET_DBL_RESULT(result, *(double *)zbx_dc_get_stats(ZBX_STATS_HISTORY_PUSED));
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -600,15 +679,15 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			}
 
 			if (NULL == tmp1 || '\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
-				SET_DBL_RESULT(result, *(double *)DCget_stats(ZBX_STATS_TREND_PFREE));
+				SET_DBL_RESULT(result, *(double *)zbx_dc_get_stats(ZBX_STATS_TREND_PFREE));
 			else if (0 == strcmp(tmp1, "total"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TREND_TOTAL));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_TREND_TOTAL));
 			else if (0 == strcmp(tmp1, "used"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TREND_USED));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_TREND_USED));
 			else if (0 == strcmp(tmp1, "free"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TREND_FREE));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_TREND_FREE));
 			else if (0 == strcmp(tmp1, "pused"))
-				SET_DBL_RESULT(result, *(double *)DCget_stats(ZBX_STATS_TREND_PUSED));
+				SET_DBL_RESULT(result, *(double *)zbx_dc_get_stats(ZBX_STATS_TREND_PUSED));
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -618,15 +697,15 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		else if (0 == strcmp(tmp, "index"))
 		{
 			if (NULL == tmp1 || '\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
-				SET_DBL_RESULT(result, *(double *)DCget_stats(ZBX_STATS_HISTORY_INDEX_PFREE));
+				SET_DBL_RESULT(result, *(double *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_PFREE));
 			else if (0 == strcmp(tmp1, "total"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_INDEX_TOTAL));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_TOTAL));
 			else if (0 == strcmp(tmp1, "used"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_INDEX_USED));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_USED));
 			else if (0 == strcmp(tmp1, "free"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_INDEX_FREE));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_FREE));
 			else if (0 == strcmp(tmp1, "pused"))
-				SET_DBL_RESULT(result, *(double *)DCget_stats(ZBX_STATS_HISTORY_INDEX_PUSED));
+				SET_DBL_RESULT(result, *(double *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_PUSED));
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -653,15 +732,15 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		if (0 == strcmp(tmp, "buffer"))
 		{
 			if (NULL == tmp1 || '\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
-				SET_DBL_RESULT(result, *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PFREE));
+				SET_DBL_RESULT(result, *(double *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_PFREE));
 			else if (0 == strcmp(tmp1, "total"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL));
 			else if (0 == strcmp(tmp1, "used"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_USED));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_USED));
 			else if (0 == strcmp(tmp1, "free"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
 			else if (0 == strcmp(tmp1, "pused"))
-				SET_DBL_RESULT(result, *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PUSED));
+				SET_DBL_RESULT(result, *(double *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_PUSED));
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -704,7 +783,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			else if (0 == strcmp(tmp1, "pfree"))
 			{
 				SET_DBL_RESULT(result, (double)(stats.memory_total - stats.memory_used) /
-						stats.memory_total * 100);
+						(double)stats.memory_total * 100);
 			}
 			else if (0 == strcmp(tmp1, "total"))
 			{
@@ -716,7 +795,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			}
 			else if (0 == strcmp(tmp1, "pused"))
 			{
-				SET_DBL_RESULT(result, (double)stats.memory_used / stats.memory_total * 100);
+				SET_DBL_RESULT(result, (double)stats.memory_used / (double)stats.memory_total * 100);
 			}
 			else
 			{
@@ -767,7 +846,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				/* work for both data received from internal and external source. */
 				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-				zbx_zabbix_stats_get(&json, zbx_config);
+				zbx_zabbix_stats_get(&json, config_startup_time);
 
 				zbx_json_close(&json);
 
@@ -814,8 +893,8 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 
 					zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-					zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
-							DCget_item_queue(NULL, from, to));
+					zbx_json_addint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
+							zbx_dc_get_item_queue(NULL, from, to));
 
 					zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
@@ -901,19 +980,19 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		{
 			zbx_uint64_t	total = stats.hits + stats.misses;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / (double)total * 100));
 		}
 		else if (0 == strcmp(tmp, "phits"))
 		{
 			zbx_uint64_t	total = stats.hits + stats.misses;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / (double)total * 100));
 		}
 		else if (0 == strcmp(tmp, "pitems"))
 		{
 			zbx_uint64_t	total = stats.items_num + stats.requests_num;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / (double)total * 100));
 		}
 		else
 		{

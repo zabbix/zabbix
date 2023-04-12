@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,9 @@
 #include "zbxself.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxalert.h"
+#include "../alerter/alerter.h"
 #include "report_protocol.h"
 #include "zbxtime.h"
-
-extern unsigned char			program_type;
 
 extern char	*CONFIG_WEBSERVICE_URL;
 
@@ -165,6 +163,16 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 				(curl_error = rw_curl_error(err)));
 		goto out;
 	}
+
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
+				(curl_error = rw_curl_error(err)));
+		goto out;
+	}
+#endif
 
 	if (NULL != config_tls_ca_file && '\0' != *config_tls_ca_file)
 	{
@@ -329,7 +337,7 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
 {
 	int			ret = FAIL;
 	zbx_vector_str_t	recipients;
-	ZBX_DB_MEDIATYPE		mt;
+	zbx_db_mediatype		mt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -432,9 +440,8 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	ppid = getppid();
 	zbx_ipc_socket_write(&socket, ZBX_IPC_REPORTER_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
-			get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -471,7 +478,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		time_wake = zbx_time();
-		zbx_update_env(time_wake);
+		zbx_update_env(get_process_type_string(process_type), time_wake);
 		time_idle += time_wake - time_now;
 
 		switch (message.code)

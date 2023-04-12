@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 
 #include "zbxregexp.h"
 
-#include "zbxstr.h"
 #include "log.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_PCRE_H
 #ifdef HAVE_PCRE2_H
@@ -43,7 +43,6 @@
 #define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
 #endif
 #define ZBX_REGEXP_CASELESS PCRE2_CASELESS
-#define ZBX_REGEXP_ERR_MSG_SIZE 256
 #endif
 
 struct zbx_regexp
@@ -70,6 +69,8 @@ zbx_regmatch_t;
 					/* Group \0 contains the matching part of string, groups \1 ...\9 */
 					/* contain captured groups (substrings).                          */
 
+ZBX_PTR_VECTOR_IMPL(expression, zbx_expression_t *)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: compiles a regular expression                                     *
@@ -81,7 +82,7 @@ zbx_regmatch_t;
  *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
  *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
  *                      ZBX_REGEXP_MULTILINE.                                 *
- *     regexp    - [OUT] output regexp.                                       *
+ *     regexp    - [OUT] compiled regular expression.                         *
  *     err_msg   - [OUT] error message if any.                                *
  *                       Free with zbx_regexp_err_msg_free()                  *
  *                                                                            *
@@ -149,6 +150,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		pcre_free(pcre_regexp);
 #endif
 #ifdef HAVE_PCRE2_H
+#define ZBX_REGEXP_ERR_MSG_SIZE 256
+
 	*err_msg = NULL;
 
 	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags,
@@ -180,15 +183,27 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	}
 	else
 		pcre2_code_free(pcre2_regexp);
+
+#undef ZBX_REGEXP_ERR_MSG_SIZE
 #endif
 	return SUCCEED;
 }
 
-/*******************************************************
- *                                                     *
- * Purpose: public wrapper for regexp_compile          *
- *                                                     *
- *******************************************************/
+/******************************************************************************
+ *                                                                            *
+ * Purpose: public wrapper to compile a regular expression                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pattern   - [IN] regular expression as a text string. Empty            *
+ *                      string ("") is allowed, it will match everything.     *
+ *                      NULL is not allowed.                                  *
+ *     regexp    - [OUT] compiled regular expression.                         *
+ *     err_msg   - [OUT] error message if any.                                *
+ *                       Free with zbx_regexp_err_msg_free()                  *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **err_msg)
 {
 #ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
@@ -198,11 +213,22 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
 #endif
 }
 
-/*******************************************************
- *                                                     *
- * Purpose: public wrapper for regexp_compile          *
- *                                                     *
- *******************************************************/
+/******************************************************************************
+ *                                                                            *
+ * Purpose: public wrapper for regexp_compile                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pattern   - [IN] regular expression as a text string. Empty            *
+ *                      string ("") is allowed, it will match everything.     *
+ *                      NULL is not allowed.                                  *
+ *     regexp    - [OUT] compiled regular expression.                         *
+ *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
+ *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
+ *                      ZBX_REGEXP_MULTILINE.                                 *
+ *     err_msg   - [OUT] error message if any.                                *
+ *                       Free with zbx_regexp_err_msg_free()                  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **err_msg)
 {
 	return regexp_compile(pattern, flags, regexp, err_msg);
@@ -420,7 +446,7 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
  *          returning matching groups                                         *
  *                                                                            *
  * Parameters: string - [IN] string to be matched                             *
- *             regex  - [IN] precompiled regular expression                   *
+ *             regexp - [IN] precompiled regular expression                   *
  *                                                                            *
  * Return value: 0 - successful match                                         *
  *               nonzero - no match                                           *
@@ -436,10 +462,10 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
 
 /****************************************************************************************************
  *                                                                                                  *
- * Purpose: compiles and executes a regexp                                                          *
+ * Purpose: compiles and executes a regex pattern                                                   *
  *                                                                                                  *
  * Parameters:                                                                                      *
- *     string     - [IN] string to be matched against 'regexp'                                      *
+ *     string     - [IN] string to be matched against 'pattern'                                     *
  *     pattern    - [IN] regular expression pattern                                                 *
  *     flags      - [IN] execution flags for matching                                               *
  *     len        - [OUT] length of matched string,                                                 *
@@ -744,7 +770,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
  *                                    string is constructed from template by     *
  *                                    replacing \<n> sequences with the captured *
  *                                    regexp group.                              *
- *            out              - [OUT] the output value if the input string      *
+ *             out             - [OUT] the output value if the input string      *
  *                                     matches the specified regular expression  *
  *                                     or NULL otherwise                         *
  *                                                                               *
@@ -784,12 +810,12 @@ int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_
 /******************************************************************************
  *                                                                            *
  * Purpose: frees expression data retrieved by DCget_expressions function or  *
- *          prepared with add_regexp_ex() function calls                      *
+ *          prepared with zbx_add_regexp_ex() function calls                  *
  *                                                                            *
  * Parameters: expressions  - [IN] a vector of expression data pointers       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions)
+void	zbx_regexp_clean_expressions(zbx_vector_expression_t *expressions)
 {
 	int	i;
 
@@ -802,11 +828,11 @@ void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions)
 		zbx_free(regexp);
 	}
 
-	zbx_vector_ptr_clear(expressions);
+	zbx_vector_expression_clear(expressions);
 }
 
-void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expression, int expression_type,
-		char exp_delimiter, int case_sensitive)
+void	zbx_add_regexp_ex(zbx_vector_expression_t *regexps, const char *name, const char *expression,
+		int expression_type, char exp_delimiter, int case_sensitive)
 {
 	zbx_expression_t	*regexp;
 
@@ -819,7 +845,7 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 	regexp->exp_delimiter = exp_delimiter;
 	regexp->case_sensitive = case_sensitive;
 
-	zbx_vector_ptr_append(regexps, regexp);
+	zbx_vector_expression_append(regexps, regexp);
 }
 
 /**********************************************************************************
@@ -990,7 +1016,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *           the whole string is stored into 'output' variable.                   *
  *                                                                                *
  **********************************************************************************/
-int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
 		int case_sensitive, const char *output_template, char **output)
 {
 /* regular expressions */
@@ -1100,18 +1126,19 @@ out:
 #undef EXPRESSION_TYPE_FALSE
 }
 
-int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)
+int	zbx_regexp_match_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
+		int case_sensitive)
 {
-	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
+	return zbx_regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
 }
 
-int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps)
+int	zbx_global_regexp_exists(const char *name, const zbx_vector_expression_t *regexps)
 {
 	int	i;
 
 	for (i = 0; i < regexps->values_num; i++)
 	{
-		const zbx_expression_t	*regexp = (const zbx_expression_t *)regexps->values[i];
+		const zbx_expression_t	*regexp = regexps->values[i];
 
 		if (0 == strcmp(regexp->name, name))
 			return SUCCEED;
@@ -1223,7 +1250,7 @@ static void	zbx_regexp_escape_string(char *p, const char *string)
 
 /**********************************************************************************
  *                                                                                *
- * Purpose: escaping of symbols for using in regexp expression                    *
+ * Purpose: escaping of symbols for using in regular expression                   *
  *                                                                                *
  * Parameters: string - [IN/OUT] the string to update                             *
  *                                                                                *

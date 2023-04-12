@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ class CMapImporter extends CImporter {
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
 					foreach ($selement['elements'] as &$element) {
 						$triggerid = $this->referencer->findTriggeridByName($element['description'],
-							$element['expression'], $element['recovery_expression']
+							$element['expression'], $element['recovery_expression'], true
 						);
 
 						if ($triggerid === null) {
@@ -222,7 +222,7 @@ class CMapImporter extends CImporter {
 			foreach ($link['linktriggers'] as &$linktrigger) {
 				$trigger = $linktrigger['trigger'];
 				$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
-					$trigger['recovery_expression']
+					$trigger['recovery_expression'], true
 				);
 
 				if ($triggerid === null) {

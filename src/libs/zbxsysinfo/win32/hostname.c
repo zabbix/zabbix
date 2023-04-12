@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,6 +98,23 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 
 			name = zbx_strdup(NULL, buffer);
+		}
+		else if (0 == strcmp(type, "fqdn"))
+		{
+			DWORD	size = 0;
+
+			GetComputerNameExA(ComputerNameDnsFullyQualified, NULL, &size);
+			name = zbx_malloc(NULL, size);
+
+			if (0 == GetComputerNameExA(ComputerNameDnsFullyQualified, name, &size))
+			{
+				zbx_free(name);
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain FQDN: %s",
+						strerror_from_system(WSAGetLastError())));
+				return SYSINFO_RET_FAIL;
+			}
+
+			zbx_rtrim(name, " \r\n.");
 		}
 		else
 		{

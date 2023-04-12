@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,26 +90,21 @@ include dirname(__FILE__).'/itemtest.js.php';
 
 		typeChangeHandler() {
 			// Selected item type.
-			const type = parseInt($('#type').val(), 10);
+			const type = parseInt(jQuery('#type').val(), 10);
+			const has_key_button = [ <?= ITEM_TYPE_ZABBIX ?>, <?= ITEM_TYPE_ZABBIX_ACTIVE ?>, <?= ITEM_TYPE_SIMPLE ?>,
+				<?= ITEM_TYPE_INTERNAL ?>, <?= ITEM_TYPE_DB_MONITOR ?>, <?= ITEM_TYPE_SNMPTRAP ?>, <?= ITEM_TYPE_JMX ?>,
+				<?= ITEM_TYPE_IPMI ?>
+			];
 
-			$('#keyButton').prop('disabled',
-				type != <?= ITEM_TYPE_ZABBIX ?>
-					&& type != <?= ITEM_TYPE_ZABBIX_ACTIVE ?>
-					&& type != <?= ITEM_TYPE_SIMPLE ?>
-					&& type != <?= ITEM_TYPE_INTERNAL ?>
-					&& type != <?= ITEM_TYPE_DB_MONITOR ?>
-					&& type != <?= ITEM_TYPE_SNMPTRAP ?>
-					&& type != <?= ITEM_TYPE_JMX ?>
-					&& type != <?= ITEM_TYPE_IPMI ?>
-			);
+			jQuery('#keyButton').prop('disabled', !has_key_button.includes(type));
 
 			if (type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>) {
-				$('label[for=username]').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-				$('input[name=username]').attr('aria-required', 'true');
+				jQuery('label[for=username]').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+				jQuery('input[name=username]').attr('aria-required', 'true');
 			}
 			else {
-				$('label[for=username]').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-				$('input[name=username]').removeAttr('aria-required');
+				jQuery('label[for=username]').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+				jQuery('input[name=username]').removeAttr('aria-required');
 			}
 		},
 
@@ -137,7 +132,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 		},
 
 		refresh() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];
 			const fields = getFormFields(form);
 
@@ -170,7 +165,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();

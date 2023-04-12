@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,17 @@
 #ifndef ZABBIX_UPGRADE_H
 #define ZABBIX_UPGRADE_H
 
-int	DBcheck_version(void);
-int	DBcheck_double_type(void);
+#include "zbxcommon.h"
+#include "zbxdbhigh.h"
+
+typedef enum {
+	ZBX_HA_MODE_STANDALONE,
+	ZBX_HA_MODE_CLUSTER
+}
+zbx_ha_mode_t;
+
+void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb);
+
+int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode);
 
 #endif

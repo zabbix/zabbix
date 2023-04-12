@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -424,12 +424,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Last error message of scenario "Web scenario for execute now".: DR5-web-dep',
 						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
 						'LLD for Discovered host tests',
-						'Linux by Zabbix agent: Mounted filesystem discovery',
+						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery',
 						'Test of discovered host 1 template for unlink: Template1 discovery rule',
 						'Test of discovered host 2 template for clear: Template2 discovery rule',
 						'Test of discovered host Template: Template discovery rule',
-						'Zabbix server health: Zabbix stats proxy: Zabbix proxy discovery'
+						'Zabbix server health: Zabbix proxies stats: Zabbix proxy discovery'
 					]
 				]
 			],
@@ -451,7 +451,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
-					'rows' => 6
+					'rows' => 16
 				]
 			],
 			[

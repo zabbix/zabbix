@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "zbxcachevalue.h"
 #include "zbxlld.h"
-#include "zbxalert.h"
+#include "../alerter/alerter.h"
 #include "zbxtime.h"
 
 #define ZBX_DIAG_LLD_RULES		0x00000001
@@ -541,6 +541,8 @@ int	diag_add_section_info(const char *section, const struct zbx_json_parse *jp, 
 		zbx_diag_add_locks_info(json);
 		ret = SUCCEED;
 	}
+	else if (0 == strcmp(section, ZBX_DIAG_CONNECTOR))
+		ret = zbx_diag_add_connector_info(jp, json, error);
 	else
 		*error = zbx_dsprintf(*error, "Unsupported diagnostics section: %s", section);
 

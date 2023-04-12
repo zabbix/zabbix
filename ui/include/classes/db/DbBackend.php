@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -199,13 +199,6 @@ abstract class DbBackend {
 	 * @return bool
 	 */
 	abstract public function checkEncoding();
-
-	/**
-	* Check if database is using IEEE754 compatible double precision columns.
-	*
-	* @return bool
-	*/
-	abstract public function isDoubleIEEE754();
 
 	/**
 	 * Set warning message.

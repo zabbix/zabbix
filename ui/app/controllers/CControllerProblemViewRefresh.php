@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -46,6 +46,7 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			'evaltype' =>			'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>				'array',
 			'show_tags' =>			'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
+			'show_symptoms' =>		'in 0,1',
 			'show_suppressed' =>	'in 0,1',
 			'unacknowledged' =>		'in 0,1',
 			'compact_view' =>		'in 0,1',
@@ -130,6 +131,7 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 					'tag_name_format' => $this->getInput('tag_name_format', TAG_NAME_FULL),
 					'tag_priority' => $this->getInput('tag_priority', ''),
 					'show_suppressed' => $this->getInput('show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
+					'show_symptoms' => $this->getInput('show_symptoms', 0),
 					'unacknowledged' => $this->getInput('unacknowledged', 0),
 					'compact_view' => $this->getInput('compact_view', 0),
 					'show_timeline' => $this->getInput('show_timeline', ZBX_TIMELINE_OFF),

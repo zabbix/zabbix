@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 namespace SCIM;
 
+use CJsonRpc;
 use Exception;
 use CHttpRequest;
 use CApiClientResponse;
@@ -40,10 +41,13 @@ class API {
 		[, $class] = explode('/', $request->header('PATH-INFO'), 3) + ['', ''];
 		$class = strtolower($class);
 		$action = strtolower($request->method());
-		$input = $this->parseRequestData($request);
+		$input = $this->parseRequestData($request, $class);
 
 		/** @var CApiClientResponse $response */
-		$response = $client->callMethod($class, $action, $input, $request->getAuthBearerValue());
+		$response = $client->callMethod($class, $action, $input, [
+			'type' => CJsonRpc::AUTH_TYPE_HEADER,
+			'auth' => $request->getAuthBearerValue()
+		]);
 
 		if ($response->errorCode !== null) {
 			throw new Exception($response->errorMessage, $response->errorCode);
@@ -56,10 +60,11 @@ class API {
 	 * Parse request body data adding supported GET parameters, return parsed parameters as array.
 	 *
 	 * @param CHttpRequest $request
+	 * @param string       $class
 	 *
 	 * @return array
 	 */
-	private function parseRequestData(CHttpRequest $request): array {
+	private function parseRequestData(CHttpRequest $request, string $class): array {
 		$input = $request->body() === '' ? [] : json_decode($request->body(), true);
 		[, , $id] = explode('/', $request->header('PATH-INFO'), 3) + ['', '', ''];
 
@@ -68,10 +73,14 @@ class API {
 		}
 
 		if (array_key_exists('filter', $_GET)) {
-			preg_match('/^userName eq "(?<value>(?:[^"]|\\\\")*)"$/', $_GET['filter'], $filter_value);
+			$class === 'users'
+				? preg_match('/^userName eq "(?<value>(?:[^"]|\\\\")*)"$/', $_GET['filter'], $filter_value)
+				: preg_match('/^displayName eq "(?<value>(?:[^"]|\\\\")*)"$/', $_GET['filter'], $filter_value);
 
 			if (array_key_exists('value', $filter_value)) {
-				$input['userName'] = $filter_value['value'];
+				$class === 'users'
+					? $input['userName'] = $filter_value['value']
+					: $input['displayName'] = $filter_value['value'];
 			}
 			else {
 				throw new Exception(_('This filter is not supported'), 400);
@@ -88,5 +97,4 @@ class API {
 
 		return $input;
 	}
-
 }

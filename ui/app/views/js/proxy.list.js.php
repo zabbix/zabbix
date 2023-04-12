@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,11 +77,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
 			overlay.$dialogue[0].addEventListener('dialogue.configRefresh', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('proxy');
-
-				this._reload(e.detail);
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail));
 		}
 
 		_editHost(hostid) {
@@ -113,7 +109,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.config.refresh');
 
-			this._post(target, proxyids, curl.getUrl());
+			this._post(target, proxyids, curl);
 		}
 
 		_enableHosts(target, proxyids) {
@@ -128,7 +124,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.host.enable');
 
-			this._post(target, proxyids, curl.getUrl());
+			this._post(target, proxyids, curl);
 		}
 
 		_disableHosts(target, proxyids) {
@@ -143,7 +139,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.host.disable');
 
-			this._post(target, proxyids, curl.getUrl());
+			this._post(target, proxyids, curl);
 		}
 
 		_delete(target, proxyids) {
@@ -158,13 +154,17 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.delete');
 
-			this._post(target, proxyids, curl.getUrl());
+			this._post(target, proxyids, curl);
 		}
 
 		_post(target, proxyids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('proxy')) ?>
+			);
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({proxyids})
@@ -211,6 +211,7 @@
 				postMessageDetails('success', success.messages);
 			}
 
+			uncheckTableRows('proxy');
 			location.href = location.href;
 		}
 	};

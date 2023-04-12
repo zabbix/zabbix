@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class CControllerHostEdit extends CController {
 	protected $host;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
@@ -244,6 +244,10 @@ class CControllerHostEdit extends CController {
 			}
 			else {
 				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
+			}
+
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				$macro['allow_revert'] = true;
 			}
 
 			unset($macro['automatic']);

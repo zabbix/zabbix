@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,8 +51,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->templateName);
 
 		$table = $this->query('class:list-table')->asTable()->one();
-		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web',
-				'Linked templates', 'Linked to templates', 'Tags'
+		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
+				'Version', 'Linked templates', 'Linked to templates', 'Tags'
 		];
 		$this->assertSame($headers, $table->getHeadersText());
 

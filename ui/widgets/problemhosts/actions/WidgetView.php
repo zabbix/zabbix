@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,7 +140,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'evaltype' => $this->fields_values['evaltype'],
 			'tags' => $this->fields_values['tags'],
 			'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
-			'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
+			'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'symptom' => false
 		]);
 
 		$hosts_data = [];

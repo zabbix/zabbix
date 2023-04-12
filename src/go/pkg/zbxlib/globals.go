@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,25 @@ package zbxlib
 
 /* cspell:disable */
 
+/*
+#include "zbxsysinfo.h"
+
+ZBX_PROPERTY_DECL(int, config_timeout, 3)
+ZBX_PROPERTY_DECL(int, config_enable_remote_commands, 1)
+ZBX_PROPERTY_DECL(int, config_log_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, config_unsafe_user_parameters, 0)
+
+void	init_globals(void)
+{
+	zbx_init_library_sysinfo(get_config_timeout, get_config_enable_remote_commands,
+			get_config_log_remote_commands, get_config_unsafe_user_parameters);
+}
+*/
 import "C"
+
+import (
+	"git.zabbix.com/ap/plugin-support/log"
+)
 
 const (
 	ItemStateNormal       = 0
@@ -31,3 +49,8 @@ const (
 	Succeed = 0
 	Fail    = -1
 )
+
+func init() {
+	log.Tracef("Calling C function \"init_globals()\"")
+	C.init_globals()
+}

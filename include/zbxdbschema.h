@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,17 +57,17 @@ typedef struct
 	unsigned char	flags;
 	unsigned char	fk_flags;
 }
-ZBX_FIELD;
+zbx_db_field_t;
 
 typedef struct
 {
 	const char	*table;
 	const char	*recid;
 	unsigned char	flags;
-	ZBX_FIELD	fields[ZBX_MAX_FIELDS];
+	zbx_db_field_t	fields[ZBX_MAX_FIELDS];
 	const char	*uniq;
 }
-ZBX_TABLE;
+zbx_db_table_t;
 
 typedef struct
 {
@@ -76,10 +76,8 @@ typedef struct
 }
 zbx_db_table_changelog_t;
 
-extern const ZBX_TABLE			tables[];
-extern const zbx_db_table_changelog_t	changelog_tables[];
-extern const char			*const db_schema;
-extern const char			*const db_schema_fkeys[];
-extern const char			*const db_schema_fkeys_drop[];
+zbx_db_table_t			*zbx_dbschema_get_tables(void);
+const zbx_db_table_changelog_t	*zbx_dbschema_get_changelog_tables(void);
+const char			*zbx_dbschema_get_schema(void);
 
 #endif

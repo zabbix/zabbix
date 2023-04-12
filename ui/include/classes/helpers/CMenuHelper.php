@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ class CMenuHelper {
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
-				? (new CMenuItem(_('Maintenance')))->setUrl(new CUrl('maintenance.php'), 'maintenance.php')
+				? (new CMenuItem(_('Maintenance')))->setAction('maintenance.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
 				? (new CMenuItem(_('Event correlation')))
@@ -230,37 +230,46 @@ class CMenuHelper {
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS)
 							? (new CMenuItem(_('Trigger actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
-									'actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
+										->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
+									'action.list?eventsource='.EVENT_SOURCE_TRIGGERS
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS)
 							? (new CMenuItem(_('Service actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_SERVICE),
-									'actionconf.php?eventsource='.EVENT_SOURCE_SERVICE
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
+										->setArgument('eventsource', EVENT_SOURCE_SERVICE),
+									'action.list?eventsource='.EVENT_SOURCE_SERVICE
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS)
 							? (new CMenuItem(_('Discovery actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
-									'actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
+										->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
+									'action.list?eventsource='.EVENT_SOURCE_DISCOVERY
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS)
 							? (new CMenuItem(_('Autoregistration actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
 										->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
-										'actionconf.php?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
+									'action.list?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS)
 							? (new CMenuItem(_('Internal actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
-									'actionconf.php?eventsource='.EVENT_SOURCE_INTERNAL
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
+										->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
+									'action.list?eventsource='.EVENT_SOURCE_INTERNAL
 								)
 							: null
 					])))
@@ -348,6 +357,9 @@ class CMenuHelper {
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),
+						(new CMenuItem(_('Connectors')))
+							->setAction('connector.list')
+							->setAliases(['connector.edit']),
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
 					])))
@@ -469,7 +481,7 @@ class CMenuHelper {
 				->setIcon('icon-signout')
 				->setUrl(new CUrl('#signout'))
 				->setTitle(_('Sign out'))
-				->onClick('ZABBIX.logout()')
+				->onClick('ZABBIX.logout(event)')
 		);
 
 		return $menu;

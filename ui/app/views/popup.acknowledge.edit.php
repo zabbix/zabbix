@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
  */
 
 $form = (new CForm())
-	->cleanItems()
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('acknowledge')))->removeId())
 	->setId('acknowledge_form')
 	->addVar('action', 'popup.acknowledge.create')
 	->addVar('eventids', $data['eventids']);
@@ -68,7 +68,8 @@ $form_list
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
-	->addRow(_('Change severity'),
+	->addRow(
+		new CLabel(_('Change severity'), 'change_severity'),
 		(new CList([
 			(new CCheckBox('change_severity', ZBX_PROBLEM_UPDATE_SEVERITY))
 				->onClick('javascript: jQuery("#severity input").attr("disabled", this.checked ? false : true)')
@@ -79,9 +80,9 @@ $form_list
 			->addClass(ZBX_STYLE_HOR_LIST)
 	)
 	->addRow(
-		(new CLabel([_('Suppress'),
+		new CLabel([_('Suppress'),
 			makeHelpIcon(_('Manual problem suppression. Date-time input accepts relative and absolute time format.'))
-		])),
+		], 'suppress_problem'),
 		(new CList([
 			(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
 				->setChecked($data['suppress_problem'])
@@ -99,7 +100,7 @@ $form_list
 		]))->addClass(ZBX_STYLE_HOR_LIST)
 	)
 	->addRow(
-		(new CLabel([_('Unsuppress'), makeHelpIcon(_('Deactivates manual suppression.'))])),
+		new CLabel([_('Unsuppress'), makeHelpIcon(_('Deactivates manual suppression.'))], 'unsuppress_problem'),
 		(new CList([
 			(new CCheckBox('unsuppress_problem', ZBX_PROBLEM_UPDATE_UNSUPPRESS))
 				->setChecked($data['unsuppress_problem'])
@@ -109,11 +110,11 @@ $form_list
 
 if ($data['has_unack_events']) {
 	$form_list->addRow(
-		(new CLabel([_('Acknowledge'),
+		new CLabel([_('Acknowledge'),
 			makeHelpIcon(
 				_('Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation.')
 			)
-		])),
+		], 'acknowledge_problem'),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 			->onChange("$('#unacknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
@@ -122,7 +123,7 @@ if ($data['has_unack_events']) {
 
 if ($data['has_ack_events']) {
 	$form_list->addRow(
-		(new CLabel([_('Unacknowledge'), makeHelpIcon(_('Undo problem acknowledgement.'))])),
+		new CLabel([_('Unacknowledge'), makeHelpIcon(_('Undo problem acknowledgement.'))], 'unacknowledge_problem'),
 		(new CCheckBox('unacknowledge_problem', ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
 			->onChange("$('#acknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
@@ -130,6 +131,13 @@ if ($data['has_ack_events']) {
 }
 
 $form_list
+	->addRow(
+		new CLabel([_('Convert to cause'),
+			makeHelpIcon(_('Converts a symptom event back to cause event'))
+		], 'change_rank'),
+		(new CCheckBox('change_rank', ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
+			->setEnabled($data['allowed_change_problem_ranking'] && $data['problem_can_change_rank'])
+	)
 	->addRow(_('Close problem'),
 		(new CCheckBox('close_problem', ZBX_PROBLEM_UPDATE_CLOSE))
 			->setChecked($data['close_problem'])

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,6 @@ class CVaultSecretParser extends CParser {
 	}
 
 	private function parseHashiCorp($source, $pos) {
-		$this->start = $pos;
 		$this->errorClear();
 
 		$src_size = strlen($source);
@@ -115,7 +114,7 @@ class CVaultSecretParser extends CParser {
 	}
 
 	private function parseCyberArk($source, $pos) {
-		$this->start = $pos;
+		$start = $pos;
 		$this->errorClear();
 		$this->cyberark_has_appid = true;
 		$this->cyberark_has_key = true;
@@ -135,7 +134,7 @@ class CVaultSecretParser extends CParser {
 			$pos++;
 		}
 
-		if ($this->start == $pos) {
+		if ($start == $pos) {
 			$this->errorPos($source, $pos);
 
 			return self::PARSE_FAIL;

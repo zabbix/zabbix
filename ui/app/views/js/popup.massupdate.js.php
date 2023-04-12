@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -339,9 +339,11 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		let valuemap_table = element.closest('table');
 
 		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((element) => disable_names.push(element.value));
+
 		PopUp('popup.generic', {
-			srctbl: 'valuemaps',
+			srctbl: element.dataset.context === 'host' ? 'valuemaps' : 'template_valuemaps',
 			srcfld1: 'valuemapid',
+			context: element.dataset.context,
 			disable_names: disable_names,
 			editable: true
 		}, {dialogue_class: 'modal-popup-generic', trigger_element: element});
@@ -434,7 +436,7 @@ function submitPopup(overlay) {
 	// Remove error message.
 	overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
-	const url = new Curl('zabbix.php', false);
+	const url = new Curl('zabbix.php');
 	url.setArgument('action', action);
 	url.setArgument('output', 'ajax');
 

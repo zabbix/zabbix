@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2444,7 +2444,7 @@ class CMap extends CMapElement {
 
 			if ($this->outputIsRequested('tags', $options['selectSelements']) && $selements) {
 				$db_tags = DBselect(
-					'SELECT selementid, tag, value, operator'.
+					'SELECT selementid,tag,value,operator'.
 					' FROM sysmaps_element_tag'.
 					' WHERE '.dbConditionInt('selementid', array_keys($selements))
 				);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,11 @@
 #include "zbxcacheconfig/user_macro.h"
 #include "um_cache_mock.h"
 #include "zbxshmem.h"
+
+char	*um_mock_format_macro(const char *name, const char *context);
+void	*__wrap___zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size);
+void	*__wrap___zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, void *old, size_t size);
+void	__wrap___zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *ptr);
 
 ZBX_PTR_VECTOR_IMPL(um_mock_macro, zbx_um_mock_macro_t *)
 
@@ -736,7 +741,7 @@ void	mock_dbsync_clear(zbx_dbsync_t *sync)
 	}
 	else
 	{
-		DBfree_result(sync->dbresult);
+		zbx_db_free_result(sync->dbresult);
 		sync->dbresult = NULL;
 	}
 }

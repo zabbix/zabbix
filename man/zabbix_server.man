@@ -102,6 +102,16 @@ By default diagnostic information of all sections is logged.
 .RE
 .RS 4
 .TP 4
+\fBprof_enable\fR[=\fItarget\fR]
+Enable profiling, affects all processes if target is not specified
+.RE
+.RS 4
+.TP 4
+\fBprof_disable\fR[=\fItarget\fR]
+Disable profiling, affects all processes if target is not specified
+.RE
+.RS 4
+.TP 4
 .B ha_status
 Display high availability cluster status. 
 Can be performed only on active node.
@@ -137,7 +147,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, ha\ manager, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, service\ manager, odbc\ poller)
+All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, ha\ manager, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, service\ manager, odbc\ poller, connector\ manager, connector\ worker)
 .RE
 .RS 4
 .TP 4
@@ -148,6 +158,30 @@ Process type and number (e.g., poller,3)
 .TP 4
 .I pid
 Process identifier
+.RE
+.RE
+.SS
+.RS 4
+Profiling control targets
+.RS 4
+.TP 4
+.I process\-type
+All processes of specified type (alerter, alert\ manager, configuration\ syncer, discoverer, escalator, history\ syncer, housekeeper, http\ poller, icmp\ pinger, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, poller, preprocessing\ manager, proxy\ poller, self\-monitoring, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector, history\ poller, availability\ manager, service\ manager, odbc\ poller connector\ manager, connector\ worker)
+.RE
+.RS 4
+.TP 4
+.I process\-type,N
+Process type and number (e.g., history syncer,1)
+.RE
+.RS 4
+.TP 4
+.I pid
+Process identifier
+.RE
+.RS 4
+.TP 4
+.I scope
+(rwlock, mutex, processing) can be used with process-type (e.g., history syncer,1,processing)
 .RE
 .RE
 .IP "\fB\-h\fR, \fB\-\-help\fR"

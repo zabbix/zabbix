@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 jQuery(function($) {
 	var $container = $('.filter-space').first(),
 		xhr = null,
-		endpoint = new Curl('zabbix.php', false),
+		endpoint = new Curl('zabbix.php'),
 		element = {
 			from: $container.find('[name=from]'),
 			to: $container.find('[name=to]'),
@@ -45,7 +45,6 @@ jQuery(function($) {
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
-	endpoint.addSID();
 	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
 
 	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout' +
@@ -297,8 +296,6 @@ jQuery(function($) {
 			if ('page' in args) {
 				url.unsetArgument('page');
 			}
-
-			url.unsetArgument('sid');
 
 			history.replaceState(history.state, '', url.getUrl());
 		}
@@ -576,7 +573,7 @@ var timeControl = {
 				if (isset('graphtype', obj.objDims)) {
 					// graph size might have changed regardless of graph's type
 
-					var graphUrl = new Curl(obj.src, false);
+					var graphUrl = new Curl(obj.src);
 					graphUrl.setArgument('width', Math.floor(obj.objDims.width));
 					graphUrl.setArgument('height', Math.floor(obj.objDims.graphHeight));
 
@@ -609,7 +606,7 @@ var timeControl = {
 				from_ts: obj.timeline.from_ts,
 				to_ts: obj.timeline.to_ts
 			},
-			url = new Curl(obj.src, false);
+			url = new Curl(obj.src);
 
 		url.setArgument('_', (new Date()).getTime().toString(34));
 
@@ -639,7 +636,7 @@ var timeControl = {
 
 	refreshImage: function(id) {
 		var obj = this.objectList[id],
-			url = new Curl(obj.src, false),
+			url = new Curl(obj.src),
 			img = jQuery('#' + id),
 			zbx_sbox = img.data('zbx_sbox');
 
@@ -687,7 +684,7 @@ var timeControl = {
 		}
 
 		// link
-		var graphUrl = new Curl(container.attr('href'), false);
+		var graphUrl = new Curl(container.attr('href'));
 		graphUrl.setArgument('width', obj.objDims.width);
 		graphUrl.setArgument('from', obj.timeline.from);
 		graphUrl.setArgument('to', obj.timeline.to);
@@ -717,7 +714,7 @@ var timeControl = {
 	 */
 	objectUpdate: function(data) {
 		if (timeControl.refreshPage) {
-			var url = new Curl(location.href, false);
+			var url = new Curl(location.href);
 			url.unsetArgument('output');
 
 			// Always reset "page" when reloading with updated time range.

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,83 +27,89 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
-
-extern unsigned char			program_type;
+#include "zbxipcservice.h"
+#include "zbxdbhigh.h"
+#include "zbxdb.h"
 
 static int	hk_period;
-
-/* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
-#define HK_MAX_DELETE_PERIODS	4
 
 /******************************************************************************
  *                                                                            *
  * Purpose: remove outdated information from historical table                 *
  *                                                                            *
- * Parameters: now - current timestamp                                        *
+ * Parameters: table                 - [IN]                                   *
+ *             fieldname             - [IN]                                   *
+ *             now                   - [IN] current timestamp                 *
+ *             config_offline_buffer - [IN] hours to keep data when offline   *
+ *             config_local_buffer   - [IN] hours to keep data                *
  *                                                                            *
  * Return value: number of rows records                                       *
  *                                                                            *
  ******************************************************************************/
-static int	delete_history(const char *table, const char *fieldname, int now)
+static int	delete_history(const char *table, const char *fieldname, int now, int config_offline_buffer,
+		int config_local_buffer)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		minclock, records = 0;
 	zbx_uint64_t	lastid, maxid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);
 
-	DBbegin();
+	zbx_db_begin();
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select nextid"
 			" from ids"
 			" where table_name='%s'"
 				" and field_name='%s'",
 			table, fieldname);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = zbx_db_fetch(result)))
 		goto rollback;
 
 	ZBX_STR2UINT64(lastid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	result = DBselect("select min(clock) from %s",
+	result = zbx_db_select("select min(clock) from %s",
 			table);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
 		goto rollback;
 
 	minclock = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	result = DBselect("select max(id) from %s",
+	result = zbx_db_select("select max(id) from %s",
 			table);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+	if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
 		goto rollback;
 
 	ZBX_STR2UINT64(maxid, row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	records = DBexecute(
+/* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
+#define HK_MAX_DELETE_PERIODS	4
+
+	records = zbx_db_execute(
 			"delete from %s"
 			" where id<" ZBX_FS_UI64
 				" and (clock<%d"
 					" or (id<=" ZBX_FS_UI64 " and clock<%d))",
 			table, maxid,
-			now - CONFIG_PROXY_OFFLINE_BUFFER * SEC_PER_HOUR,
+			now - config_offline_buffer * SEC_PER_HOUR,
 			lastid,
-			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR,
+			MIN(now - config_local_buffer * SEC_PER_HOUR,
 					minclock + HK_MAX_DELETE_PERIODS * hk_period));
 
-	DBcommit();
-
+	zbx_db_commit();
+#undef HK_MAX_DELETE_PERIODS
 	return records;
 rollback:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	DBrollback();
+	zbx_db_rollback();
 
 	return 0;
 }
@@ -112,23 +118,26 @@ rollback:
  *                                                                            *
  * Purpose: remove outdated information from history                          *
  *                                                                            *
- * Parameters: now - current timestamp                                        *
+ * Parameters: now                   - [IN] current timestamp                 *
+ *             config_offline_buffer - [IN] hours to keep data when offline   *
+ *             config_local_buffer   - [IN] hours to keep data                *
  *                                                                            *
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	housekeeping_history(int now)
+static int	housekeeping_history(int now, int config_offline_buffer, int config_local_buffer)
 {
-        int	records = 0;
+	int	records = 0;
 
-        zabbix_log(LOG_LEVEL_DEBUG, "In housekeeping_history()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	records += delete_history("proxy_history", "history_lastid", now);
-	records += delete_history("proxy_dhistory", "dhistory_lastid", now);
-	records += delete_history("proxy_autoreg_host", "autoreg_host_lastid", now);
+	records += delete_history("proxy_history", "history_lastid", now, config_offline_buffer, config_local_buffer);
+	records += delete_history("proxy_dhistory", "dhistory_lastid", now, config_offline_buffer, config_local_buffer);
+	records += delete_history("proxy_autoreg_host", "autoreg_host_lastid", now, config_offline_buffer,
+			config_local_buffer);
 
-        return records;
+	return records;
 }
 
 static int	get_housekeeper_period(double time_slept)
@@ -152,12 +161,15 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	int			server_num = info->server_num;
 	int			process_num = info->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zbx_thread_proxy_housekeeper_args	*housekeeper_args_in = (zbx_thread_proxy_housekeeper_args *)
+			((((zbx_thread_args_t *)args))->args);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
+	if (0 == housekeeper_args_in->config_housekeeping_frequency)
 	{
 		sleeptime = ZBX_IPC_WAIT_FOREVER;
 		zbx_setproctitle("%s [waiting for user command]", get_process_type_string(process_type));
@@ -168,10 +180,11 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sleeptime = HOUSEKEEPER_STARTUP_DELAY * SEC_PER_MIN;
 		zbx_setproctitle("%s [startup idle for %d minutes]", get_process_type_string(process_type),
 				HOUSEKEEPER_STARTUP_DELAY);
-		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
+		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)",
+				housekeeper_args_in->config_housekeeping_frequency);
 	}
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -207,14 +220,14 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		if (!ZBX_IS_RUNNING())
 			break;
 
-		if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
+		if (0 == housekeeper_args_in->config_housekeeping_frequency)
 			sleeptime = ZBX_IPC_WAIT_FOREVER;
 		else
-			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
+			sleeptime = housekeeper_args_in->config_housekeeping_frequency * SEC_PER_HOUR;
 
 		time_now = zbx_time();
 		time_slept = time_now - sec;
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		hk_period = get_housekeeper_period(time_slept);
 
@@ -224,15 +237,16 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
+		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 		zbx_setproctitle("%s [removing old history]", get_process_type_string(process_type));
 
 		sec = zbx_time();
-		records = housekeeping_history(start);
+		records = housekeeping_history(start, housekeeper_args_in->config_proxy_offline_buffer,
+				housekeeper_args_in->config_proxy_local_buffer);
 		sec = zbx_time() - sec;
 
-		DBclose();
+		zbx_db_close();
 
 		zbx_dc_cleanup_sessions();
 		zbx_dc_cleanup_autoreg_host();

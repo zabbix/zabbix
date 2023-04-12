@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,10 @@ package oracle
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/uri"
@@ -37,6 +39,14 @@ const (
 	pluginName = "Oracle"
 	hkInterval = 10
 	sqlExt     = ".sql"
+
+	sysdbaExtension  = " as sysdba"
+	sysasmExtension  = " as sysoper"
+	sysoperExtension = " as sysasm"
+
+	sysdbaPrivelege  = "sysdba"
+	sysasmPrivelege  = "sysoper"
+	sysoperPrivelege = "sysasm"
 )
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -51,7 +61,6 @@ var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
-
 	params, extraParams, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
@@ -59,7 +68,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	service := url.QueryEscape(params["Service"])
 
-	uri, err := uri.NewWithCreds(params["URI"]+"?service="+service, params["User"], params["Password"], uriDefaults)
+	user, privilege, err := splitUserPrivilege(params)
+	if err != nil {
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
+	}
+
+	uri, err := uri.NewWithCreds(params["URI"]+"?service="+service, user, params["Password"], uriDefaults)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +83,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri)
+	conn, err := p.connMgr.GetConnection(connDetails{*uri, privilege})
 	if err != nil {
 		// Special logic of processing connection errors should be used if oracle.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -96,24 +110,56 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
-	queryStorage, err := yarn.New(http.Dir(p.options.CustomQueriesPath), "*"+sqlExt)
-	if err != nil {
-		p.Errf(err.Error())
-		// create empty storage if error occurred
-		queryStorage = yarn.NewFromMap(map[string]string{})
-	}
-
 	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
 		time.Duration(p.options.ConnectTimeout)*time.Second,
 		time.Duration(p.options.CallTimeout)*time.Second,
 		hkInterval*time.Second,
-		queryStorage,
+		p.setCustomQuery(),
 	)
+}
+
+func (p *Plugin) setCustomQuery() yarn.Yarn {
+	if p.options.CustomQueriesPath == "" {
+		return yarn.NewFromMap(map[string]string{})
+	}
+
+	queryStorage, err := yarn.New(http.Dir(p.options.CustomQueriesPath), "*"+sqlExt)
+	if err != nil {
+		p.Errf(err.Error())
+		// create empty storage if error occurred
+		return yarn.NewFromMap(map[string]string{})
+	}
+
+	return queryStorage
 }
 
 // Stop implements the Runner interface and frees resources when plugin is deactivated.
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
+}
+
+func splitUserPrivilege(params map[string]string) (user, privilege string, err error) {
+	var ok bool
+	user, ok = params["User"]
+	if !ok {
+		return "", "", errors.New("missing parameter 'User'")
+	}
+
+	var extension string
+
+	switch true {
+	case strings.HasSuffix(strings.ToLower(user), sysdbaExtension):
+		privilege = sysdbaPrivelege
+		extension = sysdbaExtension
+	case strings.HasSuffix(strings.ToLower(user), sysoperExtension):
+		privilege = sysoperPrivelege
+		extension = sysoperExtension
+	case strings.HasSuffix(strings.ToLower(user), sysasmExtension):
+		privilege = sysasmPrivelege
+		extension = sysasmExtension
+	}
+
+	return user[:len(user)-len(extension)], privilege, nil
 }

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,11 +54,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('templategroup');
-
-				this._reload(e.detail);
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail));
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -127,6 +123,7 @@
 				postMessageDetails('success', success.messages);
 			}
 
+			uncheckTableRows('templategroup');
 			location.href = location.href;
 		}
 	}

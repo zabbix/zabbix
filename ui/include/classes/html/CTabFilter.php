@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ class CTabFilter extends CDiv {
 	 * support_custom_time  - can filters define custom time range or not.
 	 * data                 - array of filters data arrays.
 	 * page                 - current page number used by selected tab for pagination.
+	 * csrf_token           - CSRF token.
 	 * timeselector         - array of timeselector data, can be set with addTimeselector or passed as array.
 	 */
 	public $options = [
@@ -56,7 +57,8 @@ class CTabFilter extends CDiv {
 		'expanded' => false,
 		'support_custom_time' => 1,
 		'data' => [],
-		'page' => null
+		'page' => null,
+		'csrf_token' => null
 	];
 
 	/**
@@ -363,7 +365,7 @@ class CTabFilter extends CDiv {
 		$nav_list = new CList([
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
-				->addClass('btn-widget-expand'),
+				->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass('btn-iterator-page-next')

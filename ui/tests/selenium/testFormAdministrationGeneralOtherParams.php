@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		}
 
 		$limits = [
-			'url' => 255,
+			'url' => 2048,
 			'login_attempts' => 2,
 			'login_block' => 32,
 			'uri_valid_schemes' => 255,

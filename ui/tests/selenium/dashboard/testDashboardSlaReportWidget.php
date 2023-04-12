@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,11 +147,11 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'value' => 20
 			],
 			'id:date_from' => [
-				'maxlength' => 255,
+				'maxlength' => 2048,
 				'placeholder' => 'YYYY-MM-DD'
 			],
 			'id:date_to' => [
-				'maxlength' => 255,
+				'maxlength' => 2048,
 				'placeholder' => 'YYYY-MM-DD'
 			]
 		];

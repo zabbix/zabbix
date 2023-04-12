@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,12 +59,9 @@ class CHtmlPageHeader {
 	 */
 	protected array $js_files = [];
 
-	protected string $sid;
-
 	public function __construct(string $title, string $lang) {
 		$this->title = CHtml::encode($title);
 		$this->lang = $lang;
-		$this->sid = substr(CSessionHelper::getId(), 16, 16);
 	}
 
 	public function setTheme(string $theme): self {
@@ -140,7 +137,6 @@ class CHtmlPageHeader {
 				<link rel="apple-touch-icon-precomposed" sizes="152x152" href="assets/img/apple-touch-icon-152x152-precomposed.png">
 				<link rel="apple-touch-icon-precomposed" sizes="180x180" href="assets/img/apple-touch-icon-180x180-precomposed.png">
 				<link rel="icon" sizes="192x192" href="assets/img/touch-icon-192x192.png">
-				<meta name="csrf-token" content="$this->sid"/>
 				<meta name="msapplication-TileImage" content="assets/img/ms-tile-144x144.png">
 				<meta name="msapplication-TileColor" content="#d40000">
 				<meta name="msapplication-config" content="none"/>

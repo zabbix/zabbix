@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ use Zabbix\Widgets\CWidgetField;
 class CWidgetFieldUrl extends CWidgetField {
 
 	public const DEFAULT_VALUE = '';
+	public const MAX_LENGTH = 2048;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);

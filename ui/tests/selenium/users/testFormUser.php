@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -934,15 +934,26 @@ class testFormUser extends CWebTest {
 
 		// Update user parameters.
 		$form = $this->query('name:user_form')->asForm()->one();
+
 		if (array_key_exists('Password', $data['fields']) || array_key_exists('Password (once again)', $data['fields'])) {
 			$form->query('button:Change password')->one()->click();
 		}
 		$form->fill($data['fields']);
+
 		if (array_key_exists('auto_logout', $data)) {
 			$this->setAutoLogout($data['auto_logout']);
 		}
 
 		$form->submit();
+
+		if (array_key_exists('Password', $data['fields']) && array_key_exists('Password (once again)', $data['fields'])) {
+			$this->assertTrue($this->page->isAlertPresent());
+			$this->assertEquals('In case of successful password change user will be logged out of all active sessions. Continue?',
+					$this->page->getAlertText()
+			);
+			$this->page->acceptAlert();
+		}
+
 		$this->page->waitUntilReady();
 
 		// Verify if the user was updated.
@@ -1002,6 +1013,12 @@ class testFormUser extends CWebTest {
 			'Password (once again)' => $data['new_password']
 		]);
 		$form_update->submit();
+
+		$this->assertTrue($this->page->isAlertPresent());
+		$this->assertEquals('In case of successful password change user will be logged out of all active sessions. Continue?',
+				$this->page->getAlertText()
+		);
+		$this->page->acceptAlert();
 
 		try {
 			$this->page->logout();
