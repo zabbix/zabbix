@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ void	scriptitem_es_engine_destroy(void)
 		zbx_es_destroy(&es_engine);
 }
 
-int	get_value_script(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_script(zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, timeout_seconds, ret = NOTSUPPORTED;

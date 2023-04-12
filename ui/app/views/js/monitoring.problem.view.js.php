@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@
 		opened_eventids: [],
 
 		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
-			this.refresh_url = new Curl(refresh_url, false);
+			this.refresh_url = new Curl(refresh_url);
 			this.refresh_interval = refresh_interval;
 			this.filter_defaults = filter_defaults;
 
-			const url = new Curl('zabbix.php', false);
+			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'problem.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
@@ -355,7 +355,7 @@
 		 */
 		refreshResults() {
 			const url = new Curl();
-			const refresh_url = new Curl('zabbix.php', false);
+			const refresh_url = new Curl('zabbix.php');
 			const data = Object.assign({}, this.filter_defaults, this.global_timerange, url.getArgumentsObject());
 
 			// Modify filter data.
@@ -442,7 +442,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -450,24 +450,6 @@
 
 		events: {
 			hostSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					const title = data.success.title;
-					let messages = [];
-
-					if ('messages' in data.success) {
-						messages = data.success.messages;
-					}
-
-					addMessage(makeMessageBox('good', messages, title));
-				}
-
-				view.refreshResults();
-				view.refreshCounters();
-			},
-
-			hostDelete(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

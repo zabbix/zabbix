@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,43 +38,44 @@
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 
-extern int				CONFIG_ENABLE_REMOTE_COMMANDS;
-extern int				CONFIG_LOG_REMOTE_COMMANDS;
 extern unsigned char			program_type;
 extern char 				*CONFIG_HOSTNAME;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: execute remote command task                                       *
- *                                                                            *
- * Parameters: taskid         - [IN] task identifier                          *
- *             clock          - [IN] task creation time                       *
- *             ttl            - [IN] task expiration period in seconds        *
- *             now            - [IN] current time                             *
- *             config_timeout - [IN]                                          *
- *                                                                            *
- * Return value: SUCCEED -     remote command was executed                    *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now, int config_timeout)
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose: execute remote command task                                               *
+ *                                                                                    *
+ * Parameters: taskid                        - [IN]                                   *
+ *             clock                         - [IN] task creation time                *
+ *             ttl                           - [IN] task expiration period in seconds *
+ *             now                           - [IN]                                   *
+ *             config_timeout                - [IN]                                   *
+ *             config_enable_remote_commands - [IN]                                   *
+ *             config_log_remote_commands    - [IN]                                   *
+ *                                                                                    *
+ * Return value: SUCCEED - remote command was executed                                *
+ *               FAIL    - otherwise                                                  *
+ *                                                                                    *
+ **************************************************************************************/
+static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now, int config_timeout,
+		int config_enable_remote_commands, int config_log_remote_commands)
 {
-	DB_ROW		row;
-	DB_RESULT	result;
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
 	zbx_uint64_t	parent_taskid, hostid, alertid;
 	zbx_tm_task_t	*task = NULL;
 	int		ret = FAIL;
 	zbx_script_t	script;
 	char		*info = NULL, error[MAX_STRING_LEN];
-	DC_HOST		host;
+	zbx_dc_host_t	host;
 
-	result = DBselect("select command_type,execute_on,port,authtype,username,password,publickey,privatekey,"
+	result = zbx_db_select("select command_type,execute_on,port,authtype,username,password,publickey,privatekey,"
 					"command,parent_taskid,hostid,alertid"
 				" from task_remote_command"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
@@ -89,7 +90,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	}
 
 	ZBX_STR2UINT64(hostid, row[10]);
-	if (FAIL == DCget_host_by_hostid(&host, hostid))
+	if (FAIL == zbx_dc_get_host_by_hostid(&host, hostid))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, "Unknown host.");
 		goto finish;
@@ -114,14 +115,14 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
 		{
-			if (0 == CONFIG_ENABLE_REMOTE_COMMANDS)
+			if (0 == config_enable_remote_commands)
 			{
 				task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
 						"Remote commands are not enabled");
 				goto finish;
 			}
 
-			if (1 == CONFIG_LOG_REMOTE_COMMANDS)
+			if (1 == config_log_remote_commands)
 				zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", script.command);
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", script.command);
@@ -144,9 +145,9 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 
 	zbx_free(info);
 finish:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	DBbegin();
+	zbx_db_begin();
 
 	if (NULL != task)
 	{
@@ -154,9 +155,9 @@ finish:
 		zbx_tm_task_free(task);
 	}
 
-	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
-	DBcommit();
+	zbx_db_commit();
 
 	return ret;
 }
@@ -170,8 +171,8 @@ finish:
  ******************************************************************************/
 static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			processed_num;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -183,15 +184,15 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_vector_uint64_create(&itemids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from task_check_now where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
-	result = DBselect("%s", sql);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		zbx_vector_uint64_append(&itemids, itemid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != (processed_num = itemids.values_num))
 		zbx_dc_reschedule_items(&itemids, zbx_time(), NULL);
@@ -201,9 +202,9 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where",
 				ZBX_TM_STATUS_DONE);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "taskid", taskids->values, taskids->values_num);
 
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 	}
 
 	zbx_free(sql);
@@ -259,19 +260,19 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
 static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	zbx_tm_task_t		*task = NULL;
 	int			ret = FAIL, data_type;
 	char			*info = NULL;
 	zbx_uint64_t		parent_taskid;
 
-	result = DBselect("select parent_taskid,data,type"
+	result = zbx_db_select("select parent_taskid,data,type"
 				" from task_data"
 				" where taskid=" ZBX_FS_UI64,
 				taskid);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
 	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
@@ -302,9 +303,9 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 
 	zbx_free(info);
 finish:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
-	DBbegin();
+	zbx_db_begin();
 
 	if (NULL != task)
 	{
@@ -312,9 +313,9 @@ finish:
 		zbx_tm_task_free(task);
 	}
 
-	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
-	DBcommit();
+	zbx_db_commit();
 
 	return ret;
 }
@@ -327,10 +328,10 @@ finish:
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	int			processed_num = 0, clock, ttl;
 	zbx_uint64_t		taskid;
 	unsigned char		type;
@@ -338,14 +339,14 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 
 	zbx_vector_uint64_create(&check_now_taskids);
 
-	result = DBselect("select taskid,type,clock,ttl"
+	result = zbx_db_select("select taskid,type,clock,ttl"
 				" from task"
 				" where status=%d"
 					" and type in (%d, %d, %d)"
 				" order by taskid",
 			ZBX_TM_STATUS_NEW, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_TASK_CHECK_NOW, ZBX_TM_TASK_DATA);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(taskid, row[0]);
 		ZBX_STR2UCHAR(type, row[1]);
@@ -356,7 +357,8 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
 				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now,
-						config_comms->config_timeout))
+						config_comms->config_timeout, config_enable_remote_commands,
+						config_log_remote_commands))
 				{
 					processed_num++;
 				}
@@ -374,7 +376,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 				break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < check_now_taskids.values_num)
 		processed_num += tm_process_check_now(&check_now_taskids);
@@ -391,10 +393,10 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
  ******************************************************************************/
 static void	tm_remove_old_tasks(int now)
 {
-	DBbegin();
-	DBexecute("delete from task where status in (%d,%d) and clock<=%d",
+	zbx_db_begin();
+	zbx_db_execute("delete from task where status in (%d,%d) and clock<=%d",
 			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, now - ZBX_TM_CLEANUP_TASK_AGE);
-	DBcommit();
+	zbx_db_commit();
 }
 
 /******************************************************************************
@@ -409,9 +411,9 @@ static void	force_config_sync(void)
 	zbx_uint64_t	taskid;
 	struct zbx_json	j;
 
-	taskid = DBget_maxid("task");
+	taskid = zbx_db_get_maxid("task");
 
-	DBbegin();
+	zbx_db_begin();
 
 	task = zbx_tm_task_create(taskid, ZBX_TM_PROXYDATA, ZBX_TM_STATUS_NEW, (int)time(NULL), 0, 0);
 
@@ -423,7 +425,7 @@ static void	force_config_sync(void)
 
 	zbx_tm_save_task(task);
 
-	DBcommit();
+	zbx_db_commit();
 
 	zbx_tm_task_free(task);
 	zbx_json_free(&j);
@@ -453,7 +455,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			taskmanager_args_in->zbx_get_program_type_cb_arg);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	sec1 = zbx_time();
 
@@ -490,7 +492,10 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
 		tasks_num = tm_process_tasks(&rtc, (int)sec1, taskmanager_args_in->config_comms,
-				taskmanager_args_in->config_startup_time);
+				taskmanager_args_in->config_startup_time,
+				taskmanager_args_in->config_enable_remote_commands,
+				taskmanager_args_in->config_log_remote_commands);
+
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((int)sec1);

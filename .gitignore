@@ -3,6 +3,9 @@
 !/src/modules/dummy/Makefile
 *.a
 *.o
+*.gcda
+*.gcno
+/tests_results
 .cproject
 .deps
 .dirstamp
@@ -81,6 +84,7 @@ m4/conf_tests.m4
 frontend.mo
 include/common/config.h
 include/common/config.h.in
+include/common/stamp-h1
 include/stamp-h1
 misc/images/inkscape.log.txt
 misc/images/pngcrush.log.txt
@@ -221,6 +225,8 @@ tests/libs/zbxsysinfo/linux/system_boottime
 tests/libs/zbxsysinfo/linux/system_cpu_intr
 tests/libs/zbxsysinfo/linux/system_cpu_switches
 tests/libs/zbxsysinfo/linux/system_hw_chassis
+tests/libs/zbxsysinfo/linux/system_sw_packages_get
+tests/libs/zbxsysinfo/linux/system_sw_software
 tests/libs/zbxsysinfo/linux/vfs_fs_discovery
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
@@ -229,15 +235,16 @@ tests/libs/zbxcommon/zbx_tm_add
 tests/libs/zbxcommon/zbx_tm_sub
 tests/libs/zbxcommon/zbx_tm_round_up
 tests/libs/zbxcommon/zbx_tm_round_down
+tests/libs/zbxtagfilter/tagfilter_match_tags
 tests/libs/zbxtime/zbx_iso8601_utc
 tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxsysinfo/process_http
 tests/zabbix_server/pinger/zbx_pinger_test
 tests/zabbix_server/poller/zbx_poller_test
-tests/zabbix_server/preprocessor/item_preproc_csv_to_json
-tests/zabbix_server/preprocessor/item_preproc_xpath
-tests/zabbix_server/preprocessor/zbx_item_preproc
+tests/libs/zbxpreproc/item_preproc_csv_to_json
+tests/libs/zbxpreproc/item_preproc_xpath
+tests/libs/zbxpreproc/zbx_item_preproc
 tests/zabbix_server/service/service_get_rootcause_eventids
 tests/zabbix_server/service/service_get_main_status
 tests/zabbix_server/service/service_get_rule_status

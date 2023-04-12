@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,6 +52,10 @@ perl-Scalar-List-Utils,1.56-461.el9,x86_64,143652,1628565132,1662121942`,
 /var/log/packages/brotli-1.0.9-x86_64-7:UNCOMPRESSED PACKAGE SIZE:     2.4M
 /var/log/packages/ca-certificates-20221205-noarch-1_slack15.0:UNCOMPRESSED PACKAGE SIZE:     360K`,
 		"expectedOutput": `[{"name":"aaa_glibc-solibs","manager":"pkgtools","version":"2.33-5","size":14680064,"arch":"x86_64","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}},{"name":"brotli","manager":"pkgtools","version":"1.0.9-7","size":2516582,"arch":"x86_64","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}},{"name":"ca-certificates","manager":"pkgtools","version":"20221205-1_slack15.0","size":368640,"arch":"noarch","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}}]`,
+	},
+	"portage": {
+		"input": `dev-lang,tcl,8.6.12,r1,gentoo: 1104 files, 25 non-files, 10871914 bytes`,
+		"expectedOutput": `[{"name":"tcl","manager":"portage","version":"8.6.12","size":10871914,"arch":"","buildtime":{"timestamp":0,"value":""},"installtime":{"timestamp":0,"value":""}}]`,
 	},
 }
 

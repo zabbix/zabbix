@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 **/
 
 #include "dbupgrade.h"
+#include "dbupgrade_common.h"
 
-#include "zbxcommon.h"
-#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
 
 /*
  * 3.4 maintenance database patches
@@ -28,19 +28,14 @@
 
 #ifndef HAVE_SQLITE3
 
-int	DBpatch_3040006(void);
-int	DBpatch_3040007(void);
-
 static int	DBpatch_3040000(void)
 {
 	return SUCCEED;
 }
 
-extern int	DBpatch_3020001(void);
-
 static int	DBpatch_3040001(void)
 {
-	return DBpatch_3020001();
+	return delete_problems_with_nonexistent_object();
 }
 
 static int	DBpatch_3040002(void)
@@ -60,28 +55,20 @@ static int	DBpatch_3040004(void)
 
 static int	DBpatch_3040005(void)
 {
-	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sessions", 1, &field);
 }
 
-int	DBpatch_3040006(void)
+static int	DBpatch_3040006(void)
 {
-	if (FAIL == DBindex_exists("problem", "problem_3"))
-		return DBcreate_index("problem", "problem_3", "r_eventid", 0);
-
-	return SUCCEED;
+	return create_problem_3_index();
 }
 
-int	DBpatch_3040007(void)
+static int	DBpatch_3040007(void)
 {
-#ifdef HAVE_MYSQL	/* MySQL automatically creates index and might not remove it on some conditions */
-	if (SUCCEED == DBindex_exists("problem", "c_problem_2"))
-		return DBdrop_index("problem", "c_problem_2");
-#endif
-	return SUCCEED;
+	return drop_c_problem_2_index();
 }
-
 #endif
 
 DBPATCH_START(3040)

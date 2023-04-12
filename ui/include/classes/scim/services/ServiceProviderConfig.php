@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class ServiceProviderConfig extends ScimApiService {
 	public function get(array $options = []): array {
 		return [
 			'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig'],
-			'patch' => ['supported' => false],
+			'patch' => ['supported' => true],
 			'bulk' => [
 				'supported' => false,
 				'maxOperations' => 0,

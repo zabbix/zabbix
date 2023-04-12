@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2022 Zabbix SIA
+-- Copyright (C) 2001-2023 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -92,6 +92,8 @@ FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|custom_interfaces|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|name_upper	|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|vendor_name	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|vendor_version	|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -319,7 +321,6 @@ FIELD		|smtp_security	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_peer|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_host|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_authentication|t_integer	|'0'	|NOT NULL	|0
-FIELD		|exec_params	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|maxsessions	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|maxattempts	|t_integer	|'3'	|NOT NULL	|0
 FIELD		|attempt_interval|t_varchar(32)	|'10s'	|NOT NULL	|0
@@ -339,6 +340,7 @@ FIELD		|mediatype_paramid|t_id		|	|NOT NULL	|0
 FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|1|media_type
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|mediatypeid
 
 TABLE|media_type_message|mediatype_messageid|ZBX_DATA
@@ -391,7 +393,7 @@ FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|new_window	|t_integer	|'1'	|NOT NULL	|0
 INDEX		|1		|usrgrpid
 INDEX		|2		|groupid
-UNIQUE		|3		|name
+UNIQUE		|3		|name,menu_path
 
 TABLE|script_param|script_paramid|ZBX_DATA
 FIELD		|script_paramid	|t_id		|	|NOT NULL	|0
@@ -582,7 +584,7 @@ FIELD		|media_type_test_timeout	|t_varchar(32)	|'65s'	|NOT NULL	|ZBX_NODATA
 FIELD		|script_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
 FIELD		|item_test_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
 FIELD		|session_key	|t_varchar(32)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|url			|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|report_test_timeout|t_varchar(32)|'60s'|NOT NULL	|ZBX_NODATA
 FIELD		|dbversion_status	|t_shorttext|''	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_service|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
@@ -591,7 +593,7 @@ FIELD		|passwd_check_rules	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
 FIELD		|auditlog_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|ha_failover_delay	|t_varchar(32)	|'1m'	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_tile_provider|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|geomaps_tile_url	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|geomaps_tile_url	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_max_zoom	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|vault_provider	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -894,14 +896,14 @@ TABLE|sysmap_element_url|sysmapelementurlid|ZBX_TEMPLATE
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
 FIELD		|selementid	|t_id		|	|NOT NULL	|0			|1|sysmaps_elements
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
 UNIQUE		|1		|selementid,name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_TEMPLATE
 FIELD		|sysmapurlid	|t_id		|	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|sysmapid,name
 
@@ -1253,9 +1255,9 @@ FIELD		|vendor		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|contract_number|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|installer_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|deployment_status|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|url_a		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|url_b		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-FIELD		|url_c		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_a		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_b		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_c		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|host_networks	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|host_netmask	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|host_router	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
@@ -1343,6 +1345,7 @@ FIELD		|sessionid	|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|secret		|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|userid,status,lastaccess
 
 TABLE|trigger_discovery|triggerid|0
@@ -1631,7 +1634,7 @@ FIELD		|widgetid	|t_id		|	|NOT NULL	|0			|1|widget
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value_str	|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|value_groupid	|t_id		|	|NULL		|0			|2|hstgrp	|groupid
 FIELD		|value_hostid	|t_id		|	|NULL		|0			|3|hosts	|hostid
 FIELD		|value_itemid	|t_id		|	|NULL		|0			|4|items	|itemid
@@ -2069,8 +2072,43 @@ FIELD		|scim_groupid		|t_id	|	|NOT NULL	|0	|2|scim_group
 INDEX		|1	|userid
 INDEX		|2	|scim_groupid
 
+TABLE|connector|connectorid|ZBX_DATA
+FIELD		|connectorid	|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|protocol	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|max_records	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|max_senders	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|max_attempts	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|timeout	|t_varchar(255)	|'5s'	|NOT NULL	|0
+FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|token		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|verify_peer	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|verify_host	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|ssl_cert_file	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|ssl_key_file	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|status		|t_integer	|'1'	|NOT NULL	|0
+FIELD		|tags_evaltype	|t_integer	|'0'	|NOT NULL	|0
+UNIQUE		|1		|name
+CHANGELOG	|17
+
+TABLE|connector_tag|connector_tagid|0
+FIELD	|connector_tagid|t_id		|	|NOT NULL	|0
+FIELD	|connectorid	|t_id		|	|NOT NULL	|0	|1|connector|	|RESTRICT
+FIELD	|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD	|operator	|t_integer	|'0'	|NOT NULL	|0
+FIELD	|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX	|1		|connectorid
+CHANGELOG	|18
+
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030158	|6030158
+ROW		|1		|6050011	|6050011

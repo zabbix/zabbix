@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,13 +41,10 @@ $titles = [
 	'triggers' => _('Triggers'),
 	'graphs' => _('Graphs'),
 	'httptests' => _('Web scenarios'),
-	'maps' => _('Maps')
+	'maps' => _('Maps'),
+	'images' => _('Images'),
+	'mediaTypes' => _('Media types')
 ];
-
-if ($data['user']['type'] == USER_TYPE_SUPER_ADMIN) {
-	$titles['images'] = _('Images');
-	$titles['mediaTypes'] = _('Media types');
-}
 
 switch ($data['rules_preset']) {
 	case 'map':
@@ -124,30 +121,6 @@ foreach ($titles as $key => $title) {
 			->addClass('js-delete');
 	}
 
-	switch ($key) {
-		case 'maps':
-			if (!$data['user']['can_edit_maps']) {
-				$checkbox_update->setAttribute('disabled', 'disabled');
-				$checkbox_create->setAttribute('disabled', 'disabled');
-			}
-			break;
-
-		default:
-			if ($data['user']['type'] != USER_TYPE_SUPER_ADMIN && $data['user']['type'] != USER_TYPE_ZABBIX_ADMIN) {
-				if ($checkbox_update !== null) {
-					$checkbox_update->setAttribute('disabled', 'disabled');
-				}
-
-				if ($checkbox_create !== null) {
-					$checkbox_create->setAttribute('disabled', 'disabled');
-				}
-
-				if ($checkbox_delete !== null) {
-					$checkbox_delete->setAttribute('disabled', 'disabled');
-				}
-			}
-	}
-
 	$checkbox_row = (new CRow([
 		$title,
 		$col_update ? (new CCol($checkbox_update))->addClass(ZBX_STYLE_CENTER) : null,
@@ -192,6 +165,7 @@ $form_grid = (new CFormGrid())
 	->addItem([new CLabel(_('Rules')), new CFormField($rules_table)]);
 
 $form = (new CForm('post', null, 'multipart/form-data'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('import')))->removeId())
 	->setId('import-form')
 	->addVar('import', 1)
 	->addVar('rules_preset', $data['rules_preset'])

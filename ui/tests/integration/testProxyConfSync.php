@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -286,6 +286,22 @@ class testProxyConfSync extends CIntegrationTest
 			'httptests' =>
 			[
 				'insert' => '3',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -642,6 +658,28 @@ class testProxyConfSync extends CIntegrationTest
 				"delete" =>
 				"0"
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -988,6 +1026,22 @@ class testProxyConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '3'
 			]
+		],
+		[
+			'connector' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -1057,11 +1111,11 @@ class testProxyConfSync extends CIntegrationTest
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_PROXY));
 		$data = explode("\n", $log);
 
-		$sync_lines = preg_grep('/DCsync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
+		$sync_lines = preg_grep('/zbx_dc_sync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
 
 		$sync_lines1 = preg_replace(
 			[
-				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ DCsync_configuration\(\) /",
+				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",
 				"/:sql:[0-9]+\.[0-9]+sec/"
@@ -1537,7 +1591,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->createProxy();
 
 		self::startComponent(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		self::startComponent(self::COMPONENT_PROXY);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);
@@ -1551,7 +1605,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->loadInitialConfiguration();
 
 		self::startComponent(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		self::startComponent(self::COMPONENT_PROXY);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);
@@ -1621,7 +1675,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->disableAllHosts();
 
 		self::startComponent(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);
@@ -1659,7 +1713,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->purgeHostGroups();
 
 		self::startComponent(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);

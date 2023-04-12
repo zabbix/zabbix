@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,27 +144,5 @@ class OracleDbBackend extends DbBackend {
 		}
 
 		return !$row;
-	}
-
-	/**
-	* Check if database is using IEEE754 compatible double precision columns.
-	*
-	* @return bool
-	*/
-	public function isDoubleIEEE754() {
-		global $DB;
-
-		$conditions_or = [
-			'(table_name=\'HISTORY\' AND column_name=\'VALUE\')',
-			'(table_name=\'TRENDS\' AND column_name IN (\'VALUE_MIN\', \'VALUE_AVG\', \'VALUE_MAX\'))'
-		];
-
-		$sql =
-			'SELECT COUNT(*) cnt FROM user_tab_columns'.
-				' WHERE data_type=\'BINARY_DOUBLE\' AND ('.implode(' OR ', $conditions_or).')';
-
-		$result = DBfetch(DBselect($sql));
-
-		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == 4);
 	}
 }

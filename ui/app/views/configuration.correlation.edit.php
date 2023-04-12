@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,14 +30,13 @@ $html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation rules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT));
 
+$csrf_token = CCsrfTokenHelper::get('correlation');
+
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'correlation.condition.add')
-		->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['correlationid'] != 0) {
@@ -250,7 +249,8 @@ $condition_table->addItem(
 
 $form_list
 	->addRow((new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'), [
-		(new CSelect('evaltype'))
+		(new CDiv(
+			(new CSelect('evaltype'))
 			->setId('evaltype')
 			->setValue($data['evaltype'])
 			->setFocusableElementId('evaltype_select')
@@ -259,15 +259,18 @@ $form_list
 				CONDITION_EVAL_TYPE_AND => _('And'),
 				CONDITION_EVAL_TYPE_OR => _('Or'),
 				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())
-			->setId('formula-div')
-			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())->setId('expression'),
-		(new CTextBox('formula', $data['formula']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+			]))
+			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan())->setId('expression'),
+			(new CTextBox('formula', $data['formula']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('formula')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION)
 	])
 	->addRow(
 		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
@@ -329,7 +332,7 @@ else {
 	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'correlation.delete')
 			->setArgument('correlationids', (array) $data['correlationid'])
-			->setArgumentSID(),
+			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
 		_('Delete current correlation?')
 	))->setId('delete');
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -750,6 +750,13 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function scrollToTop() {
 		CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)', [$this]);
+	}
+
+	/**
+	 * Scroll the element to the visible position.
+	 */
+	public function scrollIntoView() {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});', [$this]);
 	}
 
 	/**

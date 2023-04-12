@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ $html_page = (new CHtmlPage())
 			(new CList())
 				->addItem(
 					(new CForm('get'))
-						->cleanItems()
 						->addItem(
 							(new CSubmit('form', _('Create map')))->setEnabled($data['allowed_edit'])
 						)
@@ -39,7 +38,11 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CButton('form', _('Import')))
 						->onClick(
-							'return PopUp("popup.import", {rules_preset: "map"}, {
+							'return PopUp("popup.import", '.
+								json_encode([ 'rules_preset' => 'map',
+									CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('import')
+								]).
+						', {
 								dialogueid: "popup_import",
 								dialogue_class: "modal-popup-generic"
 							});'
@@ -119,7 +122,8 @@ $sysmapForm->addItem([
 			)
 		],
 		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?'),
-			'disabled' => $data['allowed_edit'] ? null : 'disabled'
+			'disabled' => $data['allowed_edit'] ? null : 'disabled',
+			'csrf_token' => CCsrfTokenHelper::get('sysmaps.php')
 		]
 	])
 ]);

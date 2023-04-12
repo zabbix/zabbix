@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1968,9 +1968,13 @@ static void	jsonpath_index_append_result(zbx_hashset_t *index, const char *name,
  *             index_token - [IN] the expression index token (relative path)  *
  *                                                                            *
  ******************************************************************************/
-static void	jsonpath_create_index(zbx_jsonobj_t *obj, zbx_jsonpath_token_t *index_token)
+static void	jsonpath_create_index(zbx_jsonobj_t *root, zbx_jsonobj_t *obj,
+		zbx_jsonpath_token_t *index_token)
 {
 	zbx_jsonpath_context_t	ctx;
+
+	if (0 != root->index_num)
+		return;
 
 	jsonobj_init_index(obj, index_token->text);
 
@@ -2019,6 +2023,8 @@ static void	jsonpath_create_index(zbx_jsonobj_t *obj, zbx_jsonpath_token_t *inde
 	}
 
 	zbx_vector_jsonobj_ref_destroy(&ctx.objects);
+
+	root->index_num++;
 }
 
 /******************************************************************************
@@ -2309,9 +2315,9 @@ static int	jsonpath_query_object(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *obj
 	else if (ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION == segment->type && NULL != segment->data.expression.index_token)
 	{
 		if (NULL == obj->index)
-			jsonpath_create_index(obj, segment->data.expression.index_token);
+			jsonpath_create_index(ctx->root, obj, segment->data.expression.index_token);
 
-		if (0 == strcmp(obj->index->path, segment->data.expression.index_token->text))
+		if (NULL != obj->index && 0 == strcmp(obj->index->path, segment->data.expression.index_token->text))
 			return jsonpath_match_indexed_expression(ctx, obj, path_depth);
 	}
 
@@ -2465,10 +2471,13 @@ static int	jsonpath_query_array(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *arra
 			if (NULL != segment->data.expression.index_token)
 			{
 				if (NULL == array->index)
-					jsonpath_create_index(array, segment->data.expression.index_token);
+					jsonpath_create_index(ctx->root, array, segment->data.expression.index_token);
 
-				if (0 == strcmp(array->index->path, segment->data.expression.index_token->text))
+				if (NULL != array->index && 0 == strcmp(array->index->path,
+						segment->data.expression.index_token->text))
+				{
 					return jsonpath_match_indexed_expression(ctx, array, path_depth);
+				}
 			}
 			break;
 		default:

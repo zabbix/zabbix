@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_High',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
 						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
@@ -67,7 +67,7 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
 						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
@@ -110,7 +110,7 @@ class testPageTriggerUrl extends CWebTest {
 		// Add 'Acknowledge' menu link to data provider.
 		$array = $data['links'];
 		array_shift($array);
-		$data['links'] = ['Problems' => $data['links']['Problems'],	'Acknowledge' => ''] + $array;
+		$data['links'] = ['Problems' => $data['links']['Problems'],	'Update problem' => ''] + $array;
 
 		// Remove 'cause and symptoms' from data provider.
 		unset($data['links']['Mark as cause']);

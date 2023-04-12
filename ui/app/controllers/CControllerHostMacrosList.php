@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,10 @@ class CControllerHostMacrosList extends CController {
 	 * @var array  Array of parent host defined macros.
 	 */
 	protected $parent_macros = [];
+
+	protected function init(): void {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput() {
 		$fields = [

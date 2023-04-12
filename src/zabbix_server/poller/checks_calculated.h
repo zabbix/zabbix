@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,6 @@
 #include "zbxcachehistory.h"
 #include "module.h"
 
-int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result);
+int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result);
 
 #endif

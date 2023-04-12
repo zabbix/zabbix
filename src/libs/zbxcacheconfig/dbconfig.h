@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -858,11 +858,48 @@ zbx_dc_dcheck_t;
 
 typedef struct
 {
+	zbx_uint64_t	connectortagid;
+	zbx_uint64_t	connectorid;
+	unsigned char	op;		/* condition operator */
+	const char	*tag;
+	const char	*value;
+}
+zbx_dc_connector_tag_t;
+
+ZBX_PTR_VECTOR_DECL(dc_connector_tag, zbx_dc_connector_tag_t *)
+
+typedef struct
+{
+	zbx_uint64_t			connectorid;
+	unsigned char			protocol;
+	unsigned char			data_type;
+	const char			*url;
+	int				max_records;
+	int				max_senders;
+	const char			*timeout;
+	unsigned char			max_attempts;
+	const char			*token;
+	const char			*http_proxy;
+	unsigned char			authtype;
+	const char			*username;
+	const char			*password;
+	unsigned char			verify_peer;
+	unsigned char			verify_host;
+	const char			*ssl_cert_file;
+	const char			*ssl_key_file;
+	const char			*ssl_key_password;
+	int				status;
+	int				tags_evaltype;
+	zbx_vector_dc_connector_tag_t	tags;
+}
+zbx_dc_connector_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
-	int			item_sync_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
@@ -949,6 +986,8 @@ typedef struct
 	zbx_hashset_t		httptest_fields;
 	zbx_hashset_t		httpsteps;
 	zbx_hashset_t		httpstep_fields;
+	zbx_hashset_t		connectors;
+	zbx_hashset_t		connector_tags;
 	zbx_hashset_t		sessions[ZBX_SESSION_TYPE_COUNT];
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
@@ -967,7 +1006,6 @@ ZBX_DC_CONFIG;
 extern int	sync_in_progress;
 extern ZBX_DC_CONFIG	*config;
 extern zbx_rwlock_t	config_lock;
-extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
 #define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
@@ -1012,8 +1050,8 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
 /* maintenance support */
 
 /* number of slots to store maintenance update flags */
-#define ZBX_MAINTENANCE_UPDATE_FLAGS_NUM()	\
-		((((size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER]) + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
+int	cacheconfig_get_config_forks(unsigned char proc_type);
+size_t	zbx_maintenance_update_flags_num(void);
 
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
@@ -1021,11 +1059,11 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
 
 char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num);
 
-void		DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE *src_interface);
+void		DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *src_interface);
 ZBX_DC_HOST	*DCfind_host(const char *host);
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key);
-void		DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src_function);
-void		DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags);
+void		DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src_function);
+void		DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags);
 int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 			char **error);
 
@@ -1036,6 +1074,7 @@ int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interfac
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
-		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault);
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault,
+		unsigned char program_type);
 
 #endif

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1028,10 +1028,10 @@ class CService extends CApiService {
 		unset($row);
 
 		foreach ($options['selectStatusTimeline'] as $index => $period) {
-			$db_alarms_start_resource = DBselect('SELECT sa.serviceid, sa.value'.
+			$db_alarms_start_resource = DBselect('SELECT sa.serviceid,sa.value'.
 				' FROM service_alarms sa'.
 				' JOIN ('.
-					'SELECT sa2.serviceid, MAX(sa2.clock) AS clock'.
+					'SELECT sa2.serviceid,MAX(sa2.clock) AS clock'.
 						' FROM service_alarms sa2'.
 						' WHERE '.dbConditionId('sa2.serviceid', array_keys($result)).
 							' AND sa2.clock<'.dbQuoteInt($period['period_from']).
@@ -1053,7 +1053,7 @@ class CService extends CApiService {
 				'sa.clock BETWEEN '.dbQuoteInt($period['period_from']).' AND '.dbQuoteInt($period['period_to'] - 1);
 		}
 
-		$db_alarms_resource = DBselect('SELECT sa.serviceid, sa.clock, sa.value'.
+		$db_alarms_resource = DBselect('SELECT sa.serviceid,sa.clock,sa.value'.
 			' FROM service_alarms sa'.
 			' WHERE '.dbConditionId('sa.serviceid', array_keys($result)).
 				' AND ('.implode(' OR ', $where_or).')'.

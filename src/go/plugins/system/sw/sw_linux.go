@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,6 +121,14 @@ func getManagers() []manager {
 			"grep -r '^UNCOMPRESSED PACKAGE SIZE' /var/log/packages",
 			parseRegex,
 			pkgtoolsDetails,
+		},
+		{
+			"portage",
+			"qsize --version 2> /dev/null",
+			"qlist -C -I -F '%{PN},%{PV},%{PR}'",
+			"qsize -C --bytes -F '%{CATEGORY},%{PN},%{PV},%{PR},%{REPO}'",
+			parseRegex,
+			portageDetails,
 		},
 	}
 }
@@ -493,6 +501,77 @@ func pkgtoolsDetails(manager string, in []string, regex string) (out string, err
 
 		// pkgtools has no build/install time information
 		pd = append(pd, appendPackage(split[0], manager, split[1], size, split[2], 0, "", 0, ""))
+	}
+
+	var b []byte
+
+	b, err = json.Marshal(pd)
+	if err != nil {
+		return
+	}
+
+	out = string(b)
+
+	return
+}
+
+func portageParseSizeInfo(in string) (out uint64, err error) {
+	const sizeinfo_num_fields = 3
+
+	// "n files, n non-files, n bytes"
+	sizeinfo := strings.Split(in, ", ")
+
+	if len(sizeinfo) != sizeinfo_num_fields {
+		err = errors.New("invalid input format: separator \", \" not found in \"%s\"")
+		return
+	}
+
+	_, err = fmt.Sscanf(sizeinfo[2], "%d bytes", &out)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func portageDetails(manager string, in []string, regex string) (out string, err error) {
+	const num_fields, pkginfo_num_fields, sizeinfo_num_fields = 2, 5, 3
+
+	rgx, err := regexp.Compile(regex);
+	if err != nil {
+		log.Debugf("internal error: cannot compile regex \"%s\"", regex)
+
+		return
+	}
+
+	pd := []PackageDetails{};
+
+	for _, s := range in {
+		var size uint64
+
+		// category,name,version,revision,repo: file count, nonfile count, size
+		split := strings.Split(s, ":")
+
+		if len(split) != num_fields {
+			log.Debugf("invalid input format: separator \":\" not found in \"%s\"", s)
+
+			continue
+		}
+
+		// category,name,version,revision,repo
+		pkginfo := strings.Split(split[0], ",")
+
+		if "" != regex && !rgx.MatchString(pkginfo[1]) {
+			continue
+		}
+
+		size, err = portageParseSizeInfo(split[1])
+		if err != nil {
+			log.Debugf("internal error: failed to parse package size information in \"%s\"", split[1])
+			continue
+		}
+
+		pd = append(pd, appendPackage(pkginfo[1], manager, pkginfo[2], size, "", 0, "", 0, ""))
 	}
 
 	var b []byte

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,6 @@
 int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **error);
 
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
-		const zbx_config_vault_t *config_vault, int config_timeout);
+		const zbx_config_vault_t *config_vault, int config_timeout, const char *server);
 
 #endif

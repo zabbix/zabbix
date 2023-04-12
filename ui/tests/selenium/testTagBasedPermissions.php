@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Current problems"]/../../..//div[contains(@class, "is-loading")]'));
+		CDashboardElement::find()->one()->getWidget('Current problems', true);
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText('//h4[text()="Current problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
 
@@ -292,7 +292,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Current problems"]/../../..//div[contains(@class, "is-loading")]'));
+		CDashboardElement::find()->one()->getWidget('Current problems', true);
 		$this->zbxTestTextPresent($data['trigger_names']);
 
 		// Check problem displaying on Problem page
@@ -396,7 +396,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
-		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Current problems"]/../../..//div[contains(@class, "is-loading")]'));
+		CDashboardElement::find()->one()->getWidget('Current problems', true);
 		$this->zbxTestTextPresent($data['trigger_names']);
 
 		// Check problem displaying on Problem page

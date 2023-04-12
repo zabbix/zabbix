@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@
 #include "zbx_item_constants.h"
 
 #define MAX_NAME			256
+
+extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Provider/@Name",

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,6 @@
 #include "module.h"
 #include "zbxalgo.h"
 
-int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
+int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
 
 #endif

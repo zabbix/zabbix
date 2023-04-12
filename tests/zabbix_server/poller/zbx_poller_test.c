@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	DC_ITEM		item;
+	zbx_dc_item_t	item;
 	const char	*test_type = NULL;
 	int		returned_code, expected_code;
 	char 		*error = NULL;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,7 +143,8 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&param_result);
-	zbx_init_library_sysinfo(get_config_timeout);
+	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
 
 	if (SUCCEED != zbx_parse_item_key(key_string, &request))
 		fail_msg("Cannot parse item key from string '%s'", key_string);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,12 @@
 #include "lld_worker.h"
 #include "lld.h"
 
+#include "../events/events.h"
+
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "../events.h"
 #include "lld_protocol.h"
 #include "zbxtime.h"
 #include "zbxdbwrap.h"
@@ -60,7 +61,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 	char			*value, *error;
 	zbx_timespec_t		ts;
 	zbx_item_diff_t		diff;
-	DC_ITEM			item;
+	zbx_dc_item_t		item;
 	int			errcode, mtime;
 	unsigned char		state, meta;
 
@@ -68,7 +69,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	zbx_lld_deserialize_item_value(message->data, &itemid, &hostid, &value, &ts, &meta, &lastlogsize, &mtime, &error);
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
 	if (SUCCEED != errcode)
 		goto out;
 
@@ -143,19 +144,19 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		diff.itemid = itemid;
 		zbx_vector_ptr_append(&diffs, &diff);
 
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 		if (16 < sql_offset)
-			DBexecute("%s", sql);
+			zbx_db_execute("%s", sql);
 
-		DCconfig_items_apply_changes(&diffs);
+		zbx_dc_config_items_apply_changes(&diffs);
 
 		zbx_vector_ptr_destroy(&diffs);
 		zbx_free(sql);
 	}
 
-	DCconfig_clean_items(&item, &errcode, 1);
+	zbx_dc_config_clean_items(&item, &errcode, 1);
 out:
 	zbx_free(value);
 	zbx_free(error);
@@ -196,7 +197,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	time_stat = zbx_time();
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -246,7 +247,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 
-	DBclose();
+	zbx_db_close();
 
 	zbx_ipc_socket_close(&lld_socket);
 }

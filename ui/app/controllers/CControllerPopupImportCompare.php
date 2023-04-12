@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,11 @@ class CControllerPopupImportCompare extends CController {
 	public const CHANGE_REMOVED = 2;
 
 	private $toc = [];
+	private $id_counter = 0;
+
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -322,7 +327,7 @@ class CControllerPopupImportCompare extends CController {
 		return $yaml_key;
 	}
 
-	private function objectToRows(array $before, array $after, int $depth, string $id): array {
+	private function objectToRows(array $before, array $after, int $depth, int $id): array {
 		if ($before && $after) {
 			$outer_change_type = self::CHANGE_NONE;
 		}
@@ -445,7 +450,8 @@ class CControllerPopupImportCompare extends CController {
 					$object = $before ? $before : $after;
 					unset($entity['before'], $entity['after']);
 
-					$id = $object['uuid'];
+					$id = $this->id_counter++;
+
 					$this->toc[$change_type][$entity_type][] = [
 						'name' => $this->nameForToc($entity_type, $object),
 						'id' => $id
@@ -460,6 +466,7 @@ class CControllerPopupImportCompare extends CController {
 				}
 			}
 		}
+
 		return $rows;
 	}
 

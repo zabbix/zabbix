@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@
 					verify_peer: form_data['verify_peer'] || 0
 				};
 
-				if (properties.authtype != <?= HTTPTEST_AUTH_NONE ?>) {
+				if (properties.authtype != <?= ZBX_HTTP_AUTH_NONE ?>) {
 					properties = jQuery.extend(properties, {
 						http_username: form_data['http_username'],
 						http_password: form_data['http_password']

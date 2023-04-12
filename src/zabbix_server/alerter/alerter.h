@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,8 +86,9 @@ zbx_alerter_dispatch_t;
 
 typedef struct
 {
-	zbx_get_config_forks_f	get_process_forks_cb_arg;
-	zbx_get_config_str_f	get_scripts_path_cb_arg;
+	zbx_get_config_forks_f		get_process_forks_cb_arg;
+	zbx_get_config_str_f		get_scripts_path_cb_arg;
+	const zbx_config_dbhigh_t	*config_dbhigh;
 }
 zbx_thread_alert_manager_args;
 
@@ -109,9 +110,9 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 		const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *exec_path,
 		const char *gsm_modem, const char *username, const char *passwd, unsigned short smtp_port,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *exec_params, int maxsessions, int maxattempts,
-		const char *attempt_interval, unsigned char content_type, const char *script, const char *timeout,
-		const char *sendto, const char *subject, const char *message, const char *params);
+		unsigned char smtp_authentication, int maxsessions, int maxattempts, const char *attempt_interval,
+		unsigned char content_type, const char *script, const char *timeout, const char *sendto,
+		const char *subject, const char *message, const char *params);
 
 void	zbx_alerter_deserialize_result_ext(const unsigned char *data, char **recipient, char **value, int *errcode,
 		char **error, char **debug);
@@ -119,7 +120,7 @@ void	zbx_alerter_deserialize_result_ext(const unsigned char *data, char **recipi
 int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *subject, const char *message,
 		const char *content_name, const char *content_type, const char *content, zbx_uint32_t content_size,
 		char **error);
-int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const ZBX_DB_MEDIATYPE *mediatype,
+int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_mediatype *mediatype,
 		const zbx_vector_str_t *recipients, char **error);
 int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error);
 void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch);

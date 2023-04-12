@@ -114,6 +114,13 @@ AS_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
     if test "x$found_ssh2" = "xyes"; then
       AC_DEFINE([HAVE_SSH2], 1, [Define to 1 if you have the 'libssh2' library (-lssh2)])
       AC_MSG_RESULT(yes)
+
+      ENUM_CHECK([LIBSSH2_METHOD_KEX],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_HOSTKEY],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_CRYPT_CS],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_CRYPT_SC],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_MAC_CS],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_MAC_SC],[libssh2.h])
     else
       AC_MSG_RESULT(no)
       SSH2_CFLAGS=""

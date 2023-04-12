@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
-#include "../events.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
@@ -68,11 +67,11 @@ static void	proxy_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, co
 {
 	char	*ip_esc, *dns_esc, *value_esc;
 
-	ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", ip);
-	dns_esc = DBdyn_escape_field("proxy_dhistory", "dns", dns);
-	value_esc = DBdyn_escape_field("proxy_dhistory", "value", value);
+	ip_esc = zbx_db_dyn_escape_field("proxy_dhistory", "ip", ip);
+	dns_esc = zbx_db_dyn_escape_field("proxy_dhistory", "dns", dns);
+	value_esc = zbx_db_dyn_escape_field("proxy_dhistory", "value", value);
 
-	DBexecute("insert into proxy_dhistory (clock,druleid,dcheckid,ip,dns,port,value,status)"
+	zbx_db_execute("insert into proxy_dhistory (clock,druleid,dcheckid,ip,dns,port,value,status)"
 			" values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,'%s',%d)",
 			now, druleid, dcheckid, ip_esc, dns_esc, port, value_esc, status);
 
@@ -92,10 +91,10 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
 {
 	char	*ip_esc, *dns_esc;
 
-	ip_esc = DBdyn_escape_field("proxy_dhistory", "ip", ip);
-	dns_esc = DBdyn_escape_field("proxy_dhistory", "dns", dns);
+	ip_esc = zbx_db_dyn_escape_field("proxy_dhistory", "ip", ip);
+	dns_esc = zbx_db_dyn_escape_field("proxy_dhistory", "dns", dns);
 
-	DBexecute("insert into proxy_dhistory (clock,druleid,ip,dns,status)"
+	zbx_db_execute("insert into proxy_dhistory (clock,druleid,ip,dns,status)"
 			" values (%d," ZBX_FS_UI64 ",'%s','%s',%d)",
 			now, druleid, ip_esc, dns_esc, status);
 
@@ -181,7 +180,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 		char		**pvalue;
 		size_t		value_offset = 0;
 		ZBX_FPING_HOST	host;
-		DC_ITEM		item;
+		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
 
 		zbx_alarm_on(config_timeout);
@@ -213,7 +212,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
-				memset(&item, 0, sizeof(DC_ITEM));
+				memset(&item, 0, sizeof(zbx_dc_item_t));
 
 				zbx_strscpy(item.key_orig, dcheck->key_);
 				item.key = item.key_orig;
@@ -382,11 +381,11 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 
 		for (port = first; port <= last; port++)
 		{
-			zbx_service_t	*service;
+			zbx_dservice_t	*service;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __func__, port);
 
-			service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
+			service = (zbx_dservice_t *)zbx_malloc(NULL, sizeof(zbx_dservice_t));
 			service->status = (SUCCEED == discover_service(dcheck, ip, port, config_timeout, &value,
 					&value_alloc) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
 			service->dcheckid = dcheck->dcheckid;
@@ -413,11 +412,11 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_checks(const ZBX_DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
+static void	process_checks(const zbx_db_drule *drule, int *host_status, char *ip, int unique, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids, int config_timeout)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	DB_DCHECK	dcheck;
 	char		sql[MAX_STRING_LEN];
 	size_t		offset = 0;
@@ -438,9 +437,9 @@ static void	process_checks(const ZBX_DB_DRULE *drule, int *host_status, char *ip
 
 	zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by dcheckid");
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		memset(&dcheck, 0, sizeof(dcheck));
 
@@ -461,11 +460,12 @@ static void	process_checks(const ZBX_DB_DRULE *drule, int *host_status, char *ip
 
 		process_check(&dcheck, host_status, ip, now, services, config_timeout);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
-static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, const char *ip, const char *dns,
-		int now, const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
+static int	process_services(const zbx_db_drule *drule, zbx_db_dhost *dhost, const char *ip, const char *dns,
+		int now, const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids,
+		zbx_add_event_func_t add_event_cb)
 {
 	int	i, ret;
 
@@ -473,12 +473,12 @@ static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, cons
 
 	zbx_vector_uint64_sort(dcheckids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (SUCCEED != (ret = DBlock_ids("dchecks", "dcheckid", dcheckids)))
+	if (SUCCEED != (ret = zbx_db_lock_ids("dchecks", "dcheckid", dcheckids)))
 		goto fail;
 
 	for (i = 0; i < services->values_num; i++)
 	{
-		zbx_service_t	*service = (zbx_service_t *)services->values[i];
+		zbx_dservice_t	*service = (zbx_dservice_t *)services->values[i];
 
 		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
@@ -486,7 +486,7 @@ static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, cons
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			zbx_discovery_update_service(drule, service->dcheckid, dhost, ip, dns, service->port,
-					service->status, service->value, now);
+					service->status, service->value, now, add_event_cb);
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		{
@@ -505,9 +505,9 @@ fail:
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(ZBX_DB_DRULE *drule, int config_timeout)
+static void	process_rule(zbx_db_drule *drule, int config_timeout, const zbx_events_funcs_t *events_cbs)
 {
-	ZBX_DB_DHOST		dhost;
+	zbx_db_dhost		dhost;
 	int			host_status, now;
 	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma, dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	int			ipaddress[8];
@@ -586,11 +586,11 @@ static void	process_rule(ZBX_DB_DRULE *drule, int config_timeout)
 
 			process_checks(drule, &host_status, ip, 0, now, &services, &dcheckids, config_timeout);
 
-			DBbegin();
+			zbx_db_begin();
 
-			if (SUCCEED != DBlock_druleid(drule->druleid))
+			if (SUCCEED != zbx_db_lock_druleid(drule->druleid))
 			{
-				DBrollback();
+				zbx_db_rollback();
 
 				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' was deleted during processing,"
 						" stopping", drule->name);
@@ -598,9 +598,10 @@ static void	process_rule(ZBX_DB_DRULE *drule, int config_timeout)
 				goto out;
 			}
 
-			if (SUCCEED != process_services(drule, &dhost, ip, dns, now, &services, &dcheckids))
+			if (SUCCEED != process_services(drule, &dhost, ip, dns, now, &services, &dcheckids,
+					events_cbs->add_event_cb))
 			{
-				DBrollback();
+				zbx_db_rollback();
 
 				zabbix_log(LOG_LEVEL_DEBUG, "all checks where deleted for discovery rule '%s'"
 						" during processing, stopping", drule->name);
@@ -613,14 +614,18 @@ static void	process_rule(ZBX_DB_DRULE *drule, int config_timeout)
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				zbx_discovery_update_host(&dhost, host_status, now);
-				zbx_process_events(NULL, NULL);
-				zbx_clean_events();
+				zbx_discovery_update_host(&dhost, host_status, now, events_cbs->add_event_cb);
+
+				if (NULL != events_cbs->process_events_cb)
+					events_cbs->process_events_cb(NULL, NULL);
+
+				if (NULL != events_cbs->clean_events_cb)
+					events_cbs->clean_events_cb();
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule->druleid, ip, dns, host_status, now);
 
-			DBcommit();
+			zbx_db_commit();
 		}
 		while (SUCCEED == zbx_iprange_next(&iprange, ipaddress));
 next:
@@ -646,8 +651,8 @@ out:
  ******************************************************************************/
 static void	discovery_clean_services(zbx_uint64_t druleid)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*iprange = NULL;
 	zbx_vector_uint64_t	keep_dhostids, del_dhostids, del_dserviceids;
 	zbx_uint64_t		dhostid, dserviceid;
@@ -656,12 +661,12 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
+	result = zbx_db_select("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != (row = zbx_db_fetch(result)))
 		iprange = zbx_strdup(iprange, row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (NULL == iprange)
 		goto out;
@@ -670,7 +675,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	zbx_vector_uint64_create(&del_dhostids);
 	zbx_vector_uint64_create(&del_dserviceids);
 
-	result = DBselect(
+	result = zbx_db_select(
 			"select dh.dhostid,ds.dserviceid,ds.ip"
 			" from dhosts dh"
 				" left join dservices ds"
@@ -678,11 +683,11 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 			" where dh.druleid=" ZBX_FS_UI64,
 			druleid);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		ZBX_STR2UINT64(dhostid, row[0]);
 
-		if (SUCCEED == DBis_null(row[1]))
+		if (SUCCEED == zbx_db_is_null(row[1]))
 		{
 			zbx_vector_uint64_append(&del_dhostids, dhostid);
 		}
@@ -696,7 +701,7 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 		else
 			zbx_vector_uint64_append(&keep_dhostids, dhostid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(iprange);
 
@@ -710,10 +715,10 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dservices where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
 				del_dserviceids.values, del_dserviceids.values_num);
 
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 
 		/* remove dhosts */
 
@@ -738,10 +743,10 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from dhosts where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "dhostid",
 				del_dhostids.values, del_dhostids.values_num);
 
-		DBexecute("%s", sql);
+		zbx_db_execute("%s", sql);
 	}
 
 	zbx_free(sql);
@@ -753,10 +758,10 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	process_discovery(time_t *nextcheck, int config_timeout)
+static int	process_discovery(time_t *nextcheck, int config_timeout, const zbx_events_funcs_t *events_cbs)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			rule_count = 0, delay;
 	char			*delay_str = NULL;
 	zbx_dc_um_handle_t	*um_handle;
@@ -772,7 +777,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 
 	do
 	{
-		result = DBselect(
+		result = zbx_db_select(
 				"select distinct r.iprange,r.name,c.dcheckid,r.delay"
 				" from drules r"
 					" left join dchecks c"
@@ -780,9 +785,9 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 							" and c.uniq=1"
 				" where r.druleid=" ZBX_FS_UI64, druleid);
 
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != (row = zbx_db_fetch(result)))
 		{
-			ZBX_DB_DRULE	drule;
+			zbx_db_drule	drule;
 
 			rule_count++;
 
@@ -806,7 +811,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 				drule.name = row[1];
 				ZBX_DBROW2UINT64(drule.unique_dcheckid, row[2]);
 
-				process_rule(&drule, config_timeout);
+				process_rule(&drule, config_timeout, events_cbs);
 			}
 
 			zbx_dc_drule_queue(now, druleid, delay);
@@ -816,7 +821,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
 				discovery_clean_services(druleid);
 
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		now = time(NULL);
 	}
@@ -859,7 +864,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_rtc_subscribe(process_type, process_num, discoverer_args_in->config_timeout, &rtc);
 
@@ -880,7 +885,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
-			rule_count += process_discovery(&nextcheck, discoverer_args_in->config_timeout);
+			rule_count += process_discovery(&nextcheck, discoverer_args_in->config_timeout,
+					discoverer_args_in->events_cbs);
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)
@@ -919,7 +925,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}
-
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

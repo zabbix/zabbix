@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ class CDashboardHelper {
 					'widgetid' => $widget_data['widgetid'],
 					'type' => $widget_data['type'],
 					'name' => $widget_data['name'],
-					'view_mode' => $widget_data['view_mode'],
+					'view_mode' => (int) $widget_data['view_mode'],
 					'pos' => [
 						'x' => (int) $widget_data['x'],
 						'y' => (int) $widget_data['y'],

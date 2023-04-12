@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('action')))->removeId())
 	->setName('action.edit')
 	->setId('action-form')
 	->addVar('actionid', $data['actionid'] ?: 0)
@@ -122,21 +123,27 @@ $condition_tag_value_template = (new CTemplateTag('condition-tag-value-row-tmpl'
 $action_tab->addItem([
 	(new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'),
 	(new CFormField([
-		(new CSelect('evaltype'))
-			->setId('evaltype')
-			->setFocusableElementId('evaltype_select')
-			->setValue($data['action']['filter']['evaltype'])
-			->addOptions(CSelect::createOptionsFromArray([
-				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-				CONDITION_EVAL_TYPE_AND => _('And'),
-				CONDITION_EVAL_TYPE_OR => _('Or'),
-				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan(''))
-			->addStyle('white-space: normal;')
-			->setId('expression'),
-		$formula,
+		(new CDiv([
+			(new CSelect('evaltype'))
+				->setId('evaltype')
+				->setFocusableElementId('evaltype_select')
+				->setValue($data['action']['filter']['evaltype'])
+				->addOptions(CSelect::createOptionsFromArray([
+					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+					CONDITION_EVAL_TYPE_AND => _('And'),
+					CONDITION_EVAL_TYPE_OR => _('Or'),
+					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+				])),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		]))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan(''))
+				->addStyle('white-space: normal;')
+				->setId('expression'),
+			$formula
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION),
 		$condition_suppressed_template,
 		$condition_template_default,
 		$condition_tag_value_template

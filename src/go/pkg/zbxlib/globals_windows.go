@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/components_strings_representations.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/libc_wrappers.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/symbols.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/win32_file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/expr.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/function.o
@@ -63,7 +65,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/variant.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dns.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_file.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_vfs_file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_alias.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
@@ -77,8 +79,6 @@ package zbxlib
 int CONFIG_MAX_LINES_PER_SECOND = 20;
 int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = 20;
 char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
-int	CONFIG_UNSAFE_USER_PARAMETERS= 0;
-int	CONFIG_ENABLE_REMOTE_COMMANDS= 0;
 char *CONFIG_SOURCE_IP = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
@@ -132,5 +132,6 @@ DWORD	zbx_get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
 {
 	return 0;
 }
+
 */
 import "C"

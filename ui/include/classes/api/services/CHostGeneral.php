@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -310,8 +310,9 @@ abstract class CHostGeneral extends CHostBase {
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
+	 * @param array|null $upd_hostids
 	 */
-	protected function updateTemplates(array &$hosts, array $db_hosts = null): void {
+	protected function updateTemplates(array &$hosts, ?array $db_hosts = null, array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		parent::updateTemplates($hosts, $db_hosts);
@@ -620,7 +621,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($ruleids) {
 			CItemPrototype::linkTemplateObjects($templateids, $hostids);
-			API::HostPrototype()->syncTemplates($ruleids, $hostids);
+			API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
 		}
 
 		API::Trigger()->syncTemplates($link_request);
@@ -853,7 +854,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($ruleids) {
 				CItemPrototype::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
-				API::HostPrototype()->syncTemplates($ruleids, $link_request['hostids']);
+				API::HostPrototype()->linkTemplateObjects($ruleids, $link_request['hostids']);
 			}
 		}
 

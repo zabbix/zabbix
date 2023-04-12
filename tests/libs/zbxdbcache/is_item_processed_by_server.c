@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,6 @@ void	zbx_mock_test_entry(void **state)
 
 	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	zbx_mock_assert_result_eq("is_item_processed_by_server() return code", expected_result,
-			is_item_processed_by_server((unsigned char)type, key));
+	zbx_mock_assert_result_eq("zbx_is_item_processed_by_server() return code", expected_result,
+			zbx_is_item_processed_by_server((unsigned char)type, key));
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,31 +20,23 @@
 
 class CWidgetGraph extends CWidget {
 
-	_init() {
-		super._init();
-
+	onInitialize() {
 		this._is_graph_mode = false;
 	}
 
-	_doActivate() {
+	onActivate() {
 		if (this._is_graph_mode) {
 			this._activateGraph();
 		}
-
-		super._doActivate();
 	}
 
-	_doDeactivate() {
+	onDeactivate() {
 		if (this._is_graph_mode) {
 			this._deactivateGraph();
 		}
-
-		super._doDeactivate();
 	}
 
-	resize() {
-		super.resize();
-
+	onResize() {
 		if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
 			const graph_size = this._getGraphSize();
 
@@ -63,7 +55,7 @@ class CWidgetGraph extends CWidget {
 			timeControl.objectList['graph_' + this._unique_id].objDims.width = graph_size.width;
 			timeControl.objectList['graph_' + this._unique_id].objDims.graphHeight = graph_size.height;
 
-			const image_curl = new Curl(image.src, false);
+			const image_curl = new Curl(image.src);
 
 			image_curl.setArgument('width', graph_size.width);
 			image_curl.setArgument('height', graph_size.height);
@@ -74,7 +66,7 @@ class CWidgetGraph extends CWidget {
 
 	updateProperties({name, view_mode, fields}) {
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating(true);
+			this._stopUpdating();
 		}
 
 		this._is_graph_mode = false;
@@ -82,9 +74,7 @@ class CWidgetGraph extends CWidget {
 		super.updateProperties({name, view_mode, fields});
 	}
 
-	setEditMode() {
-		super.setEditMode();
-
+	onEdit() {
 		if (this._is_graph_mode && this._graph_url !== null) {
 			this._flickerfreescreen_container.href = 'javascript:void(0)';
 			this._flickerfreescreen_container.setAttribute('role', 'button');
@@ -93,7 +83,7 @@ class CWidgetGraph extends CWidget {
 
 	setDynamicHost(dynamic_hostid) {
 		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating(true);
+			this._stopUpdating();
 		}
 
 		if (this._is_graph_mode) {
@@ -104,25 +94,25 @@ class CWidgetGraph extends CWidget {
 		super.setDynamicHost(dynamic_hostid);
 	}
 
-	_promiseUpdate() {
+	promiseUpdate() {
 		if (this._is_graph_mode) {
 			timeControl.refreshObject('graph_' + this._unique_id);
 
 			return Promise.resolve();
 		}
 
-		return super._promiseUpdate();
+		return super.promiseUpdate();
 	}
 
-	_processUpdateResponse(response) {
-		super._processUpdateResponse(response);
+	setContents(response) {
+		super.setContents(response);
 
 		if (!this._is_graph_mode && response.async_data !== undefined) {
 			this._is_graph_mode = true;
 
 			this._graph_url = response.async_data.graph_url;
 
-			this._flickerfreescreen = this._content_body.querySelector('.flickerfreescreen');
+			this._flickerfreescreen = this._body.querySelector('.flickerfreescreen');
 			this._flickerfreescreen.id = 'flickerfreescreen_graph_' + this._unique_id;
 
 			this._flickerfreescreen_container = this._flickerfreescreen.querySelector('.dashboard-widget-graph-link');
@@ -150,7 +140,7 @@ class CWidgetGraph extends CWidget {
 
 	_activateGraph() {
 		if (this._graph_url !== null) {
-			const curl = new Curl(this._graph_url, false);
+			const curl = new Curl(this._graph_url);
 
 			curl.setArgument('from', this._time_period.from);
 			curl.setArgument('to', this._time_period.to);
@@ -163,7 +153,7 @@ class CWidgetGraph extends CWidget {
 		this._time_control_data.objDims.width = graph_size.width;
 		this._time_control_data.objDims.graphHeight = graph_size.height;
 
-		const curl = new Curl(this._time_control_data.src, false);
+		const curl = new Curl(this._time_control_data.src);
 
 		curl.setArgument('from', this._time_period.from);
 		curl.setArgument('to', this._time_period.to);
@@ -184,12 +174,12 @@ class CWidgetGraph extends CWidget {
 	}
 
 	_getGraphSize() {
-		const content = this._content_body;
-		const style = getComputedStyle(content);
+		const contents = this._contents;
+		const style = getComputedStyle(contents);
 
 		return {
-			width: Math.floor(content.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)),
-			height: Math.floor(content.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
+			width: Math.floor(contents.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)),
+			height: Math.floor(contents.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
 		};
 	}
 
@@ -223,14 +213,14 @@ class CWidgetGraph extends CWidget {
 			label: t('Download image'),
 			disabled: !this._is_graph_mode,
 			clickCallback: () => {
-				downloadPngImage(this._content_body.querySelector('img'), 'graph.png');
+				downloadPngImage(this._body.querySelector('img'), 'graph.png');
 			}
 		});
 
 		return menu;
 	}
 
-	_hasPadding() {
+	hasPadding() {
 		return true;
 	}
 }

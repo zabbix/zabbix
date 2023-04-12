@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 #include "zbxnix.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
-#include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "../taskmanager/taskmanager.h"
@@ -38,7 +37,7 @@ static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 #define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(proxy_lock)
 
-int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int status,
+int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
 		int upload_status)
 {
 	struct zbx_json		json;
@@ -123,21 +122,24 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *                                                                            *
  * Purpose: receive 'proxy data' request from proxy                           *
  *                                                                            *
- * Parameters: sock           - [IN] the connection socket                    *
- *             jp             - [IN] the received JSON data                   *
- *             ts             - [IN] the connection timestamp                 *
- *             config_timeout - [IN]                                          *
+ * Parameters: sock                - [IN] connection socket                   *
+ *             jp                  - [IN] received JSON data                  *
+ *             ts                  - [IN] connection timestamp                *
+ *             events_cbs          - [IN]                                     *
+ *             config_timeout      - [IN]                                     *
+ *             proxydata_frequency - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, int config_timeout)
+void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency)
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
 	char			*error = NULL, *version_str = NULL;
-	DC_PROXY		proxy;
+	zbx_dc_proxy_t		proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (status = get_active_proxy_from_request(jp, &proxy, &error)))
+	if (SUCCEED != (status = zbx_get_active_proxy_from_request(jp, &proxy, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy data from active proxy at \"%s\": %s",
 				sock->peer, error);
@@ -171,7 +173,8 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
+		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, events_cbs,
+				proxydata_frequency, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 					proxy.host, sock->peer, error);
@@ -273,8 +276,8 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			config_comms->config_tls, config_comms->config_timeout))
+	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
+			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;
@@ -284,11 +287,11 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
-	get_interface_availability_data(&j, &availability_ts);
-	proxy_get_hist_data(&j, &history_lastid, &more_history);
-	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
-	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
-	proxy_get_host_active_availability(&j);
+	zbx_get_interface_availability_data(&j, &availability_ts);
+	zbx_proxy_get_hist_data(&j, &history_lastid, &more_history);
+	zbx_proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
+	zbx_proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+	zbx_proxy_get_host_active_availability(&j);
 
 	zbx_vector_tm_task_create(&tasks);
 	zbx_tm_get_remote_tasks(&tasks, 0, 0);
@@ -306,7 +309,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
 
-	if (0 != history_lastid && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
+	if (0 != history_lastid && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
@@ -323,32 +326,32 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	{
 		zbx_set_availability_diff_ts(availability_ts);
 
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != history_lastid)
 		{
 			zbx_uint64_t	history_maxid;
-			DB_RESULT	result;
-			DB_ROW		row;
+			zbx_db_result_t	result;
+			zbx_db_row_t	row;
 
-			result = DBselect("select max(id) from proxy_history");
+			result = zbx_db_select("select max(id) from proxy_history");
 
-			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
 				history_maxid = history_lastid;
 			else
 				ZBX_STR2UINT64(history_maxid, row[0]);
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
-			reset_proxy_history_count(history_maxid - history_lastid);
-			proxy_set_hist_lastid(history_lastid);
+			zbx_reset_proxy_history_count(history_maxid - history_lastid);
+			zbx_proxy_set_hist_lastid(history_lastid);
 		}
 
 		if (0 != discovery_lastid)
-			proxy_set_dhis_lastid(discovery_lastid);
+			zbx_proxy_set_dhis_lastid(discovery_lastid);
 
 		if (0 != areg_lastid)
-			proxy_set_areg_lastid(areg_lastid);
+			zbx_proxy_set_areg_lastid(areg_lastid);
 
 		if (0 != tasks.values_num)
 		{
@@ -365,7 +368,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 			}
 		}
 
-		DBcommit();
+		zbx_db_commit();
 	}
 	else
 	{
@@ -403,8 +406,8 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			config_comms->config_tls, config_comms->config_timeout))
+	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
+			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;
@@ -434,7 +437,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, config_comms->config_timeout,
 			&error))
 	{
-		DBbegin();
+		zbx_db_begin();
 
 		if (0 != tasks.values_num)
 		{
@@ -451,7 +454,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 			}
 		}
 
-		DBcommit();
+		zbx_db_commit();
 	}
 	else
 	{
