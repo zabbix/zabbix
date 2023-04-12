@@ -1489,6 +1489,10 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		goto out;
 	}
 
+	s->socket_orig = s->socket;	/* remember main socket */
+	s->socket = accepted_socket;	/* replace socket to accepted */
+	s->accepted = 1;
+
 	if (SUCCEED != socket_set_nonblocking(accepted_socket))
 	{
 		zbx_set_socket_strerror("failed to set socket non-blocking mode: %s",
@@ -1496,10 +1500,6 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		zbx_tcp_unaccept(s);
 		goto out;
 	}
-
-	s->socket_orig = s->socket;	/* remember main socket */
-	s->socket = accepted_socket;	/* replace socket to accepted */
-	s->accepted = 1;
 
 	if (SUCCEED != zbx_socket_peer_ip_save(s))
 	{
