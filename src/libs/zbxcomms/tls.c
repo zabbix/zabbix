@@ -3794,7 +3794,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	}
 #endif
 
-	return n;
+	return offset;
 }
 
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
