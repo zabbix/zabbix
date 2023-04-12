@@ -803,65 +803,60 @@ class CUserGroup extends CApiService {
 	 * @param null|array $db_groups
 	 */
 	private static function updateUsers(array &$groups, array $db_groups = null): void {
-		$changes = [];
+		$users = [];
+		$db_users = [];
 
 		foreach ($groups as &$group) {
 			if (!array_key_exists('users', $group)) {
 				continue;
 			}
 
-			$db_userids = $db_groups !== null
+			$_db_users = $db_groups !== null
 				? array_column($db_groups[$group['usrgrpid']]['users'], null, 'userid')
 				: [];
-			$userids = array_column($group['users'], null, 'userid');
 
-			$ins_userids = array_diff_key($userids, $db_userids);
-			$del_userids = array_diff_key($db_userids, $userids);
+			foreach ($group['users'] as $user) {
+				$userid = $user['userid'];
 
-			foreach ($ins_userids as $userid => $foo) {
-				$changes[$userid]['ins_groups'][$group['usrgrpid']] = ['usrgrpid' => $group['usrgrpid']];
+				if (array_key_exists($userid, $_db_users)) {
+					unset($_db_users[$userid]);
+				}
+				else {
+					$users[$userid]['userid'] = $userid;
+					$users[$userid]['usrgrps'][] = ['usrgrpid' => $group['usrgrpid']];
+
+					$db_users[$userid]['userid'] = $userid;
+					$db_users[$userid]['usrgrps'] = [];
+				}
 			}
 
-			foreach ($del_userids as $userid => $foo) {
-				$changes[$userid]['del_groupids'][$group['usrgrpid']] = true;
+			foreach ($_db_users as $userid => $db_user) {
+				$users[$userid]['userid'] = $userid;
+				$users[$userid] += ['usrgrps' => []];
+
+				$db_users[$userid]['userid'] = $userid;
+				$db_users[$userid]['usrgrps'][$db_user['id']] = [
+					'id' => $db_user['id'],
+					'usrgrpid' => $group['usrgrpid']
+				];
 			}
 
-			unset($group['users']);
+			unset($group['users'], $db_groups[$group['usrgrpid']]['users']);
 		}
 		unset($group);
 
-		if (!$changes) {
+		if (!$users) {
 			return;
 		}
 
-		$users = [];
-		$db_users = [];
+		$options = [
+			'output' => ['userid', 'username'],
+			'userids' => array_keys($users)
+		];
+		$result = DBselect(DB::makeSql('users', $options));
 
-		foreach ($changes as $userid => $foo) {
-			$users[$userid] = [
-				'userid' => $userid,
-				'usrgrps' => []
-			];
-		}
-
-		CUser::addAffectedObjects($users, $db_users);
-
-		foreach ($db_users as $userid => $db_user) {
-			$user_groups = [];
-
-			foreach ($db_user['usrgrps'] as $user_group) {
-				$user_groups[$user_group['usrgrpid']] = ['usrgrpid' => $user_group['usrgrpid']];
-			}
-
-			if (array_key_exists('ins_groups', $changes[$userid])) {
-				$user_groups += $changes[$userid]['ins_groups'];
-			}
-
-			if (array_key_exists('del_groupids', $changes[$userid])) {
-				$user_groups = array_diff_key($user_groups, $changes[$userid]['del_groupids']);
-			}
-
-			$users[$userid]['usrgrps'] = array_values($user_groups);
+		while ($row = DBfetch($result)) {
+			$db_users[$row['userid']]['username'] = $row['username'];
 		}
 
 		CUser::updateForce(array_values($users), $db_users);

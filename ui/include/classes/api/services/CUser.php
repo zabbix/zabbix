@@ -391,11 +391,9 @@ class CUser extends CApiService {
 	public function update(array $users) {
 		$this->validateUpdate($users, $db_users);
 
-		$userids = array_column($users, 'userid');
-
 		self::updateForce($users, $db_users);
 
-		return ['userids' => $userids];
+		return ['userids' => array_column($users, 'userid')];
 	}
 
 	/**
@@ -404,9 +402,8 @@ class CUser extends CApiService {
 	 */
 	public static function updateForce(array $users, array $db_users): void {
 		$upd_users = [];
-		$upd_userids = [];
 
-		foreach ($users as $i => &$user) {
+		foreach ($users as $user) {
 			$upd_user = DB::getUpdatedValues('users', $user, $db_users[$user['userid']]);
 
 			if ($upd_user) {
@@ -414,10 +411,8 @@ class CUser extends CApiService {
 					'values' => $upd_user,
 					'where' => ['userid' => $user['userid']]
 				];
-				$upd_userids[$i] = $user['userid'];
 			}
 		}
-		unset($user);
 
 		if ($upd_users) {
 			DB::update('users', $upd_users);
@@ -629,7 +624,7 @@ class CUser extends CApiService {
 	 * @param array $users
 	 * @param array $db_users
 	 */
-	public static function addAffectedObjects(array $users, array &$db_users): void {
+	private static function addAffectedObjects(array $users, array &$db_users): void {
 		$userids = ['usrgrps' => [], 'medias' => []];
 
 		foreach ($users as $user) {
@@ -645,17 +640,15 @@ class CUser extends CApiService {
 		}
 
 		if ($userids['usrgrps']) {
-			$db_usrgrps = DBselect(
-				'SELECT ug.id,ug.usrgrpid,ug.userid,u.username'.
-				' FROM users_groups ug,users u'.
-				' WHERE ug.userid=u.userid'.
-					' AND '.dbConditionId('ug.userid', $userids['usrgrps'])
-			);
-			$user_fields = array_flip(['userid', 'username']);
+			$options = [
+				'output' => ['id', 'usrgrpid', 'userid'],
+				'filter' => ['userid' => $userids['usrgrps']]
+			];
+			$db_usrgrps = DBselect(DB::makeSql('users_groups', $options));
 
 			while ($db_usrgrp = DBfetch($db_usrgrps)) {
-				$db_users[$db_usrgrp['userid']] += array_intersect_key($db_usrgrp, $user_fields);
-				$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] = array_diff_key($db_usrgrp, $user_fields);
+				$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] =
+					array_diff_key($db_usrgrp, array_flip(['userid']));
 			}
 		}
 
