@@ -1,1 +1,1 @@
-A......... [ZBX-20263] removed possibility to link host or template to two or more templates with the matching item keys (vmaksimovs)
+A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template (epulke, vmaksimovs)
