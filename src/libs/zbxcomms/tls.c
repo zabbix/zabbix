@@ -3096,7 +3096,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		if (SSL_ERROR_WANT_READ != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
 			break;
 
-		if (FAIL == (res = tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err)))
+		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
 					strerror_from_system(zbx_socket_last_error()));
