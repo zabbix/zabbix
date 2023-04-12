@@ -2645,32 +2645,28 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 		arg_operator = &output->values[output->values_num - token->opt + 1];
 
-		if (ZBX_VARIANT_STR == arg_operator->type)
-		{
-			operator = zbx_strdup(NULL, arg_operator->data.str);
-		}
-		else if (ZBX_VARIANT_NONE != arg_operator->type)
+		if (ZBX_VARIANT_NONE != arg_operator->type &&
+				SUCCEED != zbx_variant_convert(arg_operator, ZBX_VARIANT_STR))
 		{
 			*error = zbx_strdup(*error, "invalid second parameter");
 			return FAIL;
 		}
 
+		operator = arg_operator->data.str;
+
 		if (2 < token->opt)
 		{
-			zbx_variant_t	arg_tmp;
+			zbx_variant_t	*arg_pattern;
 
-			zbx_variant_copy(&arg_tmp, &output->values[output->values_num - token->opt + 2]);
+			arg_pattern = &output->values[output->values_num - token->opt + 2];
 
-			if (SUCCEED != zbx_variant_convert(&arg_tmp, ZBX_VARIANT_STR))
+			if (SUCCEED != zbx_variant_convert(arg_pattern, ZBX_VARIANT_STR))
 			{
-				zbx_variant_clear(&arg_tmp);
 				*error = zbx_strdup(NULL, "invalid third parameter");
-				ret = FAIL;
-				goto out;
+				return FAIL;
 			}
 
-			pattern = zbx_strdup(NULL, arg_tmp.data.str);
-			zbx_variant_clear(&arg_tmp);
+			pattern = arg_pattern->data.str;
 		}
 
 		zbx_vector_expression_create(&pdata.regexps);
@@ -2695,9 +2691,6 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 	if (FAIL != ret)
 		eval_function_return(token->opt, &ret_value, output);
-out:
-	zbx_free(operator);
-	zbx_free(pattern);
 
 	return ret;
 }

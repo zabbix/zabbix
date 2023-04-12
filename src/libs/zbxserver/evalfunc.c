@@ -1216,7 +1216,7 @@ int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char valu
 
 	if (0 != pdata->numeric_search)
 	{
-		if (NULL != operator && '\0' != *operator && '\0' == *pattern)
+		if (NULL != operator && '\0' != *operator && (NULL == pattern || '\0' == *pattern))
 		{
 			*error = zbx_strdup(*error, "pattern must be provided along with operator for numeric values");
 			return FAIL;
