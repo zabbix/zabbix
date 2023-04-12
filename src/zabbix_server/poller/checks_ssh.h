@@ -26,7 +26,7 @@
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "zbxcacheconfig.h"
 
-int	get_value_ssh(zbx_dc_item_t *item, AGENT_RESULT *result);
+int	get_value_ssh(zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
 
 #endif

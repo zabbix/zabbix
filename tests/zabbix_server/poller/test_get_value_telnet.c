@@ -18,6 +18,7 @@
 **/
 
 #include "test_get_value_telnet.h"
+#include "zbxmocktest.h"
 
 #include "../../../src/zabbix_server/poller/checks_telnet.h"
 
