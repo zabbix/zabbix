@@ -340,7 +340,7 @@ final class CHistFunctionData {
 		'exists_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'count', 'max', 'min', 'sum'],
+				'in' => ['avg', 'max', 'min', 'sum'],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -382,7 +382,7 @@ final class CHistFunctionData {
 		'min_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'count', 'max', 'min', 'sum'],
+				'in' => ['avg', 'max', 'min', 'sum'],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -396,7 +396,7 @@ final class CHistFunctionData {
 		'sum_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'count', 'max', 'min', 'sum'],
+				'in' => ['avg', 'max', 'min', 'sum'],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],

@@ -104,32 +104,34 @@ final class CMathFunctionData {
 		'count' => [
 			[
 				'if' => [
-					'parameters' => ['min' => 2, 'max' => 3]
-				],
-				'rules' => [
-					[
-						'type' => 'require_history_child',
-						'in' => ['avg_foreach', 'count_foreach', 'exists_foreach', 'last_foreach',
-							'max_foreach', 'min_foreach', 'sum_foreach'],
-						'position' => 0
-					],
-					[
-						'type' => 'regexp',
-						'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/',
-						'position' => 1
-					]
-				]
-			],
-			[
-				'if' => [
 					'parameters' => ['count' => 1]
 				],
 				'rules' => [
 					[
 						'type' => 'require_history_child',
 						'in' => ['avg_foreach', 'count_foreach', 'exists_foreach', 'last_foreach',
-							'max_foreach', 'min_foreach', 'sum_foreach'],
+							'max_foreach', 'min_foreach', 'sum_foreach'
+						],
 						'position' => 0
+					]
+				]
+			],
+			[
+				'if' => [
+					'parameters' => ['min' => 2, 'max' => 3]
+				],
+				'rules' => [
+					[
+						'type' => 'require_history_child',
+						'in' => ['avg_foreach', 'count_foreach', 'exists_foreach', 'last_foreach',
+							'max_foreach', 'min_foreach', 'sum_foreach'
+						],
+						'position' => 0
+					],
+					[
+						'type' => 'regexp',
+						'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/',
+						'position' => 1
 					]
 				]
 			]

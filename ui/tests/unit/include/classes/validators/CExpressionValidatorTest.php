@@ -138,7 +138,7 @@ class CExpressionValidatorTest extends TestCase {
 			['count(last_foreach(/host/key, 1), 1, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "count"']],
 			['count(last_foreach(/host/key, 1), "eq", 1)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(last_foreach(/host/key, 1), "eq", 1, 1)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
-			['count(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(last_foreach(/host/key, 1), "eq")', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['avg(count_foreach(/host/key, 20m), "eq", 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "count_foreach"']],
 			['avg(count_foreach(/host/key, 20m), 1, 1)', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "count_foreach"']],
 			['avg(count_foreach(/host/key, 20m, "eq", 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
