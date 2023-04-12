@@ -722,10 +722,8 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
-		zbx_alarm_on(config_comms->config_timeout);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num,
 				config_comms->config_timeout);
-		zbx_alarm_off();
 	}
 	else if (1 == num)
 	{
