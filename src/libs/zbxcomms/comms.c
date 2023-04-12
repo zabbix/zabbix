@@ -632,13 +632,13 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 	}
 #endif
 
-	if (0 == (n = ZBX_TCP_WRITE(s->socket, buf, len)) || (size_t)n == len)
+	if (0 < (n = ZBX_TCP_WRITE(s->socket, buf, len)) && (size_t)n == len)
 		return n;
 
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
 
-	for (; 0 != n; n = ZBX_TCP_WRITE(s->socket, buf + offset, (len - (size_t)offset)))
+	while (1)
 	{
 		if (0 > n)
 		{
@@ -648,7 +648,7 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 			{
 				zbx_set_socket_strerror("cannot write data: %s",
 						strerror_from_system(zbx_socket_last_error()));
-				return n;
+				return ZBX_PROTO_ERROR;
 			}
 
 			if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
@@ -687,6 +687,8 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 			zbx_set_socket_strerror("write timeout");
 			return ZBX_PROTO_ERROR;
 		}
+
+		n = ZBX_TCP_WRITE(s->socket, buf + offset, (len - (size_t)offset));
 	}
 
 	return offset;
