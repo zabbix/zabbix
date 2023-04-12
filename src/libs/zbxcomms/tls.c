@@ -3103,7 +3103,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			goto out;
 		}
 
-		if (0 == res && SUCCEED != zbx_socket_check_deadline(s))
+		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
 			*error = zbx_strdup(*error, "SSL_connect() timed out");
 			goto out;
