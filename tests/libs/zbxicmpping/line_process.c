@@ -28,10 +28,20 @@
 const char	*mock_get_source_ip(void);
 void		test_process_fping_statistics_line(void);
 void		test_process_response_to_individual_fping_request(void);
+char		*__wrap_zbx_fgets(char *buffer, int size, FILE *fp);
 
 const char	*mock_get_source_ip(void)
 {
 	return "NotNull";
+}
+
+char	*__wrap_zbx_fgets(char *buffer, int size, FILE *fp)
+{
+	ZBX_UNUSED(buffer);
+	ZBX_UNUSED(size);
+	ZBX_UNUSED(fp);
+
+	return "";
 }
 
 void	test_process_fping_statistics_line(void)
