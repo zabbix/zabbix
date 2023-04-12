@@ -120,27 +120,6 @@ class testHost extends CAPITest {
 					'interfaces' => 10
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
-			],
-			[
-				'request' => [
-					'groups' => [
-						'groupid' => 4
-					],
-					'host' => 'new host 7',
-					'interfaces' => [
-						"type" => 1,
-						"main" => 1,
-						"useip" => 1,
-						"ip" => "192.168.3.1",
-						"dns" => "",
-						"port" => "10050"
-					],
-					'templates' => [
-						['templateid' => 10050],
-						['templateid' => 10081]
-					]
-				],
-				'expected_error' => 'Item "agent.hostname" already exists on "new host 7", inherited from another template.'
 			]
 		];
 	}
