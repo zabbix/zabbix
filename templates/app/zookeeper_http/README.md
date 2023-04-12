@@ -81,11 +81,11 @@ Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOO
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Zookeeper: Server mode has changed|<p>Zookeeper node state has changed. Ack to close.</p>|`last(/Zookeeper by HTTP/Zookeeper: Server mode,#1)<>last(/Zookeeper by HTTP/Zookeeper: Server mode,#2) and length(last(/Zookeeper by HTTP/Zookeeper: Server mode))>0`|Info|**Manual close**: Yes|
-|Zookeeper: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/Zookeeper by HTTP/Zookeeper: Uptime,10m)=1`|Warning|**Manual close**: Yes|
-|Zookeeper: Version has changed|<p>Zookeeper version has changed. Ack to close.</p>|`last(/Zookeeper by HTTP/Zookeeper: Version,#1)<>last(/Zookeeper by HTTP/Zookeeper: Version,#2) and length(last(/Zookeeper by HTTP/Zookeeper: Version))>0`|Info|**Manual close**: Yes|
-|Zookeeper: Too many file descriptors used|<p>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</p>|`min(/Zookeeper by HTTP/Zookeeper: File descriptors, open,5m) * 100 / last(/Zookeeper by HTTP/zookeeper.max_file_descriptor_count) > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}`|Warning||
-|Zookeeper: Too many queued requests|<p>Number of queued requests in the server. This goes up when the server receives more requests than it can process.</p>|`min(/Zookeeper by HTTP/Zookeeper: Outstanding requests,5m)>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}`|Average|**Manual close**: Yes|
+|Zookeeper: Server mode has changed|<p>Zookeeper node state has changed. Ack to close.</p>|`last(/Zookeeper by HTTP/zookeeper.server_state,#1)<>last(/Zookeeper by HTTP/zookeeper.server_state,#2) and length(last(/Zookeeper by HTTP/zookeeper.server_state))>0`|Info|**Manual close**: Yes|
+|Zookeeper: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/Zookeeper by HTTP/zookeeper.uptime,10m)=1`|Warning|**Manual close**: Yes|
+|Zookeeper: Version has changed|<p>Zookeeper version has changed. Ack to close.</p>|`last(/Zookeeper by HTTP/zookeeper.version,#1)<>last(/Zookeeper by HTTP/zookeeper.version,#2) and length(last(/Zookeeper by HTTP/zookeeper.version))>0`|Info|**Manual close**: Yes|
+|Zookeeper: Too many file descriptors used|<p>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</p>|`min(/Zookeeper by HTTP/zookeeper.open_file_descriptor_count,5m) * 100 / last(/Zookeeper by HTTP/zookeeper.max_file_descriptor_count) > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}`|Warning||
+|Zookeeper: Too many queued requests|<p>Number of queued requests in the server. This goes up when the server receives more requests than it can process.</p>|`min(/Zookeeper by HTTP/zookeeper.outstanding_requests,5m)>{$ZOOKEEPER.OUTSTANDING_REQ.MAX.WARN}`|Average|**Manual close**: Yes|
 
 ### LLD rule Leader metrics discovery
 
@@ -108,8 +108,8 @@ Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOO
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Zookeeper: Too many pending syncs||`min(/Zookeeper by HTTP/Zookeeper: Pending syncs{#SINGLETON},5m)>{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}`|Average|**Manual close**: Yes|
-|Zookeeper: Too few active followers|<p>The number of followers should equal the total size of your ZooKeeper ensemble, minus 1 (the leader is not included in the follower count). If the ensemble fails to maintain quorum, all automatic failover features are suspended.</p>|`last(/Zookeeper by HTTP/Zookeeper: Synced followers{#SINGLETON}) < last(/Zookeeper by HTTP/zookeeper.quorum_size[{#SINGLETON}])-1`|Average||
+|Zookeeper: Too many pending syncs||`min(/Zookeeper by HTTP/zookeeper.pending_syncs[{#SINGLETON}],5m)>{$ZOOKEEPER.PENDING_SYNCS.MAX.WARN}`|Average|**Manual close**: Yes|
+|Zookeeper: Too few active followers|<p>The number of followers should equal the total size of your ZooKeeper ensemble, minus 1 (the leader is not included in the follower count). If the ensemble fails to maintain quorum, all automatic failover features are suspended.</p>|`last(/Zookeeper by HTTP/zookeeper.synced_followers[{#SINGLETON}]) < last(/Zookeeper by HTTP/zookeeper.quorum_size[{#SINGLETON}])-1`|Average||
 
 ### LLD rule Clients discovery
 
