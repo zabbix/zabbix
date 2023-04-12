@@ -466,7 +466,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
-	int		ret = FAIL;
+	int		ret = FAIL, flags;
 	struct addrinfo	*ai = NULL, hints;
 	struct addrinfo	*ai_bind = NULL;
 	char		service[8], *error = NULL;
@@ -496,8 +496,17 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #endif
 	s->timeout = timeout;
 
+	if (SUCCEED == zbx_is_ip4(ip))
+		flags = AI_NUMERICHOST;
+#ifdef HAVE_IPV6
+	else if (SUCCEED == zbx_is_ip6(ip))
+		flags = AI_NUMERICHOST;
+#endif
+	else
+		flags = 0;
+
 	zbx_snprintf(service, sizeof(service), "%hu", port);
-	tcp_init_hints(&hints, type, 0);
+	tcp_init_hints(&hints, type, flags);
 
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
