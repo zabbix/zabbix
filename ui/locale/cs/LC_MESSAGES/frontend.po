@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-03-08 09:35+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2023-04-05 11:27+0000\n"
+"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -1182,7 +1182,7 @@ msgstr "Eventuálně to můžete nainstalovat manuálně:"
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Množství fyzické paměti hosta, která je odložena do odkládacího prostoru, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor virtuálního počítače VMware"
 
 #: include/classes/data/CItemData.php:1449
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -1190,7 +1190,7 @@ msgstr "Množství fyzické paměti hosta, která je odložena do odkládacího 
 
 #: include/classes/data/CItemData.php:1482
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Množství fyzické paměti hostitele spotřebované pro zálohování stránek fyzické paměti hosta, \"url\" – URL služby VMware, \"uuid\" – globální unikátní identifikátor virtuálního počítače VMware"
 
 #: include/classes/data/CItemData.php:1469
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -1448,7 +1448,7 @@ msgstr "Atribuce"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
-msgstr ""
+msgstr "Atribuce HTML"
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1624,7 +1624,7 @@ msgstr "Střední"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Průměrný počet nevyřízených požadavků na čtení na virtuální disk během intervalu sběru, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor virtuálního počítače VMware, \"instance\" - instance diskového zařízení"
 
 #: include/classes/data/CItemData.php:1529
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -1632,7 +1632,7 @@ msgstr "Průměrný počet nevyřízených požadavků na čtení na virtuální
 
 #: include/classes/data/CItemData.php:1562
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Průměrný počet nevyřízených požadavků na zápis na virtuální disk během intervalu sběru, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor virtuálního počítače VMware, \"instance\" - instance diskového zařízení"
 
 #: include/classes/data/CItemData.php:1549
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -1830,7 +1830,7 @@ msgstr "CPU load. Vrátí desetinné číslo"
 
 #: include/classes/data/CItemData.php:1442
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "Čas CPU strávený čekáním na swap-in, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor hostitele virtuálního počítače VMware, \"instance\" - instance CPU"
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
@@ -1838,7 +1838,7 @@ msgstr "Čas CPU strávený čekáním na swap-in, <url> - URL služby VMware, <
 
 #: include/classes/data/CItemData.php:1294
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Využití CPU v procentech během intervalu závisí na správě napájení nebo HT, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor hypervisoru VMware"
 
 #: include/classes/data/CItemData.php:1281
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -1846,7 +1846,7 @@ msgstr "Využití CPU v procentech během intervalu závisí na správě napáje
 
 #: include/classes/data/CItemData.php:1286
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Využití procesoru v procentech během intervalu, \"url\" – URL služby VMware, \"uuid\" – globální unikátní identifikátor hostitele hypervisoru VMware"
 
 #: include/classes/data/CItemData.php:1446
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -19836,7 +19836,7 @@ msgstr "VMware verze, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
 #: include/classes/data/CItemData.php:1278
 msgid "VMware service full name, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware plné jméno služby, \"url\" - URL VMware služby"
 
 #: include/classes/data/CItemData.php:1265
 msgid "VMware service full name, <url> - VMware service URL"
@@ -19844,7 +19844,7 @@ msgstr "VMware plné jméno služby, <url> - URL VMware služby"
 
 #: include/classes/data/CItemData.php:1418
 msgid "VMware service version, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware verze, \"url\" - URL VMware služby"
 
 #: include/classes/data/CItemData.php:1405
 msgid "VMware service version, <url> - VMware service URL"
@@ -20012,7 +20012,7 @@ msgstr "VMware velikost swapovací paměti virtuálního stroje, <url> - URL VMw
 
 #: include/classes/data/CItemData.php:1506
 msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware velikost celkové paměti virtuálního stroje \"url\" - URL VMware služby, <uuid> - globální unikátní identifikátor virtuálního stroje VMware"
 
 #: include/classes/data/CItemData.php:1493
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20020,7 +20020,7 @@ msgstr "VMware celková velikost paměti virtuálního stroje, <url> - URL VMwar
 
 #: include/classes/data/CItemData.php:1554
 msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware nevyužitý úložný prostor virtuálním strojem \"url\" - URL VMware služby, \"uuid\" - globální unikátní identifikátor virtuálního stroje VMware"
 
 #: include/classes/data/CItemData.php:1541
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20044,7 +20044,7 @@ msgstr "VMware čas provozu virtuálního stroje, <url> - URL VMware služby, <u
 
 #: include/classes/data/CItemData.php:1366
 msgid "VVMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "Stav údržby hypervisoru VMware, \"url\" – URL služby VMware, \"uuid\" – globální unikátní identifikátor hypervizoru VMware. Vrátí 0 – není v údržbě; 1 - je v údržbě"
 
 #: include/classes/data/CItemData.php:1353
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
@@ -21812,7 +21812,7 @@ msgstr "vzorec hosta"
 
 #: include/classes/api/services/CHostPrototype.php:1174
 msgid "host prototype with the same UUID already exists"
-msgstr ""
+msgstr "prototyp hosta se stejným UUID již existuje"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -22181,7 +22181,7 @@ msgstr "maximální počet závislých položek dosažen"
 #: include/classes/validators/CApiInputValidator.php:1556
 #, c-format
 msgid "maximum number of array elements is %1$s"
-msgstr ""
+msgstr "maximální počet prvků pole je %1$s"
 
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
@@ -22320,7 +22320,7 @@ msgstr "žádná data"
 #: include/classes/api/services/CHostPrototype.php:1344
 #, c-format
 msgid "no default interface for \"%1$s\" type"
-msgstr ""
+msgstr "žádné výchozí rozhraní pro typ \"%1$s\""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
