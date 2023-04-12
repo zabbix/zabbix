@@ -795,27 +795,25 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		foreach ($item_indexes as $key => $indexes) {
-			$template_count = count($indexes);
-
-			if ($template_count == 1) {
+			if (count($indexes) == 1) {
 				continue;
 			}
 
-			for ($i = 0; $i < $template_count - 1; $i++) {
-				for ($j = $i + 1; $j < $template_count; $j++) {
-					$templateid_i = $tpl_items[$indexes[$i]]['hostid'];
-					$templateid_j = $tpl_items[$indexes[$j]]['hostid'];
+			$hostids = [];
 
-					$same_hosts = array_intersect($tpl_links[$templateid_i], $tpl_links[$templateid_j]);
+			foreach ($indexes as $i) {
+				$templateid = $tpl_items[$i]['hostid'];
+				$same_hosts = array_intersect($tpl_links[$templateid], $hostids);
 
-					if ($same_hosts) {
-						$hostid = reset($same_hosts);
+				if ($same_hosts) {
+					$hostid = reset($same_hosts);
 
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							sprintf($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $key, $chd_hosts[$hostid]['host'])
-						);
-					}
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						sprintf($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $key, $chd_hosts[$hostid]['host'])
+					);
 				}
+
+				$hostids = array_merge($hostids, $tpl_links[$templateid]);
 			}
 		}
 	}
