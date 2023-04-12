@@ -9575,10 +9575,12 @@ static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr
  *              * internal items                                              *
  *                                                                            *
  * Parameters: items       - [IN/OUT] hashset with DC_ITEMs                   *
+ *             um_handle   - [IN/OUT] shared user macro cache handle          *
  *             timestamp   - [IN/OUT] timestamp of a last update              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revision)
+void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shared_handle_t **um_handle,
+		zbx_uint64_t *revision)
 {
 	ZBX_DC_HOST			*dc_host;
 	zbx_pp_item_t			*pp_item;
@@ -9586,6 +9588,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *
 	int				i;
 	zbx_uint64_t			global_revision = *revision;
 	zbx_vector_dc_item_ptr_t	items_sync;
+	zbx_dc_um_shared_handle_t	*um_handle_new = NULL;
 
 	if (config->revision.config == *revision)
 		return;
@@ -9594,6 +9597,8 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *
 	zbx_vector_dc_item_ptr_reserve(&items_sync, 100);
 
 	RDLOCK_CACHE;
+
+	um_handle_new = zbx_dc_um_shared_handle_update(*um_handle);
 
 	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &global_revision))
 		global_revision = 0;
@@ -9672,6 +9677,9 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *
 	}
 
 	zbx_vector_dc_item_ptr_destroy(&items_sync);
+
+	if (SUCCEED == zbx_dc_um_shared_handle_reacquire(*um_handle, um_handle_new))
+		*um_handle = um_handle_new;
 }
 
 void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num)
@@ -15761,4 +15769,92 @@ void	zbx_recalc_time_period(int *ts_from, int table_group)
 	if (least_ts > *ts_from)
 		*ts_from = (int)least_ts;
 #undef HK_CFG_UPDATE_INTERVAL
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update shared user macro cache handle acquiring new handle if     *
+ *          old was null or its revision was less than user macro cache       *
+ *          revision                                                          *
+ *                                                                            *
+ * Parameters: handle - [IN] shared user macro cache handle, can be null      *
+ *                                                                            *
+ * Return value: The shared user macro handle.                                *
+ *                                                                            *
+ ******************************************************************************/
+zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_update(zbx_dc_um_shared_handle_t *handle)
+{
+	if (NULL != handle)
+	{
+		if (handle->um_cache == config->um_cache)
+			return handle;
+	}
+
+	handle = (zbx_dc_um_shared_handle_t *)zbx_malloc(NULL, sizeof(zbx_dc_um_shared_handle_t));
+	handle->refcount = 1;
+	handle->um_cache = NULL;
+
+	return handle;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reacquire user macro cache if it has been updated                 *
+ *                                                                            *
+ * Return value: SUCCEED - a new user macro cache handle was acquired         *
+ *               FAIL    - no need to acquire new user macro cache handle     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx_dc_um_shared_handle_t *new_handle)
+{
+	if (old_handle == new_handle)
+		return FAIL;
+
+	WRLOCK_CACHE;
+
+	if (NULL != old_handle)
+	{
+		if (0 == --old_handle->refcount)
+		{
+			um_cache_release(old_handle->um_cache);
+			zbx_free(old_handle);
+		}
+	}
+
+	config->um_cache->refcount++;
+	new_handle->um_cache = config->um_cache;
+
+	UNLOCK_CACHE;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release shared user macro cache handle                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle)
+{
+	if (0 == --handle->refcount)
+	{
+		WRLOCK_CACHE;
+
+		um_cache_release(handle->um_cache);
+		zbx_free(handle);
+
+		UNLOCK_CACHE;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy shared user macro cache handle                               *
+ *                                                                            *
+ ******************************************************************************/
+zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_t *handle)
+{
+	handle->refcount++;
+
+	return handle;
 }

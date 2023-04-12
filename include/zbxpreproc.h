@@ -104,8 +104,6 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 		zbx_uint64_t *pending_num, zbx_uint64_t *processing_num, zbx_uint64_t *finished_num);
 void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager);
 
-zbx_uint64_t	zbx_pp_manager_get_revision(const zbx_pp_manager_t *manager);
-void	zbx_pp_manager_set_revision(zbx_pp_manager_t *manager, zbx_uint64_t revision);
 zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager);
 zbx_uint64_t	zbx_pp_manager_get_pending_num(zbx_pp_manager_t *manager);
 void	zbx_pp_manager_get_diag_stats(zbx_pp_manager_t *manager, zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,

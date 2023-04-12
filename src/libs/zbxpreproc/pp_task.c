@@ -104,6 +104,7 @@ static void	pp_task_test_clear(zbx_pp_task_test_t *task)
  *                                                                            *
  * Parameters: itemid    - [IN] item identifier                               *
  *             preproc   - [IN] item preprocessing data                       *
+ *             um_handle - [IN] shared user macro cache handle                *
  *             value     - [IN] value to preprocess, its contents will be     *
  *                              directly copied over and cleared by the task  *
  *                              (optional)                                    *
@@ -114,8 +115,9 @@ static void	pp_task_test_clear(zbx_pp_task_test_t *task)
  * Return value: The created task.                                            *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
-		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt, zbx_pp_cache_t *cache)
+zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc,
+		zbx_dc_um_shared_handle_t *um_handle, zbx_variant_t *value, zbx_timespec_t ts,
+		const zbx_pp_value_opt_t *value_opt, zbx_pp_cache_t *cache)
 {
 	zbx_pp_task_t		*task = pp_task_create(sizeof(zbx_pp_task_value_t));
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
@@ -137,6 +139,7 @@ zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *
 		d->opt.flags = ZBX_PP_VALUE_OPT_NONE;
 
 	d->preproc = zbx_pp_item_preproc_copy(preproc);
+	d->um_handle = zbx_dc_um_shared_handle_copy(um_handle);
 
 	return task;
 }
@@ -156,6 +159,7 @@ static void	pp_task_value_clear(zbx_pp_task_value_t *task)
 	zbx_variant_clear(&task->result);
 	zbx_pp_item_preproc_release(task->preproc);
 	pp_cache_release(task->cache);
+	zbx_dc_um_shared_handle_release(task->um_handle);
 }
 
 /******************************************************************************
@@ -164,6 +168,7 @@ static void	pp_task_value_clear(zbx_pp_task_value_t *task)
  *                                                                            *
  * Parameters: itemid    - [IN] item identifier                               *
  *             preproc   - [IN] item preprocessing data                       *
+ *             um_handle - [IN] shared user macro cache handle                *
  *             value     - [IN] value to preprocess, its contents will be     *
  *                              directly copied over and cleared by the task  *
  *                              (optional)                                    *
@@ -174,10 +179,11 @@ static void	pp_task_value_clear(zbx_pp_task_value_t *task)
  * Return value: The created task.                                            *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_task_t	*pp_task_value_seq_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
-		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt, zbx_pp_cache_t *cache)
+zbx_pp_task_t	*pp_task_value_seq_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc,
+		zbx_dc_um_shared_handle_t *um_handle, zbx_variant_t *value, zbx_timespec_t ts,
+		const zbx_pp_value_opt_t *value_opt, zbx_pp_cache_t *cache)
 {
-	zbx_pp_task_t	*task = pp_task_value_create(itemid, preproc, value, ts, value_opt, cache);
+	zbx_pp_task_t	*task = pp_task_value_create(itemid, preproc, um_handle, value, ts, value_opt, cache);
 
 	task->type = ZBX_PP_TASK_VALUE_SEQ;
 
