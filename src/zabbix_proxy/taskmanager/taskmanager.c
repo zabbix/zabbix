@@ -38,26 +38,27 @@
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 
-extern int				CONFIG_ENABLE_REMOTE_COMMANDS;
-extern int				CONFIG_LOG_REMOTE_COMMANDS;
 extern unsigned char			program_type;
 extern char 				*CONFIG_HOSTNAME;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: execute remote command task                                       *
- *                                                                            *
- * Parameters: taskid         - [IN] task identifier                          *
- *             clock          - [IN] task creation time                       *
- *             ttl            - [IN] task expiration period in seconds        *
- *             now            - [IN] current time                             *
- *             config_timeout - [IN]                                          *
- *                                                                            *
- * Return value: SUCCEED -     remote command was executed                    *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now, int config_timeout)
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose: execute remote command task                                               *
+ *                                                                                    *
+ * Parameters: taskid                        - [IN]                                   *
+ *             clock                         - [IN] task creation time                *
+ *             ttl                           - [IN] task expiration period in seconds *
+ *             now                           - [IN]                                   *
+ *             config_timeout                - [IN]                                   *
+ *             config_enable_remote_commands - [IN]                                   *
+ *             config_log_remote_commands    - [IN]                                   *
+ *                                                                                    *
+ * Return value: SUCCEED - remote command was executed                                *
+ *               FAIL    - otherwise                                                  *
+ *                                                                                    *
+ **************************************************************************************/
+static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now, int config_timeout,
+		int config_enable_remote_commands, int config_log_remote_commands)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -114,14 +115,14 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 
 		if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
 		{
-			if (0 == CONFIG_ENABLE_REMOTE_COMMANDS)
+			if (0 == config_enable_remote_commands)
 			{
 				task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
 						"Remote commands are not enabled");
 				goto finish;
 			}
 
-			if (1 == CONFIG_LOG_REMOTE_COMMANDS)
+			if (1 == config_log_remote_commands)
 				zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", script.command);
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", script.command);
@@ -327,7 +328,7 @@ finish:
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -356,7 +357,8 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
 				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now,
-						config_comms->config_timeout))
+						config_comms->config_timeout, config_enable_remote_commands,
+						config_log_remote_commands))
 				{
 					processed_num++;
 				}
@@ -490,7 +492,10 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
 		tasks_num = tm_process_tasks(&rtc, (int)sec1, taskmanager_args_in->config_comms,
-				taskmanager_args_in->config_startup_time);
+				taskmanager_args_in->config_startup_time,
+				taskmanager_args_in->config_enable_remote_commands,
+				taskmanager_args_in->config_log_remote_commands);
+
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((int)sec1);

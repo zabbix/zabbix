@@ -23,6 +23,7 @@
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxdb.h"
+#include "zbxcacheconfig.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 		"unknown error",

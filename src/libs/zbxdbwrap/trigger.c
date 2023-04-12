@@ -17,13 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbhigh.h"
-
-#include "log.h"
 #include "zbxdbwrap.h"
-#include "events.h"
+
+#include "zbxdbhigh.h"
 #include "zbxserver.h"
-#include "zbxnum.h"
 
 /* temporary cache of trigger related data */
 typedef struct

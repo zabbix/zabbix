@@ -5,7 +5,9 @@
 	"name": "URL",
 	"namespace": "Url",
 	"version": "1.0",
-	"author": "Zabbix SIA",
+	"author": "Zabbix",
+	"description": "Displays the content retrieved from the specified URL.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/url",
 	"widget": {
 		"js_class": "CWidgetUrl",
 		"template_support": true,
