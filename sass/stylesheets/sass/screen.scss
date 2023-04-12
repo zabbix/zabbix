@@ -25,6 +25,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "base/colors";
 @import "base/typography";
 @import "base/icons";
+@import "base/logos";
 @import "base/common";
 
 @import "utils/indicator";
@@ -189,24 +190,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	width: 0;
 	font-size: 0;
 	line-height: 0;
-}
-
-.zabbix-logo {
-	width: 114px;
-	height: 30px;
-	background: url($sprite-path) no-repeat 0 -864px; // TODO - AS: should be removed
-}
-
-.zabbix-sidebar-logo {
-	width: 91px;
-	height: 24px;
-	background: url($sprite-path) no-repeat -570px -400px; // TODO - AS: should be removed
-}
-
-.zabbix-sidebar-logo-compact {
-	width: 24px;
-	height: 24px;
-	background: url($sprite-path) no-repeat -540px -400px; // TODO - AS: should be removed
 }
 
 .hor-list {
@@ -2099,10 +2082,8 @@ select {
 		padding: 0;
 	}
 
-	.setup-logo {
-		display: flex;
+	.zabbix-logo {
 		margin-bottom: 40px;
-		justify-content: flex-start;
 	}
 
 	#tls_encryption_hint {

@@ -378,7 +378,7 @@ class testSidebarMenu extends CWebTest {
 
 			// Waiting sidemenu to hide/collapse.
 			if ($view === 'compact') {
-				$this->query('class:zabbix-sidebar-logo')->one(false)->waitUntilNotVisible();
+				$this->query('class:zabbix-logo-sidebar')->one(false)->waitUntilNotVisible();
 			}
 			elseif ($view === 'hidden') {
 				$this->query('xpath://aside[@class="sidebar is-hidden"]')->one(false)->waitUntilNotVisible();

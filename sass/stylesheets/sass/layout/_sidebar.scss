@@ -92,12 +92,12 @@ $sidebar-padding: 12px;
 		}
 
 		&:focus {
-			.sidebar-logo {
+			.zabbix-logo-sidebar {
 				box-shadow: 0 0 0 2px rgba($blue, .35);
 			}
 		}
 
-		.sidebar-logo-compact {
+		.zabbix-logo-sidebar-compact {
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -163,7 +163,7 @@ $sidebar-padding: 12px;
 			}
 
 			.logo {
-				.sidebar-logo {
+				.zabbix-logo-sidebar {
 					opacity: 0;
 
 					@if $ui-transitions {
@@ -171,7 +171,7 @@ $sidebar-padding: 12px;
 					}
 				}
 
-				.sidebar-logo-compact {
+				.zabbix-logo-sidebar-compact {
 					opacity: 1;
 
 					@if $ui-transitions {

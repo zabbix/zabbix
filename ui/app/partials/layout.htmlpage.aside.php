@@ -29,8 +29,8 @@ $header = (new CDiv())
 	->addItem(
 		(new CLink(
 			[
-				makeLogo(LOGO_TYPE_SIDEBAR)->addClass('sidebar-logo'),
-				makeLogo(LOGO_TYPE_SIDEBAR_COMPACT)->addClass('sidebar-logo-compact')
+				makeLogo(LOGO_TYPE_SIDEBAR),
+				makeLogo(LOGO_TYPE_SIDEBAR_COMPACT)
 			],
 			CMenuHelper::getFirstUrl()
 		))->addClass(ZBX_STYLE_LOGO)

@@ -2134,8 +2134,8 @@ define('ZBX_STYLE_PROBLEM_ICON_LIST' , 'problem-icon-list');
 define('ZBX_STYLE_PROBLEM_ICON_LINK' , 'problem-icon-link');
 define('ZBX_STYLE_PROBLEM_ICON_LIST_ITEM' , 'problem-icon-list-item');
 define('ZBX_STYLE_ZABBIX_LOGO', 'zabbix-logo');
-define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO', 'zabbix-sidebar-logo');
-define('ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT', 'zabbix-sidebar-logo-compact');
+define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR', 'zabbix-logo-sidebar');
+define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR_COMPACT', 'zabbix-logo-sidebar-compact');
 define('ZBX_STYLE_DEFAULT_OPTION', 'default-option');
 
 // HTML column layout.

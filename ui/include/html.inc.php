@@ -781,8 +781,8 @@ function makeServerStatusOutput() {
 function makeLogo(int $type): ?CTag {
 	static $zabbix_logo_classes = [
 		LOGO_TYPE_NORMAL => ZBX_STYLE_ZABBIX_LOGO,
-		LOGO_TYPE_SIDEBAR => ZBX_STYLE_ZABBIX_SIDEBAR_LOGO,
-		LOGO_TYPE_SIDEBAR_COMPACT => ZBX_STYLE_ZABBIX_SIDEBAR_LOGO_COMPACT
+		LOGO_TYPE_SIDEBAR => ZBX_STYLE_ZABBIX_LOGO_SIDEBAR,
+		LOGO_TYPE_SIDEBAR_COMPACT => ZBX_STYLE_ZABBIX_LOGO_SIDEBAR_COMPACT
 	];
 
 	$brand_logo = CBrandHelper::getLogo($type);

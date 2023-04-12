@@ -360,7 +360,7 @@ class CSetupWizard extends CForm {
 	protected function bodyToString($destroy = true): string {
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
-			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
+			->addItem(makeLogo(LOGO_TYPE_NORMAL))
 			->addItem($this->getList());
 
 		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
