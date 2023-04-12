@@ -53,6 +53,10 @@
 		}
 	}
 
+	&.form-grid-actions {
+		margin-top: 10px;
+	}
+
 	.form-field {
 		$offsets: (
 				1: 2,
@@ -99,6 +103,10 @@
 
 		.list-check-radio {
 			line-height: $body-line-height;
+		}
+
+		.icon-info {
+			margin-left: 5px;
 		}
 	}
 

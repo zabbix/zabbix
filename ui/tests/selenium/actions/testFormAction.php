@@ -327,10 +327,10 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Remove from host group']
 			],
 			[
-				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Link to template']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Link template']
 			],
 			[
-				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Unlink from template']
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Unlink template']
 			],
 			[
 				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_operation_operationtype' => 'Enable host']
@@ -370,7 +370,7 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_operation_operationtype' => 'Add to host group']
 			],
 			[
-				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_operation_operationtype' => 'Link to template']
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_operation_operationtype' => 'Link template']
 			],
 			[
 				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_operation_operationtype' => 'Disable host']
@@ -992,8 +992,8 @@ class testFormAction extends CLegacyWebTest {
 							'Remove host',
 							'Add to host group',
 							'Remove from host group',
-							'Link to template',
-							'Unlink from template',
+							'Link template',
+							'Unlink template',
 							'Enable host',
 							'Disable host',
 							'Set host inventory mode',
@@ -1109,8 +1109,8 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertElementPresentXpath('//div[@id=\'operation_opgroup__groupid\']/input');
 				$this->zbxTestAssertNotVisibleXpath('//div[@id=\'operation_optemplate__templateid\']/input');
 				break;
-			case 'Link to template':
-			case 'Unlink from template':
+			case 'Link template':
+			case 'Unlink template':
 				$this->zbxTestAssertElementPresentXpath('//div[@id=\'operation_optemplate__templateid\']/input');
 				$this->zbxTestAssertNotVisibleXpath('//div[@id=\'operation_opgroup__groupid\']/input');
 				break;

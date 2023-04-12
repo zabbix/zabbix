@@ -132,7 +132,7 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
  *             recids - [OUT] the record identifiers (optional)               *
  *                                                                            *
  ******************************************************************************/
-static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_TABLE *table,
+static void	proxyconfig_add_row(struct zbx_json *j, const zbx_db_row_t row, const zbx_db_table_t *table,
 		zbx_vector_uint64_t *recids)
 {
 	int	fld = 0, i;
@@ -181,7 +181,7 @@ static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_
  *             j          - [OUT] the output json                             *
  *                                                                            *
  ******************************************************************************/
-static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table,
+static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_db_table_t *table,
 		struct zbx_json *j)
 {
 	int	i;
@@ -228,12 +228,12 @@ static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_of
 static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vector_uint64_t *hostids,
 		const char *config_vault_db_path, zbx_vector_ptr_t *keys_paths, struct zbx_json *j, char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	char		*sql;
-	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i, ret = FAIL, offset;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	const zbx_db_table_t	*table;
+	char			*sql;
+	size_t			sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			i, ret = FAIL, offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -368,12 +368,12 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 		const zbx_vector_uint64_t *key_ids, const char *filter, zbx_vector_uint64_t *recids, struct zbx_json *j,
 		char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	char		*sql = NULL;
-	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		ret = FAIL;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	const zbx_db_table_t	*table;
+	char			*sql = NULL;
+	size_t			sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -447,7 +447,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	master_itemid;
-	DB_ROW		row;
+	zbx_db_row_t	row;
 	int		cols_num;
 }
 zbx_proxyconfig_dep_item_t;
@@ -467,7 +467,7 @@ static void	proxyconfig_dep_item_free(zbx_proxyconfig_dep_item_t *item)
 }
 
 static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t itemid, zbx_uint64_t master_itemid,
-		const DB_ROW row, int cols_num)
+		const zbx_db_row_t row, int cols_num)
 {
 	zbx_proxyconfig_dep_item_t	*item;
 	int				i;
@@ -476,7 +476,7 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
 	item->itemid = itemid;
 	item->master_itemid = master_itemid;
 	item->cols_num = cols_num;
-	item->row = (DB_ROW)zbx_malloc(NULL, sizeof(char *) * (size_t)cols_num);
+	item->row = (zbx_db_row_t)zbx_malloc(NULL, sizeof(char *) * (size_t)cols_num);
 
 	for (i = 0; i < cols_num; i++)
 	{
@@ -505,13 +505,13 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
 static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vector_uint64_t *itemids,
 		struct zbx_json *j, char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	char		*sql;
-	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
-	zbx_uint64_t	itemid, master_itemid;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	const zbx_db_table_t	*table;
+	char			*sql;
+	size_t			sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
+	zbx_uint64_t		itemid, master_itemid;
 
 	zbx_vector_proxyconfig_dep_item_ptr_t	dep_items;
 	zbx_hashset_t				items;
@@ -572,7 +572,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 			unsigned char	type;
 
 			ZBX_STR2UCHAR(type, row[fld_type]);
-			if (SUCCEED == is_item_processed_by_server(type, row[fld_key]))
+			if (SUCCEED == zbx_is_item_processed_by_server(type, row[fld_key]))
 					continue;
 
 			ZBX_DBROW2UINT64(itemid, row[0]);
@@ -712,7 +712,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	proxyconfig_get_drules_data(const DC_PROXY *proxy, struct zbx_json *j, char **error)
+static int	proxyconfig_get_drules_data(const zbx_dc_proxy_t *proxy, struct zbx_json *j, char **error)
 {
 	zbx_vector_uint64_t	druleids;
 	zbx_vector_uint64_t	proxy_hostids;
@@ -833,7 +833,7 @@ out:
 	return ret;
 }
 
-static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_config_revision,
+static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_config_revision,
 		const zbx_dc_revision_t *dc_revision, struct zbx_json *j, zbx_proxyconfig_status_t *status,
 		const zbx_config_vault_t *config_vault, char **error)
 {
@@ -1037,7 +1037,7 @@ out:
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
+int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
 		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault, char **error)
 {
 	int			ret = FAIL;
@@ -1112,7 +1112,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
-	DC_PROXY			proxy;
+	zbx_dc_proxy_t			proxy;
 	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel, version_int;
 	size_t				buffer_size, reserved = 0;
 	zbx_proxyconfig_status_t	status;

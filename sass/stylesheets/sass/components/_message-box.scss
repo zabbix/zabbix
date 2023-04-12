@@ -12,6 +12,11 @@
 	border: 2px solid;
 	border-radius: 2px;
 
+	.overlay-close-btn {
+		color: $font-alt-color;
+		background-color: transparent;
+	}
+
 	.link-action {
 		margin-right: 10px;
 		font-size: $font-msg-reset-size;
@@ -23,6 +28,10 @@
 		.arrow-down {
 			border-top-color: darken(desaturate($green, 10%), 20%);
 		}
+	}
+
+	button {
+		background-color: transparent;
 	}
 
 	&::after {
@@ -69,8 +78,17 @@
 		border-top-color: $msg-bad-color;
 	}
 
+	button {
+		color: $msg-btn-text-color;
+		border-color: $msg-bad-color;
+	}
+
 	&::after {
 		background-color: $msg-bad-color;
+	}
+
+	.msg-details {
+		padding-right: 10px;
 	}
 }
 

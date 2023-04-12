@@ -1475,7 +1475,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Check that Dashboard has been saved
 			$this->checkDashboardMessage();
 			// Confirm that widget is not present on dashboard.
-			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
+			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header")]/h4[text()='.
 					CXPathHelper::escapeQuotes($name).']')->count());
 			$widget_sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 					' WHERE w.name='.zbx_dbstr($name);

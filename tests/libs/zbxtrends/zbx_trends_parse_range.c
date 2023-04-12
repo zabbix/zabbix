@@ -28,8 +28,9 @@
 #include "zbxdbhigh.h"
 
 int	__wrap_zbx_db_is_null(const char *field);
-DB_ROW	__wrap_zbx_db_fetch(DB_RESULT result);
-DB_RESULT	__wrap_zbx_db_select(const char *fmt, ...);
+zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result);
+zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group);
 
 int	__wrap_zbx_db_is_null(const char *field)
 {
@@ -37,16 +38,22 @@ int	__wrap_zbx_db_is_null(const char *field)
 	return SUCCEED;
 }
 
-DB_ROW	__wrap_zbx_db_fetch(DB_RESULT result)
+zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result)
 {
 	ZBX_UNUSED(result);
 	return NULL;
 }
 
-DB_RESULT	__wrap_zbx_db_select(const char *fmt, ...)
+zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...)
 {
 	ZBX_UNUSED(fmt);
 	return NULL;
+}
+
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
+{
+	ZBX_UNUSED(tm_start);
+	ZBX_UNUSED(table_group);
 }
 
 void	zbx_mock_test_entry(void **state)

@@ -88,11 +88,11 @@ trait TableTrait {
 	 * @throws Exception
 	 */
 	public function assertTableHasData($data = [], $selector = 'class:list-table') {
-		$table_rows = $this->query($selector)->asTable()->one()->index();
+		$table = $this->query($selector)->asTable()->one();
 
 		if (!$data) {
-			// Check that table contain one row with text "No data found."
-			$this->assertEquals(['No data found.'], $rows->asText());
+			// Check that table contains one row with text "No data found."
+			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 
 			return;
 		}
@@ -100,7 +100,7 @@ trait TableTrait {
 		foreach ($data as $data_row) {
 			$found = false;
 
-			foreach ($table_rows as $table_row) {
+			foreach ($table->index() as $table_row) {
 				$match = true;
 
 				foreach ($data_row as $key => $value) {
@@ -200,5 +200,14 @@ trait TableTrait {
 			$result[] = $row->getColumn($column)->getText();
 		}
 		return $result;
+	}
+
+	/**
+	 * Assert text of selected rows amount.
+	 *
+	 * @param integer $count	selected rows count
+	 */
+	public function assertSelectedCount($count) {
+		$this->assertEquals($count.' selected', $this->query('id:selected_count')->one()->getText());
 	}
 }

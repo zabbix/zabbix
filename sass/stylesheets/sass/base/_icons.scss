@@ -111,10 +111,10 @@ $zi-z: "\ea6c";
 
 @font-face {
 	font-family: "zabbix-icons";
-	src: url("#{$icons-path}zabbix-icons.woff2?t=1678702425533") format("woff2"),
-	url("#{$icons-path}zabbix-icons.woff?t=1678702425533") format("woff"),
-	url('#{$icons-path}zabbix-icons.ttf?t=1678702425533') format('truetype'),
-	url('#{$icons-path}zabbix-icons.svg?t=1678702425533#zabbix-icons') format('svg');
+	src: url("#{$icons-path}zabbix-icons.woff2?t=1681288516775") format("woff2"),
+	url("#{$icons-path}zabbix-icons.woff?t=1681288516775") format("woff"),
+	url('#{$icons-path}zabbix-icons.ttf?t=1681288516775') format('truetype'),
+	url('#{$icons-path}zabbix-icons.svg?t=1681288516775#zabbix-icons') format('svg');
 }
 
 %icons-font {

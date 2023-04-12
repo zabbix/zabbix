@@ -110,6 +110,7 @@ $form-search-icon-bg-position: -570px -616px;
 $msg-bad-color: darken(desaturate($red, 10%), 20%);
 $msg-good-color: #344e3f;
 $msg-warning-color: #a97d38;
+$msg-btn-text-color: #ffffff;
 
 // Buttons
 $btn-font-color: #f2f2f2;
@@ -262,7 +263,7 @@ $toc-title-bg-color: #4f4f4f;
 .dashboard-grid-widget {
 	&.dashboard-grid-widget-hidden-header {
 		&.dashboard-grid-widget-focus {
-			.dashboard-grid-widget-head {
+			.dashboard-grid-widget-header {
 				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 			}
 		}
@@ -271,7 +272,7 @@ $toc-title-bg-color: #4f4f4f;
 
 .dashboard-grid-iterator {
 	&.dashboard-grid-iterator-focus {
-		.dashboard-grid-iterator-head {
+		.dashboard-grid-iterator-header {
 			box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 		}
 	}
@@ -281,7 +282,7 @@ $toc-title-bg-color: #4f4f4f;
 	.dashboard-grid-widget {
 		&.ui-draggable-dragging {
 			&.dashboard-grid-widget-hidden-header {
-				.dashboard-grid-widget-head {
+				.dashboard-grid-widget-header {
 					box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 				}
 			}
@@ -293,11 +294,11 @@ $toc-title-bg-color: #4f4f4f;
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
 			}
 
-			.dashboard-grid-widget-head {
+			.dashboard-grid-widget-header {
 				border-color: $ui-border-color;
 			}
 
-			.dashboard-grid-widget-content {
+			.dashboard-grid-widget-contents {
 				border-color: $ui-border-color;
 			}
 		}
@@ -305,7 +306,7 @@ $toc-title-bg-color: #4f4f4f;
 
 	.dashboard-grid-iterator {
 		&.ui-draggable-dragging {
-			.dashboard-grid-iterator-head {
+			.dashboard-grid-iterator-header {
 				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 			}
 		}
@@ -316,17 +317,17 @@ $toc-title-bg-color: #4f4f4f;
 				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
 			}
 
-			.dashboard-grid-iterator-head {
+			.dashboard-grid-iterator-header {
 				border-color: $ui-border-color;
 			}
 
-			.dashboard-grid-iterator-content {
+			.dashboard-grid-iterator-contents {
 				.dashboard-grid-widget {
-					.dashboard-grid-widget-head {
+					.dashboard-grid-widget-header {
 						border-color: $ui-border-color;
 					}
 
-					.dashboard-grid-widget-content {
+					.dashboard-grid-widget-contents {
 						border-color: $ui-border-color;
 					}
 				}

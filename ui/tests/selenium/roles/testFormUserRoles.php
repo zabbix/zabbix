@@ -1366,6 +1366,8 @@ class testFormUserRoles extends CWebTest {
 				$this->query('button:Enable')->one()->click();
 				$this->page->acceptAlert();
 				$this->page->waitUntilReady();
+
+				$this->assertMessage(TEST_GOOD, 'Modules enabled');
 			}
 			else {
 				foreach ($modules as $module) {

@@ -1492,7 +1492,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 								(new CSimpleButton(_('Remove')))
 									->addClass(ZBX_STYLE_BTN_LINK)
 									->addClass('js-group-json-action-delete')
-									->setEnabled($count > 3)
+									->setEnabled(!$readonly && $count > 3)
 							))->addClass(ZBX_STYLE_NOWRAP)
 						]))->addClass('group-json-row')
 					];
@@ -1518,6 +1518,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 											(new CSimpleButton(_('Add')))
 												->addClass(ZBX_STYLE_BTN_LINK)
 												->addClass('js-group-json-action-add')
+												->setEnabled(!$readonly)
 										))->setColSpan(4)
 									)
 							)

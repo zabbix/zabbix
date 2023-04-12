@@ -296,12 +296,16 @@ abstract class CItemGeneralOld extends CApiService {
 					$item['name']
 				);
 
-				// apply rules
-				foreach ($this->fieldRules as $field => $rules) {
-					if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
-						$rules['template'] = 1;
-					}
+				$field_rules = $this->fieldRules;
 
+				if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
+					$field_rules = [
+						'params' => ['template' => 1]
+					] + $this->fieldRules;
+				}
+
+				// apply rules
+				foreach ($field_rules as $field => $rules) {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
 
@@ -2893,9 +2897,7 @@ abstract class CItemGeneralOld extends CApiService {
 
 		// Select tags from database.
 		$db_tags = DBselect(
-			'SELECT itemtagid, itemid, tag, value'.
-			' FROM item_tag'.
-			' WHERE '.dbConditionInt('itemid', array_keys($items))
+			'SELECT itemtagid,itemid,tag,value FROM item_tag WHERE '.dbConditionInt('itemid', array_keys($items))
 		);
 
 		array_walk($items, function (&$item) {

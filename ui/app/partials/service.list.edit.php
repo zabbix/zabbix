@@ -92,7 +92,7 @@ foreach ($data['services'] as $serviceid => $service) {
 			? new CLink($problem_event['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
-					->setArgument('filter_name', '')
+					->setArgument('filter_set', '1')
 					->setArgument('triggerids', [$problem_event['triggerid']])
 			)
 			: $problem_event['name'];

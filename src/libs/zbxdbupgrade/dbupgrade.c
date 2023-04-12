@@ -22,13 +22,11 @@
 #include "zbxdbschema.h"
 
 #include "log.h"
-
-typedef struct
-{
-	zbx_dbpatch_t	*patches;
-	const char	*description;
-}
-zbx_db_version_t;
+#include "../../zabbix_server/ha/ha.h"
+#include "zbxtime.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -90,7 +88,7 @@ zbx_db_version_t;
 #define ZBX_FIRST_DB_VERSION		2010000
 
 #ifndef HAVE_SQLITE3
-static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
+static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_db_field_t *field)
 {
 	switch (field->type)
 	{
@@ -129,7 +127,8 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 	}
 }
 
-static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
+static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_db_field_t *field)
 {
 	switch (field->type)
 	{
@@ -197,7 +196,8 @@ static zbx_oracle_column_type_t	zbx_oracle_column_type(unsigned char field_type)
 }
 #endif
 
-static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
+static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_SQL_NAME " ", field->name);
 	DBfield_type_string(sql, sql_alloc, sql_offset, field);
@@ -247,7 +247,7 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 	DBfield_type_suffix_string(sql, sql_alloc, sql_offset, field);
 }
 
-static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table)
+static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_db_table_t *table)
 {
 	int	i;
 
@@ -277,8 +277,8 @@ static void	DBdrop_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop table %s", table_name);
 }
 
-static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, const ZBX_FIELD *field)
+static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
@@ -291,8 +291,8 @@ static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 #endif
 }
 
-static void	DBdrop_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, const ZBX_FIELD *field)
+static void	DBdrop_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
@@ -305,8 +305,8 @@ static void	DBdrop_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 #endif
 }
 
-static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, const ZBX_FIELD *field)
+static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table " ZBX_FS_SQL_NAME ZBX_DB_ALTER_COLUMN " ",
 			table_name);
@@ -326,8 +326,8 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 #endif
 }
 
-static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, const ZBX_FIELD *field)
+static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
@@ -340,8 +340,8 @@ static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offse
 #endif
 }
 
-static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, const ZBX_FIELD *field)
+static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DB_ALTER_COLUMN " ", table_name);
 
@@ -354,15 +354,15 @@ static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 #endif
 }
 
-static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, const ZBX_FIELD *field)
+static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table " ZBX_FS_SQL_NAME " add ", table_name);
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 }
 
-static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, const char *field_name, const ZBX_FIELD *field)
+static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		const char *field_name, const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table " ZBX_FS_SQL_NAME " ", table_name);
 
@@ -417,8 +417,8 @@ static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 #endif
 }
 
-static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *table_name, int id, const ZBX_FIELD *field)
+static void	DBadd_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *table_name,
+		int id, const zbx_db_field_t *field)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 			"alter table " ZBX_FS_SQL_NAME " add constraint c_%s_%d foreign key (" ZBX_FS_SQL_NAME ")"
@@ -435,7 +435,7 @@ static void	DBdrop_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_of
 			table_name, table_name, id);
 }
 
-int	DBcreate_table(const ZBX_TABLE *table)
+int	DBcreate_table(const zbx_db_table_t *table)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -483,7 +483,7 @@ int	DBdrop_table(const char *table_name)
 	return ret;
 }
 
-int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
+int	DBadd_field(const char *table_name, const zbx_db_field_t *field)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -499,7 +499,7 @@ int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
 	return ret;
 }
 
-int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIELD *field)
+int	DBrename_field(const char *table_name, const char *field_name, const zbx_db_field_t *field)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -516,7 +516,7 @@ int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIE
 }
 
 #ifdef HAVE_ORACLE
-static int	DBmodify_field_type_with_copy(const char *table_name, const ZBX_FIELD *field)
+static int	DBmodify_field_type_with_copy(const char *table_name, const zbx_db_field_t *field)
 {
 #define ZBX_OLD_FIELD	"zbx_old_tmp"
 
@@ -579,7 +579,7 @@ int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
 
 #endif
 
-int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZBX_FIELD *old_field)
+int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, const zbx_db_field_t *old_field)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -612,7 +612,7 @@ int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field, const ZB
 	return ret;
 }
 
-int	DBset_not_null(const char *table_name, const ZBX_FIELD *field)
+int	DBset_not_null(const char *table_name, const zbx_db_field_t *field)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -628,7 +628,7 @@ int	DBset_not_null(const char *table_name, const ZBX_FIELD *field)
 	return ret;
 }
 
-int	DBset_default(const char *table_name, const ZBX_FIELD *field)
+int	DBset_default(const char *table_name, const zbx_db_field_t *field)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -644,7 +644,7 @@ int	DBset_default(const char *table_name, const ZBX_FIELD *field)
 	return ret;
 }
 
-int	DBdrop_default(const char *table_name, const ZBX_FIELD *field)
+int	DBdrop_default(const char *table_name, const zbx_db_field_t *field)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -660,7 +660,7 @@ int	DBdrop_default(const char *table_name, const ZBX_FIELD *field)
 	return ret;
 }
 
-int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
+int	DBdrop_not_null(const char *table_name, const zbx_db_field_t *field)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -741,7 +741,7 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 	return ret;
 }
 
-int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field)
+int	DBadd_foreign_key(const char *table_name, int id, const zbx_db_field_t *field)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -775,7 +775,7 @@ int	DBdrop_foreign_key(const char *table_name, int id)
 
 static int	DBcreate_dbversion_table(void)
 {
-	const ZBX_TABLE	table =
+	const zbx_db_table_t	table =
 			{"dbversion", "", 0,
 				{
 					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -819,73 +819,73 @@ static int	DBset_version(int version, unsigned char mandatory)
 
 zbx_get_program_type_f	DBget_program_type_cb;
 
-extern zbx_dbpatch_t	DBPATCH_VERSION(2010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6040)[];
-/*extern zbx_dbpatch_t	DBPATCH_VERSION(6050)[];*/
+DBPATCHES_ARRAY_DECL(2010);
+DBPATCHES_ARRAY_DECL(2020);
+DBPATCHES_ARRAY_DECL(2030);
+DBPATCHES_ARRAY_DECL(2040);
+DBPATCHES_ARRAY_DECL(2050);
+DBPATCHES_ARRAY_DECL(3000);
+DBPATCHES_ARRAY_DECL(3010);
+DBPATCHES_ARRAY_DECL(3020);
+DBPATCHES_ARRAY_DECL(3030);
+DBPATCHES_ARRAY_DECL(3040);
+DBPATCHES_ARRAY_DECL(3050);
+DBPATCHES_ARRAY_DECL(4000);
+DBPATCHES_ARRAY_DECL(4010);
+DBPATCHES_ARRAY_DECL(4020);
+DBPATCHES_ARRAY_DECL(4030);
+DBPATCHES_ARRAY_DECL(4040);
+DBPATCHES_ARRAY_DECL(4050);
+DBPATCHES_ARRAY_DECL(5000);
+DBPATCHES_ARRAY_DECL(5010);
+DBPATCHES_ARRAY_DECL(5020);
+DBPATCHES_ARRAY_DECL(5030);
+DBPATCHES_ARRAY_DECL(5040);
+DBPATCHES_ARRAY_DECL(5050);
+DBPATCHES_ARRAY_DECL(6000);
+DBPATCHES_ARRAY_DECL(6010);
+DBPATCHES_ARRAY_DECL(6020);
+DBPATCHES_ARRAY_DECL(6030);
+DBPATCHES_ARRAY_DECL(6040);
+DBPATCHES_ARRAY_DECL(6050);
 
-static zbx_db_version_t dbversions[] = {
-	{DBPATCH_VERSION(2010), "2.2 development"},
-	{DBPATCH_VERSION(2020), "2.2 maintenance"},
-	{DBPATCH_VERSION(2030), "2.4 development"},
-	{DBPATCH_VERSION(2040), "2.4 maintenance"},
-	{DBPATCH_VERSION(2050), "3.0 development"},
-	{DBPATCH_VERSION(3000), "3.0 maintenance"},
-	{DBPATCH_VERSION(3010), "3.2 development"},
-	{DBPATCH_VERSION(3020), "3.2 maintenance"},
-	{DBPATCH_VERSION(3030), "3.4 development"},
-	{DBPATCH_VERSION(3040), "3.4 maintenance"},
-	{DBPATCH_VERSION(3050), "4.0 development"},
-	{DBPATCH_VERSION(4000), "4.0 maintenance"},
-	{DBPATCH_VERSION(4010), "4.2 development"},
-	{DBPATCH_VERSION(4020), "4.2 maintenance"},
-	{DBPATCH_VERSION(4030), "4.4 development"},
-	{DBPATCH_VERSION(4040), "4.4 maintenance"},
-	{DBPATCH_VERSION(4050), "5.0 development"},
-	{DBPATCH_VERSION(5000), "5.0 maintenance"},
-	{DBPATCH_VERSION(5010), "5.2 development"},
-	{DBPATCH_VERSION(5020), "5.2 maintenance"},
-	{DBPATCH_VERSION(5030), "5.4 development"},
-	{DBPATCH_VERSION(5040), "5.4 maintenance"},
-	{DBPATCH_VERSION(5050), "6.0 development"},
-	{DBPATCH_VERSION(6000), "6.0 maintenance"},
-	{DBPATCH_VERSION(6010), "6.2 development"},
-	{DBPATCH_VERSION(6020), "6.2 maintenance"},
-	{DBPATCH_VERSION(6030), "6.4 development"},
-	{DBPATCH_VERSION(6040), "6.4 maintenance"},
-/*	{DBPATCH_VERSION(6050), "7.0 development"},*/
-	{NULL}
+static zbx_dbpatch_t *dbversions[] = {
+	DBPATCH_VERSION(2010), /* 2.2 development */
+	DBPATCH_VERSION(2020), /* 2.2 maintenance */
+	DBPATCH_VERSION(2030), /* 2.4 development */
+	DBPATCH_VERSION(2040), /* 2.4 maintenance */
+	DBPATCH_VERSION(2050), /* 3.0 development */
+	DBPATCH_VERSION(3000), /* 3.0 maintenance */
+	DBPATCH_VERSION(3010), /* 3.2 development */
+	DBPATCH_VERSION(3020), /* 3.2 maintenance */
+	DBPATCH_VERSION(3030), /* 3.4 development */
+	DBPATCH_VERSION(3040), /* 3.4 maintenance */
+	DBPATCH_VERSION(3050), /* 4.0 development */
+	DBPATCH_VERSION(4000), /* 4.0 maintenance */
+	DBPATCH_VERSION(4010), /* 4.2 development */
+	DBPATCH_VERSION(4020), /* 4.2 maintenance */
+	DBPATCH_VERSION(4030), /* 4.4 development */
+	DBPATCH_VERSION(4040), /* 4.4 maintenance */
+	DBPATCH_VERSION(4050), /* 5.0 development */
+	DBPATCH_VERSION(5000), /* 5.0 maintenance */
+	DBPATCH_VERSION(5010), /* 5.2 development */
+	DBPATCH_VERSION(5020), /* 5.2 maintenance */
+	DBPATCH_VERSION(5030), /* 5.4 development */
+	DBPATCH_VERSION(5040), /* 5.4 maintenance */
+	DBPATCH_VERSION(5050), /* 6.0 development */
+	DBPATCH_VERSION(6000), /* 6.0 maintenance */
+	DBPATCH_VERSION(6010), /* 6.2 development */
+	DBPATCH_VERSION(6020), /* 6.2 maintenance */
+	DBPATCH_VERSION(6030), /* 6.4 development */
+	DBPATCH_VERSION(6040), /* 6.4 maintenance */
+	DBPATCH_VERSION(6050), /* 7.0 development */
+	NULL
 };
 
 static void	DBget_version(int *mandatory, int *optional)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	*mandatory = -1;
 	*optional = -1;
@@ -915,16 +915,73 @@ void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb)
 {
 	DBget_program_type_cb = get_program_type_cb;
 }
-
-int	DBcheck_version(void)
+#ifndef HAVE_SQLITE3
+static int	DBcheck_nodes(void)
 {
-	const char		*dbversion_table_name = "dbversion";
+	zbx_db_result_t	result;
+	zbx_db_row_t		row;
+	int		ret = SUCCEED, db_time = 0, failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
+
+	zbx_db_begin();
+
+	result = zbx_db_select("select " ZBX_DB_TIMESTAMP() ",ha_failover_delay from config");
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		db_time = atoi(row[0]);
+
+		if (SUCCEED != zbx_is_time_suffix(row[1], &failover_delay, ZBX_LENGTH_UNLIMITED))
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve database time");
+
+	zbx_db_free_result(result);
+
+	/* check if there are recently accessed ZBX_NODE_STATUS_STANDBY or ZBX_NODE_STATUS_ACTIVE nodes */
+	result = zbx_db_select("select lastaccess,name"
+			" from ha_node"
+			" where status not in (%d,%d)"
+			" order by ha_nodeid" ZBX_FOR_UPDATE,
+			ZBX_NODE_STATUS_STOPPED, ZBX_NODE_STATUS_UNAVAILABLE);
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		int	lastaccess, age;
+
+		lastaccess = atoi(row[0]);
+
+		if ((age = lastaccess + failover_delay - db_time) <= 0)
+			continue;
+
+		zabbix_log(LOG_LEVEL_WARNING, "cannot perform database upgrade: node \"%s\" is still running, if node"
+				" is unreachable it will be skipped in %s",
+				'\0' != *row[1] ? row[1] : "<standalone server>", zbx_age2str(age));
+
+		ret = FAIL;
+	}
+	zbx_db_free_result(result);
+
+	if (SUCCEED == ret)
+	{
+		if (ZBX_DB_OK != zbx_db_commit())
+			ret = FAIL;
+	}
+	else
+		zbx_db_rollback();
+
+	return ret;
+}
+#endif
+
+int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode)
+{
+#define ZBX_DB_WAIT_UPGRADE	10
+	const char		*dbversion_table_name = "dbversion", *ha_node_table_name = "ha_node";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
-	zbx_db_version_t	*dbversion;
+	zbx_dbpatch_t		**dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
-	int			total = 0, current = 0, completed, last_completed = -1, optional_num = 0;
+	int			total = 0, current = 0, completed, last_completed = -1, mandatory_num = 0;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -932,10 +989,10 @@ int	DBcheck_version(void)
 
 	/* find out the required version number by getting the last mandatory version */
 	/* of the last version patch array                                            */
-	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
+	for (dbversion = dbversions; NULL != *dbversion; dbversion++)
 		;
 
-	patches = (--dbversion)->patches;
+	patches = *(--dbversion);
 
 	for (i = 0; 0 != patches[i].version; i++)
 	{
@@ -974,14 +1031,15 @@ int	DBcheck_version(void)
 	DBget_version(&db_mandatory, &db_optional);
 
 #ifndef HAVE_SQLITE3
-	for (dbversion = dbversions; NULL != (patches = dbversion->patches); dbversion++)
+	for (dbversion = dbversions; NULL != (patches = *dbversion); dbversion++)
 	{
 		for (i = 0; 0 != patches[i].version; i++)
 		{
 			if (0 != patches[i].mandatory)
-				optional_num = 0;
-			else
-				optional_num++;
+			{
+				if (db_mandatory < patches[i].version)
+					mandatory_num++;
+			}
 
 			if (db_optional < patches[i].version)
 				total++;
@@ -1017,18 +1075,37 @@ int	DBcheck_version(void)
 	if (0 == total)
 		goto out;
 
-	if (0 != optional_num)
+	if (0 != mandatory_num)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "mandatory patches were found");
+		if (SUCCEED == zbx_db_table_exists(ha_node_table_name))
+			ret = DBcheck_nodes();
+
+		if (ZBX_HA_MODE_CLUSTER == ha_mode)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot perform database upgrade in HA mode: all nodes need to be"
+					" stopped and Zabbix server started in standalone mode for the time of"
+					" upgrade.");
+			ret = FAIL;
+		}
+
+		if (FAIL == ret)
+			goto out;
+	}
+	else
 		zabbix_log(LOG_LEVEL_INFORMATION, "optional patches were found");
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting automatic database upgrade");
 
-	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
+	for (dbversion = dbversions; NULL != *dbversion; dbversion++)
 	{
-		patches = dbversion->patches;
+		patches = *dbversion;
 
 		for (i = 0; 0 != patches[i].version; i++)
 		{
 			static sigset_t	orig_mask, mask;
+			zbx_db_result_t	result;
+			zbx_db_row_t		row;
 
 			if (db_optional >= patches[i].version)
 				continue;
@@ -1044,11 +1121,26 @@ int	DBcheck_version(void)
 
 			zbx_db_begin();
 
-			/* skipping the duplicated patches */
-			if ((0 != patches[i].duplicates && patches[i].duplicates <= db_optional) ||
-					SUCCEED == (ret = patches[i].function()))
+			result = zbx_db_select("select optional,mandatory from dbversion" ZBX_FOR_UPDATE);
+			if (NULL != (row = zbx_db_fetch(result)))
+				db_optional = atoi(row[0]);
+
+			zbx_db_free_result(result);
+			if (db_optional >= patches[i].version)
 			{
-				ret = DBset_version(patches[i].version, patches[i].mandatory);
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot perform database upgrade:"
+						" patch with version %08d was already performed by other node",
+						patches[i].version);
+				ret = FAIL;
+			}
+			else
+			{
+				/* skipping the duplicated patches */
+				if ((0 != patches[i].duplicates && patches[i].duplicates <= db_optional) ||
+						SUCCEED == (ret = patches[i].function()))
+				{
+					ret = DBset_version(patches[i].version, patches[i].mandatory);
+				}
 			}
 
 			ret = zbx_db_end(ret);
@@ -1081,7 +1173,11 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_WARNING, "database upgrade fully completed");
 	}
 	else
-		zabbix_log(LOG_LEVEL_CRIT, "database upgrade failed");
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "database upgrade failed on patch %08d, exiting in %d seconds",
+				patches[i].version, ZBX_DB_WAIT_UPGRADE);
+		sleep(ZBX_DB_WAIT_UPGRADE);
+	}
 #endif	/* not HAVE_SQLITE3 */
 
 out:
@@ -1090,60 +1186,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
-}
-
-int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	const int	total_dbl_cols = 4;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
-#if defined(HAVE_MYSQL)
-	sql = zbx_db_dyn_escape_string(config_dbhigh->config_dbname);
-	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
-			" where table_schema='%s' and column_type='double'", sql);
-#elif defined(HAVE_POSTGRESQL)
-	sql = zbx_db_dyn_escape_string(NULL == config_dbhigh->config_dbschema ||
-			'\0' == *config_dbhigh->config_dbschema ? "public" : config_dbhigh->config_dbschema);
-	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
-			" where table_schema='%s' and data_type='double precision'", sql);
-#elif defined(HAVE_ORACLE)
-	ZBX_UNUSED(config_dbhigh);
-	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
-			" where data_type='BINARY_DOUBLE'");
-#elif defined(HAVE_SQLITE3)
-	ZBX_UNUSED(config_dbhigh);
-	/* upgrade patch is not required for sqlite3 */
-	ret = SUCCEED;
-	goto out;
-#endif
-
-	if (NULL == (result = zbx_db_select("%s"
-			" and ((lower(table_name)='trends'"
-					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
-			" or (lower(table_name)='history' and lower(column_name)='value'))", sql)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot select records with columns information");
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)) && total_dbl_cols == atoi(row[0]))
-		ret = SUCCEED;
-
-	zbx_db_free_result(result);
-out:
-	zbx_db_close();
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
+#undef ZBX_DB_WAIT_UPGRADE
 }
 
 #ifndef HAVE_SQLITE3
@@ -1156,7 +1199,7 @@ static int	DBget_changelog_table_by_name(const char *table_name)
 {
 	const zbx_db_table_changelog_t	*table;
 
-	for (table = changelog_tables; NULL != table->table; table++)
+	for (table = zbx_dbschema_get_changelog_tables(); NULL != table->table; table++)
 	{
 		if (0 == strcmp(table_name, table->table))
 			return table->object;
@@ -1221,7 +1264,7 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	table_type, ret = FAIL;;
+	int	table_type, ret = FAIL;
 
 	if (FAIL == (table_type = DBget_changelog_table_by_name(table_name)))
 	{
@@ -1273,7 +1316,7 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	table_type, ret = FAIL;;
+	int	table_type, ret = FAIL;
 
 	if (FAIL == (table_type = DBget_changelog_table_by_name(table_name)))
 	{

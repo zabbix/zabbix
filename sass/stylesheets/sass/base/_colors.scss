@@ -189,6 +189,7 @@ $form-search-focused-border-color: lighten($sidebar-bg-color, 20%) !default;
 $msg-bad-color: #dc3545 !default;
 $msg-good-color: #28a745 !default;
 $msg-warning-color: #ffc107 !default;
+$msg-btn-text-color: darken(desaturate($red, 10%), 20%) !default;
 
 // Buttons
 $btn-font-color: #ffffff !default;
