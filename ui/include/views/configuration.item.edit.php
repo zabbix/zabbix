@@ -261,10 +261,11 @@ $item_tab
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
-						(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
-							->setAttribute('placeholder', _('value'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+                                               '&rArr;',
+                                                (new CCol((new CTextArea('query_fields[value][#{index}]', '#{value}', compact('readonly')))
+                                                        ->setAttribute('placeholder', _('value'))
+                                                        ->setAttribute('maxlength', 2048)
+                                                        ->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)))->setAttribute('style', 'vertical-align:top;'),						
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->setEnabled(!$readonly)
