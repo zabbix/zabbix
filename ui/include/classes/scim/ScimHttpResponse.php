@@ -26,6 +26,7 @@ use Throwable;
 class ScimHttpResponse {
 
 	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
+	private const SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
 	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
 
 	/** @var array $response_data  Array of response data to be sent. */
@@ -89,8 +90,11 @@ class ScimHttpResponse {
 				'status' => $this->exception->getCode()
 			]);
 		}
-		else {
+		elseif ($this->class === 'users') {
 			$this->setResponseData($this->prepareUsersResponse());
+		}
+		else {
+			$this->setResponseData($this->prepareGroupsResponse());
 		}
 
 		header('Content-Type: application/json', true, $this->response_code);
@@ -104,8 +108,11 @@ class ScimHttpResponse {
 	 * @return array
 	 */
 	private function prepareUsersResponse(): array {
-		if ($this->method !== 'delete'
-				&& (array_key_exists('userName', $this->request_data) || array_key_exists('id', $this->request_data))) {
+		if ($this->method === 'delete' ) {
+			return ['schemas'	=> [self::SCIM_USER_SCHEMA]];
+		}
+
+		if (array_key_exists('userName', $this->request_data) || array_key_exists('id', $this->request_data)) {
 			if ($this->response_data === []) {
 				return [
 					'schemas' => [self::SCIM_USER_SCHEMA],
@@ -116,28 +123,78 @@ class ScimHttpResponse {
 
 			return $this->wrapUserData($this->response_data);
 		}
-		elseif ($this->method === 'delete' ) {
-			return ['schemas'	=> [self::SCIM_USER_SCHEMA]];
+
+		$total_users = count($this->response_data);
+		$resources = [];
+
+		foreach ($this->response_data as $resource) {
+			$user = $this->wrapUserData($resource);
+			unset($user['schemas']);
+
+			$resources[] = $user;
 		}
-		else {
-			$total_users = count($this->response_data);
 
-			$resources = [];
-			foreach ($this->response_data as $resource) {
-				$user = $this->wrapUserData($resource);
-				unset($user['schemas']);
+		return [
+			'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+			'totalResults' => $total_users,
+			'startIndex' => max($this->request_data['startIndex'], 1),
+			'itemsPerPage' => min($total_users, max($total_users, 0)),
+			'Resources' => $resources
+		];
+	}
 
-				$resources[] = $user;
+	private function prepareGroupsResponse(): array {
+		if ($this->method === 'delete' ) {
+			return ['schemas'	=> [self::SCIM_GROUP_SCHEMA]];
+		}
+
+		if (array_key_exists('id', $this->request_data) || array_key_exists('displayName', $this->request_data)) {
+			if ($this->response_data === []) {
+				return [
+					'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+					'Resources' => []
+				];
 			}
 
-			return [
-				'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
-				'totalResults' => $total_users,
-				'startIndex' => max($this->request_data['startIndex'], 1),
-				'itemsPerPage' => min($total_users, max($total_users, 0)),
-				'Resources' => $resources
+			$data = [
+				'schemas' => [self::SCIM_GROUP_SCHEMA],
+				'id' => $this->response_data['id'],
+				'displayName' => $this->response_data['displayName'],
+				'members' => []
+			];
+
+			if ($this->response_data['users'] != []) {
+				$data['members'] = $this->wrapGroupUserData($this->response_data['users']);
+				unset($this->response_data['users']);
+			}
+
+			return $data;
+		}
+
+		$total_groups = count($this->response_data);
+		$data = [
+			'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+			'totalResults' => $total_groups,
+			'Resources' => []
+		];
+
+		if (array_key_exists('startIndex', $this->request_data)) {
+			$data['startIndex'] = max($this->request_data['startIndex'], 1);
+		}
+
+		if (array_key_exists('count', $this->request_data)) {
+			$data['itemsPerPage'] = min($total_groups, max($this->request_data['count'], 0));
+		}
+
+		foreach ($this->response_data as $groupid => $group_data) {
+			$data['Resources'][] = [
+				'id' => (string) $groupid,
+				'displayName' => $group_data['name'],
+				'members' => $this->wrapGroupUserData($group_data['users'])
 			];
 		}
+
+		return $data;
 	}
 
 	/**
@@ -160,5 +217,20 @@ class ScimHttpResponse {
 		unset($user_data['userid'], $user_data['username']);
 
 		return $data + $user_data;
+	}
+
+	private function wrapGroupUserData(array $users): array {
+		$members = [];
+
+		if ($users != []) {
+			foreach ($users as $user) {
+				$members[] = [
+					'value' => $user['userid'],
+					'display' => $user['username']
+				];
+			}
+		}
+
+		return $members;
 	}
 }

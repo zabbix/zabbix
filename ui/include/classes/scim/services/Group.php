@@ -31,16 +31,7 @@ use SCIM\ScimApiService;
 
 class Group extends ScimApiService {
 
-	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'put' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'post' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'patch' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
-	];
-
 	private const SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
-	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
 	private const SCIM_PATCH_SCEMA = 'urn:ietf:params:scim:api:messages:2.0:PatchOp';
 
 	protected array $data = [
@@ -70,7 +61,11 @@ class Group extends ScimApiService {
 
 			$users = $this->getUsersByGroupIds([$options['id']]);
 
-			$this->setData($options['id'], $db_scim_group[0]['name'], $users[$options['id']]);
+			return [
+				'id' => $options['id'],
+				'displayName' =>  $db_scim_group[0]['name'],
+				'users' => $users[$options['id']]
+			];
 		}
 		elseif (array_key_exists('displayName', $options)) {
 			$db_scim_group = DB::select('scim_group', [
@@ -79,46 +74,33 @@ class Group extends ScimApiService {
 			]);
 
 			if (!$db_scim_group) {
-				$this->data = [
-					'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
-					'Resources' => []
-				];
+				return [];
 			}
-			else {
-				$users = $this->getUsersByGroupIds([$db_scim_group[0]['scim_groupid']]);
 
-				$this->setData($db_scim_group[0]['scim_groupid'], $db_scim_group[0]['name'],
-					$users[$db_scim_group[0]['scim_groupid']]
-				);
-			}
+			$users = $this->getUsersByGroupIds([$db_scim_group[0]['scim_groupid']]);
+
+			return [
+				'id' => $db_scim_group[0]['scim_groupid'],
+				'displayName' => $db_scim_group[0]['name'],
+				'users' => $users
+			];
 		}
 		else {
 			$db_scim_groups = DB::select('scim_group', [
 				'output' => ['name'],
 				'preservekeys' => true
 			]);
-			$total_groups = count($db_scim_groups);
-
-			$this->data = [
-				'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
-				'totalResults' => $total_groups,
-				'startIndex' => max($options['startIndex'], 1),
-				'itemsPerPage' => min($total_groups, max($options['count'], 0)),
-				'Resources' => []
-			];
 
 			if ($db_scim_groups) {
 				$groups_users = $this->getUsersByGroupIds(array_keys($db_scim_groups));
 
-				foreach ($groups_users as $groupid => $group_users) {
-					$this->data['Resources'][] = $this->prepareData(
-						$groupid, $db_scim_groups[$groupid]['name'], $group_users
-					);
+				foreach ($groups_users as $groupid => $users) {
+					$db_scim_groups[$groupid]['users'] = $users;
 				}
 			}
-		}
 
-		return $this->data;
+			return $db_scim_groups;
+		}
 	}
 
 	/**
@@ -151,7 +133,6 @@ class Group extends ScimApiService {
 	 * @return array                                 Returns array with data necessary for SCIM response.
 	 */
 	public function post(array $options): array {
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 		$this->validatePost($options);
 
 		$db_scim_groups = DB::select('scim_group', [
@@ -170,12 +151,16 @@ class Group extends ScimApiService {
 			self::exception(self::SCIM_INTERNAL_ERROR, 'Cannot create group '.$options['displayName'].'.');
 		}
 
-		$users = [];
+		$group = [
+			'id' => $scim_groupid,
+			'displayName' =>  $options['displayName'],
+			'users' => []
+		];
 
-		if (array_key_exists('memebers', $options)) {
+		if (array_key_exists('members', $options) && $options['members'] != []) {
+			$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 			$scim_group_members = array_column($options['members'], 'value');
-
-			$users = $this->verifyUserids($scim_group_members, $userdirectoryid);
+			$group['users'] = $this->verifyUserids($scim_group_members, $userdirectoryid);
 
 			foreach ($scim_group_members as $memberid) {
 				$user_group = DB::insert('user_scim_group', [[
@@ -193,9 +178,7 @@ class Group extends ScimApiService {
 			}
 		}
 
-		$this->setData($scim_groupid, $options['displayName'], $users);
-
-		return $this->data;
+		return $group;
 	}
 
 	/**
@@ -234,8 +217,6 @@ class Group extends ScimApiService {
 	 * @return array                                 Returns array with data necessary for SCIM response.
 	 */
 	public function put(array $options): array {
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-
 		$this->validatePut($options);
 
 		$db_scim_groups = DB::select('scim_group', [
@@ -263,6 +244,7 @@ class Group extends ScimApiService {
 			$db_scim_group['name'] = $options['displayName'];
 		}
 
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 		$scim_group_members = array_column($options['members'], 'value');
 
 		$db_scim_group_members = DB::select('user_scim_group', [
@@ -307,9 +289,11 @@ class Group extends ScimApiService {
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
-		$this->setData($options['id'], $db_scim_group['name'], $db_users);
-
-		return $this->data;
+		return [
+			'id' => $options['id'],
+			'displayName' => $db_scim_group['name'],
+			'users' => $db_users
+		];
 	}
 
 	/**
@@ -454,9 +438,11 @@ class Group extends ScimApiService {
 			$this->updateProvisionedUserGroups($db_userid, $userdirectoryid);
 		}
 
-		$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
-
-		return $this->data;
+		return [
+			'id' => $options['id'],
+			'displayName' => $db_scim_groups[0]['name'],
+			'users' => $db_users
+		];
 	}
 
 	/**
@@ -507,8 +493,6 @@ class Group extends ScimApiService {
 	 * @return array                Returns schema parameter in the array if the deletion was successful.
 	 */
 	public function delete(array $options): array {
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-
 		$this->validateDelete($options);
 
 		$db_scim_group_members = DB::select('user_scim_group', [
@@ -519,10 +503,10 @@ class Group extends ScimApiService {
 		DB::delete('scim_group', ['scim_groupid' => $options['id']]);
 
 		foreach (array_column($db_scim_group_members, 'userid') as $userid) {
-			$this->updateProvisionedUserGroups($userid, $userdirectoryid);
+			$this->updateProvisionedUserGroups($userid, CAuthenticationHelper::getSamlUserdirectoryidForScim());
 		}
 
-		return $this->data;
+		return [$options['id']];
 	}
 
 	/**
@@ -538,56 +522,6 @@ class Group extends ScimApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
 		}
-	}
-
-	/**
-	 * Sets $this->data parameter to a necessary value.
-	 *
-	 * @param string $scim_groupid
-	 * @param string $scim_group_name
-	 * @param array  $users            Users that belong to this group.
-	 *
-	 * @return void
-	 */
-	private function setData(string $scim_groupid, string $scim_group_name, array $users = null): void {
-		$this->data += $this->prepareData($scim_groupid, $scim_group_name, $users);
-	}
-
-	/**
-	 * Prepares data array as required for SCIM response.
-	 *
-	 * @param string $scim_groupid
-	 * @param string $scim_group_name
-	 * @param array  $users                Users that belong to this group.
-	 * @param string $users[]['userid']
-	 * @param string $users[]['username']
-	 *
-	 * @return array
-	 *         ['id']
-	 *         ['displayName']
-	 *         ['members']
-	 *         ['members'][]['value']
-	 *         ['members'][]['display']
-	 */
-	private function prepareData(string $scim_groupid, string $scim_group_name, array $users = null): array {
-		$data = [
-			'id' => $scim_groupid,
-			'displayName' => $scim_group_name
-		];
-
-		if ($users !== null) {
-			$members = [];
-			foreach ($users as $user) {
-				$members[] = [
-					'value' => $user['userid'],
-					'display' => $user['username']
-				];
-			}
-
-			$data['members'] = $members;
-		}
-
-		return $data;
 	}
 
 	/**
