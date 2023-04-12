@@ -1256,7 +1256,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_server);
+	zbx_init_library_preproc(preproc_flush_value_server, get_zbx_config_source_ip);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1435,7 +1435,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip};
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
-			zbx_config_dbhigh};
+			zbx_config_dbhigh, zbx_config_source_ip};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 	zbx_thread_vmware_args                  vmware_args = {zbx_config_source_ip};

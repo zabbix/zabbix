@@ -455,8 +455,8 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
-			ret = zbx_es_execute_command(script->command, params, script->timeout, result, error,
-					max_error_len, debug);
+			ret = zbx_es_execute_command(script->command, params, script->timeout, config_source_ip,
+					result, error, max_error_len, debug);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)

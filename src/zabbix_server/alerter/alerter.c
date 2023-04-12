@@ -233,15 +233,17 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 	zbx_free(command);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: processes webhook alert                                           *
- *                                                                            *
- * Parameters: socket      - [IN] connection socket                           *
- *             ipc_message - [IN] ipc message with media type and alert data  *
- *                                                                            *
- ******************************************************************************/
-static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: processes webhook alert                                                *
+ *                                                                                 *
+ * Parameters: socket           - [IN] connection socket                           *
+ *             ipc_message      - [IN] ipc message with media type and alert data  *
+ *             config_source_ip - [IN]                                             *
+ *                                                                                 *
+ ***********************************************************************************/
+static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
+		const char *config_source_ip)
 {
 	char			*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
 	int			script_bin_sz, ret, timeout;
@@ -250,7 +252,7 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params, &debug);
 
 	if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
-		ret = zbx_es_init_env(&es_engine, &error);
+		ret = zbx_es_init_env(&es_engine, config_source_ip, &error);
 
 	if (SUCCEED == ret)
 	{
@@ -378,7 +380,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				alerter_process_exec(&alerter_socket, &message);
 				break;
 			case ZBX_IPC_ALERTER_WEBHOOK:
-				alerter_process_webhook(&alerter_socket, &message);
+				alerter_process_webhook(&alerter_socket, &message, alerter_args_in->config_source_ip);
 				break;
 		}
 

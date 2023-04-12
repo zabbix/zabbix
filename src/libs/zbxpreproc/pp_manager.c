@@ -49,6 +49,8 @@
 #endif
 
 static zbx_flush_value_func_t	flush_value_func_cb = NULL;
+static zbx_get_config_str_f get_config_source_ip_func_cb = NULL;
+
 
 /******************************************************************************
  *                                                                            *
@@ -98,9 +100,15 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb)
+void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_config_str_f get_config_source_ip_cb)
 {
 	flush_value_func_cb = flush_value_cb;
+	get_config_source_ip_func_cb = get_config_source_ip_cb;
+}
+
+const char	*preproc_get_config_source_ip(void)
+{
+	return get_config_source_ip_func_cb();
 }
 
 /******************************************************************************

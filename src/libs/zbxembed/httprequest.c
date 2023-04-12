@@ -184,7 +184,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 113: %s", env->config_source_ip);
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 113 9: %s", env->config_source_ip);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, env->config_source_ip, err);
 
 	duk_push_pointer(ctx, request);

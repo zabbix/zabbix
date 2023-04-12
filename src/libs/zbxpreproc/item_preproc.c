@@ -1139,7 +1139,7 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 
 	if (SUCCEED != zbx_es_is_env_initialized(es))
 	{
-		if (SUCCEED != zbx_es_init_env(es, errmsg))
+		if (SUCCEED != zbx_es_init_env(es, preproc_get_config_source_ip(), errmsg))
 			return FAIL;
 	}
 

@@ -1154,7 +1154,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_source_ip);
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_proxy);
+	zbx_init_library_preproc(preproc_flush_value_proxy, get_zbx_config_source_ip);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{

@@ -353,7 +353,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 #endif
 			break;
 		case ITEM_TYPE_SCRIPT:
-			res = get_value_script(item, result);
+			res = get_value_script(item, config_comms->config_source_ip, result);
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
