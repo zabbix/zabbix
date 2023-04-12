@@ -39,47 +39,47 @@ class CControllerHostEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'hostid'			=> 'db hosts.hostid',
-			'groupids'			=> 'array_db hosts_groups.groupid',
-			'clone'		=> 'in 1',
-			'host'				=> 'db hosts.host',
-			'visiblename'		=> 'db hosts.name',
-			'description'		=> 'db hosts.description',
-			'status'			=> 'db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
-										HOST_STATUS_NOT_MONITORED
-									]),
-			'proxy_hostid'		=> 'db hosts.proxy_hostid',
-			'interfaces'		=> 'array',
-			'mainInterfaces'	=> 'array',
-			'groups'			=> 'array',
-			'tags'				=> 'array',
-			'templates'			=> 'array_db hosts.hostid',
-			'add_templates'		=> 'array_db hosts.hostid',
-			'ipmi_authtype'		=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
-										IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
-										IPMI_AUTHTYPE_RMCP_PLUS
-									]),
-			'ipmi_privilege'	=> 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER,
-										IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM
-									]),
-			'ipmi_username'		=> 'db hosts.ipmi_username',
-			'ipmi_password'		=> 'db hosts.ipmi_password',
+			'hostid'				=> 'db hosts.hostid',
+			'groupids'				=> 'array_db hosts_groups.groupid',
+			'clone'					=> 'in 1',
+			'host'					=> 'db hosts.host',
+			'visiblename'			=> 'db hosts.name',
+			'description'			=> 'db hosts.description',
+			'status'				=> 'db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
+											HOST_STATUS_NOT_MONITORED
+										]),
+			'proxy_hostid'			=> 'db hosts.proxy_hostid',
+			'interfaces'			=> 'array',
+			'mainInterfaces'		=> 'array',
+			'groups'				=> 'array',
+			'tags'					=> 'array',
+			'templates'				=> 'array_db hosts.hostid',
+			'add_templates'			=> 'array_db hosts.hostid',
+			'ipmi_authtype'			=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
+											IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
+											IPMI_AUTHTYPE_RMCP_PLUS
+										]),
+			'ipmi_privilege'		=> 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER,
+											IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM
+										]),
+			'ipmi_username'			=> 'db hosts.ipmi_username',
+			'ipmi_password'			=> 'db hosts.ipmi_password',
 			'show_inherited_macros' => 'in 0,1',
-			'tls_connect'		=> 'db hosts.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK,
-										HOST_ENCRYPTION_CERTIFICATE
-									]),
-			'tls_accept'		=> 'db hosts.tls_accept|ge 0|le '.
+			'tls_connect'			=> 'db hosts.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE,
+											HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE
+										]),
+			'tls_accept'			=> 'db hosts.tls_accept|ge 0|le '.
 										(0 | HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
-			'tls_subject'		=> 'db hosts.tls_subject',
-			'tls_issuer'		=> 'db hosts.tls_issuer',
-			'tls_psk_identity'	=> 'db hosts.tls_psk_identity',
-			'tls_psk'			=> 'db hosts.tls_psk',
-			'inventory_mode'	=> 'db host_inventory.inventory_mode|in '.implode(',', [HOST_INVENTORY_DISABLED,
-										HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
-									]),
-			'host_inventory'	=> 'array',
-			'macros'			=> 'array',
-			'valuemaps'			=> 'array'
+			'tls_subject'			=> 'db hosts.tls_subject',
+			'tls_issuer'			=> 'db hosts.tls_issuer',
+			'tls_psk_identity'		=> 'db hosts.tls_psk_identity',
+			'tls_psk'				=> 'db hosts.tls_psk',
+			'inventory_mode'		=> 'db host_inventory.inventory_mode|in '.implode(',', [HOST_INVENTORY_DISABLED,
+											HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
+										]),
+			'host_inventory'		=> 'array',
+			'macros'				=> 'array',
+			'valuemaps'				=> 'array'
 		];
 
 		$ret = ($this->validateInput($fields) && $this->checkCloneSourceHostId());
