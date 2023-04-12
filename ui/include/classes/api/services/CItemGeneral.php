@@ -564,7 +564,7 @@ abstract class CItemGeneral extends CApiService {
 
 					$hosts = DB::select('hosts', [
 						'output' => ['hostid', 'host'],
-						'hostids' => [$templateid_first, $templateid_second],
+						'hostids' => [$templateid_first, $templateid_second, $same_host['hostid']],
 						'preservekeys' => true
 					]);
 
@@ -593,7 +593,8 @@ abstract class CItemGeneral extends CApiService {
 					}
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key,
-						$hosts[$templateid_first]['host'], $hosts[$templateid_second]['host'], $same_host['host']
+						$hosts[$templateid_first]['host'], $hosts[$templateid_second]['host'],
+						$hosts[$same_host['hostid']]['host']
 					));
 				}
 
