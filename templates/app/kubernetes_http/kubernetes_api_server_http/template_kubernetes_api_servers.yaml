@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-11T22:14:30Z'
+  date: '2023-04-12T04:37:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1561,27 +1561,30 @@ zabbix_export:
           value: software
         -
           tag: target
-          value: 'kubernetes api server'
+          value: api-server
+        -
+          tag: target
+          value: kubernetes
       macros:
         -
           macro: '{$KUBE.API.CERT.EXPIRATION}'
           value: '7'
-          description: 'Number of days for alert of client certificate used for trigger'
+          description: 'Number of days for alert of client certificate used for trigger.'
         -
           macro: '{$KUBE.API.HTTP.CLIENT.ERROR}'
           value: '2'
-          description: 'Maximum number of HTTP client requests failures used for trigger'
+          description: 'Maximum number of HTTP client requests failures used for trigger.'
         -
           macro: '{$KUBE.API.HTTP.SERVER.ERROR}'
           value: '2'
-          description: 'Maximum number of HTTP client requests failures used for trigger'
+          description: 'Maximum number of HTTP server requests failures used for trigger.'
         -
           macro: '{$KUBE.API.SERVER.URL}'
-          value: 'http://localhost:8086/metrics'
-          description: 'instance URL'
+          value: 'https://localhost:6443/metrics'
+          description: 'Kubernetes API server metrics endpoint URL.'
         -
           macro: '{$KUBE.API.TOKEN}'
-          description: 'API Authorization Token'
+          description: 'API Authorization Token.'
       dashboards:
         -
           uuid: 5dd45bdfb5ed45bd9e3b26f01806820f

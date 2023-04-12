@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-11T22:14:33Z'
+  date: '2023-04-12T04:37:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -881,7 +881,10 @@ zabbix_export:
           value: software
         -
           tag: target
-          value: 'kubernetes controller manager'
+          value: controller-manager
+        -
+          tag: target
+          value: kubernetes
       macros:
         -
           macro: '{$KUBE.API.TOKEN}'
@@ -889,11 +892,11 @@ zabbix_export:
         -
           macro: '{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}'
           value: '2'
-          description: 'Maximum number of HTTP client requests failures used for trigger'
+          description: 'Maximum number of HTTP client requests failures used for trigger.'
         -
           macro: '{$KUBE.CONTROLLER.SERVER.URL}'
-          value: 'http://localhost:10252/metrics'
-          description: 'Instance URL'
+          value: 'https://localhost:10257/metrics'
+          description: 'Kubernetes Controller manager metrics endpoint URL.'
       dashboards:
         -
           uuid: 9e088e468b7048698e737f5b4719ce33

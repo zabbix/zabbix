@@ -38,11 +38,11 @@ Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.TOKEN}|<p>Service account bearer token</p>||
-|{$KUBE.KUBELET.URL}|<p>Instance URL</p>|`https://localhost:10250`|
-|{$KUBE.KUBELET.METRIC.ENDPOINT}|<p>Kubelet /metrics endpoint</p>|`/metrics`|
-|{$KUBE.KUBELET.CADVISOR.ENDPOINT}|<p>cAdvisor metrics from Kubelet /metrics/cadvisor endpoint</p>|`/metrics/cadvisor`|
-|{$KUBE.KUBELET.PODS.ENDPOINT}|<p>Kubelet /pods endpoint</p>|`/pods`|
+|{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
+|{$KUBE.KUBELET.URL}|<p>Kubernetes Kubelet instance URL.</p>|`https://localhost:10250`|
+|{$KUBE.KUBELET.METRIC.ENDPOINT}|<p>Kubelet /metrics endpoint.</p>|`/metrics`|
+|{$KUBE.KUBELET.CADVISOR.ENDPOINT}|<p>cAdvisor metrics from Kubelet /metrics/cadvisor endpoint.</p>|`/metrics/cadvisor`|
+|{$KUBE.KUBELET.PODS.ENDPOINT}|<p>Kubelet /pods endpoint.</p>|`/pods`|
 
 ### Items
 

@@ -42,9 +42,16 @@ Get the generated service account token using the command
 Then set it to the macro `{$KUBE.API.TOKEN}`.  
 Set `{$KUBE.STATE.ENDPOINT.NAME}` with Kube state metrics endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-kube-state-metrics`.
 
-Also, see the Macros section for a list of macros used to set trigger values.
+*NOTE.* If you wish to monitor Controller Manager and Scheduler components, you might need to set the `--binding-address` option for them to the address where Zabbix proxy can reach them.
+For example, for clusters created with `kubeadm` it can be set in the following manifest files (changes will be applied immediately):
+
+- /etc/kubernetes/manifests/kube-controller-manager.yaml
+- /etc/kubernetes/manifests/kube-scheduler.yaml
+
 
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
+
+Also, see the Macros section for a list of macros used to set trigger values.
 
 Set up the macros to filter the metrics of discovered worker nodes:
 
@@ -75,12 +82,12 @@ Set up macros to filter node metrics by nodename:
 |{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name.</p>|`zabbix-kube-state-metrics`|
 |{$KUBE.API_SERVER.SCHEME}|<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.API_SERVER.PORT}|<p>Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.</p>|`6443`|
-|{$KUBE.CONTROLLER_MANAGER.SCHEME}|<p>Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.</p>|`http`|
-|{$KUBE.CONTROLLER_MANAGER.PORT}|<p>Kubernetes Controller manager metrics endpoint port. Used in ControlPlane LLD.</p>|`10252`|
-|{$KUBE.SCHEDULER.SCHEME}|<p>Kubernetes Scheduler manager metrics endpoint scheme. Used in ControlPlane LLD.</p>|`http`|
-|{$KUBE.SCHEDULER.PORT}|<p>Kubernetes Scheduler manager metrics endpoint port. Used in ControlPlane LLD.</p>|`10251`|
-|{$KUBE.KUBELET.SCHEME}|<p>Kubernetes Kubelet manager metrics endpoint scheme. Used in Kubelet LLD.</p>|`https`|
-|{$KUBE.KUBELET.PORT}|<p>Kubernetes Kubelet manager metrics endpoint port. Used in Kubelet LLD.</p>|`10250`|
+|{$KUBE.CONTROLLER_MANAGER.SCHEME}|<p>Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
+|{$KUBE.CONTROLLER_MANAGER.PORT}|<p>Kubernetes Controller manager metrics endpoint port. Used in ControlPlane LLD.</p>|`10257`|
+|{$KUBE.SCHEDULER.SCHEME}|<p>Kubernetes Scheduler metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
+|{$KUBE.SCHEDULER.PORT}|<p>Kubernetes Scheduler metrics endpoint port. Used in ControlPlane LLD.</p>|`10259`|
+|{$KUBE.KUBELET.SCHEME}|<p>Kubernetes Kubelet metrics endpoint scheme. Used in Kubelet LLD.</p>|`https`|
+|{$KUBE.KUBELET.PORT}|<p>Kubernetes Kubelet metrics endpoint port. Used in Kubelet LLD.</p>|`10250`|
 |{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}|<p>Filter of discoverable metrics by namespace.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered metrics by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$KUBE.LLD.FILTER.NODE.MATCHES}|<p>Filter of discoverable nodes by nodename.</p>|`.*`|

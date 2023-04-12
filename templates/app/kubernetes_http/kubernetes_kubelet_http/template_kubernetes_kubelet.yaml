@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-11T22:14:35Z'
+  date: '2023-04-12T04:37:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -945,27 +945,30 @@ zabbix_export:
           value: software
         -
           tag: target
-          value: 'kubernetes kubelet'
+          value: kubelet
+        -
+          tag: target
+          value: kubernetes
       macros:
         -
           macro: '{$KUBE.API.TOKEN}'
-          description: 'Service account bearer token'
+          description: 'Service account bearer token.'
         -
           macro: '{$KUBE.KUBELET.CADVISOR.ENDPOINT}'
           value: /metrics/cadvisor
-          description: 'cAdvisor metrics from Kubelet /metrics/cadvisor endpoint'
+          description: 'cAdvisor metrics from Kubelet /metrics/cadvisor endpoint.'
         -
           macro: '{$KUBE.KUBELET.METRIC.ENDPOINT}'
           value: /metrics
-          description: 'Kubelet /metrics endpoint'
+          description: 'Kubelet /metrics endpoint.'
         -
           macro: '{$KUBE.KUBELET.PODS.ENDPOINT}'
           value: /pods
-          description: 'Kubelet /pods endpoint'
+          description: 'Kubelet /pods endpoint.'
         -
           macro: '{$KUBE.KUBELET.URL}'
           value: 'https://localhost:10250'
-          description: 'Instance URL'
+          description: 'Kubernetes Kubelet instance URL.'
       dashboards:
         -
           uuid: ecaddf40146948668ec7c75505fd8af8

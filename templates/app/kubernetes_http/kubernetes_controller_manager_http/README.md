@@ -29,15 +29,20 @@ Template needs to use Authorization via API token.
 Don't forget change macros {$KUBE.CONTROLLER.SERVER.URL}, {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 
+*NOTE.* You might need to set the `--binding-address` option for Controller Manager to the address where Zabbix proxy can reach it.
+For example, for clusters created with `kubeadm` it can be set in the following manifest file (changes will be applied immediately):
+
+- /etc/kubernetes/manifests/kube-controller-manager.yaml
+
 *NOTE.* Some metrics may not be collected depending on your Kubernetes Controller manager instance version and configuration.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.CONTROLLER.SERVER.URL}|<p>Instance URL</p>|`http://localhost:10252/metrics`|
+|{$KUBE.CONTROLLER.SERVER.URL}|<p>Kubernetes Controller manager metrics endpoint URL.</p>|`https://localhost:10257/metrics`|
 |{$KUBE.API.TOKEN}|<p>API Authorization Token</p>||
-|{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger</p>|`2`|
+|{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger.</p>|`2`|
 
 ### Items
 
