@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-11T14:07:19Z'
+  date: '2023-04-12T06:10:59Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -128,13 +128,17 @@ zabbix_export:
                             limits: { cpu: 0, memory: 0 },
                             requests: { cpu: 0, memory: 0 },
                             restartCount: 0
-                        }
+                        },
+                            containerStatuses = [{ restartCount: 0 }];
+            
+                        if (typeof pod.status.hostIP === 'object'
+                            || typeof pod.status.hostIP === 'undefined') {
+                            pod.status.hostIP = 'none';
+                        };
             
                         pod.spec.containers.forEach(function (container) {
                             var limits = container.resources.limits,
                                 requests = container.resources.requests;
-            
-                            nodePodsCount++;
             
                             if (typeof limits !== 'undefined') {
                                 containers.limits.cpu += Fmt.cpuFormat(limits.cpu);
@@ -147,8 +151,13 @@ zabbix_export:
                             }
                         });
             
+                        if (typeof pod.status.containerStatuses !== 'object'
+                            || typeof pod.status.containerStatuses === 'undefined') {
+                            pod.status.containerStatuses = containerStatuses;
+                        };
                         pod.status.containerStatuses.forEach(function (container) {
                             containers.restartCount += container.restartCount;
+                            
                         });
             
                         Pods.push({
@@ -160,7 +169,8 @@ zabbix_export:
                             "phase": pod.status.phase,
                             "conditions": pod.status.conditions,
                             "startTime": pod.status.startTime,
-                            "containers": containers
+                            "containers": containers,
+                            "hostname": 'none'
                         })
                     });
                     return Pods;
@@ -236,7 +246,6 @@ zabbix_export:
                 var nodes = Kube.getNodes(),
                     pods = Kube.getPods(),
                     endpointIPs = Kube.getEndpointIPs();
-            
                 for (idx in nodes) {
                     var nodePodsCount = 0,
                         endpointpod = [],
