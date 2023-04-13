@@ -85,7 +85,7 @@ foreach ($data['groups'] as $group) {
 		$n++;
 
 		if ($n > $data['config']['max_in_table']) {
-			$hosts_output[] = ' &hellip;';
+			$hosts_output[] = [' ', HELLIP()];
 
 			break;
 		}

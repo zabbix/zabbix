@@ -138,6 +138,10 @@ function BR() {
 	return new CTag('br');
 }
 
+function HELLIP() {
+	return new CHtmlEntity('&hellip;');
+}
+
 function NBSP() {
 	return new CHtmlEntity('&nbsp;');
 }

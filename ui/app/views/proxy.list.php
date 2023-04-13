@@ -117,7 +117,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 
 	foreach ($proxy['hosts'] as $host_index => $host) {
 		if ($host_index >= $data['config']['max_in_table']) {
-			$hosts[] = ' &hellip;';
+			$hosts[] = [' ', HELLIP()];
 
 			break;
 		}
