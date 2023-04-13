@@ -113,6 +113,7 @@ class CPage {
 		}
 
 		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
+		$this->driver->setCommandExecutor(new CommandExecutor($this->driver->getCommandExecutor()));
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
