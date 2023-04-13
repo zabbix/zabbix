@@ -333,36 +333,66 @@ class CTemplateDashboard extends CDashboardGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkAndAddUuid($dashboards);
+		self::addUuid($dashboards);
+
+		self::checkUuidDuplicates($dashboards);
 		$this->checkDuplicates($dashboards);
 		$this->checkWidgets($dashboards);
 		$this->checkWidgetFields($dashboards);
 	}
 
 	/**
-	 * Check that no duplicate UUID is being added. Add UUID to all template dashboards, if it doesn't exist.
+	 * Add the UUID to those of the given template dashboards that don't have the 'uuid' parameter set.
 	 *
-	 * @param array $dashboards_to_create
-	 *
-	 * @throws APIException
+	 * @param array $dashboards
 	 */
-	protected function checkAndAddUuid(array &$dashboards_to_create): void {
-		foreach ($dashboards_to_create as &$dashboard) {
+	private static function addUuid(array &$dashboards): void {
+		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('uuid', $dashboard)) {
 				$dashboard['uuid'] = generateUuidV4();
 			}
 		}
 		unset($dashboard);
+	}
 
-		$db_uuid = DB::select('dashboard', [
+	/**
+	 * Verify template dashboard UUIDs are not repeated.
+	 *
+	 * @param array      $dashboards
+	 * @param array|null $db_dashboards
+	 *
+	 * @throws APIException
+	 */
+	private static function checkUuidDuplicates(array $dashboards, array $db_dashboards = null): void {
+		$dashboard_indexes = [];
+
+		foreach ($dashboards as $i => $dashboard) {
+			if (!array_key_exists('uuid', $dashboard)) {
+				continue;
+			}
+
+			if ($db_dashboards === null || $dashboard['uuid'] !== $db_dashboards[$dashboard['dashboardid']]['uuid']) {
+				$dashboard_indexes[$dashboard['uuid']] = $i;
+			}
+		}
+
+		if (!$dashboard_indexes) {
+			return;
+		}
+
+		$duplicates = DB::select('dashboard', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($dashboards_to_create, 'uuid')],
+			'filter' => [
+				'uuid' => array_keys($dashboard_indexes)
+			],
 			'limit' => 1
 		]);
 
-		if ($db_uuid) {
+		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				_s('Invalid parameter "%1$s": %2$s.', '/'.($dashboard_indexes[$duplicates[0]['uuid']] + 1),
+					_('template dashboard with the same UUID already exists')
+				)
 			);
 		}
 	}
@@ -374,7 +404,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['dashboardid']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],
@@ -411,7 +441,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		}
 
 		$db_dashboards = $this->get([
-			'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
+			'output' => ['uuid', 'dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
 			'dashboardids' => array_column($dashboards, 'dashboardid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -439,6 +469,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		// Check ownership of the referenced pages and widgets.
 		$this->checkReferences($dashboards, $db_dashboards);
 
+		self::checkUuidDuplicates($dashboards, $db_dashboards);
 		$this->checkDuplicates($dashboards, $db_dashboards);
 		$this->checkWidgets($dashboards, $db_dashboards);
 		$this->checkWidgetFields($dashboards, $db_dashboards);

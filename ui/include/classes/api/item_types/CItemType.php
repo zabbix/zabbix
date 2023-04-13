@@ -203,27 +203,10 @@ abstract class CItemType {
 
 		switch ($field_name) {
 			case 'interfaceid':
-				switch (static::TYPE) {
-					case ITEM_TYPE_SIMPLE:
-					case ITEM_TYPE_EXTERNAL:
-					case ITEM_TYPE_SSH:
-					case ITEM_TYPE_TELNET:
-					case ITEM_TYPE_HTTPAGENT:
-						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-							}, 'type' => API_ID],
-							['else' => true, 'type' => API_ID, 'in' => '0']
-						]];
-
-					default:
-						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-							}, 'type' => API_ID],
-							['else' => true, 'type' => API_ID, 'in' => '0']
-						]];
-				}
+				return ['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+					['else' => true, 'type' => API_ID, 'in' => '0']
+				]];
 
 			case 'authtype':
 				switch (static::TYPE) {
@@ -314,9 +297,7 @@ abstract class CItemType {
 		switch ($field_name) {
 			case 'interfaceid':
 				return ['type' => API_MULTIPLE, 'rules' => [
-					['if' => static function () use ($db_item): bool {
-						return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-					}, 'type' => API_ID],
+					['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
 					['else' => true, 'type' => API_ID, 'in' => '0']
 				]];
 
