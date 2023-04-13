@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-15T08:03:37Z'
+  date: '2023-03-01T07:47:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -696,13 +696,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].fs.total.available_in_bytes.first()'
+                    - $..fs.total.available_in_bytes.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -723,17 +723,41 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].fs.total.total_in_bytes.first()'
+                    - $..fs.total.total_in_bytes.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
                   value: storage
+                -
+                  tag: node
+                  value: '{#ES.NODE}'
+            -
+              uuid: 979eddbb814f44ef9ce34d19cc79ecd0
+              name: 'ES {#ES.NODE}: Get data'
+              type: DEPENDENT
+              key: 'es.node.get.data[{#ES.NODE}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Returns cluster nodes statistics.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$..[?(@.name==''{#ES.NODE}'')].first()'
+              master_item:
+                key: es.nodes.get_stats
+              tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: node
                   value: '{#ES.NODE}'
@@ -749,13 +773,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].http.current_open.first()'
+                    - $..http.current_open.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -777,13 +801,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].http.total_opened.first()'
+                    - $..http.total_opened.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -834,13 +858,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.flush.total.first()'
+                    - $..indices.flush.total.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -861,13 +885,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.flush.total_time_in_millis.first()'
+                    - $..indices.flush.total_time_in_millis.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -887,13 +911,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_current.first()'
+                    - $..indices.indexing.index_current.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -945,13 +969,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_time_in_millis.first()'
+                    - $..indices.indexing.index_time_in_millis.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -971,13 +995,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.index_total.first()'
+                    - $..indices.indexing.index_total.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -999,7 +1023,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.indexing.throttle_time_in_millis.first()'
+                    - $..indices.indexing.throttle_time_in_millis.first()
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1009,7 +1033,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1031,7 +1055,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.merges.total_throttled_time_in_millis.first()'
+                    - $..indices.merges.total_throttled_time_in_millis.first()
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1041,7 +1065,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1063,7 +1087,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.recovery.throttle_time_in_millis.first()'
+                    - $..indices.recovery.throttle_time_in_millis.first()
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1073,7 +1097,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1095,13 +1119,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.refresh.total.first()'
+                    - $..indices.refresh.total.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1123,7 +1147,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.refresh.total_time_in_millis.first()'
+                    - $..indices.refresh.total_time_in_millis.first()
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1133,7 +1157,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1155,13 +1179,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_total.first()'
+                    - $..indices.search.fetch_total.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1181,9 +1205,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_current.first()'
+                    - $..indices.search.fetch_current.first()
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1237,7 +1261,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_time_in_millis.first()'
+                    - $..indices.search.fetch_time_in_millis.first()
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1247,7 +1271,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1268,13 +1292,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_time_in_millis.first()'
+                    - $..indices.search.fetch_time_in_millis.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1294,13 +1318,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.fetch_total.first()'
+                    - $..indices.search.fetch_total.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1322,13 +1346,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_total.first()'
+                    - $..indices.search.query_total.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1348,9 +1372,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_current.first()'
+                    - $..indices.search.query_current.first()
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1403,7 +1427,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_time_in_millis.first()'
+                    - $..indices.search.query_time_in_millis.first()
                 -
                   type: MULTIPLIER
                   parameters:
@@ -1413,7 +1437,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1434,13 +1458,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_time_in_millis.first()'
+                    - $..indices.search.query_time_in_millis.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1460,13 +1484,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].indices.search.query_total.first()'
+                    - $..indices.search.query_total.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1487,13 +1511,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_committed_in_bytes.first()'
+                    - $..jvm.mem.heap_committed_in_bytes.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1514,13 +1538,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_max_in_bytes.first()'
+                    - $..jvm.mem.heap_max_in_bytes.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1541,13 +1565,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_used_in_bytes.first()'
+                    - $..jvm.mem.heap_used_in_bytes.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1569,13 +1593,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.mem.heap_used_percent.first()'
+                    - $..jvm.mem.heap_used_percent.first()
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1630,13 +1654,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].jvm.uptime_in_millis.first()'
+                    - $..jvm.uptime_in_millis.first()
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.001'
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1669,9 +1693,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.active.first()'
+                    - $..thread_pool.refresh.active.first()
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1693,13 +1717,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.completed.first()'
+                    - $..thread_pool.refresh.completed.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1719,9 +1743,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.queue.first()'
+                    - $..thread_pool.refresh.queue.first()
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1743,13 +1767,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.refresh.rejected.first()'
+                    - $..thread_pool.refresh.rejected.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1781,9 +1805,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.active.first()'
+                    - $..thread_pool.search.active.first()
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1805,13 +1829,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.completed.first()'
+                    - $..thread_pool.search.completed.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1831,9 +1855,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.queue.first()'
+                    - $..thread_pool.search.queue.first()
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1855,13 +1879,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.search.rejected.first()'
+                    - $..thread_pool.search.rejected.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1893,9 +1917,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.active.first()'
+                    - $..thread_pool.write.active.first()
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1917,13 +1941,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.completed.first()'
+                    - $..thread_pool.write.completed.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1943,9 +1967,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.queue.first()'
+                    - $..thread_pool.write.queue.first()
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
@@ -1967,13 +1991,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[?(@.name==''{#ES.NODE}'')].thread_pool.write.rejected.first()'
+                    - $..thread_pool.write.rejected.first()
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: es.nodes.get_stats
+                key: 'es.node.get.data[{#ES.NODE}]'
               tags:
                 -
                   tag: component
