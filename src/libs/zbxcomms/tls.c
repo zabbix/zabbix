@@ -3607,14 +3607,14 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		if (SSL_ERROR_WANT_READ != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
 			break;
 
-		if (FAIL == (res = tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err)))
+		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
 					strerror_from_system(zbx_socket_last_error()));
 			goto out;
 		}
 
-		if (0 == res && SUCCEED != zbx_socket_check_deadline(s))
+		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
 			*error = zbx_strdup(*error, "SSL_accept() timed out");
 			goto out;
