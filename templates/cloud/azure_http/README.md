@@ -84,8 +84,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure by HTTP/Azure: Get errors))>0`|Average||
-|Azure: There are errors in storages requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure by HTTP/Azure: Get storage accounts errors))>0`|Average|**Depends on**:<br><ul><li>Azure: There are errors in requests to API</li></ul>|
+|Azure: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure by HTTP/azure.get.errors))>0`|Average||
+|Azure: There are errors in storages requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure by HTTP/azure.get.storage.acc.errors))>0`|Average|**Depends on**:<br><ul><li>Azure: There are errors in requests to API</li></ul>|
 
 ### LLD rule Storage accounts discovery
 
@@ -286,11 +286,11 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Virtual Machine by HTTP/Azure: Get errors))>0`|Average||
-|Azure: Virtual machine is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Virtual Machine by HTTP/Azure: Availability state)=2`|High||
-|Azure: Virtual machine is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Virtual Machine by HTTP/Azure: Availability state)=1`|Average||
-|Azure: Virtual machine is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Virtual Machine by HTTP/Azure: Availability state)=3`|Warning||
-|Azure: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Virtual Machine by HTTP/Azure: Percentage CPU,5m)>{$AZURE.VM.CPU.UTIL.CRIT}`|High||
+|Azure: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Virtual Machine by HTTP/azure.vm.data.errors))>0`|Average||
+|Azure: Virtual machine is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=2`|High||
+|Azure: Virtual machine is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=1`|Average||
+|Azure: Virtual machine is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=3`|Warning||
+|Azure: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Virtual Machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}`|High||
 
 # Azure MySQL Flexible Server by HTTP
 
@@ -367,14 +367,14 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure MySQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure MySQL Flexible Server by HTTP/Azure MySQL: Get errors))>0`|Average||
-|Azure MySQL: MySQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure MySQL Flexible Server by HTTP/Azure MySQL: Availability state)=2`|High||
-|Azure MySQL: MySQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure MySQL Flexible Server by HTTP/Azure MySQL: Availability state)=1`|Average||
-|Azure MySQL: MySQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure MySQL Flexible Server by HTTP/Azure MySQL: Availability state)=3`|Warning||
-|Azure MySQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure MySQL Flexible Server by HTTP/Azure MySQL: Percentage CPU,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
-|Azure MySQL: Server has aborted connections|<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED.CONN.MAX.WARN}`.</p>|`min(/Azure MySQL Flexible Server by HTTP/Azure MySQL: Connections aborted,5m)>{$AZURE.DB.ABORTED.CONN.MAX.WARN}`|Average||
-|Azure MySQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure MySQL Flexible Server by HTTP/Azure MySQL: Storage percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
-|Azure MySQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure MySQL Flexible Server by HTTP/Azure MySQL: Storage percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
+|Azure MySQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.data.errors))>0`|Average||
+|Azure MySQL: MySQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=2`|High||
+|Azure MySQL: MySQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=1`|Average||
+|Azure MySQL: MySQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=3`|Warning||
+|Azure MySQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
+|Azure MySQL: Server has aborted connections|<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED.CONN.MAX.WARN}`.</p>|`min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED.CONN.MAX.WARN}`|Average||
+|Azure MySQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
+|Azure MySQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
 
 # Azure MySQL Single Server by HTTP
 
@@ -451,15 +451,15 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure MySQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure MySQL Single Server by HTTP/Azure MySQL: Get errors))>0`|Average||
-|Azure MySQL: MySQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure MySQL Single Server by HTTP/Azure MySQL: Availability state)=2`|High||
-|Azure MySQL: MySQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure MySQL Single Server by HTTP/Azure MySQL: Availability state)=1`|Average||
-|Azure MySQL: MySQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure MySQL Single Server by HTTP/Azure MySQL: Availability state)=3`|Warning||
-|Azure MySQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure MySQL Single Server by HTTP/Azure MySQL: Percentage CPU,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
-|Azure MySQL: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure MySQL Single Server by HTTP/Azure MySQL: Memory utilization,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
-|Azure MySQL: Server has failed connections|<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED.CONN.MAX.WARN}`.</p>|`min(/Azure MySQL Single Server by HTTP/Azure MySQL: Connections failed,5m)>{$AZURE.DB.FAILED.CONN.MAX.WARN}`|Average||
-|Azure MySQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure MySQL Single Server by HTTP/Azure MySQL: Storage percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
-|Azure MySQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure MySQL Single Server by HTTP/Azure MySQL: Storage percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
+|Azure MySQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure MySQL Single Server by HTTP/azure.db.mysql.data.errors))>0`|Average||
+|Azure MySQL: MySQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=2`|High||
+|Azure MySQL: MySQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=1`|Average||
+|Azure MySQL: MySQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=3`|Warning||
+|Azure MySQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure MySQL Single Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
+|Azure MySQL: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure MySQL Single Server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
+|Azure MySQL: Server has failed connections|<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED.CONN.MAX.WARN}`.</p>|`min(/Azure MySQL Single Server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED.CONN.MAX.WARN}`|Average||
+|Azure MySQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
+|Azure MySQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
 
 # Azure PostgreSQL Flexible Server by HTTP
 
@@ -541,14 +541,14 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure PostgreSQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure PostgreSQL Flexible Server by HTTP/Azure PostgreSQL: Get errors))>0`|Average||
-|Azure PostgreSQL: PostgreSQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/Azure PostgreSQL: Availability state)=2`|High||
-|Azure PostgreSQL: PostgreSQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/Azure PostgreSQL: Availability state)=1`|Average||
-|Azure PostgreSQL: PostgreSQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/Azure PostgreSQL: Availability state)=3`|Warning||
-|Azure PostgreSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure PostgreSQL Flexible Server by HTTP/Azure PostgreSQL: Percentage CPU,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
-|Azure PostgreSQL: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure PostgreSQL Flexible Server by HTTP/Azure PostgreSQL: Memory utilization,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
-|Azure PostgreSQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/Azure PostgreSQL: Storage percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
-|Azure PostgreSQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/Azure PostgreSQL: Storage percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
+|Azure PostgreSQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.data.errors))>0`|Average||
+|Azure PostgreSQL: PostgreSQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=2`|High||
+|Azure PostgreSQL: PostgreSQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=1`|Average||
+|Azure PostgreSQL: PostgreSQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=3`|Warning||
+|Azure PostgreSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
+|Azure PostgreSQL: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
+|Azure PostgreSQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
+|Azure PostgreSQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
 
 # Azure PostgreSQL Single Server by HTTP
 
@@ -625,14 +625,14 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure PostgreSQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure PostgreSQL Single Server by HTTP/Azure PostgreSQL: Get errors))>0`|Average||
-|Azure PostgreSQL: PostgreSQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure PostgreSQL Single Server by HTTP/Azure PostgreSQL: Availability state)=2`|High||
-|Azure PostgreSQL: PostgreSQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure PostgreSQL Single Server by HTTP/Azure PostgreSQL: Availability state)=1`|Average||
-|Azure PostgreSQL: PostgreSQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure PostgreSQL Single Server by HTTP/Azure PostgreSQL: Availability state)=3`|Warning||
-|Azure PostgreSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure PostgreSQL Single Server by HTTP/Azure PostgreSQL: Percentage CPU,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
-|Azure PostgreSQL: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure PostgreSQL Single Server by HTTP/Azure PostgreSQL: Memory utilization,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
-|Azure PostgreSQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure PostgreSQL Single Server by HTTP/Azure PostgreSQL: Storage percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
-|Azure PostgreSQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure PostgreSQL Single Server by HTTP/Azure PostgreSQL: Storage percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
+|Azure PostgreSQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.data.errors))>0`|Average||
+|Azure PostgreSQL: PostgreSQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=2`|High||
+|Azure PostgreSQL: PostgreSQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=1`|Average||
+|Azure PostgreSQL: PostgreSQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=3`|Warning||
+|Azure PostgreSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
+|Azure PostgreSQL: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
+|Azure PostgreSQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
+|Azure PostgreSQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
 
 # Azure Microsoft SQL Serverless Database by HTTP
 
@@ -716,13 +716,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure Microsoft SQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL Serverless Database by HTTP/Azure Microsoft SQL: Get errors))>0`|Average||
-|Azure Microsoft SQL: Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/Azure Microsoft SQL: Availability state)=2`|High||
-|Azure Microsoft SQL: Microsoft SQL database is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/Azure Microsoft SQL: Availability state)=1`|Average||
-|Azure Microsoft SQL: Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/Azure Microsoft SQL: Availability state)=3`|Warning||
-|Azure Microsoft SQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL Serverless Database by HTTP/Azure Microsoft SQL: Percentage CPU,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
-|Azure Microsoft SQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/Azure Microsoft SQL: Data space used percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
-|Azure Microsoft SQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/Azure Microsoft SQL: Data space used percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
+|Azure Microsoft SQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.data.errors))>0`|Average||
+|Azure Microsoft SQL: Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=2`|High||
+|Azure Microsoft SQL: Microsoft SQL database is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
+|Azure Microsoft SQL: Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=3`|Warning||
+|Azure Microsoft SQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
+|Azure Microsoft SQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
+|Azure Microsoft SQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
 
 # Azure Microsoft SQL Database by HTTP
 
@@ -807,13 +807,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure Microsoft SQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL Database by HTTP/Azure Microsoft SQL: Get errors))>0`|Average||
-|Azure Microsoft SQL: Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL Database by HTTP/Azure Microsoft SQL: Availability state)=2`|High||
-|Azure Microsoft SQL: Microsoft SQL database is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Microsoft SQL Database by HTTP/Azure Microsoft SQL: Availability state)=1`|Average||
-|Azure Microsoft SQL: Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL Database by HTTP/Azure Microsoft SQL: Availability state)=3`|Warning||
-|Azure Microsoft SQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL Database by HTTP/Azure Microsoft SQL: Percentage CPU,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
-|Azure Microsoft SQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL Database by HTTP/Azure Microsoft SQL: Data space used percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
-|Azure Microsoft SQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL Database by HTTP/Azure Microsoft SQL: Data space used percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
+|Azure Microsoft SQL: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.data.errors))>0`|Average||
+|Azure Microsoft SQL: Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=2`|High||
+|Azure Microsoft SQL: Microsoft SQL database is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
+|Azure Microsoft SQL: Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=3`|Warning||
+|Azure Microsoft SQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
+|Azure Microsoft SQL: Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
+|Azure Microsoft SQL: Storage space is low|<p>High utilization of the storage space.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}`|Warning||
 
 # Azure Cosmos DB for MongoDB by HTTP
 
@@ -828,7 +828,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- TODO
+- Microsoft Azure Cosmos DB
 
 ## Configuration
 
@@ -887,8 +887,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure MongoDB: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cosmos DB for MongoDB by HTTP/Azure MongoDB: Get errors))>0`|Average||
-|Azure MongoDB: Cosmos DB for MongoDB account: Availability is low||`(min(/Azure Cosmos DB for MongoDB by HTTP/Azure MongoDB: Service availability,#3))<{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}`|Warning||
+|Azure MongoDB: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.data.errors))>0`|Average||
+|Azure MongoDB: Cosmos DB for MongoDB account: Availability is low||`(min(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.service.availability,#3))<{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}`|Warning||
 
 ## Feedback
 
