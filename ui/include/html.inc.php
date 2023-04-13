@@ -142,6 +142,10 @@ function NBSP() {
 	return new CHtmlEntity('&nbsp;');
 }
 
+function RARR() {
+	return new CHtmlEntity('&rArr;');
+}
+
 function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favourite':

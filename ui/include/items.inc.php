@@ -974,7 +974,7 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
 			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $name, [NBSP(), '&rArr;', NBSP()]);
+		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);
 
 		$itemid = $parent_templates['links'][$itemid]['itemid'];
 	}

@@ -125,7 +125,7 @@ $form_list
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -221,7 +221,7 @@ $form_list
 					(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited'], 2000))
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
