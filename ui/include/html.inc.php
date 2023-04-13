@@ -138,6 +138,10 @@ function BR() {
 	return new CTag('br');
 }
 
+function BULLET() {
+	return new CHtmlEntity('&bullet;');
+}
+
 function HELLIP() {
 	return new CHtmlEntity('&hellip;');
 }
