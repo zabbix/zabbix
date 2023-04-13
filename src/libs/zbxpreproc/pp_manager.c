@@ -1145,7 +1145,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-zabbix_log(LOG_LEVEL_INFORMATION, "VW, args in: %s", pp_manager_args_in->config_source_ip);
+
 	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
 			(void *)&service, pp_manager_args_in->config_source_ip, &error)))
 	{

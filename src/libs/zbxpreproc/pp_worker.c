@@ -184,12 +184,13 @@ static void	*pp_worker_entry(void *arg)
  *                                                                            *
  * Purpose: initialize and start preprocessing worker                         *
  *                                                                            *
- * Parameters: worker     - [IN] preprocessing worker                         *
- *             id         - [IN] worker id (index)                            *
- *             queue      - [IN] task queue                                   *
- *             timekeeper - [IN] timekeeper object for busy/idle worker       *
+ * Parameters: worker           - [IN] preprocessing worker                   *
+ *             id               - [IN] worker id (index)                      *
+ *             queue            - [IN] task queue                             *
+ *             timekeeper       - [IN] timekeeper object for busy/idle worker *
  *                               state reporting                              *
- *             error      - [OUT]                                             *
+ *             config_source_ip - [IN]                                        *
+ *             error            - [OUT]                                       *
  *                                                                            *
  * Return value: SUCCEED - the worker was initialized and started             *
  *               FAIL    - otherwise                                          *
