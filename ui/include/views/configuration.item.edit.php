@@ -750,7 +750,7 @@ foreach ($valuemaps as $valuemap) {
 }
 
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$valuemap_select = [$valuemap_select, '&nbsp;',
+	$valuemap_select = [$valuemap_select, NBSP(),
 		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'valuemap.list')
 			->getUrl()

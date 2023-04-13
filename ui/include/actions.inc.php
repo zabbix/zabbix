@@ -568,7 +568,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 							order_result($user_names_list);
 
 							$result[$i][$j][] = bold(_('Send message to users').': ');
-							$result[$i][$j][] = [implode(', ', $user_names_list), SPACE, _('via'), SPACE,
+							$result[$i][$j][] = [implode(', ', $user_names_list), NBSP(), _('via'), NBSP(),
 								$media_type
 							];
 							$result[$i][$j][] = BR();
@@ -586,7 +586,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 							order_result($user_groups_list);
 
 							$result[$i][$j][] = bold(_('Send message to user groups').': ');
-							$result[$i][$j][] = [implode(', ', $user_groups_list), SPACE, _('via'), SPACE,
+							$result[$i][$j][] = [implode(', ', $user_groups_list), NBSP(), _('via'), NBSP(),
 								$media_type
 							];
 							$result[$i][$j][] = BR();
@@ -731,7 +731,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 							order_result($user_names_list);
 
 							$result[$i][$j][] = bold(_('Send message to users').': ');
-							$result[$i][$j][] = [implode(', ', $user_names_list), SPACE, _('via'), SPACE,
+							$result[$i][$j][] = [implode(', ', $user_names_list), NBSP(), _('via'), NBSP(),
 								$media_type
 							];
 							$result[$i][$j][] = BR();
@@ -749,7 +749,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 							order_result($user_groups_list);
 
 							$result[$i][$j][] = bold(_('Send message to user groups').': ');
-							$result[$i][$j][] = [implode(', ', $user_groups_list), SPACE, _('via'), SPACE,
+							$result[$i][$j][] = [implode(', ', $user_groups_list), NBSP(), _('via'), NBSP(),
 								$media_type
 							];
 							$result[$i][$j][] = BR();
@@ -1793,7 +1793,7 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']),
 			makeActionTableUser($severity, $users),
-			$old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name
+			[$old_severity_name, NBSP(), '&rArr;', NBSP(), $new_severity_name]
 		]);
 	}
 
@@ -2117,7 +2117,7 @@ function makeActionTableIcon(array $action, array $config) {
 
 				$old_severity_name = getSeverityName($action['old_severity'], $config);
 				$new_severity_name = getSeverityName($action['new_severity'], $config);
-				$hint = $old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name;
+				$hint = [$old_severity_name, NBSP(), '&rArr;', NBSP(), $new_severity_name];
 
 				$action_icons[] = makeActionIcon(['button' => true, 'icon' => $action_type, 'hint' => $hint]);
 			}

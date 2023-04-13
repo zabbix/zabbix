@@ -664,7 +664,7 @@ foreach ($valuemaps as $valuemap) {
 }
 
 $form_list
-	->addRow(new CLabel(_('Show value'), 'label-valuemap'), [$valuemap_select, SPACE,
+	->addRow(new CLabel(_('Show value'), 'label-valuemap'), [$valuemap_select, NBSP(),
 		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'valuemap.list')
 			->getUrl()

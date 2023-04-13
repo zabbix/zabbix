@@ -383,7 +383,7 @@ $item_form_list
 		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
 			->setLabel(_('Show value'))
 			->setChecked(isset($data['visible']['valuemapid'])),
-		(new CDiv([$valuemap_select, SPACE,
+		(new CDiv([$valuemap_select, NBSP(),
 			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 				->getUrl()
