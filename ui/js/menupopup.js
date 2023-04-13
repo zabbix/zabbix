@@ -974,54 +974,56 @@ function getMenuPopupItem(options) {
 	const items = [];
 	let url;
 
-	// latest data link
-	if (options.allowed_ui_latest_data) {
-		url = new Curl('zabbix.php');
-		url.setArgument('action', 'latest.view');
-		url.setArgument('hostids[]', options.hostid);
-		url.setArgument('name', options.name);
-		url.setArgument('filter_set', '1');
+	if (options.context !== 'template') {
+		// latest data link
+		if (options.allowed_ui_latest_data) {
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'latest.view');
+			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('name', options.name);
+			url.setArgument('filter_set', '1');
+
+			items.push({
+				label: t('Latest data'),
+				url: url.getUrl()
+			});
+		}
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showgraph');
+		url.setArgument('itemids[]', options.itemid);
 
 		items.push({
-			label: t('Latest data'),
-			url: url.getUrl()
+			label: t('Graph'),
+			url: url.getUrl(),
+			disabled: !options.showGraph
+		});
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showvalues');
+		url.setArgument('itemids[]', options.itemid);
+
+		items.push({
+			label: t('Values'),
+			url: url.getUrl(),
+			disabled: !options.history && !options.trends
+		});
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showlatest');
+		url.setArgument('itemids[]', options.itemid);
+
+		items.push({
+			label: t('500 latest values'),
+			url: url.getUrl(),
+			disabled: !options.history && !options.trends
+		});
+
+		sections.push({
+			label: t('View'),
+			items: items
 		});
 	}
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showgraph');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('Graph'),
-		url: url.getUrl(),
-		disabled: !options.showGraph
-	});
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showvalues');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('Values'),
-		url: url.getUrl(),
-		disabled: !options.history && !options.trends
-	});
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showlatest');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('500 latest values'),
-		url: url.getUrl(),
-		disabled: !options.history && !options.trends
-	});
-
-	sections.push({
-		label: t('View'),
-		items: items
-	});
 
 	if (options.allowed_ui_conf_hosts) {
 		const config_urls = [];
@@ -1112,25 +1114,27 @@ function getMenuPopupItem(options) {
 		});
 	}
 
-	const execute = {
-		label: t('Execute now'),
-		disabled: !options.isExecutable
-	};
-
-	if (options.isExecutable) {
-		execute.clickCallback = function () {
-			jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-			view.checkNow(options.itemid);
+	if (options.context !== 'template') {
+		const execute = {
+			label: t('Execute now'),
+			disabled: !options.isExecutable
 		};
+
+		if (options.isExecutable) {
+			execute.clickCallback = function() {
+				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+				view.checkNow(options.itemid);
+			};
+		}
+
+		actions.push(execute);
+
+		sections.push({
+			label: t('Actions'),
+			items: actions
+		});
 	}
-
-	actions.push(execute);
-
-	sections.push({
-		label: t('Actions'),
-		items: actions
-	});
 
 	return sections;
 }
