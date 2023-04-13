@@ -3736,10 +3736,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	while (1)
 	{
 		if (0 == (n = (ssize_t)ZBX_TLS_WRITE(s->tls_ctx->ctx, buf + offset, len - (size_t)offset)))
-		{
-			*error = zbx_dsprintf(*error, "connection closed");
-			return ZBX_PROTO_ERROR;
-		}
+			break;
 
 		if (0 > n)
 		{
@@ -3772,6 +3769,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	}
 
 #if defined(HAVE_GNUTLS)
+	if (0 == n)
+	{
+		*error = zbx_dsprintf(*error, "connection closed");
+		return ZBX_PROTO_ERROR;
+	}
+
 	if (0 > n)
 	{
 		*error = zbx_dsprintf(*error, "gnutls_record_send() failed: " ZBX_FS_SSIZE_T " %s",
@@ -3804,38 +3807,38 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
-	while (0 >= n)
+	while (1)
 	{
-		if (0 == (n = (ssize_t)ZBX_TLS_READ(s->tls_ctx->ctx, buf, len)))
+		ssize_t	err;
+
+		if (0 <= (n = (ssize_t)ZBX_TLS_READ(s->tls_ctx->ctx, buf, len)))
+			break;
+
+		err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
+		if (SUCCEED != tls_is_nonblocking_error(err))
+			break;
+
+		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 		{
-			*error = zbx_dsprintf(*error, "connection closed");
+			*error = zbx_dsprintf(*error, "cannot wait socket: %s",
+					strerror_from_system(zbx_socket_last_error()));
 			return ZBX_PROTO_ERROR;
 		}
 
-		if (0 > n)
+		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
-			ssize_t	err;
-
-			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
-			if (SUCCEED != tls_is_nonblocking_error(err))
-				break;
-
-			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
-			{
-				*error = zbx_dsprintf(*error, "cannot wait socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
-				return ZBX_PROTO_ERROR;
-			}
-
-			if (SUCCEED != zbx_socket_check_deadline(s))
-			{
-				*error = zbx_strdup(*error, "read timeout");
-				return ZBX_PROTO_ERROR;
-			}
+			*error = zbx_strdup(*error, "read timeout");
+			return ZBX_PROTO_ERROR;
 		}
 	}
 
 #if defined(HAVE_GNUTLS)
+	if (0 == n)
+	{
+		*error = zbx_dsprintf(*error, "connection closed");
+		return ZBX_PROTO_ERROR;
+	}
+
 	if (0 > n)
 	{
 		/* in case of rehandshake a GNUTLS_E_REHANDSHAKE will be returned, deal with it as with error */
