@@ -585,7 +585,7 @@ $conditionFormList->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'
 			(new CTextBox('formula', $data['formula']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('formula')
-				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+				->setAttribute('placeholder', 'A or (B and C) ...')
 		]))
 			->addClass(ZBX_STYLE_CELL)
 			->addClass(ZBX_STYLE_CELL_EXPRESSION)

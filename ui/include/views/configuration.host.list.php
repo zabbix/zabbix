@@ -296,7 +296,7 @@ foreach ($data['hosts'] as $host) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$hostTemplates[] = ' &hellip;';
+			$hostTemplates[] = [' ', HELLIP()];
 
 			break;
 		}
