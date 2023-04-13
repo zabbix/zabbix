@@ -76,6 +76,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					'rows_per_page', 'url', 'roleid', 'timezone', 'userdirectoryid'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
+				'selectRole' => ['roleid'],
 				'selectUsrgrps' => ['usrgrpid'],
 				'userids' => $this->getInput('userid'),
 				'editable' => true
@@ -145,6 +146,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['medias'] = $this->user['medias'];
 			$data['db_user']['username'] = $this->user['username'];
 			$data['userdirectoryid'] = $this->user['userdirectoryid'];
+			$data['roleid_required'] = (bool) $this->user['role'];
 
 			if (!$this->getInput('form_refresh', 0)) {
 				$data['roleid'] = $this->user['roleid'];
@@ -152,6 +154,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		}
 		else {
 			$data['change_password'] = true;
+			$data['roleid_required'] = true;
 			$data['roleid'] = $this->getInput('roleid', '');
 		}
 
