@@ -667,7 +667,11 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,	NULL},
+	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,
+		{
+			{NULL}
+		}
+	},
 	{NULL}
 };
 
