@@ -30,6 +30,5 @@ libzbxpreproc_a_CFLAGS = \
 
 libzbxpreprocbase_a_SOURCES = \
 	pp_history.c \
-	pp_history.h \
 	pp_item.c \
 	pp_item.h
