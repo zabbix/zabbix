@@ -129,12 +129,12 @@ class testFormConnectors extends CWebTest {
 			$form->fill(['HTTP authentication' => $auth]);
 
 			// Check visible fields.
-			$this->compareArrays(array_merge($default_labels['fields'], $auth_fields),
+			$this->assertEqualsCanonicalizing(array_merge($default_labels['fields'], $auth_fields),
 					$form->getLabels(CElementFilter::VISIBLE)->asText()
 			);
 
 			// Check required fields.
-			$this->compareArrays(array_merge($default_labels['required'], ($auth === 'Bearer') ? $auth_fields : []),
+			$this->assertEqualsCanonicalizing(array_merge($default_labels['required'], ($auth === 'Bearer') ? $auth_fields : []),
 					$form->getRequiredLabels()
 			);
 
@@ -1143,17 +1143,5 @@ class testFormConnectors extends CWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->close();
-	}
-
-	/**
-	 * Sort arrays and compare if they are equal.
-	 *
-	 * @param array $expected	expected fields from data provider
-	 * @param array $actual		actual fields on page
-	 */
-	private function compareArrays($expected, $actual) {
-		sort($expected);
-		sort($actual);
-		$this->assertEquals(json_encode($expected), json_encode($actual));
 	}
 }
