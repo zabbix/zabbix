@@ -686,13 +686,15 @@ out:
  ******************************************************************************/
 void	zbx_dc_maintenance_set_update_flags(void)
 {
-	size_t	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), timers_left;
+	size_t	slots_num, timers_left;
+
+	slots_num = zbx_maintenance_update_flags_num();
 
 	WRLOCK_CACHE;
 
 	memset(config->maintenance_update_flags, 0xff, sizeof(zbx_uint64_t) * slots_num);
 
-	if (0 != (timers_left = ((size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER] % (sizeof(uint64_t) * 8))))
+	if (0 != (timers_left = ((size_t)cacheconfig_get_config_forks(ZBX_PROCESS_TYPE_TIMER) % (sizeof(uint64_t) * 8))))
 		config->maintenance_update_flags[slots_num - 1] >>= (sizeof(zbx_uint64_t) * 8 - timers_left);
 
 	UNLOCK_CACHE;
@@ -763,8 +765,10 @@ int	zbx_dc_maintenance_check_update_flag(int timer)
  ******************************************************************************/
 int	zbx_dc_maintenance_check_update_flags(void)
 {
-	size_t	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM();
+	size_t	slots_num;
 	int	ret = SUCCEED;
+
+	slots_num = zbx_maintenance_update_flags_num();
 
 	RDLOCK_CACHE;
 

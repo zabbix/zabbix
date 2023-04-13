@@ -9324,6 +9324,16 @@ msgstr "Der Hostprototyp mit dem Hostnamen „%1$s“ existiert bereits in der S
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Hostprototyp namens \"%1$s\" existiert bereits in Suchlauf \"%2$s\"."
 
+#: include/classes/api/services/CHostPrototype.php:1127
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1124
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
@@ -24061,6 +24071,10 @@ msgstr "Host-Gruppe"
 msgid "host pattern"
 msgstr "Host-Muster"
 
+#: include/classes/api/services/CHostPrototype.php:1190
+msgid "host prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -24452,6 +24466,11 @@ msgstr "max() - Höchstwert für den Zeitraum T"
 msgid "maximum dependent items count reached"
 msgstr "maximale Anzahl abhängiger Datenpunkte erreicht"
 
+#: include/classes/validators/CApiInputValidator.php:1726
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -24601,6 +24620,11 @@ msgstr "keine LDAP-Server"
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
 msgstr "Keine Daten"
+
+#: include/classes/api/services/CHostPrototype.php:1360
+#, c-format
+msgid "no default interface for \"%1$s\" type"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format

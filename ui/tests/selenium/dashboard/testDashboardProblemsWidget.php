@@ -141,7 +141,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Host groups' => ['value' => '', 'enabled' => true],
 			'Exclude host groups' => ['value' => '', 'enabled' => true],
 			'Hosts' => ['value' => '', 'enabled' => true],
-			'Problem' => ['value' => '', 'maxlength' => 255, 'enabled' => true],
+			'Problem' => ['value' => '', 'maxlength' => 2048, 'enabled' => true],
 
 			// Severity checkboxes.
 			'id:severities_0' => ['value' => false, 'enabled' => true],
@@ -159,7 +159,7 @@ class testDashboardProblemsWidget extends CWebTest {
 
 			'Show tags' => ['value' => 'None', 'enabled' => true],
 			'Tag name' => ['value' => 'Full', 'enabled' => false],
-			'Tag display priority' => ['value' => '', 'placeholder' => 'comma-separated list', 'enabled' => false, 'maxlength' => 255],
+			'Tag display priority' => ['value' => '', 'placeholder' => 'comma-separated list', 'enabled' => false, 'maxlength' => 2048],
 			'Show operational data' => ['value' => 'None', 'enabled' => true],
 			'Show symptoms' => ['value' => false, 'enabled' => true],
 			'Show suppressed problems' => ['value' => false, 'enabled' => true],

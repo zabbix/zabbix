@@ -9214,6 +9214,16 @@ msgstr "호스트 이름이 \"%1$s\"인 호스트 프로토타입이 템플릿 \
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "호스트명 \"%1$s\"를 가진 호스트 프로토타입은 디스커버리 규칙 \"%2$s\"에 이미 존재합니다."
 
+#: include/classes/api/services/CHostPrototype.php:1127
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1124
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
@@ -23885,6 +23895,10 @@ msgstr "호스트 그룹"
 msgid "host pattern"
 msgstr "호스트 패턴"
 
+#: include/classes/api/services/CHostPrototype.php:1190
+msgid "host prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
 msgid "icon"
@@ -24276,6 +24290,11 @@ msgstr "max() - 기간T 안의 최대치"
 msgid "maximum dependent items count reached"
 msgstr "의존 아이템수가 최대 수에 도달하였습니다"
 
+#: include/classes/validators/CApiInputValidator.php:1726
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -24425,6 +24444,11 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
 msgstr "데이터 없음"
+
+#: include/classes/api/services/CHostPrototype.php:1360
+#, c-format
+msgid "no default interface for \"%1$s\" type"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
