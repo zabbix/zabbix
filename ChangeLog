@@ -1,3 +1,15 @@
+Changes for 6.0.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.16
+
+6.0.16rc1 was released as 6.0.16 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.16rc1
 
 Bug fixes:
@@ -2472,6 +2484,7 @@ Changes for 5.0.34rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
 ..F....... [ZBX-21013] hid option "Groups" for unprivileged users in the Import form (Sasha)
 ...G...... [ZBX-22219] added validation to the "Server" ip/dns option in configuration configuration of the Zabbix Agent 2 (kprutkovs)
 ..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
