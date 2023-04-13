@@ -27,14 +27,14 @@ class CControllerDiscoveryList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort'          => 'in name',
-			'sortorder'     => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck'       => 'in 1',
-			'filter_set'    => 'in 1',
-			'filter_rst'    => 'in 1',
-			'filter_name'   => 'string',
-			'filter_status' => 'in -1,'.DRULE_STATUS_ACTIVE.','.DRULE_STATUS_DISABLED,
-			'page'          => 'ge 1'
+			'sort' =>			'in name',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'filter_status' =>	'in -1,'.DRULE_STATUS_ACTIVE.','.DRULE_STATUS_DISABLED,
+			'page' =>			'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);

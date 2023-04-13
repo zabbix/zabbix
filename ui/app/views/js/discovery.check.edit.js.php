@@ -26,11 +26,10 @@
 
 window.check_popup = new class {
 
-	init({dcheckid}) {
+	init() {
 		this.overlay = overlays_stack.getById('discovery-check');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.dcheckid = dcheckid;
 
 		this._loadViews();
 	}
@@ -58,8 +57,6 @@ window.check_popup = new class {
 			SVC_TELNET => ['row_dcheck_ports']
 		], JSON_THROW_ON_ERROR) ?>);
 
-		// todo - rewrite jqueries to vanilla js
-
 		var $type = jQuery('#type-select'),
 			$snmpv3_securitylevel = jQuery('#snmpv3-securitylevel');
 
@@ -85,7 +82,7 @@ window.check_popup = new class {
 			jQuery(window).trigger('resize');
 		});
 
-		let that = this;
+		const that = this;
 
 		if ($type.val() == <?= SVC_SNMPv3 ?>) {
 			// Fires the change event to initialize CViewSwitcher.
@@ -103,27 +100,6 @@ window.check_popup = new class {
 				that._setDCheckDefaultPort();
 			});
 		}
-	}
-
-	/**
-	 * Get check table data to check if row with the same data already exists.
-	 */
-	_addCheckTableData() {
-		// todo - fix and pass all hiddden input from row
-		const table = document.getElementById('dcheckList');
-		const tbody = table.getElementsByTagName('tbody')[0];
-		const trList = tbody.getElementsByTagName('tr');
-		let dchecks = [];
-
-		[...trList].map(element => {
-			const table_row = element.getElementsByTagName('td')
-
-			if (table_row.length > 0) {
-				dchecks.push(table_row[0].innerHTML)
-			}
-		});
-
-		return dchecks;
 	}
 
 	/**
@@ -196,9 +172,10 @@ window.check_popup = new class {
 		return has_duplicates;
 	}
 
-
-
 	submit() {
+		const curl = new Curl('zabbix.php');
+		let fields = getFormFields(this.form);
+
 		for (const element of this.form.parentNode.children) {
 			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 				element.parentNode.removeChild(element);
@@ -206,25 +183,10 @@ window.check_popup = new class {
 		}
 
 		if (this._hasDCheckDuplicates()) {
-			jQuery(makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>]))
-				.insertBefore(this.form);
-
-			this.overlay.unsetLoading();
+			this._addDuplicateMessage();
 		}
-
 		else {
-			const curl = new Curl('zabbix.php');
-			const fields = getFormFields(this.form);
-
-			for (const key in fields) {
-				if (fields.hasOwnProperty(key) && fields[key].trim() === '') {
-					delete fields[key];
-				}
-
-				if (fields.hasOwnProperty(key) && ['name', 'iprange', 'delay'].includes(key)) {
-					fields[key] = fields[key].trim()
-				}
-			}
+			this._updateFields(fields);
 
 			curl.setArgument('action', 'discovery.check.check');
 			this._post(curl.getUrl(), fields);
@@ -269,6 +231,58 @@ window.check_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	_addDuplicateMessage() {
+		jQuery(makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>]))
+			.insertBefore(this.form);
+
+		this.overlay.unsetLoading();
+	}
+
+	/**
+	 * Updates form fields based on check type and trims string values.
+	 */
+	_updateFields(fields) {
+		if (![ <?= SVC_SNMPv3 ?> ].includes(parseInt(fields.type))) {
+			for (const key in fields) {
+				if (['snmpv3_privpassphrase', 'key_'].includes(key)) {
+					delete fields[key];
+				}
+			}
+		}
+
+		if (parseInt(fields.type) ===  <?= SVC_SNMPv3 ?>) {
+			let security_level = false;
+			for (const key in fields) {
+				if (['snmp_community', 'key_'].includes(key)) {
+					delete fields[key];
+				}
+
+				if (key == 'snmpv3_securitylevel' && fields[key] != <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>) {
+					security_level = true;
+				}
+
+				if (key == 'snmpv3_privpassphrase' && security_level) {
+					delete fields[key];
+				}
+			}
+			console.log(fields.snmpv3_privpassphrase);
+		}
+
+		if (![<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(fields.type))) {
+			for (const key in fields) {
+				if (['snmp_community', 'snmp_oid', 'snmpv3_privpassphrase'].includes(key)) {
+					delete fields[key];
+				}
+			}
+		}
+
+		for (let key in fields) {
+			if (typeof fields[key] === 'string') {
+				fields[key] = fields[key].trim();
+			}
+		}
 	}
 
 	/**

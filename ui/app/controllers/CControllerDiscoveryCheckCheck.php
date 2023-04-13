@@ -46,7 +46,6 @@ class CControllerDiscoveryCheckCheck extends CController {
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
 			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
-			// todo - add stricter validation rules to these ?
 			'host_source' =>			'string',
 			'name_source' =>			'string'
 		];
@@ -109,8 +108,8 @@ class CControllerDiscoveryCheckCheck extends CController {
 		else {
 			$data['name'] = discovery_check2str(
 				$data['type'],
-				array_key_exists('key_', $data) ?  $data['key_'] : '',
-				array_key_exists('ports',  $data) ?  $data['ports'] : ''
+				array_key_exists('key_', $data) ? $data['key_'] : '',
+				array_key_exists('ports',  $data) ? $data['ports'] : ''
 			);
 		}
 

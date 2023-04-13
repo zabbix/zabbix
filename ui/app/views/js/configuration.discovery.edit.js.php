@@ -294,8 +294,12 @@ window.drule_edit_popup = new class {
 	}
 
 	submit() {
-		// todo - add trim fields
 		const fields = getFormFields(this.form);
+
+		['name', 'iprange', 'delay'].forEach(
+			field => fields[field] = fields[field].trim()
+		);
+
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.druleid === null ? 'discovery.create' : 'discovery.update');
 

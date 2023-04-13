@@ -67,8 +67,7 @@ class CControllerDiscoveryCheckEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		// todo - add permission check
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
 	protected function doAction() {

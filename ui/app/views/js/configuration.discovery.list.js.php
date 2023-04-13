@@ -156,7 +156,6 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						// todo - check if keepids are passed here
 						uncheckTableRows('discovery', response.keepids ?? []);
 					}
 					else if ('success' in response) {
