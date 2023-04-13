@@ -69,7 +69,8 @@ window.check_popup = new class {
 					ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => ['row_dcheck_snmpv3_authprotocol',
 						'row_dcheck_snmpv3_authpassphrase'
 					],
-					ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => ['row_dcheck_snmpv3_authprotocol', 'row_dcheck_snmpv3_authpassphrase',
+					ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => [
+						'row_dcheck_snmpv3_authprotocol', 'row_dcheck_snmpv3_authpassphrase',
 						'row_dcheck_snmpv3_privprotocol', 'row_dcheck_snmpv3_privpassphrase'
 					]
 				], JSON_THROW_ON_ERROR) ?>);
@@ -288,7 +289,9 @@ window.check_popup = new class {
 	 * Resets fields of the discovery check form to default values.
 	 */
 	_clearDCheckForm() {
-		const elementsToClear = document.querySelectorAll('#key_, #snmp_community, #snmp_oid, #snmpv3_contextname, #snmpv3_securityname, #snmpv3_authpassphrase, #snmpv3_privpassphrase');
+		const elementsToClear = document.querySelectorAll(
+			'#key_, #snmp_community, #snmp_oid, #snmpv3_contextname, #snmpv3_securityname, #snmpv3_authpassphrase, #snmpv3_privpassphrase'
+		);
 		elementsToClear.forEach(function(element) {
 			element.value = '';
 		});

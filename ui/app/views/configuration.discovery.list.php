@@ -67,7 +67,8 @@ $discoveryForm = (new CForm())->setName('druleForm');
 $discoveryTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_drules'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'druleids');")
+			(new CCheckBox('all_drules'))
+				->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'druleids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
 			->setArgument('action', 'discovery.list')

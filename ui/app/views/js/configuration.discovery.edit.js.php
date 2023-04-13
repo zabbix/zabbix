@@ -31,7 +31,7 @@ window.drule_edit_popup = new class {
 		this.drule = drule;
 		this.dcheckid = getUniqueId();
 
-		// append existing discovery checks to check table.
+		// Append existing discovery checks to check table.
 		if (typeof(dchecks) === 'object') {
 			dchecks = Object.values(dchecks);
 		}
