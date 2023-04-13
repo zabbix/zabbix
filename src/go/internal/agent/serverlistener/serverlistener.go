@@ -20,8 +20,10 @@
 package serverlistener
 
 import (
+	"errors"
 	"fmt"
 	"net"
+	"os"
 	"strings"
 	"time"
 
@@ -42,6 +44,8 @@ type ServerListener struct {
 	tlsConfig    *tls.Config
 	allowedPeers *zbxnet.AllowedPeers
 	bindIP       string
+	last_err     string
+	stopped      bool
 }
 
 func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err error) {
@@ -64,8 +68,45 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	return nil
 }
 
+func (c *ServerListener) handleError(err error) error {
+	var netErr net.Error
+
+	if !errors.As(err, &netErr) {
+		log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+		return nil
+	}
+
+	if netErr.Timeout() {
+		log.Debugf("failed to accept an incoming connection: %s", err.Error())
+
+		return nil
+	}
+
+	if c.stopped {
+		return err
+	}
+
+	log.Errf("failed to accept an incoming connection: %s", err.Error())
+
+	var se *os.SyscallError
+
+	if !errors.As(err, &se) {
+		return nil
+	}
+
+	/* sleep to avoid high CPU usage on surprising temporary errors */
+	if c.last_err == se.Err.Error() {
+		time.Sleep(time.Second)
+	}
+	c.last_err = se.Err.Error()
+
+	return nil
+}
+
 func (sl *ServerListener) run() {
 	defer log.PanicHook()
+
 	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
 
 	for {
@@ -81,11 +122,13 @@ func (sl *ServerListener) run() {
 				log.Warningf("failed to process an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
 			}
 		} else {
-			if nerr, ok := err.(net.Error); ok && nerr.Temporary() {
-				log.Errf("failed to accept an incoming connection: %s", err.Error())
-				continue
+			if err != nil {
+				if sl.handleError(err) == nil {
+					continue
+				}
+
+				break
 			}
-			break
 		}
 	}
 
@@ -115,6 +158,7 @@ func (sl *ServerListener) Start() (err error) {
 }
 
 func (sl *ServerListener) Stop() {
+	sl.stopped = true
 	if sl.listener != nil {
 		sl.listener.Close()
 	}

@@ -121,9 +121,6 @@ jQuery(function ($) {
 			data.isHintBoxFrozen = true;
 			graph.data('widget')._pauseUpdating();
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
-
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				graph.data('widget')._resumeUpdating();
 				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
@@ -132,6 +129,10 @@ jQuery(function ($) {
 			});
 
 			repositionHintBox(e, graph);
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
+
 			graph
 				.off('mouseup', hintboxSilentMode)
 				.on('mouseup', {graph: graph}, hintboxSilentMode);
