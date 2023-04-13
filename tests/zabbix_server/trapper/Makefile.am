@@ -58,7 +58,8 @@ zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_user_init \
 	-Wl,--wrap=zbx_user_free \
 	-Wl,--wrap=zbx_init_agent_result \
-	-Wl,--wrap=zbx_free_agent_result
+	-Wl,--wrap=zbx_free_agent_result \
+	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
 
 zbx_trapper_preproc_test_run_CFLAGS = \
 	-I@top_srcdir@/tests -I@top_srcdir@/src  @LIBXML2_CFLAGS@

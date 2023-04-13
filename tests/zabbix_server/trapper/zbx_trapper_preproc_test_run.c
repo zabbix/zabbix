@@ -76,7 +76,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 
 	zbx_variant_set_none(&value_out);
 
-	pp_execute(&ctx, preproc, NULL, &value_in, *ts, &value_out, &results_out, &results_num);
+	pp_execute(&ctx, preproc, NULL, NULL, &value_in, *ts, &value_out, &results_out, &results_num);
 
 	/* copy results */
 	for (i = 0; i < results_num; i++)
@@ -160,6 +160,17 @@ void	__wrap_zbx_free_agent_result(AGENT_RESULT *result)
 	ZBX_UNUSED(result);
 }
 
+int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
+		int hostids_num, char **error)
+{
+	ZBX_UNUSED(um_cache);
+	ZBX_UNUSED(text);
+	ZBX_UNUSED(hostids);
+	ZBX_UNUSED(hostids_num);
+	ZBX_UNUSED(error);
+
+	return SUCCEED;
+}
 
 void	zbx_mock_test_entry(void **state)
 {

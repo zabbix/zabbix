@@ -352,6 +352,7 @@ static zbx_pp_item_t	*pp_manager_get_cacheable_dependent_item(zbx_pp_manager_t *
  *                                                                            *
  * Parameters: manager        - [IN] manager                                  *
  *             preproc        - [IN] master item preprocessing data           *
+ *             um_handle      - [IN] shared user macro cache handle           *
  *             exclude_itemid - [IN] dependent itemid to exclude, can be 0    *
  *             value          - [IN] value                                    *
  *             ts             - [IN] value timestamp                          *
@@ -362,7 +363,8 @@ static zbx_pp_item_t	*pp_manager_get_cacheable_dependent_item(zbx_pp_manager_t *
  *                                                                            *
  ******************************************************************************/
 static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc,
-		zbx_uint64_t exclude_itemid, const zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_cache_t *cache)
+		zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t exclude_itemid, const zbx_variant_t *value,
+		zbx_timespec_t ts, zbx_pp_cache_t *cache)
 {
 	int	queued_num = 0;
 
@@ -389,12 +391,12 @@ static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_p
 
 		if (ZBX_PP_PROCESS_PARALLEL == item->preproc->mode)
 		{
-			new_task = pp_task_value_create(item->itemid, item->preproc, manager->um_handle, NULL, ts, NULL,
+			new_task = pp_task_value_create(item->itemid, item->preproc, um_handle, NULL, ts, NULL,
 					cache);
 		}
 		else
 		{
-			new_task = pp_task_value_seq_create(item->itemid, item->preproc, manager->um_handle, NULL, ts,
+			new_task = pp_task_value_seq_create(item->itemid, item->preproc, um_handle, NULL, ts,
 					NULL, cache);
 		}
 
@@ -439,14 +441,14 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 		d_dep->cache = pp_cache_create(item->preproc, &d->result);
 		zbx_variant_set_none(&value);
 
-		d_dep->primary = pp_task_value_create(item->itemid, item->preproc, manager->um_handle, &value, d->ts,
+		d_dep->primary = pp_task_value_create(item->itemid, item->preproc, d->um_handle, &value, d->ts,
 				NULL, d_dep->cache);
 
 		pp_task_queue_push_immediate(&manager->queue, dep_task);
 		pp_task_queue_notify(&manager->queue);
 	}
 	else
-		pp_manager_queue_dependents(manager, d->preproc, 0, &d->result, d->ts, NULL);
+		pp_manager_queue_dependents(manager, d->preproc, d->um_handle, 0, &d->result, d->ts, NULL);
 }
 
 /******************************************************************************
@@ -466,7 +468,7 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
 	zbx_pp_task_value_t	*dp = (zbx_pp_task_value_t *)PP_TASK_DATA(task_value);
 
 	pp_manager_queue_value_task_result(manager, d->primary);
-	pp_manager_queue_dependents(manager, d->preproc, task_value->itemid, &dp->result, dp->ts, d->cache);
+	pp_manager_queue_dependents(manager, d->preproc, dp->um_handle, task_value->itemid, &dp->result, dp->ts, d->cache);
 
 	d->primary = NULL;
 	pp_task_free(task);

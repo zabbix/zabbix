@@ -287,7 +287,7 @@ void	zbx_mock_test_entry(void **state)
 		history_ts.ns = 0;
 	}
 
-	if (FAIL == (returned_ret = pp_execute_step(&ctx, NULL, value_type, &value, ts, &step, &history_value,
+	if (FAIL == (returned_ret = pp_execute_step(&ctx, NULL, NULL, 0, value_type, &value, ts, &step, &history_value,
 			&history_ts)))
 	{
 		pp_error_on_fail(&value, &step);

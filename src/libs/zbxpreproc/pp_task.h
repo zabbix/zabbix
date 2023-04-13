@@ -55,7 +55,7 @@ typedef struct
 
 	zbx_pp_item_preproc_t		*preproc;
 	zbx_pp_cache_t			*cache;
-	zbx_dc_um_shared_handle_t	*um_handle
+	zbx_dc_um_shared_handle_t	*um_handle;
 }
 zbx_pp_task_value_t;
 

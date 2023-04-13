@@ -867,13 +867,6 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_
 		cache = um_cache_dup(cache);
 	}
 
-	if (ZBX_DBSYNC_INIT != gmacros->mode)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] cache_sync: gmacros:%d, hmacros:%d, htmpls:%d",
-				gmacros->rows.values_num, hmacros->rows.values_num , htmpls->rows.values_num);
-	}
-
-
 	cache->revision = revision;
 
 	um_cache_sync_macros(cache, gmacros, 1, config_vault, program_type);
