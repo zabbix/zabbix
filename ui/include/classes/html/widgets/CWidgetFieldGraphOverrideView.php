@@ -28,16 +28,16 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 	}
 
 	public function getView(): CList {
-		$list = (new CList())->addClass(ZBX_STYLE_OVERRIDES_LIST);
+		$view = (new CList())->addClass(ZBX_STYLE_OVERRIDES_LIST);
 
 		$i = 0;
 		foreach ($this->field->getValue() as $override) {
-			$list->addItem($this->getItemTemplate($override, $i));
+			$view->addItem($this->getItemTemplate($override, $i));
 
 			$i++;
 		}
 
-		$list->addItem(
+		$view->addItem(
 			(new CDiv(
 				(new CButton('override_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new override')]))
 					->addClass(ZBX_STYLE_BTN_ALT)
@@ -46,7 +46,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			'overrides-foot'
 		);
 
-		return $list;
+		return $view;
 	}
 
 	public function getJavaScript(): string {

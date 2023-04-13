@@ -1,6 +1,8 @@
 Changes for 7.0.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-8324] dropped support for floats of limited range (jfreibergs, kprutkovs)
+...G...... [ZBXNEXT-7569] fixed a possible NULL pointer deref (jxl)
 ...G...... [ZBXNEXT-7569] added support for Portage in system.sw.packages{,.get} items (jxl)
 ..F....... [ZBXNEXT-8237] changed module details view to a modal (popup) and updated module details (ddauksa)
 ...G...... [ZBXNEXT-7132] added option of getting fully qualified domain name in system.hostname key to the Zabbix agent and Zabbix agent 2 (kprutkovs)
@@ -16,6 +18,8 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+A.F.I..PS. [ZBX-22363] added support for item and item_preproc table fields to be either nvarchar or nclob (agriscenko, vso)
+..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
 ...G...... [ZBX-22306] fixed crash in Zabbix agent 2 when running out of available file descriptors (vso)
 ..F....... [ZBX-21013] hid options "Create new template/host groups" for unprivileged users in the Import form (Sasha)
 ...G...... [ZBX-22219] added validation to the "Server" ip/dns option in configuration configuration of the Zabbix Agent 2 (kprutkovs)
@@ -113,6 +117,7 @@ Changes for 6.4.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
 A.F.I..PS. [ZBX-22363] added support for item and item_preproc table fields to be either nvarchar or nclob (agriscenko, vso)
 ...G...... [ZBX-22306] fixed crash in Zabbix agent 2 when running out of available file descriptors (vso)
 ..F....... [ZBX-21013] hid options "Create new template/host groups" for unprivileged users in the Import form (Sasha)
@@ -1219,6 +1224,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.16
+
+6.0.16rc1 was released as 6.0.16 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.16rc1
@@ -3695,6 +3712,7 @@ Changes for 5.0.34rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
 ..F....... [ZBX-21013] hid option "Groups" for unprivileged users in the Import form (Sasha)
 ...G...... [ZBX-22219] added validation to the "Server" ip/dns option in configuration configuration of the Zabbix Agent 2 (kprutkovs)
 ..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
