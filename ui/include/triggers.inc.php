@@ -2282,7 +2282,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 			$list_item[] = ')';
 		}
 
-		array_unshift($list, $list_item, [NBSP(), '&rArr;', NBSP()]);
+		array_unshift($list, $list_item, [NBSP(), RARR(), NBSP()]);
 
 		$triggerid = $parent_templates['links'][$triggerid]['triggerid'];
 	}

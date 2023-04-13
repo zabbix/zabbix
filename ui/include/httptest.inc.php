@@ -284,7 +284,7 @@ function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $p
 			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $name, [NBSP(), '&rArr;', NBSP()]);
+		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);
 
 		$httptestid = $parent_templates['links'][$httptestid]['httptestid'];
 	}
