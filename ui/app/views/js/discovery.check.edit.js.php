@@ -103,7 +103,7 @@ window.check_popup = new class {
 	}
 
 	/**
-	 * Checks duplicate discovery cheks.
+	 * Checks duplicate discovery checks.
 	 */
 	_hasDCheckDuplicates() {
 		const dcheck = getFormFields(this.form);

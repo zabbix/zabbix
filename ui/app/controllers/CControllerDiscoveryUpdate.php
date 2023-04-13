@@ -48,7 +48,7 @@ class CControllerDiscoveryUpdate extends CController {
 						'title' => _('Cannot create discovery rule'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 		}
 

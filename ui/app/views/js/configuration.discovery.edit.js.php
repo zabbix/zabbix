@@ -28,11 +28,10 @@ window.drule_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this.druleid = druleid;
-		this.dchecks = dchecks;
 		this.drule = drule;
 		this.dcheckid = getUniqueId();
 
-		// append existing discovery checks to Check table\
+		// append existing discovery checks to check table.
 		if (typeof(dchecks) === 'object') {
 			dchecks = Object.values(dchecks);
 		}
@@ -60,8 +59,15 @@ window.drule_edit_popup = new class {
 	}
 
 	_updateCheck(row, input) {
-		input.host_source = this._getSourceValue('host_source');
-		input.name_source = this._getSourceValue('name_source');
+		if (!input.host_source) {
+			input.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val()
+				|| '<?= ZBX_DISCOVERY_DNS ?>';
+		}
+		if (!input.name_source) {
+			input.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val()
+				|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
+		}
+
 		delete input.dchecks;
 
 		this._addCheck(input, row);
@@ -109,8 +115,7 @@ window.drule_edit_popup = new class {
 
 		const overlay = PopUp('discovery.check.edit', params, {
 			dialogueid: 'discovery-check',
-			dialogue_class: 'modal-popup-medium',
-			trigger_element: this
+			dialogue_class: 'modal-popup-medium'
 		});
 
 		overlay.$dialogue[0].addEventListener('check.submit', (e) => {
@@ -150,7 +155,9 @@ window.drule_edit_popup = new class {
 				.forEach(function(dcheck) {
 					dcheck.value = (name === 'name_source') ? <?= ZBX_DISCOVERY_UNSPEC ?> : <?= ZBX_DISCOVERY_DNS ?>;
 				});
-			document.querySelector('[name="dchecks[' + target.dataset.id + '][' + name + ']"]').value = <?= ZBX_DISCOVERY_VALUE ?>;
+			document.querySelector(
+				'[name="dchecks[' + target.dataset.id + '][' + name + ']"]'
+			).value = <?= ZBX_DISCOVERY_VALUE ?>;
 		}
 		else {
 			document.querySelectorAll('[name^=dchecks][name$="[' + name + ']"]')
@@ -256,27 +263,11 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	clone() {
+	clone({title, buttons}) {
 		this.druleid = null;
-		const title = <?= json_encode(_('New discovery rule')) ?>;
-		const buttons = [
-			{
-				title: <?= json_encode(_('Add')) ?>,
-				class: '',
-				keepOpen: true,
-				isSubmit: true,
-				action: () => this.submit()
-			},
-			{
-				title: <?= json_encode(_('Cancel')) ?>,
-				class: 'btn-alt',
-				cancel: true,
-				action: () => ''
-			}
-		];
 
-		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+		this.overlay.unsetLoading();
 	}
 
 	delete() {

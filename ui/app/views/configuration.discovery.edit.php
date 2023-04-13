@@ -225,7 +225,24 @@ if ($data['drule']['druleid']) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'drule_edit_popup.clone();'
+			'action' => 'drule_edit_popup.clone('.json_encode([
+					'title' => _('New discovery rule'),
+					'buttons' => [
+						[
+							'title' => _('Add'),
+							'class' => 'js-add',
+							'keepOpen' => true,
+							'isSubmit' => true,
+							'action' => 'drule_edit_popup.submit();'
+						],
+						[
+							'title' => _('Cancel'),
+							'class' => ZBX_STYLE_BTN_ALT,
+							'cancel' => true,
+							'action' => ''
+						]
+					]
+				]).');'
 		],
 		[
 			'title' => _('Delete'),
