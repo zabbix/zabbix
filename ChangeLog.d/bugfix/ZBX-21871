@@ -1,1 +1,1 @@
-A......... [ZBX-21871] modified audit logging of changes in usergroup users to be written as updates to user groups (jfreibergs, vmaksimovs)
+A......... [ZBX-21871] modified the way to audit logging the changes in users of user group API object to updates in groups of user API objects (jfreibergs, vmaksimovs)
