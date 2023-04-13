@@ -717,7 +717,7 @@ function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templat
 			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+		array_unshift($list, $name, [NBSP(), '&rArr;', NBSP()]);
 
 		$host_prototypeid = $parent_templates['links'][$host_prototypeid]['hostid'];
 	}

@@ -148,7 +148,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 	$table_subfilter = (new CTableInfo())
 		->addRow([
 			new CTag('h4', true, [
-				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
+				_('Subfilter'), NBSP(), (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
 		], ZBX_STYLE_HOVER_NOBG);
 
