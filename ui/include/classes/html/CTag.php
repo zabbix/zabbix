@@ -22,30 +22,6 @@
 class CTag extends CObject {
 
 	/**
-	 * Encodes the '<', '>', '"' and '&' symbols.
-	 */
-	const ENC_ALL = 1;
-
-	/**
-	 * Encodes all symbols in ENC_ALL except for '&'.
-	 */
-	const ENC_NOAMP = 2;
-
-	/**
-	 * The HTML encoding strategy to use for the contents of the tag.
-	 *
-	 * @var int
-	 */
-	protected $encStrategy = self::ENC_NOAMP;
-
-	/**
-	 * The HTML encoding strategy for the "value", "name" and "id" attributes.
-	 *
-	 * @var int
-	 */
-	protected $attrEncStrategy = self::ENC_ALL;
-
-	/**
 	 * The list of tag attributes.
 	 *
 	 * @var array
@@ -84,22 +60,16 @@ class CTag extends CObject {
 		}
 	}
 
-	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
 	protected function startToString() {
-		$res = '<'.$this->tagname;
+		$attributes = '';
+
 		foreach ($this->attributes as $key => $value) {
-			if ($value === null) {
-				continue;
+			if ($value !== null) {
+				$attributes .= ' '.$key.'="'.CHtml::encode($value).'"';
 			}
-
-			// a special encoding strategy should be used for the "value", "name" and "id" attributes
-			$strategy = in_array($key, ['value', 'name', 'id'], true) ? $this->attrEncStrategy : $this->encStrategy;
-			$value = $this->encode($value, $strategy);
-			$res .= ' '.$key.'="'.$value.'"';
 		}
-		$res .= '>';
 
-		return $res;
+		return '<'.$this->tagname.$attributes.'>';
 	}
 
 	protected function bodyToString() {
@@ -131,7 +101,7 @@ class CTag extends CObject {
 	public function addItem($value) {
 		// the string contents of an HTML tag should be properly encoded
 		if (is_string($value)) {
-			$value = $this->encode($value, $this->getEncStrategy());
+			$value = CHtml::encode($value);
 		}
 
 		parent::addItem($value);
@@ -326,40 +296,6 @@ class CTag extends CObject {
 		$this->removeAttribute('id');
 
 		return $this;
-	}
-
-	/**
-	 * Sanitizes a string according to the given strategy before outputting it to the browser.
-	 *
-	 * @param string	$value
-	 * @param int		$strategy
-	 *
-	 * @return string
-	 */
-	protected function encode($value, $strategy = self::ENC_NOAMP) {
-		if ($strategy == self::ENC_NOAMP) {
-			$value = str_replace(['<', '>', '"'], ['&lt;', '&gt;', '&quot;'], $value);
-		}
-		else {
-			$value = CHtml::encode($value);
-		}
-
-		return $value;
-	}
-
-	/**
-	 * @param int $encStrategy
-	 */
-	public function setEncStrategy($encStrategy) {
-		$this->encStrategy = $encStrategy;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getEncStrategy() {
-		return $this->encStrategy;
 	}
 
 	/**
