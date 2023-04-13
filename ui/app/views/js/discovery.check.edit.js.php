@@ -267,7 +267,6 @@ window.check_popup = new class {
 					delete fields[key];
 				}
 			}
-			console.log(fields.snmpv3_privpassphrase);
 		}
 
 		if (![<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(fields.type))) {
