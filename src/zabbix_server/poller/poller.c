@@ -299,7 +299,6 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	{
 		case ITEM_TYPE_ZABBIX:
 			res = get_value_agent(item, config_comms->config_timeout, result);
-			zbx_alarm_off();
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */

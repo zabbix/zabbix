@@ -540,8 +540,6 @@ close:
 	zbx_free(publickey);
 	zbx_free(privatekey);
 
-	zbx_alarm_off();
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
