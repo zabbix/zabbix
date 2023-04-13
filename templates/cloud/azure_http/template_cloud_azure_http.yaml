@@ -19,7 +19,7 @@ zabbix_export:
       description: |
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
-        Currently the template supports the discovery of virtual machines (VMs), Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+        Currently the template supports the discovery of virtual machines (VMs), Cosmos DB for MongoDB, Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
@@ -29,8 +29,6 @@ zabbix_export:
           3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, and `{$AZURE.SUBSCRIPTION.ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -155,7 +153,8 @@ zabbix_export:
                     {"method": "Microsoft.DBforMySQL/servers", "version": "2017-12-01"},
                     {"method": "Microsoft.DBforPostgreSQL/flexibleServers", "version": "2021-06-01"},
                     {"method": "Microsoft.DBforPostgreSQL/servers", "version": "2017-12-01"},
-                    {"method": "Microsoft.Sql/servers", "version": "2022-05-01-preview"}
+                    {"method": "Microsoft.Sql/servers", "version": "2022-05-01-preview"},
+                    {"method": "Microsoft.DocumentDB/databaseAccounts", "version": "2022-11-15-preview"}
                 ];
                 data['errors'] = {},
                 data['resources'] = {};
@@ -441,6 +440,117 @@ zabbix_export:
                   value: availability
       discovery_rules:
         -
+          uuid: 3bfbfc8d770a4c77a17d62aaebb55e64
+          name: 'Cosmos DB account discovery'
+          type: DEPENDENT
+          key: azure.cosmos.mongo.db.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: ^Microsoft.DocumentDB/databaseAccounts
+                formulaid: G
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'The list of the Cosmos databases is provided by the subscription.'
+          host_prototypes:
+            -
+              uuid: 16eec30e921e4627b3599b4d06e48072
+              host: 'Azure Cosmos DB {#NAME}'
+              name: 'Azure Cosmos DB {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Databases
+              macros:
+                -
+                  macro: '{$AZURE.RESOURCE.ID}'
+                  value: '{#ID}'
+              tags:
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: resource-group
+                  value: '{#GROUP}'
+                -
+                  tag: version
+                  value: '{#VERSION}'
+          master_item:
+            key: azure.get.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
+              lld_macro: '{#VERSION}'
+              path: $.kind
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.resources.value
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          overrides:
+            -
+              name: MongoDB
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#VERSION}'
+                    value: ^MongoDB$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure Cosmos DB for MongoDB by HTTP'
+        -
           uuid: c875a410ddd84ccfbc5b407cd6e34803
           name: 'Microsoft SQL databases discovery'
           type: DEPENDENT
@@ -473,11 +583,11 @@ zabbix_export:
                 formulaid: D
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
               -
@@ -611,11 +721,11 @@ zabbix_export:
                 formulaid: D
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the MySQL servers is provided by the subscription.'
@@ -744,11 +854,11 @@ zabbix_export:
                 formulaid: D
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the PostgreSQL servers is provided by the subscription.'
@@ -873,11 +983,11 @@ zabbix_export:
                 formulaid: D
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of all storage accounts available under the subscription.'
@@ -1257,7 +1367,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1290,7 +1400,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -1365,8 +1475,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -1528,7 +1638,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1559,7 +1669,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'The upper limit on the amount of storage that can be used by Azure Files Service in bytes.'
+              description: 'The upper limit on the amount of storage that can be used by Azure Files Service, in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1620,7 +1730,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'The amount of storage used by the snapshots in storage account''s File service in bytes.'
+              description: 'The amount of storage used by the snapshots in storage account''s File service, in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1683,7 +1793,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -1758,8 +1868,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -1791,7 +1901,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1919,7 +2029,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1982,7 +2092,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -2057,8 +2167,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -2091,7 +2201,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -2339,7 +2449,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'The amount of ingress data expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2372,7 +2482,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                The average end-to-end latency of successful requests made to a storage service or the specified API operation expressed in milliseconds.
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
                 -
@@ -2447,8 +2557,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -2480,8 +2590,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
-                This number includes successful and failed requests and also requests, which produced errors.
-                Use `ResponseType` dimension for the number of different type of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -2545,25 +2655,25 @@ zabbix_export:
               name: 'Azure: Capacity by storage [{#NAME}]'
               graph_items:
                 -
-                  color: 1A7C11
+                  color: 199C0D
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.used.capacity[{#NAME}]'
                 -
                   sortorder: '1'
-                  color: 2774A4
+                  color: F63100
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.blob.capacity[{#NAME}]'
                 -
                   sortorder: '2'
-                  color: F63100
+                  color: 00611C
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.table.capacity[{#NAME}]'
                 -
                   sortorder: '3'
-                  color: A54F10
+                  color: F7941D
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.file.capacity[{#NAME}]'
@@ -2578,25 +2688,25 @@ zabbix_export:
               name: 'Azure: Transactions by storage [{#NAME}]'
               graph_items:
                 -
-                  color: 1A7C11
+                  color: 199C0D
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.transactions[{#NAME}]'
                 -
                   sortorder: '1'
-                  color: 2774A4
+                  color: F63100
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.blob.transactions[{#NAME}]'
                 -
                   sortorder: '2'
-                  color: F63100
+                  color: 00611C
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.table.transactions[{#NAME}]'
                 -
                   sortorder: '3'
-                  color: A54F10
+                  color: F7941D
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.file.transactions[{#NAME}]'
@@ -2662,11 +2772,11 @@ zabbix_export:
                 formulaid: D
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
                 formulaid: A
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'The list of the virtual machines is provided by the subscription.'
@@ -2744,6 +2854,22 @@ zabbix_export:
           macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
         -
+          macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
@@ -2804,11 +2930,11 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
-          macro: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+          macro: '{$AZURE.RESOURCE.GROUP.MATCHES}'
           value: '.*'
           description: 'This macro is used in discovery rules.'
         -
-          macro: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
+          macro: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in discovery rules.'
         -
@@ -2862,6 +2988,832 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in virtual machines discovery rule.'
     -
+      uuid: 29325098807848aa928b4192ad5e020f
+      template: 'Azure Cosmos DB for MongoDB by HTTP'
+      name: 'Azure Cosmos DB for MongoDB by HTTP'
+      description: |
+        This template is designed to monitor Microsoft Azure Cosmos DB for MongoDB by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
+        
+        Generated by official Zabbix template tool "Templator" beta 2.0-12042023
+      groups:
+        -
+          name: Templates/Cloud
+      items:
+        -
+          uuid: 9e247bdb17f44630b9440b59d5ef251b
+          name: 'Azure MongoDB: Autoscale max throughput'
+          type: DEPENDENT
+          key: azure.cosmosdb.autoscale.max.throughput
+          delay: '0'
+          history: 7d
+          description: 'The autoscale max throughput.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.AutoscaleMaxThroughput.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 35a7d2c96990407f937e07fd160266a9
+          name: 'Azure MongoDB: Get errors'
+          type: DEPENDENT
+          key: azure.cosmosdb.data.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: dfd484aa8a4e4b759e4e34c5318c7176
+              expression: 'length(last(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.data.errors))>0'
+              name: 'Azure MongoDB: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 647faea1597c4da6a3cd78694be8e77e
+          name: 'Azure MongoDB: Get data'
+          type: SCRIPT
+          key: azure.cosmosdb.data.get
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var AzureCosmoDB = {
+                params: {},
+                token: null,
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    AzureCosmoDB.params = params;
+                },
+            
+                login: function () {
+                    var response, login = new HttpRequest();
+                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
+                    response = login.post(
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmoDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCosmoDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCosmoDB.params.password)
+                    );
+            
+                    if (login.getStatus() !== 200) {
+                        throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+                    }
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse login session response.';
+                    }
+                    if (!response.hasOwnProperty('access_token')) {
+                        throw 'Authentication response does not contain access token.';
+                    }
+                    AzureCosmoDB.token = response['access_token'];
+                },
+            
+                request: function (url) {
+                    var response, request = new HttpRequest();
+                    if (!AzureCosmoDB.token) {
+                        throw 'Request does not contain access token.';
+                    }
+                    request.addHeader('Accept: application/json');
+                    request.addHeader('Authorization: Bearer ' + AzureCosmoDB.token);
+                    Zabbix.log(4, '[ AzureCosmoDB ] request url: ' + url);
+                    response = request.get(url);
+            
+                    if (request.getStatus() !== 200) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+                },
+            
+                getField: function (data, path) {
+                    var steps = path.split('.');
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            throw 'Required field was not found: ' + path;
+                        }
+            
+                        data = data[step];
+                    }
+            
+                    return data;
+                },
+            
+                getMetricsData: function () {
+                    var data = {};
+                    start_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date(new Date().getTime()).toISOString().replace(/\.\d+/, '');
+                    endpoints = {
+                        'availability': '/providers/Microsoft.Insights/metrics?metricnames=ServiceAvailability&api-version=2021-05-01&interval=PT1H&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                        'requests': '/providers/Microsoft.Insights/metrics?metricnames=DataUsage,IndexUsage,DocumentQuota,AvailableStorage,DocumentCount,NormalizedRUConsumption,PhysicalPartitionThroughputInfo,PhysicalPartitionSizeInfo,AutoscaleMaxThroughput,ProvisionedThroughput,TotalRequests,TotalRequestUnits,MetadataRequests,MongoRequests,MongoRequestCharge,ServerSideLatency,ServerSideLatencyGateway,ServerSideLatencyDirect,ReplicationLatency&api-version=2021-05-01&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date),
+                    };
+            
+                    Object.keys(endpoints).forEach(function (field) {
+                        data[field] = {};
+                        try {
+                            metrics = AzureCosmoDB.request('https://management.azure.com' + AzureCosmoDB.params.resource_id + endpoints[field]);
+                            if (!metrics.hasOwnProperty('value')) {
+                                throw 'Failed getting required field. Check debug log for more information.';
+                            }
+            
+                            for (k in metrics.value) {
+                                key = AzureCosmoDB.getField(metrics.value[k], 'name.value')
+                                if (metrics.value[k].timeseries.length === 0) {
+                                    metrics.value[k].timeseries.push({ 'data': ['nodata'] })
+                                }
+                                data[field][key] = AzureCosmoDB.getField(metrics.value[k], 'timeseries.0.data.0');
+                            }
+                        }
+                        catch (error) {
+                            data.error = error.toString();
+                        }
+                    });
+                    return data
+                }
+            
+            };
+            
+            try {
+                AzureCosmoDB.setParams(JSON.parse(value));
+                AzureCosmoDB.login();
+                return JSON.stringify(AzureCosmoDB.getMetricsData());
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ AzureCosmoDB ] ERROR: ' + error);
+                return JSON.stringify({ 'error': error });
+            }
+          description: 'The result of API requests is expressed in the JSON.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP.ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT.ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION.ID}'
+            -
+              name: resource_id
+              value: '{$AZURE.RESOURCE.ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 947a2eb530754a609fa81c59e29fe7b7
+          name: 'Azure MongoDB: Data usage'
+          type: DEPENDENT
+          key: azure.cosmosdb.data.usage
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total data usage.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.DataUsage.total
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 0bf3da9168144016b663c9b8e76447fa
+          name: 'Azure MongoDB: Document count'
+          type: DEPENDENT
+          key: azure.cosmosdb.document.count
+          delay: '0'
+          history: 7d
+          description: 'The total document count.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.DocumentCount.total
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 7fa0f59f8cfa4d9e83086b203e4f71ea
+          name: 'Azure MongoDB: Document quota'
+          type: DEPENDENT
+          key: azure.cosmosdb.document.quota
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total storage quota.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.DocumentQuota.total
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: b09f9445d960415185457b89b6a73452
+          name: 'Azure MongoDB: Index usage'
+          type: DEPENDENT
+          key: azure.cosmosdb.index.usage
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The total index usage.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.IndexUsage.total
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: cd35f04b180542cda50dc5d4e979e54e
+          name: 'Azure MongoDB: Metadata requests'
+          type: DEPENDENT
+          key: azure.cosmosdb.metadata.requests
+          delay: '0'
+          history: 7d
+          description: |
+            The count of metadata requests. 
+            Cosmos DB maintains system metadata collection for each account, that allows you to enumerate collections, databases, etc, and their configurations, free of charge.
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.MetadataRequests.count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: e42cf83e456a490295a84cfe9eb288ef
+          name: 'Azure MongoDB: Mongo requests'
+          type: DEPENDENT
+          key: azure.cosmosdb.mongo.requests
+          delay: '0'
+          history: 7d
+          description: 'The number of Mongo requests made.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.MongoRequests.count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 8fd4068986af444799ae64c6bc8f16a6
+          name: 'Azure MongoDB: Mongo request charge'
+          type: DEPENDENT
+          key: azure.cosmosdb.mongo.requests.charge
+          delay: '0'
+          history: 7d
+          description: 'The Mongo request units consumed.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.MongoRequestCharge.total
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: fda6b39ce6ef4b8c8418b2e123ecdd17
+          name: 'Azure MongoDB: Normalized RU consumption'
+          type: DEPENDENT
+          key: azure.cosmosdb.normalized.ru.consumption
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'The max RU consumption percentage per minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.NormalizedRUConsumption.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: be6800214a0443e899c40f8a4b6c3f21
+          name: 'Azure MongoDB: Physical partition size'
+          type: DEPENDENT
+          key: azure.cosmosdb.physical.partition.size
+          delay: '0'
+          history: 7d
+          units: B
+          description: 'The physical partition size in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.PhysicalPartitionSizeInfo.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: e30d5eadde15427484e7a0d1cb38e9e3
+          name: 'Azure MongoDB: Physical partition throughput'
+          type: DEPENDENT
+          key: azure.cosmosdb.physical.partition.throughput
+          delay: '0'
+          history: 7d
+          description: 'The physical partition throughput.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.PhysicalPartitionThroughputInfo.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 49311bbfb2584a46b42ed1a7d8fcfd94
+          name: 'Azure MongoDB: Provisioned throughput'
+          type: DEPENDENT
+          key: azure.cosmosdb.provisioned.throughput
+          delay: '0'
+          history: 7d
+          description: 'The provisioned throughput.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ProvisionedThroughput.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 6d7175e27d10406191c883dc2e5949e4
+          name: 'Azure MongoDB: Replication latency, P99'
+          type: DEPENDENT
+          key: azure.cosmosdb.replication.latency
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The P99 replication latency across source and target regions for geo-enabled account.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ReplicationLatency.average
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: d9b5af0c71874114b48464ce20f8cf3d
+          name: 'Azure MongoDB: Server side latency'
+          type: DEPENDENT
+          key: azure.cosmosdb.server.side.latency
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The server side latency.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ServerSideLatency.average
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 7587d3750d1643f085db5931670dc2f3
+          name: 'Azure MongoDB: Server side latency, direct'
+          type: DEPENDENT
+          key: azure.cosmosdb.server.side.latency.direct
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The server side latency in direct connection mode.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ServerSideLatencyDirect.average
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 0aefdc3101fe4bcba4743d6e32671554
+          name: 'Azure MongoDB: Server side latency, gateway'
+          type: DEPENDENT
+          key: azure.cosmosdb.server.side.latency.gateway
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The server side latency in gateway connection mode.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.ServerSideLatencyGateway.average
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 42bd03c1753b4f19bc9793b03834cd3d
+          name: 'Azure MongoDB: Service availability'
+          type: DEPENDENT
+          key: azure.cosmosdb.service.availability
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The account requests availability at one hour granularity.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.availability.ServiceAvailability.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: c7649cd317f04a3d8fec0eebe3df6766
+              expression: '(min(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.service.availability,#3))<{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}'
+              name: 'Azure MongoDB: Cosmos DB for MongoDB account: Availability is low'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: f4d4d2def5e945ab9048ada4813b7f04
+          name: 'Azure MongoDB: Total request units'
+          type: DEPENDENT
+          key: azure.cosmosdb.total.request.units
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The request units consumed per minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.TotalRequestUnits.total
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 3dd2cd4edb7746edb9d917c83b280ca3
+          name: 'Azure MongoDB: Total requests'
+          type: DEPENDENT
+          key: azure.cosmosdb.total.requests
+          delay: '0'
+          history: 7d
+          description: 'Number of requests per minute.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests.TotalRequests.count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.cosmosdb.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+        -
+          tag: target
+          value: cosmosdb
+        -
+          tag: target
+          value: mongodb
+      macros:
+        -
+          macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 15s
+          description: 'A response timeout for an API.'
+        -
+          macro: '{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}'
+          value: '70'
+          description: 'The warning threshold of the Cosmos DB for MongoDB service availability.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.RESOURCE.ID}'
+          description: 'Microsoft Azure Cosmos DB ID.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION.ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT.ID}'
+          description: 'Microsoft Azure tenant ID.'
+      dashboards:
+        -
+          uuid: 323fb91b388a44bfbd4b7d634f6e6b6c
+          name: 'Overview Cosmos DB for MongoDB'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '14'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Cosmos DB for MongoDB by HTTP'
+                        name: 'Azure MongoDB: Latency'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '9'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Cosmos DB for MongoDB by HTTP'
+                        name: 'Azure MongoDB: Requests'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '4'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Cosmos DB for MongoDB by HTTP'
+                        name: 'Azure MongoDB: Usage'
+                -
+                  type: ITEM
+                  name: 'Document Count'
+                  x: '18'
+                  width: '6'
+                  height: '4'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Cosmos DB for MongoDB by HTTP'
+                        key: azure.cosmosdb.document.count
+                -
+                  type: ITEM
+                  name: 'Normalized RU Consumption'
+                  x: '12'
+                  width: '6'
+                  height: '4'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '4'
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Cosmos DB for MongoDB by HTTP'
+                        key: azure.cosmosdb.normalized.ru.consumption
+                -
+                  type: ITEM
+                  name: 'Provisioned Throughput'
+                  x: '6'
+                  width: '6'
+                  height: '4'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Cosmos DB for MongoDB by HTTP'
+                        key: azure.cosmosdb.provisioned.throughput
+                -
+                  type: ITEM
+                  name: 'Service Availability'
+                  width: '6'
+                  height: '4'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: show
+                      value: '4'
+                    -
+                      type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    -
+                      type: STRING
+                      name: units
+                      value: '%'
+                    -
+                      type: STRING
+                      name: up_color
+                      value: 4CAF50
+                    -
+                      type: STRING
+                      name: units_color
+                      value: 66BB6A
+                    -
+                      type: STRING
+                      name: value_color
+                      value: 66BB6A
+                    -
+                      type: STRING
+                      name: down_color
+                      value: FF0000
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Cosmos DB for MongoDB by HTTP'
+                        key: azure.cosmosdb.service.availability
+    -
       uuid: 2d8b9329b5d04cdf85bf17d2d0db2b29
       template: 'Azure Microsoft SQL Database by HTTP'
       name: 'Azure Microsoft SQL Database by HTTP'
@@ -2877,8 +3829,6 @@ zabbix_export:
           3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -3721,7 +4671,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The space used in `tempdb` data files expressed in bytes. Not applicable to the data warehouses.'
+          description: 'The space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -3769,7 +4719,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The space used in `tempdb` transaction log file in bytes. Not applicable to the data warehouses.'
+          description: 'The space used in `tempdb` transaction log file, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -3823,24 +4773,24 @@ zabbix_export:
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
-          value: 60s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -3887,8 +4837,6 @@ zabbix_export:
           3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -4687,7 +5635,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Space used in `tempdb` data files expressed in bytes. Not applicable to the data warehouses.'
+          description: 'Space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -4735,7 +5683,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Space used in `tempdb` transaction log files expressed in bytes. Not applicable to the data warehouses.'
+          description: 'Space used in `tempdb` transaction log files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -4789,24 +5737,24 @@ zabbix_export:
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
-          value: 60s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -4853,8 +5801,6 @@ zabbix_export:
           3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -4998,11 +5944,11 @@ zabbix_export:
           triggers:
             -
               uuid: 3346ea2331c14fa18658eb33e461ec7c
-              expression: 'min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+              expression: 'min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED.CONN.MAX.WARN}'
               name: 'Azure MySQL: Server has aborted connections'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED_CONN.MAX.WARN}`.'
+              description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED.CONN.MAX.WARN}`.'
               tags:
                 -
                   tag: scope
@@ -5392,7 +6338,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network egress of a host expressed in bytes.'
+          description: 'Network egress of a host, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -5417,7 +6363,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network ingress of a host expressed in bytes.'
+          description: 'Network ingress of a host, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -5462,7 +6408,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The replication lag expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -5484,7 +6430,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used backup storage expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -5505,7 +6451,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -5526,7 +6472,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization expressed in %.'
+          description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -5570,7 +6516,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -5598,24 +6544,24 @@ zabbix_export:
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
-          value: 60s
+          value: 15s
           description: 'A response timeout for an API.'
         -
-          macro: '{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+          macro: '{$AZURE.DB.ABORTED.CONN.MAX.WARN}'
           value: '25'
           description: 'The number of failed attempts to connect to the MySQL server for a trigger expression.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization expressed in %.'
+          description: 'The critical threshold of the storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization expressed in %.'
+          description: 'The warning threshold of the storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -5662,8 +6608,6 @@ zabbix_export:
           3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -5828,11 +6772,11 @@ zabbix_export:
           triggers:
             -
               uuid: 5b3a09ca04704e6a9972ee4865d358cd
-              expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+              expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED.CONN.MAX.WARN}'
               name: 'Azure MySQL: Server has failed connections'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED_CONN.MAX.WARN}`.'
+              description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED.CONN.MAX.WARN}`.'
               tags:
                 -
                   tag: scope
@@ -6203,7 +7147,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The replication lag expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -6225,7 +7169,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used backup storage expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6246,7 +7190,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6267,7 +7211,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization expressed in %.'
+          description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -6311,7 +7255,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit of a server log expressed in bytes.'
+          description: 'The storage limit of a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6332,7 +7276,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization by a server log expressed in %.'
+          description: 'The storage utilization by a server log, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -6353,7 +7297,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a server log expressed in bytes.'
+          description: 'The storage space used by a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6374,7 +7318,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6402,28 +7346,28 @@ zabbix_export:
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
-          value: 60s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
-          macro: '{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+          macro: '{$AZURE.DB.FAILED.CONN.MAX.WARN}'
           value: '25'
           description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -6470,8 +7414,6 @@ zabbix_export:
           3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -7182,7 +8124,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used backup storage expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7204,7 +8146,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Free storage space expressed in bytes.'
+          description: 'Free storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7225,7 +8167,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization expressed in %.'
+          description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -7269,7 +8211,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a transaction log expressed in bytes.'
+          description: 'The storage space used by a transaction log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7290,7 +8232,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7338,24 +8280,24 @@ zabbix_export:
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
-          value: 60s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -7402,8 +8344,6 @@ zabbix_export:
           3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -7932,7 +8872,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The replication lag expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -7954,7 +8894,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Lag expressed in bytes for the most lagging replica.'
+          description: 'Lag for the most lagging replica, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7976,7 +8916,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used backup storage expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7997,7 +8937,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8018,7 +8958,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization expressed in %.'
+          description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -8062,7 +9002,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit of a server log expressed in bytes.'
+          description: 'The storage limit of a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8083,7 +9023,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization by a server log expressed in %.'
+          description: 'The storage utilization by a server log, expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -8104,7 +9044,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a server log expressed in bytes.'
+          description: 'The storage space used by a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8125,7 +9065,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8153,24 +9093,24 @@ zabbix_export:
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
-          value: 60s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of memory utilization expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of storage utilization expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of storage utilization expressed in %.'
+          description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -8217,8 +9157,6 @@ zabbix_export:
           3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
-        
-        Template tooling version used: 0.43
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -8616,7 +9554,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Baseline bytes per second throughput Data Disk can achieve without bursting.'
+          description: 'Baseline bytes per second throughput that the data disk can achieve without bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -9092,7 +10030,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Inbound Flows are a number of the current flows in the inbound direction (the traffic going into the VM).'
+          description: 'The number of current flows in the inbound direction (the traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -9134,7 +10072,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Outbound Flows are a number of the current flows in the outbound direction (the traffic going out of the VM).'
+          description: 'The number of current flows in the outbound direction (the traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -9197,7 +10135,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'The number of bytes received on all network interfaces by the VMs (incoming traffic).'
+          description: 'The number of bytes received by the VMs via all network interfaces (incoming traffic).'
           preprocessing:
             -
               type: JSONPATH
@@ -9223,7 +10161,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'The number of bytes out on all network interfaces by the VMs (outgoing traffic).'
+          description: 'The number of bytes sent by the VMs via all network interfaces (outgoing traffic).'
           preprocessing:
             -
               type: JSONPATH
@@ -9293,7 +10231,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Maximum bytes per second throughput OS Disk can achieve with bursting.'
+          description: 'Maximum bytes per second throughput that the OS Disk can achieve with bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -9315,7 +10253,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Maximum IOPS OS Disk can achieve with bursting.'
+          description: 'Maximum IOPS that the OS Disk can achieve with bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -9402,7 +10340,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Baseline bytes per second throughput OS Disk can achieve without bursting.'
+          description: 'Baseline bytes per second throughput that the OS Disk can achieve without bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -9662,7 +10600,7 @@ zabbix_export:
           description: 'The App ID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
-          value: 60s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.PASSWORD}'
@@ -9680,7 +10618,7 @@ zabbix_export:
         -
           macro: '{$AZURE.VM.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
       valuemaps:
         -
           uuid: 38c8ce1516704ec2a6f1ea9686db56b9
@@ -9704,13 +10642,13 @@ zabbix_export:
       name: 'Azure: Data disk read/write bytes'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.read.bps
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.write.bps
@@ -9719,13 +10657,13 @@ zabbix_export:
       name: 'Azure: Data disk read/write rates'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.read.ops
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.write.ops
@@ -9734,13 +10672,13 @@ zabbix_export:
       name: 'Azure: Disk read/write bytes'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.read.bytes
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.write.bytes
@@ -9749,13 +10687,13 @@ zabbix_export:
       name: 'Azure: Disk read/write rates'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.read.ops
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.write.ops
@@ -9764,25 +10702,25 @@ zabbix_export:
       name: 'Azure: Flows'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.inbound
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.outbound
         -
           sortorder: '2'
-          color: F63100
+          color: 00611C
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.inbound.max
         -
           sortorder: '3'
-          color: A54F10
+          color: F7941D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.outbound.max
@@ -9791,13 +10729,13 @@ zabbix_export:
       name: 'Azure: Network traffic'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.network.in.total
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.network.out.total
@@ -9806,13 +10744,13 @@ zabbix_export:
       name: 'Azure: OS disk read/write bytes'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.read.bps
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.write.bps
@@ -9821,13 +10759,13 @@ zabbix_export:
       name: 'Azure: OS disk read/write rates'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.read.ops
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.write.ops
@@ -9836,13 +10774,13 @@ zabbix_export:
       name: 'Azure: Premium data disk cache read'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.data.disk.cache.read.hit
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.data.disk.cache.read.miss
@@ -9851,13 +10789,13 @@ zabbix_export:
       name: 'Azure: Premium OS disk cache read'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.hit
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
@@ -9866,19 +10804,19 @@ zabbix_export:
       name: 'Azure Microsoft SQL: Connections'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.connections.failed.system
         -
           sortorder: '2'
-          color: F63100
+          color: 00611C
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.firewall.blocked
@@ -9887,19 +10825,19 @@ zabbix_export:
       name: 'Azure Microsoft SQL: Connections'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.connections.failed.system
         -
           sortorder: '2'
-          color: F63100
+          color: 00611C
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.firewall.blocked
@@ -9908,13 +10846,13 @@ zabbix_export:
       name: 'Azure Microsoft SQL: CPU usage'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.cpu.limit
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.cpu.used
@@ -9923,13 +10861,13 @@ zabbix_export:
       name: 'Azure Microsoft SQL: CPU usage'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.cpu.limit
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.cpu.used
@@ -9938,13 +10876,13 @@ zabbix_export:
       name: 'Azure Microsoft SQL: Storage utilization'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.storage.used
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.storage.allocated
@@ -9953,34 +10891,115 @@ zabbix_export:
       name: 'Azure Microsoft SQL: Storage utilization'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.storage.used
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.storage.allocated
+    -
+      uuid: 89256a1eba8c49d2b7469a68ff050ac5
+      name: 'Azure MongoDB: Latency'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency.gateway
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency
+        -
+          sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.server.side.latency.direct
+        -
+          sortorder: '3'
+          color: F7941D
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.replication.latency
+    -
+      uuid: a1225fc27d334c5bbb5043e3d468bf02
+      name: 'Azure MongoDB: Requests'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.total.requests
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.total.request.units
+        -
+          sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.metadata.requests
+        -
+          sortorder: '3'
+          color: F7941D
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.mongo.requests
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.mongo.requests.charge
+    -
+      uuid: 07168aaf3abb42f6b61746cc6e2d2910
+      name: 'Azure MongoDB: Usage'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.data.usage
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.index.usage
+        -
+          sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Azure Cosmos DB for MongoDB by HTTP'
+            key: azure.cosmosdb.document.quota
     -
       uuid: 750ae48e6ef749c19a06f4bbe716f92f
       name: 'Azure MySQL: Connections'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.connections.active
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.connections.total
         -
           sortorder: '2'
-          color: F63100
+          color: 00611C
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.connections.aborted
@@ -9989,13 +11008,13 @@ zabbix_export:
       name: 'Azure MySQL: Connections'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.connections.active
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.connections.failed
@@ -10004,13 +11023,13 @@ zabbix_export:
       name: 'Azure MySQL: Network traffic'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.network.egress
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.network.ingress
@@ -10019,13 +11038,13 @@ zabbix_export:
       name: 'Azure MySQL: Network traffic'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.network.egress
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.network.ingress
@@ -10034,13 +11053,13 @@ zabbix_export:
       name: 'Azure MySQL: Server log storage utilization'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.server.log.used
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.server.log.limit
@@ -10049,13 +11068,13 @@ zabbix_export:
       name: 'Azure MySQL: Storage utilization'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.storage.used
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.storage.limit
@@ -10064,13 +11083,13 @@ zabbix_export:
       name: 'Azure MySQL: Storage utilization'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.used
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.limit
@@ -10079,19 +11098,19 @@ zabbix_export:
       name: 'Azure PostgreSQL: Connections'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.connections.active
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.connections.succeeded
         -
           sortorder: '2'
-          color: F63100
+          color: 00611C
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.connections.failed
@@ -10100,13 +11119,13 @@ zabbix_export:
       name: 'Azure PostgreSQL: Connections'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.connections.active
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.connections.failed
@@ -10115,13 +11134,13 @@ zabbix_export:
       name: 'Azure PostgreSQL: Network traffic'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.network.egress
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.network.ingress
@@ -10130,13 +11149,13 @@ zabbix_export:
       name: 'Azure PostgreSQL: Network traffic'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.network.egress
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.network.ingress
@@ -10145,13 +11164,13 @@ zabbix_export:
       name: 'Azure PostgreSQL: Server log storage utilization'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.server.log.used
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.server.log.limit
@@ -10160,13 +11179,13 @@ zabbix_export:
       name: 'Azure PostgreSQL: Storage utilization'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.storage.used
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.storage.free
@@ -10175,13 +11194,13 @@ zabbix_export:
       name: 'Azure PostgreSQL: Storage utilization'
       graph_items:
         -
-          color: 1A7C11
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.used
         -
           sortorder: '1'
-          color: 2774A4
+          color: F63100
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.limit
