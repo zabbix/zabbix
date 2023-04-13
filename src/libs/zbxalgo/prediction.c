@@ -22,8 +22,8 @@
 #include "log.h"
 #include "zbxnum.h"
 
-#define DB_INFINITY	(1e12 - 1e-4)
 
+#define DB_INFINITY	(1.7976931348623157E+308)
 #define ZBX_MATH_EPSILON	(1e-6)
 
 #define ZBX_IS_NAN(x)	((x) != (x))
