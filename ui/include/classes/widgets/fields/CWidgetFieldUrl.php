@@ -33,7 +33,11 @@ class CWidgetFieldUrl extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
-			->setValidationRules(['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO]);
+			->setValidationRules([
+				'type' => API_URL,
+				'flags' => API_ALLOW_USER_MACRO,
+				'length' => $this->max_length
+			]);
 	}
 
 	public function setFlags(int $flags): self {

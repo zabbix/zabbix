@@ -54,11 +54,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('templategroup');
-
-				this._reload(e.detail);
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail));
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -127,6 +123,7 @@
 				postMessageDetails('success', success.messages);
 			}
 
+			uncheckTableRows('templategroup');
 			location.href = location.href;
 		}
 	}

@@ -44,13 +44,13 @@ window.popup_import_compare = new class {
 
 	addEventListeners() {
 		this.form.addEventListener('click', (e) => {
-			if (e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')) {
-				e.preventDefault();
-				const arrow = e.target.querySelector('span');
+			if (e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')
+					|| e.target.parentNode.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')) {
+				const btn = e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>') ? e.target : e.target.parentNode;
+				const arrow = btn.querySelector('span');
 				const show = arrow.classList.contains('<?= ZBX_STYLE_ARROW_UP ?>');
 
-				e.target.parentNode.nextSibling.style.display = show ? '' : 'none';
-
+				btn.parentNode.nextSibling.style.display = show ? '' : 'none';
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_UP ?>');
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_DOWN ?>');
 			}

@@ -295,7 +295,32 @@ class testFormHost extends CWebTest {
 			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use combined requests"]')->one()
 					->asCheckbox()->isChecked()
 			);
+			if ($field === 'SNMPv3') {
+				// Check fields' lengths.
+				$field_lenghts = [
+					'Max repetition count' =>  20,
+					'Context name' => 255,
+					'Security name' => 64,
+					'Authentication passphrase' => 64,
+					'Privacy passphrase' => 64
+				];
+
+				foreach ($field_lenghts as $label => $length) {
+					$this->assertEquals($length, $snmp_form->getField($label)->getAttribute('maxlength'));
+				}
+			}
 		}
+
+		// Check hintbox.
+		$form->query('class:icon-help-hint')->one()->waitUntilClickable()->click();
+		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
+
+		// Assert text.
+		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
+
+		// Close the hintbox.
+		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->waitUntilNotPresent();
 
 		// Close host form popup to avoid unexpected alert in further cases.
 		if (!$this->standalone) {
@@ -305,13 +330,14 @@ class testFormHost extends CWebTest {
 
 	public static function getCreateData() {
 		return [
-			// Host form without mandatory values.
+			// #0 Host form without mandatory values.
 			[
 				[
 					'expected' => TEST_BAD,
 					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.']
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -321,6 +347,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect value for field "host": cannot be empty.'
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -330,7 +357,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Field "groups" is mandatory.'
 				]
 			],
-			// Existing host name and visible name.
+			// #3 Existing host name and visible name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -342,6 +369,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Host with the same name "Available host" already exists.'
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -353,6 +381,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Template with the same name "Empty template" already exists.'
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -365,7 +394,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Host with the same visible name "ЗАББИКС Сервер" already exists.'
 				]
 			],
-			// Host name field validation.
+			// #6 Host name field validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -377,7 +406,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect characters used for host name "@#$%^&*()_+".'
 				]
 			],
-			// UTF8MB4 check.
+			// #7 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -389,7 +418,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect characters used for host name "😀".'
 				]
 			],
-			// Interface fields validation.
+			// #8 Interface fields validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -408,6 +437,7 @@ class testFormHost extends CWebTest {
 					'error' => 'IP and DNS cannot be empty for host interface.'
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -427,6 +457,7 @@ class testFormHost extends CWebTest {
 					'error' => 'IP and DNS cannot be empty for host interface.'
 				]
 			],
+			// 10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -446,6 +477,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Interface with DNS "test" cannot have empty IP address.'
 				]
 			],
+			// 11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -465,6 +497,7 @@ class testFormHost extends CWebTest {
 						' "Use DNS" property on "Empty dns and filled in IP".'
 				]
 			],
+			// 12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -483,7 +516,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Port cannot be empty for host interface.'
 				]
 			],
-			// IP validation.
+			// #13 IP validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -502,6 +535,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Invalid IP address "test".'
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -520,7 +554,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Invalid IP address "127.0.0.".'
 				]
 			],
-			// Port validation.
+			// #15 Port validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -539,6 +573,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect interface port "100500" provided.'
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -557,6 +592,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect interface port "test" provided.'
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -575,7 +611,7 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect interface port "10.5" provided.'
 				]
 			],
-			// Empty SNMP community.
+			// #18 Empty SNMP community.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -594,7 +630,26 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect arguments passed to function.'
 				]
 			],
-			// Host without interface.
+			// #19 Zero in SNMP Max repetition count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Invalid snmp community',
+						'Host groups' => 'Zabbix servers'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => '0'
+						]
+					],
+					'error_title' => 'Cannot add host',
+					'error' => 'Incorrect arguments passed to function.'
+				]
+			],
+			// #20 Host without interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -604,7 +659,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// UTF8MB4 check.
+			// #21 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -616,7 +671,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// Default values of all interfaces.
+			// #22 Default values of all interfaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -644,7 +699,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// Change default host interface.
+			// #23 Change default host interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -670,7 +725,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// Different versions of SNMP interface and encryption.
+			// #24 Different versions of SNMP interface and encryption.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -689,7 +744,8 @@ class testFormHost extends CWebTest {
 							'action' => USER_ACTION_ADD,
 							'type' => 'SNMP',
 							'SNMP version' => 'SNMPv2',
-							'SNMP community' => '{$SNMP_TEST}'
+							'SNMP community' => '{$SNMP_TEST}',
+							'Max repetition count' => '20'
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -725,7 +781,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// All interfaces and all fields in form.
+			// #25 All interfaces and all fields in form.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -754,6 +810,7 @@ class testFormHost extends CWebTest {
 							'Connect to' => 'DNS',
 							'port' => '200',
 							'SNMP version' => 'SNMPv3',
+							'Max repetition count' => '15',
 							'Context name' => 'aaa',
 							'Security name' => 'bbb',
 							'Security level' => 'authPriv',
@@ -1183,6 +1240,26 @@ class testFormHost extends CWebTest {
 					'error_title' => 'Cannot update host',
 					'error' => 'Incorrect arguments passed to function.'
 				]
+			],
+			// Zero Max repetition count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Invalid max repetition count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Max repetition count' => '0'
+						]
+					],
+					'error_title' => 'Cannot update host',
+					'error' => 'Incorrect arguments passed to function.'
+				]
 			]
 		];
 	}
@@ -1236,6 +1313,7 @@ class testFormHost extends CWebTest {
 							'Connect to' => 'DNS',
 							'port' => '166',
 							'SNMP version' => 'SNMPv3',
+							'Max repetition count' => '10',
 							'Context name' => 'zabbix',
 							'Security name' => 'selenium',
 							'Security level' => 'authPriv',
@@ -1305,13 +1383,13 @@ class testFormHost extends CWebTest {
 							'port' => '122',
 							'Connect to' => 'DNS',
 							'SNMP version' => 'SNMPv3',
+							'Max repetition count' => '90',
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'authNoPriv',
 							'Authentication protocol' => 'SHA384',
 							'Authentication passphrase' => 'new-test123',
-							'Use combined requests' => true,
-							'Max repetition count' => 10
+							'Use combined requests' => true
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1409,11 +1487,11 @@ class testFormHost extends CWebTest {
 							'index' => 2,
 							'port' => '501',
 							'SNMP version' => 'SNMPv3',
+							'Max repetition count' => '20',
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'noAuthNoPriv',
-							'Use combined requests' => true,
-							'Max repetition count' => 10
+							'Use combined requests' => true
 						],
 						[
 							'action' => USER_ACTION_REMOVE,
@@ -1666,6 +1744,7 @@ class testFormHost extends CWebTest {
 								'Connect to' => 'IP',
 								'port' => '122',
 								'SNMP version' => 'SNMPv3',
+								'Max repetition count' => '13',
 								'Context name' => 'zabbix',
 								'Security name' => 'selenium',
 								'Security level' => 'authPriv',

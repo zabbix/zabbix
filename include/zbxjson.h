@@ -291,7 +291,6 @@ const char	*zbx_json_strerror(void);
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
 void	zbx_json_clean(struct zbx_json *j);
-void	zbx_json_cleanarray(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
@@ -385,5 +384,7 @@ int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj);
 void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);
 int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output);
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj);
+
+void	zbx_jsonobj_disable_indexing(zbx_jsonobj_t *obj);
 
 #endif /* ZABBIX_ZJSON_H */

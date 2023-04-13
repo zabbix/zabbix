@@ -5,7 +5,9 @@
 	"name": "SLA report",
 	"namespace": "SlaReport",
 	"version": "1.0",
-	"author": "Zabbix SIA",
+	"author": "Zabbix",
+	"description": "Displays SLA reports.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/sla_report",
 	"widget": {
 		"refresh_rate": 0
 	},

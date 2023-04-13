@@ -120,17 +120,16 @@ trait TableTrait {
 		$table = $this->getTable($selector);
 
 		if (!$data) {
-			// Check that table contain one row with text "No data found."
+			// Check that table contains one row with text "No data found."
 			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 
 			return;
 		}
 
-		$table_rows = $table->index();
 		foreach ($data as $data_row) {
 			$found = false;
 
-			foreach ($table_rows as $table_row) {
+			foreach ($table->index() as $table_row) {
 				$match = true;
 
 				foreach ($data_row as $key => $value) {
@@ -241,5 +240,14 @@ trait TableTrait {
 			$result[] = $row->getColumn($column)->getText();
 		}
 		return $result;
+	}
+
+	/**
+	 * Assert text of selected rows amount.
+	 *
+	 * @param integer $count	selected rows count
+	 */
+	public function assertSelectedCount($count) {
+		$this->assertEquals($count.' selected', $this->query('id:selected_count')->one()->getText());
 	}
 }
