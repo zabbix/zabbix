@@ -39,7 +39,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'is_template_dashboard' => $this->isTemplateDashboard()
 		];
 
 		// Editing template dashboard?

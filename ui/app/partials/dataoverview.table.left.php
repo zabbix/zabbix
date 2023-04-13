@@ -26,7 +26,8 @@ $table = (new CTableInfo())
 	->makeVerticalRotation()
 	->setHeadingColumn(0);
 
-$header = [_('Hosts')];
+$header[] = $data['is_template_dashboard'] ? _('Host') : _('Hosts');
+
 foreach ($data['items'] as $item_name => $item_data) {
 	foreach ($item_data as $columns_data) {
 		$header[] = (new CColHeader($item_name))

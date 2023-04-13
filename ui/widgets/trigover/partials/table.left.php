@@ -26,7 +26,8 @@ $table = (new CTableInfo())
 	->makeVerticalRotation()
 	->setHeadingColumn(0);
 
-$headings[] = _('Hosts');
+$headings[] = $data['is_template_dashboard'] ? _('Host') : _('Hosts');
+
 foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
 	$headings[] = (new CColHeader($trigname))
 		->addClass('vertical_rotation')
