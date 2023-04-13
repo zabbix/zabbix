@@ -21,6 +21,7 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @dataSource TagFilter, Proxies
@@ -30,6 +31,14 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @onBefore prepareHostsData
  */
 class testPageHosts extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
 	public $HostIp = '127.0.0.1';
@@ -813,6 +822,7 @@ class testPageHosts extends CLegacyWebTest {
 			$this->assertTrue($this->page->isAlertPresent());
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
 			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
 			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
 		}
