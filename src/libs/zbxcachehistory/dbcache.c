@@ -1986,10 +1986,10 @@ static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees resources allocated to store str/text/log value             *
+ * Purpose: frees resources allocated to store str/text/log/bin value         *
  *                                                                            *
- * Parameters: history     - [IN] the history data                            *
- *             history_num - [IN] the number of values in history data        *
+ * Parameters: history     - [IN] history data                                *
+ *             history_num - [IN] number of values in history data            *
  *                                                                            *
  ******************************************************************************/
 static void	dc_history_clean_value(zbx_dc_history_t *history)
@@ -2027,10 +2027,10 @@ static void	dc_history_clean_value(zbx_dc_history_t *history)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees resources allocated to store str/text/log values            *
+ * Purpose: frees resources allocated to store str/text/log/bin values        *
  *                                                                            *
- * Parameters: history     - [IN] the history data                            *
- *             history_num - [IN] the number of values in history data        *
+ * Parameters: history     - [IN] history data                                *
+ *             history_num - [IN] number of values in history data            *
  *                                                                            *
  ******************************************************************************/
 static void	hc_free_item_values(zbx_dc_history_t *history, int history_num)
@@ -4448,7 +4448,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			if (ITEM_VALUE_TYPE_BIN == value_type && FAIL == zbx_base64_validate(value->data.str))
 			{
 				dc_local_add_history_notsupported(itemid, &ts,
-						"Binary type requires Base 64 encoded string. ", lastlogsize, mtime,
+						"Binary type requires Base64 encoded string. ", lastlogsize, mtime,
 						value_flags);
 				return;
 			}

@@ -22,7 +22,14 @@
 #include <assert.h>
 #include "zbxcommon.h"
 
-static int	base64_block_regex_is_valid(const char c)
+/**********************************************************************
+ *  Purpose: Check if supplied character is a valid base64 character. *
+ *           Not a complete check, since it ignores equal sign '='    *
+ *	     as it depends on the context where this is placed.       *
+ *	     Corresponds to the [A-Za-z0-9+\\/] block validation from *
+ *	     zbx_base64_validate() function below.                    *
+ **********************************************************************/
+static int	is_valid_base64_char(const char c)
 {
 	if (('A' <= c && 'Z' >= c) ||
 		('a' <= c && 'z' >= c) ||
@@ -65,10 +72,10 @@ int	zbx_base64_validate(const char *p_str)
 			continue;
 
 		/* validate first/repeated block: (?:[A-Za-z0-9+\\/]{4}) */
-		if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i - 2]) &&
-				SUCCEED == base64_block_regex_is_valid(p_str[i - 1]))
+		if (SUCCEED == is_valid_base64_char(p_str[i - 4]) &&
+				SUCCEED == is_valid_base64_char(p_str[i - 3]) &&
+				SUCCEED == is_valid_base64_char(p_str[i - 2]) &&
+				SUCCEED == is_valid_base64_char(p_str[i - 1]))
 		{
 			if ('\0' == p_str[i])
 				return SUCCEED;
@@ -78,23 +85,23 @@ int	zbx_base64_validate(const char *p_str)
 		/* validate second/final block: (?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+\\/]{3}=|[A-Za-z0-9+\\/]{4}) */
 		else if ('\0' == p_str[i])
 		{
-			if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
-					SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) && '=' == p_str[i - 2] &&
+			if (SUCCEED == is_valid_base64_char(p_str[i - 4]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 3]) && '=' == p_str[i - 2] &&
 					'=' == p_str[i - 1])
 			{
 					return SUCCEED;
 			}
-			else if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
-					SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) &&
-					SUCCEED == base64_block_regex_is_valid(p_str[i - 2]) &&
+			else if (SUCCEED == is_valid_base64_char(p_str[i - 4]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 3]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 2]) &&
 					'=' == p_str[i - 1])
 			{
 				return SUCCEED;
 			}
-			else if (SUCCEED == base64_block_regex_is_valid(p_str[i - 4]) &&
-					SUCCEED == base64_block_regex_is_valid(p_str[i - 3]) &&
-					SUCCEED == base64_block_regex_is_valid(p_str[i - 2]) &&
-					SUCCEED == base64_block_regex_is_valid(p_str[i - 1]))
+			else if (SUCCEED == is_valid_base64_char(p_str[i - 4]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 3]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 2]) &&
+					SUCCEED == is_valid_base64_char(p_str[i - 1]))
 			{
 				return SUCCEED;
 			}

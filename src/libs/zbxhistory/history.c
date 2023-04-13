@@ -264,10 +264,10 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
  *                                                                            *
  * Purpose: converts history value to string format                           *
  *                                                                            *
- * Parameters: buffer     - [OUT] the output buffer                           *
- *             size       - [IN] the output buffer size                       *
- *             value      - [IN] the value to convert                         *
- *             value_type - [IN] the history value type                       *
+ * Parameters: buffer     - [OUT] output buffer                               *
+ *             size       - [IN] output buffer size                           *
+ *             value      - [IN] value to convert                             *
+ *             value_type - [IN] history value type                           *
  *                                                                            *
  ******************************************************************************/
 void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t *value, int value_type)
@@ -282,8 +282,10 @@ void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t 
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-		case ITEM_VALUE_TYPE_BIN:
 			zbx_strlcpy_utf8(buffer, value->str, size);
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+			zbx_strlcpy(buffer, value->str, size);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_strlcpy_utf8(buffer, value->log->value, size);
