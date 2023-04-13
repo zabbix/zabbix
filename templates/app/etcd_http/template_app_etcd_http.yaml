@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:16:53Z'
+  date: '2023-04-13T10:53:58Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -498,7 +498,6 @@ zabbix_export:
             It defines - whether or not this member is a leader:
             1 - it is;
             0 - otherwise.
-            
           valuemap:
             name: 'Etcd leader'
           preprocessing:

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:24:07Z'
+  date: '2023-04-13T11:02:57Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -447,6 +447,7 @@ zabbix_export:
               history: 2w
               trends: '0'
               value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -466,6 +467,7 @@ zabbix_export:
               history: 2w
               trends: '0'
               value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1289,6 +1291,7 @@ zabbix_export:
               delay: 3m
               history: 2w
               trends: 0d
+              description: 'MIB: ENTITY-STATE-MIB'
               valuemap:
                 name: 'ENTITY-STATE-MIB::EntityOperState'
               tags:

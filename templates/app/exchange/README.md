@@ -3,7 +3,7 @@
 
 ## Overview
 
-Official Template for Microsoft Exchange Server 2016.    
+Official Template for Microsoft Exchange Server 2016.
 
 
 ## Requirements

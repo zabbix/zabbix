@@ -3,7 +3,14 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of Mikrotik monitoring by Zabbix via SNMP and doesn't require any external scripts.
+### Known Issues
+
+  Description: Doesn't have ifHighSpeed filled. fixed in more recent versions
+  Version: RouterOS 6.28 or lower
+
+  Description: Doesn't have any temperature sensors
+  Version: RouterOS 6.38.5
+  Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD
 
 ## Requirements
 

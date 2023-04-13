@@ -168,8 +168,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#ENT_NAME}: Hardware model name| |SNMP agent|system.hw.model[entPhysicalModelName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|{#ENT_NAME}: Hardware serial number| |SNMP agent|system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|{#ENT_NAME}: Hardware model name|<p>MIB: ENTITY-MIB</p>|SNMP agent|system.hw.model[entPhysicalModelName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|{#ENT_NAME}: Hardware serial number|<p>MIB: ENTITY-MIB</p>|SNMP agent|system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
 
 ### Trigger prototypes for Entity discovery
 
@@ -187,7 +187,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#ENT_NAME}: Power supply status| |SNMP agent|sensor.psu.status[entStateOper.{#SNMPINDEX}]|
+|{#ENT_NAME}: Power supply status|<p>MIB: ENTITY-STATE-MIB</p>|SNMP agent|sensor.psu.status[entStateOper.{#SNMPINDEX}]|
 
 ### Trigger prototypes for PSU discovery
 

@@ -3,7 +3,7 @@
 
 ## Overview
 
-Official JMX Template for WildFly server.    
+Official JMX Template for WildFly server.
 
 
 ## Requirements

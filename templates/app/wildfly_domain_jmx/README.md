@@ -3,7 +3,7 @@
 
 ## Overview
 
-Official JMX Template for WildFly Domain Controller.    
+Official JMX Template for WildFly Domain Controller.
 
 
 ## Requirements

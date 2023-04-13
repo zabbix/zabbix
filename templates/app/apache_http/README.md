@@ -7,43 +7,43 @@ This template is designed for the effortless deployment of Apache monitoring by 
 Template `Apache by HTTP` - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) with HTTP agent remotely:  
 
 ```text
-  127.0.0.1
-  ServerVersion: Apache/2.4.41 (Unix)
-  ServerMPM: event
-  Server Built: Aug 14 2019 00:35:10
-  CurrentTime: Friday, 16-Aug-2019 12:38:40 UTC
-  RestartTime: Wednesday, 14-Aug-2019 07:58:26 UTC
-  ParentServerConfigGeneration: 1
-  ParentServerMPMGeneration: 0
-  ServerUptimeSeconds: 189613
-  ServerUptime: 2 days 4 hours 40 minutes 13 seconds
-  Load1: 4.60
-  Load5: 1.20
-  Load15: 0.47
-  Total Accesses: 27860
-  Total kBytes: 33011
-  Total Duration: 54118
-  CPUUser: 18.02
-  CPUSystem: 31.76
-  CPUChildrenUser: 0
-  CPUChildrenSystem: 0
-  CPULoad: .0262535
-  Uptime: 189613
-  ReqPerSec: .146931
-  BytesPerSec: 178.275
-  BytesPerReq: 1213.33
-  DurationPerReq: 1.9425
-  BusyWorkers: 7
-  IdleWorkers: 93
-  Processes: 4
-  Stopping: 0
-  BusyWorkers: 7
-  IdleWorkers: 93
-  ConnsTotal: 13
-  ConnsAsyncWriting: 0
-  ConnsAsyncKeepAlive: 5
-  ConnsAsyncClosing: 0
-  Scoreboard: __________________________________________W_____________W___________________LW_____W______W_W_______............................................................................................................................................................................................................................................................................................................
+127.0.0.1
+ServerVersion: Apache/2.4.41 (Unix)
+ServerMPM: event
+Server Built: Aug 14 2019 00:35:10
+CurrentTime: Friday, 16-Aug-2019 12:38:40 UTC
+RestartTime: Wednesday, 14-Aug-2019 07:58:26 UTC
+ParentServerConfigGeneration: 1
+ParentServerMPMGeneration: 0
+ServerUptimeSeconds: 189613
+ServerUptime: 2 days 4 hours 40 minutes 13 seconds
+Load1: 4.60
+Load5: 1.20
+Load15: 0.47
+Total Accesses: 27860
+Total kBytes: 33011
+Total Duration: 54118
+CPUUser: 18.02
+CPUSystem: 31.76
+CPUChildrenUser: 0
+CPUChildrenSystem: 0
+CPULoad: .0262535
+Uptime: 189613
+ReqPerSec: .146931
+BytesPerSec: 178.275
+BytesPerReq: 1213.33
+DurationPerReq: 1.9425
+BusyWorkers: 7
+IdleWorkers: 93
+Processes: 4
+Stopping: 0
+BusyWorkers: 7
+IdleWorkers: 93
+ConnsTotal: 13
+ConnsAsyncWriting: 0
+ConnsAsyncKeepAlive: 5
+ConnsAsyncClosing: 0
+Scoreboard: ...
 
 ```
 

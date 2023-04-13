@@ -4,7 +4,7 @@
 ## Overview
 
 The template to monitor Travis CI by Zabbix that work without any external scripts.
-Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.     
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 
 ## Requirements

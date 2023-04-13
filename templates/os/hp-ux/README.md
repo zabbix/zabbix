@@ -3,7 +3,7 @@
 
 ## Overview
 
-It is an official HP-UX template. It requires Zabbix agent 4.0 or newer.
+It is an official HP-UX template. It requires Zabbix agent 6.0 or newer.
 
 
 ## Requirements

@@ -40,8 +40,8 @@
 |Alcatel Timetra TiMOS: Available memory|<p>MIB: TIMETRA-SYSTEM-MIB</p><p>The value of sgiKbMemoryAvailable indicates the amount of free memory, in kilobytes, in the overall system that is not allocated to memory pools, but is available in case a memory pool needs to grow.</p>|SNMP agent|vm.memory.available[sgiKbMemoryAvailable.0]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1024`</li></ul>|
 |Alcatel Timetra TiMOS: Total memory|<p>Total memory in Bytes.</p>|Calculated|vm.memory.total[snmp]|
 |Alcatel Timetra TiMOS: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util[vm.memory.util.0]|
-|Alcatel Timetra TiMOS: Hardware model name| |SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li>Regular expression: `^(\w|-|\.|/)+ (\w|-|\.|/)+ (.+) Copyright \3`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Alcatel Timetra TiMOS: Operating system| |SNMP agent|system.sw.os[sysDescr.0]<p>**Preprocessing**</p><ul><li>Regular expression: `^((\w|-|\.|/)+) \1`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Alcatel Timetra TiMOS: Hardware model name|<p>MIB: SNMPv2-MIB</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li>Regular expression: `^(\w|-|\.|/)+ (\w|-|\.|/)+ (.+) Copyright \3`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Alcatel Timetra TiMOS: Operating system|<p>MIB: SNMPv2-MIB</p>|SNMP agent|system.sw.os[sysDescr.0]<p>**Preprocessing**</p><ul><li>Regular expression: `^((\w|-|\.|/)+) \1`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Alcatel Timetra TiMOS: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.01`</li></ul>|
 |Alcatel Timetra TiMOS: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.01`</li></ul>|
 |Alcatel Timetra TiMOS: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
@@ -137,7 +137,7 @@
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#ENT_NAME}: Hardware serial number| |SNMP agent|system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|{#ENT_NAME}: Hardware serial number|<p>MIB:TIMETRA-CHASSIS-MIB</p>|SNMP agent|system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 
 ### Trigger prototypes for Entity Serial Numbers Discovery
 
