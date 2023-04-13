@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:08:16Z'
+  date: '2023-04-13T15:34:25Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -265,10 +265,10 @@ zabbix_export:
             -
               uuid: 3a3ac7e0d5fc4feca67eb2447fcbcf34
               expression: 'last(/MikroTik CRS326-24G-2SIN by SNMP/system.hw.serialnumber,#1)<>last(/MikroTik CRS326-24G-2SIN by SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik CRS326-24G-2SIN by SNMP/system.hw.serialnumber))>0'
-              name: 'Mikrotik:  has been replaced'
-              event_name: 'Mikrotik:  has been replaced (new serial number received)'
+              name: 'Mikrotik: Device has been replaced'
+              event_name: 'Mikrotik: Device has been replaced (new serial number received)'
               priority: INFO
-              description: ' serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
               tags:
                 -

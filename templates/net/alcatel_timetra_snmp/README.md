@@ -137,7 +137,7 @@
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#ENT_NAME}: Hardware serial number|<p>MIB:TIMETRA-CHASSIS-MIB</p>|SNMP agent|system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|{#ENT_NAME}: Hardware serial number|<p>MIB: TIMETRA-CHASSIS-MIB</p>|SNMP agent|system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 
 ### Trigger prototypes for Entity Serial Numbers Discovery
 

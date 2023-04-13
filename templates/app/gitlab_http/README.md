@@ -7,7 +7,7 @@ This template is designed to monitor GitLab by Zabbix that works without any ext
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 The template `GitLab by HTTP` — collects metrics by an HTTP agent from the GitLab `/-/metrics` endpoint.
-See https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html.    
+See https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html.
 
 
 ## Requirements

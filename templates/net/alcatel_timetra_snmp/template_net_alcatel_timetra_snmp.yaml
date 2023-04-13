@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:02:49Z'
+  date: '2023-04-13T15:22:54Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -558,7 +558,7 @@ zabbix_export:
               history: 2w
               trends: '0'
               value_type: CHAR
-              description: 'MIB:TIMETRA-CHASSIS-MIB'
+              description: 'MIB: TIMETRA-CHASSIS-MIB'
               preprocessing:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT

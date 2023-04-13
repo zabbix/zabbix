@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:36:22Z'
+  date: '2023-04-13T15:23:48Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -11,7 +11,7 @@ zabbix_export:
       template: 'Linux by Zabbix agent'
       name: 'Linux by Zabbix agent'
       description: |
-        Official Linux template. Requires agent of Zabbix 6.0.0 or newer.
+        Official Linux template. Requires agent of Zabbix 6.0 or newer.
               
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         

@@ -3,7 +3,7 @@
 
 ## Overview
 
-his template is designed to get metrics from the Control-M server using the Control-M Automation API with HTTP agent.
+This template is designed to get metrics from the Control-M server using the Control-M Automation API with HTTP agent.
 
 This template monitors server statistics, discovers jobs and agents using Low Level Discovery.
 

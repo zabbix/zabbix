@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:10:28Z'
+  date: '2023-04-13T15:37:28Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -264,10 +264,10 @@ zabbix_export:
             -
               uuid: 9bc744f5b70748e68b13933b618f9550
               expression: 'last(/MikroTik RB260GSP by SNMP/system.hw.serialnumber,#1)<>last(/MikroTik RB260GSP by SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik RB260GSP by SNMP/system.hw.serialnumber))>0'
-              name: 'Mikrotik:  has been replaced'
-              event_name: 'Mikrotik:  has been replaced (new serial number received)'
+              name: 'Mikrotik: Device has been replaced'
+              event_name: 'Mikrotik: Device has been replaced (new serial number received)'
               priority: INFO
-              description: ' serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
               tags:
                 -

@@ -3,7 +3,7 @@
 
 ## Overview
 
-New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
+New official Linux template. Requires agent of Zabbix 6.0 or newer.
 
 ## Requirements
 

@@ -13,7 +13,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Microsoft Exchange Server 2016 CU18 
+- Microsoft Exchange Server 2016 CU18
 
 ## Configuration
 

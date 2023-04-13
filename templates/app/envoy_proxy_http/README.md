@@ -24,9 +24,11 @@ This template has been tested on:
 ## Setup
 
 Internal service metrics are collected from {$ENVOY.METRICS.PATH} endpoint (default: /stats/prometheus).
+https://www.envoyproxy.io/docs/envoy/v1.20.0/operations/stats_overview
 
 Don't forget to change macros {$ENVOY.URL}, {$ENVOY.METRICS.PATH}.
-Also, see the Macros section for a list of macros used to set trigger values.  
+Also, see the Macros section for a list of macros used to set trigger values.
+
 *NOTE.* Some metrics may not be collected depending on your Envoy Proxy instance version and configuration.
 
 ### Macros used
