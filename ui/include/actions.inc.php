@@ -1736,7 +1736,7 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButton {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']),
 			makeActionTableUser($severity, $users),
-			$old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name
+			[$old_severity_name, NBSP(), '&rArr;', NBSP(), $new_severity_name]
 		]);
 	}
 
@@ -2104,7 +2104,7 @@ function makeActionTableIcon(array $action) {
 
 				$old_severity_name = CSeverityHelper::getName((int) $action['old_severity']);
 				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);
-				$hint = $old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name;
+				$hint = [$old_severity_name, NBSP(), '&rArr;', NBSP(), $new_severity_name];
 
 				$action_icons[] = makeActionIcon(['button' => true, 'icon' => $action_type, 'hint' => $hint]);
 			}
