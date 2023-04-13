@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:40:46Z'
+  date: '2023-04-13T17:10:35Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -153,8 +153,8 @@ zabbix_export:
               priority: HIGH
               dependencies:
                 -
-                  name: 'Intel SR1630 IPMI: BB +1.05V PCH Critical [{ITEM.VALUE}]'
-                  expression: 'last(/Intel SR1630 IPMI/bb_1.05v_pch)<0.953 or last(/Intel SR1630 IPMI/bb_1.05v_pch)>1.149'
+                  name: 'Intel SR1630 IPMI: BB +1.1V P1 Vccp Critical [{ITEM.VALUE}]'
+                  expression: 'last(/Intel SR1630 IPMI/bb_1.1v_p1_vccp)<0.683 or last(/Intel SR1630 IPMI/bb_1.1v_p1_vccp)>1.543'
                 -
                   name: 'Intel SR1630 IPMI: Power'
                   expression: 'last(/Intel SR1630 IPMI/power)=0'

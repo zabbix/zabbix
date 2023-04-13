@@ -36,12 +36,12 @@ Refer to the vendor documentation.
 |{$VFS.FS.FREE.MIN.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`10G`|
 |{$VFS.FS.PUSED.MAX.CRIT}||`90`|
 |{$VFS.FS.PUSED.MAX.WARN}||`80`|
+|{$CPU.UTIL.CRIT}||`90`|
 |{$MEMORY.UTIL.MAX}|<p>The warning threshold of the "Physical memory: Memory utilization" item.</p>|`90`|
 |{$MEMORY.TYPE.NOT_MATCHES}|<p>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</p>|`CHANGE_IF_NEEDED`|
 |{$MEMORY.TYPE.MATCHES}|<p>This macro is used in memory discovery. Can be overridden on the host or linked template level.</p>|`.*(\.2\|hrStorageRam)$`|
 |{$MEMORY.NAME.MATCHES}|<p>This macro is used in memory discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$MEMORY.NAME.NOT_MATCHES}|<p>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</p>|`CHANGE_IF_NEEDED`|
-|{$CPU.UTIL.CRIT}||`90`|
+|{$MEMORY.NAME.NOT_MATCHES}|<p>Filter is overridden to ignore RAM(Cache) and RAM(Buffers) memory objects.</p>|`(Buffer\|Cache)`|
 |{$SNMP.TIMEOUT}||`5m`|
 |{$ICMP_LOSS_WARN}||`20`|
 |{$ICMP_RESPONSE_TIME_WARN}||`0.15`|

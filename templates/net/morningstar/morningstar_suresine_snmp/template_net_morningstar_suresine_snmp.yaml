@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:34:33Z'
+  date: '2023-04-13T16:44:55Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -34,7 +34,7 @@ zabbix_export:
             -
               type: MULTIPLIER
               parameters:
-                - '0.0002581787109375'
+                - '2.581787109375E-4'
             -
               type: REGEX
               parameters:
@@ -69,7 +69,7 @@ zabbix_export:
             -
               type: MULTIPLIER
               parameters:
-                - '0.0001953125'
+                - '1.953125E-4'
             -
               type: REGEX
               parameters:
@@ -453,7 +453,7 @@ zabbix_export:
                 -
                   type: MULTIPLIER
                   parameters:
-                    - '0.0002581787109375'
+                    - '2.581787109375E-4'
                 -
                   type: REGEX
                   parameters:
