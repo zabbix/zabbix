@@ -104,17 +104,17 @@ class CControllerActionUpdate extends CController {
 			'evaltype' => $this->getInput('evaltype')
 		];
 
-		if ($filter['conditions']) {
-			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				if (count($filter['conditions']) > 1) {
-					$filter['formula'] = $this->getInput('formula');
-				}
-				else {
-					// If only one or no conditions are left, reset the evaltype to "and/or".
-					$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
-				}
+		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			if (count($filter['conditions']) > 1) {
+				$filter['formula'] = $this->getInput('formula');
 			}
+			else {
+				// If only one or no conditions are left, reset the evaltype to "and/or".
+				$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+			}
+		}
 
+		if ($filter['conditions']) {
 			foreach ($filter['conditions'] as &$condition) {
 				if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 					unset($condition['formulaid']);
@@ -130,9 +130,9 @@ class CControllerActionUpdate extends CController {
 				unset($condition['row_index'], $condition['name']);
 			}
 			unset($condition);
-
-			$action['filter'] = $filter;
 		}
+
+		$action['filter'] = $filter;
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 			foreach ($action[$operation_group] as &$operation) {

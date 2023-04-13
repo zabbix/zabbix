@@ -94,11 +94,10 @@ class CHistoryManager {
 
 		foreach ($itemids_by_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
-				'SELECT itemid'.
+				'SELECT DISTINCT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-					($period !== null ? ' AND clock>'.$period : '').
-				' GROUP BY itemid'
+					($period !== null ? ' AND clock>'.$period : '')
 			), 'itemid');
 
 			$results += array_intersect_key($items, array_flip($type_results));
@@ -257,7 +256,7 @@ class CHistoryManager {
 				$history_table = self::getTableName($value_type);
 
 				$max_clock_per_item = DBselect(
-					'SELECT h.itemid, MAX(h.clock) AS clock'.
+					'SELECT h.itemid,MAX(h.clock) AS clock'.
 					' FROM '.$history_table.' h'.
 					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
 						($period !== null ? ' AND h.clock>'.$period : '').
@@ -289,7 +288,7 @@ class CHistoryManager {
 						' FROM '.$history_table.' h'.
 						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 							($period !== null ? ' AND h.clock>'.$period : '').
-						' ORDER BY h.clock DESC, h.ns DESC',
+						' ORDER BY h.clock DESC,h.ns DESC',
 						$limit
 					);
 
@@ -555,7 +554,7 @@ class CHistoryManager {
 			' WHERE itemid='.zbx_dbstr($item['itemid']).
 				' AND clock<'.zbx_dbstr($clock).
 				' AND clock>='.zbx_dbstr($time_from).
-			' ORDER BY clock DESC, ns DESC';
+			' ORDER BY clock DESC,ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			return $row;
@@ -898,7 +897,7 @@ class CHistoryManager {
 					' GROUP BY '.implode(', ', $sql_group_by);
 
 				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
-					$sql = 'SELECT DISTINCT h.itemid, h.'.($source === 'history' ? 'value' : 'value_avg').' AS value, h.clock, hi.tick'.
+					$sql = 'SELECT DISTINCT h.itemid,h.'.($source === 'history' ? 'value' : 'value_avg').' AS value,h.clock,hi.tick'.
 						' FROM '.$sql_from.' h'.
 						' JOIN('.$sql.') hi ON h.itemid = hi.itemid AND h.clock = hi.clock';
 				}
