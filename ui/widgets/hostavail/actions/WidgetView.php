@@ -43,9 +43,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 			array_intersect($interface_types, $this->fields_values['interface_type'])
 		);
 
-		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-			? getSubGroups($this->fields_values['groupids'])
-			: null;
+		$groupids = null;
+
+		if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid')) {
+			$host_group = API::HostGroup()->get([
+				'output' => [],
+				'hostids' => $this->getInput('dynamic_hostid'),
+				'preservekeys' => true
+			]);
+			$groupids = array_keys($host_group);
+		}
+		elseif (!$this->isTemplateDashboard() && $this->fields_values['groupids']) {
+			$groupids = getSubGroups($this->fields_values['groupids']);
+		}
 
 		$hosts_types = $this->fields_values['interface_type'] ?: $interface_types;
 
