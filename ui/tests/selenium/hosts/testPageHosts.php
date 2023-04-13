@@ -800,4 +800,21 @@ class testPageHosts extends CLegacyWebTest {
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();
 	}
+
+	/**
+	 * Test the Enable and Disable link in the Host list.
+	 */
+	public function testPageHosts_EnableDisableLink() {
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Enabled status');
+
+		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
+			$host_row->getColumn('Status')->click();
+			$this->assertTrue($this->page->isAlertPresent());
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
+			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
+		}
+	}
 }
