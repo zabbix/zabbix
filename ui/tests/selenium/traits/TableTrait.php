@@ -219,19 +219,10 @@ trait TableTrait {
 	}
 
 	/**
-	 * Assert text of selected rows amount.
-	 *
-	 * @param integer $count	selected rows count
-	 */
-	public function assertSelectedCount($count) {
-		$this->assertEquals($count.' selected',	$this->query('id:selected_count')->one()->getText());
-	}
-
-	/**
 	 * Get data from chosen column.
 	 *
-	 * @param string $column		Column name, where value should be checked
-	 * @param string $selector		Table selector
+	 * @param string $column    column name, where value should be checked
+	 * @param string $selector  table selector
 	 */
 	private function getTableColumnData($column, $selector = null) {
 		$table = $this->getTable($selector);

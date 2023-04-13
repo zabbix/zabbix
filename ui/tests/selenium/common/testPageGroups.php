@@ -150,6 +150,13 @@ class testPageGroups extends CWebTest {
 				array_key_exists('lld', $links) ? $links['lld'].': '.$links['name'] : $links['name']
 		);
 
+		// Check template link color.
+		if ($this->object === 'template') {
+			$this->assertTrue($row->getColumn('Templates')->query('link', $links['host_template'])->one()
+					->hasClass('grey')
+			);
+		}
+
 		// Check link to the host or template edit form.
 		$row->getColumn(ucfirst($this->object).'s')->query('link', $links['host_template'])->one()->click();
 		if ($this->object === 'host') {
@@ -244,6 +251,32 @@ class testPageGroups extends CWebTest {
 		}
 	}
 
+	public static function getFilterData() {
+		return [
+			// Too many spaces in field.
+			[
+				[
+					'Name' => '  '
+				]
+			],
+			// Special symbols, utf8 and long name.
+			[
+				[
+					'Name' => '&<>//\\[]""#@'
+				]
+			],
+			[
+				[
+					'Name' => 'æ㓴🙂'
+				]
+			],
+			[
+				[
+					'Name' => STRING_255
+				]
+			]
+		];
+	}
 	public function filter($data) {
 		$all = $this->getGroupNames();
 		if (array_key_exists('all', $data)) {
@@ -343,8 +376,8 @@ class testPageGroups extends CWebTest {
 			$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
 		}
 
-		if (!is_array(CTestArrayHelper::get($data, 'groups', []))){
-				$data['groups'] = [$data['groups']];
+		if (!is_array(CTestArrayHelper::get($data, 'groups', []))) {
+			$data['groups'] = [$data['groups']];
 		}
 
 		$all = $this->getGroupNames();
@@ -352,7 +385,7 @@ class testPageGroups extends CWebTest {
 
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$table = $this->getTable();
-		$this->selectTableRows(CTestArrayHelper::get($data, 'groups', []));
+		$this->selectTableRows(CTestArrayHelper::get($data, 'groups'));
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$table->waitUntilReloaded();

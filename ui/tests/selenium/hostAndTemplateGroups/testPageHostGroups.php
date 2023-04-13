@@ -168,14 +168,9 @@ class testPageHostGroups extends testPageGroups {
 		$this->coulmnSorting();
 	}
 
-	public static function getFilterData() {
+	public static function getHostGroupsFilterData() {
 		return [
 			// Too many spaces in field.
-			[
-				[
-					'Name' => '  '
-				]
-			],
 			[
 				[
 					'Name' => '  host'
@@ -190,12 +185,6 @@ class testPageHostGroups extends testPageGroups {
 			[
 				[
 					'Name' => 'Templates'
-				]
-			],
-			// Special symbols.
-			[
-				[
-					'Name' => '☺&<>//\\[]""#@'
 				]
 			],
 			// Exact match.
@@ -244,6 +233,7 @@ class testPageHostGroups extends testPageGroups {
 
 	/**
 	 * @dataProvider getFilterData
+	 * @dataProvider getHostGroupsFilterData
 	 */
 	public function testPageHostGroups_Filter($data) {
 		$this->filter($data);
@@ -297,8 +287,9 @@ class testPageHostGroups extends testPageGroups {
 			$dialog->ensureNotPresent();
 
 			// Check status in table.
-			$this->assertMessage(TEST_GOOD, 'Host updated');
 			$table->waitUntilReloaded();
+			$this->assertMessage(TEST_GOOD, 'Host updated', 'Updated status of host "'.$data['change_host'].'".');
+			CMessageElement::find()->one()->close();
 			$this->assertTrue($hosts->query('link', $data['change_host'])->one()->hasClass($status ? 'green' : 'red'));
 			$this->assertTrue($hosts->query('link', $data['host'])->one()->hasClass('red'));
 
@@ -355,7 +346,7 @@ class testPageHostGroups extends testPageGroups {
 			],
 			[
 				[
-					self::LLD.': '.self::DISCOVERED_GROUP => self::DISCOVERED_HOST,
+					self::LLD.': '.self::DISCOVERED_GROUP => [self::DISCOVERED_HOST],
 					'Group with two enabled hosts testPageHostGroup' => ['One enabled host testPageHostGroup',
 						'Two enabled host testPageHostGroup']
 				]
@@ -371,6 +362,10 @@ class testPageHostGroups extends testPageGroups {
 	}
 
 	private function checkHostStatusChange($data, $status = 'enable') {
+		if (count($data) === 1 && array_values($data)[0] === '') {
+			$old_hash = CDBHelper::getHash(self::HOSTS_SQL);
+		}
+
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$this->setColumnNames(['', 'Name', 'Count', 'Hosts', 'Info']);
 		$table = $this->getTable();
@@ -384,8 +379,10 @@ class testPageHostGroups extends testPageGroups {
 
 		$details = [];
 		foreach ($data as $group => $hosts) {
+			// Skip checks if group without hosts.
 			if (!is_array($hosts)) {
-				break;
+				$this->assertEquals($old_hash, CDBHelper::getHash(self::HOSTS_SQL));
+				continue;
 			}
 			$row = $table->findRow('Name', $group);
 

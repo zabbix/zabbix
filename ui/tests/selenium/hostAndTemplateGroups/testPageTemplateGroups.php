@@ -118,14 +118,9 @@ class testPageTemplateGroups extends testPageGroups {
 		$this->coulmnSorting();
 	}
 
-	public static function getFilterData() {
+	public static function getTemplateGroupsFilterData() {
 		return [
 			// Too many spaces in field.
-			[
-				[
-					'Name' => '  '
-				]
-			],
 			[
 				[
 					'Name' => '  with'
@@ -136,13 +131,19 @@ class testPageTemplateGroups extends testPageGroups {
 					'Name' => 'with  '
 				]
 			],
-			// Special symbols.
+			// Host group name.
 			[
 				[
-					'Name' => '☺&<>//\\[]""#@'
+					'Name' => 'Group for Script'
 				]
 			],
 			// Exact match.
+			[
+				[
+					'Name' => 'Templates/testPageTemplateGroup',
+					'expected' => ['Templates/testPageTemplateGroup']
+				]
+			],
 			[
 				[
 					'Name' => self::GROUP1,
@@ -186,6 +187,7 @@ class testPageTemplateGroups extends testPageGroups {
 
 	/**
 	 * @dataProvider getFilterData
+	 * @dataProvider getTemplateGroupsFilterData
 	 */
 	public function testPageTemplateGroups_Filter($data) {
 		$this->filter($data);

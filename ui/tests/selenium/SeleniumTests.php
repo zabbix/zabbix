@@ -87,9 +87,9 @@ require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
 require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
 
-// Groups.
-require_once dirname(__FILE__).'/groups/testPageHostGroups.php';
-require_once dirname(__FILE__).'/groups/testPageTemplateGroups.php';
+// Host and template groups.
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageHostGroups.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageTemplateGroups.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
