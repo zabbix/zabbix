@@ -161,7 +161,8 @@ ZBX_PTR_VECTOR_DECL(pp_task_ptr, zbx_pp_task_t *)
 
 typedef struct
 {
-	int	workers_num;
+	int		workers_num;
+	const char	*config_source_ip;
 }
 zbx_thread_pp_manager_args;
 
@@ -170,7 +171,7 @@ typedef struct zbx_pp_manager	zbx_pp_manager_t;
 typedef void(*zbx_flush_value_func_t)(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
 	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
 
-void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_config_str_f get_config_source_ip_cb);
+void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb);
 
 void	zbx_pp_value_task_get_data(zbx_pp_task_t *task, unsigned char *value_type, unsigned char *flags,
 		zbx_variant_t **value, zbx_timespec_t *ts, zbx_pp_value_opt_t **value_opt);
@@ -183,7 +184,7 @@ void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc);
 int	zbx_pp_preproc_has_history(int type);
 
 zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
-		void *finished_data, char **error);
+		void *finished_data, const char *config_source_ip, char **error);
 void	zbx_pp_manager_free(zbx_pp_manager_t *manager);
 zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
 		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);

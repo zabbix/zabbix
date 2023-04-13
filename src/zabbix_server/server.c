@@ -1246,7 +1246,6 @@ int	main(int argc, char **argv)
 	/* required for simple checks */
 	zbx_init_metrics();
 	zbx_load_config(&t);
-
 	zbx_init_library_cfg(program_type);
 	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_icmpping(&config_icmpping);
@@ -1256,7 +1255,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_server, get_zbx_config_source_ip);
+	zbx_init_library_preproc(preproc_flush_value_server);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1426,8 +1425,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args =
-						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
-
+						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+						zbx_config_source_ip};
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args	ipmi_manager_args = {zbx_config_timeout, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay};

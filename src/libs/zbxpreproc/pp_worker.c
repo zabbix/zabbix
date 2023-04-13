@@ -36,11 +36,11 @@
  * Purpose: process preprocessing testing task                                *
  *                                                                            *
  ******************************************************************************/
-static void	pp_task_process_test(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
+static void	pp_task_process_test(zbx_pp_context_t *ctx, zbx_pp_task_t *task, const char *config_source_ip)
 {
 	zbx_pp_task_test_t	*d = (zbx_pp_task_test_t *)PP_TASK_DATA(task);
 
-	pp_execute(ctx, d->preproc, NULL, &d->value, d->ts, &d->result, &d->results, &d->results_num);
+	pp_execute(ctx, d->preproc, NULL, &d->value, d->ts, config_source_ip, &d->result, &d->results, &d->results_num);
 }
 
 /******************************************************************************
@@ -48,11 +48,11 @@ static void	pp_task_process_test(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
  * Purpose: process value preprocessing task                                  *
  *                                                                            *
  ******************************************************************************/
-static void	pp_task_process_value(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
+static void	pp_task_process_value(zbx_pp_context_t *ctx, zbx_pp_task_t *task, const char *config_source_ip)
 {
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 
-	pp_execute(ctx, d->preproc, d->cache, &d->value, d->ts, &d->result, NULL, NULL);
+	pp_execute(ctx, d->preproc, d->cache, &d->value, d->ts, config_source_ip, &d->result, NULL, NULL);
 }
 
 /******************************************************************************
@@ -60,12 +60,13 @@ static void	pp_task_process_value(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
  * Purpose: process dependent preprocessing task                              *
  *                                                                            *
  ******************************************************************************/
-static void	pp_task_process_dependent(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
+static void	pp_task_process_dependent(zbx_pp_context_t *ctx, zbx_pp_task_t *task, const char *config_source_ip)
 {
 	zbx_pp_task_dependent_t	*d = (zbx_pp_task_dependent_t *)PP_TASK_DATA(task);
 	zbx_pp_task_value_t	*d_first = (zbx_pp_task_value_t *)PP_TASK_DATA(d->primary);
 
-	pp_execute(ctx, d_first->preproc, d->cache, &d_first->value, d_first->ts, &d_first->result, NULL, NULL);
+	pp_execute(ctx, d_first->preproc, d->cache, &d_first->value, d_first->ts, config_source_ip, &d_first->result,
+			NULL, NULL);
 }
 
 /******************************************************************************
@@ -73,7 +74,7 @@ static void	pp_task_process_dependent(zbx_pp_context_t *ctx, zbx_pp_task_t *task
  * Purpose: process first task in sequence task                               *
  *                                                                            *
  ******************************************************************************/
-static	void	pp_task_process_sequence(zbx_pp_context_t *ctx, zbx_pp_task_t *task_seq)
+static	void	pp_task_process_sequence(zbx_pp_context_t *ctx, zbx_pp_task_t *task_seq, const char *config_source_ip)
 {
 	zbx_pp_task_sequence_t	*d_seq = (zbx_pp_task_sequence_t *)PP_TASK_DATA(task_seq);
 	zbx_pp_task_t		*task;
@@ -84,10 +85,10 @@ static	void	pp_task_process_sequence(zbx_pp_context_t *ctx, zbx_pp_task_t *task_
 		{
 			case ZBX_PP_TASK_VALUE:
 			case ZBX_PP_TASK_VALUE_SEQ:
-				pp_task_process_value(ctx, task);
+				pp_task_process_value(ctx, task, config_source_ip);
 				break;
 			case ZBX_PP_TASK_DEPENDENT:
-				pp_task_process_dependent(ctx, task);
+				pp_task_process_dependent(ctx, task, config_source_ip);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -134,17 +135,17 @@ static void	*pp_worker_entry(void *arg)
 			switch (in->type)
 			{
 				case ZBX_PP_TASK_TEST:
-					pp_task_process_test(&worker->execute_ctx, in);
+					pp_task_process_test(&worker->execute_ctx, in, worker->config_source_ip);
 					break;
 				case ZBX_PP_TASK_VALUE:
 				case ZBX_PP_TASK_VALUE_SEQ:
-					pp_task_process_value(&worker->execute_ctx, in);
+					pp_task_process_value(&worker->execute_ctx, in, worker->config_source_ip);
 					break;
 				case ZBX_PP_TASK_DEPENDENT:
-					pp_task_process_dependent(&worker->execute_ctx, in);
+					pp_task_process_dependent(&worker->execute_ctx, in, worker->config_source_ip);
 					break;
 				case ZBX_PP_TASK_SEQUENCE:
-					pp_task_process_sequence(&worker->execute_ctx, in);
+					pp_task_process_sequence(&worker->execute_ctx, in, worker->config_source_ip);
 					break;
 			}
 
@@ -195,13 +196,14 @@ static void	*pp_worker_entry(void *arg)
  *                                                                            *
  ******************************************************************************/
 int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
-		char **error)
+		const char *config_source_ip, char **error)
 {
 	int	err, ret = FAIL;
 
 	worker->id = id;
 	worker->queue = queue;
 	worker->timekeeper = timekeeper;
+	worker->config_source_ip = config_source_ip;
 
 	if (0 != (err = pthread_create(&worker->thread, NULL, pp_worker_entry, (void *)worker)))
 	{

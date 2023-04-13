@@ -41,11 +41,13 @@ typedef struct
 
 	zbx_pp_notify_cb_t	finished_cb;
 	void			*finished_data;
+
+	const char		*config_source_ip;
 }
 zbx_pp_worker_t;
 
 int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
-		char **error);
+		const char *config_source_ip, char **error);
 void	pp_worker_set_finished_cb(zbx_pp_worker_t *worker, zbx_pp_notify_cb_t finished_cb, void *finished_data);
 void	pp_worker_stop(zbx_pp_worker_t *worker);
 void	pp_worker_destroy(zbx_pp_worker_t *worker);

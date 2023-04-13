@@ -54,7 +54,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_variant_set_none(&history_value);
 	zbx_timespec(&ts);
 
-	act_ret = pp_execute_step(&ctx, NULL, ITEM_VALUE_TYPE_TEXT, &value, ts, &step, &history_value, &history_ts);
+	act_ret = pp_execute_step(&ctx, NULL, ITEM_VALUE_TYPE_TEXT, &value, ts, &step, &history_value, &history_ts,
+			get_zbx_config_source_ip());
 
 	exp_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_int_eq("return value", exp_ret, act_ret);

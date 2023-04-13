@@ -49,8 +49,6 @@
 #endif
 
 static zbx_flush_value_func_t	flush_value_func_cb = NULL;
-static zbx_get_config_str_f get_config_source_ip_func_cb = NULL;
-
 
 /******************************************************************************
  *                                                                            *
@@ -100,32 +98,27 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_config_str_f get_config_source_ip_cb)
+void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb)
 {
 	flush_value_func_cb = flush_value_cb;
-	get_config_source_ip_func_cb = get_config_source_ip_cb;
-}
-
-const char	*preproc_get_config_source_ip(void)
-{
-	return get_config_source_ip_func_cb();
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: create preprocessing manager                                      *
  *                                                                            *
- * Parameters: workers_num   - [IN] number of workers to create               *
- *             finished_cb   - [IN] callback to call after finishing          *
+ * Parameters: workers_num      - [IN] number of workers to create            *
+ *             finished_cb      - [IN] callback to call after finishing       *
  *                                  task (optional)                           *
- *             finished_data - [IN] callback data (optional)                  *
- *             error         - [OUT]                                          *
+ *             finished_data    - [IN] callback data (optional)               *
+ *             config_source_ip - [IN]                                        *
+ *             error            - [OUT]                                       *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
 zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
-		void *finished_data, char **error)
+		void *finished_data, const char *config_source_ip, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
 	time_t			time_start;
@@ -146,14 +139,13 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t fini
 		goto out;
 
 	manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
-
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_pp_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_pp_worker_t));
 
 	for (i = 0; i < workers_num; i++)
 	{
 		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper,
-				error))
+				config_source_ip, error))
 		{
 			goto out;
 		}
@@ -1134,6 +1126,9 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0,
 					processing_num = 0;
 
+	zbx_thread_pp_manager_args	*pp_manager_args_in = (zbx_thread_pp_manager_args *)
+							(((zbx_thread_args_t *)args)->args);
+
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
@@ -1150,9 +1145,9 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
+zabbix_log(LOG_LEVEL_INFORMATION, "VW, args in: %s", pp_manager_args_in->config_source_ip);
 	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
-			(void *)&service, &error)))
+			(void *)&service, pp_manager_args_in->config_source_ip, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);

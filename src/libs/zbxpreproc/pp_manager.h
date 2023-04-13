@@ -40,6 +40,4 @@ struct zbx_pp_manager
 	zbx_timekeeper_t	*timekeeper;
 };
 
-const char	*preproc_get_config_source_ip(void);
-
 #endif

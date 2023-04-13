@@ -1154,7 +1154,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_source_ip);
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_proxy, get_zbx_config_source_ip);
+	zbx_init_library_preproc(preproc_flush_value_proxy);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1295,7 +1295,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, config_unavailable_delay};
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args =
-						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
+						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+						zbx_config_source_ip};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 

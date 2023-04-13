@@ -295,7 +295,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (FAIL == (returned_ret = pp_execute_step(&ctx, NULL, value_type, &value, ts, &step, &history_value,
-			&history_ts)))
+			&history_ts, get_zbx_config_source_ip())))
 	{
 		pp_error_on_fail(&value, &step);
 

@@ -300,6 +300,8 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 	es->env = zbx_malloc(NULL, sizeof(zbx_es_env_t));
 	memset(es->env, 0, sizeof(zbx_es_env_t));
 
+	es->env->config_source_ip = config_source_ip;
+
 	if (0 != setjmp(es->env->loc))
 	{
 		*error = zbx_strdup(*error, es->env->error);
@@ -343,7 +345,6 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 		goto out;
 
 	es->env->timeout = ZBX_ES_TIMEOUT;
-	es->env->config_source_ip = config_source_ip;
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
