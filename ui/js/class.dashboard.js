@@ -18,6 +18,7 @@
 **/
 
 
+const ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES = 'btn-dashboard-page-properties';
 const ZBX_STYLE_DASHBOARD_IS_MULTIPAGE = 'dashboard-is-multipage';
 const ZBX_STYLE_DASHBOARD_IS_EDIT_MODE = 'dashboard-is-edit-mode';
 const ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE = 'is-scrollable';
@@ -237,10 +238,13 @@ class CDashboard {
 		}
 
 		if (this._buttons.slideshow !== null) {
+			if (this._is_kiosk_mode) {
+				this._buttons.slideshow.classList.remove(ZBX_ICON_PLAY);
+				this._buttons.slideshow.classList.add(ZBX_ICON_PAUSE);
+			}
+
 			this._buttons.slideshow.classList.remove('slideshow-state-stopped');
-			this._buttons.slideshow.classList.remove('zi-pause');
 			this._buttons.slideshow.classList.add('slideshow-state-started');
-			this._buttons.slideshow.classList.add('zi-play');
 
 			if (this._buttons.slideshow.title !== '') {
 				this._buttons.slideshow.title = t('Stop slideshow');
@@ -263,10 +267,13 @@ class CDashboard {
 		}
 
 		if (this._buttons.slideshow !== null) {
+			if (this._is_kiosk_mode) {
+				this._buttons.slideshow.classList.remove(ZBX_ICON_PAUSE);
+				this._buttons.slideshow.classList.add(ZBX_ICON_PLAY);
+			}
+
 			this._buttons.slideshow.classList.remove('slideshow-state-started');
-			this._buttons.slideshow.classList.remove('zi-play');
 			this._buttons.slideshow.classList.add('slideshow-state-stopped');
-			this._buttons.slideshow.classList.add('zi-pause');
 
 			if (this._buttons.slideshow.title !== '') {
 				this._buttons.slideshow.title = t('Start slideshow');
@@ -1665,7 +1672,7 @@ class CDashboard {
 		if (!this._is_kiosk_mode) {
 			const has_aria_expanded = this._tabs
 				.getList()
-				.querySelector('.btn-dashboard-page-properties[aria-expanded="true"]') !== null;
+				.querySelector(`.${ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES}[aria-expanded="true"]`) !== null;
 
 			if (has_aria_expanded) {
 				return true;
@@ -1717,7 +1724,7 @@ class CDashboard {
 			properties_button.title = t('Actions');
 			properties_button.setAttribute('aria-expanded', 'false');
 			properties_button.setAttribute('aria-haspopup', 'true');
-			properties_button.classList.add('btn-icon', ZBX_ICON_MORE, 'btn-dashboard-page-properties');
+			properties_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE, ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES);
 
 			tab_contents.append(properties_button);
 		}
@@ -2036,7 +2043,7 @@ class CDashboard {
 					if (dashboard_page !== this._selected_dashboard_page) {
 						this._selectDashboardPage(dashboard_page, {is_async: true});
 					}
-					else if (e.target.classList.contains('btn-dashboard-page-properties')) {
+					else if (e.target.classList.contains(ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES)) {
 						jQuery(e.target).menuPopup(this._getDashboardPageActionsContextMenu(dashboard_page),
 							new jQuery.Event(e)
 						);
@@ -2054,7 +2061,7 @@ class CDashboard {
 						if (dashboard_page !== this._selected_dashboard_page) {
 							this._selectDashboardPage(dashboard_page, {is_async: true});
 						}
-						else if (e.target.classList.contains('btn-dashboard-page-properties')) {
+						else if (e.target.classList.contains(ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES)) {
 							jQuery(e.target).menuPopup(this._getDashboardPageActionsContextMenu(dashboard_page),
 								new jQuery.Event(e)
 							);

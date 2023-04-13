@@ -183,7 +183,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		let edit = document.createElement('a');
 
-		edit.classList.add('btn-icon', ZBX_ICON_COG_FILLED, TABFILTERITEM_STYLE_EDIT_BTN);
+		edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COG_FILLED, TABFILTERITEM_STYLE_EDIT_BTN);
 		edit.addEventListener('click', () => this.openPropertiesDialog({}, this._target));
 
 		this._target.parentNode.appendChild(edit);

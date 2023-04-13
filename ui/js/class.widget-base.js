@@ -1236,7 +1236,7 @@ class CWidgetBase {
 			this._button_edit = document.createElement('button');
 			this._button_edit.type = 'button';
 			this._button_edit.title = t('Edit')
-			this._button_edit.classList.add('btn-icon', ZBX_ICON_COG_FILLED, 'js-widget-edit');
+			this._button_edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COG_FILLED, 'js-widget-edit');
 
 			const li = document.createElement('li');
 
@@ -1249,7 +1249,7 @@ class CWidgetBase {
 		this._button_actions.title = t('Actions');
 		this._button_actions.setAttribute('aria-expanded', 'false');
 		this._button_actions.setAttribute('aria-haspopup', 'true');
-		this._button_actions.classList.add('btn-icon', ZBX_ICON_MORE, 'js-widget-action');
+		this._button_actions.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE, 'js-widget-action');
 
 		const li = document.createElement('li');
 

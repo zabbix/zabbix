@@ -87,13 +87,13 @@ $dashboard->addItem(
 				->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 				->addItem([
 					(new CSimpleButton())
-						->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-						->addClass('btn-iterator-page-previous')
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
+						->addClass(ZBX_STYLE_BTN_ICON)
 						->addClass(ZBX_ICON_CHEVRON_LEFT)
 						->setEnabled(false),
 					(new CSimpleButton())
-						->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-						->addClass('btn-iterator-page-next')
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE)
+						->addClass(ZBX_STYLE_BTN_ICON)
 						->addClass(ZBX_ICON_CHEVRON_RIGHT)
 						->setEnabled(false)
 				])

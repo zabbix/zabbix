@@ -472,7 +472,7 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'doc_url':
 				this.unsetProperty(key);
 				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
-					<a class="btn-icon zi-help" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} zi-help" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
 				`);
 				break;
 

@@ -152,21 +152,21 @@ if (count($data['dashboard']['pages']) > 1
 						->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 						->addItem([
 							(new CSimpleButton())
-								->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-								->addClass('btn-iterator-page-previous')
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
+								->addClass(ZBX_STYLE_BTN_ICON)
 								->addClass(ZBX_ICON_CHEVRON_LEFT)
 								->setEnabled(false),
 							(new CSimpleButton())
-								->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-								->addClass('btn-iterator-page-next')
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE)
+								->addClass(ZBX_STYLE_BTN_ICON)
 								->addClass(ZBX_ICON_CHEVRON_RIGHT)
 								->setEnabled(false),
 							(new CSimpleButton([
 								(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
 								(new CSpan(_s('Stop slideshow')))->addClass('slideshow-state-started')
 							]))
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW)
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW)
 								->addClass(
 									($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 										? 'slideshow-state-started'

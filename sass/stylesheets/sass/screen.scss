@@ -1646,8 +1646,8 @@ select {
 		}
 	}
 
-	.btn-info,
-	.btn-time,
+	.btn-info, // TODO need to check, not good.
+	.btn-time, // TODO need to check, not good.
 	.filter-trigger {
 		border-radius: 2px;
 		color: $btn-font-color;

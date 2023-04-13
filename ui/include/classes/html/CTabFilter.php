@@ -375,7 +375,6 @@ class CTabFilter extends CDiv {
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_CHEVRON_RIGHT)
-				->addClass('btn-iterator-page-next')
 		]);
 
 		if (array_key_exists('timeselector', $this->options)) {
@@ -386,8 +385,7 @@ class CTabFilter extends CDiv {
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectPrevTab')
 				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_LEFT)
-				->addClass('btn-iterator-page-previous'),
+				->addClass(ZBX_ICON_CHEVRON_LEFT),
 			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
 			$static ? $static : null,
 			$nav_list
