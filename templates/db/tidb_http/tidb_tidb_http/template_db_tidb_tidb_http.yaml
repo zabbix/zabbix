@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:51:33Z'
+  date: '2023-04-13T06:22:49Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -536,7 +536,6 @@ zabbix_export:
           description: |
             The number of schema lease errors per second.
             "change" means that the schema has changed
-            
           preprocessing:
             -
               type: JSONPATH

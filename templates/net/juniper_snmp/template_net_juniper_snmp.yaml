@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:54:44Z'
+  date: '2023-04-13T06:26:12Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -395,7 +395,6 @@ zabbix_export:
             This red alarm state could be turned off by the
             ACO/LT (Alarm Cut Off / Lamp Test) button on the
             front panel module.
-            
           valuemap:
             name: 'JUNIPER-ALARM-MIB::jnxRedAlarmState'
           tags:
@@ -427,9 +426,7 @@ zabbix_export:
           history: 2w
           trends: '0'
           value_type: CHAR
-          description: |
-            MIB: SNMPv2-MIB
-            
+          description: 'MIB: SNMPv2-MIB'
           inventory_link: OS
           preprocessing:
             -
@@ -621,9 +618,7 @@ zabbix_export:
               delay: 3m
               history: 2w
               trends: 0d
-              description: |
-                MIB: JUNIPER-MIB
-                
+              description: 'MIB: JUNIPER-MIB'
               valuemap:
                 name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
               tags:
@@ -667,7 +662,6 @@ zabbix_export:
                 MIB: JUNIPER-MIB
                 If they are using DC power supplies there is a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.
                 This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK-MX104/m-p/289644#M14122
-                
               valuemap:
                 name: 'JUNIPER-ALARM-MIB::jnxOperatingState'
               tags:
@@ -705,7 +699,6 @@ zabbix_export:
           description: |
             Scanning JUNIPER-MIB::jnxOperatingTable for Temperature
             http://kb.juniper.net/InfoCenter/index?page=content&id=KB17526&actp=search. Filter limits results to Routing Engines
-            
           item_prototypes:
             -
               uuid: 96f44fbce5de45e6918efd140283453b

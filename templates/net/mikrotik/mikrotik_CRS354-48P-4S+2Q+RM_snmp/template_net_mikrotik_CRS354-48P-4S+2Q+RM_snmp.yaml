@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:58:10Z'
+  date: '2023-04-13T06:30:32Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -9,7 +9,7 @@ zabbix_export:
     -
       uuid: fa5e5e131eb34bbea1b1f7b2352a853d
       template: 'MikroTik CRS354-48P-4S2QRM by SNMP'
-      name: 'MikroTik CRS354-48P-4S2QRM by SNMP'
+      name: 'MikroTik CRS354-48P-4S+2Q+RM by SNMP'
       description: |
         The template for monitoring Switch MikroTik CRS354-48P-4S+2Q+RM.
         The 48 port champion you’ve been waiting for - now with PoE-out!
@@ -458,7 +458,6 @@ zabbix_export:
             memory allocated to a buffer pool might be modified or
             the amount of disk space allocated to virtual memory
             might be modified.
-            
           preprocessing:
             -
               type: MULTIPLIER
@@ -631,7 +630,6 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).
                 Might be missing in entry models (RB750, RB450G..).
-                
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -707,7 +705,6 @@ zabbix_export:
           description: |
             MIKROTIK-MIB::mtxrHlTemperature
             Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.
-            
           item_prototypes:
             -
               uuid: 1d1fbc3838c341cc9b874721a824deef
@@ -1790,7 +1787,6 @@ zabbix_export:
                 memory allocated to a buffer pool might be modified or
                 the amount of disk space allocated to virtual memory
                 might be modified.
-                
               preprocessing:
                 -
                   type: MULTIPLIER

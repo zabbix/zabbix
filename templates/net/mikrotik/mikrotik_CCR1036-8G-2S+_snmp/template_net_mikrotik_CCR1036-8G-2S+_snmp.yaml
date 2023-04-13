@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:55:54Z'
+  date: '2023-04-13T06:27:51Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -9,7 +9,7 @@ zabbix_export:
     -
       uuid: 7f44e67e3f564ec9894c9142d7276553
       template: 'MikroTik CCR1036-8G-2S by SNMP'
-      name: 'MikroTik CCR1036-8G-2S by SNMP'
+      name: 'MikroTik CCR1036-8G-2S+ by SNMP'
       description: |
         The template for monitoring Ethernet router MikroTik CCR1036-8G-2S+.
         1U rackmount, 8x Gigabit Ethernet, 2xSFP+ cages, LCD, 36 cores x 1.2GHz CPU, 4GB RAM, 41.5mpps fastpath, Up to 28Gbit/s throughput, RouterOS L6, Dual PSU
@@ -458,7 +458,6 @@ zabbix_export:
             memory allocated to a buffer pool might be modified or
             the amount of disk space allocated to virtual memory
             might be modified.
-            
           preprocessing:
             -
               type: MULTIPLIER
@@ -631,7 +630,6 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).
                 Might be missing in entry models (RB750, RB450G..).
-                
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -707,7 +705,6 @@ zabbix_export:
           description: |
             MIKROTIK-MIB::mtxrHlTemperature
             Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.
-            
           item_prototypes:
             -
               uuid: 1798378de4a34ef39db1c9b22a1131e8
@@ -1790,7 +1787,6 @@ zabbix_export:
                 memory allocated to a buffer pool might be modified or
                 the amount of disk space allocated to virtual memory
                 might be modified.
-                
               preprocessing:
                 -
                   type: MULTIPLIER

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:03:26Z'
+  date: '2023-04-13T06:36:28Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -1199,12 +1199,12 @@ zabbix_export:
               -
                 macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           item_prototypes:
             -
               uuid: 9a0448cf8a184d52a7872df410f25d6b

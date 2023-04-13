@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:01:22Z'
+  date: '2023-04-13T06:34:26Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -35,7 +35,6 @@ zabbix_export:
             Units:V
             Range:[0, 80]
             Modbus address:0x0013
-            
           tags:
             -
               tag: component
@@ -77,7 +76,6 @@ zabbix_export:
             Units:A
             Range:[0, 40]
             Modbus address:0x0011
-            
           tags:
             -
               tag: component
@@ -104,7 +102,6 @@ zabbix_export:
             6: Pwm
             7: Float
             8: Equalize
-            
           valuemap:
             name: 'ProStar PWM charge state'
           preprocessing:
@@ -157,7 +154,6 @@ zabbix_export:
             Units:Ah
             Range:[0.0, 4294967294]
             Modbus addresses:H=0x0026 L=0x0027
-            
           preprocessing:
             -
               type: MULTIPLIER
@@ -183,7 +179,6 @@ zabbix_export:
             Units:kWh
             Range:[0.0, 65535]
             Modbus address:0x002A
-            
           tags:
             -
               tag: component
@@ -204,7 +199,6 @@ zabbix_export:
             Units:Ah
             Range:[0.0, 4294967294]
             Modbus addresses:H=0x0032 L=0x0033
-            
           preprocessing:
             -
               type: MULTIPLIER
@@ -230,7 +224,6 @@ zabbix_export:
             Units:A
             Range:[0, 60]
             Modbus address:0x0016
-            
           tags:
             -
               tag: component
@@ -257,7 +250,6 @@ zabbix_export:
             6: NormalOff
             7: Override
             8: NotUsed
-            
           valuemap:
             name: 'ProStar PWM load state'
           preprocessing:
@@ -310,7 +302,6 @@ zabbix_export:
             Units:V
             Range:[0, 80]
             Modbus address:0x0014
-            
           tags:
             -
               tag: component
@@ -328,7 +319,6 @@ zabbix_export:
             MIB: PROSTAR-PWM
             Description:Alarms
             Modbus addresses:H=0x0038 L=0x0039
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -374,7 +364,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
-                  
           tags:
             -
               tag: component
@@ -613,7 +602,6 @@ zabbix_export:
             MIB: PROSTAR-PWM
             Description:Array Faults
             Modbus address:0x0022
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -649,7 +637,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
-                  
           tags:
             -
               tag: component
@@ -822,7 +809,6 @@ zabbix_export:
             MIB: PROSTAR-PWM
             Description:Load Faults
             Modbus address:0x002F
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -854,7 +840,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
-                  
           tags:
             -
               tag: component
@@ -997,7 +982,6 @@ zabbix_export:
             Units:V
             Range:[0.0, 80.0]
             Modbus address:0x0024
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1023,7 +1007,6 @@ zabbix_export:
             Units:deg C
             Range:[-128, 127]
             Modbus address:0x001C
-            
           tags:
             -
               tag: component
@@ -1044,7 +1027,6 @@ zabbix_export:
             Units:deg C
             Range:[-128, 127]
             Modbus address:0x001B
-            
           tags:
             -
               tag: component
@@ -1118,7 +1100,6 @@ zabbix_export:
             Units:deg C
             Range:[-128, 127]
             Modbus address:0x001A
-            
           tags:
             -
               tag: component
@@ -1145,7 +1126,6 @@ zabbix_export:
                 MIB: PROSTAR-PWM
                 Description:Control State
                 Modbus address:0x0021
-                
               tags:
                 -
                   tag: component

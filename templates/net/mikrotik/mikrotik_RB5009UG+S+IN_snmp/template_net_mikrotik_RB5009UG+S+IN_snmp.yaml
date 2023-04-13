@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:00:10Z'
+  date: '2023-04-13T06:33:12Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -9,7 +9,7 @@ zabbix_export:
     -
       uuid: 7b6f7a12a6b449ca926e74c894eca354
       template: 'MikroTik RB5009UGSIN by SNMP'
-      name: 'MikroTik RB5009UGSIN by SNMP'
+      name: 'MikroTik RB5009UG+S+IN by SNMP'
       description: |
         The template for monitoring Ethernet router MikroTik RB5009UG+S+IN.
         The ultimate heavy-duty home lab router with USB 3.0, 1G and 2.5G Ethernet and a 10G SFP+ cage. You can mount four of these new routers in a single 1U rackmount space! Unprecedented processing power in such a small form factor.
@@ -458,7 +458,6 @@ zabbix_export:
             memory allocated to a buffer pool might be modified or
             the amount of disk space allocated to virtual memory
             might be modified.
-            
           preprocessing:
             -
               type: MULTIPLIER
@@ -631,7 +630,6 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).
                 Might be missing in entry models (RB750, RB450G..).
-                
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -707,7 +705,6 @@ zabbix_export:
           description: |
             MIKROTIK-MIB::mtxrHlTemperature
             Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.
-            
           item_prototypes:
             -
               uuid: 63a9a283529a47c1921b9e91925783f5
@@ -1790,7 +1787,6 @@ zabbix_export:
                 memory allocated to a buffer pool might be modified or
                 the amount of disk space allocated to virtual memory
                 might be modified.
-                
               preprocessing:
                 -
                   type: MULTIPLIER

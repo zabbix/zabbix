@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:49:54Z'
+  date: '2023-04-13T06:20:57Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -2566,11 +2566,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -2585,11 +2585,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -2605,11 +2605,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -2625,11 +2625,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid

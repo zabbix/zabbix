@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:49:21Z'
+  date: '2023-04-13T06:20:45Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -31,7 +31,6 @@ zabbix_export:
             The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket with a value of either 0 or 1. 
             The average statistic shows the error rate, and the sum statistic shows the count of that type of error, during each period.
             Statistic: Average (reports per request).
-            
           preprocessing:
             -
               type: JSONPATH
@@ -59,7 +58,6 @@ zabbix_export:
             The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket with a value of either 0 or 1. 
             The average statistic shows the error rate, and the sum statistic shows the count of that type of error, during each period.
             Statistic: Average (reports per request).
-            
           preprocessing:
             -
               type: JSONPATH
@@ -123,7 +121,6 @@ zabbix_export:
           description: |
             The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
             If you're using a metrics configuration with a filter, then this metric only returns the HTTP requests that meet the filter's requirements.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -172,7 +169,6 @@ zabbix_export:
           description: |
             The number of bytes downloaded for requests made to an Amazon S3 bucket, where the response includes a body.
             Statistic: Average (bytes per request).
-            
           preprocessing:
             -
               type: JSONPATH
@@ -242,7 +238,6 @@ zabbix_export:
           description: |
             The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
             This also includes Delete Multiple Objects requests. This metric shows the number of requests, not the number of objects deleted.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -483,11 +478,9 @@ zabbix_export:
             
                 return JSON.stringify({ 'error': error });
             }
-            
           description: |
             Get alarms data.
             DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
-            
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -712,11 +705,9 @@ zabbix_export:
             
                 // return JSON.stringify({'error': error});
             }
-            
           description: |
             Get bucket metrics.
             Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
-            
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -757,7 +748,6 @@ zabbix_export:
           description: |
             The number of HTTP GET requests made for objects in an Amazon S3 bucket. This doesn't include list operations.
             Paginated list-oriented requests, like List Multipart Uploads, List Parts, Get Bucket Object versions, and others, are not included in this metric.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -861,7 +851,6 @@ zabbix_export:
             This a daily metric for the bucket.
             The total number of objects stored in a bucket for all storage classes. 
             This value is calculated by counting all objects in the bucket (both current and noncurrent objects) and the total number of parts for all incomplete multipart uploads to the bucket.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -906,7 +895,6 @@ zabbix_export:
           description: |
             The number of HTTP POST requests made to an Amazon S3 bucket.
             Delete Multiple Objects and SELECT Object Content requests are not included in this metric.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1044,7 +1032,6 @@ zabbix_export:
             The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
             This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency.
             Statistic: Average.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1073,7 +1060,6 @@ zabbix_export:
             The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
             This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency.
             Statistic: 90 percentile.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1121,7 +1107,6 @@ zabbix_export:
                 The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
                 Alarm description:
                 {#ALARM_DESCRIPTION}
-                
               valuemap:
                 name: 'Alarm state'
               preprocessing:
@@ -1138,7 +1123,6 @@ zabbix_export:
                       var state = ['OK', 'INSUFFICIENT_DATA', 'ALARM'];
                       
                       return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
-                      
               master_item:
                 key: aws.s3.get_alarms
               tags:
@@ -1168,7 +1152,6 @@ zabbix_export:
                 An explanation for the alarm state, in text format.
                 Alarm description:
                 {#ALARM_DESCRIPTION}
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1194,7 +1177,6 @@ zabbix_export:
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
                 Reason: {ITEM.LASTVALUE2}
-                
               tags:
                 -
                   tag: scope
@@ -1220,7 +1202,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

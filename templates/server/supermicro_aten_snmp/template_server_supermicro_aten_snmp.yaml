@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:08:02Z'
+  date: '2023-04-13T06:40:48Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -383,7 +383,6 @@ zabbix_export:
                 MIB: ATEN-IPMI-MIB
                 A textual string containing information about the interface.
                 This string should include the name of the manufacturer, the product name and the version of the interface hardware/software.
-                
               tags:
                 -
                   tag: component
@@ -422,7 +421,6 @@ zabbix_export:
                 MIB: ATEN-IPMI-MIB
                 A textual string containing information about the interface.
                 This string should include the name of the manufacturer, the product name and the version of the interface hardware/software.
-                
               tags:
                 -
                   tag: component
@@ -528,11 +526,11 @@ zabbix_export:
                   fields:
                     -
                       type: INTEGER
-                      name: show
+                      name: adv_conf
                       value: '1'
                     -
                       type: INTEGER
-                      name: adv_conf
+                      name: show
                       value: '1'
                     -
                       type: ITEM

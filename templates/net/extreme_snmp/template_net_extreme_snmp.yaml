@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:54:07Z'
+  date: '2023-04-13T06:25:34Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -167,7 +167,6 @@ zabbix_export:
                     avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT}
                     or
                     last(/Extreme EXOS by SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
-                    
                   recovery_expression: 'max(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT}-3'
               tags:
                 -
@@ -539,7 +538,6 @@ zabbix_export:
             The software revision of the primary image stored in this device.
             This string will have a zero length if the revision is unknown, invalid or not present.
             This will also be reported in RMON2 probeSoftwareRev if this is the software image currently running in the device.
-            
           inventory_link: OS
           preprocessing:
             -
@@ -2472,7 +2470,6 @@ zabbix_export:
         avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT}
         or
         last(/Extreme EXOS by SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
-        
       recovery_mode: RECOVERY_EXPRESSION
       recovery_expression: 'max(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT}-3'
       name: 'Device: Temperature is above critical threshold'

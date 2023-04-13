@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:57:15Z'
+  date: '2023-04-13T06:29:22Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -9,7 +9,7 @@ zabbix_export:
     -
       uuid: 8da94e2f01ff46e28becf0b08ff09ace
       template: 'MikroTik CRS312-4C8XG-RM by SNMP'
-      name: 'MikroTik CRS312-4C8XG-RM by SNMP'
+      name: 'MikroTik CRS312-4C+8XG-RM by SNMP'
       description: |
         The template for monitoring Switch MikroTik CRS312-4C+8XG-RM.
         Switch of the future: the first MikroTik product with 10G RJ45 Ethernet ports and SFP+
@@ -458,7 +458,6 @@ zabbix_export:
             memory allocated to a buffer pool might be modified or
             the amount of disk space allocated to virtual memory
             might be modified.
-            
           preprocessing:
             -
               type: MULTIPLIER
@@ -631,7 +630,6 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).
                 Might be missing in entry models (RB750, RB450G..).
-                
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -707,7 +705,6 @@ zabbix_export:
           description: |
             MIKROTIK-MIB::mtxrHlTemperature
             Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.
-            
           item_prototypes:
             -
               uuid: 1e429d1a498044d3b95d2a73db924f77
@@ -1790,7 +1787,6 @@ zabbix_export:
                 memory allocated to a buffer pool might be modified or
                 the amount of disk space allocated to virtual memory
                 might be modified.
-                
               preprocessing:
                 -
                   type: MULTIPLIER

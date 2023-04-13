@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:57:36Z'
+  date: '2023-04-13T06:29:42Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -9,7 +9,7 @@ zabbix_export:
     -
       uuid: bc80883918ac4f879427ca145122b5cb
       template: 'MikroTik CRS326-24G-2SRM by SNMP'
-      name: 'MikroTik CRS326-24G-2SRM by SNMP'
+      name: 'MikroTik CRS326-24G-2S+RM by SNMP'
       description: |
         The template for monitoring Switch MikroTik CRS326-24G-2S+RM.
         24 Gigabit port switch with 2 x SFP+ cages in 1U rackmount case, Dual boot (RouterOS or SwitchOS)
@@ -458,7 +458,6 @@ zabbix_export:
             memory allocated to a buffer pool might be modified or
             the amount of disk space allocated to virtual memory
             might be modified.
-            
           preprocessing:
             -
               type: MULTIPLIER
@@ -631,7 +630,6 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).
                 Might be missing in entry models (RB750, RB450G..).
-                
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -707,7 +705,6 @@ zabbix_export:
           description: |
             MIKROTIK-MIB::mtxrHlTemperature
             Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.
-            
           item_prototypes:
             -
               uuid: ce36e933fd9146c29d9d46ebfef95489
@@ -1790,7 +1787,6 @@ zabbix_export:
                 memory allocated to a buffer pool might be modified or
                 the amount of disk space allocated to virtual memory
                 might be modified.
-                
               preprocessing:
                 -
                   type: MULTIPLIER

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:45:48Z'
+  date: '2023-04-13T06:16:59Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -397,7 +397,6 @@ zabbix_export:
                 0: Database without any copy and dismounted.
                 1: Database is a primary database and mounted.
                 2: Database is a passive copy and the state is healthy.
-                
               valuemap:
                 name: 'Exchange database state'
               preprocessing:

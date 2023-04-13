@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:01:29Z'
+  date: '2023-04-13T06:34:33Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -65,7 +65,6 @@ zabbix_export:
             Units:A
             Range:[0.0, 17]
             Modbus address:0x0005
-            
           preprocessing:
             -
               type: MULTIPLIER
@@ -102,7 +101,6 @@ zabbix_export:
             6: NormalOff
             7: UnknownState
             8: Standby
-            
           valuemap:
             name: 'SureSine load state'
           preprocessing:
@@ -152,7 +150,6 @@ zabbix_export:
             MIB: SURESINE
             Description:Faults
             Modbus address:0x0007
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -179,7 +176,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
-                  
           tags:
             -
               tag: component
@@ -238,7 +234,6 @@ zabbix_export:
             MIB: SURESINE
             Description:Faults
             Modbus address:0x0007
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -269,7 +264,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
-                  
           tags:
             -
               tag: component
@@ -426,7 +420,6 @@ zabbix_export:
             Units:C
             Range:[-128, 127]
             Modbus address:0x0006
-            
           tags:
             -
               tag: component
@@ -456,7 +449,6 @@ zabbix_export:
                 Units:V
                 Range:[0.0, 17.0]
                 Modbus address:0x0004
-                
               preprocessing:
                 -
                   type: MULTIPLIER

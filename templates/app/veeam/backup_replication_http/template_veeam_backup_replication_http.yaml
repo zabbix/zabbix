@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:48:26Z'
+  date: '2023-04-13T06:19:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -178,7 +178,6 @@ zabbix_export:
                 Zabbix.log(3, '[ VEEAM ] ERROR: ' + error);
                 return JSON.stringify({'error': error});
             }
-            
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$VEEAM.DATA.TIMEOUT}'
           parameters:
@@ -887,7 +886,6 @@ zabbix_export:
                         return value;
                       });
                   return JSON.stringify(obj);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

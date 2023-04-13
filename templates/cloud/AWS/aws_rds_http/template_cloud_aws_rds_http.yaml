@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:49:19Z'
+  date: '2023-04-13T06:20:42Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -157,7 +157,6 @@ zabbix_export:
             When an instance is running, credits in the CPUCreditBalance don't expire. When the instance stops, the CPUCreditBalance does not persist, and all accrued credits are lost.
             
             This metric applies only to db.t2.small and db.t2.medium instances for Aurora MySQL, and to db.t3 instances for Aurora PostgreSQL.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -199,7 +198,6 @@ zabbix_export:
             This metric measures the amount of time during which physical CPUs have been used for processing instructions by virtual CPUs allocated to the DB instance.
             
             This metric applies only to db.t2.small and db.t2.medium instances for Aurora MySQL, and to db.t3 instances for Aurora PostgreSQL
-            
           preprocessing:
             -
               type: JSONPATH
@@ -291,7 +289,6 @@ zabbix_export:
             - Sessions created by the database engine's parallel execution capabilities
             - Sessions created by the database engine job scheduler
             - Amazon Aurora/RDS connections
-            
           preprocessing:
             -
               type: JSONPATH
@@ -337,7 +334,6 @@ zabbix_export:
           description: |
             The percentage of throughput credits remaining in the burst bucket of your RDS database. This metric is available for basic monitoring only.
             To find the instance sizes that support this metric, see the instance sizes with an asterisk (*) in the EBS optimized by default table (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html#current) in Amazon RDS User Guide for Linux Instances.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -374,7 +370,6 @@ zabbix_export:
           description: |
             The percentage of I/O credits remaining in the burst bucket of your RDS database. This metric is available for basic monitoring only.
             To find the instance sizes that support this metric, see the instance sizes with an asterisk (*) in the EBS optimized by default table (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html#current) in Amazon RDS User Guide for Linux Instances.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -524,7 +519,6 @@ zabbix_export:
             The amount of available random access memory.
             
             For MariaDB, MySQL, Oracle, and PostgreSQL DB instances, this metric reports the value of the MemAvailable field of /proc/meminfo.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -552,7 +546,6 @@ zabbix_export:
             Unlike for other DB engines, for Aurora DB instances this metric reports the amount of storage available to each DB instance. 
             This value depends on the DB instance class. You can increase the amount of free storage space for an instance by choosing a larger DB instance class for your instance.
             (This doesn't apply to Aurora Serverless v2.)
-            
           preprocessing:
             -
               type: JSONPATH
@@ -761,7 +754,6 @@ zabbix_export:
             
                 return JSON.stringify({ 'error': error });
             }
-            
           description: 'DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html'
           preprocessing:
             -
@@ -951,7 +943,6 @@ zabbix_export:
             
                     return JSON.stringify({ 'error': error });
                 }
-            
           description: 'DescribeEvents API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeEvents.html'
           preprocessing:
             -
@@ -1115,11 +1106,9 @@ zabbix_export:
                 Zabbix.log(3, '[ AWS RDS ] ERROR: ' + error);
                 return JSON.stringify({ 'error': error });
             }
-            
           description: |
             Get instance info.
             DescribeDBInstances API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBInstances.html
-            
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -1386,12 +1375,10 @@ zabbix_export:
             
                 return JSON.stringify({'error': error});
             }
-            
           description: |
             Get instance metrics.
             Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
             Full metrics list related to Amazon Aurora: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
-            
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -1658,7 +1645,6 @@ zabbix_export:
           description: |
             The status of a read replica. If the instance isn't a read replica, this is blank.
             Boolean value that is true if the instance is operating normally, or false if the instance is in an error state.
-            
           valuemap:
             name: 'Read replica state'
           preprocessing:
@@ -1690,7 +1676,6 @@ zabbix_export:
               description: |
                 The status of a read replica.
                 False if the instance is in an error state.
-                
               tags:
                 -
                   tag: scope
@@ -1707,7 +1692,6 @@ zabbix_export:
           description: |
             The status of a read replica. If the instance isn't a read replica, this is blank.
             Status of the DB instance. For a StatusType of read replica, the values can be replicating, replication stop point set, replication stop point reached, error, stopped, or terminated.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1817,7 +1801,6 @@ zabbix_export:
           description: |
             Specifies the current state of this database.
             All possible status values and their description: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/accessing-monitoring.html#Overview.DBInstance.Status
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1870,7 +1853,6 @@ zabbix_export:
           description: |
             The upper limit in gibibytes (GiB) to which Amazon RDS can automatically scale the storage of the DB instance.
             If limit is not specified returns -1.
-            
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1878,7 +1860,6 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value)
                   return (typeof data.MaxAllocatedStorage === 'undefined') ? -1 : data.MaxAllocatedStorage
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1901,7 +1882,6 @@ zabbix_export:
           description: |
             The incoming (receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
             For Amazon Aurora: The amount of network throughput received from the Aurora storage subsystem by each instance in the DB cluster.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1926,7 +1906,6 @@ zabbix_export:
           description: |
             The outgoing (transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.
             For Amazon Aurora: The amount of network throughput sent to the Aurora storage subsystem by each instance in the Aurora MySQL DB cluster.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1978,7 +1957,6 @@ zabbix_export:
             This metric is available for the Aurora PostgreSQL DB instance classes db.t3.medium, db.t3.large, db.r4.large, db.r4.xlarge, db.r5.large, db.r5.xlarge, db.r6g.large, and db.r6g.xlarge. 
             For Aurora MySQL, this metric applies only to db.t* DB instance classes.
             This metric is not available for SQL Server.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -2164,7 +2142,6 @@ zabbix_export:
                 The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
                 Alarm description:
                 {#ALARM_DESCRIPTION}
-                
               valuemap:
                 name: 'Alarm state'
               preprocessing:
@@ -2181,7 +2158,6 @@ zabbix_export:
                       var state = ['OK', 'INSUFFICIENT_DATA', 'ALARM'];
                       
                       return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
-                      
               master_item:
                 key: aws.rds.get_alarms
               tags:
@@ -2211,7 +2187,6 @@ zabbix_export:
                 An explanation for the alarm state, in text format.
                 Alarm description:
                 {#ALARM_DESCRIPTION}
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2237,7 +2212,6 @@ zabbix_export:
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
                 Reason: {ITEM.LASTVALUE2}
-                
               tags:
                 -
                   tag: scope
@@ -2264,7 +2238,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2278,7 +2251,6 @@ zabbix_export:
           description: |
             Discovery Amazon Aurora metrics.
             https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
-            
           item_prototypes:
             -
               uuid: 28df1a214515425099514140a1244cc4
@@ -2762,7 +2734,6 @@ zabbix_export:
                   })
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2778,7 +2749,6 @@ zabbix_export:
             Storage types:
              aurora (for MySQL 5.6-compatible Aurora)
              aurora-mysql (for MySQL 5.7-compatible and MySQL 8.0-compatible Aurora)
-            
           item_prototypes:
             -
               uuid: 3842a935bedf446d8b8b9a7fd58fc24b
@@ -2821,7 +2791,6 @@ zabbix_export:
                 A high value: The replica is lagging the replication source.
                 0 or a value close to 0: The replica process is active and current.
                 -1: Aurora can't determine the lag, which can happen during replica setup or when the replica is in an error state
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2849,7 +2818,6 @@ zabbix_export:
               description: |
                 The average number of current transactions executing on an Aurora database instance per second.
                 By default, Aurora doesn't enable this metric. To begin measuring this value, set innodb_monitor_enable='all' in the DB parameter group for a specific DB instance.
-                
               preprocessing:
                 -
                   type: JSONPATH

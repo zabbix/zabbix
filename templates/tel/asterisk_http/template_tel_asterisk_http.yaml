@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:08:06Z'
+  date: '2023-04-13T06:40:52Z'
   groups:
     -
       uuid: 1d12408342854fd5a4436dd6d5d1bd4a
@@ -432,7 +432,6 @@ zabbix_export:
                   catch (e) {}
                   
                   return JSON.stringify(asterisk);
-                  
           url: '{$AMI.URL}'
           query_fields:
             -

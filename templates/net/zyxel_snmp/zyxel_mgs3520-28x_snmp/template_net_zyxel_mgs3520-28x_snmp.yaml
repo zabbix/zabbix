@@ -1,13 +1,13 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:02:59Z'
+  date: '2023-04-13T06:36:02Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
     -
-      uuid: 87090ed8ccb14f118feea3f81eca9daf
+      uuid: 9cc843a085bb4ee5af0dc4d764a7eee9
       template: 'ZYXEL MGS3520-28x by SNMP'
       name: 'ZYXEL MGS3520-28x by SNMP'
       description: |

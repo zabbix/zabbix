@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:07:56Z'
+  date: '2023-04-13T06:40:42Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -520,7 +520,6 @@ zabbix_export:
                 Fan speed expressed in percent(%) of maximum RPM.
                 An octet string expressed as 'ddd% of maximum' where:d is a decimal digit or blank space for a leading zero.
                 If the fan is determined not to be running or the fan speed cannot be determined, the string will indicate 'Offline'.
-                
               preprocessing:
                 -
                   type: REGEX

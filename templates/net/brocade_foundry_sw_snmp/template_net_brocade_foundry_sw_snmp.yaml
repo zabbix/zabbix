@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:52:58Z'
+  date: '2023-04-13T06:24:21Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -254,9 +254,7 @@ zabbix_export:
           history: 2w
           trends: '0'
           value_type: CHAR
-          description: |
-            MIB: FOUNDRY-SN-AGENT-MIB
-            
+          description: 'MIB: FOUNDRY-SN-AGENT-MIB'
           inventory_link: SERIALNO_A
           preprocessing:
             -
@@ -503,9 +501,7 @@ zabbix_export:
               delay: 3m
               history: 2w
               trends: 0d
-              description: |
-                MIB: FOUNDRY-SN-AGENT-MIB
-                
+              description: 'MIB: FOUNDRY-SN-AGENT-MIB'
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
               tags:
@@ -1044,9 +1040,7 @@ zabbix_export:
               delay: 3m
               history: 2w
               trends: 0d
-              description: |
-                MIB: FOUNDRY-SN-AGENT-MIB
-                
+              description: 'MIB: FOUNDRY-SN-AGENT-MIB'
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
               tags:
@@ -1107,7 +1101,6 @@ zabbix_export:
                 Temperature of the chassis. Each unit is 0.5 degrees Celsius.
                 Only management module built with temperature sensor hardware is applicable.
                 For those non-applicable management module, it returns no-such-name.
-                
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -2835,9 +2828,7 @@ zabbix_export:
               delay: 3m
               history: 2w
               trends: 0d
-              description: |
-                MIB: FOUNDRY-SN-AGENT-MIB
-                
+              description: 'MIB: FOUNDRY-SN-AGENT-MIB'
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus'
               tags:
@@ -3376,9 +3367,7 @@ zabbix_export:
               delay: 3m
               history: 2w
               trends: 0d
-              description: |
-                MIB: FOUNDRY-SN-AGENT-MIB
-                
+              description: 'MIB: FOUNDRY-SN-AGENT-MIB'
               valuemap:
                 name: 'FOUNDRY-SN-AGENT-MIB::snChasPwrSupplyOperStatus'
               tags:

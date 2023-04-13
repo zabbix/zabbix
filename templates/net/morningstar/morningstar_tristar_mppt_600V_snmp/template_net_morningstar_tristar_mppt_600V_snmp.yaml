@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:01:39Z'
+  date: '2023-04-13T06:34:42Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -35,7 +35,6 @@ zabbix_export:
             Units:A
             Range:[-10, 80]
             Modbus address:0x001d
-            
           tags:
             -
               tag: component
@@ -56,7 +55,6 @@ zabbix_export:
             Units:W
             Range:[-10, 5000]
             Modbus address:0x003c
-            
           tags:
             -
               tag: component
@@ -77,7 +75,6 @@ zabbix_export:
             Units:V
             Range:[-10, 650.0]
             Modbus address:0x003d
-            
           tags:
             -
               tag: component
@@ -98,7 +95,6 @@ zabbix_export:
             Units:V
             Range:[-10, 650.0]
             Modbus address:0x003e
-            
           tags:
             -
               tag: component
@@ -119,7 +115,6 @@ zabbix_export:
             Units:V
             Range:[-10, 650]
             Modbus address:0x001b
-            
           tags:
             -
               tag: component
@@ -141,7 +136,6 @@ zabbix_export:
             Units:V
             Range:[-10, 80]
             Modbus address:0x0018
-            
           tags:
             -
               tag: component
@@ -168,7 +162,6 @@ zabbix_export:
             Units:A
             Range:[-10, 80]
             Modbus address:0x001c
-            
           tags:
             -
               tag: component
@@ -189,7 +182,6 @@ zabbix_export:
             Units:W
             Range:[-10, 4000]
             Modbus address:0x003a
-            
           tags:
             -
               tag: component
@@ -218,7 +210,6 @@ zabbix_export:
             8: Equalize
             9: Slave
             10: Fixed
-            
           valuemap:
             name: 'TriStar MPPT 600V charge state'
           preprocessing:
@@ -271,7 +262,6 @@ zabbix_export:
             Units:Ah
             Range:[0.0, 5000]
             Modbus addresses:H=0x0034 L=0x0035
-            
           tags:
             -
               tag: component
@@ -292,7 +282,6 @@ zabbix_export:
             Units:kWh
             Range:[0.0, 65535.0]
             Modbus address:0x0038
-            
           tags:
             -
               tag: component
@@ -310,7 +299,6 @@ zabbix_export:
             MIB: TRISTAR-MPPT
             Description:Alarms
             Modbus addresses:H=0x002e L=0x002f
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -365,7 +353,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
-                  
           tags:
             -
               tag: component
@@ -674,7 +661,6 @@ zabbix_export:
             MIB: TRISTAR-MPPT
             Description:Faults
             Modbus addresses:H=0x002c L=0x002d
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -726,7 +712,6 @@ zabbix_export:
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
-                  
           tags:
             -
               tag: component
@@ -1083,7 +1068,6 @@ zabbix_export:
             Units:V
             Range:[-10, 650.0]
             Modbus address:0x0033
-            
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1109,7 +1093,6 @@ zabbix_export:
             Units:C
             Range:[-40, 80]
             Modbus address:0x0025
-            
           tags:
             -
               tag: component
@@ -1183,7 +1166,6 @@ zabbix_export:
             Units:C
             Range:[-40, 80]
             Modbus address:0x0023
-            
           tags:
             -
               tag: component
@@ -1213,7 +1195,6 @@ zabbix_export:
                 Units:V
                 Range:[-10, 80]
                 Modbus address:0x0018
-                
               tags:
                 -
                   tag: component

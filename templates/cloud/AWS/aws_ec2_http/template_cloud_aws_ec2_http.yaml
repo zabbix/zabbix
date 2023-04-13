@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:49:13Z'
+  date: '2023-04-13T06:20:35Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -68,7 +68,6 @@ zabbix_export:
             Credits are accrued in the credit balance after they are earned, and removed from the credit balance when they are spent. The credit balance has a maximum limit, determined by the instance size. After the limit is reached, any new credits that are earned are discarded. For T2 Standard, launch credits do not count towards the limit.
             The credits in the CPUCreditBalance are available for the instance to spend to burst beyond its baseline CPU utilization.
             When an instance is running, credits in the CPUCreditBalance do not expire. When a T3 or T3a instance stops, the CPUCreditBalance value persists for seven days. Thereafter, all accrued credits are lost. When a T2 instance stops, the CPUCreditBalance value does not persist, and all accrued credits are lost.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -108,7 +107,6 @@ zabbix_export:
           description: |
             The number of CPU credits spent by the instance for CPU utilization.
             One CPU credit equals one vCPU running at 100% utilization for one minute or an equivalent combination of vCPUs, utilization, and time (for example, one vCPU running at 50% utilization for two minutes or two vCPUs running at 25% utilization for two minutes).
-            
           preprocessing:
             -
               type: JSONPATH
@@ -135,7 +133,6 @@ zabbix_export:
           description: |
             The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
             The CPUSurplusCreditBalance value is paid down by earned CPU credits. If the number of surplus credits exceeds the maximum number of credits that the instance can earn in a 24-hour period, the spent surplus credits above the maximum incur an additional charge.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -166,7 +163,6 @@ zabbix_export:
             - The spent surplus credits exceed the maximum number of credits that the instance can earn in a 24-hour period. Spent surplus credits above the maximum are charged at the end of the hour;
             - The instance is stopped or terminated;
             - The instance is switched from unlimited to standard.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -207,7 +203,6 @@ zabbix_export:
           description: |
             The percentage of allocated EC2 compute units that are currently in use on the instance. This metric identifies the processing power required to run an application on a selected instance.
             Depending on the instance type, tools in your operating system can show a lower percentage than CloudWatch when the instance is not allocated a full processor core.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -250,7 +245,6 @@ zabbix_export:
             This metric is used to determine the volume of the data the application reads from the hard disk of the instance.
             This can be used to determine the speed of the application.
             If there are no instance store volumes, either the value is 0 or the metric is not reported.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -279,7 +273,6 @@ zabbix_export:
           description: |
             Completed read operations from all instance store volumes available to the instance in a specified period of time.
             If there are no instance store volumes, either the value is 0 or the metric is not reported.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -310,7 +303,6 @@ zabbix_export:
             This metric is used to determine the volume of the data the application writes onto the hard disk of the instance.
             This can be used to determine the speed of the application.
             If there are no instance store volumes, either the value is 0 or the metric is not reported.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -339,7 +331,6 @@ zabbix_export:
           description: |
             Completed write operations to all instance store volumes available to the instance in a specified period of time.
             If there are no instance store volumes, either the value is 0 or the metric is not reported.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -733,7 +724,6 @@ zabbix_export:
             
                   return JSON.stringify({ 'error': error });
               }
-            
           description: 'DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html'
           preprocessing:
             -
@@ -987,11 +977,9 @@ zabbix_export:
             
                   return JSON.stringify({'error': error});
               }
-            
           description: |
             Get instance metrics.
             Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
-            
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -1173,11 +1161,9 @@ zabbix_export:
             
                 return JSON.stringify({ 'error': error });
             }
-            
           description: |
             Get volumes attached to instance.
             DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
-            
           preprocessing:
             -
               type: CHECK_NOT_SUPPORTED
@@ -1276,7 +1262,6 @@ zabbix_export:
           description: |
             The number of bytes received on all network interfaces by the instance.
             This metric identifies the volume of incoming network traffic to a single instance.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1305,7 +1290,6 @@ zabbix_export:
           description: |
             The number of bytes sent out on all network interfaces by the instance. 
             This metric identifies the volume of outgoing network traffic from a single instance.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1333,7 +1317,6 @@ zabbix_export:
             The number of packets received on all network interfaces by the instance.
             This metric identifies the volume of incoming traffic in terms of the number of packets on a single instance.
             This metric is available for basic monitoring only.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1362,7 +1345,6 @@ zabbix_export:
             The number of packets sent out on all network interfaces by the instance.
             This metric identifies the volume of outgoing traffic in terms of the number of packets on a single instance.
             This metric is available for basic monitoring only.
-            
           preprocessing:
             -
               type: JSONPATH
@@ -1442,7 +1424,6 @@ zabbix_export:
                 Exhausted memory
                 Corrupted file system
                 Incompatible kernel
-                
               tags:
                 -
                   tag: scope
@@ -1457,7 +1438,6 @@ zabbix_export:
           description: |
             Reports whether the instance has passed the system status check in the last minute.
             This metric can be either 0 (passed) or 1 (failed).
-            
           valuemap:
             name: 'Status check'
           preprocessing:
@@ -1486,7 +1466,6 @@ zabbix_export:
                 Loss of system power
                 Software issues on the physical host
                 Hardware issues on the physical host that impact network reachability
-                
               tags:
                 -
                   tag: scope
@@ -1568,7 +1547,6 @@ zabbix_export:
                 The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
                 Alarm description:
                 {#ALARM_DESCRIPTION}
-                
               valuemap:
                 name: 'Alarm state'
               preprocessing:
@@ -1585,7 +1563,6 @@ zabbix_export:
                       var state = ['OK', 'INSUFFICIENT_DATA', 'ALARM'];
                       
                       return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
-                      
               master_item:
                 key: aws.ec2.get_alarms
               tags:
@@ -1615,7 +1592,6 @@ zabbix_export:
                 An explanation for the alarm state, in text format.
                 Alarm description:
                 {#ALARM_DESCRIPTION}
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1641,7 +1617,6 @@ zabbix_export:
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
                 Reason: {ITEM.LASTVALUE2}
-                
               tags:
                 -
                   tag: scope
@@ -1668,7 +1643,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1716,7 +1690,6 @@ zabbix_export:
                       var state = ['attaching', 'attached', 'detaching'];
                       
                       return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
-                      
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1841,7 +1814,6 @@ zabbix_export:
               description: |
                 The state of the volume.
                 Possible values: 0 (creating), 1 (available), 2 (in-use), 3 (deleting), 4 (deleted), 5 (error).
-                
               valuemap:
                 name: 'Volume status'
               preprocessing:
@@ -1857,7 +1829,6 @@ zabbix_export:
                       var state = ['creating', 'available', 'in-use', 'deleting', 'deleted', 'error'];
                       
                       return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
-                      
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1897,7 +1868,6 @@ zabbix_export:
                 Used with General Purpose SSD (gp2), Throughput Optimized HDD (st1), and Cold HDD (sc1) volumes only.
                 Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket. 
                 Data is reported to CloudWatch only when the volume is active. If the volume is not attached, no data is reported.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1941,7 +1911,6 @@ zabbix_export:
                 The total amount of read and write operations (normalized to 256K capacity units) consumed in a specified period of time.
                 I/O operations that are smaller than 256K each count as 1 consumed IOPS. I/O operations that are larger than 256K are counted in 256K capacity units. 
                 For example, a 1024K I/O would count as 4 consumed IOPS.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -1972,7 +1941,6 @@ zabbix_export:
               description: |
                 This metric is not supported with Multi-Attach enabled volumes.
                 The total number of seconds in a specified period of time when no read or write operations were submitted.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2031,7 +1999,6 @@ zabbix_export:
                 Provides information on the read operations in a specified period of time.
                 The average size of each read operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.
                 For Xen instances, data is reported only when there is read activity on the volume.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2093,7 +2060,6 @@ zabbix_export:
                 Provisioned IOPS SSD volumes deliver their provisioned performance 99.9 percent of the time.
                 During a write, if there are no other pending I/O requests in a minute, the metric value will be 100 percent.
                 Also, a volume's I/O performance may become degraded temporarily due to an action you have taken (for example, creating a snapshot of a volume during peak usage, running the volume on a non-EBS-optimized instance, or accessing data on the volume for the first time).
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2127,7 +2093,6 @@ zabbix_export:
                 If multiple requests are submitted at the same time, this total could be greater than the length of the period. 
                 For example, for a period of 1 minutes (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds. 
                 For Xen instances, data is reported only when there is read activity on the volume.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2161,7 +2126,6 @@ zabbix_export:
                 If multiple requests are submitted at the same time, this total could be greater than the length of the period.
                 For example, for a period of 1 minute (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds. 
                 For Xen instances, data is reported only when there is write activity on the volume.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2193,7 +2157,6 @@ zabbix_export:
                 Provides information on the write operations in a specified period of time.
                 The average size of each write operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.
                 For Xen instances, data is reported only when there is write activity on the volume.
-                
               preprocessing:
                 -
                   type: JSONPATH
@@ -2454,11 +2417,9 @@ zabbix_export:
                 
                     return JSON.stringify({'error': error});
                 }
-                
               description: |
                 Get metrics of EBS volume.
                 Full metrics list related to EBS: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html
-                
               preprocessing:
                 -
                   type: CHECK_NOT_SUPPORTED
@@ -2556,7 +2517,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

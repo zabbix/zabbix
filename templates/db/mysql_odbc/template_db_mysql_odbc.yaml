@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:50:51Z'
+  date: '2023-04-13T06:22:02Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f

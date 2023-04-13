@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:54:39Z'
+  date: '2023-04-13T06:26:06Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1079,7 +1079,6 @@ zabbix_export:
                 avg(/Intel_Qlogic Infiniband by SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}
                 or
                 last(/Intel_Qlogic Infiniband by SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
-                
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Intel_Qlogic Infiniband by SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
               name: '{#SENSOR_INFO}: Temperature is above critical threshold'
@@ -1100,7 +1099,6 @@ zabbix_export:
                 avg(/Intel_Qlogic Infiniband by SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}
                 or
                 last(/Intel_Qlogic Infiniband by SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
-                
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Intel_Qlogic Infiniband by SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_INFO}"}-3'
               name: '{#SENSOR_INFO}: Temperature is above warning threshold'
@@ -1115,7 +1113,6 @@ zabbix_export:
                     avg(/Intel_Qlogic Infiniband by SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}
                     or
                     last(/Intel_Qlogic Infiniband by SNMP/sensor.temp.status[icsChassisSensorSlotOperStatus.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
-                    
                   recovery_expression: 'max(/Intel_Qlogic Infiniband by SNMP/sensor.temp.value[icsChassisSensorSlotValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
               tags:
                 -

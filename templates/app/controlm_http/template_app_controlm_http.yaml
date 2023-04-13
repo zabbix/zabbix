@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:45:18Z'
+  date: '2023-04-13T06:16:34Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -393,7 +393,6 @@ zabbix_export:
                           'Ended Late'    // 3
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
-                      
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -773,7 +772,6 @@ zabbix_export:
                       'Up',       // 1
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -899,7 +897,6 @@ zabbix_export:
                           'Discovering',  // 4
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
-                      
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1055,7 +1052,6 @@ zabbix_export:
                           'true',     // 1
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
-                      
               master_item:
                 key: 'job.stats[''{#JOB.ID}'']'
               tags:
@@ -1147,7 +1143,6 @@ zabbix_export:
                           'Executing'         // 7 — currently executing.
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
-                      
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1209,7 +1204,6 @@ zabbix_export:
                           'Job'           // 8
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
-                      
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:

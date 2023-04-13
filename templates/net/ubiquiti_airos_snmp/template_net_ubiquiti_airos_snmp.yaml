@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T20:02:01Z'
+  date: '2023-04-13T06:35:04Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -450,9 +450,7 @@ zabbix_export:
           key: 'vm.memory.free[memFree.0]'
           history: 7d
           units: B
-          description: |
-            MIB: FROGFOOT-RESOURCES-MIB
-            
+          description: 'MIB: FROGFOOT-RESOURCES-MIB'
           preprocessing:
             -
               type: MULTIPLIER

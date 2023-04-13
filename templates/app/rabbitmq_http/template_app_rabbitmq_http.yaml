@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T19:47:56Z'
+  date: '2023-04-13T06:19:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -586,9 +586,7 @@ zabbix_export:
                 value: '{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: |
-            Individual exchange metrics
-            
+          description: 'Individual exchange metrics'
           item_prototypes:
             -
               uuid: d8cdcef7ad324aebb597e9d2cd32bdf2
@@ -1117,9 +1115,7 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.healthcheck.v3810.discovery
           delay: '0'
-          description: |
-            Version 3.8.10+ specific metrics
-            
+          description: 'Version 3.8.10+ specific metrics'
           item_prototypes:
             -
               uuid: 90db70de99454f7b924d84174a5951fb
@@ -1854,9 +1850,7 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.healthcheck.v389.discovery
           delay: '0'
-          description: |
-            Specific metrics up to and including version 3.8.4
-            
+          description: 'Specific metrics up to and including version 3.8.4'
           item_prototypes:
             -
               uuid: 22f9a51fd0ea41148846ecde7dbf4d99
@@ -1922,9 +1916,7 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.healthcheck.v3810.discovery
           delay: '0'
-          description: |
-            Version 3.8.10+ specific metrics
-            
+          description: 'Version 3.8.10+ specific metrics'
           item_prototypes:
             -
               uuid: d18cd1fd8cd749e4a00b8186fd93345f
@@ -2218,9 +2210,7 @@ zabbix_export:
                 macro: '{#NODE}'
                 value: '{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}'
                 formulaid: A
-          description: |
-            Individual queue metrics
-            
+          description: 'Individual queue metrics'
           item_prototypes:
             -
               uuid: 335ed3ef31e2471b9cdb25537cee4fe8
