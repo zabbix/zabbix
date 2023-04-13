@@ -965,6 +965,7 @@ function getMenuPopupTrigger(options, trigger_element) {
  * @param bool   options['trends']                      Are trends available.
  * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
  * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
+ * @param string options['context']                     Determines whether the menu is made for host or template item.
  *
  * @return array
  */
