@@ -102,11 +102,11 @@ class CFilterContainerElement extends CElement {
 	 *
 	 * @param boolean $expanded    expanded state of filter container
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function checkIfExpanded($expanded = true) {
 		if ($this->isExpanded($expanded) === false) {
-			throw new \Exception('Filter is'.($expanded ? ' not' : '').' expanded.');
+			throw new Exception('Filter is'.($expanded ? ' not' : '').' expanded.');
 		}
 	}
 }

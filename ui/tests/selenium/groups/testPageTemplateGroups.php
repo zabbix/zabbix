@@ -30,8 +30,8 @@ require_once dirname(__FILE__).'/../common/testPageGroups.php';
  */
 class testPageTemplateGroups extends testPageGroups {
 
-	public $link = 'zabbix.php?action=templategroup.list';
-	public $object = 'template';
+	protected $link = 'zabbix.php?action=templategroup.list';
+	protected $object = 'template';
 	const GROUP1 = 'Group with one template testPageTemplateGroup';
 	const TEMPLATE1_1 = 'Template for testPageHostGroup';
 	const GROUP2 = 'Group with two templates testPageTemplateGroup';

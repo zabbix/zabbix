@@ -58,29 +58,29 @@ class testPageGroups extends CWebTest {
 	/**
 	 * SQL query to get groups to compare hash values.
 	 */
-	private $groups_sql = 'SELECT * FROM hstgrp g INNER JOIN hosts_groups hg ON g.groupid=hg.groupid'.
+	const GROUPS_SQL = 'SELECT * FROM hstgrp g INNER JOIN hosts_groups hg ON g.groupid=hg.groupid'.
 			' ORDER BY g.groupid, hg.hostgroupid';
 
 	/**
 	 * SQL query to get hosts to compare hash values.
 	 */
-	private $hosts_sql = 'SELECT * FROM hosts ORDER BY hostid';
+	const HOSTS_SQL = 'SELECT * FROM hosts ORDER BY hostid';
 
 	/**
 	 * Link to page for opening groups page.
 	 */
-	public $link;
+	protected $link;
 
 	/**
 	 * Host or template group.
 	 */
-	public $object;
+	protected $object;
 
 	/**
 	 *  Test for checking group page layout.
 	 *
-	 * @param array $data          data provider
-	 * @param array $links
+	 * @param array $data   data provider
+	 * @param array $links  related links of group to be checked
 	 */
 	public function layout($data, $links) {
 		$this->page->login()->open($this->link)->waitUntilReady();
@@ -103,14 +103,17 @@ class testPageGroups extends CWebTest {
 
 		// Check buttons.
 		$this->assertEquals(3, $this->query('button', ['Create '.$this->object.' group', 'Apply', 'Reset'])
-				->all()->filter(CElementFilter::CLICKABLE)->count());
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
 		$disabled_buttons = ($this->object === 'host') ? ['Enable hosts', 'Disable hosts', 'Delete'] : ['Delete'];
 		$this->assertEquals(count($disabled_buttons),
 				$this->query('button', $disabled_buttons)->all()->filter(CElementFilter::NOT_CLICKABLE)->count()
 		);
 
 		// Check table headers.
-		$set_headers = ($this->object === 'host') ? ['' , 'Name', 'Count', 'Hosts', 'Info'] : ['' , 'Name', 'Count', 'Templates'];
+		$set_headers = ($this->object === 'host')
+			? ['' , 'Name', 'Count', 'Hosts', 'Info']
+			: ['' , 'Name', 'Count', 'Templates'];
 		$this->setColumnNames($set_headers);
 		$table = $this->getTable();
 		$headers = ($this->object === 'host') ? ['', 'Name', 'Hosts', 'Info'] : ['', 'Name', 'Templates'];
@@ -143,7 +146,9 @@ class testPageGroups extends CWebTest {
 
 		// Check related links of group in table row.
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($links['host_template']));
-		$row = $table->findRow('Name', array_key_exists('lld', $links) ? $links['lld'].': '.$links['name'] : $links['name']);
+		$row = $table->findRow('Name',
+				array_key_exists('lld', $links) ? $links['lld'].': '.$links['name'] : $links['name']
+		);
 
 		// Check link to the host or template edit form.
 		$row->getColumn(ucfirst($this->object).'s')->query('link', $links['host_template'])->one()->click();
@@ -167,31 +172,35 @@ class testPageGroups extends CWebTest {
 		// Check link to hosts or templates page with selected group in filer.
 		$group_id = CDBHelper::getValue('SELECT groupid FROM hstgrp WHERE name='.zbx_dbstr($links['name']));
 		$row->getColumn('Count')->query('link', $links['count'])->one()->click();
-		$this->assertStringContainsString((($this->object === 'host') ? 'zabbix.php?action=host.list&' : 'templates.php?').
-				'filter_set=1&filter_groups%5B0%5D='.$group_id, $this->page->getCurrentUrl()
+		$this->assertStringContainsString((($this->object === 'host')
+			? 'zabbix.php?action=host.list&'
+			: 'templates.php?').'filter_set=1&filter_groups%5B0%5D='.$group_id, $this->page->getCurrentUrl()
 		);
 		$this->page->assertHeader(ucfirst($this->object).'s');
 		$filter_form = CFilterContainerElement::find()->one()->getFilterForm();
 		$filter_form->checkValue([ucfirst($this->object).' groups' => $links['name']]);
 		$this->assertTableHasData([
-				[
-					'Name' => array_key_exists('lld', $links)
-						? $links['lld'].': '.$links['host_template']
-						: $links['host_template']
-				]
+			[
+				'Name' => array_key_exists('lld', $links)
+					? $links['lld'].': '.$links['host_template']
+					: $links['host_template']
 			]
-		);
+		]);
 		$this->page->open($this->link)->waitUntilReady();
 
 		// Check link to host prototype from host group name.
 		if (array_key_exists('lld', $links)) {
 			$row->getColumn('Name')->query('link', $links['lld'])->one()->click();
-			$this->assertStringContainsString('host_prototypes.php?form=update&parent_discoveryid=', $this->page->getCurrentUrl());
+			$this->assertStringContainsString('host_prototypes.php?form=update&parent_discoveryid=',
+					$this->page->getCurrentUrl()
+			);
 			$this->page->assertHeader('Host prototypes');
 			$this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one()
 					->checkValue(['Host name' => self::HOST_PROTOTYPE]);
 			$this->query('button:Cancel')->one()->click();
-			$this->assertStringContainsString('host_prototypes.php?cancel=1&parent_discoveryid=', $this->page->getCurrentUrl());
+			$this->assertStringContainsString('host_prototypes.php?cancel=1&parent_discoveryid=',
+					$this->page->getCurrentUrl()
+			);
 			$this->page->open($this->link)->waitUntilReady();
 		}
 	}
@@ -199,7 +208,9 @@ class testPageGroups extends CWebTest {
 	/**
 	 * Get and sort group names.
 	 *
-	 * @param string $sort      sort content ascending or descending
+	 * @param string $sort  sort content ascending or descending
+	 *
+	 * @return array
 	 */
 	public function getGroupNames($sort = 'asc') {
 		$names = CDBHelper::getColumn('SELECT name FROM hstgrp WHERE type='.
@@ -278,8 +289,8 @@ class testPageGroups extends CWebTest {
 				'all' => true
 			]
 		];
-		$old_grpups_hash = CDBHelper::getHash($this->groups_sql);
-		$old_hosts_hash = CDBHelper::getHash($this->hosts_sql);
+		$groups_old_hash = CDBHelper::getHash(self::GROUPS_SQL);
+		$hosts_old_hash = CDBHelper::getHash(self::HOSTS_SQL);
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$table = $this->getTable();
 
@@ -304,8 +315,8 @@ class testPageGroups extends CWebTest {
 			$this->assertSelectedCount($row['count']);
 		}
 
-		$this->assertEquals($old_grpups_hash, CDBHelper::getHash($this->groups_sql));
-		$this->assertEquals($old_hosts_hash, CDBHelper::getHash($this->hosts_sql));
+		$this->assertEquals($groups_old_hash, CDBHelper::getHash(self::GROUPS_SQL));
+		$this->assertEquals($hosts_old_hash, CDBHelper::getHash(self::HOSTS_SQL));
 	}
 
 	public static function getDeleteData() {
@@ -329,7 +340,7 @@ class testPageGroups extends CWebTest {
 
 	public function delete($data) {
 		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash($this->groups_sql);
+			$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
 		}
 
 		if (!is_array(CTestArrayHelper::get($data, 'groups', []))){
@@ -359,7 +370,7 @@ class testPageGroups extends CWebTest {
 		else {
 			$this->assertSelectedCount($count);
 			$this->assertMessage(TEST_BAD, 'Cannot delete '.$this->object.' group'.(($count > 1) ? 's' : ''), $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($this->groups_sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
 
 			// Reset selected groups.
 			$this->query('button:Reset')->one()->click();

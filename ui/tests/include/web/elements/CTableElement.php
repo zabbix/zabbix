@@ -129,7 +129,7 @@ class CTableElement extends CElement {
 	/**
 	 * Set array of header element texts for column naming.
 	 *
-	 * @param array $names array of names
+	 * @param array $names  array of names
 	 */
 	public function setColumnNames($names) {
 		$this->column_names = $names;

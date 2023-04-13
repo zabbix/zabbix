@@ -30,8 +30,8 @@ require_once dirname(__FILE__).'/../common/testPageGroups.php';
  */
 class testPageHostGroups extends testPageGroups {
 
-	public $link = 'zabbix.php?action=hostgroup.list';
-	public $object = 'host';
+	protected $link = 'zabbix.php?action=hostgroup.list';
+	protected $object = 'host';
 	const DISCOVERED_HOST = 'Discovered host from prototype 1';
 	const GROUP = 'Group with two disabled hosts testPageHostGroup';
 	const HOST1 = 'One disabled host testPageHostGroup';
@@ -405,8 +405,6 @@ class testPageHostGroups extends testPageGroups {
 			}
 		}
 
-		// TODO: remove $status after fix ZBX-22320
-		$status = 'enable';
 		$message_title = (count($details) === 1) ? 'Host '.$status.'d' : 'Hosts '.$status.'d';
 		$this->assertMessage(TEST_GOOD, $message_title, $details);
 	}
