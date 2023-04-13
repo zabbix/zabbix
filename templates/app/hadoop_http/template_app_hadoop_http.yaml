@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:54:16Z'
+  date: '2023-04-05T15:27:40Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1846,6 +1846,69 @@ zabbix_export:
             -
               value: '1'
               newvalue: Up
+  graphs:
+    -
+      uuid: 632a641116194105983cc581b1bd890d
+      name: 'NameNode: DataNodes'
+      graph_items:
+        -
+          color: 199C0D
+          calc_fnc: ALL
+          item:
+            host: 'Hadoop by HTTP'
+            key: hadoop.namenode.num_live_data_nodes
+        -
+          sortorder: '1'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'Hadoop by HTTP'
+            key: hadoop.namenode.num_dead_data_nodes
+        -
+          sortorder: '2'
+          color: 00611C
+          calc_fnc: ALL
+          item:
+            host: 'Hadoop by HTTP'
+            key: hadoop.namenode.num_stale_data_nodes
+    -
+      uuid: 96ef586f2f554d028efcbb75b4c7024b
+      name: 'NameNode: NMs'
+      graph_items:
+        -
+          color: 199C0D
+          calc_fnc: ALL
+          item:
+            host: 'Hadoop by HTTP'
+            key: hadoop.resourcemanager.num_active_nm
+        -
+          sortorder: '1'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'Hadoop by HTTP'
+            key: hadoop.resourcemanager.num_lost_nm
+        -
+          sortorder: '2'
+          color: 00611C
+          calc_fnc: ALL
+          item:
+            host: 'Hadoop by HTTP'
+            key: hadoop.resourcemanager.num_rebooted_nm
+        -
+          sortorder: '3'
+          color: F7941D
+          calc_fnc: ALL
+          item:
+            host: 'Hadoop by HTTP'
+            key: hadoop.resourcemanager.num_shutdown_nm
+        -
+          sortorder: '4'
+          color: FC6EA3
+          calc_fnc: ALL
+          item:
+            host: 'Hadoop by HTTP'
+            key: hadoop.resourcemanager.num_unhealthy_nm
   graphs:
     -
       uuid: 632a641116194105983cc581b1bd890d
