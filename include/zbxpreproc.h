@@ -87,11 +87,6 @@ void	zbx_pp_test_task_get_data(zbx_pp_task_t *task, zbx_ipc_client_t **client, z
 		zbx_pp_result_t **results, int *results_num, zbx_pp_history_t **history);
 void	zbx_pp_tasks_clear(zbx_vector_pp_task_ptr_t *tasks);
 
-zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char type, unsigned char value_type,
-		unsigned char flags);
-void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc);
-int	zbx_pp_preproc_has_history(int type);
-
 zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
 		void *finished_data, char **error);
 void	zbx_pp_manager_free(zbx_pp_manager_t *manager);
