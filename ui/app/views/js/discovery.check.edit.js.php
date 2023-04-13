@@ -32,6 +32,7 @@ window.check_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this._loadViews();
+		this.form.removeAttribute('style');
 	}
 
 	_loadViews() {
@@ -253,7 +254,7 @@ window.check_popup = new class {
 			}
 		}
 
-		if (parseInt(fields.type) ===  <?= SVC_SNMPv3 ?>) {
+		if (parseInt(fields.type) === <?= SVC_SNMPv3 ?>) {
 			let security_level = false;
 			for (const key in fields) {
 				if (['snmp_community', 'key_'].includes(key)) {
@@ -321,7 +322,7 @@ window.check_popup = new class {
 	/**
 	 * Returns a default port number for the specified discovery check type.
 	 *
-	 * @param {string} dcheck_type  Discovery check type.
+	 * @param {string} dcheck_type Discovery check type.
 	 *
 	 * @returns {string}
 	 */
@@ -330,7 +331,7 @@ window.check_popup = new class {
 			<?= SVC_SSH ?>: '22',
 			<?= SVC_LDAP ?>: '389',
 			<?= SVC_SMTP ?>: '25',
-			<?= SVC_FTP ?>:  '21',
+			<?= SVC_FTP ?>: '21',
 			<?= SVC_HTTP ?>: '80',
 			<?= SVC_POP ?>: '110',
 			<?= SVC_NNTP ?>: '119',
