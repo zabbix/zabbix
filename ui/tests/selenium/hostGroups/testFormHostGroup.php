@@ -56,13 +56,13 @@ class testFormHostGroup extends testFormGroups {
 
 	/**
 	 * @dataProvider getCreateData
-	 * @dataProvider getHostCreateData
+	 * @dataProvider getGroupCreateData
 	 */
 	public function testFormHostGroup_Create($data) {
 		$this->checkForm($data, 'create');
 	}
 
-	public static function getHostUpdateData() {
+	public static function getGroupUpdateData() {
 		return [
 			[
 				[

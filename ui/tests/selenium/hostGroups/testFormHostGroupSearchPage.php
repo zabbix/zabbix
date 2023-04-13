@@ -44,7 +44,7 @@ class testFormHostGroupSearchPage extends testFormGroups {
 		$this->layout(self::DISCOVERED_GROUP, true);
 	}
 
-	public static function getHostUpdateData() {
+	public static function getGroupUpdateData() {
 		return [
 			[
 				[

@@ -52,7 +52,7 @@ class testFormGroups extends CWebTest {
 	const DELETE_GROUP = 'Group for Delete test';
 
 	/**
-	 * Host and template sub group name for clone test scenario.
+	 * Host and template subgroup name for clone test scenario.
 	 */
 	const SUBGROUP = 'Group1/Subgroup1/Subgroup2';
 
@@ -492,6 +492,15 @@ class testFormGroups extends CWebTest {
 					'expected' => TEST_BAD,
 					'name' => self::SUBGROUP,
 					'error' => 'Host group "'.self::SUBGROUP.'" already exists.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => self::DELETE_GROUP,
+					'fields'  => [
+						'Group name' => microtime().' cloned group'
+					]
 				]
 			],
 			[
