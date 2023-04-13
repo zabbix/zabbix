@@ -87,6 +87,23 @@ static int	DBpatch_6050007(void)
 	return DBmodify_field_type("widget_field", &field, NULL);
 }
 
+static char	*fix_hist_param_escaping(const char *param, size_t left, size_t right)
+{
+	size_t escaped_len = 0;
+	/* resulting string cannot be more than 2 times longer than original string */
+	char *escaped = zbx_malloc(NULL, 2 * (right - left + 1) * sizeof(char) + 1);
+
+	for (size_t i = left; i <= right; i++)
+	{
+		escaped[escaped_len++] = param[i];
+		if (i < right && '\\' == param[i] && '"' != param[i + 1])
+			escaped[escaped_len++] = '\\';
+	}
+	escaped[escaped_len++] = '\0';
+
+	return escaped;
+}
+
 static int	DBpatch_6050008(void)
 {
 	zbx_db_result_t	result;
@@ -103,8 +120,7 @@ static int	DBpatch_6050008(void)
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*ptr;
-		char		*buf, *param = NULL;
-		int		escaped;
+		char		*buf, *tmp, *param = NULL;
 		size_t		param_pos, param_len, sep_pos, buf_alloc, buf_offset = 0;
 
 		buf_alloc  = strlen(row[1]);
@@ -113,21 +129,22 @@ static int	DBpatch_6050008(void)
 		for (ptr = row[1]; ptr < row[1] + strlen(row[1]); ptr += sep_pos + 1)
 		{
 			zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
-			param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &escaped);
 
-			if (SUCCEED == zbx_function_param_escape(&param, escaped))
+			if (param_pos < sep_pos)
+			{
+				param = fix_hist_param_escaping(ptr, param_pos, sep_pos - 1);
 				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
-			else
-				ret = FAIL;
+			}
 
 			if (',' == ptr[sep_pos])
 				zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
-
 			zbx_free(param);
 		}
 
+		tmp = zbx_db_dyn_escape_string(buf);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update functions set parameter='%s' where functionid=%s;\n", buf, row[0]);
+				"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
+		zbx_free(tmp);
 		zbx_free(buf);
 
 		if (SUCCEED == ret)
@@ -158,17 +175,15 @@ ZBX_VECTOR_IMPL(fun_stack, expr_fun_call)
 
 static int	DBpatch_6050009(void)
 {
-	char			*error = NULL;
 	int			ret = SUCCEED;
 	zbx_eval_context_t	ctx;
 	int			token_num;
 	const zbx_eval_token_t	*token;
 	zbx_vector_fun_stack_t	fun_stack;
 	zbx_vector_ptr_t	hist_param_tokens;
-	char			*substitute = NULL;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	char			*sql = NULL;
+	char			*tmp, *substitute = NULL, *sql = NULL, *error = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zbx_vector_fun_stack_create(&fun_stack);
@@ -225,29 +240,19 @@ static int	DBpatch_6050009(void)
 		for (token_num = 0; token_num < hist_param_tokens.values_num; token_num++)
 		{
 			size_t	right_pos;
-			char	*escaped = NULL;
-			size_t	escaped_len = 0;
 
 			token = hist_param_tokens.values[token_num];
 			right_pos = token->loc.r;
+			tmp = fix_hist_param_escaping(substitute, token->loc.l, right_pos);
+			zbx_replace_string(&substitute, token->loc.l, &right_pos, tmp);
 
-			/* resulting string cannot be more than 2 times longer than original string */
-			escaped = zbx_malloc(NULL, 2 * (right_pos - token->loc.l + 1) * sizeof(char) + 1);
-
-			for (size_t i = token->loc.l; i <= right_pos; i++)
-			{
-				escaped[escaped_len++] = substitute[i];
-				if (i < right_pos && '\\' == substitute[i] && '"' != substitute[i + 1])
-					escaped[escaped_len++] = '\\';
-			}
-			escaped[escaped_len++] = '\0';
-
-			zbx_replace_string(&substitute, token->loc.l, &right_pos, escaped);
-			zbx_free(escaped);
+			zbx_free(tmp);
 		}
 
+		tmp = zbx_db_dyn_escape_string(substitute);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set params='%s' where itemid=%s;\n",
-				zbx_db_dyn_escape_string(substitute), row[0]);
+				tmp, row[0]);
+		zbx_free(tmp);
 		zbx_free(substitute);
 		zbx_eval_clear(&ctx);
 
