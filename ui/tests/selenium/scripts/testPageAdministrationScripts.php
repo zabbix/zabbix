@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup scripts
  *
+ * @dataSource HostTemplateGroups
+ *
  * @onBefore prepareScriptData
  */
 class testPageAdministrationScripts extends CWebTest {

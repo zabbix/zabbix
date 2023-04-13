@@ -113,7 +113,8 @@ class DiscoveredHosts {
 
 		$host_prototypeid = $host_prototypes['hostids'][0];
 		$group_prototypeid = CDBHelper::getValue('SELECT group_prototypeid FROM group_prototype WHERE name='.
-				zbx_dbstr('Group created from host prototype {#KEY}'));
+				zbx_dbstr('Group created from host prototype {#KEY}')
+		);
 
 		// Emulate host discovery in DB.
 		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).

@@ -208,7 +208,7 @@ require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
 require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.php';
 require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
-require_once dirname(__FILE__).'/groups/testPageHostGroups.php';
+require_once dirname(__FILE__).'/hostGroups/testPageHostGroups.php';
 require_once dirname(__FILE__).'/reports/testPageReportsActionLog.php';
 require_once dirname(__FILE__).'/reports/testPageReportsAudit.php';
 require_once dirname(__FILE__).'/reports/testPageReportsNotifications.php';

@@ -397,10 +397,20 @@ class testPageHostGroups extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// Special symbols.
+			// Special symbols, utf8 and long name.
 			[
 				[
-					'Name' => '☺&<>//\\[]""#@'
+					'Name' => '&<>//\\[]""#@'
+				]
+			],
+			[
+				[
+					'Name' => 'æ㓴🙂'
+				]
+			],
+			[
+				[
+					'Name' => STRING_255
 				]
 			],
 			// Exact match.
@@ -437,7 +447,7 @@ class testPageHostGroups extends CWebTest {
 					'expected' => ['Group2 with disabled host testPageHostGroups', 'Group with disabled host testPageHostGroups']
 				]
 			],
-			// Space triming.
+			// Space trimming.
 			[
 				[
 					'Name' => '   enabled   ',
@@ -578,8 +588,9 @@ class testPageHostGroups extends CWebTest {
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$dialog->asForm()->fill(['Enabled' => $status])->submit();
 			$dialog->ensureNotPresent();
-			$this->assertMessage(TEST_GOOD, 'Host updated');
 			$table->waitUntilReloaded();
+			$this->assertMessage(TEST_GOOD, 'Host updated', 'Updated status of host "'.$data['change_host'].'".');
+			CMessageElement::find()->one()->close();
 
 			// Check status in table.
 			foreach ([$data['change_host'] => $status ? 'green' : 'red', $data['host'] => 'red',
@@ -640,7 +651,7 @@ class testPageHostGroups extends CWebTest {
 			],
 			[
 				[
-					self::LLD.': '.self::DISCOVERED_GROUP => self::DISCOVERED_HOST,
+					self::LLD.': '.self::DISCOVERED_GROUP => [self::DISCOVERED_HOST],
 					self::GROUP_ENABLED => ['One enabled host testPageHostGroups', 'Two enabled host testPageHostGroups']
 				]
 			]
@@ -657,10 +668,14 @@ class testPageHostGroups extends CWebTest {
 	/**
 	 * Check that hosts are enabled or disabled when performing an action on a host group.
 	 *
-	 * @param array $data        data provider
-	 * @param string $status	enable or disable hosts
+	 * @param array $data     data provider
+	 * @param string $status  enable or disable hosts
 	 */
 	private function checkHostStatusChange($data, $status = 'enable') {
+		if (count($data) === 1 && array_values($data)[0] === '') {
+			$old_hash = CDBHelper::getHash(self::HOSTS_SQL);
+		}
+
 		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 		$this->selectTableRows(array_keys($data));
@@ -673,8 +688,10 @@ class testPageHostGroups extends CWebTest {
 
 		$details = [];
 		foreach ($data as $group => $hosts) {
+			// Skip checks if group without hosts.
 			if (!is_array($hosts)) {
-				break;
+				$this->assertEquals($old_hash, CDBHelper::getHash(self::HOSTS_SQL));
+				continue;
 			}
 			$row = $table->findRow('Name', $group);
 
@@ -797,8 +814,8 @@ class testPageHostGroups extends CWebTest {
 			$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
 		}
 
-		if (!is_array(CTestArrayHelper::get($data, 'groups', []))){
-				$data['groups'] = [$data['groups']];
+		if (!is_array(CTestArrayHelper::get($data, 'groups', []))) {
+			$data['groups'] = [$data['groups']];
 		}
 
 		$all = $this->getGroupNames();
