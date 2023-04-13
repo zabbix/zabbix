@@ -83,7 +83,7 @@ foreach ($data['groups'] as $group) {
 		$n++;
 
 		if ($n > $data['config']['max_in_table']) {
-			$templates_output[] = ' &hellip;';
+			$templates_output[] = [' ', HELLIP()];
 
 			break;
 		}

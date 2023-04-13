@@ -99,7 +99,7 @@ foreach ($data['scripts'] as $script) {
 					$i++;
 
 					if ($i > $data['config']['max_in_table']) {
-						$actions[] = ' &hellip;';
+						$actions[] = [' ', HELLIP()];
 
 						break;
 					}
