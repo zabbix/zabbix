@@ -36,7 +36,6 @@ class CControllerDiscoveryCheckEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'update' =>					'in 1',
-			'validate' =>				'in 1',
 			'dcheckid' =>				'string',
 			'type' =>					'in '.implode(',', array_keys(discovery_check_type2str())),
 			'ports' =>					'string|not_empty|db dchecks.ports',
@@ -68,6 +67,7 @@ class CControllerDiscoveryCheckEdit extends CController {
 	}
 
 	protected function checkPermissions() {
+		// todo - add permission check
 		return true;
 	}
 

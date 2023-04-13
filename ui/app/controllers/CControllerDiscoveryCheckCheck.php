@@ -46,10 +46,9 @@ class CControllerDiscoveryCheckCheck extends CController {
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
 			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
-			'dchecks' => 'array',
 			// todo - add stricter validation rules to these ?
 			'host_source' =>			'string',
-			'name_source' =>			'string',
+			'name_source' =>			'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -113,18 +112,6 @@ class CControllerDiscoveryCheckCheck extends CController {
 				array_key_exists('key_', $data) ?  $data['key_'] : '',
 				array_key_exists('ports',  $data) ?  $data['ports'] : ''
 			);
-		}
-
-		$dchecks = $this->getInput('dchecks', []);
-
-		// todo - update duplicate check
-		foreach ($dchecks as $dcheck) {
-			if ($data['name'] === $dcheck) {
-				$data['error'] = [
-					'title' => _('Check already exists.'),
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				];
-			}
 		}
 
 		if ($data['type'] == SVC_SNMPv1 || $data['type'] == SVC_SNMPv2c || $data['type'] == SVC_SNMPv3) {

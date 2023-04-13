@@ -30,7 +30,6 @@ window.check_popup = new class {
 		this.overlay = overlays_stack.getById('discovery-check');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-
 		this.dcheckid = dcheckid;
 
 		this._loadViews();
@@ -127,24 +126,109 @@ window.check_popup = new class {
 		return dchecks;
 	}
 
-	submit() {
-		const curl = new Curl('zabbix.php');
-		const fields = getFormFields(this.form);
+	/**
+	 * Checks duplicate discovery cheks.
+	 */
+	_hasDCheckDuplicates() {
+		const dcheck = getFormFields(this.form);
 
-		// todo - check if this can be done differently
-		for (const key in fields) {
-			if (fields.hasOwnProperty(key) && fields[key].trim() === '') {
-				delete fields[key];
+		let fields = [
+			'dcheckid', 'type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
+			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+			'snmpv3_privpassphrase'
+		];
+		let result = [];
+		let duplicate = [];
+		let has_duplicates;
+
+		[...document.getElementById('dcheckList').getElementsByTagName('td')].map(element => {
+			let inputs = element.querySelectorAll('input');
+
+			inputs.forEach(input => {
+				for (let i = 0; i < fields.length; i++) {
+					if (input.name.includes(fields[i])) {
+						result[fields[i]] = input.value;
+						break;
+					}
+				}
+			});
+
+			let keys = ['snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_privprotocol'];
+			let duplicates = [];
+
+			if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
+				|| dcheck['type'] == <?= SVC_SNMPv3 ?>) {
+				dcheck['key_'] = dcheck['snmp_oid'];
+			}
+
+			for (const key in result) {
+				if (dcheck.type !== 13 && keys.includes(key)) {
+					delete result[key];
+				}
+
+				if (dcheck.hasOwnProperty(key) && result[key] === dcheck[key]) {
+					duplicates.push(key);
+				}
+
+				// remove data no dcheck update to not compare dcheck to itself
+				if (key == 'dcheckid' && result[key] === dcheck[key]) {
+					result = [];
+				}
+
+				if (key === 'dcheckid') {
+					delete result[key];
+
+					if (dcheck.hasOwnProperty(key) && result[key] === dcheck[key]) {
+						duplicates.push(key);
+					}
+				}
+			}
+
+			duplicate.push(duplicates.length > 0 && duplicates.length === Object.keys(result).length);
+		});
+
+		duplicate.forEach((result) => {
+			if (result === true) {
+				has_duplicates = true;
+			}
+		})
+
+		return has_duplicates;
+	}
+
+
+
+	submit() {
+		for (const element of this.form.parentNode.children) {
+			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+				element.parentNode.removeChild(element);
 			}
 		}
 
-		fields.dcheckid = this.dcheckid;
+		if (this._hasDCheckDuplicates()) {
+			jQuery(makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>]))
+				.insertBefore(this.form);
 
-		const dchecks = this._addCheckTableData()
-		fields.dchecks = dchecks;
+			this.overlay.unsetLoading();
+		}
 
-		curl.setArgument('action', 'discovery.check.check');
-		this._post(curl.getUrl(), fields);
+		else {
+			const curl = new Curl('zabbix.php');
+			const fields = getFormFields(this.form);
+
+			for (const key in fields) {
+				if (fields.hasOwnProperty(key) && fields[key].trim() === '') {
+					delete fields[key];
+				}
+
+				if (fields.hasOwnProperty(key) && ['name', 'iprange', 'delay'].includes(key)) {
+					fields[key] = fields[key].trim()
+				}
+			}
+
+			curl.setArgument('action', 'discovery.check.check');
+			this._post(curl.getUrl(), fields);
+		}
 	}
 
 	_post(url, data) {

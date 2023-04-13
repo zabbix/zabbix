@@ -60,9 +60,9 @@ window.drule_edit_popup = new class {
 	}
 
 	_updateCheck(row, input) {
-		this.ZBX_CHECKLIST[this.dcheckid] = input.value;
 		input.host_source = this._getSourceValue('host_source');
 		input.name_source = this._getSourceValue('name_source');
+		delete input.dchecks;
 
 		this._addCheck(input, row);
 		this._removeDCheckRow(row.id);
@@ -113,8 +113,6 @@ window.drule_edit_popup = new class {
 			trigger_element: this
 		});
 
-		this.ZBX_CHECKLIST = {};
-
 		overlay.$dialogue[0].addEventListener('check.submit', (e) => {
 			if (row !== null) {
 				this._updateCheck(row, e.detail)
@@ -127,8 +125,6 @@ window.drule_edit_popup = new class {
 	}
 
 	_addRadioButtonValues(drule) {
-		let that = this;
-
 		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(drule.uniqueness_criteria)+']')
 			.attr('checked', 'checked');
 		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(drule.host_source)+']')
@@ -136,9 +132,11 @@ window.drule_edit_popup = new class {
 		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(drule.name_source)+']')
 			.attr('checked', 'checked');
 
+		const that = this;
+
 		document.querySelectorAll('#host_source, #name_source').forEach(function(element) {
 			element.addEventListener('change', function(e) {
-				that._updateRadioButtonValues(e);;
+				that._updateRadioButtonValues(e);
 			});
 		});
 	}
@@ -163,8 +161,16 @@ window.drule_edit_popup = new class {
 	}
 
 	_addCheck(input, row = null) {
-		// todo - fix checklist
-		this.ZBX_CHECKLIST = [];
+		delete input.dchecks;
+
+		if (!input.host_source) {
+			input.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val()
+				|| '<?= ZBX_DISCOVERY_DNS ?>';
+		}
+		if (!input.name_source) {
+			input.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val()
+				|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
+		}
 
 		let template;
 		template = new Template(document.getElementById('dcheck-row-tmpl').innerHTML);
@@ -196,6 +202,7 @@ window.drule_edit_popup = new class {
 		if (available_device_types.includes(parseInt(input.type))) {
 			this._addRadioButtonRows(input);
 		}
+		this._addRadioButtonValues(this.drule);
 	}
 
 	_addRadioButtonRows(input) {
@@ -213,8 +220,6 @@ window.drule_edit_popup = new class {
 
 	_removeDCheckRow(dcheckid) {
 		dcheckid = dcheckid.substring(dcheckid.indexOf("_") + 1);
-
-		delete this.ZBX_CHECKLIST[this.dcheckid];
 
 		const elements = {
 			uniqueness_criteria_: 'ip',
