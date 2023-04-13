@@ -27,13 +27,16 @@ require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 class testAuditlogUserGroups extends testAuditlogCommon {
 
 	/**
+	 * Existing User ID.
+	 */
+	private const USERID = 2;
+
+	/**
 	 * Existing User group ID.
 	 */
 	private const USRGRPID = 12;
 
 	public function testAuditlogUserGroups_Create() {
-		$userid = 2;
-
 		$create = $this->call('usergroup.create', [
 			[
 				'name' => 'Audit user groups',
@@ -42,7 +45,7 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 					'id' => 2
 				],
 				'users' => [
-					'userid' => $userid
+					'userid' => self::USERID
 				]
 			]
 		]);
@@ -69,7 +72,7 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 			'user.usrgrps['.$id['id'].'].id' => ['add', $id['id']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, $userid);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::USERID);
 	}
 
 	public function testAuditlogUserGroups_Update() {
