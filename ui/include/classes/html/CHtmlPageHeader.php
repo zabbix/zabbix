@@ -150,8 +150,7 @@ class CHtmlPageHeader {
 			echo (new CTag('link'))
 				->setAttribute('rel', 'stylesheet')
 				->setAttribute('type', 'text/css')
-				->setAttribute('href', $path)
-				->toString();
+				->setAttribute('href', $path);
 		}
 
 		if ($this->styles) {
@@ -171,9 +170,7 @@ class CHtmlPageHeader {
 				$path .= '?'.(int) filemtime($path);
 			}
 
-			echo (new CTag('script', true))
-				->setAttribute('src', $path)
-				->toString();
+			echo (new CTag('script', true))->setAttribute('src', $path);
 		}
 
 		echo '</head>'."\n";
