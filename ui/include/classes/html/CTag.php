@@ -234,7 +234,7 @@ class CTag extends CObject {
 			$this->attributes['style'] = '';
 		}
 		if (isset($value)) {
-			$this->attributes['style'] .= htmlspecialchars(strval($value));
+			$this->attributes['style'] .= $value;
 		}
 		else {
 			unset($this->attributes['style']);
