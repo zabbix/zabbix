@@ -60,7 +60,7 @@ if ($data['warnings']) {
 	}
 
 	if (count($data['warnings']) > 1) {
-		show_messages(null, _('Details from cloned host was changed.'));
+		show_messages(null, _('Cloned host parameter values have been modified.'));
 	}
 	else {
 		show_messages();

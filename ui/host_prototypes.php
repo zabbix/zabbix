@@ -182,7 +182,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 
 	if ($warnings) {
 		if (count($warnings) > 1) {
-			CMessageHelper::setWarningTitle(_('Details from cloned host was changed.'));
+			CMessageHelper::setWarningTitle(_('Cloned host parameter values have been modified.'));
 		}
 
 		array_map('CMessageHelper::addWarning', $warnings);
