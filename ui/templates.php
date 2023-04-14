@@ -179,7 +179,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		]);
 
 		if (count($groupids) != count($groups_allowed)) {
-			$warnings[] = _("The template being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new template.");
+			$warnings[] = _("The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template.");
 		}
 
 		foreach ($groups as $idx => $group) {
@@ -193,7 +193,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 
 	if ($warnings) {
 		if (count($warnings) > 1) {
-			CMessageHelper::setWarningTitle(_('Cloned host parameter values have been modified.'));
+			CMessageHelper::setWarningTitle(_('Cloned template parameter values have been modified.'));
 		}
 
 		array_map('CMessageHelper::addWarning', $warnings);
