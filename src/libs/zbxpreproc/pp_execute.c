@@ -1044,8 +1044,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 	if (NULL == preproc || 0 == preproc->steps_num)
 	{
-		if (NULL != cache)
-			zbx_variant_copy(value_out, &cache->value);
+		zbx_variant_copy(value_out, NULL != cache ? &cache->value : value_in);
 
 		goto out;
 	}
@@ -1056,7 +1055,9 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	}
 	else
 	{
-		pp_cache_copy_value(cache, preproc->steps[0].type, value_out);
+		/* preprocessing cache is enabled only for the first step, */
+		/* so prepare output value based on first step type        */
+		pp_cache_prepare_output_value(cache, preproc->steps[0].type, value_out);
 
 		/* set input value for error reporting */
 		value_in = &cache->value;
