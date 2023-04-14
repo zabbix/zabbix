@@ -323,7 +323,7 @@ class CHistory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
+		if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS) && self::getCompressionAvailability()) {
 			self::exception(ZBX_API_ERROR_INTERNAL, _('History cleanup is not supported if compression is enabled'));
 		}
 
@@ -338,5 +338,18 @@ class CHistory extends CApiService {
 		if (count($db_items) != count($itemids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+	}
+
+	private static function getCompressionAvailability(): bool {
+		$dbversion_status = CSettingsHelper::getDbVersionStatus();
+
+		foreach ($dbversion_status as $dbversion) {
+			if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+				return array_key_exists('compression_availability', $dbversion)
+					&& (bool) $dbversion['compression_availability'];
+			}
+		}
+
+		return false;
 	}
 }
