@@ -110,73 +110,69 @@ window.check_popup = new class {
 	_hasDCheckDuplicates() {
 		const dcheck = getFormFields(this.form);
 
+		let results = [];
 		let fields = [
 			'dcheckid', 'type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
 			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 			'snmpv3_privpassphrase'
 		];
-		let result = [];
-		let duplicate = [];
-		let has_duplicates;
 
-		[...document.getElementById('dcheckList').getElementsByTagName('td')].map(element => {
+		[...document.getElementById('dcheckList').getElementsByTagName('tr')].map(element => {
 			let inputs = element.querySelectorAll('input');
 
-			inputs.forEach(input => {
+			let result = [];
+			for (const input of inputs) {
 				for (let i = 0; i < fields.length; i++) {
 					if (input.name.includes(fields[i])) {
 						result[fields[i]] = input.value;
 						break;
 					}
 				}
-			});
-
-			let keys = ['snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_privprotocol'];
-			let duplicates = [];
-
-			if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
-				|| dcheck['type'] == <?= SVC_SNMPv3 ?>) {
-				dcheck['key_'] = dcheck['snmp_oid'];
 			}
 
-			if (dcheck['type'] == <?= SVC_SNMPv3 ?> || dcheck['type'] == <?= SVC_AGENT ?>) {
-				result['snmp_community'] = '';
-			}
-
-			for (const key in result) {
-				if (dcheck.type != <?= SVC_SNMPv3 ?> && keys.includes(key)) {
-					delete result[key];
-				}
-
-				// Remove data on dcheck update to not compare dcheck to itself.
-				if (key == 'dcheckid' && result[key] === dcheck[key]) {
-					result = [];
-				}
-
-				if (key == 'dcheckid') {
-					delete result[key];
-					delete dcheck[key];
-
-					if (dcheck.hasOwnProperty(key) && result[key] === dcheck[key]) {
-						duplicates.push(key);
-					}
-				}
-
-				if (dcheck.hasOwnProperty(key) && result[key] === dcheck[key]) {
-					duplicates.push(key);
-				}
-			}
-
-			duplicate.push(duplicates.length > 0 && duplicates.length === Object.keys(result).length);
-		});
-
-		duplicate.forEach((result) => {
-			if (result === true) {
-				has_duplicates = true;
-			}
+			results.push(result);
 		})
 
-		return has_duplicates;
+		const lookup = [
+			{
+				types: [
+					<?= SVC_SSH ?>, <?= SVC_LDAP ?>, <?= SVC_SMTP ?>, <?= SVC_FTP ?>, <?= SVC_HTTP ?>, <?= SVC_POP ?>,
+					<?= SVC_NNTP ?>, <?= SVC_IMAP ?>, <?= SVC_TCP ?>, <?= SVC_ICMPPING ?>, <?= SVC_HTTPS ?>,
+					<?= SVC_TELNET ?>
+				],
+				keys: ['type', 'ports']
+			},
+			{
+				types: [<?= SVC_AGENT ?>],
+				keys: ['type', 'ports', 'key_']
+			},
+			{
+				types: [<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>],
+				keys: ['type', 'ports', 'snmp_community', 'snmp_oid']
+			},
+			{
+				types: [<?= SVC_SNMPv3 ?>],
+				keys: [
+					'type', 'ports', 'snmp_oid', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
+					'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase'
+				]
+			}
+		]
+
+		return results.some(result => {
+			if (!result.type) {
+				return false
+			}
+			if (result.dcheckid === dcheck.dcheckid) {
+				return false;
+			}
+
+			const check = lookup.find(entry => entry.types.includes(parseInt(result.type)))
+
+			return Object.keys(result)
+				.filter(key => check.keys.includes(key))
+				.every(key => dcheck[key] === result[key])
+		})
 	}
 
 	submit() {
@@ -274,7 +270,7 @@ window.check_popup = new class {
 			}
 		}
 
-		if(fields.type != <?= SVC_SNMPv3 ?>) {
+		if (fields.type != <?= SVC_SNMPv3 ?>) {
 			for (const key in fields) {
 				if (key == 'snmpv3_privpassphrase') {
 					delete fields[key];
