@@ -133,7 +133,7 @@ $html_page = (new CHtmlPage())
 							))->addClass(ZBX_STYLE_BTN_ALT)
 						)
 						->addItem(
-							(new CButton('dashboard-add', '&#8203;'))
+							(new CButton('dashboard-add', ZWSPACE()))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
 						),
