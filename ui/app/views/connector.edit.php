@@ -279,8 +279,6 @@ $form_grid = (new CFormGrid())
 		)
 	]);
 
-//$tabs = (new CTabView(['id' => 'connector-tabs']))->addTab('connector-tab', _('Connector'), $connector_tab);
-
 $form
 	->addItem($form_grid)
 	->addItem(
