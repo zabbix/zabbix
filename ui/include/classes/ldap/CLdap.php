@@ -352,6 +352,7 @@ class CLdap {
 
 		$placeholders = ['%{user}' => $user];
 		$group_key = strtolower($this->cnf['group_membership']);
+		$group_name_key = strtolower($this->cnf['group_name']);
 		$results = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], $placeholders, $attributes);
 		$user = [];
 
@@ -369,30 +370,54 @@ class CLdap {
 			$key = $results[$i];
 			[$key => $value] = $results;
 
-			if ($key === $group_key) {
-				$groups = [];
-				$regex = '/'.preg_quote($this->cnf['group_name'], '/').'=(?<groupname>[^,]+)/';
-				unset($value['count']);
-
-				/*
-				 * Extract group names from their DN strings.
-				 * For DN string "cn=zabbix-admins,ou=Group,dc=example,dc=org" and "Group name attribute" set to "cn"
-				 * will store string "zabbix-admins" in $groups array.
-				 */
-				foreach ($value as $group_dn) {
-					if (preg_match($regex, $group_dn, $match)) {
-						$groups[] = $match['groupname'];
-					}
-				}
-
-				$user[$key] = $groups;
-			}
-			else {
-				$user[$key] = $value[0];
-			}
+			$user[$key] = ($key === $group_key) ? $this->getGroupPatternsFromDns($group_name_key, $value) : $value[0];
 		}
 
 		return $user;
+	}
+
+	/**
+	 * Extract group pattern from their DN strings.
+	 * For DN string "cn=zabbix-admins,ou=Group,dc=example,dc=org" and "Group name attribute" set to "cn" will store string "zabbix-admins" in $groups array.
+	 * https://ldap.com/ldap-dns-and-rdns/
+	 *
+	 * @param string $group_name_key  Lower case group name attribute to extract value for from RDN.
+	 * @param array  $group_dns       Array of DN strings.
+	 * @return array of strings with extracted groups.
+	 */
+	public function getGroupPatternsFromDns($group_name_key, $group_dns): array {
+		$groups = [];
+
+		foreach ($group_dns as $group_dn) {
+			$rdns = ldap_explode_dn($group_dn, 0);
+
+			if (!is_array($rdns)) {
+				continue;
+			}
+
+			foreach ($rdns as $rdn) {
+				if (strpos($rdn, '=') === false) {
+					continue;
+				}
+
+				/*
+				 * For multivalued RDNs $rdn_key will be set to key of first key-value pair, as value will be set rest of string.
+				 * For example for RDN "cn=John Doe+mail=jdoe@example.com" $rdn_value will be equal "John Doe+mail=jdoe@example.com".
+				 */
+				[$rdn_key, $rdn_value] = explode('=', $rdn, 2);
+
+				if (strtolower($rdn_key) !== $group_name_key) {
+					continue;
+				}
+
+				// Convert every charcode back to character. String "cn=Universit\C4\81te" will be converted back to "cn=Universitāte".
+				$groups[] = preg_replace_callback('/\\\\([0-9A-F]{2})/i', function ($m) {
+					return chr(hexdec($m[1]));
+				}, $rdn_value);
+			}
+		}
+
+		return $groups;
 	}
 
 	/**
