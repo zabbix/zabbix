@@ -139,26 +139,31 @@ window.check_popup = new class {
 				dcheck['key_'] = dcheck['snmp_oid'];
 			}
 
+			if (dcheck['type'] == <?= SVC_SNMPv3 ?> || dcheck['type'] == <?= SVC_AGENT ?>) {
+				result['snmp_community'] = '';
+			}
+
 			for (const key in result) {
 				if (dcheck.type != <?= SVC_SNMPv3 ?> && keys.includes(key)) {
 					delete result[key];
 				}
 
-				if (dcheck.hasOwnProperty(key) && result[key] === dcheck[key]) {
-					duplicates.push(key);
-				}
-
 				// Remove data on dcheck update to not compare dcheck to itself.
-				if (key === 'dcheckid' && result[key] === dcheck[key]) {
+				if (key == 'dcheckid' && result[key] === dcheck[key]) {
 					result = [];
 				}
 
-				if (key === 'dcheckid') {
+				if (key == 'dcheckid') {
 					delete result[key];
+					delete dcheck[key];
 
 					if (dcheck.hasOwnProperty(key) && result[key] === dcheck[key]) {
 						duplicates.push(key);
 					}
+				}
+
+				if (dcheck.hasOwnProperty(key) && result[key] === dcheck[key]) {
+					duplicates.push(key);
 				}
 			}
 
@@ -245,32 +250,17 @@ window.check_popup = new class {
 	 * Updates form fields based on check type and trims string values.
 	 */
 	_updateFields(fields) {
-		if (![<?= SVC_SNMPv3 ?>, <?= SVC_AGENT ?>].includes(parseInt(fields.type))) {
+		if (fields.type != <?= SVC_AGENT ?>) {
 			for (const key in fields) {
-				if (['key_'].includes(key)) {
+				if (key == 'key_') {
 					delete fields[key];
 				}
 			}
 		}
 
-		for (const key in fields) {
-			if (['snmpv3_privpassphrase'].includes(key)) {
-				delete fields[key];
-			}
-		}
-
-		if (fields.type == <?= SVC_SNMPv3 ?>) {
-			let security_level = false;
+		if (![<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>].includes(parseInt(fields.type))) {
 			for (const key in fields) {
-				if (['snmp_community', 'key_'].includes(key)) {
-					delete fields[key];
-				}
-
-				if (key == 'snmpv3_securitylevel' && fields[key] != <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>) {
-					security_level = true;
-				}
-
-				if (key == 'snmpv3_privpassphrase' && security_level) {
+				if (key == 'snmp_community') {
 					delete fields[key];
 				}
 			}
@@ -278,7 +268,29 @@ window.check_popup = new class {
 
 		if (![<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(fields.type))) {
 			for (const key in fields) {
-				if (['snmp_community', 'snmp_oid', 'snmpv3_privpassphrase'].includes(key)) {
+				if (key == 'snmp_oid') {
+					delete fields[key];
+				}
+			}
+		}
+
+		if(fields.type != <?= SVC_SNMPv3 ?>) {
+			for (const key in fields) {
+				if (key == 'snmpv3_privpassphrase') {
+					delete fields[key];
+				}
+			}
+		}
+
+		if (fields.type == <?= SVC_SNMPv3 ?>) {
+			let security_level = false;
+			for (const key in fields) {
+
+				if (key == 'snmpv3_securitylevel' && fields[key] != <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>) {
+					security_level = true;
+				}
+
+				if (key == 'snmpv3_privpassphrase' && security_level) {
 					delete fields[key];
 				}
 			}
