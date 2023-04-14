@@ -30,7 +30,7 @@ class CHtmlEntity {
 		$this->entity = $entity;
 	}
 
-	public function toString() {
+	public function toString(): string {
 		return $this->entity;
 	}
 }
