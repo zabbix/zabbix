@@ -27,14 +27,10 @@
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "zbxcompress.h"
-#include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "../taskmanager/taskmanager.h"
-
-extern zbx_vector_ptr_t	zbx_addrs;
-extern char		*CONFIG_HOSTNAME;
-extern char		*CONFIG_SOURCE_IP;
+#include "zbxjson.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -52,7 +48,8 @@ extern char		*CONFIG_SOURCE_IP;
  *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *
  *                                                                            *
- * Parameters: buffer - [IN] the contents of a packet (JSON)                  *
+ * Parameters: buffer - [IN] contents of a packet (JSON)                      *
+ *             state  - [OUT]                                                 *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
@@ -81,8 +78,8 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_config_tls_t *config_tls,
-		const zbx_thread_info_t *info, int config_timeout)
+static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_thread_info_t *info,
+		zbx_thread_datasender_args *args)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
@@ -103,10 +100,10 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, args->config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == upload_state && CONFIG_PROXYDATA_FREQUENCY <= now - data_timestamp &&
+	if (SUCCEED == upload_state && args->config_proxydata_frequency <= now - data_timestamp &&
 			ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
 	{
 		if (SUCCEED == zbx_get_interface_availability_data(&j, &availability_ts))
@@ -185,8 +182,9 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		/* retry till have a connection */
-		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
-				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, config_tls))
+		if (FAIL == zbx_connect_to_server(&sock, args->config_source_ip, args->config_server_addrs, 600,
+				args->config_timeout, args->config_proxydata_frequency, LOG_LEVEL_WARNING,
+				args->zbx_config_tls))
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -320,8 +318,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		do
 		{
-			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state,
-					datasender_args_in->zbx_config_tls, info, datasender_args_in->config_timeout);
+			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state, info,
+					datasender_args_in);
 
 			time_now = zbx_time();
 			time_diff = time_now - time_start;
