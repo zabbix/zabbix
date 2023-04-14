@@ -235,8 +235,8 @@ window.check_popup = new class {
 	}
 
 	_addDuplicateMessage() {
-		jQuery(makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>]))
-			.insertBefore(this.form);
+		const messageBox = makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>])[0];
+		this.form.parentNode.insertBefore(messageBox, this.form);
 
 		this.overlay.unsetLoading();
 	}
