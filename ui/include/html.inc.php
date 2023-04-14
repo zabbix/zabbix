@@ -154,6 +154,10 @@ function NBSP() {
 	return new CHtmlEntity('&nbsp;');
 }
 
+function NDASH() {
+	return new CHtmlEntity('&ndash;');
+}
+
 function RARR() {
 	return new CHtmlEntity('&rArr;');
 }
