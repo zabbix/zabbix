@@ -1344,10 +1344,18 @@ class CHistoryManager {
 			$table_names['trends'] = ITEM_VALUE_TYPE_FLOAT;
 		}
 
-		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && PostgresqlDbBackend::isCompressed($item_tables)) {
-			error(_('Some of the history for this item may be compressed, deletion is not available.'));
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+			if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
+					&& $this->checkCompressionAvailability() === true) {
+				error( _('History cleanup is not supported if compression is enabled'));
 
-			return false;
+				return false;
+			}
+			elseif (PostgresqlDbBackend::isCompressed($item_tables)) {
+				error(_('Some of the history for this item may be compressed, deletion is not available.'));
+
+				return false;
+			}
 		}
 
 		foreach ($item_tables as $table_name) {
@@ -1359,6 +1367,22 @@ class CHistoryManager {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns true if database supports data compression. False otherwise.
+	 */
+	private function checkCompressionAvailability(): bool {
+		$dbversion_status = CSettingsHelper::getDbVersionStatus();
+
+		foreach ($dbversion_status as $dbversion) {
+			if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+				return array_key_exists('compression_availability', $dbversion)
+					&& (bool) $dbversion['compression_availability'];
+			}
+		}
+
+		return false;
 	}
 
 	/**

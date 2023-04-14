@@ -1,0 +1,1 @@
+A.F....... [ZBX-22536] fixed TimescaleDB compression detection for hostory.clear API method and proper error appearance in frontend (miks)

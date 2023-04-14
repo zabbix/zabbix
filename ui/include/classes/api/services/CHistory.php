@@ -323,10 +323,6 @@ class CHistory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)) {
-			self::exception(ZBX_API_ERROR_INTERNAL, _('History cleanup is not supported if compression is enabled'));
-		}
-
 		$db_items = API::Item()->get([
 			'output' => ['itemid', 'value_type', 'name'],
 			'itemids' => $itemids,
