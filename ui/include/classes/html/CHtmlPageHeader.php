@@ -147,7 +147,11 @@ class CHtmlPageHeader {
 				$path .= '?'.(int) filemtime($path);
 			}
 
-			echo '<link rel="stylesheet" type="text/css" href="'.htmlspecialchars($path).'" />'."\n";
+			echo (new CTag('link'))
+				->setAttribute('rel', 'stylesheet')
+				->setAttribute('type', 'text/css')
+				->setAttribute('href', $path)
+				->toString();
 		}
 
 		if ($this->styles) {
@@ -167,7 +171,9 @@ class CHtmlPageHeader {
 				$path .= '?'.(int) filemtime($path);
 			}
 
-			echo '<script src="'.htmlspecialchars($path).'"></script>'."\n";
+			echo (new CTag('script', true))
+				->setAttribute('src', $path)
+				->toString();
 		}
 
 		echo '</head>'."\n";
