@@ -139,7 +139,7 @@ foreach ($data['groups'] as $group) {
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = (new CLink(CHtml::encode($group['name']),
+	$name[] = (new CLink($group['name'],
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'hostgroup.edit')
 			->setArgument('groupid', $group['groupid'])
