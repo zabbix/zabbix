@@ -664,11 +664,6 @@ class testFormGroups extends CWebTest {
 	 * @param array $data  data provider with fields values
 	 */
 	public function cancel($data) {
-		// TODO: delete if() after fix ZBX-22376
-		if ($this->standalone && $data['action'] === 'Delete') {
-			return;
-		}
-
 		// There is no group creation on the search page.
 		if ($this->search && $data['action'] === 'Add') {
 			return;
@@ -734,11 +729,8 @@ class testFormGroups extends CWebTest {
 		$form = $this->openForm($data['name']);
 		$footer = ($this->standalone) ? $form : COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 		$footer->query('button:Delete')->one()->waitUntilClickable()->click();
-
-		if (!$this->standalone) {
-			$this->assertEquals('Delete selected '.$this->object.' group?', $this->page->getAlertText());
-			$this->page->acceptAlert();
-		}
+		$this->assertEquals('Delete selected '.$this->object.' group?', $this->page->getAlertText());
+		$this->page->acceptAlert();
 
 		if ($data['expected'] === TEST_GOOD) {
 			if (!$this->standalone) {
