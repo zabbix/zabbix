@@ -4031,7 +4031,7 @@ static int	token_parse_nested_macro(const char *expression, const char *macro, z
 		if (SUCCEED != token_parse_expression_macro(expression, macro + 1, token_search, &expr_token))
 			return FAIL;
 
-		ptr = macro + expr_token.loc.r;
+		ptr = expression + expr_token.loc.r;
 	}
 	else
 	{
