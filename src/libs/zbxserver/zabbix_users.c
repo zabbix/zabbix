@@ -41,8 +41,8 @@ zbx_group_status_type_t;
  ******************************************************************************/
 int	check_perm2system(zbx_uint64_t userid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		res = SUCCEED;
 
 	result = zbx_db_select(
@@ -63,8 +63,8 @@ int	check_perm2system(zbx_uint64_t userid)
 
 char	*get_user_timezone(zbx_uint64_t userid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*user_timezone;
 
 	result = zbx_db_select("select timezone from users where userid=" ZBX_FS_UI64, userid);
@@ -100,8 +100,8 @@ int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, co
 		const char *role_rule)
 {
 	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
 

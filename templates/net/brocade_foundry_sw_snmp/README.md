@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 For devices(old Foundry devices, MLXe and so on) that doesn't support Stackable SNMP Tables: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table -
 FOUNDRY-SN-AGENT-MIB::snChasFanTable, snChasPwrSupplyTable,snAgentTempTable are used instead.
 For example:
@@ -142,7 +142,7 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 For devices(most of the IronWare Brocade devices) that support Stackable SNMP Tables in FOUNDRY-SN-AGENT-MIB: snChasFan2Table, snChasPwrSupply2Table,snAgentTemp2Table - so objects from all Stack members are provided.
 
 This template was tested on:

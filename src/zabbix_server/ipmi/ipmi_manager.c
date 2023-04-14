@@ -28,14 +28,15 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
-#include "preproc.h"
 #include "ipmi_protocol.h"
 #include "ipmi.h"
 #include "../poller/poller.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbxpreproc.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
@@ -608,7 +609,7 @@ static zbx_ipmi_manager_host_t	*ipmi_manager_cache_host(zbx_ipmi_manager_t *mana
  *             hostid    - [IN] the host                                        *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_update_host(zbx_ipmi_manager_t *manager, const DC_INTERFACE *interface,
+static void	ipmi_manager_update_host(zbx_ipmi_manager_t *manager, const zbx_dc_interface_t *interface,
 		zbx_uint64_t hostid)
 {
 	zbx_ipmi_manager_host_t	*ipmi_host;
@@ -633,17 +634,17 @@ static void	ipmi_manager_update_host(zbx_ipmi_manager_t *manager, const DC_INTER
  ******************************************************************************/
 static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uint64_t itemid, zbx_timespec_t *ts)
 {
-	DC_ITEM		item;
+	zbx_dc_item_t	item;
 	int		errcode;
 	unsigned char	*data = NULL;
 	size_t		data_alloc = 0, data_offset = 0;
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	zbx_activate_item_interface(ts, &item, &data, &data_alloc, &data_offset);
 	ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 
-	DCconfig_clean_items(&item, &errcode, 1);
+	zbx_dc_config_clean_items(&item, &errcode, 1);
 
 	if (NULL != data)
 	{
@@ -657,26 +658,30 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
  * Purpose: tries to deactivate item's interface after receiving              *
  *          host level error                                                  *
  *                                                                            *
- * Parameters: manager - [IN] the IPMI manager                                *
- *             itemid  - [IN] the item identifier                             *
- *             ts      - [IN] the deactivation timestamp                      *
- *             error   - [IN] the error                                       *
+ * Parameters: manager            - [IN] the IPMI manager                     *
+ *             itemid             - [IN] the item identifier                  *
+ *             ts                 - [IN] the deactivation timestamp           *
+ *             unavailable_delay  - [IN]                                      *
+ *             unreachable_period - [IN]                                      *
+ *             unreachable_delay  - [IN]                                      *
+ *             error              - [IN] the error                            *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_uint64_t itemid, zbx_timespec_t *ts,
-		int unavailable_delay, const char *error)
+		int unavailable_delay, int unreachable_period, int unreachable_delay, const char *error)
 {
-	DC_ITEM		item;
+	zbx_dc_item_t	item;
 	int		errcode;
 	unsigned char	*data = NULL;
 	size_t		data_alloc = 0, data_offset = 0;
 
-	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
-	zbx_deactivate_item_interface(ts, &item, &data, &data_alloc, &data_offset, unavailable_delay, error);
+	zbx_deactivate_item_interface(ts, &item, &data, &data_alloc, &data_offset, unavailable_delay,
+			unreachable_period, unreachable_delay, error);
 	ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 
-	DCconfig_clean_items(&item, &errcode, 1);
+	zbx_dc_config_clean_items(&item, &errcode, 1);
 
 	if (NULL != data)
 	{
@@ -695,7 +700,7 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
  *             message   - [OUT] the message                                  *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_manager_serialize_request(const DC_ITEM *item, zbx_ipc_message_t *message)
+static void	ipmi_manager_serialize_request(const zbx_dc_item_t *item, zbx_ipc_message_t *message)
 {
 	zbx_uint32_t	size;
 
@@ -744,11 +749,11 @@ static void	ipmi_manager_schedule_request(zbx_ipmi_manager_t *manager, zbx_uint6
 static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, int config_timeout, int *nextcheck)
 {
 	int			i, num;
-	DC_ITEM			items[MAX_POLLER_ITEMS];
+	zbx_dc_item_t		items[ZBX_MAX_POLLER_ITEMS];
 	zbx_ipmi_request_t	*request;
 	char			*error = NULL;
 
-	num = DCconfig_get_ipmi_poller_items(now, MAX_POLLER_ITEMS, config_timeout, items, nextcheck);
+	num = zbx_dc_config_get_ipmi_poller_items(now, ZBX_MAX_POLLER_ITEMS, config_timeout, items, nextcheck);
 
 	for (i = 0; i < num; i++)
 	{
@@ -763,7 +768,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 			zbx_timespec(&ts);
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
 					items[i].flags, NULL, &ts, state, error);
-			DCrequeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
+			zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
 			zbx_free(error);
 			continue;
 		}
@@ -777,7 +782,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 	}
 
 	zbx_preprocessor_flush();
-	DCconfig_clean_items(items, NULL, num);
+	zbx_dc_config_clean_items(items, NULL, num);
 
 	return num;
 }
@@ -847,15 +852,18 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
  *                                                                                    *
  * Purpose: processes IPMI check result received from IPMI poller                     *
  *                                                                                    *
- * Parameters: manager           - [IN] IPMI manager                                  *
- *             client            - [IN] client (IPMI poller)                          *
- *             message           - [IN] received ZBX_IPC_IPMI_VALUE_RESULT message    *
- *             now               - [IN] current time                                  *
- *             unavailable_delay - [IN]                                               *
+ * Parameters: manager            - [IN] IPMI manager                                 *
+ *             client             - [IN] client (IPMI poller)                         *
+ *             message            - [IN] received ZBX_IPC_IPMI_VALUE_RESULT message   *
+ *             now                - [IN] current time                                 *
+ *             unavailable_delay  - [IN]                                              *
+ *             unreachable_period - [IN]                                              *
+ *             unreachable_delay  - [IN]                                              *
  *                                                                                    *
  *************************************************************************************/
 static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_ipc_client_t *client,
-		zbx_ipc_message_t *message, int now, int unavailable_delay)
+		zbx_ipc_message_t *message, int now, int unavailable_delay, int unreachable_period,
+		int unreachable_delay)
 {
 	char			*value;
 	zbx_timespec_t		ts;
@@ -894,7 +902,8 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case NETWORK_ERROR:
 		case GATEWAY_ERROR:
 		case TIMEOUT_ERROR:
-			ipmi_manager_deactivate_interface(manager, itemid, &ts, unavailable_delay, value);
+			ipmi_manager_deactivate_interface(manager, itemid, &ts, unavailable_delay,
+					unreachable_period, unreachable_delay, value);
 			break;
 		case CONFIG_ERROR:
 			/* nothing to do */
@@ -932,7 +941,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 	zbx_free(value);
 
 	/* put back the item in configuration cache IPMI poller queue */
-	DCrequeue_items(&itemid, &ts.sec, &errcode, 1);
+	zbx_dc_requeue_items(&itemid, &ts.sec, &errcode, 1);
 
 	ipmi_poller_free_request(poller);
 	ipmi_manager_process_poller_queue(manager, poller, now);
@@ -1041,7 +1050,9 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 				/* poller -> manager or poller -> manager -> client if value request sent by client */
 				case ZBX_IPC_IPMI_VALUE_RESULT:
 					ipmi_manager_process_value_result(&ipmi_manager, client, message, now,
-							ipmi_manager_args_in->config_unavailable_delay);
+							ipmi_manager_args_in->config_unavailable_delay,
+							ipmi_manager_args_in->config_unreachable_period,
+							ipmi_manager_args_in->config_unreachable_delay);
 					polled_num++;
 					break;
 				/* client -> manager */

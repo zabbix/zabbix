@@ -631,7 +631,7 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the host group
  *
- * @return CDiv
+ * @return CLink
  */
 function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -658,7 +658,7 @@ function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the host
  *
- * @return CDiv
+ * @return CLink
  */
 function getHostLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -685,7 +685,7 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the graph
  *
- * @return CDiv
+ * @return CLink
  */
 function getGraphLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -712,7 +712,7 @@ function getGraphLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the trigger
  *
- * @return CDiv
+ * @return CLink
  */
 function getTriggerLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -739,7 +739,7 @@ function getTriggerLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the item
  *
- * @return CDiv
+ * @return CLink
  */
 function getItemLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.

@@ -12,7 +12,8 @@ if AGENT
 AGENT_tests = \
 	zbx_execute_agent_check \
 	zbx_execute_agent_check_http \
-	check_key_access_rules
+	check_key_access_rules \
+	check_get_fqdn
 endif
 
 noinst_PROGRAMS = $(SERVER_tests) $(AGENT_tests)
@@ -36,7 +37,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
-	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
+	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
@@ -51,8 +52,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
-	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
-	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -88,6 +88,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
@@ -136,6 +137,7 @@ check_service_test_LDADD = \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
@@ -182,6 +184,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -253,5 +256,28 @@ check_key_access_rules_LDADD += @AGENT_LIBS@
 check_key_access_rules_LDFLAGS = @AGENT_LDFLAGS@
 
 check_key_access_rules_CFLAGS = -I@top_srcdir@/tests
+
+# check_get_fqdn
+
+check_get_fqdn_SOURCES = \
+	check_get_fqdn.c \
+	../../zbxmocktest.h
+
+check_get_fqdn_LDADD = $(COMMON_LIB_FILES) \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
+
+check_get_fqdn_LDADD += @AGENT_LIBS@
+
+check_get_fqdn_LDFLAGS = @AGENT_LDFLAGS@
+
+check_get_fqdn_WRAP_FUNCS = \
+	-Wl,--wrap=gethostname \
+	-Wl,--wrap=getaddrinfo \
+	-Wl,--wrap=freeaddrinfo
+
+check_get_fqdn_CFLAGS = $(check_get_fqdn_WRAP_FUNCS) -I@top_srcdir@/tests
 
 endif

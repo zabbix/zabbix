@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template is developed to monitor DBMS PostgreSQL and its forks.
 
 
@@ -14,9 +14,9 @@ This template has been tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
-1. Deploy Zabbix agent2 with Postgres plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 postgres metrics moved to a loadable plugin and requires separate package installation or [compilation of a plugin from sources](https://www.zabbix.com/documentation/6.4/manual/extensions/plugins/build).
+1. Deploy Zabbix agent2 with Postgres plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 / 7.0 postgres metrics moved to a loadable plugin and requires separate package installation or [compilation of a plugin from sources](https://www.zabbix.com/documentation/7.0/manual/extensions/plugins/build).
 
 2. Create PostgreSQL user to monitor (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
 

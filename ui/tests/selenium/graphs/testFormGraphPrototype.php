@@ -167,7 +167,8 @@ class testFormGraphPrototype extends testFormGraphs {
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1'
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			[

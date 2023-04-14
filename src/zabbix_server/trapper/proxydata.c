@@ -27,7 +27,6 @@
 #include "zbxnix.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
-#include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "../taskmanager/taskmanager.h"
@@ -38,7 +37,7 @@ static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 #define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(proxy_lock)
 
-int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int status,
+int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
 		int upload_status)
 {
 	struct zbx_json		json;
@@ -123,17 +122,20 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *                                                                            *
  * Purpose: receive 'proxy data' request from proxy                           *
  *                                                                            *
- * Parameters: sock           - [IN] the connection socket                    *
- *             jp             - [IN] the received JSON data                   *
- *             ts             - [IN] the connection timestamp                 *
- *             config_timeout - [IN]                                          *
+ * Parameters: sock                - [IN] connection socket                   *
+ *             jp                  - [IN] received JSON data                  *
+ *             ts                  - [IN] connection timestamp                *
+ *             events_cbs          - [IN]                                     *
+ *             config_timeout      - [IN]                                     *
+ *             proxydata_frequency - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, int config_timeout)
+void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency)
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
 	char			*error = NULL, *version_str = NULL;
-	DC_PROXY		proxy;
+	zbx_dc_proxy_t		proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -171,7 +173,8 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
+		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, events_cbs,
+				proxydata_frequency, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 					proxy.host, sock->peer, error);
@@ -274,7 +277,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			config_comms->config_tls, config_comms->config_timeout))
+			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;
@@ -328,8 +331,8 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 		if (0 != history_lastid)
 		{
 			zbx_uint64_t	history_maxid;
-			DB_RESULT	result;
-			DB_ROW		row;
+			zbx_db_result_t	result;
+			zbx_db_row_t	row;
 
 			result = zbx_db_select("select max(id) from proxy_history");
 
@@ -340,7 +343,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 
 			zbx_db_free_result(result);
 
-			reset_proxy_history_count(history_maxid - history_lastid);
+			zbx_reset_proxy_history_count(history_maxid - history_lastid);
 			zbx_proxy_set_hist_lastid(history_lastid);
 		}
 
@@ -404,7 +407,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			config_comms->config_tls, config_comms->config_timeout))
+			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;

@@ -753,6 +753,13 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Scroll the element to the visible position.
+	 */
+	public function scrollIntoView() {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});', [$this]);
+	}
+
+	/**
 	 * Check presence of the class(es).
 	 *
 	 * @param string|array $class	class or classes to be present.

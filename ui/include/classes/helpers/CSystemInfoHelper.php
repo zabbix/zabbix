@@ -32,13 +32,12 @@ class CSystemInfoHelper {
 	 * @throws APIException
 	 */
 	public static function getData(): array {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
-			'status' => static::getServerStatus($ZBX_SERVER, (int) $ZBX_SERVER_PORT),
+			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
-			'failover_delay' => 0,
-			'float_double_precision' => $DB['DOUBLE_IEEE754']
+			'failover_delay' => 0
 		];
 
 		$db_backend = DB::getDbBackend();

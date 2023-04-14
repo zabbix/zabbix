@@ -38,15 +38,17 @@ OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
 	..\..\..\src\libs\zbxalgo\hashset.o \
-	..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxcrypto\endian.o \
+	..\..\..\src\libs\zbxcommon\setproctitle.o \
 	..\..\..\src\libs\zbxip\ip.o \
 	..\..\..\src\libs\zbxip\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxnum\num.o \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
+	..\..\..\src\libs\zbxfile\file.o \
+	..\..\..\src\libs\zbxfile\win32\win32_file.o \
 	..\..\..\src\libs\zbxparam\param.o \
-	..\..\..\src\libs\zbxcommon\file.o \
 	..\..\..\src\libs\zbxtime\time.o \
 	..\..\..\src\libs\zbxexpr\expr.o \
 	..\..\..\src\libs\zbxexpr\function.o \
@@ -71,7 +73,6 @@ OBJS = \
 	..\..\..\src\libs\zbxjson\jsonobj.o \
 	..\..\..\src\libs\zbxlog\log.o \
 	..\..\..\src\libs\zbxmutexs\mutexs.o \
-	..\..\..\src\libs\zbxsymbols\symbols.o \
 	..\..\..\src\libs\zbxthreads\threads.o \
 	..\..\..\src\libs\zbxexec\execute.o \
 	..\..\..\src\libs\zbxhash\zbxhash.o \
@@ -83,7 +84,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\zbxsysinfo_common.o \
 	..\..\..\src\libs\zbxsysinfo\common\cpu.o \
 	..\..\..\src\libs\zbxsysinfo\common\dir.o \
-	..\..\..\src\libs\zbxsysinfo\common\file.o \
+	..\..\..\src\libs\zbxsysinfo\common\vfs_file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\http_metrics.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
@@ -114,7 +115,7 @@ OBJS = \
 	..\..\..\src\libs\zbxversion\version.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwinservice\service.o \
-	..\..\..\src\zabbix_agent\active.o \
+	..\..\..\src\zabbix_agent\active_checks\active_checks.o \
 	..\..\..\src\zabbix_agent\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \
 	..\..\..\src\zabbix_agent\listener.o \
@@ -127,7 +128,8 @@ OBJS = \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\libs\zbxwin32\fatal.o \
-	..\..\..\src\libs\zbxwin32\disk.o
+	..\..\..\src\libs\zbxwin32\disk.o \
+	..\..\..\src\libs\zbxwin32\symbols.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib $(LIBS)
 
