@@ -28,7 +28,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	}
 
 	public function getView(): CList {
-		$list = (new CList())
+		$view = (new CList())
 			->setId('data_sets')
 			->addClass(ZBX_STYLE_SORTABLE_LIST);
 
@@ -50,12 +50,12 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 				$value['item_names'] = $item_names;
 			}
 
-			$list->addItem(
+			$view->addItem(
 				$this->getGraphDataSetLayout($value, $value['dataset_type'], $i == 0, $i)
 			);
 		}
 
-		return $list;
+		return $view;
 	}
 
 	public function getFooterView(): CList {

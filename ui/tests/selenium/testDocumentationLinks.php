@@ -26,13 +26,13 @@ use Facebook\WebDriver\WebDriverKeys;
 /**
  * @dataSource Proxies
  *
- * @backup profiles, module, services, token
+ * @backup profiles, module, services, token, connector
  *
- * @onBefore prepareServiceData
+ * @onBefore prepareData
  */
 class testDocumentationLinks extends CWebTest {
 
-	public function prepareServiceData() {
+	public function prepareData() {
 		self::$version = substr(ZABBIX_VERSION, 0, 3);
 
 		// Create a service.
@@ -49,6 +49,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				'name' => 'Admin token',
 				'userid' => 1
+			]
+		]);
+
+		// Create a Connector.
+		CDataHelper::call('connector.create', [
+			[
+				'name' => 'Default connector',
+				'url' => '{$URL}'
 			]
 		]);
 	}
@@ -2325,6 +2333,40 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'widget_type' => 'Data overview',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/data_overview'
+				]
+			],
+			// #232 Connectors list view.
+			[
+				[
+					'url' => 'zabbix.php?action=connector.list',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#connectors'
+				]
+			],
+			// #233 Create connectors popup.
+			[
+				[
+					'url' => 'zabbix.php?action=connector.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create connector'
+						]
+					],
+					'doc_link' => '/en/manual/config/export/streaming#configuration'
+				]
+			],
+			// #234 Edit connectors popup.
+			[
+				[
+					'url' => 'zabbix.php?action=connector.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Default connector'
+						]
+					],
+					'doc_link' => '/en/manual/config/export/streaming#configuration'
+
 				]
 			]
 		];
