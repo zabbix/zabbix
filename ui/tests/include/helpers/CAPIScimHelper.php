@@ -27,6 +27,26 @@ require_once dirname(__FILE__).'/../../../include/hosts.inc.php';
 
 class CAPIScimHelper extends CAPIHelper {
 
+	protected static $token = null;
+
+	/**
+	 * Get token.
+	 *
+	 * @return string
+	 */
+	public static function getToken() {
+		return static::$token;
+	}
+
+	/**
+	 * Set token.
+	 *
+	 * @param string $token    Token to be used.
+	 */
+	public static function setToken($token) {
+		static::$token = $token;
+	}
+
 	/**
 	 * Make API SCIM call.
 	 *
@@ -40,7 +60,7 @@ class CAPIScimHelper extends CAPIHelper {
 	public static function callRaw($data, string $auth_token = null): array {
 		[$class, $method_type] = explode('.', $data['method'], 2) + ['', ''];
 
-		$url = PHPUNIT_URL.'api_scim.php/'.ucfirst($class).'s';
+		$url = PHPUNIT_URL.'api_scim.php/'.ucfirst($class);
 
 		if (is_array($data['params'])) {
 			$data = json_encode($data['params']);
@@ -59,6 +79,7 @@ class CAPIScimHelper extends CAPIHelper {
 					'Content-type: application/json',
 					'Content-Length: '.strlen($data)
 				],
+				// Fetches the content even on failure status codes. Necessary for correct SCIM response.
 				'ignore_errors' => '1'
 			]
 		];
@@ -72,15 +93,25 @@ class CAPIScimHelper extends CAPIHelper {
 			$response = @stream_get_contents($handle);
 			fclose($handle);
 		}
+		else {
+			$php_errormsg = CTestArrayHelper::get(error_get_last(), 'message');
+			$response = false;
+		}
 
-		$debug['response'] = $response;
+		if ($response !== false) {
+			$debug['response'] = $response;
 
-		if ($response !== '') {
-			$response = json_decode($response, true);
+			if ($response !== '') {
+				$response = json_decode($response, true);
 
-			if (!is_array($response)) {
-				throw new Exception('API response is not in JSON format');
+				if (!is_array($response)) {
+					throw new Exception('API response is not in JSON format');
+				}
 			}
+		}
+		else {
+			static::$debug[] = $debug;
+			throw new Exception('Problem with '.$url.', '.$php_errormsg);
 		}
 
 		static::$debug[] = $debug;
@@ -97,12 +128,9 @@ class CAPIScimHelper extends CAPIHelper {
 	 * @return array
 	 */
 	public static function call($method, $params) {
-		$token = $params['token'];
-		unset($params['token']);
-
 		return static::callRaw([
 			'method' => $method,
 			'params' => $params,
-		], $token);
+		], static::$token);
 	}
 }

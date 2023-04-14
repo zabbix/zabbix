@@ -57,8 +57,7 @@ class testScimGroup extends CAPIScimTest {
 			'user_group_w_members' => null
 		],
 		'token' => [
-			'tokenid' => null,
-			'token' => null
+			'tokenid' => null
 		],
 		'mediatypeid' => '3'
 	];
@@ -191,7 +190,7 @@ class testScimGroup extends CAPIScimTest {
 		$token = CDataHelper::call('token.generate', [static::$data['token']['tokenid']]);
 
 		$this->assertArrayHasKey('token', $token[0]);
-		static::$data['token']['token'] = $token[0]['token'];
+		CAPIScimHelper::setToken($token[0]['token']);
 	}
 
 	public function createInvalidGetRequest(): array {
@@ -211,9 +210,7 @@ class testScimGroup extends CAPIScimTest {
 	 * @dataProvider createInvalidGetRequest
 	 */
 	public function testInvalidGet($group, $expected_error) {
-		$group['token'] = self::$data['token']['token'];
-
-		$this->call('group.get', $group, $expected_error);
+		$this->call('groups.get', $group, $expected_error);
 	}
 
 	public function createValidGetRequest(): array {
@@ -289,9 +286,7 @@ class testScimGroup extends CAPIScimTest {
 			unset($resource);
 		}
 
-		$group['token'] = self::$data['token']['token'];
-
-		$result = $this->call('group.get', $group);
+		$result = $this->call('groups.get', $group);
 
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 	}
@@ -464,10 +459,7 @@ class testScimGroup extends CAPIScimTest {
 	 */
 	public function testInvalidPost($group, $expected_error): void {
 		$this->resolveData($group);
-
-		$group['token'] = self::$data['token']['token'];
-
-		$this->call('group.post', $group, $expected_error);
+		$this->call('groups.post', $group, $expected_error);
 	}
 
 	public function createValidPostRequest(): array {
@@ -516,9 +508,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->resolveData($group);
 		$this->resolveData($expected_result);
 
-		$group['token'] = self::$data['token']['token'];
-
-		$result = $this->call('group.post', $group);
+		$result = $this->call('groups.post', $group);
 
 		// Compare response with expected response.
 		foreach ($expected_result as $key => $expected) {
@@ -748,9 +738,7 @@ class testScimGroup extends CAPIScimTest {
 	public function testInvalidPut(array $group, array $expected_error) {
 		$this->resolveData($group);
 
-		$group['token'] = self::$data['token']['token'];
-
-		$this->call('group.put', $group, $expected_error);
+		$this->call('groups.put', $group, $expected_error);
 	}
 
 	public function createValidPutRequest(): array {
@@ -849,9 +837,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->resolveData($group);
 		$this->resolveData($expected_result);
 
-		$group['token'] = self::$data['token']['token'];
-
-		$result = $this->call('group.put', $group);
+		$result = $this->call('groups.put', $group);
 
 		// Compare response with expected response.
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
@@ -1203,10 +1189,7 @@ class testScimGroup extends CAPIScimTest {
 	 */
 	public function testInvalidPatch(array $group, array $expected_error): void {
 		$this->resolveData($group);
-
-		$group['token'] = self::$data['token']['token'];
-
-		$this->call('group.patch', $group, $expected_error);
+		$this->call('groups.patch', $group, $expected_error);
 	}
 
 	public function createValidPatchRequest(): array {
@@ -1378,9 +1361,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->resolveData($group, true);
 		$this->resolveData($expected_result);
 
-		$group['token'] = self::$data['token']['token'];
-
-		$result = $this->call('group.patch', $group);
+		$result = $this->call('groups.patch', $group);
 
 		// Compare response with expected response.
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
@@ -1440,9 +1421,7 @@ class testScimGroup extends CAPIScimTest {
 	 * @dataProvider createInvalidDeleteRequest
 	 */
 	public function testInvalidDelete(array $group, array $expected_error): void {
-		$group['token'] = self::$data['token']['token'];
-
-		$this->call('group.delete', $group, $expected_error);
+		$this->call('groups.delete', $group, $expected_error);
 	}
 
 	public function createValidDeleteRequest(): array {
@@ -1473,9 +1452,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->resolveData($group);
 		$this->resolveData($expected_result);
 
-		$group['token'] = self::$data['token']['token'];
-
-		$result = $this->call('group.delete', $group);
+		$result = $this->call('groups.delete', $group);
 
 		// Compare response with expected response.
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');

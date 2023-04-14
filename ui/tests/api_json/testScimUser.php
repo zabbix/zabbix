@@ -46,8 +46,7 @@ class testScimUser extends CAPIScimTest {
 			'saml_user_only_username' => 'andy.bernard@office.com'
 		],
 		'token' => [
-			'tokenid' => null,
-			'token' => null
+			'tokenid' => null
 		],
 		'mediatypeid' => '3',
 		'scim_groupids' => [
@@ -58,7 +57,7 @@ class testScimUser extends CAPIScimTest {
 		]
 	];
 
-	public function prepareUserData() {
+	public function prepareUserData(): void {
 		// Create userdirectory for SAML.
 		$userdirectory_saml = CDataHelper::call('userdirectory.create', [
 			'idp_type' => IDP_TYPE_SAML,
@@ -194,7 +193,7 @@ class testScimUser extends CAPIScimTest {
 		$token = CDataHelper::call('token.generate', [static::$data['token']['tokenid']]);
 
 		$this->assertArrayHasKey('token', $token[0]);
-		static::$data['token']['token'] = $token[0]['token'];
+		CAPIScimHelper::setToken($token[0]['token']);
 	}
 
 	public static function createInvalidGetRequest(): array {
@@ -232,9 +231,7 @@ class testScimUser extends CAPIScimTest {
 	public function testInvalidUserGet($user, $expected_error) {
 		$this->resolveData($user);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$this->call('user.get', $user, $expected_error);
+		$this->call('users.get', $user, $expected_error);
 	}
 
 	public static function createValidGetRequest(): array {
@@ -321,8 +318,7 @@ class testScimUser extends CAPIScimTest {
 			unset($resource);
 		}
 
-		$user['token'] = self::$data['token']['token'];
-		$result = $this->call('user.get', $user);
+		$result = $this->call('users.get', $user);
 
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 	}
@@ -426,9 +422,7 @@ class testScimUser extends CAPIScimTest {
 	public function testInvalidUserPost($user, $expected_error) {
 		$this->resolveData($user);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$this->call('user.post', $user, $expected_error);
+		$this->call('users.post', $user, $expected_error);
 	}
 
 	public static function createValidPostRequest(): array {
@@ -480,9 +474,7 @@ class testScimUser extends CAPIScimTest {
 		$this->resolveData($user);
 		$this->resolveData($expected_result);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$result = $this->call('user.post', $user);
+		$result = $this->call('users.post', $user);
 
 		// Compare response with expected response.
 		foreach ($expected_result as $key => $expected) {
@@ -659,9 +651,7 @@ class testScimUser extends CAPIScimTest {
 	public function testInvalidUserPut($user, $expected_error) {
 		$this->resolveData($user);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$this->call('user.put', $user, $expected_error);
+		$this->call('users.put', $user, $expected_error);
 	}
 
 	public function createValidPutRequest() {
@@ -739,9 +729,7 @@ class testScimUser extends CAPIScimTest {
 		$this->resolveData($user);
 		$this->resolveData($expected_result);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$result = $this->call('user.put', $user);
+		$result = $this->call('users.put', $user);
 
 		// Compare response with expected response.
 		foreach ($expected_result as $key => $expected) {
@@ -983,9 +971,7 @@ class testScimUser extends CAPIScimTest {
 	public function testInvalidUserPatch(array $user, array $expected_error): void {
 		$this->resolveData($user);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$this->call('user.patch', $user, $expected_error);
+		$this->call('users.patch', $user, $expected_error);
 	}
 
 	public function createValidPatchRequest(): array {
@@ -1067,9 +1053,7 @@ class testScimUser extends CAPIScimTest {
 		$this->resolveData($user);
 		$this->resolveData($expected_result);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$result = $this->call('user.patch', $user);
+		$result = $this->call('users.patch', $user);
 
 		// Compare result with expected result.
 		foreach ($expected_result as $key => $expected) {
@@ -1164,9 +1148,7 @@ class testScimUser extends CAPIScimTest {
 	public function testInvalidDelete($user, $expected_error): void {
 		$this->resolveData($user);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$this->call('user.delete', $user, $expected_error);
+		$this->call('users.delete', $user, $expected_error);
 	}
 
 	public function createValidDeleteRequest(): array {
@@ -1186,9 +1168,7 @@ class testScimUser extends CAPIScimTest {
 	public function testValidDelete($user, $expected_result) {
 		$this->resolveData($user);
 
-		$user['token'] = self::$data['token']['token'];
-
-		$result = $this->call('user.delete', $user);
+		$result = $this->call('users.delete', $user);
 
 		// Compare response with expected response.
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
