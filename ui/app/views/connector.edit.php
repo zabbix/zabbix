@@ -33,7 +33,7 @@ $form = (new CForm('post'))
 // Enable form submitting on Enter.
 $form->addItem((new CInput('submit'))->addStyle('display: none;'));
 
-$connector_tab = (new CFormGrid())
+$form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
@@ -161,109 +161,108 @@ $connector_tab = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass('js-field-token')
 	])
-	->addItem([
-		new CLabel(_('Advanced configuration'), 'advanced_configuration'),
-		new CFormField(
-			(new CCheckBox('advanced_configuration'))->setChecked($data['form']['advanced_configuration'])
-		)
-	])
-	->addItem([
-		(new CLabel(_('Max records per message'), 'max_records'))
-			->addClass('js-field-max-records')
-			->setAsteriskMark(),
-		(new CFormField([
-			(new CDiv(
-				(new CRadioButtonList('max_records_mode', $data['form']['max_records_mode']))
-					->addValue(_('Unlimited'), 0)
-					->addValue(_('Custom'), 1)
-					->setModern()
-			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false, false))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired()
-		]))->addClass('js-field-max-records')
-	])
-	->addItem([
-		(new CLabel(_('Concurrent sessions'), 'max_senders'))
-			->addClass('js-field-max-senders')
-			->setAsteriskMark(),
-		(new CFormField(
-			(new CNumericBox('max_senders', $data['form']['max_senders'], 3, false, false, false))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired()
-		))->addClass('js-field-max-senders')
-	])
-	->addItem([
-		(new CLabel(_('Attempts'), 'max_attempts'))
-			->addClass('js-field-max-attempts')
-			->setAsteriskMark(),
-		(new CFormField(
-			(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false, false))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setAriaRequired()
-		))->addClass('js-field-max-attempts')
-	])
-	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))
-			->addClass('js-field-timeout')
-			->setAsteriskMark(),
-		(new CFormField(
-			(new CTextBox('timeout', $data['form']['timeout'], false, DB::getFieldLength('connector', 'timeout')))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		))->addClass('js-field-timeout')
-	])
-	->addItem([
-		(new CLabel(_('HTTP proxy'), 'http_proxy'))->addClass('js-field-http-proxy'),
-		(new CFormField(
-			(new CTextBox('http_proxy', $data['form']['http_proxy'], false,
-				DB::getFieldLength('connector', 'http_proxy')
-			))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
-				->disableAutocomplete()
-		))->addClass('js-field-http-proxy')
-	])
-	->addItem([
-		(new CLabel(_('SSL verify peer'), 'verify_peer'))->addClass('js-field-verify-peer'),
-		(new CFormField(
-			(new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
-				->setChecked($data['form']['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
-		))->addClass('js-field-verify-peer')
-	])
-	->addItem([
-		(new CLabel(_('SSL verify host'), 'verify_host'))->addClass('js-field-verify-host'),
-		(new CFormField(
-			(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
-				->setChecked($data['form']['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
-		))->addClass('js-field-verify-host')
-	])
-	->addItem([
-		(new CLabel(_('SSL certificate file'), 'ssl_cert_file'))->addClass('js-field-ssl-cert-file'),
-		(new CFormField(
-			(new CTextBox('ssl_cert_file', $data['form']['ssl_cert_file'], false,
-				DB::getFieldLength('connector', 'ssl_cert_file')
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('js-field-ssl-cert-file')
-	])
-	->addItem([
-		(new CLabel(_('SSL key file'), 'ssl_key_file'))->addClass('js-field-ssl-key-file'),
-		(new CFormField(
-			(new CTextBox('ssl_key_file', $data['form']['ssl_key_file'], false,
-				DB::getFieldLength('connector', 'ssl_key_file')
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass('js-field-ssl-key-file')
-	])
-	->addItem([
-		(new CLabel(_('SSL key password'), 'ssl_key_password'))->addClass('js-field-ssl-key-password'),
-		(new CFormField(
-			(new CTextBox('ssl_key_password', $data['form']['ssl_key_password'], false,
-				DB::getFieldLength('connector', 'ssl_key_password')
-			))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->disableAutocomplete()
-		))->addClass('js-field-ssl-key-password')
-	])
+	->addItem(
+		(new CFormSectionCollapsible(_('Advanced configuration'), 'advanced-configuration'))
+			->addItem([
+				(new CLabel(_('Max records per message'), 'max_records'))
+					->addClass('js-field-max-records')
+					->setAsteriskMark(),
+				(new CFormField([
+					(new CDiv(
+						(new CRadioButtonList('max_records_mode', $data['form']['max_records_mode']))
+							->addValue(_('Unlimited'), 0)
+							->addValue(_('Custom'), 1)
+							->setModern()
+					))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CNumericBox('max_records', $data['form']['max_records'], 10, false, false, false))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setAriaRequired()
+				]))->addClass('js-field-max-records')
+			])
+			->addItem([
+				(new CLabel(_('Concurrent sessions'), 'max_senders'))
+					->addClass('js-field-max-senders')
+					->setAsteriskMark(),
+				(new CFormField(
+					(new CNumericBox('max_senders', $data['form']['max_senders'], 3, false, false, false))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setAriaRequired()
+				))->addClass('js-field-max-senders')
+			])
+			->addItem([
+				(new CLabel(_('Attempts'), 'max_attempts'))
+					->addClass('js-field-max-attempts')
+					->setAsteriskMark(),
+				(new CFormField(
+					(new CNumericBox('max_attempts', $data['form']['max_attempts'], 1, false, false, false))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setAriaRequired()
+				))->addClass('js-field-max-attempts')
+			])
+			->addItem([
+				(new CLabel(_('Timeout'), 'timeout'))
+					->addClass('js-field-timeout')
+					->setAsteriskMark(),
+				(new CFormField(
+					(new CTextBox('timeout', $data['form']['timeout'], false,
+						DB::getFieldLength('connector', 'timeout')
+					))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->setAriaRequired()
+				))->addClass('js-field-timeout')
+			])
+			->addItem([
+				(new CLabel(_('HTTP proxy'), 'http_proxy'))->addClass('js-field-http-proxy'),
+				(new CFormField(
+					(new CTextBox('http_proxy', $data['form']['http_proxy'], false,
+						DB::getFieldLength('connector', 'http_proxy')
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
+						->disableAutocomplete()
+				))->addClass('js-field-http-proxy')
+			])
+			->addItem([
+				(new CLabel(_('SSL verify peer'), 'verify_peer'))->addClass('js-field-verify-peer'),
+				(new CFormField(
+					(new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
+						->setChecked($data['form']['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
+				))->addClass('js-field-verify-peer')
+			])
+			->addItem([
+				(new CLabel(_('SSL verify host'), 'verify_host'))->addClass('js-field-verify-host'),
+				(new CFormField(
+					(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
+						->setChecked($data['form']['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
+				))->addClass('js-field-verify-host')
+			])
+			->addItem([
+				(new CLabel(_('SSL certificate file'), 'ssl_cert_file'))->addClass('js-field-ssl-cert-file'),
+				(new CFormField(
+					(new CTextBox('ssl_cert_file', $data['form']['ssl_cert_file'], false,
+						DB::getFieldLength('connector', 'ssl_cert_file')
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				))->addClass('js-field-ssl-cert-file')
+			])
+			->addItem([
+				(new CLabel(_('SSL key file'), 'ssl_key_file'))->addClass('js-field-ssl-key-file'),
+				(new CFormField(
+					(new CTextBox('ssl_key_file', $data['form']['ssl_key_file'], false,
+						DB::getFieldLength('connector', 'ssl_key_file')
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				))->addClass('js-field-ssl-key-file')
+			])
+			->addItem([
+				(new CLabel(_('SSL key password'), 'ssl_key_password'))->addClass('js-field-ssl-key-password'),
+				(new CFormField(
+					(new CTextBox('ssl_key_password', $data['form']['ssl_key_password'], false,
+						DB::getFieldLength('connector', 'ssl_key_password')
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->disableAutocomplete()
+				))->addClass('js-field-ssl-key-password')
+			])
+	)
 	->addItem([
 		new CLabel(_('Description'), 'description'),
 		new CFormField(
@@ -280,10 +279,10 @@ $connector_tab = (new CFormGrid())
 		)
 	]);
 
-$tabs = (new CTabView(['id' => 'connector-tabs']))->addTab('connector-tab', _('Connector'), $connector_tab);
+//$tabs = (new CTabView(['id' => 'connector-tabs']))->addTab('connector-tab', _('Connector'), $connector_tab);
 
 $form
-	->addItem($tabs)
+	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag('
 			connector_edit_popup.init('.json_encode([

@@ -124,6 +124,25 @@ static int	DBpatch_6050011(void)
 	return DBmodify_field_type("trends", &field, &field);
 }
 
+static int	DBpatch_6050012(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name='adv_conf' and widgetid in ("
+				"select widgetid"
+				" from widget"
+				" where type in ('clock', 'item')"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -142,5 +161,6 @@ DBPATCH_ADD(6050008, 0, 1)
 DBPATCH_ADD(6050009, 0, 1)
 DBPATCH_ADD(6050010, 0, 1)
 DBPATCH_ADD(6050011, 0, 1)
+DBPATCH_ADD(6050012, 0, 1)
 
 DBPATCH_END()

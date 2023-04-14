@@ -30,31 +30,26 @@ window.ldap_edit_popup = new class {
 		this.overlay = null;
 		this.dialogue = null;
 		this.form = null;
-		this.advanced_chbox = null;
 	}
 
 	init({provision_groups, provision_media}) {
 		this.overlay = overlays_stack.getById('ldap_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.advanced_chbox = document.getElementById('advanced_configuration');
 		this.allow_jit_chbox = document.getElementById('provision_status');
 		this.provision_groups_table = document.getElementById('ldap-user-groups-table');
 
-		this.toggleAdvancedConfiguration(this.advanced_chbox.checked);
 		this.toggleAllowJitProvisioning(this.allow_jit_chbox.checked);
 		this.toggleGroupConfiguration();
 
 		this._addEventListeners();
 		this._renderProvisionGroups(provision_groups);
 		this._renderProvisionMedia(provision_media);
+
+		new CFormSectionCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	_addEventListeners() {
-		this.advanced_chbox.addEventListener('change', (e) => {
-			this.toggleAdvancedConfiguration(e.target.checked);
-		});
-
 		this.allow_jit_chbox.addEventListener('change', (e) => {
 			this.toggleAllowJitProvisioning(e.target.checked);
 		});
@@ -91,12 +86,6 @@ window.ldap_edit_popup = new class {
 
 		if (document.getElementById('bind-password-btn') !== null) {
 			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
-		}
-	}
-
-	toggleAdvancedConfiguration(checked) {
-		for (const element of this.form.querySelectorAll('.advanced-configuration')) {
-			element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 		}
 	}
 
@@ -202,11 +191,6 @@ window.ldap_edit_popup = new class {
 	preprocessFormFields(fields) {
 		this.trimFields(fields);
 
-		if (fields.advanced_configuration != 1) {
-			delete fields.start_tls;
-			delete fields.search_filter;
-		}
-
 		if (fields.provision_status != <?= JIT_PROVISIONING_ENABLED ?>) {
 			delete fields.group_basedn;
 			delete fields.group_name;
@@ -222,8 +206,6 @@ window.ldap_edit_popup = new class {
 		if (fields.userdirectoryid == null) {
 			delete fields.userdirectoryid;
 		}
-
-		delete fields.advanced_configuration;
 
 		return fields;
 	}

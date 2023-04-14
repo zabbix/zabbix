@@ -280,29 +280,26 @@ $form = (new CForm('post', $form_action))
 					->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			))->addClass('allow-jit-provisioning')
 		])
-		->addItem([
-			new CLabel(_('Advanced configuration'), 'advanced_configuration'),
-			new CFormField(
-				(new CCheckBox('advanced_configuration'))->setChecked($data['advanced_configuration'])
-			)
-		])
-		->addItem([
-			(new CLabel(_('StartTLS'), 'start_tls'))->addClass('advanced-configuration'),
-			(new CFormField(
-				(new CCheckBox('start_tls', ZBX_AUTH_START_TLS_ON))
-					->setChecked($data['start_tls'] == ZBX_AUTH_START_TLS_ON)
-			))->addClass('advanced-configuration')
-		])
-		->addItem([
-			(new CLabel(_('Search filter'), 'search_filter'))->addClass('advanced-configuration'),
-			(new CFormField(
-				(new CTextBox('search_filter', $data['search_filter'], false,
-					DB::getFieldLength('userdirectory_ldap', 'search_filter')
-				))
-					->setAttribute('placeholder', CLdap::DEFAULT_FILTER_USER)
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			))->addClass('advanced-configuration')
-		])
+		->addItem(
+			(new CFormSectionCollapsible(_('Advanced configuration'), 'advanced-configuration'))
+				->addItem([
+					new CLabel(_('StartTLS'), 'start_tls'),
+					new CFormField(
+						(new CCheckBox('start_tls', ZBX_AUTH_START_TLS_ON))
+							->setChecked($data['start_tls'] == ZBX_AUTH_START_TLS_ON)
+					)
+				])
+				->addItem([
+					new CLabel(_('Search filter'), 'search_filter'),
+					new CFormField(
+						(new CTextBox('search_filter', $data['search_filter'], false,
+							DB::getFieldLength('userdirectory_ldap', 'search_filter')
+						))
+							->setAttribute('placeholder', CLdap::DEFAULT_FILTER_USER)
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					)
+				])
+		)
 	)
 	->addItem(
 		(new CScriptTag('
