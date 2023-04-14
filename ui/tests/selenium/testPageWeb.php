@@ -601,7 +601,7 @@ class testPageWeb extends CWebTest {
 
 		// Directly open API created Web scenario and add/remove one step.
 		foreach (['Add' => '4', 'Remove' => '3'] as $action => $count) {
-			$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
+			$this->page->open("httpconf.php?context=host&form=update&hostid=".self::$hostid['WebData Host']."&httptestid=".
 					self::$httptestid['Web scenario 3 step'])->waitUntilReady();
 			$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
 			$this->query('id:stepTab')->asTable()->one()->query('xpath:.//button[text()=' .
