@@ -59,7 +59,7 @@ class testFormHostGroupSearchPage extends testFormGroups {
 
 	/**
 	 * @dataProvider getUpdateData
-	 * @dataProvider getHostUpdateData
+	 * @dataProvider getGroupUpdateData
 	 */
 	public function testFormHostGroupSearchPage_Update($data) {
 		$this->link = 'zabbix.php?action=search&search=upd';

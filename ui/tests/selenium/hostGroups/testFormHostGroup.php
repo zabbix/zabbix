@@ -41,7 +41,7 @@ class testFormHostGroup extends testFormGroups {
 		$this->layout(self::DISCOVERED_GROUP, true);
 	}
 
-	public static function getHostCreateData() {
+	public static function getGroupCreateData() {
 		return [
 			[
 				[
@@ -77,7 +77,7 @@ class testFormHostGroup extends testFormGroups {
 
 	/**
 	 * @dataProvider getUpdateData
-	 * @dataProvider getHostUpdateData
+	 * @dataProvider getGroupUpdateData
 	 */
 	public function testFormHostGroup_Update($data) {
 		$this->checkForm($data, 'update');
