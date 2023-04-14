@@ -597,7 +597,7 @@ out:
   expression: '{?1 + 2'
   return: SUCCEED
 ---
- test case: 'Success: no hang with lots of recursive expression macros'
+test case: 'Success: no hang with lots of recursive expression macros'
 in:
   expression: '{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{?1 + 2}'
 out:
