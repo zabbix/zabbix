@@ -591,9 +591,9 @@ class testPageWeb extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
 		$sql = 'SELECT * FROM httptest, hosts, httpstep WHERE httptest.hostid = hosts.hostid'.
-			' AND hosts.hostid ='.self::$hostid['WebData Host'].
-			' AND httptest.httptestid = httpstep.httptestid'.
-			' AND httptest.httptestid ='.self::$httptestid['Web scenario 3 step'];
+				' AND hosts.hostid ='.self::$hostid['WebData Host'].
+				' AND httptest.httptestid = httpstep.httptestid'.
+				' AND httptest.httptestid ='.self::$httptestid['Web scenario 3 step'];
 
 		// Check if steps in DB are equal to the frontend amount of steps.
 		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
@@ -604,13 +604,13 @@ class testPageWeb extends CWebTest {
 			$this->page->open("httpconf.php?context=host&form=update&hostid=".self::$hostid['WebData Host']."&httptestid=".
 					self::$httptestid['Web scenario 3 step'])->waitUntilReady();
 			$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
-			$this->query('id:stepTab')->asTable()->one()->query('xpath:.//button[text()=' .
-				CXPathHelper::escapeQuotes($action) . ']')->one()->click();
+			$this->query('id:stepTab')->asTable()->one()->query("xpath:.//button[text()=".
+					CXPathHelper::escapeQuotes($action) . ']')->one()->click();
 
 			if ($action === 'Add') {
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->query('id:http_step')->asForm()->one()
-					->fill(['Name' => 'Step number 4', 'id:url' => 'test.com'])->submit();
+						->fill(['Name' => 'Step number 4', 'id:url' => 'test.com'])->submit();
 				COverlayDialogElement::find()->one()->waitUntilNotVisible();
 			}
 
