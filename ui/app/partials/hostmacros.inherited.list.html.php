@@ -130,7 +130,7 @@ else {
 
 		// Parent host macro value.
 		if ($is_hostprototype) {
-			$row[] = array_key_exists('parent_host', $macro) ? '&lArr;' : '';
+			$row[] = array_key_exists('parent_host', $macro) ? LARR() : '';
 			$row[] = (new CDiv(array_key_exists('parent_host', $macro) ? '"'.$macro['parent_host']['value'].'"' : null))
 				->setAdaptiveWidth($inherited_width)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
@@ -154,13 +154,13 @@ else {
 			$template_macro = [$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"'];
 		}
 
-		$row[] = array_key_exists('template', $macro) ? '&lArr;' : '';
+		$row[] = array_key_exists('template', $macro) ? LARR() : '';
 		$row[] = (new CDiv(array_key_exists('template', $macro) ? $template_macro : null))
 			->setAdaptiveWidth($inherited_width)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
 		// Global macro value.
-		$row[] = array_key_exists('global', $macro) ? '&lArr;' : '';
+		$row[] = array_key_exists('global', $macro) ? LARR() : '';
 		$row[] = (new CDiv(array_key_exists('global', $macro) ? '"'.$macro['global']['value'].'"' : null))
 			->setAdaptiveWidth($inherited_width)
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
