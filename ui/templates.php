@@ -191,7 +191,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 
 	if ($warnings) {
 		if (count($warnings) > 1) {
-			CMessageHelper::setWarningTitle(_('Cloned host parameter values have been modified.'));
+			CMessageHelper::setWarningTitle(_('Cloned template parameter values have been modified.'));
 		}
 
 		array_map('CMessageHelper::addWarning', $warnings);
