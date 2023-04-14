@@ -140,7 +140,7 @@ window.check_popup = new class {
 			}
 
 			for (const key in result) {
-				if (dcheck.type !== 13 && keys.includes(key)) {
+				if (dcheck.type != <?= SVC_SNMPv3 ?> && keys.includes(key)) {
 					delete result[key];
 				}
 
@@ -148,8 +148,8 @@ window.check_popup = new class {
 					duplicates.push(key);
 				}
 
-				// remove data no dcheck update to not compare dcheck to itself
-				if (key == 'dcheckid' && result[key] === dcheck[key]) {
+				// Remove data on dcheck update to not compare dcheck to itself.
+				if (key === 'dcheckid' && result[key] === dcheck[key]) {
 					result = [];
 				}
 
@@ -189,7 +189,6 @@ window.check_popup = new class {
 		}
 		else {
 			this._updateFields(fields);
-
 			curl.setArgument('action', 'discovery.check.check');
 			this._post(curl.getUrl(), fields);
 		}
@@ -246,15 +245,21 @@ window.check_popup = new class {
 	 * Updates form fields based on check type and trims string values.
 	 */
 	_updateFields(fields) {
-		if (![ <?= SVC_SNMPv3 ?> ].includes(parseInt(fields.type))) {
+		if (![<?= SVC_SNMPv3 ?>, <?= SVC_AGENT ?>].includes(parseInt(fields.type))) {
 			for (const key in fields) {
-				if (['snmpv3_privpassphrase', 'key_'].includes(key)) {
+				if (['key_'].includes(key)) {
 					delete fields[key];
 				}
 			}
 		}
 
-		if (parseInt(fields.type) === <?= SVC_SNMPv3 ?>) {
+		for (const key in fields) {
+			if (['snmpv3_privpassphrase'].includes(key)) {
+				delete fields[key];
+			}
+		}
+
+		if (fields.type == <?= SVC_SNMPv3 ?>) {
 			let security_level = false;
 			for (const key in fields) {
 				if (['snmp_community', 'key_'].includes(key)) {

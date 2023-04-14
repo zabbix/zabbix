@@ -93,29 +93,15 @@ class CControllerDiscoveryCheckCheck extends CController {
 
 		$data['dcheckid'] =$this->getInput('dcheckid');
 
-		if ($data['type'] == 10 || $data['type'] == 11) {
-			$type_to_string = discovery_check_type2str($data['type']);
-			$data['name'] = $type_to_string.' "'.$data['snmp_oid'].'"';
-		}
-		elseif ($data['type'] == 13) {
-			$type_to_string = discovery_check_type2str($data['type']);
-			$data['name'] = $type_to_string.' ('.$data['ports'].') "'.$data['snmp_oid'].'"';
-		}
-		elseif ($data['type'] == 9) {
-			$type_to_string = discovery_check_type2str($data['type']);
-			$data['name'] = $type_to_string.' "'.$data['key_'].'"';
-		}
-		else {
-			$data['name'] = discovery_check2str(
-				$data['type'],
-				array_key_exists('key_', $data) ? $data['key_'] : '',
-				array_key_exists('ports',  $data) ? $data['ports'] : ''
-			);
-		}
-
 		if ($data['type'] == SVC_SNMPv1 || $data['type'] == SVC_SNMPv2c || $data['type'] == SVC_SNMPv3) {
 			$data['key_'] = $data['snmp_oid'];
 		}
+
+		$data['name'] = discovery_check2str(
+			$data['type'],
+			array_key_exists('key_', $data) ? $data['key_'] : '',
+			array_key_exists('ports',  $data) ? $data['ports'] : ''
+		);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));
 	}
