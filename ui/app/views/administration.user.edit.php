@@ -200,8 +200,7 @@ else {
 		&& ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER);
 
 	$hint = !$change_password_enabled
-		? $hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))
-			->addStyle('margin-left: 5px; margin-top: 4px')
+		? $hint = makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.'))
 		: null;
 
 	$user_form_list->addRow(_('Password'), [
@@ -272,7 +271,7 @@ else {
 	}
 
 	if ($language_error) {
-		$language_error = (makeErrorIcon($language_error))->addStyle('margin-left: 5px;');
+		$language_error = makeErrorIcon($language_error);
 	}
 
 	$timezone_select

@@ -149,7 +149,7 @@ foreach ($data['groups'] as $group) {
 
 	$info_icons = [];
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete'] != 0) {
-		$info_icons[] = getHostGroupLifetimeIndicator($current_time, $group['groupDiscovery']['ts_delete']);
+		$info_icons[] = getHostGroupLifetimeIndicator($current_time, (int) $group['groupDiscovery']['ts_delete']);
 	}
 
 	$count = '';
@@ -171,7 +171,7 @@ foreach ($data['groups'] as $group) {
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol($count))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$hosts_output ? $hosts_output : '',
+		$hosts_output ?: '',
 		makeInformationList($info_icons)
 	]);
 }

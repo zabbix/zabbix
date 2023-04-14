@@ -452,9 +452,7 @@ class CSetupWizard extends CForm {
 			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 		}
 
-		$language_error = ($language_error !== '')
-			? (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')
-			: null;
+		$language_error = ($language_error !== '') ? makeErrorIcon($language_error) : null;
 
 		$language_select = (new CFormList())
 			->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()), [

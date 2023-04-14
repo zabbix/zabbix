@@ -25,16 +25,6 @@
 		&.fields-group-label {
 			padding-top: 5px;
 		}
-
-		.zi-circle-question-filled,
-		.zi-i {
-			margin-left: 5px;
-
-			&:before {
-				vertical-align: middle;
-				position: relative;
-			}
-		}
 	}
 
 	> .form-field,
@@ -104,10 +94,13 @@
 		.list-check-radio {
 			line-height: $body-line-height;
 		}
+	}
 
-		.icon-info {
-			margin-left: 5px;
-		}
+	.icon-help,
+	.icon-info {
+		position: relative;
+		top: 1px;
+		margin-left: 5px;
 	}
 
 	&.form-grid-1-1 {

@@ -243,6 +243,18 @@ $problem-ack-fg-color: #cc0000 !default;
 $ok-unack-fg-color: #009900 !default;
 $ok-ack-fg-color: #009900 !default;
 
+$status-color: $white;
+$status-green-bg-color: darken(desaturate($alt-green, 10%), 16%);
+$status-green-border-color: darken(desaturate($alt-green, 10%), 20%);
+$status-yellow-bg-color: darken(desaturate($alt-yellow, 9%), 18%);
+$status-yellow-border-color: darken(desaturate($alt-yellow, 9%), 20%);
+$status-red-bg-color: darken(desaturate($alt-red, 10%), 5%);
+$status-red-border-color: darken(desaturate($alt-red, 10%), 9%);
+$status-grey-bg-color: #ebebeb;
+$status-grey-border-color: #ccd5d9;
+$status-dark-grey-bg-color: darken(desaturate($alt-blue-grey, 10%), 8%);
+$status-dark-grey-border-color: darken(desaturate($alt-blue-grey, 10%), 12%);
+
 // Multiselect
 $multiselect-selected-bg-color: #93a5af !default;
 $multiselect-disabled-bg-color: $disabled-bg-color;

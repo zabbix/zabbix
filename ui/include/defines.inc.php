@@ -1956,6 +1956,8 @@ define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_ICON_COUNT', 'icon-count');
+define('ZBX_STYLE_ICON_HELP', 'icon-help');
+define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
 define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');

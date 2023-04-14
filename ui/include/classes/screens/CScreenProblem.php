@@ -1430,7 +1430,7 @@ class CScreenProblem extends CScreenBase {
 				$cell_info = (new CButton(null))
 					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_MORE)
-					->addStyle('margin-left: -3px;')
+					->addStyle('margin-left: -3px;')  // FIXME
 					->setHint(makeInformationList($info_icons));
 			}
 			else {

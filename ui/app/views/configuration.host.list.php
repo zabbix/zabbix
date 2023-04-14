@@ -386,7 +386,7 @@ foreach ($data['hosts'] as $host) {
 	$info_icons = [];
 
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
-		$info_icons[] = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
+		$info_icons[] = getHostLifetimeIndicator($current_time, (int) $host['hostDiscovery']['ts_delete']);
 	}
 
 	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE

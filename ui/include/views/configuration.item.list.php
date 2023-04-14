@@ -270,7 +270,7 @@ foreach ($data['items'] as $item) {
 
 		// discovered item lifetime indicator
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
+			$info_icons[] = getItemLifetimeIndicator($current_time, (int) $item['itemDiscovery']['ts_delete']);
 		}
 	}
 

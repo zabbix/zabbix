@@ -1016,13 +1016,6 @@ footer {
     word-wrap: break-word; }
     .form-grid > label.fields-group-label {
       padding-top: 5px; }
-    .form-grid > label .zi-circle-question-filled,
-    .form-grid > label .zi-i {
-      margin-left: 5px; }
-      .form-grid > label .zi-circle-question-filled:before,
-      .form-grid > label .zi-i:before {
-        vertical-align: middle;
-        position: relative; }
   .form-grid > .form-field,
   .form-grid > .field-fluid,
   .form-grid .form-actions {
@@ -1056,7 +1049,10 @@ footer {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
     line-height: 1.4em; }
-  .form-grid .form-field .icon-info {
+  .form-grid .icon-help,
+  .form-grid .icon-info {
+    position: relative;
+    top: 1px;
     margin-left: 5px; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
@@ -2420,10 +2416,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
   border: 1px solid #dfe4e7; }
   .list-table .btn-icon::before {
     color: #768d99; }
-  .list-table a.zi-i:before,
-  .list-table a.zi-alert:before {
-    vertical-align: middle;
-    position: relative; }
   .list-table span.zi-calendar-warning {
     display: inline-block;
     width: 18px;
@@ -3129,8 +3121,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
     .radio-list-control input[type="radio"][disabled] + label {
       transition: none;
       cursor: default; }
-  .radio-list-control + .zi-i {
-    margin-left: 5px; }
 
 .range-control {
   position: relative;
@@ -4286,8 +4276,6 @@ form.is-loading {
       display: block;
       height: 24px;
       line-height: 24px; }
-      .table-forms .table-forms-td-left label .icon-info {
-        margin-left: 5px; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;
@@ -4311,8 +4299,6 @@ form.is-loading {
         word-wrap: break-word; }
       .table-forms .table-forms-td-right td:last-child {
         padding-right: 0; }
-      .table-forms .table-forms-td-right td .icon-info {
-        margin-left: 5px; }
       .table-forms .table-forms-td-right td.na-bg, .table-forms .table-forms-td-right td.normal-bg, .table-forms .table-forms-td-right td.info-bg, .table-forms .table-forms-td-right td.average-bg, .table-forms .table-forms-td-right td.warning-bg, .table-forms .table-forms-td-right td.high-bg, .table-forms .table-forms-td-right td.disaster-bg {
         padding-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
@@ -4328,6 +4314,11 @@ form.is-loading {
   .table-forms .dynamic-row-control > td {
     padding-top: 0;
     padding-bottom: 0; }
+  .table-forms .icon-help,
+  .table-forms .icon-info {
+    position: relative;
+    top: 1px;
+    margin-left: 5px; }
 
 .table-forms-separator {
   border: 1px solid #ebeef0;
@@ -4857,27 +4848,31 @@ z-select button.focusable, z-select a.focusable.btn-icon,
 .zi-tree-top-bottom::before {
   font-size: 12px; }
 
-.zi-i {
-  position: relative;
-  width: 8px;
-  height: 11px;
-  cursor: pointer;
-  margin: -12px 0 -4px; }
-  .zi-i:link, .zi-i:hover, .zi-i:focus {
-    border-bottom: 1px solid; }
-  .zi-i:focus {
-    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
-  .zi-i::before {
-    top: -3px;
-    left: -4px;
-    width: 14px;
-    height: 14px;
-    color: #ffffff;
-    font-size: 16px; }
-  .zi-i.status-red:link, .zi-i.status-red:hover, .zi-i.status-red:focus {
-    border-color: #d23d3d; }
-  .zi-i.status-yellow:link, .zi-i.status-yellow:hover, .zi-i.status-yellow:focus {
-    border-color: #e79e0b; }
+button.icon-help, a.icon-help.btn-icon, button.icon-info, a.icon-info.btn-icon {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  vertical-align: text-bottom; }
+button.icon-help, a.icon-help.btn-icon {
+  color: #768d99;
+  border: none;
+  background: transparent; }
+  button.icon-help:focus, a.icon-help.btn-icon:focus {
+    box-shadow: none; }
+    button.icon-help:focus::before, a.icon-help.btn-icon:focus::before {
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 2px rgba(30, 135, 227, 0.35); }
+button.icon-info::before, a.icon-info.btn-icon::before {
+  font-size: 12px; }
+button.icon-info.status-green:hover, a.icon-info.status-green.btn-icon:hover, .btn-split li .icon-info.status-green.zi-chevron-down[aria-expanded="true"], button.icon-info.status-green:focus, a.icon-info.status-green.btn-icon:focus {
+  border-color: #2f9f5e;
+  background-color: #34af67; }
+button.icon-info.status-yellow:hover, a.icon-info.status-yellow.btn-icon:hover, .btn-split li .icon-info.status-yellow.zi-chevron-down[aria-expanded="true"], button.icon-info.status-yellow:focus, a.icon-info.status-yellow.btn-icon:focus {
+  border-color: #e79e0b;
+  background-color: #f1a50b; }
+button.icon-info.status-red:hover, a.icon-info.status-red.btn-icon:hover, .btn-split li .icon-info.status-red.zi-chevron-down[aria-expanded="true"], button.icon-info.status-red:focus, a.icon-info.status-red.btn-icon:focus {
+  border-color: #d23d3d;
+  background-color: #d64e4e; }
 
 .setup-container {
   background-color: #ffffff;
@@ -5684,7 +5679,7 @@ a.link-action {
 .status-container .status-warning-bg,
 .status-container .status-average-bg,
 .status-container .status-high-bg,
-.status-container .status-disaster-bg, .status-green, .status-red, .status-grey, .status-dark-grey, .status-yellow, .status-disabled-bg {
+.status-container .status-disaster-bg {
   padding: 2px 3px 1px;
   font-size: 0.917em;
   text-align: center;
@@ -5697,7 +5692,7 @@ a.link-action {
   .status-container .status-warning-bg:not(:last-of-type),
   .status-container .status-average-bg:not(:last-of-type),
   .status-container .status-high-bg:not(:last-of-type),
-  .status-container .status-disaster-bg:not(:last-of-type), .status-green:not(:last-of-type), .status-red:not(:last-of-type), .status-grey:not(:last-of-type), .status-dark-grey:not(:last-of-type), .status-yellow:not(:last-of-type), .status-disabled-bg:not(:last-of-type) {
+  .status-container .status-disaster-bg:not(:last-of-type) {
     border-right: 0; }
 
 .status-container {
@@ -5723,10 +5718,20 @@ a.link-action {
     border: 1px solid rgba(31, 44, 51, 0.2);
     border-radius: 0; }
 
+.status-disabled-bg {
+  color: #acbbc2;
+  border: 1px solid rgba(31, 44, 51, 0.2);
+  background-color: #ebebeb; }
+
 .status-green {
   color: #ffffff;
   border: 1px solid #2f9f5e;
   background-color: #34af67; }
+
+.status-yellow {
+  color: #ffffff;
+  border: 1px solid #e79e0b;
+  background-color: #f1a50b; }
 
 .status-red {
   color: #ffffff;
@@ -5735,22 +5740,12 @@ a.link-action {
 
 .status-grey {
   color: #acbbc2;
-  background-color: #ebebeb;
-  border: 1px solid #ccd5d9; }
+  border: 1px solid #ccd5d9;
+  background-color: #ebebeb; }
 
 .status-dark-grey {
   border: 1px solid #80898d;
   background-color: #8a9397; }
-
-.status-yellow {
-  color: #ffffff;
-  border: 1px solid #e79e0b;
-  background-color: #f1a50b; }
-
-.status-disabled-bg {
-  color: #acbbc2;
-  background-color: #ebebeb;
-  border: 1px solid rgba(31, 44, 51, 0.2); }
 
 .tag, .btn-tag {
   display: inline-block;
@@ -6124,14 +6119,10 @@ tr.cursor-move td * {
   display: inline-block;
   min-width: 16px;
   white-space: nowrap; }
-  .rel-container .zi-i {
-    margin-right: 5px; }
-    .rel-container .zi-i:only-of-type {
-      margin-right: 0; }
-    .rel-container .zi-i:last-child {
-      margin-right: 0; }
-    .rel-container .zi-i.status-green {
-      border-right: 1px solid #2f9f5e; }
+  .rel-container .icon-info {
+    margin-left: 5px; }
+    .rel-container .icon-info:first-of-type {
+      margin-left: 0; }
 
 main .server-name {
   float: right;
@@ -6551,17 +6542,6 @@ a.icon-count {
 
 ::placeholder {
   color: #9d9d9d; }
-
-.zi-circle-question-filled {
-  margin-left: 5px; }
-  .zi-circle-question-filled::before {
-    top: -2px;
-    color: #768d99; }
-  .zi-circle-question-filled:focus, .zi-circle-question-filled:hover, .zi-circle-question-filled:active {
-    border: none; }
-  .zi-circle-question-filled:focus::before {
-    border-radius: 50%;
-    box-shadow: inset 0 0 0 2px rgba(30, 135, 227, 0.35); }
 
 #expressions_list .ui-sortable-helper {
   display: table; }

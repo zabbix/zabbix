@@ -945,10 +945,6 @@ form {
 			display: block;
 			height: 24px;
 			line-height: 24px;
-
-			.icon-info {
-				margin-left: 5px;
-			}
 		}
 	}
 
@@ -985,10 +981,6 @@ form {
 
 			&:last-child {
 				padding-right: 0;
-			}
-
-			.icon-info {
-				margin-left: 5px;
 			}
 
 			&.na-bg,
@@ -1030,6 +1022,13 @@ form {
 	.dynamic-row-control > td {
 		padding-top: 0;
 		padding-bottom: 0;
+	}
+
+	.icon-help,
+	.icon-info {
+		position: relative;
+		top: 1px;
+		margin-left: 5px;
 	}
 }
 
@@ -2017,45 +2016,57 @@ select {
 	}
 }
 
-.zi-i {
-	position: relative;
-	width: 8px;
-	height: 11px;
-	cursor: pointer;
-	margin: -12px 0 -4px;
-
-	&:link,
-	&:hover,
-	&:focus {
-		border-bottom: 1px solid;
+button {
+	&.icon-help,
+	&.icon-info {
+		width: 16px;
+		height: 16px;
+		min-height: 16px;
+		vertical-align: text-bottom;
 	}
 
-	&:focus {
-		box-shadow: 0 0 0 2px $btn-border-focus-color;
-	}
+	&.icon-help {
+		color: $icon-help-hint-color;
+		border: none;
+		background: transparent;
 
-	&::before {
-		top: -3px;
-		left: -4px;
-		width: 14px;
-		height: 14px;
-		color: $white;
-		font-size: 16px;
-	}
-
-	&.status-red {
-		&:link,
-		&:hover,
 		&:focus {
-			border-color: darken(desaturate($alt-red, 10%), 9%);
+			box-shadow: none;
+
+			&::before {
+				border-radius: 50%;
+				box-shadow: inset 0 0 0 2px $btn-border-focus-color;
+			}
 		}
 	}
 
-	&.status-yellow {
-		&:link,
-		&:hover,
-		&:focus {
-			border-color: darken(desaturate($alt-yellow, 9%), 20%);
+	&.icon-info {
+		&::before {
+			font-size: $btn-icon-small-size;
+		}
+
+		&.status-green {
+			&:hover,
+			&:focus {
+				border-color: $status-green-border-color;
+				background-color: $status-green-bg-color;
+			}
+		}
+
+		&.status-yellow {
+			&:hover,
+			&:focus {
+				border-color: $status-yellow-border-color;
+				background-color: $status-yellow-bg-color;
+			}
+		}
+
+		&.status-red {
+			&:hover,
+			&:focus {
+				border-color: $status-red-border-color;
+				background-color: $status-red-bg-color;
+			}
 		}
 	}
 }
@@ -3365,45 +3376,52 @@ a.link-action {
 	}
 }
 
+.status-disabled-bg {
+	color: $form-disabled-font-color;
+	border: 1px solid rgba($font-color, .2);
+	background-color: $form-disabled-bg-color;
+	// TODO check
+	//@extend %status;
+}
+
 .status-green {
 	color: $white;
-	border: 1px solid darken(desaturate($alt-green, 10%), 20%);
-	background-color: darken(desaturate($alt-green, 10%), 16%);
-	@extend %status;
-}
-
-.status-red {
-	color: $white;
-	border: 1px solid darken(desaturate($alt-red, 10%), 9%);
-	background-color: darken(desaturate($alt-red, 10%), 5%);
-	@extend %status;
-}
-
-.status-grey {
-	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color;
-	border: 1px solid $form-disabled-border-color;
-	@extend %status;
-}
-
-.status-dark-grey {
-	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
-	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
-	@extend %status;
+	border: 1px solid $status-green-border-color;
+	background-color: $status-green-bg-color;
+	// TODO check
+	//@extend %status;
 }
 
 .status-yellow {
 	color: $white;
-	border: 1px solid darken(desaturate($alt-yellow, 9%), 20%);
-	background-color: darken(desaturate($alt-yellow, 9%), 18%);
-	@extend %status;
+	border: 1px solid $status-yellow-border-color;
+	background-color: $status-yellow-bg-color;
+	// TODO check
+	//@extend %status;
 }
 
-.status-disabled-bg {
+.status-red {
+	color: $status-color;
+	border: 1px solid $status-red-border-color;
+	background-color: $status-red-bg-color;
+
+	// TODO check
+	//@extend %status;
+}
+
+.status-grey {
 	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color;
-	border: 1px solid rgba($font-color, .2);
-	@extend %status;
+	border: 1px solid $status-grey-border-color;
+	background-color: $status-grey-bg-color;
+	// TODO check
+	//@extend %status;
+}
+
+.status-dark-grey {
+	border: 1px solid $status-dark-grey-border-color;
+	background-color: $status-dark-grey-bg-color;
+	// TODO check
+	//@extend %status;
 }
 
 .tag {
@@ -3858,18 +3876,11 @@ tr.cursor-move {
 	min-width: 16px;
 	white-space: nowrap;
 
-	.zi-i {
-		margin-right: 5px;
+	.icon-info {
+		margin-left: 5px;
 
-		&:only-of-type {
-			margin-right: 0;
-		}
-
-		&:last-child {
-			margin-right: 0;
-		}
-		&.status-green {
-			border-right: 1px solid darken(desaturate($alt-green, 10%), 20%);
+		&:first-of-type {
+			margin-left: 0;
 		}
 	}
 }
@@ -4468,27 +4479,6 @@ a.icon-count {
 
 ::placeholder {
 	color: $input-placeholder-color;
-}
-
-.zi-circle-question-filled {
-	margin-left: 5px;
-
-	&::before {
-		top: -2px;
-		color: $icon-help-hint-color;
-	}
-	&:focus,
-	&:hover,
-	&:active {
-		border: none;
-	}
-
-	&:focus {
-		&::before {
-			border-radius: 50%;
-			box-shadow: inset 0 0 0 2px $btn-border-focus-color;
-		}
-	}
 }
 
 #expressions_list .ui-sortable-helper {
