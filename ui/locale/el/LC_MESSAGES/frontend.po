@@ -10712,6 +10712,10 @@ msgstr ""
 msgid "LLD macros"
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:709
+msgid "LLD rule with the same UUID already exists"
+msgstr ""
+
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:57
 #: app/views/popup.lldoverride.php:101 include/maps.inc.php:45
@@ -21651,6 +21655,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "καθολικές ρυθμίσεις τακτοποίησης"
 
+#: include/classes/api/services/CGraphGeneral.php:836
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:830
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
 msgid "h"
@@ -21670,6 +21682,10 @@ msgstr "ξενιστής"
 #: include/classes/api/services/CMap.php:1317
 msgid "host group"
 msgstr "ομάδα ξενιστή"
+
+#: include/classes/api/services/CHostGroup.php:819
+msgid "host group with the same UUID already exists"
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
@@ -21892,6 +21908,14 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:819
 #: include/classes/widgets/CWidgetHelper.php:1175
 msgid "item pattern"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:715
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:703
+msgid "item with the same UUID already exists"
 msgstr ""
 
 #: include/classes/parsers/CItemKey.php:54
@@ -22482,6 +22506,10 @@ msgstr ""
 msgid "service"
 msgstr ""
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr "σύντομη περιγραφή"
@@ -22605,6 +22633,14 @@ msgstr ""
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "το ID σχεδιότυπου \"%1$s\" πέρασε %2$s φορές"
 
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:449
+msgid "template with the same UUID already exists"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
 msgstr ""
@@ -22723,8 +22759,16 @@ msgstr ""
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr ""
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1889
 msgid "trigger with linkages cannot be moved to another template or host"
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
@@ -22950,6 +22994,10 @@ msgstr ""
 msgid "value is too long"
 msgstr ""
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -23051,6 +23099,10 @@ msgstr "μέσω"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
+msgstr ""
+
+#: include/classes/api/services/CHttpTest.php:438
+msgid "web scenario with the same UUID already exists"
 msgstr ""
 
 #: include/classes/api/services/CTask.php:443
