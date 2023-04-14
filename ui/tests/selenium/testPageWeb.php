@@ -170,9 +170,9 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks the layout of Web page.
 	 */
-	public function testPageWeb_CheckLayout() {
+	public function testPageWeb_Layout() {
 		// Logins directly into required page.
-		$this->page->login()->open('zabbix.php?action=web.view');
+		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -216,75 +216,76 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks if button "Reset" works properly.
 	 */
-	public function testPageWeb_ResetButtonCheck() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1');
+	public function testPageWeb_ResetButton() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$this->page->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
 
-		// Check table contents before filtering.
-		$start_rows_count = $table->getRows()->count();
-		$this->assertTableStats($start_rows_count);
-		$start_contents = $this->getTableResult('Name');
+		$empty_form = [
+			'Host groups' => '',
+			'Hosts' => '',
+			'id:filter_tags_0_tag' => '',
+			'id:filter_tags_0_value' => ''
+		];
 
-		// Filter hosts.
-		$form->fill(['Hosts' => 'Simple form test host']);
-		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
+		$filled_form = [
+			'Host groups' => 'WebData HostGroup',
+			'Hosts' => 'WebData Host',
+			'id:filter_tags_0_tag' => 'FirstTag',
+			'id:filter_tags_0_value' => 'value 1'
+		];
 
-		// Check that filtered count matches expected.
-		$this->assertEquals(4, $table->getRows()->count());
-		$this->assertTableStats(4);
+		// Check reset button with/without filter submit.
+		foreach ([true, false] as $submit) {
+			$this->assertTableStats(13);
+			$form->checkValue($empty_form);
+			$form->fill($filled_form);
 
-		// After pressing reset button, check that previous hosts are displayed again.
-		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
-		$reset_rows_count = $table->getRows()->count();
-		$this->assertEquals($start_rows_count, $reset_rows_count);
-		$this->assertTableStats($reset_rows_count);
-		$this->assertEquals($start_contents, $this->getTableResult('Name'));
+			if ($submit) {
+				$form->submit();
+				$this->page->waitUntilReady();
+				$this->assertEquals(1, $this->query('class:list-table')->asTable()->one()->getRows()->count());
+				$this->assertTableStats(1);
+			}
+
+			$form->invalidate()->checkValue($filled_form);
+			$form->query('button:Reset')->one()->click();
+			$this->page->waitUntilReady();
+			$form->invalidate()->checkValue($empty_form);
+			$this->assertTableStats(13);
+		}
 	}
 
 	/**
 	 * Function which checks Hosts context menu.
 	 */
-	public function testPageWeb_CheckHostContextMenu() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
-
+	public function testPageWeb_HostContextMenu() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC')->waitUntilReady();
 		$titles = [
 			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Web', 'Configuration', 'Detect operating system',
-			'Ping', 'Traceroute'
+					'Ping', 'Traceroute'
 		];
 
 		foreach (['WebData Host', 'Simple form test host'] as $name) {
-			if ($name === 'WebData Host') {
-				$this->query('class:list-table')->asTable()->one()->findRow('Host', $name)->query('link', $name)->one()->click();
-				$this->page->waitUntilReady();
-				$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-				$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
-				$this->assertTrue($popup->hasItems($titles));
+			$this->query('class:list-table')->asTable()->one()
+					->findRow('Host', $name)->query('link', $name)->one()->click();
+			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+			$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+			$this->assertTrue($popup->hasItems($titles));
+			$items = ($name === 'WebData Host') ? ['Graphs', 'Dashboards'] : ['Dashboards'];
 
-				foreach (['Graphs', 'Dashboards'] as $disabled) {
-					$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
-							$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent());
-				}
-				$popup->close();
+			// Check that items are disabled.
+			foreach ($items as $item) {
+				$this->assertFalse($popup->getItem($item)->isEnabled());
 			}
-			else {
-				$this->query('class:list-table')->asTable()->one()->findRow('Host', $name)->query('link', $name)->one()->click();
-				$this->page->waitUntilReady();
-				$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-				$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
-				$this->assertTrue($popup->hasItems($titles));
-				$this->assertTrue($popup->query('xpath://a[@aria-label="Host, Dashboards" and @class="menu-popup-item disabled"]')->one()->isPresent());
-			}
+
+			$popup->close();
 		}
 	}
 
 	/**
 	 * Function which checks if disabled web services aren't displayed.
 	 */
-	public function testPageWeb_CheckDisabledWebServices() {
+	public function testPageWeb_DisabledWebServices() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$values = $this->getTableResult('Name');
 
@@ -296,13 +297,14 @@ class testPageWeb extends CWebTest {
 			$this->page->acceptAlert();
 			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 			$changed = ($status === 'Disable') ? array_diff($values, ['Web scenario 1 step', 'Web scenario 2 step',
-				'Web scenario 3 step']) : $values;
+					'Web scenario 3 step']) : $values;
 			$this->assertTableDataColumn($changed);
 		}
 	}
 
 	public static function getTagsFilterData() {
 		return [
+			// #0.
 			[
 				[
 					'tag_options' => [
@@ -316,6 +318,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'tag_options' => [
@@ -327,11 +330,13 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'Name' => [
-						'Web scenario 1 step',
-						'Web scenario 3 step'
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'Web scenario 1 step'
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'tag_options' => [
@@ -345,6 +350,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'tag_options' => [
@@ -358,6 +364,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'tag_options' => [
@@ -372,6 +379,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'tag_options' => [
@@ -382,11 +390,12 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'Name' => [
-						'Web scenario 2 step',
-						'Web scenario 3 step'
+						'Web scenario 3 step',
+						'Web scenario 2 step'
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'tag_options' => [
@@ -396,21 +405,22 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'Name' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
-						'testInheritanceWeb1',
-						'testInheritanceWeb2',
-						'testInheritanceWeb3',
-						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
-						'Web ZBX6663',
 						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 2 step',
+						'Web scenario 1 step',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'tag_options' => [
@@ -420,21 +430,22 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'Name' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
-						'testInheritanceWeb1',
-						'testInheritanceWeb2',
-						'testInheritanceWeb3',
-						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
-						'Web ZBX6663',
 						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 2 step',
+						'Web scenario 1 step',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'tag_options' => [
@@ -445,21 +456,22 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'Name' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
-						'testInheritanceWeb1',
-						'testInheritanceWeb2',
-						'testInheritanceWeb3',
-						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
-						'Web ZBX6663',
 						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 2 step',
+						'Web scenario 1 step',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'tag_options' => [
@@ -470,21 +482,22 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'Name' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
-						'testInheritanceWeb1',
-						'testInheritanceWeb2',
-						'testInheritanceWeb3',
-						'testInheritanceWeb4',
-						'Web scenario 1 step',
-						'Web scenario 2 step',
-						'Web ZBX6663',
 						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 2 step',
+						'Web scenario 1 step',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'tag_options' => [
@@ -494,21 +507,22 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'Name' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
-						'testInheritanceWeb1',
-						'testInheritanceWeb2',
-						'testInheritanceWeb3',
-						'testInheritanceWeb4',
-						'Web scenario 2 step',
-						'Web scenario 3 step',
-						'Web ZBX6663',
 						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'tag_options' => [
@@ -519,19 +533,36 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'Name' => [
-						'testFormWeb1',
-						'testFormWeb2',
-						'testFormWeb3',
-						'testFormWeb4',
-						'testInheritanceWeb1',
-						'testInheritanceWeb2',
-						'testInheritanceWeb3',
-						'testInheritanceWeb4',
-						'Web scenario 2 step',
-						'Web scenario 3 step',
-						'Web ZBX6663',
 						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
+				]
+			],
+			// #12.
+			[
+				[
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FirstTag', 'operator' => 'Exists'],
+							['name' => 'SecondTag', 'value' => 'value 2', 'operator' => 'Equals'],
+							['name' => 'ThirdTag', 'value' => 'value 3', 'operator' => 'Contains'],
+							['name' => 'FourthTag', 'operator' => 'Does not exist'],
+							['name' => 'FifthTag', 'value' => 'value 6', 'operator' => 'Does not equal'],
+							['name' => 'SixthTag', 'value' => 'value 7', 'operator' => 'Does not contain']
+						]
+					],
+					'Name' => []
 				]
 			]
 		];
@@ -542,52 +573,63 @@ class testPageWeb extends CWebTest {
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageWeb_TagsFilter($data) {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->query('class:list-table')->waitUntilPresent()->one();
 		$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
 		$this->setTagSelector('id:filter-tags');
 		$this->setTags($data['tag_options']['tags']);
-		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
-		$this->assertTableHasDataColumn(CTestArrayHelper::get($data, 'Name', []));
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'Name', []));
 		$this->query('button:Reset')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
 	}
 
 	/**
 	 * Function which checks number of steps for web services displayed.
 	 */
-	public function testPageWeb_CheckWebServiceNumberOfSteps() {
+	public function testPageWeb_WebServiceNumberOfSteps() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
+		$sql = 'SELECT * FROM httptest, hosts, httpstep WHERE httptest.hostid = hosts.hostid'.
+			' AND hosts.hostid ='.self::$hostid['WebData Host'].
+			' AND httptest.httptestid = httpstep.httptestid'.
+			' AND httptest.httptestid ='.self::$httptestid['Web scenario 3 step'];
+
+		// Check if steps in DB are equal to the frontend amount of steps.
 		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
+		$this->assertEquals($row->getColumn('Number of steps')->getText(), CDBHelper::getCount($sql));
 
-		// Directly open API created Web scenario and add one more step.
-		$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
-			self::$httptestid['Web scenario 3 step'])->waitUntilReady();
-		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
-		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
-		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $this->query('id:http_step')->asForm()->one();
-		$form->fill(['Name' => 'Step number 4']);
-		$form->query('id:url')->one()->fill('test.com');
-		$form->submit();
-		COverlayDialogElement::find()->one()->waitUntilNotVisible();
-		$this->query('button:Update')->one()->click();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
+		// Directly open API created Web scenario and add/remove one step.
+		foreach (['Add' => '4', 'Remove' => '3'] as $action => $count) {
+			$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
+					self::$httptestid['Web scenario 3 step'])->waitUntilReady();
+			$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
+			$this->query('id:stepTab')->asTable()->one()->query('xpath:.//button[text()=' .
+				CXPathHelper::escapeQuotes($action) . ']')->one()->click();
 
-		// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
-		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$this->assertEquals('4', $row->getColumn('Number of steps')->getText());
+			if ($action === 'Add') {
+				COverlayDialogElement::find()->one()->waitUntilReady();
+				$this->query('id:http_step')->asForm()->one()
+					->fill(['Name' => 'Step number 4', 'id:url' => 'test.com'])->submit();
+				COverlayDialogElement::find()->one()->waitUntilNotVisible();
+			}
+
+			$this->query('button:Update')->one()->waitUntilClickable()->click();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Web scenario updated');
+
+			// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
+			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+			$this->assertEquals($count, $row->getColumn('Number of steps')->getText());
+			$this->assertEquals($row->getColumn('Number of steps')->getText(), CDBHelper::getCount($sql));
+		}
 	}
 
 	/**
-	 * Function which checks sorting by Name column.
+	 * Function which checks sorting by Name/Host column.
 	 */
-	public function testPageWeb_CheckSorting() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC');
+	public function testPageWeb_Sorting() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		foreach (['Host', 'Name'] as $column_name) {
@@ -607,7 +649,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks that title field disappears while Kioskmode is active.
 	 */
-	public function testPageWeb_CheckKioskMode() {
+	public function testPageWeb_KioskMode() {
 		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 
 		// Check title, filter and table display after pressing Kiosk mode/Normal view.
@@ -632,8 +674,8 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks links to "Details of Web scenario".
 	 */
-	public function testPageWeb_CheckLinks() {
-		$this->page->login()->open('zabbix.php?action=web.view');
+	public function testPageWeb_Links() {
+		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', 'testFormWeb1')
 				->query('link', 'testFormWeb1')->one()->click();
 		$this->page->waitUntilReady();
@@ -641,8 +683,9 @@ class testPageWeb extends CWebTest {
 		$this->page->assertTitle('Details of web scenario');
 	}
 
-	public static function getCheckFilterData() {
+	public static function getFilterData() {
 		return [
+			// #0.
 			[
 				[
 					'filter' => [
@@ -662,6 +705,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'filter' => [
@@ -675,6 +719,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'filter' => [
@@ -687,6 +732,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'filter' => [
@@ -706,6 +752,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'filter' => [
@@ -729,6 +776,7 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'filter' => [
@@ -754,10 +802,10 @@ class testPageWeb extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCheckFilterData
+	 * @dataProvider getFilterData
 	 */
-	public function testPageWeb_CheckFilter($data) {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+	public function testPageWeb_Filter($data) {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill($data['filter'])->submit();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn($data['expected']);
