@@ -142,6 +142,10 @@ function BULLET() {
 	return new CHtmlEntity('&bullet;');
 }
 
+function COPYR() {
+	return new CHtmlEntity('&copy;');
+}
+
 function HELLIP() {
 	return new CHtmlEntity('&hellip;');
 }
