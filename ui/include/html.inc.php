@@ -166,6 +166,10 @@ function RARR() {
 	return new CHtmlEntity('&rArr;');
 }
 
+function ZWSPACE() {
+	return new CHtmlEntity('&#8203;');
+}
+
 function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favourite':
