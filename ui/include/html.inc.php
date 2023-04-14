@@ -146,6 +146,10 @@ function HELLIP() {
 	return new CHtmlEntity('&hellip;');
 }
 
+function LARR() {
+	return new CHtmlEntity('&lArr;');
+}
+
 function NBSP() {
 	return new CHtmlEntity('&nbsp;');
 }
