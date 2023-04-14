@@ -351,7 +351,7 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
 		$description = [_('Value of tag')];
 		$description[] = ' ';
-		$description[] = italic(CHtml::encode($value2));
+		$description[] = italic($value2);
 		$description[] = ' ';
 	}
 	elseif ($condition_type == CONDITION_TYPE_SUPPRESSED) {
@@ -369,7 +369,7 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 
 	$description[] = condition_operator2str($operator);
 	$description[] = ' ';
-	$description[] = italic(CHtml::encode($value));
+	$description[] = italic($value);
 
 	return $description;
 }

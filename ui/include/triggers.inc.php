@@ -2217,10 +2217,10 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 					->setArgument('context', 'template');
 			}
 
-			$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
+			$name = (new CLink($template['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
-			$name = new CSpan(CHtml::encode($template['name']));
+			$name = new CSpan($template['name']);
 		}
 
 		$list[] = $name->addClass(ZBX_STYLE_GREY);
@@ -2279,10 +2279,10 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 						->setArgument('context', 'template');
 				}
 
-				$name = new CLink(CHtml::encode($template['name']), $url);
+				$name = new CLink($template['name'], $url);
 			}
 			else {
-				$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+				$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 			}
 
 			$list_item[] = $name;

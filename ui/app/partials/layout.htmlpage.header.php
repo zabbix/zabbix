@@ -57,7 +57,7 @@ $show_gui_messaging = (!defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] 
 $tz_offsets = array_column((new DateTime())->getTimezone()->getTransitions(0, ZBX_MAX_DATE), 'offset', 'ts');
 
 $pageHeader
-	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
+	->addCssFile('assets/styles/'.$theme.'.css')
 	->addJsBeforeScripts('
 		const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
 		const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
