@@ -24,6 +24,29 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 class testPageAdministrationGeneralRegexp extends CWebTest {
 
 	use TableTrait;
+	private $sqlHashRegexps = '';
+	private $oldHashRegexps = '';
+	private $sqlHashExpressions = '';
+	private $oldHashExpressions = '';
+
+	private function calculateHash($conditions = null) {
+		$this->sqlHashRegexps =
+			'SELECT * FROM regexps'.
+			($conditions ? ' WHERE '.$conditions : '').
+			' ORDER BY regexpid';
+		$this->oldHashRegexps = CDBHelper::getHash($this->sqlHashRegexps);
+
+		$this->sqlHashExpressions =
+			'SELECT * FROM expressions'.
+			($conditions ? ' WHERE '.$conditions : '').
+			' ORDER BY expressionid';
+		$this->oldHashExpressions = CDBHelper::getHash($this->sqlHashExpressions);
+	}
+
+	private function verifyHash() {
+		$this->assertEquals($this->oldHashRegexps, CDBHelper::getHash($this->sqlHashRegexps));
+		$this->assertEquals($this->oldHashExpressions, CDBHelper::getHash($this->sqlHashExpressions));
+	}
 
 	/**
 	 * Test the layout for the Regular expressions page.
@@ -56,4 +79,23 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
 	}
 
+	/**
+	 * Test mass delete and cancel.
+	 */
+	public function testPageAdministrationGeneralRegexp_MassDeleteAllCancel() {
+
+		$this->calculateHash();
+
+		$this->page->login()->open('zabbix.php?action=regex.list');
+		$this->query('name:all-regexes')->one()->click();
+		$this->query('button:Delete')->one()->click();
+		$this->page->dismissAlert();
+		$this->page->assertTitle('Configuration of regular expressions');
+
+		// Make sure nothing has been deleted.
+		$this->assertFalse($this->query('xpath://*[text()="Regular expression deleted"]')->exists());
+		$this->assertFalse($this->query('xpath://*[text()="Regular expressions deleted"]')->exists());
+		$this->verifyHash();
+
+	}
 }
