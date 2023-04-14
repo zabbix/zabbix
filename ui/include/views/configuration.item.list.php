@@ -90,7 +90,7 @@ foreach ($data['items'] as $item) {
 	$description[] = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL);
 
 	if (!empty($item['discoveryRule'])) {
-		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
+		$description[] = (new CLink($item['discoveryRule']['name'],
 			(new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
@@ -100,10 +100,10 @@ foreach ($data['items'] as $item) {
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($item['master_item']['name_expanded']);
+			$description[] = $item['master_item']['name_expanded'];
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
+			$description[] = (new CLink($item['master_item']['name_expanded'],
 				'?form=update&hostid='.$item['hostid'].'&itemid='.$item['master_item']['itemid']
 			))
 				->addClass(ZBX_STYLE_LINK_ALT)
@@ -113,7 +113,7 @@ foreach ($data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($item['name_expanded']),
+	$description[] = new CLink($item['name_expanded'],
 		'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
 	);
 
@@ -154,11 +154,11 @@ foreach ($data['items'] as $item) {
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
+			$trigger_description[] = new CSpan($trigger['description']);
 		}
 		else {
 			$trigger_description[] = new CLink(
-				CHtml::encode($trigger['description']),
+				$trigger['description'],
 				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
 			);
 		}
@@ -226,12 +226,12 @@ foreach ($data['items'] as $item) {
 		($data['hostid'] == 0) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
-		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		CHtml::encode($item['applications_list']),
+		$item['applications_list'],
 		$status,
 		makeInformationList($info_icons)
 	]);

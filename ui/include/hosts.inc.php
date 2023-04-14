@@ -682,14 +682,14 @@ function makeApplicationTemplatePrefix($applicationid, array $parent_templates) 
 
 	foreach ($templates as $template) {
 		if ($template['permission'] == PERM_READ_WRITE) {
-			$name = (new CLink(CHtml::encode($template['name']),
+			$name = (new CLink($template['name'],
 				(new CUrl('applications.php'))
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['hostid']])
 			))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
-			$name = new CSpan(CHtml::encode($template['name']));
+			$name = new CSpan($template['name']);
 		}
 
 		$list[] = $name->addClass(ZBX_STYLE_GREY);
@@ -828,13 +828,13 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 	$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
 
 	if ($template['permission'] == PERM_READ_WRITE) {
-		$name = (new CLink(CHtml::encode($template['name']),
+		$name = (new CLink($template['name'],
 			(new CUrl('host_prototypes.php'))
 				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
-		$name = new CSpan(CHtml::encode($template['name']));
+		$name = new CSpan($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -855,7 +855,7 @@ function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templat
 		$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
 
 		if ($template['permission'] == PERM_READ_WRITE) {
-			$name = new CLink(CHtml::encode($template['name']),
+			$name = new CLink($template['name'],
 				(new CUrl('host_prototypes.php'))
 					->setArgument('form', 'update')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
@@ -863,7 +863,7 @@ function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templat
 			);
 		}
 		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 		}
 
 		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);

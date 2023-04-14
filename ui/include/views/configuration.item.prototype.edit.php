@@ -689,7 +689,7 @@ $form_list
 $application_list_box = new CListBox('applications[]', $data['applications'], 6);
 $application_list_box->addItem(0, '-'._('None').'-');
 foreach ($data['db_applications'] as $application) {
-	$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
+	$application_list_box->addItem($application['applicationid'], $application['name']);
 }
 $form_list
 	->addRow(_('Applications'), $application_list_box)

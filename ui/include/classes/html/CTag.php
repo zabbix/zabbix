@@ -119,7 +119,7 @@ class CTag extends CObject {
 			$value = unpack_object($value);
 		}
 		elseif (is_array($value)) {
-			$value = CHtml::serialize($value);
+			$value = json_encode($value);
 		}
 		$this->attributes[$name] = $value;
 		return $this;

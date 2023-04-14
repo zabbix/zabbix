@@ -195,39 +195,39 @@ function getCorrConditionDescription(array $condition, array $values) {
 	switch ($condition['type']) {
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 			$description[] = _('Old event tag name').' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['tag']));
+			$description[] = italic($values['tag']);
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 			$description[] = _('New event tag name').' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['tag']));
+			$description[] = italic($values['tag']);
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 			$description[] = _('New event host group').' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['group']));
+			$description[] = italic($values['group']);
 			break;
 
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 			$description[] = _('Value of old event tag').' ';
-			$description[] = italic(CHtml::encode($values['oldtag']));
+			$description[] = italic($values['oldtag']);
 			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' '.
 				_('value of new event tag').' ';
-			$description[] = italic(CHtml::encode($values['newtag']));
+			$description[] = italic($values['newtag']);
 			break;
 
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 			$description[] = _('Value of old event tag').' ';
-			$description[] = italic(CHtml::encode($values['tag']));
+			$description[] = italic($values['tag']);
 			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['value']));
+			$description[] = italic($values['value']);
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 			$description[] = _('Value of new event tag').' ';
-			$description[] = italic(CHtml::encode($values['tag']));
+			$description[] = italic($values['tag']);
 			$description[] = ' '.corrConditionOperatorToString($condition['operator']).' ';
-			$description[] = italic(CHtml::encode($values['value']));
+			$description[] = italic($values['value']);
 			break;
 	}
 

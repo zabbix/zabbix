@@ -59,9 +59,9 @@ function make_decoration($haystack, $needle, $class = null) {
 	$pos = mb_strpos($tmpHaystack, $tmpNeedle);
 
 	if ($pos !== false) {
-		$start = CHtml::encode(mb_substr($haystack, 0, $pos));
-		$end = CHtml::encode(mb_substr($haystack, $pos + mb_strlen($needle)));
-		$found = CHtml::encode(mb_substr($haystack, $pos, mb_strlen($needle)));
+		$start = mb_substr($haystack, 0, $pos);
+		$end = mb_substr($haystack, $pos + mb_strlen($needle));
+		$found = mb_substr($haystack, $pos, mb_strlen($needle));
 
 		if (is_null($class)) {
 			$result = [$start, bold($found), $end];
@@ -338,7 +338,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
+		$host = new CSpan(new CLink($db_host['name'],
 			'hosts.php?form=update&hostid='.$db_host['hostid']
 		));
 
@@ -466,7 +466,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	else {
 		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
-				CHtml::encode($db_discovery_rule['name']),
+				$db_discovery_rule['name'],
 				'host_discovery.php?form=update&itemid='.$db_discovery_rule['itemid']
 			)
 		);

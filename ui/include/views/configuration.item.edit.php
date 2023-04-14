@@ -789,7 +789,7 @@ if ($discovered_item) {
 
 	$application_list_box = new CListBox('applications_names[]', $data['applications'], 6);
 	foreach ($data['db_applications'] as $application) {
-		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
+		$application_list_box->addItem($application['applicationid'], $application['name']);
 	}
 	$application_list_box->setEnabled(!$discovered_item);
 }
@@ -801,7 +801,7 @@ else {
 	$application_list_box = new CListBox('applications[]', $data['applications'], 6);
 	$application_list_box->addItem(0, '-'._('None').'-');
 	foreach ($data['db_applications'] as $application) {
-		$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
+		$application_list_box->addItem($application['applicationid'], $application['name']);
 	}
 }
 
