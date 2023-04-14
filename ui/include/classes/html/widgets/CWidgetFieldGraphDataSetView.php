@@ -68,7 +68,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 				]))
 					->setId('dataset-add')
 					->addClass(ZBX_STYLE_BTN_ALT),
-				(new CButton(null, '&#8203;'))
+				(new CButton(null, ZWSPACE()))
 					->setId('dataset-menu')
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
