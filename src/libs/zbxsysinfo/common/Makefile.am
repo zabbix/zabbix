@@ -2,8 +2,8 @@
 
 noinst_LIBRARIES = libcommonsysinfo.a libcommonsysinfo_http.a libcommonsysinfo_httpmetrics.a
 
+#	-I@top_srcdir@/src/zabbix_agent/
 libcommonsysinfo_a_CFLAGS = \
-	-I@top_srcdir@/src/zabbix_agent/ \
 	$(TLS_CFLAGS)
 
 libcommonsysinfo_a_SOURCES = \

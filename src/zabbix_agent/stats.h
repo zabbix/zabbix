@@ -27,7 +27,7 @@
 #	include "zbxnix.h"
 #endif
 
-#include "cpustat.h"
+#include "cpustat/cpustat.h"
 
 #ifdef _AIX
 #	include "vmstats.h"

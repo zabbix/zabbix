@@ -21,7 +21,7 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "cpustat.h"
+#include "../../../zabbix_agent/cpustat/cpustat.h"
 #include "module.h"
 
 static const char	*get_cpu_status_string(int status)
