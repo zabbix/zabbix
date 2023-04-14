@@ -1793,7 +1793,7 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
 	}
 
 	if ('\0' != *pattern->data.str)
-		zbx_variant_set_str(&value, string_replace(arg->data.str, pattern->data.str, replacement->data.str));
+		zbx_variant_set_str(&value, zbx_string_replace(arg->data.str, pattern->data.str, replacement->data.str));
 	else
 		zbx_variant_copy(&value, arg);
 
