@@ -46,17 +46,7 @@ class CControllerDiscoveryDisable extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)) {
-			return false;
-		}
-
-		$drules = API::DRule()->get([
-			'druleids' => $this->getInput('druleids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($drules == count($this->getInput('druleids')));
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
 	protected function doAction() {
@@ -70,10 +60,11 @@ class CControllerDiscoveryDisable extends CController {
 		}
 
 		$result = API::DRule()->update($drules);
+
+		$output = [];
 		$updated = count($drules);
 
 		if ($result) {
-
 			$output['success']['title'] = _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
 
 			if ($messages = get_and_clear_messages()) {

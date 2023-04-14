@@ -46,25 +46,15 @@ class CControllerDiscoveryDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)) {
-			return false;
-		}
-
-		$drules = API::DRule()->get([
-			'druleids' => $this->getInput('druleids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($drules == count($this->getInput('druleids')));
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
 	protected function doAction() {
 		$druleids = $this->getInput('druleids');
+		$deleted = count($druleids);
+		$output = [];
 
 		$result = API::DRule()->delete($druleids);
-
-		$deleted = count($druleids);
 
 		if ($result) {
 			$output['success']['title'] = _n('Discovery rule deleted', 'Discovery rules deleted', $deleted);

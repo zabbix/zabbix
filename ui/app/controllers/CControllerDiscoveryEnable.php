@@ -46,17 +46,7 @@ class CControllerDiscoveryEnable extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)) {
-			return false;
-		}
-
-		$drules = API::DRule()->get([
-			'druleids' => $this->getInput('druleids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($drules == count($this->getInput('druleids')));
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
 	protected function doAction() {
