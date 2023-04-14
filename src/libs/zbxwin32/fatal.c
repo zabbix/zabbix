@@ -106,19 +106,19 @@ static void	print_backtrace(CONTEXT *pctx)
 	SymGetLineFromAddrW64_func_t	zbx_SymGetLineFromAddrW64 = NULL;
 	SymFromAddr_func_t		zbx_SymFromAddr	= NULL;
 
-	CONTEXT			ctx, ctxcount;
-	STACKFRAME64		s, scount;
-	PSYMBOL_INFO		pSym = NULL;
-	HMODULE			hModule;
-	HANDLE			hProcess, hThread;
-	DWORD64			offset;
-	wchar_t			szProcessName[MAX_PATH];
-	char			*process_name = NULL, *process_path = NULL, *frame = NULL;
-	size_t			frame_alloc = 0, frame_offset;
-	int			nframes = 0;
-	char	*file_name;
-	char	path[MAX_PATH];
-	HMODULE	hm = NULL;
+	CONTEXT		ctx, ctxcount;
+	STACKFRAME64	s, scount;
+	PSYMBOL_INFO	pSym = NULL;
+	HMODULE		hModule;
+	HANDLE		hProcess, hThread;
+	DWORD64		offset;
+	wchar_t		szProcessName[MAX_PATH];
+	char		*process_name = NULL, *process_path = NULL, *frame = NULL;
+	size_t		frame_alloc = 0, frame_offset;
+	int		nframes = 0;
+	char		*file_name;
+	char		path[MAX_PATH];
+	HMODULE		hm = NULL;
 
 	ctx = *pctx;
 
@@ -206,10 +206,16 @@ static void	print_backtrace(CONTEXT *pctx)
 			if (NULL != zbx_SymFromAddr &&
 					TRUE == zbx_SymFromAddr(hProcess, s.AddrPC.Offset, &offset, pSym))
 			{
+#ifdef _M_X64
+				zbx_uint64_t address = s.AddrPC.Offset;
+#else
+				zbx_uint32_t address = s.AddrPC.Offset;
+#endif
+
 				if (0 != GetModuleHandleExA(
 						GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
 						GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-						(LPCSTR) s.AddrPC.Offset, &hm))
+						(LPCSTR) address, &hm))
 				{
 					if (0 != GetModuleFileNameA(hm, path, sizeof(path)))
 						file_name = path;
