@@ -1,8 +1,23 @@
 Changes for 6.4.2rc1
 
 New features:
+.........T [ZBXNEXT-8394] created separate proxy compatibility triggers in Zabbix health templates, removed unnecessary dependencies (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-22595] fixed template item context menu (dpetra)
+...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
+........S. [ZBX-22492] removed limitation for size of logged messages in JS (dgoloscapov)
+A.F....... [ZBX-22609] fixed possibility to remove the last LDAP server when LDAP authentication is still enabled (miks)
+...G...... [ZBX-22373] updated go.mod/sum to allow mixing session and key parameter for Zabbix agent 2 items (esneiders)
+..F....... [ZBX-22241] fixed minimum severity filter usage for map element link triggers (miks)
+A......... [ZBX-22194] fixed inability to import a template with trigger dependency on a host trigger (jfreibergs, vmaksimovs)
+A......... [ZBX-19375] prevented the ability to set a duplicate value for the uuid parameter when updating any of template entities; added possibility to update the uuid parameter for the Service API (vmaksimovs)
+.........T [ZBX-21583] optimised preprocessing steps and added two graphs and dashboard in the Hadoop by HTTP template (aiantsen)
+.........T [ZBX-21603] optimised preprocessing steps in the Zookeeper by HTTP template (aiantsen)
+.........T [ZBX-21589] optimised SQL queries and preprocessing steps (aiantsen)
+A......... [ZBX-22635] fixed authentication for scim requests (epulke)
+.........T [ZBX-22641] updated deprecated ports in Kubernetes templates, updated target tags, added notes about binding address options for Scheduler and Cluster Manager components (drasikhov)
+..F....... [ZBX-22597] fixed ldap group membership mapping was not matched in case insensitive manner (gcalenko)
 ..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
 A.F.I..PS. [ZBX-22363] added support for item and item_preproc table fields to be either nvarchar or nclob (agriscenko, vso)
 ...G...... [ZBX-22306] fixed crash in Zabbix agent 2 when running out of available file descriptors (vso)
