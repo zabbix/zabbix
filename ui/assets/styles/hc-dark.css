@@ -4124,8 +4124,6 @@ form.is-loading {
   white-space: normal; }
   .multiselect.active {
     border-color: #bbbbbb; }
-  .multiselect span.zi-remove {
-    margin-left: 3px; }
   .multiselect input[type="text"] {
     border: 0;
     background: none;

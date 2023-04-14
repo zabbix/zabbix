@@ -334,19 +334,18 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				->setEnabled(!$this->isDisabled())
 				->setAriaRequired($this->isRequired()),
 			(new CDiv(
-				(new CButton())
+				(new CSimpleButton())
 					->setAttribute('title', _('Delete'))
 					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_REMOVE)
-					->removeId()
 			))->addClass('dataset-actions'),
 			(new CList($inputs))
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
 				->addItem(
-					(new CButton())
+					(new CSimpleButton())
+						->addClass(ZBX_STYLE_BTN_ALT)
 						->addClass(ZBX_ICON_PLUS)
 						->setAttribute('data-row', $row_num)
-						->addClass(ZBX_STYLE_BTN_ALT)
 				)
 		]))->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM);
 	}

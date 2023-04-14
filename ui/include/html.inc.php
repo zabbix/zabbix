@@ -142,13 +142,13 @@ function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favorite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
-				$icon = (new CSimpleButton(null))
+				$icon = (new CSimpleButton())
 					->addClass(ZBX_ICON_STAR_FILLED)
 					->setTitle(_('Remove from favorites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
-				$icon = (new CSimpleButton(null))
+				$icon = (new CSimpleButton())
 					->addClass(ZBX_ICON_STAR)
 					->setTitle(_('Add to favorites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
@@ -159,20 +159,20 @@ function get_icon($type, $params = []) {
 
 		case 'kioskmode':
 			if ($params['mode'] == ZBX_LAYOUT_KIOSKMODE) {
-				$icon = (new CButton(null))
-					->setTitle(_('Normal view'))
-					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
+				$icon = (new CSimpleButton())
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_ICON_MINIMIZE)
-					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL);
+					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
+					->setTitle(_('Normal view'))
+					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL);
 			}
 			else {
-				$icon = (new CButton(null))
-					->setTitle(_('Kiosk mode'))
-					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
+				$icon = (new CSimpleButton())
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_ICON_FULLSCREEN)
-					->addClass(ZBX_STYLE_BTN_KIOSK);
+					->addClass(ZBX_STYLE_BTN_KIOSK)
+					->setTitle(_('Kiosk mode'))
+					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE);
 			}
 
 			return $icon;

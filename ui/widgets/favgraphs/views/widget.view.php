@@ -37,13 +37,14 @@ foreach ($data['graphs'] as $graph) {
 		$data['allowed_ui_latest_data']
 			? new CLink($graph['label'], $url)
 			: $graph['label'],
-		(new CButton())
-			->setAttribute('data-itemid', $graph['itemid'])
-			->onClick('rm4favorites("itemid", this.dataset.itemid);')
-			->addClass(ZBX_STYLE_BTN_ICON)
-			->addClass(ZBX_ICON_REMOVE)
-			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
-			->removeId()
+		(new CCol(
+			(new CSimpleButton())
+				->addClass(ZBX_STYLE_BTN_ICON)
+				->addClass(ZBX_ICON_REMOVE)
+				->setAttribute('data-itemid', $graph['itemid'])
+				->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
+				->onClick('rm4favorites("itemid", this.dataset.itemid);')
+		))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]);
 }
 

@@ -36,13 +36,14 @@ foreach ($data['maps'] as $map) {
 				->setArgument('sysmapid', $map['sysmapid'])
 			)
 			: $map['label'],
-		(new CButton())
-			->setAttribute('data-sysmapid', $map['sysmapid'])
-			->onClick('rm4favorites("sysmapid", this.dataset.sysmapid);')
-			->addClass(ZBX_STYLE_BTN_ICON)
-			->addClass(ZBX_ICON_REMOVE)
-			->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $map['label']))
-			->removeId()
+		(new CCol(
+			(new CSimpleButton())
+				->addClass(ZBX_STYLE_BTN_ICON)
+				->addClass(ZBX_ICON_REMOVE)
+				->setAttribute('data-sysmapid', $map['sysmapid'])
+				->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $map['label']))
+				->onClick('rm4favorites("sysmapid", this.dataset.sysmapid);')
+		))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]);
 }
 
