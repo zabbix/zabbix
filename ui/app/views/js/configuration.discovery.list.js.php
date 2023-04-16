@@ -156,7 +156,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('discovery', response.keepids ?? []);
+						uncheckTableRows('discovery');
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);

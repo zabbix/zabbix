@@ -59,20 +59,9 @@ window.drule_edit_popup = new class {
 	}
 
 	_updateCheck(row, input) {
-		if (!input.host_source) {
-			const checkedHostSource = document.querySelector('[name="host_source"]:checked:not([data-id])');
-			input.host_source = checkedHostSource ? checkedHostSource.value : '<?= ZBX_DISCOVERY_DNS ?>';
-		}
-
-		if (!input.name_source) {
-			const checkedNameSource = document.querySelector('[name="name_source"]:checked:not([data-id])');
-			input.name_source = checkedNameSource ? checkedNameSource.value : '<?= ZBX_DISCOVERY_UNSPEC ?>';
-		}
-
 		delete input.dchecks;
 
-		this._addCheck(input, row);
-		this._removeDCheckRow(row.id);
+		this._addCheck(input, row, true);
 		row.remove();
 		this._addInputFields(input);
 	}
@@ -114,7 +103,7 @@ window.drule_edit_popup = new class {
 			}
 			else {
 				this.dcheckid = getUniqueId()
-				this._addCheck(e.detail);
+				this._addCheck(e.detail, null);
 			}
 		});
 	}
@@ -137,14 +126,19 @@ window.drule_edit_popup = new class {
 	}
 
 	_updateRadioButtonValues(event) {
-		let target = event.target,
-			name = target.getAttribute('name');
+		let target = event.target;
+		let name = target.getAttribute('name');
 
 		if (target.dataset.id) {
 			document.querySelectorAll('[name^=dchecks][name$="[' + name + ']"]')
 				.forEach(function(dcheck) {
 					dcheck.value = (name === 'name_source') ? <?= ZBX_DISCOVERY_UNSPEC ?> : <?= ZBX_DISCOVERY_DNS ?>;
 				});
+
+			document.querySelector(
+				'[name="dchecks[' + target.dataset.id + '][' + name + ']"]'
+			)
+
 			document.querySelector(
 				'[name="dchecks[' + target.dataset.id + '][' + name + ']"]'
 			).value = <?= ZBX_DISCOVERY_VALUE ?>;
@@ -157,24 +151,32 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	_addCheck(input, row = null) {
+	_addCheck(input, row = null, update = false) {
 		delete input.dchecks;
 
-		if (!input.host_source) {
-			const checkedHostSource = document.querySelector('[name="host_source"]:checked:not([data-id])');
-			input.host_source = checkedHostSource ? checkedHostSource.value : '<?= ZBX_DISCOVERY_DNS ?>';
-		}
+		if (update == false) {
+			if (!input.host_source) {
+				const checkedHostSource = document.querySelector('[name="host_source"]:checked:not([data-id])');
+				input.host_source = checkedHostSource ? checkedHostSource.value : '<?= ZBX_DISCOVERY_DNS ?>';
+			}
 
-		if (!input.name_source) {
-			const checkedNameSource = document.querySelector('[name="name_source"]:checked:not([data-id])');
-			input.name_source = checkedNameSource ? checkedNameSource.value : '<?= ZBX_DISCOVERY_UNSPEC ?>';
+			if (!input.name_source) {
+				const checkedNameSource = document.querySelector('[name="name_source"]:checked:not([data-id])');
+				input.name_source = checkedNameSource ? checkedNameSource.value : '<?= ZBX_DISCOVERY_UNSPEC ?>';
+			}
+		}
+		else {
+			input.host_source = row.children[0].querySelector('input[name*="host_source"]').value;
+			input.name_source = row.children[0].querySelector('input[name*="name_source"]').value;
 		}
 
 		let template;
 		template = new Template(document.getElementById('dcheck-row-tmpl').innerHTML);
 
 		if (row) {
-			row.insertAdjacentHTML('afterend', template.evaluate(input))
+			row.insertAdjacentHTML('afterend', template.evaluate(input));
+			this._addInputFields(input);
+
 		}
 		else {
 			document
@@ -184,12 +186,11 @@ window.drule_edit_popup = new class {
 			this._addInputFields(input);
 		}
 
-		var available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
+		let available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
 		if (available_device_types.includes(parseInt(input.type))) {
-			this._addRadioButtonRows(input);
+			this._addRadioButtonRows(input, update);
 		}
-		this._addRadioButtonValues(this.drule);
 	}
 
 	_addInputFields(input) {
@@ -206,17 +207,33 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	_addRadioButtonRows(input) {
-		const templates = {
-			unique_template: ['#unique-row-tmpl', '#device-uniqueness-list'],
-			host_template: ['#host-source-row-tmpl', '#host_source'],
-			name_template: ['#name-source-row-tmpl', '#name_source']
-		};
+	_addRadioButtonRows(input, update) {
+		if (update == false) {
+			const templates = {
+				unique_template: ['#unique-row-tmpl', '#device-uniqueness-list'],
+				host_template: ['#host-source-row-tmpl', '#host_source'],
+				name_template: ['#name-source-row-tmpl', '#name_source']
+			};
 
-		for (const [template, element] of Object.values(templates)) {
-			const templateHtml = document.querySelector(template).innerHTML;
-			document.querySelector(element).insertAdjacentHTML('beforeend', new Template(templateHtml).evaluate(input));
+			for (const [template, element] of Object.values(templates)) {
+				const templateHtml = document.querySelector(template).innerHTML;
+
+				document.querySelector(element)
+					.insertAdjacentHTML('beforeend', new Template(templateHtml).evaluate(input));
+			}
 		}
+		else {
+			document.querySelector(`#device-uniqueness-list input[value="${input.dcheckid}"]`).closest('li')
+				.outerHTML = new Template(document.querySelector('#unique-row-tmpl').innerHTML).evaluate(input);
+
+			document.querySelector(`#host_source input[value="_${input.dcheckid}"]`).closest('li')
+				.outerHTML = new Template(document.querySelector('#host-source-row-tmpl').innerHTML).evaluate(input);
+
+			document.querySelector(`#name_source input[value="_${input.dcheckid}"]`).closest('li')
+				.outerHTML = new Template(document.querySelector('#name-source-row-tmpl').innerHTML).evaluate(input);
+		}
+
+		this._addRadioButtonValues(this.drule);
 	}
 
 	_removeDCheckRow(dcheckid) {
@@ -235,6 +252,7 @@ window.drule_edit_popup = new class {
 				if (obj.checked) {
 					document.querySelector(`#${key}${def}`).checked = true;
 				}
+
 				document.querySelector(`#${key}row_${dcheckid}`).remove();
 			}
 		}
