@@ -149,13 +149,13 @@ window.service_edit_popup = new class {
 
 		// Update form field state according to the form data.
 
-		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
-			document
-				.getElementById(id)
-				.addEventListener('change', () => this._update());
+		for (const id of ['propagation_rule', 'algorithm']) {
+			document.getElementById(id).addEventListener('change', () => this._update());
 		}
 
 		this._update();
+
+		new CFormSectionCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	_initTemplates() {
@@ -193,7 +193,6 @@ window.service_edit_popup = new class {
 	}
 
 	_update() {
-		const advanced_configuration = document.getElementById('advanced_configuration').checked;
 		const propagation_rule = document.getElementById('propagation_rule').value;
 
 		let has_problem_tags = false;
@@ -216,30 +215,24 @@ window.service_edit_popup = new class {
 		document.getElementById('algorithm-not-applicable-warning').style.display =
 			this.children.size > 0 ? 'none' : '';
 
-		document.getElementById('additional_rules_label').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('additional_rules_field').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('status_propagation_rules_label').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('status_propagation_rules_field').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('status_propagation_value_field').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('weight_label').style.display = advanced_configuration ? '' : 'none';
-		document.getElementById('weight_field').style.display = advanced_configuration ? '' : 'none';
-
 		switch (propagation_rule) {
 			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_INCREASE ?>':
 			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_DECREASE ?>':
+				document.getElementById('status_propagation_value_field').style.display = '';
 				document.getElementById('propagation_value_number').style.display = '';
 				document.getElementById('propagation_value_status').style.display = 'none';
 				break;
 
 			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_FIXED ?>':
+				document.getElementById('status_propagation_value_field').style.display = '';
 				document.getElementById('propagation_value_number').style.display = 'none';
 				document.getElementById('propagation_value_status').style.display = '';
 				break;
 
 			default:
+				document.getElementById('status_propagation_value_field').style.display = 'none';
 				document.getElementById('propagation_value_number').style.display = 'none';
 				document.getElementById('propagation_value_status').style.display = 'none';
-				document.getElementById('status_propagation_value_field').style.display = 'none';
 		}
 
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
