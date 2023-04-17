@@ -60,9 +60,7 @@ foreach ($this->data['proxies'] as $proxy) {
 $discoveryFormGrid
 	->addItem([new CLabel(_('Discovery by proxy'), $proxy_select->getFocusableElementId()), $proxy_select])
 	->addItem([(new CLabel(_('IP range'), 'iprange'))->setAsteriskMark(),
-		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
-			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px')
-			->setAriaRequired()
+		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))->setAriaRequired()
 	])
 	->addItem([(new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
 		(new CTextBox('delay', $data['drule']['delay']))
