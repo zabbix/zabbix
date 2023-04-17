@@ -1888,21 +1888,17 @@ class CExpressionParserTest extends TestCase {
 			['(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE} and {$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m', ['error' => 'incorrect expression starting from "{$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m"', 'match' => '(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE}'], CParser::PARSE_SUCCESS_CONT],
 			['last(/host/key,1.23)', null, CParser::PARSE_FAIL],
 			['last(/host/key,1.23s)', null, CParser::PARSE_FAIL],
-			['date()', null, CParser::PARSE_SUCCESS],
-			['date(0)', null, CParser::PARSE_SUCCESS],
-			['date(0,)', null, CParser::PARSE_SUCCESS],
-			['date(0,,)', null, CParser::PARSE_SUCCESS],
-			['dayofweek()', null, CParser::PARSE_SUCCESS],
-			['dayofweek(0)', null, CParser::PARSE_SUCCESS],
-			['dayofweek(0,)', null, CParser::PARSE_SUCCESS],
+			['func()', null, CParser::PARSE_SUCCESS],
+			['func(0)', null, CParser::PARSE_SUCCESS],
+			['func(0,)', null, CParser::PARSE_SUCCESS],
+			['func(0,,)', null, CParser::PARSE_SUCCESS],
+			['func(0, , )', null, CParser::PARSE_SUCCESS],
+			['func(0,, )', null, CParser::PARSE_SUCCESS],
+			['func(0, ,)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,0)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,#123)', null, CParser::PARSE_SUCCESS],
 			['max(/host/key,123)', null, CParser::PARSE_SUCCESS],
-			['now()', null, CParser::PARSE_SUCCESS],
-			['now(0)', null, CParser::PARSE_SUCCESS],
-			['now(0,)', null, CParser::PARSE_SUCCESS],
-			['now(0,,)', null, CParser::PARSE_SUCCESS],
 
 			['(--({host:key.last(0)}+K))', null, CParser::PARSE_FAIL],
 			['func(/host/key[p1, p2 ,"p3", "p4\"" ], #1, "p3", "p4\"" )*0/1-2+3 or 4 and 5>6<7<>8=9m and -(3)+(4-5)+-(-1)+{TRIGGER', null, CParser::PARSE_SUCCESS_CONT],
@@ -2745,13 +2741,11 @@ class CExpressionParserTest extends TestCase {
 	 */
 	public function testTokens(string $expression, array $expected, array $options = []) {
 		$expression_parser = new CExpressionParser($options);
-		$result = $expression_parser->parse($expression);
+		$this->assertSame(CParser::PARSE_SUCCESS, $expression_parser->parse($expression));
 		$this->assertSame($expected, [
 			'match' => $expression_parser->getMatch(),
 			'length' => $expression_parser->getLength(),
 			'tokens' => $expression_parser->getResult()->getTokens()
 		]);
-		$this->assertSame(CParser::PARSE_SUCCESS, $result);
-
 	}
 }

@@ -692,7 +692,7 @@ class CExpressionParser extends CParser {
 								break;
 							}
 
-							if ($source[$p-1] === ',') {
+							if ($source[$p - 1] === ',' || $source[$p - 1] === ' ') {
 								$state = self::STATE_END_OF_PARAMS;
 								$_tokens[] = [
 									'type' => CExpressionParserResult::TOKEN_TYPE_STRING,

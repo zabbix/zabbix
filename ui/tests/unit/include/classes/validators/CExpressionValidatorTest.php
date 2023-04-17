@@ -149,7 +149,14 @@ class CExpressionValidatorTest extends TestCase {
 			['count(count_foreach(/host/key, 20m),,1)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(count_foreach(/host/key, 20m),)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(count_foreach(/host/key, 20m),,,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
-
+			['count(count_foreach(/host/key, 20m), , )', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m),, )', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m), ,)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m), "" , " " )', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m), " " , " " )', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "count"']],
+			['count(count_foreach(/host/key, 20m), "" , "" )', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m), " " , "" )', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "count"']],
+			['count(count_foreach(/host/key, 20m), " ", " ",)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
 
 			// Host/key reference requirement.
 			['sum(1, 2, 3)', [], ['rc' => false, 'error' => 'trigger expression must contain at least one /host/key reference']],
