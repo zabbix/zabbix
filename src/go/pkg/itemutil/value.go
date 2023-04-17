@@ -64,6 +64,12 @@ func ValueToResult(itemid uint64, ts time.Time, u interface{}) (result *plugin.R
 		value = strconv.FormatFloat(float64(v), 'f', 6, 64)
 	case float64:
 		value = strconv.FormatFloat(v, 'f', 6, 64)
+	case bool:
+		if v {
+			value = "True"
+		} else {
+			value = "False"
+		}
 	default:
 		// note that this conversion is slow and it's better to return known value type
 		value = fmt.Sprintf("%v", u)
