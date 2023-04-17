@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 class testPageAdministrationGeneralRegexp extends CWebTest {
 
@@ -46,6 +47,19 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	private function verifyHash() {
 		$this->assertEquals($this->oldHashRegexps, CDBHelper::getHash($this->sqlHashRegexps));
 		$this->assertEquals($this->oldHashExpressions, CDBHelper::getHash($this->sqlHashExpressions));
+	}
+
+	public static function allRegexps() {
+		return CDBHelper::getDataProvider('SELECT regexpid FROM regexps');
+	}
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
 	}
 
 	/**
@@ -83,7 +97,6 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	 * Test mass delete and cancel.
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAllCancel() {
-
 		$this->calculateHash();
 
 		$this->page->login()->open('zabbix.php?action=regex.list');
@@ -97,5 +110,25 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->assertFalse($this->query('xpath://*[text()="Regular expressions deleted"]')->exists());
 		$this->verifyHash();
 
+	}
+
+	/**
+	 * @dataProvider allRegexps
+	 * @backupOnce regexps
+	 */
+	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
+		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
+
+		// Delete a regexp.
+		$this->page->login()->open('zabbix.php?action=regex.list');
+		$this->query('id:regexids_'.$regexp['regexpid'])->one()->click();
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+
+		// Check the result.
+		$this->page->assertTitle('Configuration of regular expressions');
+		$this->assertMessage(TEST_GOOD, 'Regular expression deleted');
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps WHERE regexpid='.$regexp['regexpid']));
+		$this->verifyHash();
 	}
 }
