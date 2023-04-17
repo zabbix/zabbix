@@ -126,13 +126,10 @@ zbx_pp_cache_t	*pp_cache_copy(zbx_pp_cache_t *cache)
  *           cached. Otherwise the cache will be used to execute the step.    *
  *                                                                            *
  ******************************************************************************/
-void	pp_cache_copy_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *value)
+void	pp_cache_prepare_output_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *value)
 {
-	if (NULL != cache && (NULL == cache->data || step_type != cache->type))
-	{
-		zbx_variant_clear(value);
+	if (NULL == cache->data || step_type != cache->type)
 		zbx_variant_copy(value, &cache->value);
-	}
 }
 
 /******************************************************************************
