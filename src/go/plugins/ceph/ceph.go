@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"time"
 
+	"zabbix.com/pkg/metric"
 	"zabbix.com/pkg/uri"
 
 	"zabbix.com/pkg/plugin"
@@ -48,6 +49,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	if err != nil {
 		return nil, err
 	}
+
+	metric.SetDefaults(params, p.options.Default)
 
 	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["APIKey"], uriDefaults)
 	if err != nil {

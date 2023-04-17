@@ -22,6 +22,7 @@ package redis
 import (
 	"time"
 
+	"zabbix.com/pkg/metric"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
@@ -45,6 +46,8 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 	if err != nil {
 		return nil, err
 	}
+
+	metric.SetDefaults(params, p.options.Default)
 
 	uri, err := uri.NewWithCreds(params["URI"], "zabbix", params["Password"], uriDefaults)
 	if err != nil {

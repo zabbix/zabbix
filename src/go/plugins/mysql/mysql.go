@@ -23,6 +23,7 @@ import (
 	"context"
 	"time"
 
+	"zabbix.com/pkg/metric"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/tlsconfig"
 	"zabbix.com/pkg/uri"
@@ -50,6 +51,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	if err != nil {
 		return nil, err
 	}
+
+	metric.SetDefaults(params, p.options.Default)
 
 	details, err := tlsconfig.CreateDetails(params["sessionName"], params["TLSConnect"],
 		params["TLSCAFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"])

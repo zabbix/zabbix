@@ -436,3 +436,11 @@ func (ml MetricSet) List() (list []string) {
 
 	return
 }
+
+func SetDefaults(params map[string]string, defaults map[string]string) {
+	for k, v := range params {
+		if d, ok := defaults[k]; ok && v == "" {
+			params[k] = d
+		}
+	}
+}

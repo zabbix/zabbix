@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"time"
 
+	"zabbix.com/pkg/metric"
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 
@@ -49,6 +50,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	if err != nil {
 		return nil, err
 	}
+
+	metric.SetDefaults(params, p.options.Default)
 
 	if len(params["User"]+params["Password"]) > maxEntryLen {
 		return nil, zbxerr.ErrorInvalidParams.Wrap(

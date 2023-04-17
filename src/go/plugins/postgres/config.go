@@ -69,6 +69,9 @@ type PluginOptions struct {
 
 	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
 	CustomQueriesPath string `conf:"optional"`
+
+	// Default stores default connection parameter values from configuration file
+	Default map[string]string `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.

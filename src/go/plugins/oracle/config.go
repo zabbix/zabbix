@@ -36,6 +36,14 @@ type Session struct {
 	Service string `conf:"optional"`
 }
 
+//Defaults hold default connection values
+type Default struct {
+	URI      string `conf:"name=Uri,optional"`
+	Password string `conf:"optional"`
+	User     string `conf:"optional"`
+	Service  string `conf:"optional"`
+}
+
 type PluginOptions struct {
 	// ConnectTimeout is the maximum time in seconds for waiting when a connection has to be established.
 	// Default value equals to the global timeout.
@@ -53,6 +61,9 @@ type PluginOptions struct {
 
 	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
 	CustomQueriesPath string `conf:"optional"`
+
+	// Default stores default connection parameter values from configuration file
+	Default map[string]string `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.

@@ -24,6 +24,7 @@ import (
 
 	"gopkg.in/mgo.v2"
 
+	"zabbix.com/pkg/metric"
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 
@@ -50,6 +51,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	if err != nil {
 		return nil, err
 	}
+
+	metric.SetDefaults(params, p.options.Default)
 
 	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {

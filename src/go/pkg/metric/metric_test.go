@@ -389,3 +389,80 @@ func TestNew(t *testing.T) {
 		})
 	}
 }
+
+func TestSetDefaults(t *testing.T) {
+	type args struct {
+		params   map[string]string
+		defaults map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{
+			"only_defaults",
+			args{
+				map[string]string{"foo": "", "bar": ""},
+				map[string]string{"foo": "abc", "bar": "def"},
+			},
+			map[string]string{"foo": "abc", "bar": "def"},
+		},
+		{
+			"default_overrides_empty",
+			args{
+				map[string]string{"foo": "bar", "abc": ""},
+				map[string]string{"foo": "bar", "abc": "foo"},
+			},
+			map[string]string{"foo": "bar", "abc": "foo"},
+		},
+		{
+			"default_does_not_override_empty",
+			args{
+				map[string]string{"foo": "bar", "abc": "def"},
+				map[string]string{"foo": "bar", "abc": "foo"},
+			},
+			map[string]string{"foo": "bar", "abc": "def"},
+		},
+		{
+			"set_param_not_in_default",
+			args{
+				map[string]string{"foo": "bar", "abc": "def"},
+				map[string]string{"bar": "foo"},
+			},
+			map[string]string{"foo": "bar", "abc": "def"},
+		},
+		{
+			"set_default_not_in_param",
+			args{
+				map[string]string{"foo": "bar"},
+				map[string]string{"foo": "bar", "bar": "foo"},
+			},
+			map[string]string{"foo": "bar"},
+		},
+		{
+			"empty_default",
+			args{
+				map[string]string{"foo": "bar"},
+				map[string]string{},
+			},
+			map[string]string{"foo": "bar"},
+		},
+		{
+			"empty_params",
+			args{
+				map[string]string{},
+				map[string]string{"foo": "bar"},
+			},
+			map[string]string{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SetDefaults(tt.args.params, tt.args.defaults)
+			if !reflect.DeepEqual(tt.args.params, tt.want) {
+				t.Errorf("SetDefaults() got = %v, want %v", tt.args.params, tt.want)
+			}
+		})
+	}
+}
