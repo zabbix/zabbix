@@ -30,6 +30,11 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	private $sqlHashExpressions = '';
 	private $oldHashExpressions = '';
 
+	/**
+	 * Calculates a hash for the data in regexps table.
+	 *
+	 * @param $conditions Optional WHERE clause for the data query.
+	 */
 	private function calculateHash($conditions = null) {
 		$this->sqlHashRegexps =
 			'SELECT * FROM regexps'.
@@ -44,6 +49,9 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->oldHashExpressions = CDBHelper::getHash($this->sqlHashExpressions);
 	}
 
+	/**
+	 * Verify that data in regexps table has not changed since last hash calculation.
+	 */
 	private function verifyHash() {
 		$this->assertEquals($this->oldHashRegexps, CDBHelper::getHash($this->sqlHashRegexps));
 		$this->assertEquals($this->oldHashExpressions, CDBHelper::getHash($this->sqlHashExpressions));
@@ -94,7 +102,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	}
 
 	/**
-	 * Test mass delete and cancel.
+	 * Test pressing mass delete button but then cancelling.
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAllCancel() {
 		$this->calculateHash();
@@ -113,6 +121,8 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	}
 
 	/**
+	 * Test deleting all regexps one by one.
+	 *
 	 * @dataProvider allRegexps
 	 * @backupOnce regexps
 	 */
@@ -130,5 +140,23 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Regular expression deleted');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps WHERE regexpid='.$regexp['regexpid']));
 		$this->verifyHash();
+	}
+
+	/**
+	 * Test deleting all regexps at once.
+	 *
+	 * @backupOnce regexps
+	 */
+	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
+		// Delete all regexps.
+		$this->page->login()->open('zabbix.php?action=regex.list');
+		$this->query('name:all-regexes')->one()->click();
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+
+		// Check the result.
+		$this->page->assertTitle('Configuration of regular expressions');
+		$this->assertMessage(TEST_GOOD, 'Regular expressions deleted');
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps'));
 	}
 }
