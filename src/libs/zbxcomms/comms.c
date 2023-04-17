@@ -2532,7 +2532,7 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 
 			if (SUCCEED != zbx_socket_check_deadline(s))
 			{
-				zbx_set_socket_strerror("send timeout");
+				zbx_set_socket_strerror("recv timeout");
 				return FAIL;
 			}
 
