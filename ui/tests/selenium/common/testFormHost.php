@@ -1765,9 +1765,8 @@ class testFormHost extends CWebTest {
 	 * Clone or Full clone a host and compare the data with the original host.
 	 *
 	 * @param array     $data		   data provider with fields values
-	 * @param string    $button        Clone or Full clone
 	 */
-	public function cloneHost($data, $button = 'Clone') {
+	public function cloneHost($data) {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host']));
 		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $data['host']);
 
@@ -1776,7 +1775,7 @@ class testFormHost extends CWebTest {
 		$original = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 
 		// Clone host.
-		$this->query('button', $button)->waitUntilClickable()->one()->click();
+		$this->query('button', 'Clone')->waitUntilClickable()->one()->click();
 
 		$cloned_form = (!$this->standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilReady()->one()
