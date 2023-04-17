@@ -145,6 +145,10 @@ class CExpressionValidatorTest extends TestCase {
 			['count(count_foreach(/host/key, 20m, "eq", 1), "eq", 2)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(count_foreach(/host/key, 20m, 1, 1), "eq", 2)', ['calculated' => true], ['rc' => false, 'error' => 'invalid third parameter in function "count_foreach"']],
 			['count(count_foreach(/host/key, 20m), "eq", 2)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m),,)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m),,1)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m),)', ['calculated' => true], ['rc' => true, 'error' => null]],
+
 
 			// Host/key reference requirement.
 			['sum(1, 2, 3)', [], ['rc' => false, 'error' => 'trigger expression must contain at least one /host/key reference']],

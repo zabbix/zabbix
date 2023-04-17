@@ -1890,17 +1890,20 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key,1.23s)', null, CParser::PARSE_FAIL],
 			['date()', null, CParser::PARSE_SUCCESS],
 			['date(0)', null, CParser::PARSE_SUCCESS],
-			['date(0,)', null, CParser::PARSE_FAIL],
+			['date(0,)', null, CParser::PARSE_SUCCESS],
+			['date(0,,)', null, CParser::PARSE_SUCCESS],
 			['dayofweek()', null, CParser::PARSE_SUCCESS],
 			['dayofweek(0)', null, CParser::PARSE_SUCCESS],
-			['dayofweek(0,)', null, CParser::PARSE_FAIL],
+			['dayofweek(0,)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,0)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,#123)', null, CParser::PARSE_SUCCESS],
 			['max(/host/key,123)', null, CParser::PARSE_SUCCESS],
 			['now()', null, CParser::PARSE_SUCCESS],
 			['now(0)', null, CParser::PARSE_SUCCESS],
-			['now(0,)', null, CParser::PARSE_FAIL],
+			['now(0,)', null, CParser::PARSE_SUCCESS],
+			['now(0,,)', null, CParser::PARSE_SUCCESS],
+
 			['(--({host:key.last(0)}+K))', null, CParser::PARSE_FAIL],
 			['func(/host/key[p1, p2 ,"p3", "p4\"" ], #1, "p3", "p4\"" )*0/1-2+3 or 4 and 5>6<7<>8=9m and -(3)+(4-5)+-(-1)+{TRIGGER', null, CParser::PARSE_SUCCESS_CONT],
 			['func(/host/key[p1, p2 ,"p3", "p4\"" ], #1, "p3", "p4\"" )*0/1-2+3 or 4 and 5>6<7<>8=9m and -(3)+(4-5)+-(-1)+{TRIGGE', null, CParser::PARSE_SUCCESS_CONT],
@@ -2200,7 +2203,8 @@ class CExpressionParserTest extends TestCase {
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', ['error' => 'incorrect expression starting from "last(/{HOST.HOST}/key)"', 'match' => 'last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', null, CParser::PARSE_SUCCESS, ['calculated' => true, 'host_macro' => true]],
 			['last(/*/agent.ping) = {TRIGGER.VALUE}', ['error' => 'incorrect expression starting from "{TRIGGER.VALUE}"', 'match' => 'last(/*/agent.ping)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
-			['last(/*/agent.ping) = 1 or last(/host2/*) = 1', null, CParser::PARSE_FAIL]
+			['last(/*/agent.ping) = 1 or last(/host2/*) = 1', null, CParser::PARSE_FAIL],
+
 		];
 	}
 
@@ -2741,11 +2745,13 @@ class CExpressionParserTest extends TestCase {
 	 */
 	public function testTokens(string $expression, array $expected, array $options = []) {
 		$expression_parser = new CExpressionParser($options);
-		$this->assertSame(CParser::PARSE_SUCCESS, $expression_parser->parse($expression));
+		$result = $expression_parser->parse($expression);
 		$this->assertSame($expected, [
 			'match' => $expression_parser->getMatch(),
 			'length' => $expression_parser->getLength(),
 			'tokens' => $expression_parser->getResult()->getTokens()
 		]);
+		$this->assertSame(CParser::PARSE_SUCCESS, $result);
+
 	}
 }
