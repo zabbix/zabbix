@@ -455,10 +455,6 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items as $item) {
 					$options['itemids'] = [$item['itemid']];
 					$options['history'] = $item['value_type'];
-					$options['output'] = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
-						? ['clock', 'value', 'ns']
-						: API_OUTPUT_EXTEND;
-
 					$item_data = API::History()->get($options);
 
 					CArrayHelper::sort($item_data, [
