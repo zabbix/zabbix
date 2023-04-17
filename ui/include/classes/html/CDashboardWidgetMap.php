@@ -111,7 +111,7 @@ class CDashboardWidgetMap extends CDiv {
 	/**
 	 * A javascript that is used as widget's script_inline parameter.
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function getScriptData() {
 		$map_data = [

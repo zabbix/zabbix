@@ -49,8 +49,8 @@ class CControllerWidgetMapView extends CControllerWidget {
 
 			if ($previous_maps) {
 				$previous_map = API::Map()->get([
-					'sysmapids' => [array_pop($previous_maps)],
-					'output' => ['sysmapid', 'name']
+					'output' => ['sysmapid', 'name'],
+					'sysmapids' => [array_pop($previous_maps)]
 				]);
 
 				$previous_map = reset($previous_map);
@@ -64,7 +64,9 @@ class CControllerWidgetMapView extends CControllerWidget {
 			$sysmapid =  $fields['sysmapid'];
 		}
 
-		$sysmap_data = CMapHelper::get(($sysmapid == null) ? [] : [$sysmapid], ['unique_id' => $this->getInput('unique_id')]);
+		$sysmap_data = CMapHelper::get($sysmapid === null ? [] : [$sysmapid],
+			['unique_id' => $this->getInput('unique_id')]
+		);
 
 		if ($sysmapid === null || $sysmap_data['id'] < 0) {
 			$error = _('No permissions to referred object or it does not exist!');

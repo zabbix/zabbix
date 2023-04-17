@@ -87,6 +87,17 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
+	updateProperties({name, view_mode, fields}) {
+		this._deactivateContentsEvents();
+
+		this._has_contents = false;
+		this._sysmapid = null;
+		this._previous_maps = [];
+		this._initial_load = true;
+
+		super.updateProperties({name, view_mode, fields});
+	}
+
 	_promiseUpdate() {
 		if (!this._has_contents || this._map_svg === null) {
 			if (this._sysmapid !== null
@@ -133,12 +144,6 @@ class CWidgetMap extends CWidget {
 	}
 
 	_processUpdateResponse(response) {
-		if (this._has_contents) {
-			this._deactivateContentsEvents();
-
-			this._has_contents = false;
-		}
-
 		super._processUpdateResponse(response);
 
 		if (response.sysmap_data !== undefined) {
