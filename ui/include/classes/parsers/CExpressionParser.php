@@ -687,10 +687,32 @@ class CExpressionParser extends CParser {
 							break;
 
 						case ')':
-							if (!$_tokens || $source[$p-1] === ',') {
+							if (!$_tokens) {
 								$state = self::STATE_END_OF_PARAMS;
 								break;
 							}
+
+							if ($source[$p-1] === ',') {
+								$state = self::STATE_END_OF_PARAMS;
+								$_tokens[] = [
+									'type' => CExpressionParserResult::TOKEN_TYPE_STRING,
+									'pos' => $p,
+									'match' => '',
+									'length' => 0,
+									'data' => [
+										'tokens' => [
+											0 => [
+												'type' => CExpressionParserResult::TOKEN_TYPE_STRING,
+												'pos' => $p,
+												'match' => '',
+												'length' => 0
+											]
+										]
+									]
+								];
+								break;
+							}
+
 							break 3;
 
 						default:

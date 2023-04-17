@@ -148,6 +148,7 @@ class CExpressionValidatorTest extends TestCase {
 			['count(count_foreach(/host/key, 20m),,)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(count_foreach(/host/key, 20m),,1)', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(count_foreach(/host/key, 20m),)', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['count(count_foreach(/host/key, 20m),,,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
 
 
 			// Host/key reference requirement.
