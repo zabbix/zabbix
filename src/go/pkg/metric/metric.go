@@ -21,6 +21,7 @@
 package metric
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -437,7 +438,30 @@ func (ml MetricSet) List() (list []string) {
 	return
 }
 
-func SetDefaults(params map[string]string, defaults map[string]string) {
+func SetDefaults(params map[string]string, defaults interface{}) error {
+	def, err := sessionToMap(defaults)
+	if err != nil {
+		return err
+	}
+
+	setDefaults(params, def)
+
+	return nil
+}
+
+func sessionToMap(session interface{}) (out map[string]string, err error) {
+	var b []byte
+	b, err = json.Marshal(session)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(b, &out)
+
+	return
+}
+
+func setDefaults(params map[string]string, defaults map[string]string) {
 	for k, v := range params {
 		if d, ok := defaults[k]; ok && v == "" {
 			params[k] = d

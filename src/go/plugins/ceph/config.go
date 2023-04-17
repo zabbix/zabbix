@@ -53,7 +53,7 @@ type PluginOptions struct {
 	Timeout int `conf:"optional,range=1:30"`
 
 	// Default stores default connection parameter values from configuration file
-	Default map[string]string `conf:"optional"`
+	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.

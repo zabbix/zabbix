@@ -67,7 +67,10 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
-	metric.SetDefaults(params, p.options.Default)
+	err = metric.SetDefaults(params, p.options.Default)
+	if err != nil {
+		return nil, err
+	}
 
 	service := url.QueryEscape(params["Service"])
 

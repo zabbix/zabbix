@@ -47,7 +47,10 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, err
 	}
 
-	metric.SetDefaults(params, p.options.Default)
+	err = metric.SetDefaults(params, p.options.Default)
+	if err != nil {
+		return nil, err
+	}
 
 	uri, err := uri.NewWithCreds(params["URI"], "zabbix", params["Password"], uriDefaults)
 	if err != nil {
