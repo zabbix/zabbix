@@ -46,10 +46,8 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, short mode)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() poll() error rc:%d errno:%d error:[%s]", __func__, rc,
 				zbx_socket_last_error(), strerror_from_system(zbx_socket_last_error()));
-		goto out;
 	}
-
-	if (0 < rc && POLLIN != (pd.revents & (POLLIN | POLLERR | POLLHUP | POLLNVAL)))
+	else if (0 < rc && POLLIN != (pd.revents & (POLLIN | POLLERR | POLLHUP | POLLNVAL)))
 	{
 		char	*errmsg;
 
@@ -58,11 +56,8 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, short mode)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, errmsg);
 		zbx_free(errmsg);
 		rc = ZBX_PROTO_ERROR;
-
-		goto out;
 	}
 
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, rc);
 
 	return rc;
