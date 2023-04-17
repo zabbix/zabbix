@@ -1,7 +1,5 @@
 Changes for 5.0.34rc1
 
-New features:
-
 Bug fixes:
 ...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
 ........S. [ZBX-22492] removed size limitation for logged messages in JS (dgoloscapov)
