@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-04-05 13:09+0000\n"
+"PO-Revision-Date: 2023-04-14 20:39+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1424,6 +1424,10 @@ msgstr "Atribució"
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
 msgstr "Atribucions HTML"
+
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
@@ -10711,7 +10715,7 @@ msgstr "Macros LLD"
 
 #: include/classes/api/services/CItemGeneral.php:709
 msgid "LLD rule with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix una regla LLD el mateix UUID"
 
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:57
@@ -21651,11 +21655,11 @@ msgstr "configuració global de neteja"
 
 #: include/classes/api/services/CGraphGeneral.php:836
 msgid "graph prototype with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un prototip de gràfic amb el mateix UUID"
 
 #: include/classes/api/services/CGraphGeneral.php:830
 msgid "graph with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un gràfic amb el mateix UUID"
 
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
@@ -21679,7 +21683,7 @@ msgstr "grup d'equips"
 
 #: include/classes/api/services/CHostGroup.php:819
 msgid "host group with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un grup d'equips amb el mateix UUID"
 
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
@@ -21906,11 +21910,11 @@ msgstr "patró d'element"
 
 #: include/classes/api/services/CItemGeneral.php:715
 msgid "item prototype with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un prototip d'element amb el mateix UUID"
 
 #: include/classes/api/services/CItemGeneral.php:703
 msgid "item with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un element amb el mateix UUID"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -22502,7 +22506,7 @@ msgstr "servei"
 
 #: include/classes/api/services/CService.php:1411
 msgid "service with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un servei amb el mateix UUID"
 
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
@@ -22629,11 +22633,11 @@ msgstr "l'identificador de plantilla \"%1$s\" s'ha passat %2$s cops"
 
 #: include/classes/api/services/CTemplateDashboard.php:394
 msgid "template dashboard with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un tauler de plantilla amb el mateix UUID"
 
 #: include/classes/api/services/CTemplate.php:449
 msgid "template with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix una plantilla amb el mateix UUID"
 
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
@@ -22755,7 +22759,7 @@ msgstr "el prototip del trigger no es pot pas moure a una altra plantilla o equi
 
 #: include/classes/api/services/CTriggerGeneral.php:686
 msgid "trigger prototype with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un prototip de trigger amb el mateix UUID"
 
 #: include/classes/api/services/CTriggerGeneral.php:1889
 msgid "trigger with linkages cannot be moved to another template or host"
@@ -22763,7 +22767,7 @@ msgstr "el trigger amb enllaços no es pot pas moure a una altra plantilla o equ
 
 #: include/classes/api/services/CTriggerGeneral.php:680
 msgid "trigger with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un trigger amb el mateix UUID"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -22990,7 +22994,7 @@ msgstr "el valor és massa llarg"
 
 #: include/classes/api/services/CValueMap.php:501
 msgid "value map with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un mapa de valors amb el mateix UUID"
 
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
@@ -23097,7 +23101,7 @@ msgstr "w"
 
 #: include/classes/api/services/CHttpTest.php:438
 msgid "web scenario with the same UUID already exists"
-msgstr ""
+msgstr "ja existeix un escenari web amb el mateix UUID"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

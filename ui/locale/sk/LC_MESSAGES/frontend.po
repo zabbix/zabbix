@@ -1451,6 +1451,10 @@ msgstr "Pripisovanie"
 msgid "Attribution HTML"
 msgstr ""
 
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
