@@ -525,7 +525,7 @@ class CItem extends CItemGeneral {
 			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
@@ -568,7 +568,9 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
-		self::checkAndAddUuid($items);
+		self::addUuid($items);
+
+		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
 		self::checkValueMaps($items);
 		self::checkInventoryLinks($items);
@@ -638,7 +640,6 @@ class CItem extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'uuid' => 	['type' => API_UUID],
 			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
@@ -661,8 +662,8 @@ class CItem extends CItemGeneral {
 		 * fields as they stored in database.
 		 */
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
@@ -672,6 +673,7 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
+			$item['host_status'] = $db_item['host_status'];
 
 			if ($db_item['templateid'] != 0) {
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
@@ -705,12 +707,13 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'host_status', 'flags']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags']);
 
 		self::validateUniqueness($items);
 
 		self::addAffectedObjects($items, $db_items);
 
+		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
 		self::checkInventoryLinks($items, $db_items);
@@ -724,7 +727,11 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'uuid' => 			['type' => API_UUID],
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			]],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
@@ -766,7 +773,8 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'uuid' => 			['type' => API_UUID],
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -796,6 +804,8 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getDiscoveredValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
@@ -1142,15 +1152,11 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getUpdChildObjectsUsingTemplateid(array $items, array $db_items,
 			array $upd_db_items): array {
-		$parent_indexes = [];
+		$parent_indexes = array_flip(array_column($items, 'itemid'));
 
-		foreach ($items as $i => &$item) {
-			if (!array_key_exists($item['itemid'], $db_items)) {
-				continue;
-			}
-
+		foreach ($items as &$item) {
+			unset($item['uuid']);
 			$item = self::unsetNestedObjectIds($item);
-			$parent_indexes[$item['itemid']] = $i;
 		}
 		unset($item);
 
@@ -1207,8 +1213,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
 		];
