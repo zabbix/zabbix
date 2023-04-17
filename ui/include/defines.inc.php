@@ -2279,8 +2279,6 @@ define('ZBX_ICON_USER', 'zi-user');
 define('ZBX_ICON_USER_FILLED', 'zi-user-filled');
 define('ZBX_ICON_USERS', 'zi-users');
 define('ZBX_ICON_USERS_FILLED', 'zi-users-filled');
-define('ZBX_ICON_WIDGET_ADD', 'zi-widget-add');
-define('ZBX_ICON_WIDGET_RESIZE', 'zi-widget-resize');
 define('ZBX_ICON_WRENCH_ALT', 'zi-wrench-alt');
 define('ZBX_ICON_Z', 'zi-z');
 

@@ -1,6 +1,8 @@
 $theme-name: 'blue' !default;
 
 $ui-transitions: true !default;
+// Sync with JavaScript variable: UI_TRANSITION_DURATION.
+$ui-transition-duration: .3s !default;
 
 $icon-default-size: 18px;
 $icon-medium-size: 16px;
@@ -9,9 +11,6 @@ $icon-small-size: 12px;
 $main-menu-icon-size: 24px;
 $main-menu-submenu-icon-size: $icon-medium-size;
 $user-menu-icon-size: $icon-medium-size;
-
-// Sync with JavaScript variable: UI_TRANSITION_DURATION.
-$ui-transition-duration: .3s !default;
 
 // Sprite path
 $sprite-path: '../img/icon-sprite.svg?20220722'; // TODO - AS: should be removed
@@ -141,10 +140,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	[disabled] {
 		opacity: 1 !important;
 	}
-}
-
-.monospace-font {
-	font-family: $font-stack-mono;
 }
 
 %space-pre-wrap {
@@ -1038,7 +1033,7 @@ form {
 	padding: 5px;
 	position: relative;
 
-	[class^="zi-"], [class*="zi-"] {
+	[class^="zi-"], [class*="zi-"] { // TODO - check
 		&::before {
 			color: $icon-color;
 		}

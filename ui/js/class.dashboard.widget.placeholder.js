@@ -53,9 +53,9 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this._placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_BOX);
 
 		this._placeholder_box_label = document.createElement('div');
-		this._placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL, ZBX_ICON_WIDGET_ADD);
+		this._placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
 
-		this._placeholder_box_label_wrap = document.createElement('span');
+		this._placeholder_box_label_wrap = document.createElement('div');
 
 		this._placeholder_box_label.appendChild(this._placeholder_box_label_wrap);
 		this._placeholder_box.appendChild(this._placeholder_box_label);
@@ -85,8 +85,6 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 
 		this._target.classList.remove('disabled');
 		this._placeholder_box.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
-		this._placeholder_box_label.classList.remove(ZBX_ICON_WIDGET_RESIZE);
-		this._placeholder_box_label.classList.add(ZBX_ICON_WIDGET_ADD);
 		this._placeholder_box_label_wrap.textContent = '';
 
 		switch (state) {
@@ -108,8 +106,6 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 
 			case WIDGET_PLACEHOLDER_STATE_RESIZING:
 				this._placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
-				this._placeholder_box_label.classList.add(ZBX_ICON_WIDGET_RESIZE);
-				this._placeholder_box_label.classList.remove(ZBX_ICON_WIDGET_ADD);
 				this._placeholder_box_label_wrap.textContent = t('Release to create a widget.');
 
 				break;

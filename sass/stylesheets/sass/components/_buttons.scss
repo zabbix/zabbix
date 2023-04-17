@@ -48,8 +48,7 @@ button {
 		padding: 0;
 	}
 
-	&[class^="zi-"],
-	&[class*=" zi-"] {
+	&[class^="zi-"], &[class*=" zi-"] {
 		@extend %btn-icon-position;
 
 		&:not(:empty) {

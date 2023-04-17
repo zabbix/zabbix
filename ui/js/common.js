@@ -45,8 +45,6 @@ const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
 const ZBX_ICON_TRIANGLE_WARNING = 'zi-triangle-warning';
-const ZBX_ICON_WIDGET_ADD = 'zi-widget-add';
-const ZBX_ICON_WIDGET_RESIZE = 'zi-widget-resize';
 
 const KEY_ARROW_DOWN = 40;
 const KEY_ARROW_LEFT = 37;

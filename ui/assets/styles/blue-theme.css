@@ -42,7 +42,7 @@ svg *:focus {
 @font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1681727779299") format("woff2"), url("../fonts/zabbix-icons.woff?t=1681727779299") format("woff"), url("../fonts/zabbix-icons.ttf?t=1681727779299") format("truetype"), url("../fonts/zabbix-icons.svg?t=1681727779299#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, z-select button.focusable::after, z-select a.focusable.btn-icon::after,
+[class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, z-select button.focusable::after, z-select a.focusable.btn-icon::after,
 .z-select button.focusable::after,
 .z-select a.focusable.btn-icon::after, .ui-tabs-nav .ui-tabs-tab .btn-info::after, .ui-tabs-nav .ui-tabs-tab .filter-trigger::after, .ui-tabs-nav .ui-tabs-tab .btn-time::after, .btn-dropdown-container .btn-dropdown-toggle::after {
   font-family: 'zabbix-icons' !important;
@@ -484,6 +484,9 @@ svg a {
   svg a:active {
     fill: #0275b8;
     text-decoration: underline; }
+
+.monospace-font {
+  font-family: "Courier New", Courier, monospace; }
 
 .float-left {
   float: left; }
@@ -1465,31 +1468,24 @@ button.btn-overlay-close, a.btn-overlay-close.btn-icon, button.zi-remove, a.zi-r
     border: 1px dashed #acbbc2;
     box-shadow: 2px 2px 6px rgba(118, 141, 153, 0.5);
     flex: 1; }
-    .dashboard-widget-placeholder .dashboard-widget-placeholder-box .zi-widget-add,
-    .dashboard-widget-placeholder .dashboard-widget-placeholder-box .zi-widget-resize {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center; }
-      .dashboard-widget-placeholder .dashboard-widget-placeholder-box .zi-widget-add span,
-      .dashboard-widget-placeholder .dashboard-widget-placeholder-box .zi-widget-resize span {
-        padding: 0 0 20px 0;
-        text-align: center; }
-      .dashboard-widget-placeholder .dashboard-widget-placeholder-box .zi-widget-add::before,
-      .dashboard-widget-placeholder .dashboard-widget-placeholder-box .zi-widget-resize::before {
-        padding: 26px;
-        font-size: 48px; }
   .dashboard-widget-placeholder .dashboard-widget-placeholder-label {
     position: absolute;
     left: 0;
-    top: 50%;
-    transform: translate(0, -50%);
+    top: calc(50% - 23px);
     right: 0;
     bottom: 0;
+    padding: 0 5px 5px;
     text-align: center; }
+    .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before {
+      content: "";
+      font-size: 46px; }
+    .dashboard-widget-placeholder .dashboard-widget-placeholder-label .hidden {
+      display: none; }
   .dashboard-widget-placeholder .dashboard-widget-placeholder-resizing {
     background: #dadfe3;
     box-shadow: inset 2px 2px 6px rgba(118, 141, 153, 0.5); }
+    .dashboard-widget-placeholder .dashboard-widget-placeholder-resizing .dashboard-widget-placeholder-label::before {
+      content: ""; }
   .dashboard-widget-placeholder.disabled {
     opacity: 1; }
     .dashboard-widget-placeholder.disabled .dashboard-widget-placeholder-box {
@@ -3732,9 +3728,6 @@ z-select,
   .disabled .disabled,
   .disabled [disabled] {
     opacity: 1 !important; }
-
-.monospace-font {
-  font-family: "Courier New", Courier, monospace; }
 
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
