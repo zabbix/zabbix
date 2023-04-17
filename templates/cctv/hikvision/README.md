@@ -3,137 +3,162 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
 Sample device overview page: https://www.hikvision.com/en/products/IP-Products/Network-Cameras/
 
 
-This template was tested on:
+## Requirements
 
-- DS-I220
-- DS-I450
-- DS-2CD2620F-I
-- DS-2CD1631FWD-I
-- DS-2CD2020F-I
-- DS-2CD2042WD-I
-- DS-2CD2T43G0-I5
-- DS-2DF5286-AEL
-- DS-2CD2T25FWD-I5
-- DS-2CD4A35FWD-IZHS
-- DS-I200
-- DS-2CD1031-I
-- DS-2CD2125FWD-IS
-- DS-I122
-- DS-I203
-- DS-N201
-- DS-2CD2622FWD-IZS
-- DS-2CD2023G0-I
+Zabbix version: 6.4 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- DS-I220 
+- DS-I450 
+- DS-2CD2620F-I 
+- DS-2CD1631FWD-I 
+- DS-2CD2020F-I 
+- DS-2CD2042WD-I 
+- DS-2CD2T43G0-I5 
+- DS-2DF5286-AEL 
+- DS-2CD2T25FWD-I5 
+- DS-2CD4A35FWD-IZHS 
+- DS-I200 
+- DS-2CD1031-I 
+- DS-2CD2125FWD-IS 
+- DS-I122 
+- DS-I203 
+- DS-N201 
+- DS-2CD2622FWD-IZS 
+- DS-2CD2023G0-I 
+
+## Configuration
+
+> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
-
 Define macros according to your camera configuration
 
-
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CPU.UTIL.CRIT} |<p>-</p> |`90` |
-|{$HIKVISION_ISAPI_PORT} |<p>ISAPI port on device</p> |`80` |
-|{$HIKVISION_MAIN_CHANNEL_ID} |<p>Main video stream ID</p> |`101` |
-|{$HIKVISION_STREAM_HEIGHT} |<p>Main video stream image height</p> |`1080` |
-|{$HIKVISION_STREAM_WIDTH} |<p>Main video stream image width</p> |`1920` |
-|{$MEMORY.UTIL.MAX} |<p>-</p> |`95` |
-|{$PASSWORD} |<p>-</p> |`1234` |
-|{$USER} |<p>-</p> |`admin` |
+|{$CPU.UTIL.CRIT}||`90`|
+|{$HIKVISION_ISAPI_PORT}|<p>ISAPI port on device</p>|`80`|
+|{$HIKVISION_MAIN_CHANNEL_ID}|<p>Main video stream ID</p>|`101`|
+|{$HIKVISION_STREAM_HEIGHT}|<p>Main video stream image height</p>|`1080`|
+|{$HIKVISION_STREAM_WIDTH}|<p>Main video stream image width</p>|`1920`|
+|{$MEMORY.UTIL.MAX}||`95`|
+|{$PASSWORD}||`1234`|
+|{$USER}||`admin`|
 
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
+### Items
 
 |Name|Description|Type|Key and additional info|
-|----|-----------|----|----|
-|PTZ discovery |<p>-</p> |HTTP_AGENT |hikvision_cam.ptz.discovery<p>**Preprocessing**:</p><p>- XML_TO_JSON<p>- JAVASCRIPT |
-|Streaming channels discovery |<p>-</p> |HTTP_AGENT |hikvision_cam.streaming.discovery<p>**Preprocessing**:</p><p>- XML_TO_JSON<p>- JAVASCRIPT<p>**Filter**:</p>AND <p>- {#CHANNEL_ENABLED} MATCHES_REGEX `true`</p><p>**Overrides:**</p><p>trigger disabled non main channels<br> - {#CHANNEL_ID} NOT_MATCHES_REGEX `{$HIKVISION_MAIN_CHANNEL_ID}`<br>  - TRIGGER_PROTOTYPE LIKE `Invalid video stream resolution parameters` - NO_DISCOVER</p> |
+|----|-----------|----|-----------------------|
+|Hikvision camera: Boot loader released date| |Dependent item|hikvision_cam.boot_released_date<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.bootReleasedDate`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Boot loader version| |Dependent item|hikvision_cam.boot_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.bootVersion`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: CPU utilization|<p>CPU utilization in %</p>|Dependent item|hikvision_cam.cpu.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceStatus.CPUList.CPU.cpuUtilization`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Hikvision camera: Current device time| |Dependent item|hikvision_cam.current_device_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceStatus.currentDeviceTime`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Hikvision camera: Device description| |Dependent item|hikvision_cam.device_description<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.deviceDescription`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Device ID| |Dependent item|hikvision_cam.device_id<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.deviceID`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Device location| |Dependent item|hikvision_cam.device_location<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.deviceLocation`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Device name| |Dependent item|hikvision_cam.device_name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.deviceName`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Hikvision camera: Device type| |Dependent item|hikvision_cam.device_type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.deviceType`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Encoder released date| |Dependent item|hikvision_cam.encoder_released_date<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.encoderReleasedDate`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Encoder version| |Dependent item|hikvision_cam.encoder_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.encoderVersion`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Firmware released date| |Dependent item|hikvision_cam.firmware_released_date<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.firmwareReleasedDate`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Firmware version| |Dependent item|hikvision_cam.firmware_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.firmwareVersion`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Get device info|<p>Used to get the device information</p>|HTTP agent|hikvision_cam.get_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value: ``</p><p>⛔️Custom on fail: Set value to: `{"html":{"head":{"title":"Connection error"}}}`</p></li><li><p>XML to JSON: ``</p><p>⛔️Custom on fail: Set value to: `{"html":{"head":{"title":"Connection error"}}}`</p></li></ul>|
+|Hikvision camera: Get device info: Login status| |Dependent item|hikvision_cam.get_info.login_status<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Hikvision camera: Get system status|<p>It is used to get the status information of the device</p>|HTTP agent|hikvision_cam.get_status<p>**Preprocessing**</p><ul><li><p>Check for not supported value: ``</p><p>⛔️Custom on fail: Set value to: `{"html":{"head":{"title":"Connection error"}}}`</p></li><li><p>XML to JSON: ``</p><p>⛔️Custom on fail: Set value to: `{"html":{"head":{"title":"Connection error"}}}`</p></li></ul>|
+|Hikvision camera: Get system status: Login status| |Dependent item|hikvision_cam.get_status.login_status<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Hikvision camera: Get streaming channels|<p>Used to get the properties of streaming channels for the device</p>|HTTP agent|hikvision_cam.get_streaming<p>**Preprocessing**</p><ul><li><p>Check for not supported value: ``</p><p>⛔️Custom on fail: Set value to: `{"html":{"head":{"title":"Connection error"}}}`</p></li><li><p>XML to JSON: ``</p><p>⛔️Custom on fail: Set value to: `{"html":{"head":{"title":"Connection error"}}}`</p></li></ul>|
+|Hikvision camera: Get streaming channels: Login status| |Dependent item|hikvision_cam.get_streaming.login_status<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Hikvision camera: Hardware version| |Dependent item|hikvision_cam.hardware_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.hardwareVersion`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: MACaddress| |Dependent item|hikvision_cam.mac_address<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.macAddress`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Memory utilization|<p>Memory utilization in %</p>|Dependent item|hikvision_cam.memory.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceStatus.MemoryList.Memory.memoryUsage`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Hikvision camera: Model| |Dependent item|hikvision_cam.model<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.model`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Serial number| |Dependent item|hikvision_cam.serial_number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.serialNumber`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Supported beep| |Dependent item|hikvision_cam.support_beep<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.supportBeep`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Supported video loss| |Dependent item|hikvision_cam.support_video_loss<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.supportVideoLoss`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: System contact| |Dependent item|hikvision_cam.system_contact<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.systemContact`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Telecontrol ID| |Dependent item|hikvision_cam.telecontrol_id<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.telecontrolID`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
+|Hikvision camera: Uptime|<p>System uptime in 'N days, hh:mm:ss' format.</p>|Dependent item|hikvision_cam.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceStatus.deviceUpTime`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-|CPU |Hikvision camera: CPU utilization |<p>CPU utilization in %</p> |DEPENDENT |hikvision_cam.cpu.util<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceStatus.CPUList.CPU.cpuUtilization`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Hikvision camera |Hikvision camera: Boot loader released date |<p>-</p> |DEPENDENT |hikvision_cam.boot_released_date<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.bootReleasedDate`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Boot loader version |<p>-</p> |DEPENDENT |hikvision_cam.boot_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.bootVersion`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Current device time |<p>-</p> |DEPENDENT |hikvision_cam.current_device_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceStatus.currentDeviceTime`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Hikvision camera |Hikvision camera: Device description |<p>-</p> |DEPENDENT |hikvision_cam.device_description<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.deviceDescription`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Device ID |<p>-</p> |DEPENDENT |hikvision_cam.device_id<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.deviceID`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Device location |<p>-</p> |DEPENDENT |hikvision_cam.device_location<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.deviceLocation`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Device name |<p>-</p> |DEPENDENT |hikvision_cam.device_name<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.deviceName`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Hikvision camera |Hikvision camera: Device type |<p>-</p> |DEPENDENT |hikvision_cam.device_type<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.deviceType`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Encoder released date |<p>-</p> |DEPENDENT |hikvision_cam.encoder_released_date<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.encoderReleasedDate`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Encoder version |<p>-</p> |DEPENDENT |hikvision_cam.encoder_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.encoderVersion`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Firmware released date |<p>-</p> |DEPENDENT |hikvision_cam.firmware_released_date<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.firmwareReleasedDate`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Firmware version |<p>-</p> |DEPENDENT |hikvision_cam.firmware_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.firmwareVersion`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Hardware version |<p>-</p> |DEPENDENT |hikvision_cam.hardware_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.hardwareVersion`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: MACaddress |<p>-</p> |DEPENDENT |hikvision_cam.mac_address<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.macAddress`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Model |<p>-</p> |DEPENDENT |hikvision_cam.model<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.model`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Serial number |<p>-</p> |DEPENDENT |hikvision_cam.serial_number<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.serialNumber`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Supported beep |<p>-</p> |DEPENDENT |hikvision_cam.support_beep<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.supportBeep`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Supported video loss |<p>-</p> |DEPENDENT |hikvision_cam.support_video_loss<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.supportVideoLoss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: System contact |<p>-</p> |DEPENDENT |hikvision_cam.system_contact<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.systemContact`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Hikvision camera |Hikvision camera: Telecontrol ID |<p>-</p> |DEPENDENT |hikvision_cam.telecontrol_id<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceInfo.telecontrolID`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `24h`</p> |
-|Memory |Hikvision camera: Memory utilization |<p>Memory utilization in %</p> |DEPENDENT |hikvision_cam.memory.usage<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceStatus.MemoryList.Memory.memoryUsage`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|PTZ |Channel "{#PTZ_CHANNEL_ID}": Absolute zoom |<p>-</p> |DEPENDENT |hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.PTZStatus.AbsoluteHigh.absoluteZoom`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|PTZ |Channel "{#PTZ_CHANNEL_ID}": Azimuth |<p>-</p> |DEPENDENT |hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.PTZStatus.AbsoluteHigh.azimuth`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|PTZ |Channel "{#PTZ_CHANNEL_ID}": Elevation |<p>-</p> |DEPENDENT |hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.PTZStatus.AbsoluteHigh.elevation`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Status |Hikvision camera: Get device info: Login status |<p>-</p> |DEPENDENT |hikvision_cam.get_info.login_status<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var data = JSON.parse(value); if ("html" in data){     if (data.html.head.title === "Document Error: Unauthorized")         {return 1}     else if (data.html.head.title === "Connection error")         {return 2} } return 0; `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Status |Hikvision camera: Get system status: Login status |<p>-</p> |DEPENDENT |hikvision_cam.get_status.login_status<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var data = JSON.parse(value); if ("html" in data){     if (data.html.head.title === "Document Error: Unauthorized")         {return 1}     else if (data.html.head.title === "Connection error")         {return 2} } return 0; `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Status |Hikvision camera: Get streaming channels: Login status |<p>-</p> |DEPENDENT |hikvision_cam.get_streaming.login_status<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var data = JSON.parse(value); if ("html" in data){     if (data.html.head.title === "Document Error: Unauthorized")         {return 1}     else if (data.html.head.title === "Connection error")         {return 2} } return 0; `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Status |Hikvision camera: Uptime |<p>System uptime in 'N days, hh:mm:ss' format.</p> |DEPENDENT |hikvision_cam.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.DeviceStatus.deviceUpTime`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Constant bitRate |<p>-</p> |DEPENDENT |hikvision_cam.constant_bit_rate[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.constantBitRate`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$.[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Fixed quality |<p>-</p> |DEPENDENT |hikvision_cam.fixed_quality[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.fixedQuality`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": GovLength |<p>-</p> |DEPENDENT |hikvision_cam.gov_length[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.GovLength`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": H264Profile |<p>-</p> |DEPENDENT |hikvision_cam.h264Profile[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.H264Profile`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Key frame interval |<p>-</p> |DEPENDENT |hikvision_cam.key_frame_interval[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.keyFrameInterval`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.01`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Frame rate (max) |<p>-</p> |DEPENDENT |hikvision_cam.max_frame_rate[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.maxFrameRate`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.01`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Smoothing |<p>-</p> |DEPENDENT |hikvision_cam.smoothing[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.smoothing`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Snapshot image type |<p>-</p> |DEPENDENT |hikvision_cam.snap_shot_image_type[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.snapShotImageType`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": VBR lower |<p>-</p> |DEPENDENT |hikvision_cam.vbr_lower_cap[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.vbrLowerCap`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": VBR upper |<p>-</p> |DEPENDENT |hikvision_cam.vbr_upper_cap[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.vbrUpperCap`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Video codec type |<p>-</p> |DEPENDENT |hikvision_cam.video_codec_type[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoCodecType`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Video quality control type |<p>-</p> |DEPENDENT |hikvision_cam.video_quality_control_type[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoQualityControlType`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Resolution height |<p>-</p> |DEPENDENT |hikvision_cam.video_resolution_height[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoResolutionHeight`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Resolution width |<p>-</p> |DEPENDENT |hikvision_cam.video_resolution_width[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoResolutionWidth`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Streaming Channel |Channel "{#CHANNEL_ID}": Video scan type |<p>-</p> |DEPENDENT |hikvision_cam.video_scan_type[{#CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.StreamingChannelList.StreamingChannel[?(@.id=={#CHANNEL_ID})].Video.videoScanType`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- JSONPATH: `$[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |Hikvision camera: Get device info |<p>Used to get the device information</p> |HTTP_AGENT |hikvision_cam.get_info<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED: ``</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"html":{"head":{"title":"Connection error"}}}`</p><p>- XML_TO_JSON: ``</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"html":{"head":{"title":"Connection error"}}}`</p> |
-|Zabbix raw items |Hikvision camera: Get system status |<p>It is used to get the status information of the device</p> |HTTP_AGENT |hikvision_cam.get_status<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED: ``</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"html":{"head":{"title":"Connection error"}}}`</p><p>- XML_TO_JSON: ``</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"html":{"head":{"title":"Connection error"}}}`</p> |
-|Zabbix raw items |Hikvision camera: Get streaming channels |<p>Used to get the properties of streaming channels for the device</p> |HTTP_AGENT |hikvision_cam.get_streaming<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED: ``</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"html":{"head":{"title":"Connection error"}}}`</p><p>- XML_TO_JSON: ``</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"html":{"head":{"title":"Connection error"}}}`</p> |
-|Zabbix raw items |Hikvision camera: Get PTZ info: Channel "{#PTZ_CHANNEL_ID}": Login status |<p>-</p> |DEPENDENT |hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var data = JSON.parse(value); if ("html" in data){     if (data.html.head.title === "Document Error: Unauthorized")         {return 1}     else if (data.html.head.title === "Connection error")         {return 2} } return 0; `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |Hikvision camera: Get PTZ info |<p>High precision positioning which is accurate to a bit after the decimal point</p> |HTTP_AGENT |hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED: ``</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"html":{"head":{"title":"Connection error"}}}`</p><p>- XML_TO_JSON: ``</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> {"html":{"head":{"title":"Connection error"}}}`</p> |
-
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
-|Hikvision camera: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Hikvision camera by HTTP/hikvision_cam.cpu.util,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|Hikvision camera: Version has changed |<p>Hikvision camera version has changed. Ack to close.</p> |`last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.firmware_version))>0` |INFO |<p>Manual close: YES</p> |
-|Hikvision camera: Camera has been replaced |<p>Camera serial number has changed. Ack to close</p> |`last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.serial_number))>0` |INFO |<p>Manual close: YES</p> |
-|Hikvision camera: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Hikvision camera by HTTP/hikvision_cam.memory.usage,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
-|Channel "{#PTZ_CHANNEL_ID}": PTZ position changed |<p>The direction of the camera has changed</p> |`last(/Hikvision camera by HTTP/hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}],#2) or  last(/Hikvision camera by HTTP/hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}],#2) or  last(/Hikvision camera by HTTP/hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}],#2) ` |INFO |<p>Manual close: YES</p> |
-|Hikvision camera: Authorisation error |<p>Check the correctness of the authorization data</p> |`last(/Hikvision camera by HTTP/hikvision_cam.get_info.login_status)=1 or last(/Hikvision camera by HTTP/hikvision_cam.get_streaming.login_status)=1 or last(/Hikvision camera by HTTP/hikvision_cam.get_status.login_status)=1 ` |WARNING |<p>Manual close: YES</p> |
-|Hikvision camera: Error receiving data |<p>Check the availability of the HTTP port</p> |`last(/Hikvision camera by HTTP/hikvision_cam.get_info.login_status)=2 or last(/Hikvision camera by HTTP/hikvision_cam.get_streaming.login_status)=2 or last(/Hikvision camera by HTTP/hikvision_cam.get_status.login_status)=2 ` |WARNING |<p>Manual close: YES</p> |
-|Hikvision camera: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Hikvision camera by HTTP/hikvision_cam.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Channel "{#CHANNEL_ID}": Invalid video stream resolution parameters |<p>expected: {$HIKVISION_STREAM_WIDTH} px x {$HIKVISION_STREAM_HEIGHT} px</p><p>received: {ITEM.LASTVALUE2} x {ITEM.LASTVALUE1}</p> |`last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}])<>{$HIKVISION_STREAM_HEIGHT} or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}])<>{$HIKVISION_STREAM_WIDTH} ` |WARNING |<p>Manual close: YES</p> |
-|Channel "{#CHANNEL_ID}": Parameters of video stream are changed |<p>-</p> |`last(/Hikvision camera by HTTP/hikvision_cam.fixed_quality[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.fixed_quality[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.constant_bit_rate[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.constant_bit_rate[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_quality_control_type[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_quality_control_type[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}],#2) ` |INFO |<p>Manual close: YES</p> |
-|Hikvision camera: Authorisation error on get PTZ channels |<p>Check the correctness of the authorization data</p> |`last(/Hikvision camera by HTTP/hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}])=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Hikvision camera: Authorisation error</p> |
-|Hikvision camera: Error receiving data on PTZ channels |<p>Check the availability of the HTTP port</p> |`last(/Hikvision camera by HTTP/hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}])=2` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Hikvision camera: Error receiving data</p> |
+|----|-----------|----------|--------|--------------------------------|
+|Hikvision camera: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Hikvision camera by HTTP/hikvision_cam.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Hikvision camera: Version has changed|<p>Hikvision camera version has changed. Ack to close.</p>|`last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.firmware_version))>0`|Info|**Manual close**: Yes|
+|Hikvision camera: Authorisation error|<p>Check the correctness of the authorization data</p>|`last(/Hikvision camera by HTTP/hikvision_cam.get_info.login_status)=1 or last(/Hikvision camera by HTTP/hikvision_cam.get_streaming.login_status)=1 or last(/Hikvision camera by HTTP/hikvision_cam.get_status.login_status)=1`|Warning|**Manual close**: Yes|
+|Hikvision camera: Error receiving data|<p>Check the availability of the HTTP port</p>|`last(/Hikvision camera by HTTP/hikvision_cam.get_info.login_status)=2 or last(/Hikvision camera by HTTP/hikvision_cam.get_streaming.login_status)=2 or last(/Hikvision camera by HTTP/hikvision_cam.get_status.login_status)=2`|Warning|**Manual close**: Yes|
+|Hikvision camera: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Hikvision camera by HTTP/hikvision_cam.memory.usage,5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Hikvision camera: Camera has been replaced|<p>Camera serial number has changed. Ack to close</p>|`last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.serial_number))>0`|Info|**Manual close**: Yes|
+|Hikvision camera: has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/Hikvision camera by HTTP/hikvision_cam.uptime)<10m`|Info|**Manual close**: Yes|
+
+### LLD rule PTZ discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|PTZ discovery| |HTTP agent|hikvision_cam.ptz.discovery<p>**Preprocessing**</p><ul><li>XML to JSON: ``</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+
+### Item prototypes for PTZ discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Hikvision camera: Get PTZ info: Channel "{#PTZ_CHANNEL_ID}": Login status| |Dependent item|hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Hikvision camera: Get PTZ info|<p>High precision positioning which is accurate to a bit after the decimal point</p>|HTTP agent|hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: ``</p><p>⛔️Custom on fail: Set value to: `{"html":{"head":{"title":"Connection error"}}}`</p></li><li><p>XML to JSON: ``</p><p>⛔️Custom on fail: Set value to: `{"html":{"head":{"title":"Connection error"}}}`</p></li></ul>|
+|Channel "{#PTZ_CHANNEL_ID}": Absolute zoom| |Dependent item|hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.PTZStatus.AbsoluteHigh.absoluteZoom`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.1`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#PTZ_CHANNEL_ID}": Azimuth| |Dependent item|hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.PTZStatus.AbsoluteHigh.azimuth`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.1`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#PTZ_CHANNEL_ID}": Elevation| |Dependent item|hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.PTZStatus.AbsoluteHigh.elevation`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.1`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+
+### Trigger prototypes for PTZ discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Hikvision camera: Authorisation error on get PTZ channels|<p>Check the correctness of the authorization data</p>|`last(/Hikvision camera by HTTP/hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}])=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hikvision camera: Authorisation error</li></ul>|
+|Hikvision camera: Error receiving data on PTZ channels|<p>Check the availability of the HTTP port</p>|`last(/Hikvision camera by HTTP/hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}])=2`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hikvision camera: Error receiving data</li></ul>|
+|Channel "{#PTZ_CHANNEL_ID}": PTZ position changed|<p>The direction of the camera has changed</p>|`last(/Hikvision camera by HTTP/hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}],#2)`|Info|**Manual close**: Yes|
+
+### LLD rule Streaming channels discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Streaming channels discovery| |HTTP agent|hikvision_cam.streaming.discovery<p>**Preprocessing**</p><ul><li>XML to JSON: ``</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+
+### Item prototypes for Streaming channels discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Channel "{#CHANNEL_ID}": Constant bitRate| |Dependent item|hikvision_cam.constant_bit_rate[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Fixed quality| |Dependent item|hikvision_cam.fixed_quality[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": GovLength| |Dependent item|hikvision_cam.gov_length[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": H264Profile| |Dependent item|hikvision_cam.h264Profile[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Key frame interval| |Dependent item|hikvision_cam.key_frame_interval[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.01`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Frame rate (max)| |Dependent item|hikvision_cam.max_frame_rate[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.01`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Smoothing| |Dependent item|hikvision_cam.smoothing[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Snapshot image type| |Dependent item|hikvision_cam.snap_shot_image_type[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": VBR lower| |Dependent item|hikvision_cam.vbr_lower_cap[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": VBR upper| |Dependent item|hikvision_cam.vbr_upper_cap[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Channel "{#CHANNEL_ID}": Video codec type| |Dependent item|hikvision_cam.video_codec_type[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Video quality control type| |Dependent item|hikvision_cam.video_quality_control_type[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Resolution height| |Dependent item|hikvision_cam.video_resolution_height[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Resolution width| |Dependent item|hikvision_cam.video_resolution_width[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Channel "{#CHANNEL_ID}": Video scan type| |Dependent item|hikvision_cam.video_scan_type[{#CHANNEL_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[0]`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+
+### Trigger prototypes for Streaming channels discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Channel "{#CHANNEL_ID}": Invalid video stream resolution parameters|<p>expected: {$HIKVISION_STREAM_WIDTH} px x {$HIKVISION_STREAM_HEIGHT} pxreceived: {ITEM.LASTVALUE2} x {ITEM.LASTVALUE1}</p>|`last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}])<>{$HIKVISION_STREAM_HEIGHT} or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}])<>{$HIKVISION_STREAM_WIDTH}`|Warning|**Manual close**: Yes|
+|Channel "{#CHANNEL_ID}": Parameters of video stream are changed||`last(/Hikvision camera by HTTP/hikvision_cam.fixed_quality[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.fixed_quality[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.constant_bit_rate[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.constant_bit_rate[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_quality_control_type[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_quality_control_type[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}],#2)`|Info|**Manual close**: Yes|
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at `https://support.zabbix.com`.
+
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
