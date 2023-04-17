@@ -36,14 +36,6 @@ type Session struct {
 	Service string `conf:"optional"`
 }
 
-//Defaults hold default connection values
-type Default struct {
-	URI      string `conf:"name=Uri,optional"`
-	Password string `conf:"optional"`
-	User     string `conf:"optional"`
-	Service  string `conf:"optional"`
-}
-
 type PluginOptions struct {
 	// ConnectTimeout is the maximum time in seconds for waiting when a connection has to be established.
 	// Default value equals to the global timeout.
