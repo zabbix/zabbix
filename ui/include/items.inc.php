@@ -1349,7 +1349,7 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 
 	if ($item['value'] !== null) {
 		$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
-			? CViewHelper::binaryValueSubstitute()
+			? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
 			: formatHistoryValue($item['value'], $item);
 	}
 
@@ -1426,7 +1426,6 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
-		case ITEM_VALUE_TYPE_BINARY:
 			if ($trim && mb_strlen($value) > 20) {
 				$value = mb_substr($value, 0, 20).'...';
 			}
@@ -1439,6 +1438,13 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 				'value' => $value,
 				'units' => '',
 				'is_mapped' => $mapped_value !== false
+			];
+
+		case ITEM_VALUE_TYPE_BINARY:
+			return [
+				'value' => _('binary value'),
+				'units' => '',
+				'is_mapped' => false
 			];
 
 		default:

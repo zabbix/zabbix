@@ -287,10 +287,6 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
-					$options['output'] = $value_type == ITEM_VALUE_TYPE_BINARY
-						? ['clock', 'value', 'ns']
-						: API_OUTPUT_EXTEND;
-
 					$item_data = API::History()->get($options);
 
 					if ($item_data) {
@@ -310,39 +306,39 @@ class CScreenHistory extends CScreenBase {
 
 				foreach ($history_data as $data) {
 					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-						$data['value'] = CViewHelper::binaryValueSubstitute($this->plaintext);
+						$data['value'] = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
 					}
 					else {
 						$data['value'] = rtrim($data['value'], " \t\r\n");
 						$data['value'] = zbx_nl2br($data['value']);
+					}
 
-						$item = $items[$data['itemid']];
-						$host = reset($item['hosts']);
-						$color = null;
+					$item = $items[$data['itemid']];
+					$host = reset($item['hosts']);
+					$color = null;
 
-						if ($this->filter !== '') {
-							$haystack = mb_strtolower($data['value']);
-							$needle = mb_strtolower($this->filter);
-							$pos = mb_strpos($haystack, $needle);
+					if ($this->filter !== '' && $value_type != ITEM_VALUE_TYPE_BINARY) {
+						$haystack = mb_strtolower($data['value']);
+						$needle = mb_strtolower($this->filter);
+						$pos = mb_strpos($haystack, $needle);
 
-							if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
-								$color = $this->markColor;
-							}
-							elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
-								$color = $this->markColor;
-							}
+						if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
+							$color = $this->markColor;
+						}
+						elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
+							$color = $this->markColor;
+						}
 
-							switch ($color) {
-								case MARK_COLOR_RED:
-									$color = ZBX_STYLE_RED;
-									break;
-								case MARK_COLOR_GREEN:
-									$color = ZBX_STYLE_GREEN;
-									break;
-								case MARK_COLOR_BLUE:
-									$color = ZBX_STYLE_BLUE;
-									break;
-							}
+						switch ($color) {
+							case MARK_COLOR_RED:
+								$color = ZBX_STYLE_RED;
+								break;
+							case MARK_COLOR_GREEN:
+								$color = ZBX_STYLE_GREEN;
+								break;
+							case MARK_COLOR_BLUE:
+								$color = ZBX_STYLE_BLUE;
+								break;
 						}
 					}
 
@@ -410,10 +406,6 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
-					$options['output'] = $value_type == ITEM_VALUE_TYPE_BINARY
-						? ['itemid', 'clock', 'value', 'ns']
-						: API_OUTPUT_EXTEND;
-
 					$item_data = API::History()->get($options);
 
 					if ($item_data) {
@@ -430,25 +422,20 @@ class CScreenHistory extends CScreenBase {
 
 				foreach ($history_data as $history_row) {
 					$item = $items[$history_row['itemid']];
+					$value = $history_row['value'];
 
-					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-						$value = CViewHelper::binaryValueSubstitute($this->plaintext);
+					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
 					}
-					else {
-						$value = $history_row['value'];
 
-						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-							$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
-						}
-
-						$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
-						$value = zbx_nl2br($value);
-					}
+					$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+						: CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
 
 					$history_table->addRow([
 						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
 							->addClass(ZBX_STYLE_NOWRAP),
-						new CPre($value)
+						new CPre(zbx_nl2br($value))
 					]);
 				}
 
@@ -525,18 +512,15 @@ class CScreenHistory extends CScreenBase {
 					$values = $history_data_row['values'];
 
 					foreach ($items as $item) {
-						if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-							$value = CViewHelper::binaryValueSubstitute($this->plaintext);
-						}
-						else {
-							$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
+						$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
 
-							if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT && $value !== '') {
-								$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
-							}
-
-							$value = CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
+						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT && $value !== '') {
+							$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
 						}
+
+						$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+							? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+							: CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
 
 						$row[] = ($value === '') ? '' : new CPre($value);
 					}

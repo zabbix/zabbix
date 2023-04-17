@@ -1337,13 +1337,8 @@ class CControllerPopupTriggerExpr extends CController {
 							]);
 						}
 
-						$item = reset($items);
-
-						if ($item === false) {
+						if (($item = reset($items)) === false) {
 							error(_('Unknown host item, no such item in selected host'));
-						}
-						elseif ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-							error(_s('Binary item "%1$s" cannot be used in trigger', $item['key_']));
 						}
 					}
 

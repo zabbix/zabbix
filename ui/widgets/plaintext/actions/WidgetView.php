@@ -95,15 +95,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$histories = array_merge(...$histories);
 
 					foreach ($histories as &$history) {
-						$history['value'] = $items[$history['itemid']]['value_type'] == ITEM_VALUE_TYPE_BINARY
-							? CViewHelper::binaryValueSubstitute(true)
-							: formatHistoryValue($history['value'], $items[$history['itemid']], false);
-						$history['value'] = $this->fields_values['show_as_html']
-							? new CJsScript($history['value'])
-							: new CPre($history['value']);
-
 						if ($items[$history['itemid']]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-							$history['value']->addClass(ZBX_STYLE_GREY);
+							$history['value'] = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+						}
+						else {
+							$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']],
+								false
+							);
+							$history['value'] = $this->fields_values['show_as_html']
+								? new CJsScript($history['value'])
+								: new CPre($history['value']);
 						}
 					}
 					unset($history);

@@ -521,14 +521,7 @@ $item_tab
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
-						'normal_only' => true,
-						'value_types' => [
-							ITEM_VALUE_TYPE_FLOAT,
-							ITEM_VALUE_TYPE_STR,
-							ITEM_VALUE_TYPE_LOG,
-							ITEM_VALUE_TYPE_UINT64,
-							ITEM_VALUE_TYPE_TEXT
-						]
+						'normal_only' => true
 					]
 				]
 			]))

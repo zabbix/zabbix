@@ -85,22 +85,4 @@ class CViewHelper {
 	public static function loadSidebarMode() {
 		return (int) CProfile::get('web.sidebar.mode', ZBX_SIDEBAR_VIEW_MODE_FULL);
 	}
-
-	/**
-	 * Return substitute to be used in place of binary values.
-	 *
-	 * @param bool $plaintext
-	 */
-	public static function binaryValueSubstitute(bool $plaintext = false) {
-		static $substitute = null;
-
-		if ($substitute === null) {
-			$substitute = [
-				true => _('binary value'),
-				false => (new CTag('em', true, _('binary value')))->addClass(ZBX_STYLE_GREY)
-			];
-		}
-
-		return $substitute[$plaintext];
-	}
 }

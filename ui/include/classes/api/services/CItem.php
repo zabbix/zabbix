@@ -1717,49 +1717,49 @@ class CItem extends CItemGeneral {
 		}
 
 		// adding history data
-		$requestedOutput = [];
-		if ($this->outputIsRequested('lastclock', $options['output'])) {
-			$requestedOutput['lastclock'] = true;
-		}
-		if ($this->outputIsRequested('lastns', $options['output'])) {
-			$requestedOutput['lastns'] = true;
-		}
-		if ($this->outputIsRequested('lastvalue', $options['output'])) {
-			$requestedOutput['lastvalue'] = true;
-		}
-		if ($this->outputIsRequested('prevvalue', $options['output'])) {
-			$requestedOutput['prevvalue'] = true;
-		}
-		if ($requestedOutput) {
+		$requested_output = [
+			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
+			'lastnds' => $this->outputIsRequested('lastns', $options['output']),
+			'lastvalue' => $this->outputIsRequested('lastvalue', $options['output']),
+			'prevvalue' => $this->outputIsRequested('prevvalue', $options['output'])
+		];
+
+		if (array_filter($requested_output)) {
 			$history = Manager::History()->getLastValues($result, 2, timeUnitToSeconds(CSettingsHelper::get(
 				CSettingsHelper::HISTORY_PERIOD
 			)));
 
 			foreach ($result as &$item) {
-				if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY && array_key_exists($item['itemid'], $history)) {
-					foreach ($history[$item['itemid']] as &$row) {
-						$row['value'] = base64_encode($row['value']);
+				$last_history = false;
+				$prev_history = false;
+				$no_value = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]) ? '0' : '';
+
+				if (array_key_exists($item['itemid'], $history)) {
+					if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+						foreach ($history[$item['itemid']] as &$row) {
+							$row['value'] = base64_encode($row['value']);
+						}
+						unset($row);
 					}
-					unset($row);
+
+					$last_history = reset($history[$item['itemid']]);
+					$prev_history = end($history[$item['itemid']]);
 				}
 
-				$lastHistory = array_key_exists(0, $history[$item['itemid']]) ? $history[$item['itemid']][0] : null;
-				$prevHistory = array_key_exists(1, $history[$item['itemid']]) ? $history[$item['itemid']][1] : null;
-				$no_value = in_array($item['value_type'],
-						[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]
-					) ? '' : '0';
+				if ($requested_output['lastclock']) {
+					$item['lastclock'] = $last_history ? $last_history['clock'] : '0';
+				}
 
-				if (isset($requestedOutput['lastclock'])) {
-					$item['lastclock'] = $lastHistory ? $lastHistory['clock'] : '0';
+				if ($requested_output['lastns']) {
+					$item['lastns'] = $last_history ? $last_history['ns'] : '0';
 				}
-				if (isset($requestedOutput['lastns'])) {
-					$item['lastns'] = $lastHistory ? $lastHistory['ns'] : '0';
+
+				if ($requested_output['lastvalue']) {
+					$item['lastvalue'] = $last_history ? $last_history['value'] : $no_value;
 				}
-				if (isset($requestedOutput['lastvalue'])) {
-					$item['lastvalue'] = $lastHistory ? $lastHistory['value'] : $no_value;
-				}
-				if (isset($requestedOutput['prevvalue'])) {
-					$item['prevvalue'] = $prevHistory ? $prevHistory['value'] : $no_value;
+
+				if ($requested_output['prevvalue']) {
+					$item['prevvalue'] = $prev_history ? $prev_history['value'] : $no_value;
 				}
 			}
 			unset($item);

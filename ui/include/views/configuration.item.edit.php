@@ -584,14 +584,7 @@ $item_tab
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
 						'excludeids' => $data['itemid'] != 0 ? [$data['itemid']] : [],
-						'normal_only' => true,
-						'value_types' => [
-							ITEM_VALUE_TYPE_FLOAT,
-							ITEM_VALUE_TYPE_STR,
-							ITEM_VALUE_TYPE_LOG,
-							ITEM_VALUE_TYPE_UINT64,
-							ITEM_VALUE_TYPE_TEXT
-						]
+						'normal_only' => true
 					]
 				]
 			]))

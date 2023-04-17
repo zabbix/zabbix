@@ -398,14 +398,7 @@ if ($data['single_host_selected']) {
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
-						'only_hostid' => $data['hostid'],
-						'value_types' => [
-							ITEM_VALUE_TYPE_FLOAT,
-							ITEM_VALUE_TYPE_STR,
-							ITEM_VALUE_TYPE_LOG,
-							ITEM_VALUE_TYPE_UINT64,
-							ITEM_VALUE_TYPE_TEXT
-						]
+						'only_hostid' => $data['hostid']
 					]
 				]
 			]))
@@ -435,14 +428,7 @@ if ($data['single_host_selected']) {
 					dstfld1: "master_itemid",
 					dstfld2: "master_itemname",
 					only_hostid: this.dataset.hostid,
-					normal_only: 1,
-					value_types: '.json_encode([
-						ITEM_VALUE_TYPE_FLOAT,
-						ITEM_VALUE_TYPE_STR,
-						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_UINT64,
-						ITEM_VALUE_TYPE_TEXT
-					]).'
+					normal_only: 1
 				}, {dialogue_class: "modal-popup-generic"});
 			');
 
@@ -459,14 +445,7 @@ if ($data['single_host_selected']) {
 					dstfrm: "'.$form->getName().'",
 					dstfld1: "master_itemid",
 					dstfld2: "master_itemname",
-					parent_discoveryid: this.dataset.parent_discoveryid,
-					value_types: '.json_encode([
-						ITEM_VALUE_TYPE_FLOAT,
-						ITEM_VALUE_TYPE_STR,
-						ITEM_VALUE_TYPE_LOG,
-						ITEM_VALUE_TYPE_UINT64,
-						ITEM_VALUE_TYPE_TEXT
-					]).'
+					parent_discoveryid: this.dataset.parent_discoveryid
 				}, {dialogue_class: "modal-popup-generic"});
 			');
 	}

@@ -1182,10 +1182,10 @@ class CMacrosResolverGeneral {
 								if (array_key_exists('clock', $history)) {
 									$clock = $history['clock'];
 								}
-								if (array_key_exists('value', $history)) {
-									$value = $function['value_type'] == ITEM_VALUE_TYPE_BINARY
-										? UNRESOLVED_MACRO_STRING
-										: $history['value'];
+
+								if (array_key_exists('value', $history)
+										&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+									$value = $history['value'];
 								}
 							}
 							break;
@@ -1199,9 +1199,10 @@ class CMacrosResolverGeneral {
 
 						if (array_key_exists($function['itemid'], $history)) {
 							$clock = $history[$function['itemid']][0]['clock'];
-							$value = $function['value_type'] == ITEM_VALUE_TYPE_BINARY
-								? UNRESOLVED_MACRO_STRING
-								: $history[$function['itemid']][0]['value'];
+
+							if ($function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+								$value = $history[$function['itemid']][0]['value'];
+							}
 						}
 						break;
 				}

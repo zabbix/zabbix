@@ -1791,7 +1791,7 @@ class CScreenProblem extends CScreenBase {
 							: UNRESOLVED_MACRO_STRING
 					),
 					new CCol($item['value_type'] == ITEM_VALUE_TYPE_BINARY
-						? CViewHelper::binaryValueSubstitute()
+						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
 						: $last_value['value']
 					),
 					new CCol(
@@ -1815,7 +1815,7 @@ class CScreenProblem extends CScreenBase {
 
 				$latest_values[] = (new CLinkAction(
 					$item['value_type'] == ITEM_VALUE_TYPE_BINARY
-						? CViewHelper::binaryValueSubstitute(true)
+						? _('binary value')
 						: $last_value['value']
 				))
 					->addClass('hint-item')

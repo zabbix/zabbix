@@ -96,8 +96,8 @@ foreach ($data['rows'] as $columns) {
 
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 				if ($column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-					$formatted_value = CViewHelper::binaryValueSubstitute();
-					$column['value'] = CViewHelper::binaryValueSubstitute(true);
+					$formatted_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+					$column['value'] = _('binary value');
 				}
 				else {
 					$formatted_value = formatHistoryValue($column['value'], $column['item'], true, [

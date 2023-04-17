@@ -561,14 +561,7 @@ if (!$readonly) {
 				dstfld2: "master_itemname",
 				only_hostid: this.dataset.hostid,
 				excludeids: [this.dataset.itemid],
-				normal_only: 1,
-				value_types: '.json_encode([
-					ITEM_VALUE_TYPE_FLOAT,
-					ITEM_VALUE_TYPE_STR,
-					ITEM_VALUE_TYPE_LOG,
-					ITEM_VALUE_TYPE_UINT64,
-					ITEM_VALUE_TYPE_TEXT
-				]).'
+				normal_only: 1
 			}, {dialogue_class: "modal-popup-generic"});
 		');
 
@@ -587,14 +580,7 @@ if (!$readonly) {
 				dstfld1: "master_itemid",
 				dstfld2: "master_itemname",
 				parent_discoveryid: this.dataset.discoveryid,
-				excludeids: [this.dataset.itemid],
-				value_types: '.json_encode([
-					ITEM_VALUE_TYPE_FLOAT,
-					ITEM_VALUE_TYPE_STR,
-					ITEM_VALUE_TYPE_LOG,
-					ITEM_VALUE_TYPE_UINT64,
-					ITEM_VALUE_TYPE_TEXT
-				]).'
+				excludeids: [this.dataset.itemid]
 			}, {dialogue_class: "modal-popup-generic"});
 		');
 }

@@ -601,16 +601,16 @@ class CControllerPopupGeneric extends CController {
 			$this->disableids = $this->getInput('disableids');
 		}
 
-		if ($ret && $this->getInput('value_types', [])) {
-			$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
-			];
+		$value_types = $this->getInput('value_types', []);
 
-			foreach ($this->getInput('value_types') as $value_type) {
-				if (!is_numeric($value_type) || !in_array($value_type, $value_types)) {
-					error(_s('Incorrect value "%1$s" for "%2$s" field.', $value_type, 'value_types'));
-					$ret = false;
-				}
+		if ($ret && $value_types) {
+			$invalid_value_types = array_diff($value_types, [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT,
+				ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+			]);
+
+			if ($invalid_value_types) {
+				error(_s('Incorrect value "%1$s" for "%2$s" field.', $invalid_value_types[0], 'value_types'));
+				$ret = false;
 			}
 		}
 
