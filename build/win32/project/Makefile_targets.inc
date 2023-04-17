@@ -127,9 +127,6 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\zabbix_agent\active_checks}.c{..\..\..\src\zabbix_agent\active_checks}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
-{..\..\..\src\zabbix_agent\cpustat}.c{..\..\..\src\zabbix_agent\cpustat}.o:
-	$(CC) $? /Fo"$@" $(CFLAGS)
-
 {..\..\..\src\zabbix_agent\logfiles}.c{..\..\..\src\zabbix_agent\logfiles}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 

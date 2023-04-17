@@ -19,7 +19,7 @@
 
 #include "cpustat.h"
 
-#include "../stats.h"
+#include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
 /* defined in sysinfo lib */

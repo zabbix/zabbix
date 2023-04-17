@@ -22,6 +22,7 @@
 
 #include "zbxcommon.h"
 #include "module.h"
+#include "zbxthreads.h"
 
 /* CHECK RESULT */
 
@@ -245,5 +246,11 @@ const char	*zbx_alias_get(const char *orig);
 
 int		zbx_init_modbus(char **error);
 void		zbx_deinit_modbus(void);
+
+/* stats */
+ZBX_THREAD_ENTRY(collector_thread, args);
+
+int     init_collector_data(char **error);
+void    free_collector_data(void);
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

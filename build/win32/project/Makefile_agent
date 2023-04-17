@@ -83,6 +83,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\agent\modbus.o \
 	..\..\..\src\libs\zbxsysinfo\common\zbxsysinfo_common.o \
 	..\..\..\src\libs\zbxsysinfo\common\cpu.o \
+	..\..\..\src\libs\zbxsysinfo\common\cpustat.o \
 	..\..\..\src\libs\zbxsysinfo\common\dir.o \
 	..\..\..\src\libs\zbxsysinfo\common\vfs_file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
@@ -116,7 +117,6 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwinservice\service.o \
 	..\..\..\src\zabbix_agent\active_checks\active_checks.o \
-	..\..\..\src\zabbix_agent\cpustat\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \
 	..\..\..\src\zabbix_agent\listener.o \
 	..\..\..\src\zabbix_agent\logfiles\persistent_state.o \

@@ -2,8 +2,7 @@
 
 SUBDIRS = \
 	logfiles \
-	active_checks \
-	cpustat
+	active_checks
 
 EXTRA_DIST = \
 	eventlog.c \
@@ -16,15 +15,9 @@ sbin_PROGRAMS = zabbix_agentd
 noinst_LIBRARIES = libzbxagent.a
 
 libzbxagent_a_SOURCES = \
-	diskdevices.c \
-	diskdevices.h \
 	listener.c \
 	listener.h \
 	metrics.h \
-	procstat.c \
-	procstat.h \
-	stats.c \
-	stats.h \
 	vmstats.c \
 	vmstats.h \
 	zbxconf.c \
@@ -41,7 +34,6 @@ zabbix_agentd_SOURCES = zabbix_agentd.c
 zabbix_agentd_LDADD = \
 	libzbxagent.a \
 	active_checks/libzbxactive_checks.a \
-	cpustat/libzbxcpustat.a \
 	logfiles/libzbxlogfiles.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
