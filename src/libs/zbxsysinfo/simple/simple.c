@@ -238,28 +238,11 @@ clean:
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	zbx_socket_t	s;
-#ifdef _WINDOWS
-	u_long		argp = 1;
-#else
-	int		flags;
-#endif
+
 	*value_int = 0;
 
 	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
-#ifdef _WINDOWS
-		ioctlsocket(s.socket, FIONBIO, &argp);	/* non-zero value sets the socket to non-blocking */
-#else
-		flags = fcntl(s.socket, F_GETFL);
-		if (-1 == flags)
-			zabbix_log(LOG_LEVEL_DEBUG, " error in getting the status flag: %s", zbx_strerror(errno));
-
-		if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, " error in setting the status flag: %s",
-				zbx_strerror(errno));
-		}
-#endif
 		if (SUCCEED == zbx_telnet_test_login(&s))
 			*value_int = 1;
 		else
