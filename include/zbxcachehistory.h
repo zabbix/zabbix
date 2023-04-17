@@ -59,7 +59,7 @@ void	zbx_log_sync_history_cache_progress(void);
 #define ZBX_SYNC_ALL	1
 
 int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_uint64_t history_cache_size,
-		zbx_uint64_t history_index_cache_size,zbx_uint64_t trends_cache_size, char **error);
+		zbx_uint64_t history_index_cache_size,zbx_uint64_t *trends_cache_size, char **error);
 void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
 
 void	zbx_change_proxy_history_count(int change_count);

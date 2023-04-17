@@ -5004,7 +5004,7 @@ int	hc_get_history_compression_age(void)
 
 ZBX_SHMEM_FUNC_IMPL(__trend, trend_mem)
 
-static int	init_trend_cache(zbx_uint64_t trends_cache_size, char **error)
+static int	init_trend_cache(zbx_uint64_t *trends_cache_size, char **error)
 {
 	size_t	sz;
 	int	ret;
@@ -5015,13 +5015,13 @@ static int	init_trend_cache(zbx_uint64_t trends_cache_size, char **error)
 		goto out;
 
 	sz = zbx_shmem_required_size(1, "trend cache", "TrendCacheSize");
-	if (SUCCEED != (ret = zbx_shmem_create(&trend_mem, trends_cache_size, "trend cache", "TrendCacheSize", 0,
+	if (SUCCEED != (ret = zbx_shmem_create(&trend_mem, *trends_cache_size, "trend cache", "TrendCacheSize", 0,
 			error)))
 	{
 		goto out;
 	}
 
-	trends_cache_size -= sz;
+	*trends_cache_size -= sz;
 
 	cache->trends_num = 0;
 	cache->trends_last_cleanup_hour = 0;
@@ -5047,7 +5047,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_uint64_t history_cache_size,
-		zbx_uint64_t history_index_cache_size,zbx_uint64_t trends_cache_size, char **error)
+		zbx_uint64_t history_index_cache_size,zbx_uint64_t *trends_cache_size, char **error)
 {
 	int	ret;
 

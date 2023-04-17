@@ -1410,7 +1410,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED != zbx_init_database_cache(get_program_type, config_history_cache_size,
-			config_history_index_cache_size, config_trends_cache_size,&error))
+			config_history_index_cache_size, &config_trends_cache_size,&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
