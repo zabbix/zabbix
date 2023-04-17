@@ -3331,7 +3331,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	{
 		if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
 		{
-			if (FAIL == (res = tls_socket_wait(s->socket, s->tls_ctx->ctx, 0)))
+			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, 0))
 			{
 				*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
 						strerror_from_system(zbx_socket_last_error()));
