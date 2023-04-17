@@ -1626,6 +1626,12 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		case ZBX_VALUE_FUNC_AVG:
 		case ZBX_VALUE_FUNC_MAX:
 		case ZBX_VALUE_FUNC_SUM:
+			if (args_num >= 2)
+			{
+				*error = zbx_strdup(NULL, "invalid number of function parameters");
+				goto out;
+			}
+			ZBX_FALLTHROUGH;
 		case ZBX_VALUE_FUNC_COUNT:
 			if (1 > args_num)
 			{
@@ -1655,22 +1661,18 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 			if (args_num >= 2)
 			{
-				if (ZBX_VALUE_FUNC_COUNT != item_func)
+				if (ZBX_VARIANT_NONE != args[1].type)
 				{
-					*error = zbx_strdup(NULL, "invalid number of function parameters");
-					goto out;
-				}
+					if (SUCCEED != zbx_variant_convert(&args[1], ZBX_VARIANT_STR))
+					{
+						*error = zbx_strdup(NULL, "invalid third parameter");
+						goto out;
+					}
 
-				if (ZBX_VARIANT_NONE != args[1].type && SUCCEED != zbx_variant_convert(&args[1], ZBX_VARIANT_STR))
-				{
-					*error = zbx_strdup(NULL, "invalid third parameter");
-					goto out;
-				}
-
-				if (args[1].type == ZBX_VARIANT_STR)
 					operator = args[1].data.str;
+				}
 
-				if (args_num == 3)
+				if (args_num == 3 && ZBX_VARIANT_NONE != args[2].type)
 				{
 					if (SUCCEED != zbx_variant_convert(&args[2], ZBX_VARIANT_STR))
 					{
@@ -1678,8 +1680,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 						goto out;
 					}
 
-					if (args[2].type == ZBX_VARIANT_STR)
-						pattern = args[2].data.str;
+					pattern = args[2].data.str;
 				}
 			}
 
