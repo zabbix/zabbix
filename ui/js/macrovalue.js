@@ -35,13 +35,6 @@
 	const ZBX_STYLE_ICON_INVISIBLE = 'icon-invisible';
 	const ZBX_STYLE_ICON_SECRET = 'icon-secret';
 
-	function btnUndoFocusEventHandle() {
-		$(this)
-			.closest('.macro-input-group')
-			.find('.btn-undo')
-			.toggleClass('is-focused');
-	}
-
 	function btnUndoClickEventHandle() {
 		var $this = $(this),
 			$container = $this.closest('.macro-input-group'),
@@ -53,17 +46,15 @@
 			$('<div>')
 				.addClass('input-secret')
 				.append(
-					$('<input>')
-						.attr({
-							id: $input.attr('id'),
-							name: $input.attr('name'),
-							type: 'password',
-							value: '******',
-							placeholder: $input.attr('placeholder'),
-							maxlength: $input.attr('maxlength'),
-							disabled: true
-						})
-						.on('focus blur', btnUndoFocusEventHandle)
+					$('<input>').attr({
+						id: $input.attr('id'),
+						name: $input.attr('name'),
+						type: 'password',
+						value: '******',
+						placeholder: $input.attr('placeholder'),
+						maxlength: $input.attr('maxlength'),
+						disabled: true
+					})
 				)
 				.append($('<button>').attr({
 					type: 'button',
@@ -126,18 +117,16 @@
 			$curr_control.replaceWith($('<div>')
 				.addClass('input-secret')
 				.append(
-					$('<input>')
-						.attr({
-							id: $input.attr('id'),
-							name: $input.attr('name'),
-							type: 'password',
-							value: $input.val(),
-							placeholder: t('value'),
-							maxlength: $input.attr('maxlength'),
-							autocomplete: 'off',
-							style: 'width: 100%;'
-						})
-						.on('focus blur', btnUndoFocusEventHandle)
+					$('<input>').attr({
+						id: $input.attr('id'),
+						name: $input.attr('name'),
+						type: 'password',
+						value: $input.val(),
+						placeholder: t('value'),
+						maxlength: $input.attr('maxlength'),
+						autocomplete: 'off',
+						style: 'width: 100%;'
+					})
 				)
 				.inputSecret()
 			);
@@ -162,7 +151,6 @@
 					maxlength: $input.attr('maxlength')
 				})
 				.text($input.is(':disabled') ? '' : $input.val())
-				.on('focus blur', btnUndoFocusEventHandle)
 			);
 
 			$('.textarea-flexible', $container).textareaFlexible();
@@ -172,9 +160,6 @@
 	var methods = {
 		init() {
 			return this.each(function () {
-				$('.input-secret input, .macro-input-group .textarea-flexible', $(this))
-					.off('focus blur', btnUndoFocusEventHandle)
-					.on('focus blur', btnUndoFocusEventHandle);
 				$('.btn-undo', $(this))
 					.off('click', btnUndoClickEventHandle)
 					.on('click', btnUndoClickEventHandle);

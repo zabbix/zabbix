@@ -1,15 +1,14 @@
 $theme-name: 'blue' !default;
 
-$icon-default-size: 16px;
+$ui-transitions: true !default;
 
-$btn-icon-size: 18px;
-$btn-icon-small-size: 12px;
+$icon-default-size: 18px;
+$icon-medium-size: 16px;
+$icon-small-size: 12px;
 
 $main-menu-icon-size: 24px;
-$main-menu-submenu-icon-size: $icon-default-size;
-$user-menu-icon-size: $icon-default-size;
-
-$ui-transitions: true !default;
+$main-menu-submenu-icon-size: $icon-medium-size;
+$user-menu-icon-size: $icon-medium-size;
 
 // Sync with JavaScript variable: UI_TRANSITION_DURATION.
 $ui-transition-duration: .3s !default;
@@ -341,7 +340,7 @@ form {
 	}
 
 	&:focus {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
+		@include btn-hover-active($btn-color, $btn-bg-color);
 		z-index: 10;
 		position: relative;
 	}
@@ -372,7 +371,7 @@ form {
 		}
 
 		&:focus {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			@include btn-hover-active($btn-color, $btn-bg-color);
 			position: relative;
 		}
 
@@ -754,7 +753,7 @@ form {
 			cursor: pointer;
 
 			&::before {
-				font-size: $btn-icon-small-size *.85;
+				font-size: $icon-small-size *.85;
 				color: $ui-selected-color;
 			}
 
@@ -1420,22 +1419,23 @@ select {
 	}
 }
 
-.btn-alt {
-	color: $btn-alt-font-color;
-	background-color: $btn-alt-bg-color;
+// TODO - remove unused
+//.btn-alt {
+//	color: $btn-alt-color;
+//	background-color: $btn-alt-bg-color;
 
-	&:hover {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
+//	&:hover {
+//		@include btn-hover-active($btn-color, $btn-bg-color);
+//	}
 
-	&:focus {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
+//	&:focus {
+//		@include btn-hover-active($btn-color, $btn-bg-color);
+//	}
 
-	&:active {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
-}
+//	&:active {
+//		@include btn-hover-active($btn-color, $btn-bg-color);
+//	}
+//}
 
 // button::-moz-focus-inner {
 //	padding: 0;
@@ -1451,7 +1451,7 @@ select {
 //	background-color: $btn-bg-color;
 //	border: 1px solid $btn-bg-color;
 //	border-radius: 2px;
-//	color: $btn-font-color;
+//	color: $btn-color;
 //	margin: 0;
 //	padding: 0 11px;
 //	min-height: 24px;
@@ -1460,16 +1460,16 @@ select {
 //	transition: border-color .2s ease-out, background-color .2s ease-out;
 
 //	&:hover {
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//		@include btn-hover-active($btn-color, $btn-bg-color);
 //	}
 
 //	&:focus {
-//		box-shadow: 0 0 0 2px rgba($blue, .35);
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//		box-shadow: 0 0 0 2px $btn-focus-outline-color;
+//		@include btn-hover-active($btn-color, $btn-bg-color);
 //	}
 
 //	&:active {
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//		@include btn-hover-active($btn-color, $btn-bg-color);
 //	}
 //}
 
@@ -1645,7 +1645,7 @@ select {
 	.btn-time, // TODO need to check, not good.
 	.filter-trigger {
 		border-radius: 2px;
-		color: $btn-font-color;
+		color: $btn-color;
 		background-color: $btn-bg-color;
 		border: 1px solid $btn-bg-color;
 		position: relative;
@@ -1655,7 +1655,7 @@ select {
 
 		&:focus,
 		&:hover {
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			@include btn-hover-active($btn-color, $btn-bg-color);
 			cursor: pointer;
 		}
 	}
@@ -1683,7 +1683,6 @@ select {
 				vertical-align: middle;
 				padding-left: 8px;
 				@extend %icons-font;
-				font-size: 18px;
 				content: $zi-filter;
 			}
 		}
@@ -1701,15 +1700,15 @@ select {
 		.btn-info,
 		.btn-time,
 		.filter-trigger {
-			box-shadow: 0 0 0 2px rgba($blue, .35);
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+			@include btn-hover-active($btn-color, $btn-bg-color);
 		}
 
 		&.ui-tabs-active {
 			.btn-info,
 			.btn-time,
 			.filter-trigger {
-				box-shadow: 0 0 0 2px rgba($blue, .35);
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
@@ -1825,7 +1824,7 @@ select {
 			}
 
 			&:focus {
-				box-shadow: 0 0 0 2px rgba($blue, .35);
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 
 			&.selected {
@@ -1998,8 +1997,8 @@ select {
 .zi-tree-top-right-bottom,
 .zi-tree-top-bottom {
 	&::before {
-		//vertical-align: middle;
-		font-size: $btn-icon-small-size;
+		//vertical-align: middle; // TODO - check
+		font-size: $icon-small-size;
 	}
 }
 
@@ -2026,7 +2025,7 @@ button {
 	}
 
 	&.icon-help {
-		color: $icon-help-hint-color;
+		color: $icon-color;
 		border: none;
 		background: transparent;
 
@@ -2035,14 +2034,14 @@ button {
 
 			&::before {
 				border-radius: 50%;
-				box-shadow: inset 0 0 0 2px $btn-border-focus-color;
+				box-shadow: inset 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
 
 	&.icon-info {
 		&::before {
-			font-size: $btn-icon-small-size;
+			font-size: $icon-small-size;
 		}
 
 		&.status-green {
@@ -2303,16 +2302,14 @@ button {
 			background-color: $action-hover-color;
 		}
 
-		&.zi-check {
-			padding: 0;
+		&[class^="zi-"], &[class*=" zi-"] {
+			padding-left: 3px;
+
 			&::before {
-				padding: 0 4px;
-				top: -2px; // TODO acikuns check
-				font-size: 16px;
+				margin-right: 4px;
 				color: $icon-color;
 			}
 		}
-
 		.arrow-right {
 			position: absolute;
 			right: 10px;
@@ -2351,25 +2348,6 @@ button {
 	}
 }
 
-.menu-popup-item.zi-text,
-.menu-popup-item.zi-eye-off,
-.menu-popup-item.zi-lock {
-	padding: 0 0 0 5px;
-	&::before {
-		padding-right: 5px;
-		vertical-align: middle;
-
-		font-size: 16px;
-		color: $icon-color;
-	}
-}
-
-.menu-popup-item.zi-eye-off {
-	&::before {
-		font-size: 18px;
-	}
-}
-
 .overlay-dialogue {
 	display: table;
 	position: absolute;
@@ -2405,7 +2383,7 @@ button {
 				margin-left: 4px;
 
 				&::before {
-					font-size: $btn-icon-small-size;
+					font-size: $icon-small-size;
 				}
 
 				&:last-child {
@@ -2866,7 +2844,7 @@ button {
 				}
 
 				&.highlighted {
-					@include btn-hover-active($btn-font-color, $btn-bg-color);
+					@include btn-hover-active($btn-color, $btn-bg-color);
 					cursor: pointer;
 				}
 
@@ -4423,7 +4401,7 @@ svg {
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 2px rgba($blue, .35);
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
 }
 
@@ -4437,7 +4415,7 @@ a.icon-count {
 	margin: 1px 0;
 
 	.problem-icon-list-item {
-		color: $btn-font-color;
+		color: $btn-color;
 		font-size: 12px;
 		line-height: 1;
 		padding: 3px 5px 2px;
@@ -4455,7 +4433,7 @@ a.icon-count {
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 2px rgba($blue, .35);
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
 }
 
@@ -4479,6 +4457,33 @@ a.icon-count {
 
 ::placeholder {
 	color: $input-placeholder-color;
+}
+
+// TODO check classes
+.icon-action-command,
+.icon-action-close,
+.icon-action-msg,
+.icon-action-msgs,
+.icon-action-severity-up,
+.icon-action-severity-down,
+.icon-action-severity-changed,
+.icon-action-message,
+.icon-action-ack,
+.icon-action-unack,
+.icon-action-ack-green,
+.icon-action-suppress,
+.icon-action-unsuppress,
+.icon-action-cause,
+.icon-action-symptom,
+.icon-invisible,
+.icon-problem-generated,
+.icon-problem-recovery,
+.icon-actions-number-gray,
+.icon-actions-number-yellow,
+.icon-actions-number-red,
+.icon-description,
+.icon-user,
+.icon-user-group {
 }
 
 #expressions_list .ui-sortable-helper {
@@ -4598,56 +4603,34 @@ a.icon-count {
 		flex: 1;
 		border-right: 0;
 
-		&:focus,
-		&:active {
+		&:focus {
 			+ .btn-undo {
-				border-top-color: $form-border-focus-color;
-				border-bottom-color: $form-border-focus-color;
+				border-color: $form-border-focus-color;
 			}
 		}
 	}
 
-	button {
-		position: relative;
+	.btn-change,
+	.btn-undo {
+		border-radius: 0;
+	}
 
-		&.btn-change {
-			border-radius: 0;
-
-			&:disabled {
-				display: none;
-			}
-		}
-
-		&.zi-arrow-back {
+	.btn-change {
+		&:disabled {
 			display: none;
-			width: 24px;
-			padding: 0 2px;
-			border-left: 0;
-			border-right: 0;
-			border-top: 1px solid $form-border-color;
-			border-bottom: 1px solid $form-border-color;
-			border-radius: 0;
-			background-color: $form-bg-color;
-			color: $icon-color;
-			transition: border-color .2s ease-out, box-shadow .2s ease-out;
+		}
+	}
 
-			&.is-focused {
-				border-top: 1px solid $form-border-focus-color;
-				border-bottom: 1px solid $form-border-focus-color;
-			}
+	.btn-undo {
+		display: none;
+		color: $icon-color;
+		border-width: 1px 0;
+		border-color: $form-border-color;
 
-			&::before {
-				top: -1px;
-				font-size: 14px;
-			}
-
-			&:hover,
-			&:focus,
-			&:active {
-				border-top: 1px solid $form-border-focus-color;
-				border-bottom: 1px solid $form-border-focus-color;
-				@include btn-hover-active($btn-font-color, $btn-bg-color);
-			}
+		&:focus,
+		&:hover {
+			color: $btn-color;
+			border-color: $form-border-focus-color;
 		}
 	}
 }
@@ -4684,36 +4667,46 @@ a.icon-count {
 .btn-dropdown-container {
 	display: flex;
 
-	.zi-text,
-	.zi-eye-off,
-	.zi-lock {
-		padding: 0 5px;
-		&::before {
-			font-size: 16px;
-			color: $icon-color;
-		}
-		&:hover,
-		&:active,
-		&:focus {
-			&::before {
-				color: $white;
-			}
-		}
-	}
-
 	.btn-dropdown-toggle {
 		width: auto;
+		padding-right: 3px;
 		align-items: start;
-		padding-top: 4px;
+		line-height: 22px;
 		border-radius: 0 2px 2px 0;
+
+		&[class^="zi-"], &[class*=" zi-"] {
+			padding-left: 3px;
+
+			&::before {
+				margin-top: 2px;
+				margin-right: 2px;
+				color: $icon-color;
+			}
+
+			&:hover,
+			&:active,
+			&:focus {
+				&::before {
+					color: $btn-color;
+				}
+			}
+		}
 
 		&::after {
 			@extend %icons-font;
-			position: relative;
-			top: 4px;
-			margin-left: 2px;
-			font-size: $icon-default-size * .5;
 			content: $zi-chevron-down;
+			margin-top: 7px;
+			font-size: $icon-medium-size * .5;
+		}
+
+		&:not(:empty) {
+			&::before {
+				padding-left: 4px;
+			}
+
+			&::after {
+				margin-left: 4px;
+			}
 		}
 	}
 }
@@ -4746,7 +4739,7 @@ a.icon-count {
 
 		.zi-chevron-down {
 			&::before {
-				font-size: $btn-icon-small-size;
+				font-size: $icon-small-size;
 			}
 
 			&[aria-expanded="true"] {
@@ -5186,7 +5179,7 @@ z-select,
 	width: 30px;
 }
 .leaflet-marker-icon:focus {
-	box-shadow: 0 0 0 2px $btn-border-focus-color;
+	box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	border-radius: 2px;
 	outline: none;
 }
@@ -5200,7 +5193,6 @@ z-select,
 
 		&::before {
 			vertical-align: middle;
-			font-size: $btn-icon-size;
 		}
 	}
 
@@ -5262,12 +5254,8 @@ z-select,
 
 		.problem-row {
 			button.zi-eye-off {
-				width: 18px;
+				width: 18px; // TODO check width
 				min-height: 18px;
-
-				&::before {
-					font-size: 18px;
-				}
 			}
 		}
 
@@ -5278,7 +5266,7 @@ z-select,
 			margin-top: 7px;
 
 			&::before {
-				font-size: $icon-default-size;
+				font-size: $icon-medium-size;
 			}
 		}
 
@@ -5356,14 +5344,14 @@ z-select,
 
 		.event-severity-down {
 			&::before {
-				font-size: $btn-icon-small-size !important;
+				font-size: $icon-small-size !important; // FIXME important
 				color: $icon-action-severity-down !important;
 			}
 		}
 
 		.event-severity-up {
 			&::before {
-				font-size: $btn-icon-small-size !important;
+				font-size: $icon-small-size !important; // FIXME important
 				color: $icon-action-severety-up !important;
 			}
 		}

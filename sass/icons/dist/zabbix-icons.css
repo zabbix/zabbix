@@ -1,14 +1,14 @@
 @font-face {
   font-family: "zabbix-icons";
-  src: url("zabbix-icons.woff2?t=1681417696733") format("woff2"),
-  url("zabbix-icons.woff?t=1681417696733") format("woff"),
-  url('zabbix-icons.ttf?t=1681417696733') format('truetype'),
-  url('zabbix-icons.svg?t=1681417696733#zabbix-icons') format('svg');
+  src: url("zabbix-icons.woff2?t=1681727779299") format("woff2"),
+  url("zabbix-icons.woff?t=1681727779299") format("woff"),
+  url('zabbix-icons.ttf?t=1681727779299') format('truetype'),
+  url('zabbix-icons.svg?t=1681727779299#zabbix-icons') format('svg');
 }
 
 [class^="zi-"]::before, [class*=" zi-"]::before {
   font-family: 'zabbix-icons' !important;
-  font-size: 16px;
+  font-size: 18px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

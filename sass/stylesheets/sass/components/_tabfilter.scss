@@ -1,17 +1,3 @@
-$tab-label-color: $btn-font-color;
-$tab-label-bg-color: $btn-bg-color;
-$tab-label-focus-bg-color: $btn-form-hover-color;
-$tab-label-selected-color: $btn-font-color;
-$tab-label-selected-bg-color: $btn-bg-color;
-$tab-label-selected-border-color: $btn-bg-color;
-$tab-label-expanded-color: $font-color;
-$tab-label-expanded-bg-color: $ui-bg-color;
-$tab-label-expanded-border-color: $ui-border-color;
-$tab-label-hover-color: $btn-font-color;
-$tab-label-hover-bg-color: $btn-bg-color;
-$tab-label-counter-color: $form-font-color;
-$tab-label-counter-bg-color: $form-disabled-bg-color;
-
 .filter-container.tabfilter-container {
 	padding: 0;
 	border: 0 none;
@@ -149,7 +135,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 
 		&.focused {
-			box-shadow: 0 0 0 2px rgba($blue, .35);
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 
 		&.disabled {
@@ -167,7 +153,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 				&::before {
 					vertical-align: middle;
-					font-size: 18px;
 				}
 			}
 		}

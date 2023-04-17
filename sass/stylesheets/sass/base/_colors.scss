@@ -55,30 +55,6 @@ $body-bg-color: #ebeef0 !default;
 $overlay-bg-color: #ffffff !default;
 $overlay-border-color: #ccd5d9 !default;
 
-// Icons
-$icon-btn-icon-color: lighten(#768d99, 25%) !default;
-$icon-btn-icon-hover-color: #768d99 !default;
-$icon-btn-icon-disabled-color: lighten(#768d99, 35%) !default;
-$icon-doc-color: #bbc6cc !default;
-$icon-doc-hover-color: #768d99 !default;
-$icon-help-hint-color: #768d99 !default;
-
-// FIXME need to check color variables
-$icon-color: #768d99 !default;
-$icon-hint-color: #768d99 !default;
-$icon-calendar-color: #acbbc2 !default;
-$icon-action-arrow-up: #e33734 !default;
-$icon-action-check: #009900 !default;
-$icon-action-severity-down: #009900 !default;
-$icon-action-severety-up: #e33734 !default;
-$icon-action-severety-changed: #768d99 !default;
-$icon-action-list-table-color: #768d99 !default;
-$icon-remove-fav-color: #f3a914 !default;
-$icon-event-action-red: #e33734 !default;
-$icon-event-action-yellow: #af6b00 !default;
-$icon-event-action-gray: #768d99 !default;
-$icon-maintenance: #f3a914 !default;
-
 // Main menu
 $menu-icon-color: #8cb2ca !default;
 $main-menu-toggle-color: #4298ca !default;
@@ -192,13 +168,37 @@ $msg-good-color: #28a745 !default;
 $msg-warning-color: #ffc107 !default;
 $msg-btn-text-color: darken(desaturate($red, 10%), 20%) !default;
 
+// Icons
+$icon-color: #768d99 !default;
+
+$icon-btn-color: lighten($icon-color, 25%) !default;
+$icon-btn-hover-color: $icon-color !default;
+$icon-btn-disabled-color: lighten($icon-color, 35%) !default;
+
+// FIXME need to check color variables
+$icon-hint-color: #768d99 !default;
+$icon-calendar-color: #acbbc2 !default;
+$icon-action-arrow-up: #e33734 !default;
+$icon-action-check: #009900 !default;
+$icon-action-severity-down: #009900 !default;
+$icon-action-severety-up: #e33734 !default;
+$icon-action-severety-changed: #768d99 !default;
+$icon-action-list-table-color: #768d99 !default;
+$icon-remove-fav-color: #f3a914 !default;
+$icon-event-action-red: #e33734 !default;
+$icon-event-action-yellow: #af6b00 !default;
+$icon-event-action-gray: #768d99 !default;
+$icon-maintenance: #f3a914 !default;
+
 // Buttons
-$btn-font-color: #ffffff !default;
+$btn-color: #ffffff !default;
 $btn-bg-color: #0275b8 !default;
 $btn-border-color: #0275b8 !default;
-$btn-border-focus-color: rgba(#1e87e3, .35) !default;
+$btn-hover-bg-color: #02659f !default;
+$btn-hover-border-color: #02659f !default;
+$btn-focus-outline-color: rgba(#1e87e3, .35) !default;
 
-$btn-alt-font-color: #0275b8 !default;
+$btn-alt-color: #0275b8 !default;
 $btn-alt-bg-color: transparent !default;
 
 $btn-form-font-color: #1f2c33 !default;
@@ -227,11 +227,20 @@ $link-main-subnav-hover-color: rgba(#ffffff, 1) !default;
 $link-main-subnav-active-color: rgba(#ffffff, 1) !default;
 $link-main-subnav-visited-color: rgba(#ffffff, .8) !default;
 
-// Analog clock
-$clock-face-color: #ebebeb !default;
-$clock-hand-color: #1f2c33 !default;
-$clock-hand-sec-color: #0275b8 !default;
-$clock-lines-color: #acbbc2 !default;
+// Tabfilter
+$tab-label-color: $btn-color;
+$tab-label-bg-color: $btn-bg-color;
+$tab-label-focus-bg-color: $btn-form-hover-color;
+$tab-label-selected-color: $btn-color;
+$tab-label-selected-bg-color: $btn-bg-color;
+$tab-label-selected-border-color: $btn-bg-color;
+$tab-label-expanded-color: $font-color;
+$tab-label-expanded-bg-color: $ui-bg-color;
+$tab-label-expanded-border-color: $ui-border-color;
+$tab-label-hover-color: $btn-color;
+$tab-label-hover-bg-color: $btn-bg-color;
+$tab-label-counter-color: $form-font-color;
+$tab-label-counter-bg-color: $form-disabled-bg-color;
 
 // Indicators
 $indicator-count-color: #768d99;
@@ -291,3 +300,9 @@ $text-placeholder-bg-color: $ui-bg-selected-color !default;
 $arrow-fill-up: #3DC51D;
 $arrow-fill-down: #FC5A5A;
 $arrow-fill-up-down: #3DC51D;
+
+// Analog clock
+$clock-face-color: #ebebeb !default;
+$clock-hand-color: #1f2c33 !default;
+$clock-hand-sec-color: #0275b8 !default;
+$clock-lines-color: #acbbc2 !default;

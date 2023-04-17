@@ -29,7 +29,7 @@ $sidebar-padding: 12px;
 
 		.btn-icon {
 			&::before {
-				font-size: $icon-default-size;
+				font-size: $icon-medium-size;
 				color: $sidebar-mode-icon-color;
 			}
 
@@ -93,7 +93,7 @@ $sidebar-padding: 12px;
 
 		&:focus {
 			.zabbix-logo-sidebar {
-				box-shadow: 0 0 0 2px rgba($blue, .35);
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 

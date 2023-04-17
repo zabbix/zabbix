@@ -13,7 +13,7 @@
     "classNamePrefix": "zi",
     "styleTemplates": "./templates/styles/",
     "css": {
-      "fontSize": "16px"
+      "fontSize": "18px"
     },
     "svgicons2svgfont": {
       "fontHeight": 600,

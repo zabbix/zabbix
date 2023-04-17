@@ -19,7 +19,6 @@
 			display: inline-block;
 			width: 18px;
 			height: 18px;
-			font-size: 18px;
 		}
 	}
 
@@ -57,12 +56,12 @@
 			&::before {
 				margin-left: 2px;
 				vertical-align: middle;
-				font-size: $btn-icon-small-size;
+				font-size: $icon-small-size;
 				color: $icon-maintenance;
 			}
 
 			&:focus {
-				box-shadow: 0 0 0 2px rgba($blue, .35);
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 				border-radius: 2px;
 			}
 		}
@@ -409,7 +408,7 @@
 		}
 	}
 
-	.zi-command,
+	.zi-command, // TODO - check
 	.zi-checkbox,
 	.zi-check,
 	.zi-eye-off,

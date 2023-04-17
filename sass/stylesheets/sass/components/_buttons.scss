@@ -14,10 +14,10 @@ button {
 	margin: 0;
 	font-family: $font-stack;
 	font-size: $font-form-size;
-	color: $btn-font-color;
+	color: $btn-color;
 	cursor: pointer;
 	background-color: $btn-bg-color;
-	border: 1px solid $btn-bg-color;
+	border: 1px solid $btn-border-color;
 	border-radius: 2px;
 	outline: 0;
 
@@ -28,13 +28,13 @@ button {
 	&:hover,
 	&:focus,
 	&:active {
-		color: $btn-font-color;
-		background-color: darken($btn-bg-color, 5%);
-		border-color: darken($btn-bg-color, 5%);
+		color: $btn-color;
+		background-color: $btn-hover-bg-color;
+		border-color: $btn-hover-border-color;
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 2px rgba($blue, .35);
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
 
 	&::-moz-focus-inner {
@@ -59,10 +59,8 @@ button {
 			}
 		}
 
-		&::before {
-			font-size: $btn-icon-size;
-
-			@if $ui-transitions {
+		@if $ui-transitions {
+			&::before {
 				transition: color .2s ease-out;
 			}
 		}
@@ -83,14 +81,8 @@ button {
 }
 
 .btn-alt {
-	color: $btn-alt-font-color;
+	color: $btn-alt-color;
 	background-color: $btn-alt-bg-color;
-
-	&:hover,
-	&:focus,
-	&:active {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
 }
 
 .btn-grey {
@@ -123,7 +115,7 @@ a.btn-icon,
 	border: none;
 
 	&::before {
-		color: $icon-btn-icon-color;
+		color: $icon-btn-color;
 	}
 
 	&:hover,
@@ -132,7 +124,7 @@ a.btn-icon,
 		background: transparent;
 
 		&::before {
-			color: $icon-btn-icon-hover-color;
+			color: $icon-btn-hover-color;
 		}
 	}
 
@@ -146,7 +138,7 @@ a.btn-icon,
 			background: transparent;
 
 			&::before {
-				color: $icon-btn-icon-disabled-color;
+				color: $icon-btn-disabled-color;
 			}
 		}
 	}
@@ -160,7 +152,7 @@ button {
 		min-height: 18px;
 
 		&:before {
-			font-size: $btn-icon-small-size *.85;
+			font-size: $icon-small-size *.85;
 		}
 	}
 }
@@ -168,7 +160,7 @@ button {
 .btn-alt {
 	&.zi-plus {
 		&::before {
-			font-size: $btn-icon-small-size;
+			font-size: $icon-small-size;
 		}
 	}
 }

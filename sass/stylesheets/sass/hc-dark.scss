@@ -174,12 +174,12 @@ $msg-good-color: $light-green;
 $msg-warning-color: #ffb319;
 
 // Buttons
-$btn-font-color: #333333;
+$btn-color: #333333;
 $btn-bg-color: #e0e0e0;
 $btn-border-color: #333333;
-$btn-border-focus-color: #ffffff;
+$btn-focus-outline-color: #ffffff;
 
-$btn-alt-font-color: #ffffff;
+$btn-alt-color: #ffffff;
 $btn-alt-bg-color: transparent;
 $btn-alt-border-color: $btn-border-color;
 
@@ -1085,7 +1085,7 @@ td.inactive-bg {
 	}
 
 	button {
-		color: $btn-alt-font-color;
+		color: $btn-alt-color;
 	}
 }
 
@@ -1213,7 +1213,7 @@ td.inactive-bg {
 	&:hover,
 	&:focus {
 		background-position: -245px -658px;
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
+		@include btn-hover-active($btn-color, $btn-bg-color);
 	}
 
 	&:focus {
@@ -1231,7 +1231,7 @@ td.inactive-bg {
 	&:hover,
 	&:focus {
 		background-position: -243px -624px;
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
+		@include btn-hover-active($btn-color, $btn-bg-color);
 	}
 
 	&:focus {
@@ -1310,9 +1310,9 @@ td.inactive-bg {
 	background-position: -434px -656px;
 }
 
-.icon-invisible::before {
-	background-position: -401px -803px;
-}
+//.icon-invisible::before {
+//	background-position: -401px -803px;
+//}
 
 .icon-problem-generated::before {
 	background-position: -449px -325px;
@@ -1456,7 +1456,7 @@ td.inactive-bg {
 
 // InputSecret and ButtonDropdown.
 
-.btn-undo.is-focused {
+.btn-undo.is-focused { // TODO FIX to input:focus + .btn-undo, textarea:focus + .btn-undo
 	box-shadow: 0 1px 0 $blue, 0 -1px 0 $blue;
 }
 
