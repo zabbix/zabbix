@@ -1347,7 +1347,7 @@ class CHistoryManager {
 		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 			if (CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
 					&& $this->checkCompressionAvailability() === true) {
-				error( _('History cleanup is not supported if compression is enabled'));
+				error(_('History cleanup is not supported if compression is enabled'));
 
 				return false;
 			}
