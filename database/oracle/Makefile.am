@@ -18,5 +18,4 @@ EXTRA_DIST = \
 	data.sql \
 	images.sql \
 	schema.sql \
-	double.sql \
 	history_pk_prepare.sql
