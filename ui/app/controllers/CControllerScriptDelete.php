@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,6 +21,10 @@
 
 class CControllerScriptDelete extends CController {
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'scriptids' =>	'required|array_db scripts.scriptid'
@@ -29,7 +33,13 @@ class CControllerScriptDelete extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -40,6 +50,7 @@ class CControllerScriptDelete extends CController {
 			return false;
 		}
 
+		// todo - check this:
 		$scripts = API::Script()->get([
 			'countOutput' => true,
 			'scriptids' => $this->getInput('scriptids'),
@@ -51,24 +62,25 @@ class CControllerScriptDelete extends CController {
 
 	protected function doAction() {
 		$scriptids = $this->getInput('scriptids');
+		$output = [];
+		$deleted = count($scriptids);
 
 		$result = (bool) API::Script()->delete($scriptids);
 
-		$deleted = count($scriptids);
-
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'script.list')
-			->setArgument('page', CPagerHelper::loadPage('script.list', null))
-		);
-
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_n('Script deleted', 'Scripts deleted', $deleted));
+			$output['success']['title'] = _n('Script deleted', 'Scripts deleted', $deleted);
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			CMessageHelper::setErrorTitle(_n('Cannot delete script', 'Cannot delete scripts', $deleted));
+			$output['error'] = [
+				'title' => _n('Cannot delete script', 'Cannot delete scripts', $deleted),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

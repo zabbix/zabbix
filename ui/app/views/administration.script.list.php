@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.script.list.js.php');
@@ -32,11 +33,13 @@ if ($data['uncheck']) {
 $html_page = (new CHtmlPage())
 	->setTitle(_('Scripts'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_LIST))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create script')))->setId('js-create')
+			)
 		))
-			->setAttribute('aria-label', _('Content controls'))
+		->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'script.list'))
@@ -195,10 +198,9 @@ foreach ($data['scripts'] as $script) {
 		$execute_on = '';
 	}
 
-	$link = new CLink($script['name'], (new CUrl('zabbix.php'))
-		->setArgument('action', 'script.edit')
-		->setArgument('scriptid', $script['scriptid'])
-	);
+	$link = (new CLink($script['name']))
+		->addClass('js-edit')
+		->setAttribute('data-scriptid', $script['scriptid']);
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
@@ -221,8 +223,12 @@ $scriptsForm->addItem([
 	$scriptsTable,
 	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
-		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?'),
-			'csrf_token' => CCsrfTokenHelper::get('script')]
+		'script.delete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdelete')
+				->addClass('no-chkbxrange')
+		]
 	], 'script')
 ]);
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -25,48 +25,27 @@ class CControllerScriptEdit extends CController {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'scriptid' =>				'db scripts.scriptid',
-			'name' =>					'db scripts.name',
-			'scope' =>					'db scripts.scope| in '.implode(',', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]),
-			'type' =>					'db scripts.type|in '.implode(',', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH, ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL]),
-			'execute_on' =>				'db scripts.execute_on|in '.implode(',', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER, ZBX_SCRIPT_EXECUTE_ON_PROXY]),
-			'menu_path' =>				'db scripts.menu_path',
-			'authtype' =>				'db scripts.authtype|in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
-			'username' =>				'db scripts.username',
-			'password' =>				'db scripts.password',
-			'publickey' =>				'db scripts.publickey',
-			'privatekey' =>				'db scripts.privatekey',
-			'passphrase' =>				'db scripts.password',
-			'port' =>					'db scripts.port',
-			'command' =>				'db scripts.command',
-			'commandipmi' =>			'db scripts.command',
-			'parameters' =>				'array',
-			'script' => 				'db scripts.command',
-			'timeout' => 				'db media_type.timeout',
-			'url' => 					'db scripts.url',
-			'new_window' => 			'db scripts.new_window',
-			'description' =>			'db scripts.description',
-			'host_access' =>			'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
-			'groupid' =>				'db scripts.groupid',
-			'usrgrpid' =>				'db scripts.usrgrpid',
-			'hgstype' =>				'in 0,1',
-			'confirmation' =>			'db scripts.confirmation',
-			'enable_confirmation' =>	'in 1',
-			'form_refresh' =>			'int32'
+			'scriptid' =>	'db scripts.scriptid'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS)) {
 			return false;
 		}
@@ -82,11 +61,11 @@ class CControllerScriptEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		// Default values.
 		$data = [
-			'form_refresh' => $this->getInput('form_refresh', 0),
-			'scriptid' => 0,
+			//'form_refresh' => $this->getInput('form_refresh', 0),
+			'scriptid' => null,
 			'name' => '',
 			'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 			'type' => ZBX_SCRIPT_TYPE_WEBHOOK,

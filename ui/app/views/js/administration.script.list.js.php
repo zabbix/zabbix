@@ -28,14 +28,59 @@
 	const view = new class {
 
 		init() {
+			this._initActions();
+		}
+
+		_initActions() {
+			document.getElementById('js-create').addEventListener('click', () => this._edit());
+
+			document.getElementById('js-massdelete').addEventListener('click', (e) => {
+				this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			});
+
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-edit')) {
-					this._edit({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
+					this._editAction({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
+				}
+
+				if (e.target.classList.contains('js-edit')) {
+					this._edit({scriptid: e.target.dataset.scriptid});
 				}
 			})
 		}
 
 		_edit(parameters = {}) {
+			const overlay = PopUp('script.edit', parameters, {
+				dialogueid: 'script-form',
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('script');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('script');
+
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+		}
+
+		_editAction(parameters = {}) {
 			const overlay = PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
 				dialogue_class: 'modal-popup-large',
@@ -63,13 +108,33 @@
 			});
 		}
 
-		_post(target, actionids, url) {
+		_delete(target, scriptids) {
+			const confirmation = scriptids.length > 1
+				? <?= json_encode(_('Delete selected scripts?')) ?>
+				: <?= json_encode(_('Delete selected script?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'script.delete');
+
+			this._post(target, scriptids, curl);
+		}
+
+		_post(target, scriptids, url) {
+			debugger;
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('script')) ?>
+			);
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({actionids: actionids})
+				body: JSON.stringify({scriptids: scriptids})
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -86,6 +151,8 @@
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
+
+						uncheckTableRows('script');
 					}
 
 					location.href = location.href;
