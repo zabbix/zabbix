@@ -45,7 +45,7 @@ class CTag extends CObject {
 
 		foreach ($this->attributes as $key => $value) {
 			if ($value !== null) {
-				$attributes .= ' '.$key.'="'.CHtml::encode($value).'"';
+				$attributes .= ' '.$key.'="'.htmlspecialchars($value, ENT_QUOTES, 'UTF-8').'"';
 			}
 		}
 
@@ -79,9 +79,8 @@ class CTag extends CObject {
 	}
 
 	public function addItem($value) {
-		// the string contents of an HTML tag should be properly encoded
 		if (is_string($value)) {
-			$value = CHtml::encode($value);
+			$value = htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8');
 		}
 
 		parent::addItem($value);
