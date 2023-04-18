@@ -106,6 +106,19 @@ class testInitialConfSync extends CIntegrationTest
 				'delete' => '0'
 			]
 		],
+		/* 'where the number 95 came from'
+
+		HostInventoryAutomatic -> 3 items
+		HostMultilevelTmpl -> 10 items, (1 items, also inherits bbbtmpl, which inherits 'SampleTemplate',
+					which has 1 item, 1 item prototype, 1 discovery rule,1 httpstep(6 items)))
+		HostWithDiscovery -> 2 items (1 item prototype, 1 discovery rule)
+		HostWithItems -> 28 items
+		HostWithMacros -> 3 items
+		HostWithTemplate -> 9 items (inherits 'SampleTemplate')
+		HostWithWebScenario -> 7 items (1 item + httpstep(6 items))
+		HostWithComprehensiveTemplate -> 36 items (inherits 'Comprehensive Template')
+
+		3+10+2+28+3+9+7+36 */
 		[
 			'items' =>
 			[
@@ -412,7 +425,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"88",
+				"86",
 				"delete" =>
 				"0"
 			]

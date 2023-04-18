@@ -44,6 +44,7 @@
                     <name>TemplateItem</name>
                     <type>TRAP</type>
                     <key>tmpltrap</key>
+		    <!--WARNING, delay gets changed but this is ignored for trapper item when importing the template -->
                     <delay>10s</delay>
                     <triggers>
                         <trigger>
