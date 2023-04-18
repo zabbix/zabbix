@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T18:31:29Z'
+  date: '2023-04-15T13:17:55Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1078,19 +1078,15 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: unixtime
+              valuemap:
+                name: 'Docker date format'
               preprocessing:
                 -
                   type: JAVASCRIPT
                   parameters:
                     - |
                       var input = JSON.parse(value);
-                        return truncatedTimestamp = Math.floor(Date.parse(input.Created) / 1000) || 'Problem with date parsing in JS';
-                -
-                  type: MATCHES_REGEX
-                  parameters:
-                    - '^[-+]?[0-9]+$'
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Problem with date parsing in JS'
+                        return truncatedTimestamp = Math.floor(Date.parse(input.Created) / 1000) || -1;
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1113,19 +1109,16 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: unixtime
+              description: 'Time at which the container last terminated.'
+              valuemap:
+                name: 'Docker date format'
               preprocessing:
                 -
                   type: JAVASCRIPT
                   parameters:
                     - |
                       var input = JSON.parse(value);
-                        return truncatedTimestamp = Math.floor(Date.parse(input.State.FinishedAt) / 1000) || 'Problem with date parsing in JS';
-                -
-                  type: MATCHES_REGEX
-                  parameters:
-                    - '^[-+]?[0-9]+$'
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Problem with date parsing in JS'
+                        return truncatedTimestamp = Math.floor(Date.parse(input.State.FinishedAt) / 1000) || -1;
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1196,19 +1189,15 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: unixtime
+              valuemap:
+                name: 'Docker date format'
               preprocessing:
                 -
                   type: JAVASCRIPT
                   parameters:
                     - |
                       var input = JSON.parse(value);
-                        return truncatedTimestamp = Math.floor(Date.parse(input.State.StartedAt) / 1000) || 'Problem with date parsing in JS';
-                -
-                  type: MATCHES_REGEX
-                  parameters:
-                    - '^[-+]?[0-9]+$'
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Problem with date parsing in JS'
+                        return truncatedTimestamp = Math.floor(Date.parse(input.State.StartedAt) / 1000) || -1;
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2459,6 +2448,16 @@ zabbix_export:
             -
               value: '4'
               newvalue: none
+        -
+          uuid: 2465e37ba23f4a7cb895835d8cf94737
+          name: 'Docker date format'
+          mappings:
+            -
+              value: '-1'
+              newvalue: 'Error parsing date'
+            -
+              value: '-62135596800'
+              newvalue: 'Null time'
         -
           uuid: c289195aa4dc47ab883fa95c9cb6fd07
           name: 'Docker flag'

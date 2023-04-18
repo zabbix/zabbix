@@ -15,7 +15,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Docker 19.03.5
+- Docker 23.0.3
 
 ## Configuration
 
@@ -23,8 +23,7 @@ This template has been tested on:
 
 ## Setup
 
-Setup and configure Zabbix agent 2 compiled with the Docker monitoring plugin. 
-The user by which the Zabbix agent 2 is running should have access permissions to the Docker socket.
+Setup and configure Zabbix agent 2 compiled with the Docker monitoring plugin. The user by which the Zabbix agent 2 is running should have access permissions to the Docker socket.
 
 Test availability: `zabbix_get -s docker-host -k docker.info`
 
@@ -141,7 +140,7 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Container {#NAME}: Networks errors sent per second||Dependent item|docker.networks.tx_errors["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_errors.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Networks outgoing packets dropped per second||Dependent item|docker.networks.tx_dropped["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_dropped.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Get info|<p>Return low-level information about a container</p>|Zabbix agent|docker.container_info["{#NAME}",full]|
-|Container {#NAME}: Created||Dependent item|docker.container_info.created["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li><p>Matches regular expression: `^[-+]?[0-9]+$`</p><p>⛔️Custom on fail: Set error to: `Problem with date parsing in JS`</p></li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Container {#NAME}: Created||Dependent item|docker.container_info.created["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Image||Dependent item|docker.container_info.image["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.Names[0] == "{#NAME}")].Image.first()`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Restart count||Dependent item|docker.container_info.restart_count["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.RestartCount`</li></ul>|
 |Container {#NAME}: Status||Dependent item|docker.container_info.state.status["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Status`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
@@ -155,8 +154,8 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Container {#NAME}: Pid||Dependent item|docker.container_info.state.pid["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Pid`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Exit code||Dependent item|docker.container_info.state.exitcode["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.ExitCode`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Error||Dependent item|docker.container_info.state.error["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Error`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Container {#NAME}: Started at||Dependent item|docker.container_info.started["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li><p>Matches regular expression: `^[-+]?[0-9]+$`</p><p>⛔️Custom on fail: Set error to: `Problem with date parsing in JS`</p></li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Container {#NAME}: Finished at||Dependent item|docker.container_info.finished["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li><p>Matches regular expression: `^[-+]?[0-9]+$`</p><p>⛔️Custom on fail: Set error to: `Problem with date parsing in JS`</p></li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Container {#NAME}: Started at||Dependent item|docker.container_info.started["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Container {#NAME}: Finished at|<p>Time at which the container last terminated.</p>|Dependent item|docker.container_info.finished["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 
 ### Trigger prototypes for Containers discovery
 
