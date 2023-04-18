@@ -39,7 +39,12 @@ require_once dirname(__FILE__).'/authentication/testUsersAuthenticationLdap.php'
 require_once dirname(__FILE__).'/authentication/testUsersAuthenticationSaml.php';
 require_once dirname(__FILE__).'/authentication/testUsersPasswordComplexity.php';
 
+// Connectors.
+require_once dirname(__FILE__).'/connectors/testFormConnectors.php';
+require_once dirname(__FILE__).'/connectors/testPageConnectors.php';
+
 // Dashboards.
+require_once dirname(__FILE__).'/dashboard/testDashboardClockWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteGraphsWidget.php';
@@ -52,6 +57,8 @@ require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.p
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSlaReportWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
@@ -79,6 +86,7 @@ require_once dirname(__FILE__).'/graphs/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
+require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
@@ -297,7 +305,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testUsersAuthenticationSaml');
 		$suite->addTestSuite('testUsersPasswordComplexity');
 
+		// Connectors.
+		$suite->addTestSuite('testFormConnectors');
+		$suite->addTestSuite('testPageConnectors');
+
 		// Dashboards.
+		$suite->addTestSuite('testDashboardClockWidget');
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
@@ -310,6 +323,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPages');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardProblemsWidget');
+		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
 		$suite->addTestSuite('testDashboardSlaReportWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardTopHostsWidget');
@@ -337,6 +352,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageHostGraph');
+		$suite->addTestSuite('testPageMonitoringHostsGraph');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');

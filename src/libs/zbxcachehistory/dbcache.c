@@ -56,8 +56,7 @@ static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 static char		*sql = NULL;
 static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
-extern unsigned char	program_type;
-extern int		CONFIG_DOUBLE_PRECISION;
+static zbx_get_program_type_f	get_program_type_cb = NULL;
 
 #define ZBX_IDS_SIZE	10
 
@@ -203,7 +202,7 @@ void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info)
 	wcache_info->index_free = hc_index_mem->free_size;
 	wcache_info->index_total = hc_index_mem->total_size;
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		wcache_info->trend_free = trend_mem->free_size;
 		wcache_info->trend_total = trend_mem->orig_size;
@@ -2061,7 +2060,7 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 {
 	char	*errmsg = NULL;
 
-	if (FAIL == zbx_variant_to_value_type(value, value_type, CONFIG_DOUBLE_PRECISION, &errmsg))
+	if (FAIL == zbx_variant_to_value_type(value, value_type, &errmsg))
 	{
 		dc_history_set_error(hdata, errmsg);
 		return;
@@ -2141,7 +2140,7 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
+				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl))
 				{
 					char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -3818,7 +3817,7 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 	/*   * other parts of the program do not hold pointers to the elements of history queue that is       */
 	/*     stored in the shared memory.                                                                   */
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		/* unlock all triggers before full sync so no items are locked by triggers */
 		zbx_dc_config_unlock_all_triggers();
@@ -3845,7 +3844,7 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs)
 
 		do
 		{
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 				sync_server_history(&values_num, &triggers_num, events_cbs, &more);
 			else
 				sync_proxy_history(&values_num, &more);
@@ -3933,7 +3932,7 @@ void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, int *values_nu
 	*values_num = 0;
 	*triggers_num = 0;
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		sync_server_history(values_num, triggers_num, events_cbs, more);
 	else
 		sync_proxy_history(values_num, more);
@@ -4216,8 +4215,11 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		return;
 
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
-	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) &&
+			0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	{
 		return;
+	}
 
 	value_flags = 0;
 
@@ -4239,7 +4241,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 				return;
 
 			/* proxy stores low-level discovery (lld) values in db */
-			if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+			if (0 == (ZBX_PROGRAM_TYPE_SERVER & get_program_type_cb()))
 				dc_local_add_history_lld(itemid, ts, result->text);
 
 			return;
@@ -4336,7 +4338,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
 	if (ZBX_DC_FLAG_NOVALUE == (value_flags & (ZBX_DC_FLAG_NOVALUE | ZBX_DC_FLAG_META)) &&
-			0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		return;
 	}
@@ -4361,7 +4363,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			return;
 
 		/* proxy stores low-level discovery (lld) values in db */
-		if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		if (0 == (ZBX_PROGRAM_TYPE_SERVER & get_program_type_cb()))
 			dc_local_add_history_lld(itemid, &ts, value->data.str);
 
 		return;
@@ -5002,7 +5004,7 @@ int	hc_get_history_compression_age(void)
 
 ZBX_SHMEM_FUNC_IMPL(__trend, trend_mem)
 
-static int	init_trend_cache(char **error)
+static int	init_trend_cache(zbx_uint64_t trends_cache_size, char **error)
 {
 	size_t	sz;
 	int	ret;
@@ -5013,13 +5015,13 @@ static int	init_trend_cache(char **error)
 		goto out;
 
 	sz = zbx_shmem_required_size(1, "trend cache", "TrendCacheSize");
-	if (SUCCEED != (ret = zbx_shmem_create(&trend_mem, CONFIG_TRENDS_CACHE_SIZE, "trend cache", "TrendCacheSize", 0,
+	if (SUCCEED != (ret = zbx_shmem_create(&trend_mem, trends_cache_size, "trend cache", "TrendCacheSize", 0,
 			error)))
 	{
 		goto out;
 	}
 
-	CONFIG_TRENDS_CACHE_SIZE -= sz;
+	trends_cache_size -= sz;
 
 	cache->trends_num = 0;
 	cache->trends_last_cleanup_hour = 0;
@@ -5044,11 +5046,14 @@ out:
  * Purpose: Allocate shared memory for database cache                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_init_database_cache(char **error)
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_uint64_t history_cache_size,
+		zbx_uint64_t history_index_cache_size,zbx_uint64_t trends_cache_size, char **error)
 {
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	get_program_type_cb = get_program_type;
 
 	if (NULL != cache)
 	{
@@ -5062,13 +5067,13 @@ int	zbx_init_database_cache(char **error)
 	if (SUCCEED != (ret = zbx_mutex_create(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_shmem_create(&hc_mem, CONFIG_HISTORY_CACHE_SIZE, "history cache",
+	if (SUCCEED != (ret = zbx_shmem_create(&hc_mem, history_cache_size, "history cache",
 			"HistoryCacheSize", 1, error)))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_shmem_create(&hc_index_mem, CONFIG_HISTORY_INDEX_CACHE_SIZE, "history index cache",
+	if (SUCCEED != (ret = zbx_shmem_create(&hc_index_mem, history_index_cache_size, "history index cache",
 			"HistoryIndexCacheSize", 0, error)))
 	{
 		goto out;
@@ -5087,7 +5092,7 @@ int	zbx_init_database_cache(char **error)
 	zbx_binary_heap_create_ext(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY,
 			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_hashset_create_ext(&(cache->proxyqueue.index), ZBX_HC_SYNC_MAX,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
@@ -5098,7 +5103,7 @@ int	zbx_init_database_cache(char **error)
 
 		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
 
-		if (SUCCEED != (ret = init_trend_cache(error)))
+		if (SUCCEED != (ret = init_trend_cache(trends_cache_size, error)))
 			goto out;
 	}
 
@@ -5171,7 +5176,7 @@ static void	DCsync_all(const zbx_events_funcs_t *events_cbs)
 
 	sync_history_cache_full(events_cbs);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
@@ -5199,7 +5204,7 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs)
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_shmem_destroy(trend_mem);
 		trend_mem = NULL;

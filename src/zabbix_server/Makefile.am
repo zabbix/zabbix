@@ -21,7 +21,6 @@ SUBDIRS = \
 	scripts \
 	stats \
 	preproc \
-	availability \
 	connector \
 	lld \
 	reporter \
@@ -77,7 +76,6 @@ zabbix_server_LDADD = \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
 	scripts/libzbxscripts.a \
-	availability/libavailability.a \
 	connector/libconnector.a \
 	service/libservice.a \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
@@ -153,6 +151,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxservice/libzbxservice.a \
+	$(top_builddir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
