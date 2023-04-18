@@ -97,7 +97,7 @@ Therefore, use the following filters with these macros:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Nginx: Server response error||`length(last(/NGINX Plus by HTTP/nginx.info.error))>0`|High||
-|Nginx: Version has changed|<p>The Nginx version has changed. Acknowledge to close manually.</p>|`last(/NGINX Plus by HTTP/nginx.info.version,#1)<>last(/NGINX Plus by HTTP/nginx.info.version,#2) and length(last(/NGINX Plus by HTTP/nginx.info.version))>0`|Info|**Manual close**: Yes|
+|Nginx: Version has changed|<p>The Nginx version has changed. Acknowledge to close the problem manually.</p>|`last(/NGINX Plus by HTTP/nginx.info.version,#1)<>last(/NGINX Plus by HTTP/nginx.info.version,#2) and length(last(/NGINX Plus by HTTP/nginx.info.version))>0`|Info|**Manual close**: Yes|
 |Nginx: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/NGINX Plus by HTTP/nginx.info.uptime)<10m`|Info|**Manual close**: Yes|
 |Nginx: Failed to fetch info data|<p>Zabbix has not received any data for metrics for the last 30 minutes</p>|`nodata(/NGINX Plus by HTTP/nginx.info.uptime,30m)=1`|Warning|**Manual close**: Yes|
 |Nginx: High connections drop rate|<p>The rate of dropped connections is greater than `{$NGINX.DROP_RATE.MAX.WARN}` for the last 5 minutes.</p>|`min(/NGINX Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}`|Warning||

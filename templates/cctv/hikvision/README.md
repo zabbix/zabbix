@@ -86,19 +86,19 @@ Define macros according to your camera configuration
 |Hikvision camera: Supported video loss| |Dependent item|hikvision_cam.support_video_loss<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.supportVideoLoss`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
 |Hikvision camera: System contact| |Dependent item|hikvision_cam.system_contact<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.systemContact`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
 |Hikvision camera: Telecontrol ID| |Dependent item|hikvision_cam.telecontrol_id<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceInfo.telecontrolID`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `24h`</li></ul>|
-|Hikvision camera: Uptime|<p>System uptime in 'N days, hh:mm:ss' format.</p>|Dependent item|hikvision_cam.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceStatus.deviceUpTime`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Hikvision camera: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|hikvision_cam.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DeviceStatus.deviceUpTime`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Hikvision camera: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Hikvision camera by HTTP/hikvision_cam.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
-|Hikvision camera: Version has changed|<p>Hikvision camera version has changed. Ack to close.</p>|`last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.firmware_version))>0`|Info|**Manual close**: Yes|
+|Hikvision camera: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Hikvision camera by HTTP/hikvision_cam.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Hikvision camera: Version has changed|<p>Hikvision camera version has changed. Acknowledge to close the problem manually.</p>|`last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.firmware_version,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.firmware_version))>0`|Info|**Manual close**: Yes|
 |Hikvision camera: Authorisation error|<p>Check the correctness of the authorization data</p>|`last(/Hikvision camera by HTTP/hikvision_cam.get_info.login_status)=1 or last(/Hikvision camera by HTTP/hikvision_cam.get_streaming.login_status)=1 or last(/Hikvision camera by HTTP/hikvision_cam.get_status.login_status)=1`|Warning|**Manual close**: Yes|
 |Hikvision camera: Error receiving data|<p>Check the availability of the HTTP port</p>|`last(/Hikvision camera by HTTP/hikvision_cam.get_info.login_status)=2 or last(/Hikvision camera by HTTP/hikvision_cam.get_streaming.login_status)=2 or last(/Hikvision camera by HTTP/hikvision_cam.get_status.login_status)=2`|Warning|**Manual close**: Yes|
 |Hikvision camera: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Hikvision camera by HTTP/hikvision_cam.memory.usage,5m)>{$MEMORY.UTIL.MAX}`|Average||
-|Hikvision camera: Camera has been replaced|<p>Camera serial number has changed. Ack to close</p>|`last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.serial_number))>0`|Info|**Manual close**: Yes|
-|Hikvision camera: has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/Hikvision camera by HTTP/hikvision_cam.uptime)<10m`|Info|**Manual close**: Yes|
+|Hikvision camera: Camera has been replaced|<p>Camera serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#1)<>last(/Hikvision camera by HTTP/hikvision_cam.serial_number,#2) and length(last(/Hikvision camera by HTTP/hikvision_cam.serial_number))>0`|Info|**Manual close**: Yes|
+|Hikvision camera: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hikvision camera by HTTP/hikvision_cam.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule PTZ discovery
 

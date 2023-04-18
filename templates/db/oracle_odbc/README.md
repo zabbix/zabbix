@@ -229,11 +229,11 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 |----|-----------|----------|--------|--------------------------------|
 |Oracle: Port {$ORACLE.PORT} is unavailable|<p>The TCP port of the Oracle Server service is currently unavailable.</p>|`max(/Oracle by ODBC/net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}],#3)=0  and max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)>0`|Disaster||
 |Oracle: LISTENER process is not running||`max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)=0`|Disaster||
-|Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close manually.</p>|`last(/Oracle by ODBC/oracle.version,#1)<>last(/Oracle by ODBC/oracle.version,#2) and length(last(/Oracle by ODBC/oracle.version))>0`|Info|**Manual close**: Yes|
+|Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.version,#1)<>last(/Oracle by ODBC/oracle.version,#2) and length(last(/Oracle by ODBC/oracle.version))>0`|Info|**Manual close**: Yes|
 |Oracle: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Oracle by ODBC/oracle.uptime)<10m`|Info|**Manual close**: Yes|
 |Oracle: Failed to fetch info data|<p>Zabbix has not received any data for the items for the last 5 minutes. The database might be unavailable for connecting.</p>|`nodata(/Oracle by ODBC/oracle.uptime,5m)=1`|Warning|**Depends on**:<br><ul><li>Oracle: Port {$ORACLE.PORT} is unavailable</li></ul>|
-|Oracle: Instance name has changed|<p>The Oracle DB instance has changed. Ack to close manually.</p>|`last(/Oracle by ODBC/oracle.instance_name,#1)<>last(/Oracle by ODBC/oracle.instance_name,#2) and length(last(/Oracle by ODBC/oracle.instance_name))>0`|Info|**Manual close**: Yes|
-|Oracle: Instance hostname has changed|<p>Oracle DB Instance hostname has changed. Ack to close.</p>|`last(/Oracle by ODBC/oracle.instance_hostname,#1)<>last(/Oracle by ODBC/oracle.instance_hostname,#2) and length(last(/Oracle by ODBC/oracle.instance_hostname))>0`|Info|**Manual close**: Yes|
+|Oracle: Instance name has changed|<p>The Oracle DB instance has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.instance_name,#1)<>last(/Oracle by ODBC/oracle.instance_name,#2) and length(last(/Oracle by ODBC/oracle.instance_name))>0`|Info|**Manual close**: Yes|
+|Oracle: Instance hostname has changed|<p>Oracle DB Instance hostname has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.instance_hostname,#1)<>last(/Oracle by ODBC/oracle.instance_hostname,#2) and length(last(/Oracle by ODBC/oracle.instance_hostname))>0`|Info|**Manual close**: Yes|
 |Oracle: Too many active processes|<p>Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.</p>|`min(/Oracle by ODBC/oracle.processes_count,5m) * 100 / last(/Oracle by ODBC/oracle.processes_limit) > {$ORACLE.PROCESSES.MAX.WARN}`|Warning||
 |Oracle: Too many database files|<p>The number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafiles limit.</p>|`min(/Oracle by ODBC/oracle.db_files_count,5m) * 100 / last(/Oracle by ODBC/oracle.db_files_limit) > {$ORACLE.DB.FILE.MAX.WARN}`|Warning||
 |Oracle: Shared pool free is too low|<p>The free memory percent of the shared pool has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% for the last 5 minutes.</p>|`max(/Oracle by ODBC/oracle.shared_pool_free,5m)<{$ORACLE.SHARED.FREE.MIN.WARN}`|Warning||
@@ -266,8 +266,8 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Oracle Database '{#DBNAME}': Open status in mount mode|<p>The Oracle DB is in a mounted state.</p>|`last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"])=1`|Warning||
-|Oracle Database '{#DBNAME}': Open status has changed|<p>The Oracle DB open status has changed. Ack to close manually.</p>|`last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle Database '{#DBNAME}': Open status in mount mode</li></ul>|
-|Oracle Database '{#DBNAME}': Role has changed|<p>The Oracle DB role has changed. Ack to close manually.</p>|`last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
+|Oracle Database '{#DBNAME}': Open status has changed|<p>The Oracle DB open status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle Database '{#DBNAME}': Open status in mount mode</li></ul>|
+|Oracle Database '{#DBNAME}': Role has changed|<p>The Oracle DB role has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
 |Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog|<p>Force Logging mode - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all the transactions to the REDO.</p>|`last(/Oracle by ODBC/oracle.db_force_logging["{#DBNAME}"]) = 0 and last(/Oracle by ODBC/oracle.db_log_mode["{#DBNAME}"]) = 1`|Warning||
 
 ### LLD rule PDB discovery
@@ -288,7 +288,7 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Oracle Database '{#DBNAME}': Open status in mount mode|<p>The Oracle DB is in a mounted state.</p>|`last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"])=1`|Warning||
-|Oracle Database '{#DBNAME}': Open status has changed|<p>The Oracle DB open status has changed. Ack to close manually.</p>|`last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
+|Oracle Database '{#DBNAME}': Open status has changed|<p>The Oracle DB open status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
 
 ### LLD rule Tablespace discovery
 
@@ -318,7 +318,7 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high||`min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high</li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace usage is too high||`min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}`|High||
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE|<p>The tablespace is in the offline state.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"])=2`|Warning||
-|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Ack to close.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
+|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#1)<>last(/Oracle by ODBC/oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
 
 ### LLD rule Archive log discovery
 

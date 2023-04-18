@@ -51,7 +51,7 @@ zabbix_export:
               name: 'Tomcat: Version has been changed'
               event_name: 'Tomcat: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Tomcat version has changed. Acknowledge to close manually.'
+              description: 'The Tomcat version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

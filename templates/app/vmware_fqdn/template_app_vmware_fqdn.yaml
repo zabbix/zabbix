@@ -500,7 +500,7 @@ zabbix_export:
               name: 'VMware: VM has been restarted'
               event_name: 'VMware: VM has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1560,7 +1560,7 @@ zabbix_export:
               name: 'VMware: Hypervisor has been restarted'
               event_name: 'VMware: Hypervisor has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

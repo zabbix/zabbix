@@ -318,7 +318,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            System host name.
+            The host name of the system.
           inventory_link: NAME
           preprocessing:
             -
@@ -336,7 +336,7 @@ zabbix_export:
               name: 'TrueNAS: System name has changed'
               event_name: 'TrueNAS: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -399,7 +399,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//system.swap.free)/last(//system.swap.total)*100'
-          description: 'The free space of swap volume/file in percent.'
+          description: 'The free space of the swap volume/file expressed in %.'
           tags:
             -
               tag: component
@@ -442,7 +442,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            System uptime in 'N days, hh:mm:ss' format.
+            The system uptime expressed in the following format: "N days, hh:mm:ss".
           preprocessing:
             -
               type: MULTIPLIER
@@ -935,7 +935,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Total memory in Bytes.
+            The total memory expressed in bytes.
           preprocessing:
             -
               type: MULTIPLIER
@@ -1078,7 +1078,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: UCD-SNMP-MIB
-                Amount of time the CPU has been waiting for I/O to complete.
+                The amount of time the CPU has been waiting for I/O to complete.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -1184,7 +1184,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'CPU utilization in %.'
+              description: 'The CPU utilization expressed in %.'
               preprocessing:
                 -
                   type: JAVASCRIPT
@@ -1206,7 +1206,7 @@ zabbix_export:
                   event_name: 'TrueNAS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   dependencies:
                     -
                       name: 'TrueNAS: Load average is too high'
@@ -1406,7 +1406,7 @@ zabbix_export:
                   event_name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+                  description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold..'
                   dependencies:
                     -
                       name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
@@ -1509,7 +1509,7 @@ zabbix_export:
                   event_name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
                   priority: WARNING
-                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+                  description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold..'
                   dependencies:
                     -
                       name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
@@ -1620,8 +1620,8 @@ zabbix_export:
                   priority: AVERAGE
                   description: |
                     This trigger expression works as follows:
-                    1. Can be triggered if operations status is down.
-                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    1. It can be triggered if the operations status is down.
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
                   tags:
                     -
                       tag: scope
@@ -1677,7 +1677,7 @@ zabbix_export:
               name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.'
               dependencies:
                 -
                   name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
@@ -1697,7 +1697,7 @@ zabbix_export:
               event_name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               dependencies:
                 -
                   name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
@@ -1717,7 +1717,7 @@ zabbix_export:
               event_name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               dependencies:
                 -
                   name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Link down'
@@ -1969,8 +1969,9 @@ zabbix_export:
               opdata: 'Current usage: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: |
-                Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"}%.
-                Second condition: The dataset free space is less than {$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}.
+                Two conditions should match:
+                1. The first condition - utilization of the space should be above `{$DATASET.PUSED.MAX.WARN:"{#DATASET_NAME}"}%.`
+                2. The second condition - the dataset free space is less than `{$DATASET.FREE.MIN.WARN:"{#POOLNAME}"}`.
               dependencies:
                 -
                   name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Very high space usage'
@@ -1990,8 +1991,9 @@ zabbix_export:
               opdata: 'Current usage: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: |
-                Two conditions should match: First, space utilization should be above {$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}%.
-                Second condition: The dataset free space is less than {$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}.
+                Two conditions should match:
+                1. The first condition - utilization of the space should be above `{$DATASET.PUSED.MAX.CRIT:"{#DATASET_NAME}"}%.`
+                2. The second condition - the dataset free space is less than `{$DATASET.FREE.MIN.CRIT:"{#POOLNAME}"}`.
               tags:
                 -
                   tag: scope
@@ -2278,8 +2280,9 @@ zabbix_export:
               opdata: 'Current usage: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: |
-                Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"}%.
-                Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}.
+                Two conditions should match:
+                1. The first condition - utilization of the space should be above `{$ZPOOL.PUSED.MAX.WARN:"{#POOLNAME}"}%.`
+                2. The second condition - the pool free space is less than `{$ZPOOL.FREE.MIN.WARN:"{#POOLNAME}"}`.
               dependencies:
                 -
                   name: 'TrueNAS: Pool [{#POOLNAME}]: Very high space usage'
@@ -2299,8 +2302,9 @@ zabbix_export:
               opdata: 'Current usage: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: |
-                Two conditions should match: First, space utilization should be above {$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}%.
-                Second condition: The pool free space is less than {$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}.
+                Two conditions should match:
+                1. The first condition - utilization of the space should be above `{$ZPOOL.PUSED.MAX.CRIT:"{#POOLNAME}"}%.`
+                2. The second condition - the pool free space is less than `{$ZPOOL.FREE.MIN.CRIT:"{#POOLNAME}"}`.
               tags:
                 -
                   tag: scope
@@ -3927,7 +3931,7 @@ zabbix_export:
       event_name: 'TrueNAS: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'This trigger is ignored, if there is no swap configured.'
+      description: 'If there is no swap configured, this trigger is ignored.'
       dependencies:
         -
           name: 'TrueNAS: High memory utilization'
@@ -3967,7 +3971,7 @@ zabbix_export:
       event_name: 'TrueNAS: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
-      description: 'Per CPU load average is too high. Your system may be slow to respond.'
+      description: 'The load average per CPU is too high. The system may be slow to respond.'
       tags:
         -
           tag: scope

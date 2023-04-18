@@ -709,7 +709,7 @@ zabbix_export:
               name: 'Zookeeper: Server mode has changed'
               event_name: 'Zookeeper: Server mode has changed (new mode: {ITEM.VALUE})'
               priority: INFO
-              description: 'Zookeeper node state has changed. Ack to close.'
+              description: 'Zookeeper node state has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -813,7 +813,7 @@ zabbix_export:
               name: 'Zookeeper: Version has changed'
               event_name: 'Zookeeper: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Zookeeper version has changed. Ack to close.'
+              description: 'Zookeeper version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1415,11 +1415,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid

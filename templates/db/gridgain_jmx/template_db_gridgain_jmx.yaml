@@ -116,7 +116,7 @@ zabbix_export:
                   expression: 'min(/GridGain by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Node started to evict pages'
                   priority: INFO
-                  description: 'You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
+                  description: 'You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -779,7 +779,7 @@ zabbix_export:
                   expression: 'change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0'
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology'
                   priority: INFO
-                  description: 'One or more server node added to the topology. Ack to close.'
+                  description: 'One or more server node added to the topology. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -790,7 +790,7 @@ zabbix_export:
                   expression: 'change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0'
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology'
                   priority: WARNING
-                  description: 'One or more server node left the topology. Ack to close.'
+                  description: 'One or more server node left the topology. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -802,7 +802,7 @@ zabbix_export:
               expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])'
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology'
               priority: INFO
-              description: 'One or more server node left the topology. Ack to close.'
+              description: 'One or more server node left the topology. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -867,7 +867,7 @@ zabbix_export:
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed'
                   event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close manually.'
+                  description: 'The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -933,7 +933,7 @@ zabbix_export:
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted'
                   event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1120,7 +1120,7 @@ zabbix_export:
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
                   event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close manually.'
+                  description: 'The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1490,7 +1490,7 @@ zabbix_export:
                   name: 'Cache group [{#JMXNAME}]: List of caches has changed'
                   event_name: 'Cache group [{#JMXNAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'
+                  description: 'List of caches has changed. Significant changes have occurred in the cluster. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1516,7 +1516,7 @@ zabbix_export:
                   expression: 'max(/GridGain by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0'
                   name: 'Cache group [{#JMXNAME}]: Rebalance in progress'
                   priority: INFO
-                  description: 'Ack to close.'
+                  description: 'Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2010,7 +2010,7 @@ zabbix_export:
               expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/GridGain by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])'
               name: 'Cache group [{#JMXGROUP}]: All entries are in heap'
               priority: INFO
-              description: 'All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.'
+              description: 'All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

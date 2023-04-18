@@ -299,7 +299,7 @@ zabbix_export:
               name: 'F5 BIG-IP: Chassis has been replaced'
               event_name: 'F5 BIG-IP: Chassis has been replaced (new serial number received)'
               priority: INFO
-              description: 'Chassis serial number has changed. Ack to close'
+              description: 'Chassis serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1456,7 +1456,7 @@ zabbix_export:
                   name: 'F5 BIG-IP: High CPU utilization'
                   event_name: 'F5 BIG-IP: High CPU utilization (over {$BIGIP.CPU.UTIL.WARN.MAX}% for 5m)'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -3770,11 +3770,11 @@ zabbix_export:
         -
           macro: '{$BIGIP.CPU.UTIL.WARN.MAX}'
           value: '85'
-          description: 'The warning threshold of the CPU utilization in %.'
+          description: 'The warning threshold of the CPU utilization expressed in %.'
         -
           macro: '{$BIGIP.CPU.UTIL.WARN.MIN}'
           value: '65'
-          description: 'The recovery threshold of the CPU utilization in %.'
+          description: 'The recovery threshold of the CPU utilization expressed in %.'
         -
           macro: '{$BIGIP.FS.FREE.WARN.MAX}'
           value: '20'

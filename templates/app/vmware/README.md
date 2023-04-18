@@ -135,7 +135,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware: VM has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m`|Warning|**Manual close**: Yes|
+|VMware: VM has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m`|Warning|**Manual close**: Yes|
 
 ### LLD rule Network device discovery
 
@@ -235,7 +235,7 @@ This template has been tested on:
 |VMware: Hypervisor is down|<p>The service is unavailable or does not accept ICMP ping.</p>|`last(/VMware Hypervisor/icmpping[])=0`|Average|**Manual close**: Yes|
 |VMware: The {$VMWARE.HV.UUID} health is Red|<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p>|`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3`|High||
 |VMware: The {$VMWARE.HV.UUID} health is Yellow|<p>One or more components in the appliance might become overloaded soon.</p>|`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2`|Average|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
-|VMware: Hypervisor has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m`|Warning|**Manual close**: Yes|
+|VMware: Hypervisor has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m`|Warning|**Manual close**: Yes|
 
 ### LLD rule Datastore discovery
 

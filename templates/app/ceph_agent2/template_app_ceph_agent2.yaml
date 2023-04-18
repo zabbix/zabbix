@@ -66,7 +66,7 @@ zabbix_export:
               name: 'Ceph: Minimum monitor release version has changed'
               event_name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'A Ceph version has changed. Acknowledge to close manually.'
+              description: 'A Ceph version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

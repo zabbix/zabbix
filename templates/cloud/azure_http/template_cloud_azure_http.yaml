@@ -474,12 +474,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
               -
                 macro: '{#SIZE}'
                 value: '{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}'
@@ -612,12 +612,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           description: 'The list of the MySQL servers is provided by the subscription.'
           host_prototypes:
             -
@@ -745,12 +745,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           description: 'The list of the PostgreSQL servers is provided by the subscription.'
           host_prototypes:
             -
@@ -2663,12 +2663,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           description: 'The list of the virtual machines is provided by the subscription.'
           host_prototypes:
             -
@@ -9862,27 +9862,6 @@ zabbix_export:
             host: 'Azure virtual machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
     -
-      uuid: 62a9a5e1fb044a52a0b534bd4eeea914
-      name: 'Azure Microsoft SQL: Connections'
-      graph_items:
-        -
-          color: 199C0D
-          item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
-            key: azure.db.mssql.connections.successful
-        -
-          sortorder: '1'
-          color: F63100
-          item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
-            key: azure.db.mssql.connections.failed.system
-        -
-          sortorder: '2'
-          color: 00611C
-          item:
-            host: 'Azure Microsoft SQL serverless database by HTTP'
-            key: azure.db.mssql.firewall.blocked
-    -
       uuid: 3b278de1b81a4be7acc865568962c323
       name: 'Azure Microsoft SQL: Connections'
       graph_items:
@@ -9904,20 +9883,26 @@ zabbix_export:
             host: 'Azure Microsoft SQL database by HTTP'
             key: azure.db.mssql.firewall.blocked
     -
-      uuid: 083d307db8954fc59e8e5cfccefc16c1
-      name: 'Azure Microsoft SQL: CPU usage'
+      uuid: 62a9a5e1fb044a52a0b534bd4eeea914
+      name: 'Azure Microsoft SQL: Connections'
       graph_items:
         -
           color: 199C0D
           item:
             host: 'Azure Microsoft SQL serverless database by HTTP'
-            key: azure.db.mssql.cpu.limit
+            key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
           color: F63100
           item:
             host: 'Azure Microsoft SQL serverless database by HTTP'
-            key: azure.db.mssql.cpu.used
+            key: azure.db.mssql.connections.failed.system
+        -
+          sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.firewall.blocked
     -
       uuid: fe250a5f509d45babea9fcd12accbcac
       name: 'Azure Microsoft SQL: CPU usage'
@@ -9932,6 +9917,21 @@ zabbix_export:
           color: F63100
           item:
             host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.cpu.used
+    -
+      uuid: 083d307db8954fc59e8e5cfccefc16c1
+      name: 'Azure Microsoft SQL: CPU usage'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.cpu.limit
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
             key: azure.db.mssql.cpu.used
     -
       uuid: f541b6591683433aba4b3e58a8ad1e5c
@@ -10000,21 +10000,6 @@ zabbix_export:
             host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.connections.failed
     -
-      uuid: f929f47602734f82a79f22a5f4446f61
-      name: 'Azure MySQL: Network traffic'
-      graph_items:
-        -
-          color: 199C0D
-          item:
-            host: 'Azure MySQL flexible server by HTTP'
-            key: azure.db.mysql.network.egress
-        -
-          sortorder: '1'
-          color: F63100
-          item:
-            host: 'Azure MySQL flexible server by HTTP'
-            key: azure.db.mysql.network.ingress
-    -
       uuid: dc6840162405481ebc1c3c98fdfcaef1
       name: 'Azure MySQL: Network traffic'
       graph_items:
@@ -10028,6 +10013,21 @@ zabbix_export:
           color: F63100
           item:
             host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.network.ingress
+    -
+      uuid: f929f47602734f82a79f22a5f4446f61
+      name: 'Azure MySQL: Network traffic'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.network.egress
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.network.ingress
     -
       uuid: 3fcf43fd338e4902874d940fc0bec8b9
@@ -10045,21 +10045,6 @@ zabbix_export:
             host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.server.log.limit
     -
-      uuid: 4210e6b4ed8744589dce88217e961a56
-      name: 'Azure MySQL: Storage utilization'
-      graph_items:
-        -
-          color: 199C0D
-          item:
-            host: 'Azure MySQL flexible server by HTTP'
-            key: azure.db.mysql.storage.used
-        -
-          sortorder: '1'
-          color: F63100
-          item:
-            host: 'Azure MySQL flexible server by HTTP'
-            key: azure.db.mysql.storage.limit
-    -
       uuid: bdc178e6faaa4850badc0c60c7c80d40
       name: 'Azure MySQL: Storage utilization'
       graph_items:
@@ -10073,6 +10058,21 @@ zabbix_export:
           color: F63100
           item:
             host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.limit
+    -
+      uuid: 4210e6b4ed8744589dce88217e961a56
+      name: 'Azure MySQL: Storage utilization'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.storage.used
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.storage.limit
     -
       uuid: 2b60e8b1fd7c43f4ac61812e43c0e1ca

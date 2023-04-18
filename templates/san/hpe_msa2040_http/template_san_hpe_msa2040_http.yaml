@@ -4714,7 +4714,7 @@ zabbix_export:
         -
           macro: '{$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$HPE.MSA.DATA.TIMEOUT}'
           value: 30s

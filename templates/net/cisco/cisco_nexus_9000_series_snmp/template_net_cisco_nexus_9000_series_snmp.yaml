@@ -238,7 +238,7 @@ zabbix_export:
               name: 'Cisco Nexus 9000 Series: Device has been replaced'
               event_name: 'Cisco Nexus 9000 Series: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'The serial number of a device has changed. Acknowledge to close manually.'
+              description: 'The serial number of a device has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -298,7 +298,7 @@ zabbix_export:
               name: 'Cisco Nexus 9000 Series: System name has changed'
               event_name: 'Cisco Nexus 9000 Series: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'The system name has changed. Acknowledge to close manually.'
+              description: 'The system name has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -359,7 +359,7 @@ zabbix_export:
               recovery_mode: NONE
               name: 'Cisco Nexus 9000 Series: Operating system description has changed'
               priority: INFO
-              description: 'The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge to close manually.'
+              description: 'The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -544,7 +544,7 @@ zabbix_export:
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'The device serial number has changed. Acknowledge to close manually.'
+                  description: 'The device serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1107,7 +1107,7 @@ zabbix_export:
                   priority: AVERAGE
                   description: |
                     This trigger expression works as follows:
-                    1. Can be triggered if operations status is down.
+                    1. It can be triggered if the operations status is down.
                     2. Use $IFCONTROL macro with context "{#IFNAME}" to void trigger firing on specific interfaces. Values:
                     -  0 : Marks an interface as not important. Trigger does not fire when interface is down.
                     -  1 : Default value to fire the trigger when interface is down
@@ -1161,7 +1161,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of issues with autonegotiation. Ack to close manually.'
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of issues with autonegotiation. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
                 -

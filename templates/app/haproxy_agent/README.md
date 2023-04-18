@@ -75,8 +75,8 @@ If you use another location, don't forget to change the macros {$HAPROXY.STATS.S
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|HAProxy: Version has changed|<p>HAProxy version has changed. Ack to close.</p>|`last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2) and length(last(/HAProxy by Zabbix agent/haproxy.version))>0`|Info|**Manual close**: Yes|
-|HAProxy: has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/HAProxy by Zabbix agent/haproxy.uptime)<10m`|Info|**Manual close**: Yes|
+|HAProxy: Version has changed|<p>HAProxy version has changed. Acknowledge to close the problem manually.</p>|`last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2) and length(last(/HAProxy by Zabbix agent/haproxy.version))>0`|Info|**Manual close**: Yes|
+|HAProxy: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HAProxy by Zabbix agent/haproxy.uptime)<10m`|Info|**Manual close**: Yes|
 |HAProxy: Service is down||`last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0`|Average|**Manual close**: Yes|
 |HAProxy: Service response time is too high||`min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HAProxy: Service is down</li></ul>|
 

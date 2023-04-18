@@ -70,9 +70,9 @@ Refer to the vendor documentation.
 |ZYXEL MES3500-24S: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL MES3500-24S by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 |ZYXEL MES3500-24S: Template does not match hardware|<p>This template is for Zyxel MES3500-24S series, but connected to {ITEM.VALUE}</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.model)<>"MES3500-24S"`|Info|**Manual close**: Yes|
 |ZYXEL ES3500-8PD: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.hw.uptime)>0 and last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.hw.uptime)<10m) or (last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.hw.uptime)=0 and last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|ZYXEL MES3500-24S: Firmware has changed|<p>Firmware version has changed. Ack to close</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.fwversion,#1)<>last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.fwversion,#2) and length(last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.fwversion))>0`|Info|**Manual close**: Yes|
-|ZYXEL MES3500-24S: Device has been replaced|<p>Device serial number has changed. Ack to close</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.serialnumber,#1)<>last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.serialnumber,#2) and length(last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.serialnumber))>0`|Info|**Manual close**: Yes|
-|ZYXEL MES3500-24S: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|ZYXEL MES3500-24S: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.fwversion,#1)<>last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.fwversion,#2) and length(last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.fwversion))>0`|Info|**Manual close**: Yes|
+|ZYXEL MES3500-24S: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.serialnumber,#1)<>last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.serialnumber,#2) and length(last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.serialnumber))>0`|Info|**Manual close**: Yes|
+|ZYXEL MES3500-24S: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||
 |ZYXEL MES3500-24S: High memory utilization|<p>The system is running out of free memory.</p>|`min(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.memusage,5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule Fan discovery
@@ -161,7 +161,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|ZYXEL MES3500-24S: Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:1. Can be triggered if operations status is down.2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)WARNING: if closed manually - won't fire again on next poll, because of .diff.</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|ZYXEL MES3500-24S: Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:1. It can be triggered if the operations status is down.2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule SFP without DDM discovery
 
@@ -185,7 +185,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|ZYXEL MES3500-24S: SFP {#SNMPINDEX} has been replaced|<p>SFP {#SNMPINDEX} serial number has changed. Ack to close</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL MES3500-24S: SFP {#SNMPINDEX} has been replaced|<p>SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-24S by SNMP/zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule SFP with DDM discovery
 

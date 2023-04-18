@@ -140,7 +140,7 @@ zabbix_export:
                   expression: 'min(/Ignite by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0'
                   name: 'Data region {#JMXNAME}: Node started to evict pages'
                   priority: INFO
-                  description: 'You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.'
+                  description: 'You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -866,7 +866,7 @@ zabbix_export:
                   expression: 'change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology'
                   priority: INFO
-                  description: 'One or more server node added to the topology. Ack to close.'
+                  description: 'One or more server node added to the topology. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -880,7 +880,7 @@ zabbix_export:
                   expression: 'change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0'
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology'
                   priority: WARNING
-                  description: 'One or more server node left the topology. Ack to close.'
+                  description: 'One or more server node left the topology. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -895,7 +895,7 @@ zabbix_export:
               expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])'
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology'
               priority: INFO
-              description: 'One or more server node left the topology. Ack to close.'
+              description: 'One or more server node left the topology. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -966,7 +966,7 @@ zabbix_export:
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed'
                   event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close manually.'
+                  description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1208,7 +1208,7 @@ zabbix_export:
                   name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
                   event_name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close manually.'
+                  description: 'Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1605,7 +1605,7 @@ zabbix_export:
                   name: 'Cache group [{#JMXNAME}]: List of caches has changed'
                   event_name: 'Cache group [{#JMXNAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'List of caches has changed. Significant changes have occurred in the cluster. Ack to close.'
+                  description: 'List of caches has changed. Significant changes have occurred in the cluster. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1637,7 +1637,7 @@ zabbix_export:
                   expression: 'max(/Ignite by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0'
                   name: 'Cache group [{#JMXNAME}]: Rebalance in progress'
                   priority: INFO
-                  description: 'Ack to close.'
+                  description: 'Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2245,7 +2245,7 @@ zabbix_export:
               expression: 'last(/Ignite by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/Ignite by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])'
               name: 'Cache group [{#JMXGROUP}]: All entries are in heap'
               priority: INFO
-              description: 'All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.'
+              description: 'All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

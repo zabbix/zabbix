@@ -135,7 +135,7 @@ zabbix_export:
               name: 'HAProxy: has been restarted'
               event_name: 'HAProxy: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -174,7 +174,7 @@ zabbix_export:
               name: 'HAProxy: Version has changed'
               event_name: 'HAProxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'HAProxy version has changed. Ack to close.'
+              description: 'HAProxy version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

@@ -103,7 +103,7 @@ zabbix_export:
               name: 'Dell R840: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'Firmware version has changed. Ack to close.'
+              description: 'Firmware version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -160,7 +160,7 @@ zabbix_export:
               name: 'Dell R840: Device has been replaced'
               event_name: 'Dell R840: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -246,7 +246,7 @@ zabbix_export:
               name: 'Dell R840: System name has changed'
               event_name: 'Dell R840: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -387,7 +387,7 @@ zabbix_export:
               expression: 'last(/DELL PowerEdge R840 by SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R840 by SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R840 by SNMP/dell.server.sw.os[systemOSName]))>0'
               name: 'Dell R840: Operating system description has changed'
               priority: INFO
-              description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.'
+              description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -829,7 +829,7 @@ zabbix_export:
                   name: 'Dell R840: {#DISK_NAME} has been replaced'
                   event_name: 'Dell R840: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
-                  description: '{#DISK_NAME} serial number has changed. Ack to close'
+                  description: '{#DISK_NAME} serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

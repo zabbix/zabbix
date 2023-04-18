@@ -84,7 +84,7 @@ Additional information about metrics and used API methods:
 |{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.EC2.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization in %.</p>|`85`|
+|{$AWS.EC2.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization expressed in %.</p>|`85`|
 |{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}|<p>Minimum number of free earned CPU credits for trigger expression.</p>|`50`|
 |{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}|<p>Maximum number of spent CPU Surplus credits for trigger expression.</p>|`100`|
 |{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}|<p>Minimum percentage of I/O credits remaining for trigger expression.</p>|`20`|
@@ -134,7 +134,7 @@ Additional information about metrics and used API methods:
 |AWS EC2: Failed to get volumes info||`length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0`|Warning||
 |AWS EC2: Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS EC2 by HTTP/aws.ec2.cpu.credit_balance,5m)<{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |AWS EC2: Instance has spent too many CPU surplus credits|<p>The number of spent surplus credits that are not paid down and which thus incur an additional charge is over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}.</p>|`last(/AWS EC2 by HTTP/aws.ec2.cpu.surplus_credit_charged)>{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}`|Warning||
-|AWS EC2: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}`|Warning||
+|AWS EC2: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}`|Warning||
 |AWS EC2: Byte Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |AWS EC2: I/O Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |AWS EC2: Instance status check failed|<p>These checks detect problems that require your involvement to repair.The following are examples of problems that can cause instance status checks to fail:Failed system status checksIncorrect networking or startup configurationExhausted memoryCorrupted file systemIncompatible kernel</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1`|Average||

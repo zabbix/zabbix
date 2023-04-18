@@ -79,7 +79,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced|<p>{#CISCO.ASAV.PHYS.NAME} serial number has changed. Ack to close</p>|`last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced|<p>{#CISCO.ASAV.PHYS.NAME} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Interface discovery
 
@@ -111,7 +111,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cisco ASAv: {#CISCO.IF.NAME} Link down|<p>This trigger expression works as follows:1. Can be triggered if operations status is down.2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)WARNING: if closed manually - won't fire again on next poll, because of .diff.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|Cisco ASAv: {#CISCO.IF.NAME} Link down|<p>This trigger expression works as follows:1. It can be triggered if the operations status is down.2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)WARNING: if closed manually - won't fire again on next poll, because of .diff.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule Memory discovery
 
@@ -149,7 +149,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cisco ASAv: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco ASAv by SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Cisco ASAv: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco ASAv by SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule Session discovery
 

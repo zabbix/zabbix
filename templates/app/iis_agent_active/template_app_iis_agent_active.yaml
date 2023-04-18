@@ -463,7 +463,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Service uptime in seconds.'
+          description: 'The service uptime expressed in seconds.'
           tags:
             -
               tag: component

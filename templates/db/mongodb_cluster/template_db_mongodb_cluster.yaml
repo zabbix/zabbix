@@ -839,7 +839,7 @@ zabbix_export:
               name: 'MongoDB cluster: Version has changed'
               event_name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'MongoDB cluster version has changed. Acknowledge to close manually.'
+              description: 'MongoDB cluster version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

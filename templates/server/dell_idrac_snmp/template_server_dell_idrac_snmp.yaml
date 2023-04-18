@@ -211,7 +211,7 @@ zabbix_export:
               name: 'Dell iDRAC: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'Firmware version has changed. Ack to close'
+              description: 'Firmware version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -270,7 +270,7 @@ zabbix_export:
               name: 'Dell iDRAC: Device has been replaced'
               event_name: 'Dell iDRAC: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -357,7 +357,7 @@ zabbix_export:
               name: 'Dell iDRAC: System name has changed'
               event_name: 'Dell iDRAC: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -511,7 +511,7 @@ zabbix_export:
               expression: 'last(/Dell iDRAC by SNMP/system.sw.os[systemOSName],#1)<>last(/Dell iDRAC by SNMP/system.sw.os[systemOSName],#2) and length(last(/Dell iDRAC by SNMP/system.sw.os[systemOSName]))>0'
               name: 'Dell iDRAC: Operating system description has changed'
               priority: INFO
-              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -955,7 +955,7 @@ zabbix_export:
                   name: '{#DISK_NAME}: Disk has been replaced'
                   event_name: '{#DISK_NAME}: Disk has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Disk serial number has changed. Ack to close'
+                  description: 'Disk serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

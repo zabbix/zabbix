@@ -137,11 +137,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -158,11 +158,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -312,11 +312,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -333,11 +333,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid

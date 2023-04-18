@@ -83,7 +83,7 @@ Additional information about metrics and used API methods:
 |{$AWS.RDS.LLD.FILTER.EVENT_CATEGORY.NOT_MATCHES}|<p>Filter to exclude discovered events by category.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.RDS.LLD.FILTER.EVENT_SOURCE_TYPE.MATCHES}|<p>Filter of discoverable events by source type.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.EVENT_SOURCE_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered events by source type.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.RDS.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization in %.</p>|`85`|
+|{$AWS.RDS.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization expressed in %.</p>|`85`|
 |{$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN}|<p>Minimum number of free earned CPU credits for trigger expression.</p>|`50`|
 |{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}|<p>Minimum percentage of I/O credits remaining for trigger expression.</p>|`20`|
 |{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}|<p>Minimum percentage of Byte credits remaining for trigger expression.</p>|`20`|
@@ -154,7 +154,7 @@ Additional information about metrics and used API methods:
 |AWS RDS: Failed to get events data||`length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0`|Warning||
 |AWS RDS: Read replica in error state|<p>The status of a read replica.False if the instance is in an error state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.read_replica_state)=0`|Average||
 |AWS RDS: Burst balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.burst_balance,5m)<{$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|AWS RDS: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS RDS instance by HTTP/aws.rds.cpu.utilization,15m)>{$AWS.RDS.CPU.UTIL.WARN.MAX}`|Warning||
+|AWS RDS: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS RDS instance by HTTP/aws.rds.cpu.utilization,15m)>{$AWS.RDS.CPU.UTIL.WARN.MAX}`|Warning||
 |AWS RDS: Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS RDS instance by HTTP/aws.rds.cpu.credit_balance,5m)<{$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |AWS RDS: Byte Credit balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.ebs_byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |AWS RDS: I/O Credit balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.ebs_io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}`|Warning||

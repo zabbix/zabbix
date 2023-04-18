@@ -220,7 +220,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %.'
+          description: 'The CPU utilization expressed in %.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN

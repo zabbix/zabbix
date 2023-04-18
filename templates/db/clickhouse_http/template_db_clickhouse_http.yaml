@@ -1159,7 +1159,7 @@ zabbix_export:
               name: 'ClickHouse: Configuration has been changed'
               event_name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'ClickHouse configuration has been changed. Ack to close.'
+              description: 'ClickHouse configuration has been changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1285,7 +1285,7 @@ zabbix_export:
               name: 'ClickHouse: Version has changed'
               event_name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The ClickHouse version has changed. Acknowledge to close manually.'
+              description: 'The ClickHouse version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -2569,11 +2569,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -2588,11 +2588,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -2608,11 +2608,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -2628,11 +2628,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid

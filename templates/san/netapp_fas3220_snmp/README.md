@@ -32,7 +32,7 @@ This template has been tested on:
 |----|-----------|-------|
 |{$IF.UTIL.MAX}||`95`|
 |{$IF.ERRORS.WARN}|||
-|{$CPU.UTIL.CRIT}|<p>The critical threshold of the CPU utilization in %.</p>|`90`|
+|{$CPU.UTIL.CRIT}|<p>The critical threshold of the CPU utilization expressed in %.</p>|`90`|
 |{$FAS3220.FS.NAME.MATCHES}|<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$FAS3220.FS.NAME.NOT_MATCHES}|<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p>|`snapshot`|
 |{$FAS3220.FS.TYPE.MATCHES}|<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p><p>Value should be integer:</p><p>  2 - flexibleVolume,</p><p>  3 - aggregate,</p><p>  4 - stripedAggregate,</p><p>  5 - stripedVolume.</p>|`.*`|
@@ -78,7 +78,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |NetApp FAS3220: Number of failed disks has changed|<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedCount])>0 and last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedMessage],#2)`|Warning||
 |NetApp FAS3220: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>NetApp FAS3220: No SNMP data collection</li></ul>|
-|NetApp FAS3220: System name has changed|<p>System name has changed. Ack to close.</p>|`last(/NetApp FAS3220 by SNMP/system.name,#1)<>last(/NetApp FAS3220 by SNMP/system.name,#2) and length(last(/NetApp FAS3220 by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|NetApp FAS3220: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/NetApp FAS3220 by SNMP/system.name,#1)<>last(/NetApp FAS3220 by SNMP/system.name,#2) and length(last(/NetApp FAS3220 by SNMP/system.name))>0`|Info|**Manual close**: Yes|
 |NetApp FAS3220: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/NetApp FAS3220 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>NetApp FAS3220: Unavailable by ICMP ping</li></ul>|
 |NetApp FAS3220: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/NetApp FAS3220 by SNMP/icmpping,#3)=0`|High||
 |NetApp FAS3220: High ICMP ping loss||`min(/NetApp FAS3220 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/NetApp FAS3220 by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>NetApp FAS3220: Unavailable by ICMP ping</li></ul>|
@@ -100,7 +100,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node {#NODE.NAME}: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/NetApp FAS3220 by SNMP/fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Node {#NODE.NAME}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/NetApp FAS3220 by SNMP/fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule Cluster metrics discovery
 
@@ -168,7 +168,7 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |{#VSERVER}{#FSNAME}: Total space used|<p>The total disk space that is in use on {#FSNAME}.</p>|SNMP agent|fas3220.fs[df64UsedKBytes, "{#VSERVER}{#FSNAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1024`</li></ul>|
 |{#VSERVER}{#FSNAME}: Total space available|<p>The total disk space that is free for use on {#FSNAME}.</p>|SNMP agent|fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1024`</li></ul>|
-|{#VSERVER}{#FSNAME}: Total space|<p>The total capacity in Bytes for {#FSNAME}.</p>|SNMP agent|fas3220.fs[df64TotalKBytes, "{#VSERVER}{#FSNAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1024`</li></ul>|
+|{#VSERVER}{#FSNAME}: Total space|<p>The total capacity in bytes for {#FSNAME}.</p>|SNMP agent|fas3220.fs[df64TotalKBytes, "{#VSERVER}{#FSNAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1024`</li></ul>|
 |{#VSERVER}{#FSNAME}: Used space percents|<p>The percentage of disk space currently in use on {#FSNAME}.</p>|SNMP agent|fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"]|
 |{#VSERVER}{#FSNAME}: Saved by compression percents|<p>Provides the percentage of compression savings in a volume, which is ((compr_saved/used)) * 10(compr_saved + 0). This is only returned for volumes.</p>|SNMP agent|fas3220.fs[dfCompressSavedPercent, "{#VSERVER}{#FSNAME}"]|
 |{#VSERVER}{#FSNAME}: Saved by deduplication percents|<p>Provides the percentage of deduplication savings in a volume, which is ((dedup_saved/(dedup_saved + used)) * 100). This is only returned for volumes.</p>|SNMP agent|fas3220.fs[dfDedupeSavedPercent, "{#VSERVER}{#FSNAME}"]|
@@ -207,7 +207,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate|<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p>|`min(/NetApp FAS3220 by SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/NetApp FAS3220 by SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes|
+|Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/NetApp FAS3220 by SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/NetApp FAS3220 by SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes|
 |Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down|<p>Link state is not UP and the port status is set 'UP' by an administrator.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"])<>2 and last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"])=1`|Average|**Manual close**: Yes|
 |Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy|<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"])<>0 and length(last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]))>0`|Info||
 

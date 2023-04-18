@@ -209,7 +209,7 @@ zabbix_export:
               name: 'PD: Version has changed'
               event_name: 'PD: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'PD version has changed. Acknowledge to close manually.'
+              description: 'PD version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

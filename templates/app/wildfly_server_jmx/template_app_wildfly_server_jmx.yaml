@@ -161,7 +161,7 @@ zabbix_export:
               name: 'WildFly: Version has changed'
               event_name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'WildFly version has changed. Acknowledge to close manually.'
+              description: 'WildFly version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -597,7 +597,7 @@ zabbix_export:
                   name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed'
                   event_name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Deployment status has changed. Ack to close.'
+                  description: 'Deployment status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

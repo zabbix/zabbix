@@ -98,7 +98,7 @@ This template has been tested on:
 |APC UPS Symmetra RM: UPS is Emergency Static Bypass||`last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=16`|Average||
 |APC UPS Symmetra RM: UPS is Hardware Failure Bypass||`last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=10`|Average||
 |APC UPS Symmetra RM: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/APC UPS Symmetra RM by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC UPS Symmetra RM by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/APC UPS Symmetra RM by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC UPS Symmetra RM by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>APC UPS Symmetra RM: No SNMP data collection</li></ul>|
-|APC UPS Symmetra RM: System name has changed|<p>System name has changed. Ack to close.</p>|`last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0],#1)<>last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0],#2) and length(last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0]))>0`|Info|**Manual close**: Yes|
+|APC UPS Symmetra RM: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0],#1)<>last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0],#2) and length(last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0]))>0`|Info|**Manual close**: Yes|
 |APC UPS Symmetra RM: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/APC UPS Symmetra RM by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 
 ### LLD rule Input phases discovery

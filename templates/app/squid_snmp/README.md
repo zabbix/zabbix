@@ -114,7 +114,7 @@ snmp_access allow <zbx_acl_name> <zabbix_server_ip>
 |----|-----------|----------|--------|--------------------------------|
 |Squid: Port {$SQUID.HTTP.PORT} is down||`last(/Squid by SNMP/net.tcp.service[tcp,,{$SQUID.HTTP.PORT}])=0`|Average|**Manual close**: Yes|
 |Squid: Squid has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Squid by SNMP/squid[cacheUptime])<10m`|Info|**Manual close**: Yes|
-|Squid: Squid version has been changed|<p>Squid version has changed. Acknowledge to close manually.</p>|`last(/Squid by SNMP/squid[cacheVersionId],#1)<>last(/Squid by SNMP/squid[cacheVersionId],#2) and length(last(/Squid by SNMP/squid[cacheVersionId]))>0`|Info|**Manual close**: Yes|
+|Squid: Squid version has been changed|<p>Squid version has changed. Acknowledge to close the problem manually.</p>|`last(/Squid by SNMP/squid[cacheVersionId],#1)<>last(/Squid by SNMP/squid[cacheVersionId],#2) and length(last(/Squid by SNMP/squid[cacheVersionId]))>0`|Info|**Manual close**: Yes|
 |Squid: Swap usage is more than low watermark||`last(/Squid by SNMP/squid[cacheCurrentSwapSize])>last(/Squid by SNMP/squid[cacheSwapLowWM])*last(/Squid by SNMP/squid[cacheSwapMaxSize])/100`|Warning||
 |Squid: Swap usage is more than high watermark||`last(/Squid by SNMP/squid[cacheCurrentSwapSize])>last(/Squid by SNMP/squid[cacheSwapHighWM])*last(/Squid by SNMP/squid[cacheSwapMaxSize])/100`|High||
 |Squid: Squid is running out of file descriptors||`last(/Squid by SNMP/squid[cacheCurrentUnusedFDescrCnt])<{$SQUID.FILE.DESC.WARN.MIN}`|Warning||

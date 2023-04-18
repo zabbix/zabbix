@@ -759,7 +759,7 @@ zabbix_export:
                   name: 'SMART [{#NAME}]: Disk has been replaced'
                   event_name: 'SMART [{#NAME}]: Disk has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Device serial number has changed. Acknowledge to close manually.'
+                  description: 'Device serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

@@ -142,7 +142,7 @@ Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Vault: Vault server is sealed|<p>https://www.vaultproject.io/docs/concepts/seal</p>|`last(/HashiCorp Vault by HTTP/vault.health.sealed)=1`|Average||
-|Vault: Version has changed|<p>Vault version has changed. Acknowledge to close manually.</p>|`last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2) and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0`|Info|**Manual close**: Yes|
+|Vault: Version has changed|<p>Vault version has changed. Acknowledge to close the problem manually.</p>|`last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2) and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0`|Info|**Manual close**: Yes|
 |Vault: Vault server is not responding||`last(/HashiCorp Vault by HTTP/vault.health.check)=0`|High||
 |Vault: Failed to get metrics||`length(last(/HashiCorp Vault by HTTP/vault.get_metrics.error))>0`|Warning|**Depends on**:<br><ul><li>Vault: Vault server is sealed</li></ul>|
 |Vault: Current number of open files is too high||`min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}`|Warning||

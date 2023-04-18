@@ -57,7 +57,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |PD: Instance is not responding||`last(/TiDB PD by HTTP/pd.status)=0`|Average||
-|PD: Version has changed|<p>PD version has changed. Acknowledge to close manually.</p>|`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0`|Info|**Manual close**: Yes|
+|PD: Version has changed|<p>PD version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0`|Info|**Manual close**: Yes|
 |PD: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB PD by HTTP/pd.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Cluster metrics discovery

@@ -171,7 +171,7 @@ See documentation for details:
 |Node [{#NAME}] Requests: Total CPU requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8`|Average||
 |Node [{#NAME}] Requests: Total memory requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5`|Warning|**Depends on**:<br><ul><li>Node [{#NAME}] Requests: Total memory requests are too high</li></ul>|
 |Node [{#NAME}] Requests: Total memory requests are too high||`last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8`|Average||
-|Node [{#NAME}]: Has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
+|Node [{#NAME}]: Has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
 |Node [{#NAME}] Used: Kubelet too many pods|<p>Kubelet is running at capacity.</p>|`last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9`|Warning||
 
 ### LLD rule Cluster node discovery

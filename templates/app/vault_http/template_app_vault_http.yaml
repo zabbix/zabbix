@@ -680,7 +680,7 @@ zabbix_export:
               name: 'Vault: Version has changed'
               event_name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Vault version has changed. Acknowledge to close manually.'
+              description: 'Vault version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

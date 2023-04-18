@@ -991,7 +991,7 @@ zabbix_export:
               name: 'Docker: Version has changed'
               event_name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Docker version has changed. Acknowledge to close manually.'
+              description: 'Docker version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1261,7 +1261,7 @@ zabbix_export:
                   name: 'Container {#NAME}: An error has occurred in the container'
                   event_name: 'Container {#NAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Container {#NAME} has an error. Ack to close.'
+                  description: 'Container {#NAME} has an error. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

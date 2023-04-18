@@ -103,7 +103,7 @@ Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNS
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |MongoDB: Connection to MongoDB is unavailable|<p>Connection to MongoDB instance is currently unavailable.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0`|High||
-|MongoDB: Version has changed|<p>MongoDB version has changed. Acknowledge to close manually.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB node by Zabbix agent 2/mongodb.version))>0`|Info|**Manual close**: Yes|
+|MongoDB: Version has changed|<p>MongoDB version has changed. Acknowledge to close the problem manually.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB node by Zabbix agent 2/mongodb.version))>0`|Info|**Manual close**: Yes|
 |MongoDB: mongod process has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.uptime)<10m`|Info|**Manual close**: Yes|
 |MongoDB: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/MongoDB node by Zabbix agent 2/mongodb.uptime,10m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MongoDB: Connection to MongoDB is unavailable</li></ul>|
 |MongoDB: Total number of open connections is too high|<p>Too few available connections.If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.</p>|`min(/MongoDB node by Zabbix agent 2/mongodb.connections.current,5m)/(last(/MongoDB node by Zabbix agent 2/mongodb.connections.available)+last(/MongoDB node by Zabbix agent 2/mongodb.connections.current))*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}`|Warning||
@@ -204,7 +204,7 @@ Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNS
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MongoDB: Node in ReplicaSet changed the state|<p>Node in ReplicaSet  changed the state. Ack to close.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#2)`|Warning|**Manual close**: Yes|
+|MongoDB: Node in ReplicaSet changed the state|<p>Node in ReplicaSet  changed the state. Acknowledge to close the problem manually.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#2)`|Warning|**Manual close**: Yes|
 |MongoDB: Replication lag with primary is too high||`min(/MongoDB node by Zabbix agent 2/mongodb.rs.lag[{#RS_NAME}],5m)>{$MONGODB.REPL.LAG.MAX.WARN}`|Warning||
 |MongoDB: There are unhealthy replicas in ReplicaSet||`last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy_count[{#RS_NAME}])>0 and length(last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy[{#RS_NAME}]))>0`|Average||
 

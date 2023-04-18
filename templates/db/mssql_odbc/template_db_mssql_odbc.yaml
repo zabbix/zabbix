@@ -2040,7 +2040,7 @@ zabbix_export:
               name: 'MSSQL: Failed to fetch info data'
               event_name: 'MSSQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
                 -
                   name: 'MSSQL: Service is unavailable'
@@ -2139,7 +2139,7 @@ zabbix_export:
               name: 'MSSQL: Version has changed'
               event_name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'MSSQL version has changed. Ack to close.'
+              description: 'MSSQL version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -4879,105 +4879,6 @@ zabbix_export:
                 -
                   type: graph
                   x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Locks'
-                -
-                  type: graph
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Server memory'
-                -
-                  type: graph
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Memory/cache load'
-                -
-                  type: graph
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Waits per second'
-                -
-                  type: graph
-                  x: '12'
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Wait times'
-                -
-                  type: graph
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Database pages'
-                -
-                  type: graph
-                  x: '12'
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Cache objects'
-                -
-                  type: graph
-                  'y': '20'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Transactions'
-                -
-                  type: graph
-                  x: '12'
                   'y': '20'
                   width: '12'
                   height: '5'
@@ -4990,20 +4891,8 @@ zabbix_export:
                         name: 'MSSQL: Compilations'
                 -
                   type: graph
-                  'y': '25'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Pages'
-                -
-                  type: graph
                   x: '12'
-                  'y': '25'
+                  'y': '35'
                   width: '12'
                   height: '5'
                   fields:
@@ -5012,32 +4901,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Page life expectancy'
-                -
-                  type: graph
-                  'y': '30'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Memory grants outstanding and pending'
-                -
-                  type: graph
-                  x: '12'
-                  'y': '30'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Processes blocked'
+                        name: 'MSSQL: Auto-params'
                 -
                   type: graph
                   'y': '35'
@@ -5053,7 +4917,7 @@ zabbix_export:
                 -
                   type: graph
                   x: '12'
-                  'y': '35'
+                  'y': '30'
                   width: '12'
                   height: '5'
                   fields:
@@ -5062,7 +4926,143 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'MSSQL by ODBC'
-                        name: 'MSSQL: Auto-params'
+                        name: 'MSSQL: Processes blocked'
+                -
+                  type: graph
+                  'y': '30'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Memory grants outstanding and pending'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '25'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Page life expectancy'
+                -
+                  type: graph
+                  'y': '25'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Pages'
+                -
+                  type: graph
+                  'y': '20'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Transactions'
+                -
+                  type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Locks'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Cache objects'
+                -
+                  type: graph
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Database pages'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Wait times'
+                -
+                  type: graph
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Waits per second'
+                -
+                  type: graph
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Memory/cache load'
+                -
+                  type: graph
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'MSSQL by ODBC'
+                        name: 'MSSQL: Server memory'
                 -
                   type: graph
                   'y': '40'

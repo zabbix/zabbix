@@ -129,7 +129,7 @@ zabbix_export:
               name: 'Consul cluster: Leader has been changed'
               event_name: 'Consul cluster: Leader has been changed (new value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Consul cluster version has changed. Acknowledge to close manually.'
+              description: 'Consul cluster version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

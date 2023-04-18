@@ -75,7 +75,7 @@ zabbix_export:
                   name: 'Broker {#JMXBROKERNAME}: Version has been changed'
                   event_name: 'Broker {#JMXBROKERNAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Broker {#JMXBROKERNAME} version has changed. Acknowledge to close manually.'
+                  description: 'The Broker {#JMXBROKERNAME} version has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -390,7 +390,7 @@ zabbix_export:
                   name: 'Broker {#JMXBROKERNAME}: Broker has been restarted'
                   event_name: 'Broker {#JMXBROKERNAME}: Broker has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -

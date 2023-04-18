@@ -1530,7 +1530,7 @@ zabbix_export:
               name: 'Consul: Version has been changed'
               event_name: 'Consul: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Consul version has changed. Acknowledge to close manually.'
+              description: 'Consul version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

@@ -112,7 +112,7 @@ zabbix_export:
               name: 'OceanStor 5300 V5: Storage version has been changed'
               event_name: 'OceanStor 5300 V5: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'OceanStor 5300 V5 version has changed. Acknowledge to close manually.'
+              description: 'OceanStor 5300 V5 version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -356,7 +356,7 @@ zabbix_export:
               name: 'OceanStor 5300 V5: System name has changed'
               event_name: 'OceanStor 5300 V5: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -570,7 +570,7 @@ zabbix_export:
                   event_name: 'Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -1396,7 +1396,7 @@ zabbix_export:
                   event_name: 'Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -1805,7 +1805,7 @@ zabbix_export:
         -
           macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$HUAWEI.5300.DISK.TEMP.MAX.TIME}'
           value: 5m

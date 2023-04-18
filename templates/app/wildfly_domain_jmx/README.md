@@ -57,7 +57,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|WildFly: Version has changed|<p>WildFly version has changed. Acknowledge to close manually.</p>|`last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0`|Info|**Manual close**: Yes|
+|WildFly: Version has changed|<p>WildFly version has changed. Acknowledge to close the problem manually.</p>|`last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Domain by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0`|Info|**Manual close**: Yes|
 |WildFly: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/WildFly Domain by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Deployments discovery
@@ -91,8 +91,8 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|WildFly domain: Server {#SERVER}: Server status has changed|<p>Server status has changed. Ack to close.</p>|`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0`|Warning|**Manual close**: Yes|
-|WildFly domain: Server {#SERVER}: Server group has changed|<p>Server group has changed. Ack to close.</p>|`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0`|Info|**Manual close**: Yes|
+|WildFly domain: Server {#SERVER}: Server status has changed|<p>Server status has changed. Acknowledge to close the problem manually.</p>|`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",status]))>0`|Warning|**Manual close**: Yes|
+|WildFly domain: Server {#SERVER}: Server group has changed|<p>Server group has changed. Acknowledge to close the problem manually.</p>|`last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#1)<>last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group],#2) and length(last(/WildFly Domain by JMX/jmx["{#JMXOBJ}",group]))>0`|Info|**Manual close**: Yes|
 
 ## Feedback
 

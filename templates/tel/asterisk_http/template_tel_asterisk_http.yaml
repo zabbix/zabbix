@@ -801,7 +801,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: uptime
-          description: 'System uptime in ''N days, hh:mm:ss'' format.'
+          description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
           preprocessing:
             -
               type: JSONPATH
@@ -820,7 +820,7 @@ zabbix_export:
               name: 'Asterisk: Failed to fetch AMI page'
               event_name: 'Asterisk: Failed to fetch AMI page (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -904,7 +904,7 @@ zabbix_export:
               name: 'Asterisk: Version has changed'
               event_name: 'Asterisk: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Asterisk version has changed. Acknowledge to close manually.'
+              description: 'The Asterisk version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

@@ -471,7 +471,7 @@ zabbix_export:
               name: 'NameNode: Failed to fetch NameNode API page'
               event_name: 'NameNode: Failed to fetch NameNode API page (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -487,7 +487,7 @@ zabbix_export:
               name: 'NameNode: Service has been restarted'
               event_name: 'NameNode: Service has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -795,7 +795,7 @@ zabbix_export:
               name: 'ResourceManager: Failed to fetch ResourceManager API page'
               event_name: 'ResourceManager: Failed to fetch ResourceManager API page (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -811,7 +811,7 @@ zabbix_export:
               name: 'ResourceManager: Service has been restarted'
               event_name: 'ResourceManager: Service has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1192,7 +1192,7 @@ zabbix_export:
                   name: '{#HOSTNAME}: Failed to fetch DataNode API page'
                   event_name: '{#HOSTNAME}: Failed to fetch DataNode API page (or no data for 30m)'
                   priority: WARNING
-                  description: 'Zabbix has not received data for items for the last 30 minutes.'
+                  description: 'Zabbix has not received any data for items for the last 30 minutes.'
                   manual_close: 'YES'
                   dependencies:
                     -
@@ -1208,7 +1208,7 @@ zabbix_export:
                   name: '{#HOSTNAME}: Service has been restarted'
                   event_name: '{#HOSTNAME}: Service has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1533,7 +1533,7 @@ zabbix_export:
                   name: '{#HOSTNAME}: Failed to fetch NodeManager API page'
                   event_name: '{#HOSTNAME}: Failed to fetch NodeManager API page (or no data for 30m)'
                   priority: WARNING
-                  description: 'Zabbix has not received data for items for the last 30 minutes.'
+                  description: 'Zabbix has not received any data for items for the last 30 minutes.'
                   manual_close: 'YES'
                   dependencies:
                     -
@@ -1549,7 +1549,7 @@ zabbix_export:
                   name: '{#HOSTNAME}: Service has been restarted'
                   event_name: '{#HOSTNAME}: Service has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1735,11 +1735,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -1754,11 +1754,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -1790,11 +1790,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid
@@ -1810,11 +1810,11 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: show
-                      value: '4'
+                      value: '2'
                     -
                       type: INTEGER
                       name: show
-                      value: '2'
+                      value: '4'
                     -
                       type: ITEM
                       name: itemid

@@ -78,7 +78,7 @@ Plugin [parameters list](https://www.zabbix.com/documentation/6.4/manual/appendi
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SMART [{#NAME}]: Disk has been replaced|<p>Device serial number has changed. Acknowledge to close manually.</p>|`last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}]))>0`|Info|**Manual close**: Yes|
+|SMART [{#NAME}]: Disk has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#1)<>last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}],#2) and length(last(/SMART by Zabbix agent 2 active/smart.disk.sn[{#NAME}]))>0`|Info|**Manual close**: Yes|
 |SMART [{#NAME}]: Disk self-test is not passed||`last(/SMART by Zabbix agent 2 active/smart.disk.test[{#NAME}])="false"`|High||
 |SMART [{#NAME}]: Average disk temperature is too high||`avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>SMART [{#NAME}]: Average disk temperature is critical</li></ul>|
 |SMART [{#NAME}]: Average disk temperature is critical||`avg(/SMART by Zabbix agent 2 active/smart.disk.temperature[{#NAME}],5m)>{$SMART.TEMPERATURE.MAX.CRIT}`|Average||

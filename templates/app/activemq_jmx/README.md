@@ -89,8 +89,8 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Broker {#JMXBROKERNAME}: Version has been changed|<p>The Broker {#JMXBROKERNAME} version has changed. Acknowledge to close manually.</p>|`last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#1)<>last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#2) and length(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion]))>0`|Info|**Manual close**: Yes|
-|Broker {#JMXBROKERNAME}: Broker has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},UptimeMillis])<10m`|Info|**Manual close**: Yes|
+|Broker {#JMXBROKERNAME}: Version has been changed|<p>The Broker {#JMXBROKERNAME} version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#1)<>last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#2) and length(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion]))>0`|Info|**Manual close**: Yes|
+|Broker {#JMXBROKERNAME}: Broker has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},UptimeMillis])<10m`|Info|**Manual close**: Yes|
 |Broker {#JMXBROKERNAME}: Memory usage is too high||`min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}`|Average|**Depends on**:<br><ul><li>Broker {#JMXBROKERNAME}: Memory usage is too high</li></ul>|
 |Broker {#JMXBROKERNAME}: Memory usage is too high||`min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}`|High||
 |Broker {#JMXBROKERNAME}: Storage usage is too high||`min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}`|Average|**Depends on**:<br><ul><li>Broker {#JMXBROKERNAME}: Storage usage is too high</li></ul>|

@@ -261,7 +261,7 @@ zabbix_export:
               name: 'HP iLO: Device has been replaced'
               event_name: 'HP iLO: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -348,7 +348,7 @@ zabbix_export:
               name: 'HP iLO: System name has changed'
               event_name: 'HP iLO: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -978,7 +978,7 @@ zabbix_export:
                   name: '{#DISK_LOCATION}: Disk has been replaced'
                   event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Disk serial number has changed. Ack to close'
+                  description: 'Disk serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

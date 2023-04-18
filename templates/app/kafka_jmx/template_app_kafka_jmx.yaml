@@ -676,7 +676,7 @@ zabbix_export:
           units: s
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
-          description: 'Service uptime in seconds.'
+          description: 'The service uptime expressed in seconds.'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -694,7 +694,7 @@ zabbix_export:
               name: 'Kafka: has been restarted'
               event_name: 'Kafka: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -728,7 +728,7 @@ zabbix_export:
               name: 'Kafka: Version has changed'
               event_name: 'Kafka: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Kafka version has changed. Acknowledge to close manually.'
+              description: 'The Kafka version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

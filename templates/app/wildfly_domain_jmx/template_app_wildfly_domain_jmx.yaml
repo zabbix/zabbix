@@ -150,7 +150,7 @@ zabbix_export:
               name: 'WildFly: Version has changed'
               event_name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'WildFly version has changed. Acknowledge to close manually.'
+              description: 'WildFly version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -333,7 +333,7 @@ zabbix_export:
                   name: 'WildFly domain: Server {#SERVER}: Server group has changed'
                   event_name: 'WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'Server group has changed. Ack to close.'
+                  description: 'Server group has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -370,7 +370,7 @@ zabbix_export:
                   name: 'WildFly domain: Server {#SERVER}: Server status has changed'
                   event_name: 'WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Server status has changed. Ack to close.'
+                  description: 'Server status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

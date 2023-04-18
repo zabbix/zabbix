@@ -72,7 +72,7 @@ zabbix_export:
               name: 'Apache Cassandra: Version has changed'
               event_name: 'Apache Cassandra: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Cassandra version has changed. Ack to close.'
+              description: 'Cassandra version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

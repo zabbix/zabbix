@@ -764,7 +764,7 @@ zabbix_export:
               name: 'Zabbix proxy: Version has changed'
               event_name: 'Zabbix proxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Zabbix proxy version has changed. Acknowledge to close manually.'
+              description: 'Zabbix proxy version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

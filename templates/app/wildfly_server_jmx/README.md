@@ -71,7 +71,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 |----|-----------|----------|--------|--------------------------------|
 |WildFly: Server needs to restart for configuration change.||`find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0`|Warning||
 |WildFly: Server controller is not in RUNNING state||`find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","serverState"],,"like","running")=0`|Warning|**Depends on**:<br><ul><li>WildFly: Server needs to restart for configuration change.</li></ul>|
-|WildFly: Version has changed|<p>WildFly version has changed. Acknowledge to close manually.</p>|`last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0`|Info|**Manual close**: Yes|
+|WildFly: Version has changed|<p>WildFly version has changed. Acknowledge to close the problem manually.</p>|`last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0`|Info|**Manual close**: Yes|
 |WildFly: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m`|Info|**Manual close**: Yes|
 |WildFly: Failed to fetch info data|<p>Zabbix has not received data for items for the last 15 minutes</p>|`nodata(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"],15m)=1`|Warning||
 
@@ -95,7 +95,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed|<p>Deployment status has changed. Ack to close.</p>|`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0`|Warning|**Manual close**: Yes|
+|WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed|<p>Deployment status has changed. Acknowledge to close the problem manually.</p>|`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0`|Warning|**Manual close**: Yes|
 
 ### LLD rule JDBC metrics discovery
 

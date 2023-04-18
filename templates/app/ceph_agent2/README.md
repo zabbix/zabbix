@@ -102,7 +102,7 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 |Ceph: Can not connect to cluster|<p>The connection to the Ceph RESTful module is broken (if there is any error presented including *AUTH* and the configuration issues).</p>|`last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0`|Average||
 |Ceph: Cluster in ERROR state||`last(/Ceph by Zabbix agent 2/ceph.overall_status)=2`|Average|**Manual close**: Yes|
 |Ceph: Cluster in WARNING state||`last(/Ceph by Zabbix agent 2/ceph.overall_status)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ceph: Cluster in ERROR state</li></ul>|
-|Ceph: Minimum monitor release version has changed|<p>A Ceph version has changed. Acknowledge to close manually.</p>|`last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0`|Info|**Manual close**: Yes|
+|Ceph: Minimum monitor release version has changed|<p>A Ceph version has changed. Acknowledge to close the problem manually.</p>|`last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule OSD
 

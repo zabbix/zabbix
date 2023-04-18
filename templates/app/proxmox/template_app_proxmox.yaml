@@ -340,7 +340,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Total memory in Bytes.'
+              description: 'The total memory expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -374,7 +374,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Used memory in Bytes.'
+              description: 'Used memory in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -510,7 +510,7 @@ zabbix_export:
               history: 2w
               trends: 0d
               units: uptime
-              description: 'System uptime in ''N days, hh:mm:ss'' format.'
+              description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
               preprocessing:
                 -
                   type: JSONPATH
@@ -784,7 +784,7 @@ zabbix_export:
                   name: 'Proxmox: Node [{#NODE.NAME}]: Kernel version has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
-                  description: 'Firmware version has changed. Ack to close'
+                  description: 'Firmware version has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1037,7 +1037,7 @@ zabbix_export:
                   name: 'Proxmox: Node [{#NODE.NAME}]: PVE manager has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
-                  description: 'Firmware version has changed. Ack to close'
+                  description: 'Firmware version has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1260,7 +1260,7 @@ zabbix_export:
               history: 2w
               trends: 0d
               units: uptime
-              description: 'System uptime in ''N days, hh:mm:ss'' format.'
+              description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1344,7 +1344,7 @@ zabbix_export:
               event_name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
               opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'This trigger is ignored, if there is no swap configured.'
+              description: 'If there is no swap configured, this trigger is ignored.'
               tags:
                 -
                   tag: scope
@@ -1601,7 +1601,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Total memory in Bytes.'
+              description: 'The total memory expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1635,7 +1635,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Used memory in Bytes.'
+              description: 'Used memory in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1771,7 +1771,7 @@ zabbix_export:
               history: 2w
               trends: 0d
               units: uptime
-              description: 'System uptime in ''N days, hh:mm:ss'' format.'
+              description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
               preprocessing:
                 -
                   type: JSONPATH

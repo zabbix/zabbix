@@ -31,8 +31,8 @@ Refer to the vendor documentation.
 |{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}|<p>Filter to exclude discovered by mount point names.</p>|`CHANGE_IF_NEEDED`|
 |{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}|<p>Partitions that low free space trigger should ignore.</p>|`^/usr$`|
 |{$BIGIP.CERT.MIN}|<p>Minimum number of days before certificate expiration.</p>|`7`|
-|{$BIGIP.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization in %.</p>|`85`|
-|{$BIGIP.CPU.UTIL.WARN.MIN}|<p>The recovery threshold of the CPU utilization in %.</p>|`65`|
+|{$BIGIP.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization expressed in %.</p>|`85`|
+|{$BIGIP.CPU.UTIL.WARN.MIN}|<p>The recovery threshold of the CPU utilization expressed in %.</p>|`65`|
 |{$BIGIP.MEMORY.UTIL.WARN.MAX}|<p>The warning threshold of the memory utilization in %.</p>|`85`|
 |{$BIGIP.MEMORY.UTIL.WARN.MIN}|<p>The recovery threshold of the memory utilization in %.</p>|`65`|
 |{$BIGIP.SWAP.UTIL.WARN.MAX}|<p>The warning threshold of the swap utilization in %.</p>|`85`|
@@ -72,7 +72,7 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |F5 BIG-IP: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/F5 Big-IP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
-|F5 BIG-IP: Chassis has been replaced|<p>Chassis serial number has changed. Ack to close</p>|`last(/F5 Big-IP by SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP by SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP by SNMP/bigip.serialnumber))>0`|Info|**Manual close**: Yes|
+|F5 BIG-IP: Chassis has been replaced|<p>Chassis serial number has changed. Acknowledge to close the problem manually.</p>|`last(/F5 Big-IP by SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP by SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP by SNMP/bigip.serialnumber))>0`|Info|**Manual close**: Yes|
 |F5 BIG-IP: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/F5 Big-IP by SNMP/bigip.uptime)<10m`|Info|**Manual close**: Yes|
 |F5 BIG-IP: Cluster not in sync||`count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","3")>8 and count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","4")>6`|Warning|**Manual close**: Yes|
 |F5 BIG-IP: The device is inconsistent with the device group|<p>The device is inconsistent with the device group, requires user intervention</p>|`last(/F5 Big-IP by SNMP/bigip.syncstatus)=4`|Warning|**Manual close**: Yes|
@@ -166,7 +166,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|F5 BIG-IP: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`last(/F5 Big-IP by SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}`|Warning|**Manual close**: Yes|
+|F5 BIG-IP: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`last(/F5 Big-IP by SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}`|Warning|**Manual close**: Yes|
 
 ### LLD rule Network interface discovery
 

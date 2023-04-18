@@ -2826,7 +2826,7 @@ zabbix_export:
                         name: 'DB {#DBNAME}: Slow queries'
       valuemaps:
         -
-          uuid: 498529348c604bf6865f01130dd6adf8
+          uuid: cd2d975b0d7e4f8e89afb1033fce4ce2
           name: 'PostgreSQL checksum failure status'
           mappings:
             -

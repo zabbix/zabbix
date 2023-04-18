@@ -1091,7 +1091,7 @@ zabbix_export:
               name: 'Squid: Squid version has been changed'
               event_name: 'Squid: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Squid version has changed. Acknowledge to close manually.'
+              description: 'Squid version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

@@ -789,7 +789,7 @@ zabbix_export:
               name: 'APC Smart-UPS RT 1000 XL: System name has changed'
               event_name: 'APC Smart-UPS RT 1000 XL: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

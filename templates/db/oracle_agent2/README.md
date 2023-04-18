@@ -141,11 +141,11 @@ Test availability:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Oracle: Connection to database is unavailable|<p>Connection to Oracle Database is currently unavailable.</p>|`last(/Oracle by Zabbix agent 2/oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"])=0`|Disaster||
-|Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.version,#1)<>last(/Oracle by Zabbix agent 2/oracle.version,#2) and length(last(/Oracle by Zabbix agent 2/oracle.version))>0`|Info|**Manual close**: Yes|
+|Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.version,#1)<>last(/Oracle by Zabbix agent 2/oracle.version,#2) and length(last(/Oracle by Zabbix agent 2/oracle.version))>0`|Info|**Manual close**: Yes|
 |Oracle: Failed to fetch info data|<p>Zabbix has not received any data for the items for the last 5 minutes. The database might be unavailable for connecting.</p>|`nodata(/Oracle by Zabbix agent 2/oracle.uptime,30m)=1`|Info||
 |Oracle: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Oracle by Zabbix agent 2/oracle.uptime)<10m`|Info|**Manual close**: Yes|
-|Oracle: Instance name has changed|<p>Oracle DB Instance name has changed. Ack to close manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.instance_name,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_name,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_name))>0`|Info|**Manual close**: Yes|
-|Oracle: Instance hostname has changed|<p>Oracle DB Instance hostname has changed. Ack to close.</p>|`last(/Oracle by Zabbix agent 2/oracle.instance_hostname,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_hostname,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_hostname))>0`|Info|**Manual close**: Yes|
+|Oracle: Instance name has changed|<p>Oracle DB Instance name has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.instance_name,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_name,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_name))>0`|Info|**Manual close**: Yes|
+|Oracle: Instance hostname has changed|<p>Oracle DB Instance hostname has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.instance_hostname,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_hostname,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_hostname))>0`|Info|**Manual close**: Yes|
 |Oracle: Shared pool free is too low|<p>The free memory percent of the shared pool has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% for the last 5 minutes.</p>|`max(/Oracle by Zabbix agent 2/oracle.shared_pool_free,5m)<{$ORACLE.SHARED.FREE.MIN.WARN}`|Warning||
 |Oracle: Too many active sessions|<p>Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.</p>|`min(/Oracle by Zabbix agent 2/oracle.session_count,5m) * 100 / last(/Oracle by Zabbix agent 2/oracle.session_limit) > {$ORACLE.SESSIONS.MAX.WARN}`|Warning||
 |Oracle: Too many locked sessions|<p>The number of locked sessions exceeds {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.</p>|`min(/Oracle by Zabbix agent 2/oracle.session_lock_rate,5m) > {$ORACLE.SESSIONS.LOCK.MAX.WARN}`|Warning||
@@ -178,8 +178,8 @@ Test availability:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Oracle Database '{#DBNAME}': Open status in mount mode|<p>The Oracle DB is in a mounted state.</p>|`last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"])=1`|Warning||
-|Oracle Database '{#DBNAME}': Open status has changed|<p>The Oracle DB open status has changed. Ack to close manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle Database '{#DBNAME}': Open status in mount mode</li></ul>|
-|Oracle Database '{#DBNAME}': Role has changed|<p>The Oracle DB role has changed. Ack to close manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.db_role["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
+|Oracle Database '{#DBNAME}': Open status has changed|<p>The Oracle DB open status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle Database '{#DBNAME}': Open status in mount mode</li></ul>|
+|Oracle Database '{#DBNAME}': Role has changed|<p>The Oracle DB role has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.db_role["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
 |Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog|<p>Force Logging mode - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all the transactions to the REDO.</p>|`last(/Oracle by Zabbix agent 2/oracle.db_force_logging["{#DBNAME}"]) = 0 and last(/Oracle by Zabbix agent 2/oracle.db_log_mode["{#DBNAME}"]) = 1`|Warning||
 
 ### LLD rule PDB discovery
@@ -200,7 +200,7 @@ Test availability:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Oracle Database '{#DBNAME}': Open status in mount mode|<p>The Oracle DB is in a mounted state.</p>|`last(/Oracle by Zabbix agent 2/oracle.pdb_open_mode["{#DBNAME}"])=1`|Warning||
-|Oracle Database '{#DBNAME}': Open status has changed|<p>The Oracle DB open status has changed. Ack to close manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.pdb_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
+|Oracle Database '{#DBNAME}': Open status has changed|<p>The Oracle DB open status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.pdb_open_mode["{#DBNAME}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.pdb_open_mode["{#DBNAME}"],#2)`|Info|**Manual close**: Yes|
 
 ### LLD rule Tablespace discovery
 
@@ -230,7 +230,7 @@ Test availability:
 |Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high</li></ul>|
 |Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`|High||
 |Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE|<p>The tablespace is in the offline state.</p>|`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2`|Warning||
-|Oracle TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Ack to close.</p>|`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
+|Oracle TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
 
 ### LLD rule Archive log discovery
 

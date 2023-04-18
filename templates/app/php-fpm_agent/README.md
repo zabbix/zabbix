@@ -99,21 +99,21 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 |PHP-FPM: Number of processes running| |Zabbix agent|proc.num["{$PHP_FPM.PROCESS_NAME}"]|
 |PHP-FPM: Ping| |Dependent item|php-fpm.ping<p>**Preprocessing**</p><ul><li><p>Regular expression: `{$PHP_FPM.PING.REPLY}($|\r?\n) 1`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |PHP-FPM: Processes, active|<p>The total number of active processes.</p>|Dependent item|php-fpm.processes_active<p>**Preprocessing**</p><ul><li>JSON Path: `$.['active processes']`</li></ul>|
-|PHP-FPM: Version|<p>Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.</p>|Dependent item|php-fpm.version<p>**Preprocessing**</p><ul><li><p>Regular expression: `^[.\s\S]*X-Powered-By: PHP/([.\d]{1,}) \1`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|PHP-FPM: Pool name|<p>The name of current pool.</p>|Dependent item|php-fpm.name<p>**Preprocessing**</p><ul><li>JSON Path: `$.pool`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|PHP-FPM: Uptime|<p>How long has this pool been running.</p>|Dependent item|php-fpm.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$.['start since']`</li></ul>|
+|PHP-FPM: Version|<p>The current version of the PHP. You can get it from the HTTP-Header "X-Powered-By"; it may not work if you have changed the default HTTP-headers.</p>|Dependent item|php-fpm.version<p>**Preprocessing**</p><ul><li><p>Regular expression: `^[.\s\S]*X-Powered-By: PHP/([.\d]{1,}) \1`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|PHP-FPM: Pool name|<p>The name of the current pool.</p>|Dependent item|php-fpm.name<p>**Preprocessing**</p><ul><li>JSON Path: `$.pool`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|PHP-FPM: Uptime|<p>It indicates how long has this pool been running.</p>|Dependent item|php-fpm.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$.['start since']`</li></ul>|
 |PHP-FPM: Start time|<p>The time when this pool was started.</p>|Dependent item|php-fpm.start_time<p>**Preprocessing**</p><ul><li>JSON Path: `$.['start time']`</li></ul>|
 |PHP-FPM: Processes, total|<p>The total number of server processes currently running.</p>|Dependent item|php-fpm.processes_total<p>**Preprocessing**</p><ul><li>JSON Path: `$.['total processes']`</li></ul>|
 |PHP-FPM: Processes, idle|<p>The total number of idle processes.</p>|Dependent item|php-fpm.processes_idle<p>**Preprocessing**</p><ul><li>JSON Path: `$.['idle processes']`</li></ul>|
-|PHP-FPM: Queue usage|<p>Queue utilization</p>|Calculated|php-fpm.listen_queue_usage|
+|PHP-FPM: Queue usage|<p>The utilization of the queue.</p>|Calculated|php-fpm.listen_queue_usage|
 |PHP-FPM: Process manager|<p>The method used by the process manager to control the number of child processes for this pool.</p>|Dependent item|php-fpm.process_manager<p>**Preprocessing**</p><ul><li>JSON Path: `$.['process manager']`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|PHP-FPM: Processes, max active|<p>The highest value that 'active processes' has reached since the php-fpm server started.</p>|Dependent item|php-fpm.processes_max_active<p>**Preprocessing**</p><ul><li>JSON Path: `$.['max active processes']`</li></ul>|
+|PHP-FPM: Processes, max active|<p>The highest value of "active processes" since the PHP-FPM server was started.</p>|Dependent item|php-fpm.processes_max_active<p>**Preprocessing**</p><ul><li>JSON Path: `$.['max active processes']`</li></ul>|
 |PHP-FPM: Accepted connections per second|<p>The number of accepted requests per second.</p>|Dependent item|php-fpm.conn_accepted.rate<p>**Preprocessing**</p><ul><li>JSON Path: `$.['accepted conn']`</li><li>Change per second</li></ul>|
-|PHP-FPM: Slow requests|<p>The number of requests that exceeded your request_slowlog_timeout value.</p>|Dependent item|php-fpm.slow_requests<p>**Preprocessing**</p><ul><li>JSON Path: `$.['slow requests']`</li><li>Simple change</li></ul>|
-|PHP-FPM: Listen queue|<p>The current number of connections that have been initiated, but not yet accepted.</p>|Dependent item|php-fpm.listen_queue<p>**Preprocessing**</p><ul><li>JSON Path: `$.['listen queue']`</li></ul>|
-|PHP-FPM: Listen queue, max|<p>The maximum number of requests in the queue of pending connections since this FPM pool has started.</p>|Dependent item|php-fpm.listen_queue_max<p>**Preprocessing**</p><ul><li>JSON Path: `$.['max listen queue']`</li></ul>|
-|PHP-FPM: Listen queue, len|<p>Size of the socket queue of pending connections.</p>|Dependent item|php-fpm.listen_queue_len<p>**Preprocessing**</p><ul><li>JSON Path: `$.['listen queue len']`</li></ul>|
-|PHP-FPM: Max children reached|<p>The number of times that pm.max_children has been reached since the php-fpm pool started</p>|Dependent item|php-fpm.max_children<p>**Preprocessing**</p><ul><li>JSON Path: `$.['max children reached']`</li><li>Simple change</li></ul>|
+|PHP-FPM: Slow requests|<p>The number of requests that has exceeded your `request_slowlog_timeout` value."</p>|Dependent item|php-fpm.slow_requests<p>**Preprocessing**</p><ul><li>JSON Path: `$.['slow requests']`</li><li>Simple change</li></ul>|
+|PHP-FPM: Listen queue|<p>The current number of connections that have been initiated but not yet accepted.</p>|Dependent item|php-fpm.listen_queue<p>**Preprocessing**</p><ul><li>JSON Path: `$.['listen queue']`</li></ul>|
+|PHP-FPM: Listen queue, max|<p>The maximum number of requests in the queue of pending connections since this FPM pool was started.</p>|Dependent item|php-fpm.listen_queue_max<p>**Preprocessing**</p><ul><li>JSON Path: `$.['max listen queue']`</li></ul>|
+|PHP-FPM: Listen queue, len|<p>The size of the socket queue of pending connections.</p>|Dependent item|php-fpm.listen_queue_len<p>**Preprocessing**</p><ul><li>JSON Path: `$.['listen queue len']`</li></ul>|
+|PHP-FPM: Max children reached|<p>The number of times that `pm.max_children` has been reached since the PHP-FPM pool was started.</p>|Dependent item|php-fpm.max_children<p>**Preprocessing**</p><ul><li>JSON Path: `$.['max children reached']`</li><li>Simple change</li></ul>|
 
 ### Triggers
 
@@ -121,12 +121,12 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 |----|-----------|----------|--------|--------------------------------|
 |PHP-FPM: Process is not running||`last(/PHP-FPM by Zabbix agent/proc.num["{$PHP_FPM.PROCESS_NAME}"])=0`|High||
 |PHP-FPM: Service is down||`last(/PHP-FPM by Zabbix agent/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent/php-fpm.ping,3m)=1`|High|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PHP-FPM: Process is not running</li></ul>|
-|PHP-FPM: Version has changed|<p>The PHP-FPM version has changed. Acknowledge to close manually.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent/php-fpm.version))>0`|Info|**Manual close**: Yes|
+|PHP-FPM: Version has changed|<p>The PHP-FPM version has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent/php-fpm.version))>0`|Info|**Manual close**: Yes|
 |PHP-FPM: Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes</p>|`nodata(/PHP-FPM by Zabbix agent/php-fpm.uptime,30m)=1`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PHP-FPM: Process is not running</li></ul>|
 |PHP-FPM: Pool has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m`|Info|**Manual close**: Yes|
-|PHP-FPM: Queue utilization is high|<p>The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.</p>|`min(/PHP-FPM by Zabbix agent/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
-|PHP-FPM: Manager  changed|<p>PHP-FPM manager changed. Ack to close.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
-|PHP-FPM: Detected slow requests|<p>PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by Zabbix agent/php-fpm.slow_requests,#3)>0`|Warning||
+|PHP-FPM: Queue utilization is high|<p>The queue for this pool has reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by Zabbix agent/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
+|PHP-FPM: Manager  changed|<p>PHP-FPM manager changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
+|PHP-FPM: Detected slow requests|<p>The PHP-FPM has detected a slow request. The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by Zabbix agent/php-fpm.slow_requests,#3)>0`|Warning||
 
 ## Feedback
 

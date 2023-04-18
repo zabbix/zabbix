@@ -68,7 +68,7 @@ This template works with standalone and cluster instances. Metrics are collected
 |----|-----------|----------|--------|--------------------------------|
 |Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
 |Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes.</p>|`nodata(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1`|Warning|**Manual close**: Yes|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed|<p>Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close manually.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0`|Info|**Manual close**: Yes|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed|<p>Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Cluster metrics
 
@@ -90,9 +90,9 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology|<p>One or more server node left the topology. Ack to close.</p>|`change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0`|Warning|**Manual close**: Yes|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology|<p>One or more server node added to the topology. Ack to close.</p>|`change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0`|Info|**Manual close**: Yes|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology|<p>One or more server node left the topology. Ack to close.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])`|Info|**Manual close**: Yes|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology|<p>One or more server node left the topology. Acknowledge to close the problem manually.</p>|`change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0`|Warning|**Manual close**: Yes|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology|<p>One or more server node added to the topology. Acknowledge to close the problem manually.</p>|`change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0`|Info|**Manual close**: Yes|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology|<p>One or more server node left the topology. Acknowledge to close the problem manually.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/Ignite by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])`|Info|**Manual close**: Yes|
 
 ### LLD rule Local node metrics
 
@@ -147,7 +147,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed|<p>Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close manually.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator]))>0`|Warning|**Manual close**: Yes|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed|<p>Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Coordinator]))>0`|Warning|**Manual close**: Yes|
 
 ### LLD rule TCP Communication SPI metrics
 
@@ -205,7 +205,7 @@ This template works with standalone and cluster instances. Metrics are collected
 |----|-----------|----------|--------|--------------------------------|
 |Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m||`min(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0`|Average||
 |Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m||`min(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m) > max(/Ignite by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)`|Warning|**Depends on**:<br><ul><li>Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m</li></ul>|
-|Cache group [{#JMXGROUP}]: All entries are in heap|<p>All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/Ignite by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])`|Info|**Manual close**: Yes|
+|Cache group [{#JMXGROUP}]: All entries are in heap|<p>All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Acknowledge to close the problem manually.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/Ignite by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])`|Info|**Manual close**: Yes|
 
 ### LLD rule Data region metrics
 
@@ -233,7 +233,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Data region {#JMXNAME}: Node started to evict pages|<p>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</p>|`min(/Ignite by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0`|Info|**Manual close**: Yes|
+|Data region {#JMXNAME}: Node started to evict pages|<p>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Acknowledge to close the problem manually.</p>|`min(/Ignite by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0`|Info|**Manual close**: Yes|
 |Data region {#JMXNAME}: Data region utilization is too high|<p>Data region utilization is high. Increase data region size or delete any data.</p>|`min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Data region {#JMXNAME}: Data region utilization is too high</li></ul>|
 |Data region {#JMXNAME}: Data region utilization is too high|<p>Data region utilization is high. Increase data region size or delete any data.</p>|`min(/Ignite by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/Ignite by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}`|High||
 |Data region {#JMXNAME}: Pages replace rate more than 0|<p>There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.</p>|`min(/Ignite by JMX/jmx["{#JMXOBJ}",PagesReplaceRate],5m)>0`|Warning||
@@ -265,8 +265,8 @@ This template works with standalone and cluster instances. Metrics are collected
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Cache group [{#JMXNAME}]: One or more backups are unavailable||`min(/Ignite by JMX/jmx["{#JMXOBJ}",Backups],5m)>=max(/Ignite by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],5m)`|Warning||
-|Cache group [{#JMXNAME}]: List of caches has changed|<p>List of caches has changed. Significant changes have occurred in the cluster. Ack to close.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches]))>0`|Info|**Manual close**: Yes|
-|Cache group [{#JMXNAME}]: Rebalance in progress|<p>Ack to close.</p>|`max(/Ignite by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0`|Info|**Manual close**: Yes|
+|Cache group [{#JMXNAME}]: List of caches has changed|<p>List of caches has changed. Significant changes have occurred in the cluster. Acknowledge to close the problem manually.</p>|`last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",Caches]))>0`|Info|**Manual close**: Yes|
+|Cache group [{#JMXNAME}]: Rebalance in progress|<p>Acknowledge to close the problem manually.</p>|`max(/Ignite by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0`|Info|**Manual close**: Yes|
 |Cache group [{#JMXNAME}]: There is no copy for partitions||`max(/Ignite by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],30m)=0`|Warning||
 
 ### LLD rule Thread pool metrics

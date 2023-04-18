@@ -513,7 +513,7 @@ zabbix_export:
               name: 'Oracle: Instance hostname has changed'
               event_name: 'Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Oracle DB Instance hostname has changed. Ack to close.'
+              description: 'Oracle DB Instance hostname has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -547,7 +547,7 @@ zabbix_export:
               name: 'Oracle: Instance name has changed'
               event_name: 'Oracle: Instance name has changed (new name received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Oracle DB Instance name has changed. Ack to close manually.'
+              description: 'Oracle DB Instance name has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1597,7 +1597,7 @@ zabbix_export:
               name: 'Oracle: Version has changed'
               event_name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Oracle DB version has changed. Acknowledge to close manually.'
+              description: 'The Oracle DB version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1866,7 +1866,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB open status has changed. Ack to close manually.'
+                  description: 'The Oracle DB open status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   dependencies:
                     -
@@ -1930,7 +1930,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Role has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Role has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB role has changed. Ack to close manually.'
+                  description: 'The Oracle DB role has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2158,7 +2158,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB open status has changed. Ack to close manually.'
+                  description: 'The Oracle DB open status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2319,7 +2319,7 @@ zabbix_export:
                   name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed'
                   event_name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'Oracle tablespace status has changed. Ack to close.'
+                  description: 'Oracle tablespace status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   dependencies:
                     -

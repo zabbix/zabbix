@@ -628,7 +628,7 @@ zabbix_export:
               name: 'Memcached: has been restarted'
               event_name: 'Memcached: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -666,7 +666,7 @@ zabbix_export:
               name: 'Memcached: Version has changed'
               event_name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Memcached version has changed. Acknowledge to close manually.'
+              description: 'The Memcached version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

@@ -69,7 +69,7 @@ In case of Open Source version leave this macro empty.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Consul cluster: Leader has been changed|<p>Consul cluster version has changed. Acknowledge to close manually.</p>|`last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#1)<>last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#2) and length(last(/HashiCorp Consul Cluster by HTTP/consul.get_leader))>0`|Info|**Manual close**: Yes|
+|Consul cluster: Leader has been changed|<p>Consul cluster version has changed. Acknowledge to close the problem manually.</p>|`last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#1)<>last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#2) and length(last(/HashiCorp Consul Cluster by HTTP/consul.get_leader))>0`|Info|**Manual close**: Yes|
 |Consul: One or more nodes in cluster in 'critical' state|<p>One or more agents on current dc with serf health status 'critical'.</p>|`last(/HashiCorp Consul Cluster by HTTP/consul.nodes_critical)>0`|Average||
 |Consul: One or more nodes in cluster in 'warning' state|<p>One or more agents on current dc with serf health status 'warning'.</p>|`last(/HashiCorp Consul Cluster by HTTP/consul.nodes_warning)>0`|Warning||
 

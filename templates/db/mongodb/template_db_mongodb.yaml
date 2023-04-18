@@ -1071,7 +1071,7 @@ zabbix_export:
               name: 'MongoDB: Version has changed'
               event_name: 'MongoDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'MongoDB version has changed. Acknowledge to close manually.'
+              description: 'MongoDB version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -2801,7 +2801,7 @@ zabbix_export:
                   name: 'MongoDB: Node in ReplicaSet changed the state'
                   event_name: 'MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Node in ReplicaSet  changed the state. Ack to close.'
+                  description: 'Node in ReplicaSet  changed the state. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

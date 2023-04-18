@@ -1840,7 +1840,7 @@ zabbix_export:
               name: 'Jenkins: Version has changed'
               event_name: 'Jenkins: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Jenkins version has changed. Acknowledge to close manually.'
+              description: 'The Jenkins version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

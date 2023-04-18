@@ -215,7 +215,7 @@ zabbix_export:
               event_name: 'Cert: Fingerprint has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: |
-                The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.
+                The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Acknowledge to close the problem manually.
                 There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.
               manual_close: 'YES'
               tags:

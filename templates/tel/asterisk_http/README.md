@@ -52,7 +52,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 |Asterisk: Service response time|<p>Asterisk Manager API performance.</p>|Simple check|net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"]|
 |Asterisk: Get stats|<p>Asterisk system information in JSON format.</p>|HTTP agent|asterisk.get_stats<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
 |Asterisk: Version|<p>Service version</p>|Dependent item|asterisk.version<p>**Preprocessing**</p><ul><li>JSON Path: `$.version`</li></ul>|
-|Asterisk: Uptime|<p>System uptime in 'N days, hh:mm:ss' format.</p>|Dependent item|asterisk.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$.uptime`</li></ul>|
+|Asterisk: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|asterisk.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$.uptime`</li></ul>|
 |Asterisk: Uptime after reload|<p>System uptime after a config reload in 'N days, hh:mm:ss' format.</p>|Dependent item|asterisk.uptime_reload<p>**Preprocessing**</p><ul><li>JSON Path: `$.uptime_reload`</li></ul>|
 |Asterisk: Active channels|<p>The number of active channels at the moment.</p>|Dependent item|asterisk.active_channels<p>**Preprocessing**</p><ul><li>JSON Path: `$.active_channels`</li></ul>|
 |Asterisk: Active calls|<p>The number of active calls at the moment.</p>|Dependent item|asterisk.active_calls<p>**Preprocessing**</p><ul><li>JSON Path: `$.active_calls`</li></ul>|
@@ -81,9 +81,9 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 |----|-----------|----------|--------|--------------------------------|
 |Asterisk: Service is down||`last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0`|Average|**Manual close**: Yes|
 |Asterisk: Service response time is too high||`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
-|Asterisk: Version has changed|<p>The Asterisk version has changed. Acknowledge to close manually.</p>|`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0`|Info|**Manual close**: Yes|
+|Asterisk: Version has changed|<p>The Asterisk version has changed. Acknowledge to close the problem manually.</p>|`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0`|Info|**Manual close**: Yes|
 |Asterisk: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime)<10m`|Info|**Manual close**: Yes|
-|Asterisk: Failed to fetch AMI page|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
+|Asterisk: Failed to fetch AMI page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
 |Asterisk: has been reloaded|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m`|Info|**Manual close**: Yes|
 |Asterisk: Total number of active channels of SIP trunks is too high|<p>The SIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}`|Warning||
 |Asterisk: Total number of active channels of IAX trunks is too high|<p>The IAX trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}`|Warning||
