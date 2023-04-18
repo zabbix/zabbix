@@ -31,6 +31,6 @@ zbx_ha_mode_t;
 
 void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb);
 
-int	DBcheck_version(zbx_ha_mode_t ha_mode);
+int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode);
 
 #endif

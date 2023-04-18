@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef DC_ITEM_POLLER_TYPE_UPDATE_TEST_H
-#define DC_ITEM_POLLER_TYPE_UPDATE_TEST_H
+#ifndef ZABBIX_DBUPGRADE_COMMON_H
+#define ZABBIX_DBUPGRADE_COMMON_H
 
-void	DCitem_poller_type_update_test(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags);
-void	init_test_configuration_cache(zbx_get_config_forks_f get_config_forks);
-
-#endif /* DC_ITEM_POLLER_TYPE_UPDATE_TEST_H */
+int	delete_problems_with_nonexistent_object(void);
+int	create_problem_3_index(void);
+int	drop_c_problem_2_index(void);
+#endif

@@ -476,7 +476,7 @@ zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void);
 void			zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh);
 
 void	zbx_init_library_dbhigh(const zbx_config_dbhigh_t *config_dbhigh);
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error);
+int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, int log_slow_queries, char **error);
 void	zbx_db_deinit(void);
 
 void	zbx_db_init_autoincrement_options(void);
@@ -491,7 +491,7 @@ void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 
 #ifdef HAVE_ORACLE
 void	zbx_db_statement_prepare(const char *sql);
-void	zbx_db_table_prepare(const char *tablename, struct zbx_json *j);
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
