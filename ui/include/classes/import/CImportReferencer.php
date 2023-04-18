@@ -41,6 +41,11 @@ class CImportReferencer {
 	protected $iconmaps = [];
 	protected $images = [];
 	protected $maps = [];
+	protected $services = [];
+	protected $slas = [];
+	protected $users = [];
+	protected $actions = [];
+	protected $media_types = [];
 	protected $template_dashboards = [];
 	protected $template_macros = [];
 	protected $host_macros = [];
@@ -61,6 +66,11 @@ class CImportReferencer {
 	protected $db_iconmaps;
 	protected $db_images;
 	protected $db_maps;
+	protected $db_services;
+	protected $db_slas;
+	protected $db_users;
+	protected $db_actions;
+	protected $db_media_types;
 	protected $db_template_dashboards;
 	protected $db_template_macros;
 	protected $db_host_macros;
@@ -504,6 +514,111 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get service ID by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findServiceidByName(string $name): ?string {
+		if ($this->db_services === null) {
+			$this->selectServices();
+		}
+
+		foreach ($this->db_services as $serviceid => $service) {
+			if ($service['name'] === $name) {
+				return $serviceid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get action ID by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findSlaidByName(string $name): ?string {
+		if ($this->db_slas === null) {
+			$this->selectSlas();
+		}
+
+		foreach ($this->db_slas as $slaid => $sla) {
+			if ($sla['name'] === $name) {
+				return $slaid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get user ID by username.
+	 *
+	 * @param string $username
+	 *
+	 * @return string|null
+	 */
+	public function findUseridByUsername(string $username): ?string {
+		if ($this->db_users === null) {
+			$this->selectUsers();
+		}
+
+		foreach ($this->db_users as $userid => $user) {
+			if ($user['username'] === $username) {
+				return $userid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get action ID by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findActionidByName(string $name): ?string {
+		if ($this->db_actions === null) {
+			$this->selectActions();
+		}
+
+		foreach ($this->db_actions as $actionid => $action) {
+			if ($action['name'] === $name) {
+				return $actionid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get media type ID by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findMediaTypeidByName(string $name): ?string {
+		if ($this->db_media_types === null) {
+			$this->selectMediaTypes();
+		}
+
+		foreach ($this->db_media_types as $mediatypeid => $media_type) {
+			if ($media_type['name'] === $name) {
+				return $mediatypeid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get template dashboard ID by dashboard UUID.
 	 *
 	 * @param string $uuid
@@ -929,7 +1044,6 @@ class CImportReferencer {
 	 * @param array $maps
 	 */
 	public function addMaps(array $maps) {
-//		$this->maps = array_unique(array_merge($this->maps, $maps));
 		$this->maps = $maps;
 	}
 
@@ -943,6 +1057,51 @@ class CImportReferencer {
 		$this->db_maps[$mapid] =[
 			'name' => $map['name']
 		];
+	}
+
+	/**
+	 * Add service names that need association with a database service ID.
+	 *
+	 * @param array $services
+	 */
+	public function addServices(array $services) {
+		$this->services = $services;
+	}
+
+	/**
+	 * Add sla names that need association with a database sla ID.
+	 *
+	 * @param array $slas
+	 */
+	public function addSlas(array $slas) {
+		$this->slas = $slas;
+	}
+
+	/**
+	 * Add user usernames that need association with a database user ID.
+	 *
+	 * @param array $users
+	 */
+	public function addUsers(array $users) {
+		$this->users = $users;
+	}
+
+	/**
+	 * Add action names that need association with a database action ID.
+	 *
+	 * @param array $actions
+	 */
+	public function addActions(array $actions) {
+		$this->actions = $actions;
+	}
+
+	/**
+	 * Add media type names that need association with a database media type ID.
+	 *
+	 * @param array $media_types
+	 */
+	public function addMediaTypes(array $media_types) {
+		$this->media_types = $media_types;
 	}
 
 	/**
@@ -1386,6 +1545,101 @@ class CImportReferencer {
 		}
 
 		$this->maps = [];
+	}
+
+	/**
+	 * Select service ids for previously added names.
+	 */
+	protected function selectServices(): void {
+		$this->db_services = [];
+
+		if (!$this->services) {
+			return;
+		}
+
+		$this->db_services = API::Service()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->services)],
+			'preservekeys' => true
+		]);
+
+		$this->services = [];
+	}
+
+	/**
+	 * Select sla ids for previously added names.
+	 */
+	protected function selectSlas(): void {
+		$this->db_slas = [];
+
+		if (!$this->slas) {
+			return;
+		}
+
+		$this->db_slas = API::Sla()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->slas)],
+			'preservekeys' => true
+		]);
+
+		$this->slas = [];
+	}
+
+	/**
+	 * Select user ids for previously added usernames.
+	 */
+	protected function selectUsers(): void {
+		$this->db_users = [];
+
+		if (!$this->users) {
+			return;
+		}
+
+		$this->db_users = API::User()->get([
+			'output' => ['username'],
+			'filter' => ['username' => array_keys($this->users)],
+			'preservekeys' => true
+		]);
+
+		$this->users = [];
+	}
+
+	/**
+	 * Select action ids for previously added names.
+	 */
+	protected function selectActions(): void {
+		$this->db_actions = [];
+
+		if (!$this->actions) {
+			return;
+		}
+
+		$this->db_actions = API::Action()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->actions)],
+			'preservekeys' => true
+		]);
+
+		$this->actions = [];
+	}
+
+	/**
+	 * Select media type ids for previously added names.
+	 */
+	protected function selectMediaTypes(): void {
+		$this->db_media_types = [];
+
+		if (!$this->media_types) {
+			return;
+		}
+
+		$this->db_media_types = API::MediaType()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->media_types)],
+			'preservekeys' => true
+		]);
+
+		$this->media_types = [];
 	}
 
 	/**
