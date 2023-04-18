@@ -274,21 +274,14 @@ class CUser extends CApiService {
 		self::updateGroups($users);
 		self::updateMedias($users);
 
-		$provision_userids = [];
-
-		foreach ($users as $i => $user) {
-			if (array_key_exists('ts_provisioned', $user)) {
-				$provision_userids[$i] = true;
-			}
+		if (array_key_exists('ts_provisioned', $users[0])) {
+			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
+				CAudit::RESOURCE_USER, $users
+			);
 		}
-
-		$provision_users = array_intersect_key($users, $provision_userids);
-		$_users = array_diff_key($users, $provision_userids);
-
-		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
-			CAudit::RESOURCE_USER, $provision_users
-		);
-		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $_users);
+		else {
+			self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
+		}
 	}
 
 	/**
@@ -595,24 +588,14 @@ class CUser extends CApiService {
 		self::updateGroups($users, $db_users);
 		self::updateMedias($users, $db_users);
 
-		$provision_userids = [];
-
-		foreach ($users as $i => $user) {
-			if (array_key_exists('ts_provisioned', $user)) {
-				$provision_userids[$i] = $user['userid'];
-			}
+		if (array_key_exists('ts_provisioned', $users[0])) {
+			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
+				CAudit::RESOURCE_USER, $users, $db_users
+			);
 		}
-
-		$provision_users = array_intersect_key($users, $provision_userids);
-		$provision_db_users = array_intersect_key($db_users, array_flip($provision_userids));
-
-		$users = array_diff_key($users, $provision_userids);
-		$db_users = array_diff_key($db_users, $provision_db_users);
-
-		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
-			CAudit::RESOURCE_USER, $provision_users, $provision_db_users
-		);
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		else {
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		}
 	}
 
 	/**
@@ -1564,7 +1547,7 @@ class CUser extends CApiService {
 					if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])) {
 						$db_user['deprovisioned'] = true;
 						$idp_user_data['userid'] = $db_user['userid'];
-						$upd_user = self::updateProvisionedUser($idp_user_data);
+						$upd_user = $this->updateProvisionedUser($idp_user_data);
 
 						if ($upd_user) {
 							$user_data = $this->findAccessibleUser($db_user['username'], true, ZBX_AUTH_LDAP, false);
@@ -1951,7 +1934,7 @@ class CUser extends CApiService {
 						$provision_user,
 						$ldap->getProvisionedData($provisioning, $provision_user['username'])
 					);
-					self::updateProvisionedUser($user);
+					$this->updateProvisionedUser($user);
 					$provisionedids[] = $provision_user['userid'];
 				}
 			}
@@ -1983,7 +1966,7 @@ class CUser extends CApiService {
 		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid']));
 		unset($attrs['passwd']);
 		$user = array_intersect_key($idp_user_data, $attrs);
-		$user['medias'] = self::sanitizeUserMedia($user['medias']);
+		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
 		$users = [$user];
 
 		$this->validateCreate($users);
@@ -2004,7 +1987,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	public static function updateProvisionedUser(array $idp_user_data): array {
+	public function updateProvisionedUser(array $idp_user_data): array {
 		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid', 'userid']));
 		unset($attrs['passwd']);
 		$user = array_intersect_key($idp_user_data, $attrs);
@@ -2019,7 +2002,7 @@ class CUser extends CApiService {
 		$users = [$userid => $user];
 
 		if (array_key_exists('medias', $user)) {
-			$users[$userid]['medias'] = self::sanitizeUserMedia($user['medias']);
+			$users[$userid]['medias'] = $this->sanitizeUserMedia($user['medias']);
 			$db_users[$userid]['medias'] = DB::select('media', [
 				'output' => ['mediatypeid', 'mediaid', 'sendto'],
 				'filter' => ['userid' => $userid]
@@ -2498,7 +2481,7 @@ class CUser extends CApiService {
 		$user['username'] = $user_data['username'];
 		$user['userid'] = $user_data['userid'];
 
-		return self::updateProvisionedUser($user);
+		return $this->updateProvisionedUser($user);
 	}
 
 	/**
@@ -2507,7 +2490,7 @@ class CUser extends CApiService {
 	 * @param array $medias
 	 * @param array $medias[]['mediatypeid']
 	 */
-	private static function sanitizeUserMedia(array $medias): array {
+	protected function sanitizeUserMedia(array $medias): array {
 		if (!$medias) {
 			return $medias;
 		}
