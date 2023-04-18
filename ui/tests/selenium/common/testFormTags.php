@@ -590,12 +590,11 @@ class testFormTags extends CWebTest {
 	 * Test cloning of host, template, item, trigger or prototype with tags
 	 *
 	 * @param string   $object   host, template, item, trigger or prototype
-	 * @param string   $action   clone or full clone
 	 */
-	public function executeCloning($object, $action) {
+	public function executeCloning($object) {
 		$new_name = (strpos($object, 'prototype') !== false)
-			? 'Tags - '.$action.' '.$object.' {#KEY}'
-			: '1Tags - '.$action.' '.$object;
+			? 'Tags - Clone '.$object.' {#KEY}'
+			: '1Tags - Clone '.$object;
 
 		$this->page->login()->open($this->link);
 
@@ -669,8 +668,8 @@ class testFormTags extends CWebTest {
 		$element = $this->query($tags_table)->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
-		// Click Clone or Full Clone button.
-		$this->query('button', $action)->one()->click();
+		// Click Clone button.
+		$this->query('button', 'Clone')->one()->click();
 		$this->page->waitUntilReady();
 
 		if ($object === 'discovered host') {

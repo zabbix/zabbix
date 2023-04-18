@@ -64,7 +64,7 @@ class testFormTagsItemPrototype extends testFormTags {
 	public function testFormTagsItemPrototype_Clone() {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host with tags for cloning:trap_discovery');
 		$this->link = 'disc_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->executeCloning('item prototype', 'Clone');
+		$this->executeCloning('item prototype');
 	}
 
 	/**

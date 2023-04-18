@@ -65,7 +65,7 @@ class testFormTagsWeb extends testFormTags {
 	public function testFormTagsWeb_Clone() {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.Host with tags for cloning');
 		$this->link = 'httpconf.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
-		$this->executeCloning('web scenario', 'Clone');
+		$this->executeCloning('web scenario');
 	}
 
 	/**

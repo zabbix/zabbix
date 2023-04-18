@@ -64,7 +64,7 @@ class testFormTagsTrigger extends testFormTags {
 	public function testFormTagsTrigger_Clone() {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.Host with tags for cloning');
 		$this->link = 'triggers.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$hostid;
-		$this->executeCloning('trigger', 'Clone');
+		$this->executeCloning('trigger');
 	}
 
 	/**
