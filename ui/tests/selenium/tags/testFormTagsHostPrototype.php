@@ -68,23 +68,23 @@ class testFormTagsHostPrototype extends testFormTags {
 	}
 
 	/**
-	 * Test host full cloning with Host prototype.
+	 * Test host cloning with Host prototype.
 	 */
-	public function testFormTagsHostPrototype_HostFullClone() {
+	public function testFormTagsHostPrototype_HostClone() {
 		$this->host = 'Host with tags for cloning';
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
 		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->executeFullCloning('host prototype', 'Host');
+		$this->executeCloningByParent('host prototype', 'Host');
 	}
 
 	/**
-	 * Test template full cloning with Host prototype.
+	 * Test template cloning with Host prototype.
 	 */
-	public function testFormTagsHostPrototype_TemplateFullClone() {
+	public function testFormTagsHostPrototype_TemplateClone() {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
 		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
-		$this->clone_name = '{#TEMPLATE} prototype with tags for full cloning';
-		$this->executeFullCloning('host prototype', 'Template');
+		$this->clone_name = '{#TEMPLATE} prototype with tags for cloning';
+		$this->executeCloningByParent('host prototype', 'Template');
 	}
 
 	/**
