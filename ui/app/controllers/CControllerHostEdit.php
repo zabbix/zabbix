@@ -244,6 +244,8 @@ class CControllerHostEdit extends CController {
 						'value' => ''
 					] + $macro;
 
+					unset($macro['allow_revert']);
+
 					$data['warning'] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
 				}
 			}

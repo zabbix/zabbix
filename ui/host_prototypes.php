@@ -143,13 +143,19 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
 
+	// Reset macro type and value.
 	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
-		// Reset macro type and value.
-		$macros = array_map(function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
-				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
-				: $value;
-		}, $macros);
+		foreach ($macros as &$macro) {
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+				$macro = [
+					'type' => ZBX_MACRO_TYPE_TEXT,
+					'value' => ''
+				] + $macro;
+
+				unset($macro['allow_revert']);
+			}
+		}
+		unset($macro);
 
 		warning(_('The cloned host prototype contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
 	}

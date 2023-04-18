@@ -169,13 +169,18 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		$_REQUEST['groups'] = $groups;
 	}
 
+	// Reset macro type and value.
 	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
-		// Reset macro type and value.
-		$macros = array_map(function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
-				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
-				: $value;
-		}, $macros);
+		foreach ($macros as &$macro) {
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+				$macro = [
+					'type' => ZBX_MACRO_TYPE_TEXT,
+					'value' => ''
+				] + $macro;
+
+				unset($macro['allow_revert']);
+			}
+		}
 
 		warning(_('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
 	}
