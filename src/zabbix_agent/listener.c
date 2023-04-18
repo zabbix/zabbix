@@ -172,7 +172,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			}
 
 			zbx_tcp_unaccept(&s);
-			continue;
+
+			if (SUCCEED == ret)
+				continue;
 		}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
