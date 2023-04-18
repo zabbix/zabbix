@@ -9191,6 +9191,16 @@ msgstr ""
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostPrototype.php:1127
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1124
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
@@ -11763,6 +11773,10 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:925
 #: include/views/configuration.host.discovery.edit.php:978
 msgid "LLD macros"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneralOld.php:700
+msgid "LLD rule with the same UUID already exists"
 msgstr ""
 
 #: app/partials/popup.operations.php:257
@@ -23823,6 +23837,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr ""
 
+#: include/classes/api/services/CGraphGeneral.php:874
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:868
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:82
 #, c-format
 msgid "group name must match %1$s group name"
@@ -23848,10 +23870,18 @@ msgstr ""
 msgid "host group"
 msgstr ""
 
+#: include/classes/api/services/CHostGroup.php:795
+msgid "host group with the same UUID already exists"
+msgstr ""
+
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:336
 msgid "host pattern"
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1190
+msgid "host prototype with the same UUID already exists"
 msgstr ""
 
 #: include/classes/api/services/CMap.php:844
@@ -24085,6 +24115,14 @@ msgstr ""
 msgid "item pattern"
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:486
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:480
+msgid "item with the same UUID already exists"
+msgstr ""
+
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr ""
@@ -24245,6 +24283,11 @@ msgstr ""
 msgid "maximum dependent items count reached"
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:1726
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -24393,6 +24436,11 @@ msgstr ""
 #: include/classes/graphdraw/CLineGraphDraw.php:1464
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1360
+#, c-format
+msgid "no default interface for \"%1$s\" type"
 msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
@@ -24718,6 +24766,10 @@ msgstr ""
 msgid "service"
 msgstr ""
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr ""
@@ -24843,6 +24895,18 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:1076
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
+msgstr ""
+
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplateGroup.php:594
+msgid "template group with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:458
+msgid "template with the same UUID already exists"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1577
@@ -24976,8 +25040,16 @@ msgstr ""
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr ""
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1888
 msgid "trigger with linkages cannot be moved to another template or host"
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
@@ -25209,6 +25281,10 @@ msgstr ""
 msgid "value is too long"
 msgstr ""
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -25309,6 +25385,10 @@ msgstr ""
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
+msgstr ""
+
+#: include/classes/api/services/CHttpTest.php:440
+msgid "web scenario with the same UUID already exists"
 msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:83

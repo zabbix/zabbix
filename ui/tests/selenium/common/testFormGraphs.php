@@ -456,8 +456,6 @@ class testFormGraphs extends CWebTest {
 					'details' => [
 						'Incorrect value "65536" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "65536" for "Height" field: must be between 20 and 65535.',
-						'Field "yaxismin" is not correct: a number is too large',
-						'Field "yaxismax" is not correct: a number is too large',
 						'Incorrect value "101" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
 						'Incorrect value "101" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
 					]
@@ -511,10 +509,10 @@ class testFormGraphs extends CWebTest {
 					'details' => [
 						'Incorrect value "1" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "19" for "Height" field: must be between 20 and 65535.',
-						'Field "yaxismin" is not correct: a number has too many fractional digits',
-						'Field "yaxismax" is not correct: a number has too many fractional digits',
-						'Field "Percentile line (left)" is not correct: a number has too many fractional digits',
-						'Field "Percentile line (right)" is not correct: a number has too many fractional digits'
+						'Incorrect value "1.99999" for "Percentile line (left)" field: must be between 0 and 100, and '.
+								'have no more than 4 digits after the decimal point.',
+						'Incorrect value "2.12345" for "Percentile line (right)" field: must be between 0 and 100, and '.
+								'have no more than 4 digits after the decimal point.'
 					]
 				]
 			],
@@ -534,8 +532,6 @@ class testFormGraphs extends CWebTest {
 					],
 					'error' => 'Page received incorrect data',
 					'details' => [
-						'Field "yaxismin" is not correct: a number is too large',
-						'Field "yaxismax" is not correct: a number is too large',
 						'Incorrect value "-900000" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
 						'Incorrect value "-900000" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
 					]

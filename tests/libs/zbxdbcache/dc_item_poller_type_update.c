@@ -70,17 +70,19 @@ str_map_t;
 
 static void init_test(void)
 {
-	while (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER])
-		CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER] = rand();
+	while (0 == get_config_forks(ZBX_PROCESS_TYPE_PINGER))
+		set_config_forks(ZBX_PROCESS_TYPE_PINGER, rand());
 
-	while (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER])
-		CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER] = rand();
+	while (0 == get_config_forks(ZBX_PROCESS_TYPE_POLLER))
+		set_config_forks(ZBX_PROCESS_TYPE_POLLER, rand());
 
-	while (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
-		CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER] = rand();
+	while (0 == get_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER))
+		set_config_forks(ZBX_PROCESS_TYPE_IPMIPOLLER, rand());
 
-	while (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
-		CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER] = rand();
+	while (0 == get_config_forks(ZBX_PROCESS_TYPE_JAVAPOLLER))
+		set_config_forks(ZBX_PROCESS_TYPE_JAVAPOLLER, rand());
+
+	init_test_configuration_cache(get_config_forks);
 }
 
 #define _ZBX_MKMAP(c) { c,#c }
