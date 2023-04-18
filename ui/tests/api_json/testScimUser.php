@@ -228,7 +228,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidGetRequest
 	 */
-	public function testInvalidUserGet($user, $expected_error) {
+	public function testScimUser_GetInvalid($user, $expected_error) {
 		$this->resolveData($user);
 
 		$this->call('users.get', $user, $expected_error);
@@ -307,7 +307,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidGetRequest
 	 */
-	public function testValidUserGet($user, $expected_result) {
+	public function testScimUser_GetValid($user, $expected_result) {
 		$this->resolveData($user);
 		$this->resolveData($expected_result);
 
@@ -419,7 +419,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidPostRequest
 	 */
-	public function testInvalidUserPost($user, $expected_error) {
+	public function testScimUser_PostInvalid($user, $expected_error) {
 		$this->resolveData($user);
 
 		$this->call('users.post', $user, $expected_error);
@@ -470,7 +470,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidPostRequest
 	 */
-	public function testValidUserPost($user, $expected_result) {
+	public function testScimUser_PostValid($user, $expected_result) {
 		$this->resolveData($user);
 		$this->resolveData($expected_result);
 
@@ -495,7 +495,7 @@ class testScimUser extends CAPIScimTest {
 		}
 
 		// Check that user data in the database is correct.
-		$db_result_user_data = DBSelect('select username, name, surname, userdirectoryid from users where userid='.
+		$db_result_user_data = DBSelect('SELECT username, name, surname, userdirectoryid FROM users WHERE userid='.
 			zbx_dbstr($result['id'])
 		);
 		$db_result_user = DBFetch($db_result_user_data);
@@ -506,7 +506,7 @@ class testScimUser extends CAPIScimTest {
 		$this->assertEquals(self::$data['userdirectoryid']['saml'], $db_result_user['userdirectoryid']);
 
 		// Check that user media data in the database is correct.
-		$db_result_user_media_data = DBselect('select mediatypeid, sendto from media where userid='.
+		$db_result_user_media_data = DBselect('SELECT mediatypeid, sendto FROM media WHERE userid='.
 			zbx_dbstr($result['id'])
 		);
 		$db_result_user_media = DBfetch($db_result_user_media_data);
@@ -648,7 +648,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidPutRequest
 	 */
-	public function testInvalidUserPut($user, $expected_error) {
+	public function testScimUser_PutInvalid($user, $expected_error) {
 		$this->resolveData($user);
 
 		$this->call('users.put', $user, $expected_error);
@@ -725,7 +725,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidPutRequest
 	 */
-	public function testValidPutRequest($user, $expected_result) {
+	public function testScimUser_PutValid($user, $expected_result) {
 		$this->resolveData($user);
 		$this->resolveData($expected_result);
 
@@ -738,7 +738,7 @@ class testScimUser extends CAPIScimTest {
 		}
 
 		// Check that user data in the database is correct.
-		$db_result_user_data = DBSelect('select username, name, surname, userdirectoryid from users where userid='.
+		$db_result_user_data = DBSelect('SELECT username, name, surname, userdirectoryid FROM users WHERE userid='.
 			zbx_dbstr(self::$data['userid']['saml_user_active'])
 		);
 		$db_result_user = DBFetch($db_result_user_data);
@@ -749,7 +749,7 @@ class testScimUser extends CAPIScimTest {
 		$this->assertEquals(self::$data['userdirectoryid']['saml'], $db_result_user['userdirectoryid']);
 
 		// Check that user media data in the database is correct.
-		$db_result_user_media_data = DBselect('select mediatypeid, sendto from media where userid='.
+		$db_result_user_media_data = DBselect('SELECT mediatypeid, sendto FROM media WHERE userid='.
 			zbx_dbstr(self::$data['userid']['saml_user_active'])
 		);
 		$db_result_user_media = DBfetch($db_result_user_media_data);
@@ -760,7 +760,7 @@ class testScimUser extends CAPIScimTest {
 		// Check group mappings when user 'active' attribute is changed.
 		if ($user['active'] === false || array_key_exists('update', $user)) {
 			// Check that user data is still present in 'user_scim_group' table.
-			$db_result_user_scim_group_data = DBselect('select * from user_scim_group where userid='.
+			$db_result_user_scim_group_data = DBselect('SELECT * FROM user_scim_group WHERE userid='.
 				zbx_dbstr(self::$data['userid']['saml_user_active'])
 			);
 			$db_result_user_scim_group = DBfetch($db_result_user_scim_group_data);
@@ -769,7 +769,7 @@ class testScimUser extends CAPIScimTest {
 			);
 
 			// Check that user is added to 'Disabled' group or added back to its mapped group.
-			$db_result_user_groups_data = DBselect('select usrgrpid from users_groups where userid='.
+			$db_result_user_groups_data = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.
 				zbx_dbstr(self::$data['userid']['saml_user_active'])
 			);
 			$db_result_user_groups = DBfetch($db_result_user_groups_data);
@@ -968,7 +968,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidPatchRequest
 	 */
-	public function testInvalidUserPatch(array $user, array $expected_error): void {
+	public function testScimUser_PatchInvalid(array $user, array $expected_error): void {
 		$this->resolveData($user);
 
 		$this->call('users.patch', $user, $expected_error);
@@ -1049,7 +1049,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidPatchRequest
 	 */
-	public function testValidUserPatch(array $user, array $expected_result): void {
+	public function testScimUser_PatchValid(array $user, array $expected_result): void {
 		$this->resolveData($user);
 		$this->resolveData($expected_result);
 
@@ -1062,7 +1062,7 @@ class testScimUser extends CAPIScimTest {
 		}
 
 		// Check that user data in the database is correct.
-		$db_result_user_data = DBSelect('select username, name, surname, userdirectoryid from users where userid='.
+		$db_result_user_data = DBSelect('SELECT username, name, surname, userdirectoryid FROM users WHERE userid='.
 			zbx_dbstr(self::$data['userid']['saml_user_only_username'])
 		);
 		$db_result_user = DBFetch($db_result_user_data);
@@ -1093,7 +1093,7 @@ class testScimUser extends CAPIScimTest {
 		// Check group mappings when user 'active' attribute is changed.
 		if ($active) {
 			// Check that user data is still present in 'user_scim_group' table.
-			$db_result_user_scim_group_data = DBselect('select * from user_scim_group where userid='.
+			$db_result_user_scim_group_data = DBselect('SELECT * FROM user_scim_group WHERE userid='.
 				zbx_dbstr(self::$data['userid']['saml_user_only_username'])
 			);
 			$db_result_user_scim_group = DBfetch($db_result_user_scim_group_data);
@@ -1103,7 +1103,7 @@ class testScimUser extends CAPIScimTest {
 			);
 
 			// Check that user is added to 'Disabled' group or added back to its mapped group.
-			$db_result_user_groups_data = DBselect('select usrgrpid from users_groups where userid='.
+			$db_result_user_groups_data = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.
 				zbx_dbstr(self::$data['userid']['saml_user_only_username'])
 			);
 			$db_result_user_groups = DBfetch($db_result_user_groups_data);
@@ -1145,7 +1145,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidDeleteRequest
 	 */
-	public function testInvalidDelete($user, $expected_error): void {
+	public function testScimUser_DeleteInvalid($user, $expected_error): void {
 		$this->resolveData($user);
 
 		$this->call('users.delete', $user, $expected_error);
@@ -1165,7 +1165,7 @@ class testScimUser extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidDeleteRequest
 	 */
-	public function testValidDelete($user, $expected_result) {
+	public function testScimUser_DeleteValid($user, $expected_result) {
 		$this->resolveData($user);
 
 		$result = $this->call('users.delete', $user);
@@ -1174,7 +1174,7 @@ class testScimUser extends CAPIScimTest {
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 
 		// Check that user is present in the database and does not have role.
-		$db_result_user_data = DBSelect('select roleid, userdirectoryid from users where userid='.
+		$db_result_user_data = DBSelect('SELECT roleid, userdirectoryid FROM users WHERE userid='.
 			zbx_dbstr(self::$data['userid']['new_user'])
 		);
 		$db_result_user = DBFetch($db_result_user_data);
@@ -1183,14 +1183,14 @@ class testScimUser extends CAPIScimTest {
 		$this->assertEquals(self::$data['userdirectoryid']['saml'], $db_result_user['userdirectoryid']);
 
 		// Check that user data is removed from 'user_scim_group' table.
-		$db_result_user_scim_group_data = DBselect('select * from user_scim_group where userid='.
+		$db_result_user_scim_group_data = DBselect('SELECT * FROM user_scim_group WHERE userid='.
 			zbx_dbstr(self::$data['userid']['new_user'])
 		);
 		$db_result_user_scim_group = DBfetch($db_result_user_scim_group_data);
 		$this->assertEmpty($db_result_user_scim_group, 'User should not have any entries in "user_scim_group" table.');
 
 		// Check that user is added to 'Disabled' group.
-		$db_result_user_groups_data = DBselect('select usrgrpid from users_groups where userid='.
+		$db_result_user_groups_data = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.
 			zbx_dbstr(self::$data['userid']['new_user'])
 		);
 		$db_result_user_groups = DBfetch($db_result_user_groups_data);

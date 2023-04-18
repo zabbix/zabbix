@@ -209,7 +209,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidGetRequest
 	 */
-	public function testInvalidGet($group, $expected_error) {
+	public function testScimGroup_GetInvalid($group, $expected_error) {
 		$this->call('groups.get', $group, $expected_error);
 	}
 
@@ -275,7 +275,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidGetRequest
 	 */
-	public function testValidGet($group, $expected_result) {
+	public function testScimGroup_GetValid($group, $expected_result) {
 		$this->resolveData($group);
 		$this->resolveData($expected_result);
 
@@ -457,7 +457,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidPostRequest
 	 */
-	public function testInvalidPost($group, $expected_error): void {
+	public function testScimGroup_PostInvalid($group, $expected_error): void {
 		$this->resolveData($group);
 		$this->call('groups.post', $group, $expected_error);
 	}
@@ -504,7 +504,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidPostRequest
 	 */
-	public function testValidPost(array $group, array $expected_result): void {
+	public function testScimGroup_PostValid(array $group, array $expected_result): void {
 		$this->resolveData($group);
 		$this->resolveData($expected_result);
 
@@ -527,7 +527,7 @@ class testScimGroup extends CAPIScimTest {
 		}
 
 		// Check that scim group in the database is correct.
-		$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+		$db_result_group_data = DBSelect('SELECT name FROM scim_group WHERE scim_groupid='.
 			zbx_dbstr($result['id'])
 		);
 		$db_result_group = DBFetch($db_result_group_data);
@@ -536,7 +536,7 @@ class testScimGroup extends CAPIScimTest {
 
 		if ($group['members'] !== []) {
 			// Check that scim group and user relations in database are correct.
-			$db_result_user_group_data = DBSelect('select userid from user_scim_group where scim_groupid='.
+			$db_result_user_group_data = DBSelect('SELECT userid FROM user_scim_group WHERE scim_groupid='.
 				zbx_dbstr($result['id'])
 			);
 			$db_result_user_group = DBFetch($db_result_user_group_data);
@@ -735,7 +735,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidPutRequest
 	 */
-	public function testInvalidPut(array $group, array $expected_error) {
+	public function testScimGroup_PutInvalid(array $group, array $expected_error) {
 		$this->resolveData($group);
 
 		$this->call('groups.put', $group, $expected_error);
@@ -833,7 +833,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidPutRequest
 	 */
-	public function testValidPut(array $group, array $expected_result): void {
+	public function testScimGroup_PutValid(array $group, array $expected_result): void {
 		$this->resolveData($group);
 		$this->resolveData($expected_result);
 
@@ -843,7 +843,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 
 		// Check that scim group in the database is correct.
-		$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+		$db_result_group_data = DBSelect('SELECT name FROM scim_group WHERE scim_groupid='.
 			zbx_dbstr($result['id'])
 		);
 		$db_result_group = DBFetch($db_result_group_data);
@@ -852,7 +852,7 @@ class testScimGroup extends CAPIScimTest {
 
 		if ($group['members'] !== []) {
 			// Check that scim group and user relations in database are correct.
-			$db_result_user_group_data = DBSelect('select userid from user_scim_group where scim_groupid='.
+			$db_result_user_group_data = DBSelect('SELECT userid FROM user_scim_group WHERE scim_groupid='.
 				zbx_dbstr($result['id'])
 			);
 			$db_result_user_group = DBfetchColumn($db_result_user_group_data, 'userid');
@@ -1187,7 +1187,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidPatchRequest
 	 */
-	public function testInvalidPatch(array $group, array $expected_error): void {
+	public function testScimGroup_PatchInvalid(array $group, array $expected_error): void {
 		$this->resolveData($group);
 		$this->call('groups.patch', $group, $expected_error);
 	}
@@ -1357,7 +1357,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidPatchRequest
 	 */
-	public function testValidPatch(array $group, array $expected_result) {
+	public function testScimGroup_PatchValid(array $group, array $expected_result) {
 		$this->resolveData($group, true);
 		$this->resolveData($expected_result);
 
@@ -1369,7 +1369,7 @@ class testScimGroup extends CAPIScimTest {
 		foreach ($group['Operations'] as $operation) {
 			if ($operation['path'] === 'displayName') {
 				// Check that scim group in the database is correct.
-				$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+				$db_result_group_data = DBSelect('SELECT name FROM scim_group WHERE scim_groupid='.
 					zbx_dbstr($result['id'])
 				);
 				$db_result_group = DBFetch($db_result_group_data);
@@ -1377,7 +1377,7 @@ class testScimGroup extends CAPIScimTest {
 				$this->assertEquals($operation['value'], $db_result_group['name']);
 			}
 			elseif ($operation['path'] === 'members') {
-				$db_result_user_group_data = DBSelect('select userid from user_scim_group where scim_groupid='.
+				$db_result_user_group_data = DBSelect('SELECT userid FROM user_scim_group WHERE scim_groupid='.
 					zbx_dbstr($group['id'])
 				);
 				$db_result_user_group = DBfetchColumn($db_result_user_group_data, 'userid');
@@ -1420,7 +1420,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createInvalidDeleteRequest
 	 */
-	public function testInvalidDelete(array $group, array $expected_error): void {
+	public function testScimGroup_DeleteInvalid(array $group, array $expected_error): void {
 		$this->call('groups.delete', $group, $expected_error);
 	}
 
@@ -1448,7 +1448,7 @@ class testScimGroup extends CAPIScimTest {
 	/**
 	 * @dataProvider createValidDeleteRequest
 	 */
-	public function testValidDelete(array $group, array $expected_result): void {
+	public function testScimGroup_DeleteValid(array $group, array $expected_result): void {
 		$this->resolveData($group);
 		$this->resolveData($expected_result);
 
@@ -1458,7 +1458,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
 
 		// Check that scim group in the database is deleted.
-		$db_result_group_data = DBSelect('select name from scim_group where scim_groupid='.
+		$db_result_group_data = DBSelect('SELECT name FROM scim_group WHERE scim_groupid='.
 			zbx_dbstr($group['id'])
 		);
 		$db_result_group = DBFetch($db_result_group_data);
@@ -1466,7 +1466,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->assertFalse($db_result_group);
 
 		// Check that scim user group relations in database are deleted.
-		$db_result_user_group_data = DBSelect('select userid from user_scim_group where scim_groupid='.
+		$db_result_user_group_data = DBSelect('SELECT userid FROM user_scim_group WHERE scim_groupid='.
 			zbx_dbstr($group['id'])
 		);
 		$db_result_user_group = DBfetchColumn($db_result_user_group_data, 'userid');
