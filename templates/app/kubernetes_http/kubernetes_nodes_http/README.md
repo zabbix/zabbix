@@ -28,14 +28,23 @@ Set up the macros to filter the metrics of discovered nodes
 ## Requirements
 
 Zabbix version: 6.0 and higher.
+Set up the macros to filter the metrics of discovered nodes    
+
+
+## Requirements
+
+Zabbix version: 6.0 and higher.
 
 ## Tested versions
 
 This template has been tested on:
 - Kubernetes 1.19.10
+- Kubernetes 1.19.10
 
 ## Configuration
+## Configuration
 
+> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 > Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
@@ -108,6 +117,7 @@ See documentation for details:
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}|<p>Filter of discoverable pods by namespace.</p>|`.*`|
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered pods by namespace.</p>|`CHANGE_IF_NEEDED`|
 
+### Items
 ### Items
 
 |Name|Description|Type|Key and additional info|
@@ -208,6 +218,7 @@ See documentation for details:
 
 ## Feedback
 
+Please report any issues with the template at `https://support.zabbix.com`.
 Please report any issues with the template at `https://support.zabbix.com`.
 
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
