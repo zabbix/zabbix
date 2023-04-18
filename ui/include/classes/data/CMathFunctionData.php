@@ -131,8 +131,7 @@ final class CMathFunctionData {
 					[
 						'type' => 'regexp',
 						'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/',
-						'position' => 1,
-						'required' => false
+						'position' => 1
 					]
 				]
 			]

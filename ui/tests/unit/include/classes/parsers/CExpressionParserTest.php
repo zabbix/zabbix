@@ -1888,18 +1888,19 @@ class CExpressionParserTest extends TestCase {
 			['(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE} and {$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m', ['error' => 'incorrect expression starting from "{$USERMACRO1}+(-{$USERMACRO2})+-{$USERMACRO3}*-12K+12.5m"', 'match' => '(last(/host1/key1,0)/last(/host2/key2,#5))/10+2*{TRIGGER.VALUE}'], CParser::PARSE_SUCCESS_CONT],
 			['last(/host/key,1.23)', null, CParser::PARSE_FAIL],
 			['last(/host/key,1.23s)', null, CParser::PARSE_FAIL],
-			['func()', null, CParser::PARSE_SUCCESS],
-			['func(0)', null, CParser::PARSE_SUCCESS],
-			['func(0,)', null, CParser::PARSE_SUCCESS],
-			['func(0,,)', null, CParser::PARSE_SUCCESS],
-			['func(0, , )', null, CParser::PARSE_SUCCESS],
-			['func(0,, )', null, CParser::PARSE_SUCCESS],
-			['func(0, ,)', null, CParser::PARSE_SUCCESS],
+			['date()', null, CParser::PARSE_SUCCESS],
+			['date(0)', null, CParser::PARSE_SUCCESS],
+			['date(0,)', null, CParser::PARSE_FAIL],
+			['dayofweek()', null, CParser::PARSE_SUCCESS],
+			['dayofweek(0)', null, CParser::PARSE_SUCCESS],
+			['dayofweek(0,)', null, CParser::PARSE_FAIL],
 			['last(/host/key)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,0)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,#123)', null, CParser::PARSE_SUCCESS],
 			['max(/host/key,123)', null, CParser::PARSE_SUCCESS],
-
+			['now()', null, CParser::PARSE_SUCCESS],
+			['now(0)', null, CParser::PARSE_SUCCESS],
+			['now(0,)', null, CParser::PARSE_FAIL],
 			['(--({host:key.last(0)}+K))', null, CParser::PARSE_FAIL],
 			['func(/host/key[p1, p2 ,"p3", "p4\"" ], #1, "p3", "p4\"" )*0/1-2+3 or 4 and 5>6<7<>8=9m and -(3)+(4-5)+-(-1)+{TRIGGER', null, CParser::PARSE_SUCCESS_CONT],
 			['func(/host/key[p1, p2 ,"p3", "p4\"" ], #1, "p3", "p4\"" )*0/1-2+3 or 4 and 5>6<7<>8=9m and -(3)+(4-5)+-(-1)+{TRIGGE', null, CParser::PARSE_SUCCESS_CONT],
@@ -2199,7 +2200,16 @@ class CExpressionParserTest extends TestCase {
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', ['error' => 'incorrect expression starting from "last(/{HOST.HOST}/key)"', 'match' => 'last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
 			['last(/*/agent.ping) = 1 or last(/host2/*) = 1 or last(/*/*) or last(/{HOST.HOST}/key)', null, CParser::PARSE_SUCCESS, ['calculated' => true, 'host_macro' => true]],
 			['last(/*/agent.ping) = {TRIGGER.VALUE}', ['error' => 'incorrect expression starting from "{TRIGGER.VALUE}"', 'match' => 'last(/*/agent.ping)'], CParser::PARSE_SUCCESS_CONT, ['calculated' => true]],
-			['last(/*/agent.ping) = 1 or last(/host2/*) = 1', null, CParser::PARSE_FAIL]
+			['last(/*/agent.ping) = 1 or last(/host2/*) = 1', null, CParser::PARSE_FAIL],
+
+			// aggregate count
+			['count(count_foreach(/host/key, 1), "eq")', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['count(count_foreach(/host/key, 1), "eq", 1)', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['count(count_foreach(/host/key, 1), "eq", "1")', null, CParser::PARSE_SUCCESS, ['calculated' => true]],
+			['count(last_foreach(/host/key, 1),,)', null, CParser::PARSE_FAIL, ['calculated' => true]],
+			['count(last_foreach(/host/key, 1), , )', null, CParser::PARSE_FAIL, ['calculated' => true]],
+			['count(last_foreach(/host/key, 1),"", )', null, CParser::PARSE_FAIL, ['calculated' => true]],
+			['count(last_foreach(/host/key, 1),"eq", )', null, CParser::PARSE_FAIL, ['calculated' => true]]
 		];
 	}
 

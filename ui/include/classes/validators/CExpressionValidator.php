@@ -237,19 +237,10 @@ class CExpressionValidator extends CValidator {
 			}
 
 			foreach ($rule_set['rules'] as $rule) {
-				$required = !array_key_exists('required', $rule) || $rule['required'];
-				$tokens = $token['data']['parameters'][$rule['position']]['data']['tokens'];
-
-				if ($tokens[0]['match'] === '') {
-					if ($required) {
-						return false;
-					}
-
-					continue;
-				}
-
 				switch ($rule['type']) {
 					case 'require_history_child':
+						$tokens = $token['data']['parameters'][$rule['position']]['data']['tokens'];
+
 						if (count($tokens) != 1
 								|| $tokens[0]['type'] != CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION) {
 							return false;
@@ -262,6 +253,8 @@ class CExpressionValidator extends CValidator {
 						break;
 
 					case 'regexp':
+						$tokens = $token['data']['parameters'][$rule['position']]['data']['tokens'];
+
 						if (preg_match($rule['pattern'], CHistFunctionParser::unquoteParam($tokens[0]['match'])) != 1) {
 							return false;
 						}
