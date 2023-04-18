@@ -240,7 +240,7 @@ class CExpressionValidator extends CValidator {
 				$required = !array_key_exists('required', $rule) || $rule['required'];
 				$tokens = $token['data']['parameters'][$rule['position']]['data']['tokens'];
 
-				if ($tokens[0]['match'] === '' || $tokens[0]['match'] === '""' ) {
+				if ($tokens[0]['match'] === '') {
 					if ($required) {
 						return false;
 					}
