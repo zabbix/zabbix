@@ -19,6 +19,8 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+..F....... [ZBX-22376] fixed warning alert when deleting host group and template group on standalone page (epulke)
+.......PS. [ZBX-22615] fixed master item error handling when processing dependent items (wiper)
 ...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
 ..F....... [ZBX-22595] fixed template item context menu (dpetra)
 ..F....... [ZBXNEXT-7640] updated widget help icon link to documentation link of a specific widget (esekace)
