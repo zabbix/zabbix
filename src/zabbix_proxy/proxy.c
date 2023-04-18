@@ -65,6 +65,7 @@
 #include "../zabbix_server/preprocessor/preproc_stats.h"
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc.h"
+#include "zbxdiscovery.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -1461,6 +1462,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	proxy_db_init();
 
 	change_proxy_history_count(zbx_proxy_get_history_count());
+
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
+		zbx_discoverer_init();
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{

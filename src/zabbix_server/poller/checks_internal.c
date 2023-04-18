@@ -932,13 +932,22 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 	}
 	else if (0 == strcmp(tmp, "discoverer_queue"))			/* zabbix[discoverer_queue] */
 	{
+		zbx_uint64_t size;
+
 		if (1 != nparams)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, zbx_discovery_get_queue_size());
+		if (FAIL == zbx_discovery_get_queue_size(&size))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No \"%s\" processes started.",
+					get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERYMANAGER)));
+			goto out;
+		}
+
+		SET_UI64_RESULT(result, size);
 	}
 	else if (0 == strcmp(tmp, "tcache"))			/* zabbix[tcache,cache,<parameter>] */
 	{

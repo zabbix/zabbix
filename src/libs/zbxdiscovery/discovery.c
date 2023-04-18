@@ -36,6 +36,15 @@ typedef struct
 }
 DB_DSERVICE;
 
+#define DISCOVERER_INITIALIZED_YES	1
+
+static int	discoverer_initialized = 0;
+
+void	zbx_discoverer_init(void)
+{
+	discoverer_initialized = DISCOVERER_INITIALIZED_YES;
+}
+
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {
 	DB_RESULT	result;
@@ -575,20 +584,29 @@ static void	discovery_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t 
  *                                                                            *
  * Purpose: get queue size (enqueued checks count) of discovery manager       *
  *                                                                            *
- * Return value: enqueued item count                                          *
+ * Parameters: size - [OUT] enqueued item count                               *
+ *                                                                            *
+ * Return value: SUCCEED - queue size retrieved                               *
+ *               FAIL    - discovery manager is not initialized               *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_discovery_get_queue_size(void)
+int	zbx_discovery_get_queue_size(zbx_uint64_t *size)
 {
-	zbx_uint64_t		size;
 	zbx_ipc_message_t	message;
+
+	if (DISCOVERER_INITIALIZED_YES != discoverer_initialized)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "discoverer is not initialized: please check \"StartDiscoverers\""
+				" configuration parameter");
+		return FAIL;
+	}
 
 	zbx_ipc_message_init(&message);
 	discovery_send(ZBX_IPC_DISCOVERER_QUEUE, NULL, 0, &message);
-	memcpy(&size, message.data, sizeof(zbx_uint64_t));
+	memcpy(size, message.data, sizeof(zbx_uint64_t));
 	zbx_ipc_message_clean(&message);
 
-	return size;
+	return SUCCEED;
 }
 
 /******************************************************************************
