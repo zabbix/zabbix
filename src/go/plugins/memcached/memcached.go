@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/uri"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 
@@ -46,6 +47,11 @@ var impl Plugin
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
 	params, _, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
+	if err != nil {
+		return nil, err
+	}
+
+	err = metric.SetDefaults(params, p.options.Default)
 	if err != nil {
 		return nil, err
 	}
