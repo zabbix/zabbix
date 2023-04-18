@@ -45,7 +45,7 @@
                     <type>TRAP</type>
                     <key>tmpltrap</key>
 		    <!--WARNING, delay gets changed but this is ignored (by front-end) for trapper item when importing the template.
-		    UUID also gets changes, but its change is ignored by the configuration syncer. -->
+		    UUID also gets changed, but it is ignored by the configuration syncer. -->
                     <delay>10s</delay>
                     <triggers>
                         <trigger>
