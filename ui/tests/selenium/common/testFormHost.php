@@ -1762,7 +1762,7 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * Clone or Full clone a host and compare the data with the original host.
+	 * Clone a host and compare the data with the original host.
 	 *
 	 * @param array     $data		   data provider with fields values
 	 */
@@ -1854,11 +1854,6 @@ class testFormHost extends CWebTest {
 			],
 			[
 				[
-					'action' => 'Full clone'
-				]
-			],
-			[
-				[
 					'action' => 'Delete'
 				]
 			]
@@ -1913,7 +1908,7 @@ class testFormHost extends CWebTest {
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);
 
-		if (in_array($data['action'], ['Clone', 'Full clone', 'Delete'])) {
+		if (in_array($data['action'], ['Clone', 'Delete'])) {
 			$form_type->query('button', $data['action'])->one()->click();
 		}
 		if ($data['action'] === 'Delete') {
@@ -1922,18 +1917,17 @@ class testFormHost extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		// Check that the host creation page is open after cloning or full cloning.
-		if ($data['action'] === 'Clone' || $data['action'] === 'Full clone') {
+		// Check that the host creation page is open after cloning.
+		if ($data['action'] === 'Clone') {
 			$form_type->invalidate();
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-			$action = ($data['action'] === 'Clone') ? 'clone' : 'full_clone';
-			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&'.$action.'=1';
+			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&clone=1';
 
 			$this->assertEquals($expected_url, $this->page->getCurrentUrl());
 			$this->assertFalse($form_type->query("xpath:.//ul[".CXPathHelper::fromClass('filter-breadcrumb')."]")
 					->one(false)->isValid()
 			);
-			$this->assertFalse($form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete'])->one(false)
+			$this->assertFalse($form_type->query('button', ['Update', 'Clone', 'Delete'])->one(false)
 					->isValid()
 			);
 			$this->assertTrue($form_type->query('button', ['Add', 'Cancel'])->one(false)->isValid());
@@ -2226,7 +2220,7 @@ class testFormHost extends CWebTest {
 			}
 		}
 
-		$this->assertEquals(5, $form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete', 'Cancel'])->all()
+		$this->assertEquals(4, $form_type->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 
