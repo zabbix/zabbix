@@ -135,6 +135,8 @@ New features:
 .........T [ZBXNEXT-8394] created separate proxy compatibility triggers in Zabbix health templates, removed unnecessary dependencies (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-22376] fixed warning alert when deleting host group and template group on standalone page (epulke)
+.......PS. [ZBX-22615] fixed master item error handling when processing dependent items (wiper)
 ..F....... [ZBX-22595] fixed template item context menu (dpetra)
 ...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
 ........S. [ZBX-22492] removed limitation for size of logged messages in JS (dgoloscapov)
