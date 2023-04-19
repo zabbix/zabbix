@@ -18,10 +18,10 @@
 **/
 
 
-const ZBX_STYLE_COLLAPSED = 'section-collapsed';
-const ZBX_STYLE_TOGGLE = 'section-toggle';
+const ZBX_STYLE_COLLAPSED = 'collapsed';
+const ZBX_STYLE_TOGGLE = 'toggle';
 
-class CFormSectionCollapsible {
+class CFormFieldsetCollapsible {
 
 	constructor(target) {
 		this._target = target;
@@ -41,7 +41,8 @@ class CFormSectionCollapsible {
 	}
 
 	_update() {
-		const fields = this._target.querySelectorAll('.form-field');
+		const fields = this._target.children;
+
 		let height = 0;
 
 		if (fields !== null) {
@@ -55,6 +56,6 @@ class CFormSectionCollapsible {
 			}
 		}
 
-		this._target.style.setProperty('--form-section-height', height + 'px');
+		this._target.style.setProperty('--fieldset-height', height + 'px');
 	}
 }

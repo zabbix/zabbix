@@ -46,7 +46,7 @@ window.ldap_edit_popup = new class {
 		this._renderProvisionGroups(provision_groups);
 		this._renderProvisionMedia(provision_media);
 
-		new CFormSectionCollapsible(document.getElementById('advanced-configuration'));
+		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	_addEventListeners() {

@@ -3,81 +3,6 @@
 	row-gap: 10px;
 	column-gap: 10px;
 
-	.form-section {
-		display: contents;
-
-		.form-section-header {
-			grid-column: 1 / -1;
-
-			.section-toggle {
-				position: relative;
-				padding: 0 5px 0 24px;
-				border: 0 none;
-				background: none;
-
-				&::before {
-					@extend %btn-widget-defaults;
-
-					content: ' ';
-					position: absolute;
-					top: 0;
-					left: 0;
-					width: 24px;
-					height: 24px;
-					background: url($sprite-path) no-repeat -6px -654px;
-				}
-
-				span {
-					font-size: $font-h4-size;
-					color: $font-color;
-					border-bottom: 1px dotted $font-color;
-				}
-
-				&:focus {
-					box-shadow: none;
-
-					span {
-						border-bottom-width: 2px;
-						border-bottom-style: solid;
-					}
-				}
-
-				&::after {
-					content: ' ';
-					position: absolute;
-					width: 2px;
-					top: 20px;
-					left: 11px;
-					pointer-events: none;
-					height: var(--form-section-height, 0);
-					background: $ui-border-color;
-				}
-			}
-		}
-
-		> label {
-			padding-left: 24px;
-		}
-
-		&.section-collapsed {
-			.section-toggle {
-				&::before {
-					background-position: -6px -689px;
-				}
-
-				&::after {
-					display: none;
-				}
-			}
-
-			label,
-			.form-field,
-			.fields-group {
-				display: none;
-			}
-		}
-	}
-
 	// 15% label column width for use in standalone forms.
 	grid-template-columns: minmax(15%, max-content) auto;
 
@@ -86,15 +11,98 @@
 		grid-template-columns: max-content auto;
 	}
 
-	.fields-group {
-		grid-column: 2 / -1;
-		padding: 5px;
-		border: 1px solid $form-fields-group-border-color;
+	fieldset {
+		display: contents;
+
+		legend {
+			grid-column: 2 / -1;
+			margin-top: 10px;
+
+			span {
+				font-size: $font-h4-size;
+				color: $font-color;
+			}
+		}
+
+		> label {
+			padding-left: 24px;
+		}
+
+		&.collapsible {
+			legend {
+				grid-column: 1 / -1;
+
+				.toggle {
+					position: relative;
+					padding: 0 5px 0 24px;
+					border: none;
+					background-color: transparent;
+
+					&::before {
+						@extend %btn-widget-defaults;
+
+						content: ' ';
+						position: absolute;
+						top: 0;
+						left: 0;
+						width: 24px;
+						height: 24px;
+						background: url($sprite-path) no-repeat -6px -654px;
+					}
+
+					&::after {
+						content: ' ';
+						position: absolute;
+						top: 20px;
+						left: 11px;
+						width: 2px;
+						height: var(--fieldset-height, 0);
+						background: $ui-border-color;
+						pointer-events: none;
+					}
+
+					span {
+						border-bottom: 1px dotted $font-color;
+					}
+
+					&:hover {
+						span {
+							border-bottom-style: solid;
+						}
+					}
+
+					&:focus {
+						box-shadow: none;
+
+						span {
+							border-bottom-width: 2px;
+							border-bottom-style: solid;
+						}
+					}
+				}
+			}
+
+			&.collapsed {
+				.toggle {
+					&::before {
+						background-position: -6px -689px;
+					}
+
+					&::after {
+						display: none;
+					}
+				}
+
+				label,
+				.fields-group,
+				.form-field {
+					display: none !important;
+				}
+			}
+		}
 	}
 
-	> label,
-	.form-section > label {
-		line-height: 24px;
+	label {
 		text-align: right;
 		word-wrap: break-word;
 
@@ -108,13 +116,28 @@
 		}
 	}
 
+	.fields-group {
+		grid-column: 2 / -1;
+		padding: 5px;
+		border: 1px solid $form-fields-group-border-color;
+	}
+
 	> .form-field,
 	> .field-fluid,
-	.form-section > .form-field,
-	.form-section > .field-fluid,
+	fieldset > .form-field,
+	fieldset > .field-fluid,
 	.form-actions {
 		grid-column: 2 / -1;
 		text-align: left;
+	}
+
+	> label,
+	> .form-field,
+	> .field-fluid,
+	fieldset > .form-field,
+	fieldset > .field-fluid,
+	fieldset > label,
+	.form-actions {
 		line-height: 24px;
 	}
 

@@ -19,53 +19,38 @@
 **/
 
 
-class CFormSection extends CTag {
+class CFormFieldsetCollapsible extends CFormFieldset {
 
-	private const ZBX_STYLE_CLASS = 'form-section';
-	private const ZBX_STYLE_HEADER = 'form-section-header';
+	public const ZBX_STYLE_COLLAPSIBLE = 'collapsible';
+	public const ZBX_STYLE_COLLAPSED = 'collapsed';
+	public const ZBX_STYLE_TOGGLE = 'toggle';
 
-	protected string $title;
-	protected ?CDiv $header = null;
+	protected bool $is_expanded = false;
 
-	public function __construct(string $title = '', string $id = null) {
-		parent::__construct('div', true);
+	public function __construct(string $caption, $body = null) {
+		parent::__construct($caption, $body);
 
-		$this->title = $title;
-
-		$this->setId($id);
-		$this->addClass(self::ZBX_STYLE_CLASS);
-		$this->setHeader($title);
+		$this->addClass(self::ZBX_STYLE_COLLAPSIBLE);
 	}
 
-	public function addItem($value): self {
-		if ($value !== null) {
-			if (is_array($value)) {
-				foreach ($value as $item) {
-					$this->items[] = $item;
-				}
-			}
-			else {
-				$this->items[] = $value;
-			}
-		}
+	public function setExpanded(bool $expanded = true): self {
+		$this->is_expanded = $expanded;
 
 		return $this;
 	}
 
-	public function setHeader($items): self {
-		if ($items !== null) {
-			$this->header = (new CDiv($items))->addClass(self::ZBX_STYLE_HEADER);
-		}
-
-		return $this;
+	protected function makeLegend(): string {
+		return (new CTag('legend', true,
+			(new CSimpleButton(new CSpan($this->caption)))
+				->addClass(self::ZBX_STYLE_TOGGLE)
+				->setTitle(_('Expand'))
+		))->toString();
 	}
 
 	public function toString($destroy = true): string {
-		$body = $this->items;
-
-		$this->cleanItems();
-
-		parent::addItem([$this->header, $body]);
+		if (!$this->is_expanded) {
+			$this->addClass(self::ZBX_STYLE_COLLAPSED);
+		}
 
 		return parent::toString($destroy);
 	}

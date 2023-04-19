@@ -19,28 +19,23 @@
 **/
 
 
-class CFormSectionCollapsible extends CFormSection {
+class CFormFieldset extends CTag {
 
-	private const ZBX_STYLE_COLLAPSED = 'section-collapsed';
-	private const ZBX_STYLE_TOGGLE = 'section-toggle';
+	protected ?string $caption;
 
-	private bool $is_collapsed = true;
+	public function __construct(string $caption = null, $body = null) {
+		parent::__construct('fieldset', true, $body);
 
-	public function setCollapsed(bool $is_collapsed = true): self {
-		$this->is_collapsed = $is_collapsed;
-
-		return $this;
+		$this->caption = $caption;
 	}
 
-	public function toString($destroy = true): string {
-		$this
-			->addClass($this->is_collapsed ? self::ZBX_STYLE_COLLAPSED : null)
-			->setHeader(
-				(new CSimpleButton(new CSpan($this->title)))
-					->addClass(self::ZBX_STYLE_TOGGLE)
-					->setTitle($this->is_collapsed ? _('Expand') : _('Collapse'))
-			);
+	protected function makeLegend(): string {
+		return $this->caption !== null
+			? (new CTag('legend', true, new CSpan($this->caption)))->toString()
+			: '';
+	}
 
-		return parent::toString($destroy);
+	protected function bodyToString(): string {
+		return $this->makeLegend().parent::bodyToString();
 	}
 }

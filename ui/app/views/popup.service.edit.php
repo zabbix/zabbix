@@ -185,7 +185,8 @@ $propagation_value_status = (new CSeverity('propagation_value_status',
 ))->addValue(_('OK'), ZBX_SEVERITY_OK, ZBX_STYLE_NORMAL_BG);
 
 $service_tab->addItem(
-	(new CFormSectionCollapsible(_('Advanced configuration'), 'advanced-configuration'))
+	(new CFormFieldsetCollapsible(_('Advanced configuration')))
+		->setId('advanced-configuration')
 		->addItem([
 			new CLabel(_('Additional rules')),
 			new CFormField(

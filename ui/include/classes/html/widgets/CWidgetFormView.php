@@ -32,7 +32,7 @@ class CWidgetFormView {
 
 	private CFormGrid $form_grid;
 
-	public function __construct($data, $name = 'widget_dialogue_form') {
+	public function __construct(array $data, string $name = 'widget_dialogue_form') {
 		$this->data = $data;
 		$this->name = $name;
 
@@ -40,53 +40,90 @@ class CWidgetFormView {
 	}
 
 	/**
-	 * Add configuration row with single label and multiple CWidgetFieldView-s as content.
+	 * Add fieldset with multiple CWidgetFieldView-s as content.
 	 *
-	 * @param array|string|null $label
-	 * @param array             $items
-	 * @param string|null       $row_class
+	 * @param CWidgetFormFieldsetCollapsibleView|null $fieldset
 	 *
 	 * @return $this
 	 */
-	public function addFieldsGroup($label, array $items, string $row_class = null): self {
-		foreach ($items as &$item) {
-			if ($item instanceof CWidgetFieldView) {
-				$item = $this->makeField($item);
+	public function addFieldset(?CWidgetFormFieldsetCollapsibleView $fieldset): self {
+		if ($fieldset !== null) {
+			foreach ($fieldset->getFields() as $field) {
+				if ($field instanceof CWidgetFieldView) {
+					$this->registerField($field);
+				}
 			}
 		}
-		unset($item);
 
-		$this->form_grid->addItem([
-			$label !== null
-				? (new CLabel($label))
-					->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP_LABEL)
-					->addClass($row_class)
-				: null,
-			(new CDiv($items))
-				->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
-				->addClass($row_class)
-		]);
+		return $this->addItem($fieldset);
+	}
 
-		return $this;
+	/**
+	 * Add configuration row with single label and multiple CWidgetFieldView-s as content.
+	 *
+	 * @param CWidgetFieldsGroupView|null $fields_group
+	 *
+	 * @return $this
+	 */
+	public function addFieldsGroup(?CWidgetFieldsGroupView $fields_group): self {
+		if ($fields_group !== null) {
+			foreach ($fields_group->getFields() as $field) {
+				if ($field instanceof CWidgetFieldView) {
+					$this->registerField($field);
+				}
+			}
+		}
+
+		return $this->addItem([$fields_group->getLabel(), $fields_group]);
 	}
 
 	/**
 	 * Add configuration row based on single CWidgetFieldView.
 	 *
-	 * @param CWidgetFieldView|null $field_view
-	 * @param string|null           $row_class
-	 * @param bool                  $show_label
+	 * @param CWidgetFieldView|null $field
 	 *
 	 * @return $this
 	 */
-	public function addField(?CWidgetFieldView $field_view, string $row_class = null, bool $show_label = true): self {
-		if ($field_view !== null) {
-			$this->registerFieldView($field_view);
+	public function addField(?CWidgetFieldView $field): self {
+		if ($field !== null) {
+			$this->registerField($field);
 
-			$this->form_grid->addItem($this->makeField($field_view, $row_class, $show_label));
+			$this->form_grid->addItem($this->makeField($field));
 		}
 
 		return $this;
+	}
+
+	public function addFieldVar(?CWidgetField $field): self {
+		if ($field !== null) {
+			$this->vars[] = new CVar($field->getName(), $field->getValue());
+		}
+
+		return $this;
+	}
+
+	public function addItem($item): self {
+		$this->form_grid->addItem($item);
+
+		return $this;
+	}
+
+	public function addVar(string $name, string $value): self {
+		$this->vars[] = (new CVar($name, $value))->removeId();
+
+		return $this;
+	}
+
+	public function registerField(CWidgetFieldView $field): CWidgetFieldView {
+		$field->setFormName($this->name);
+
+		$this->addJavaScript($field->getJavaScript());
+
+		foreach ($field->getTemplates() as $template) {
+			$this->addTemplate($template);
+		}
+
+		return $field;
 	}
 
 	/**
@@ -101,27 +138,9 @@ class CWidgetFormView {
 	public function makeCustomField(CWidgetFieldView $field_view, array $items = [], string $row_class = null): array {
 		$this->registerFieldView($field_view);
 
-		return $items ?: $this->makeField($field_view, $row_class);
-	}
+		$field_view->addRowClass($row_class);
 
-	public function addItem($value): self {
-		$this->form_grid->addItem($value);
-
-		return $this;
-	}
-
-	public function addVar(string $name, string $value): self {
-		$this->vars[] = (new CVar($name, $value))->removeId();
-
-		return $this;
-	}
-
-	public function addFieldVar(?CWidgetField $field): self {
-		if ($field !== null) {
-			$this->vars[] = new CVar($field->getName(), $field->getValue());
-		}
-
-		return $this;
+		return $items ?: $this->makeField($field_view);
 	}
 
 	public function addJavaScript(string $javascript): self {
@@ -144,7 +163,6 @@ class CWidgetFormView {
 
 			$this->javascript[] = ob_get_clean();
 		}
-
 
 		return $this;
 	}
@@ -269,17 +287,10 @@ class CWidgetFormView {
 		}
 	}
 
-	private function makeField(CWidgetFieldView $field_view, string $row_class = null, bool $show_label = true): array {
-		$label = $show_label ? $field_view->getLabel() : null;
-
+	private function makeField(CWidgetFieldView $field_view): array {
 		return [
-			$label !== null
-				? $label
-					->addClass($row_class)
-					->setAsteriskMark($field_view->isRequired())
-				: null,
-			(new CFormField($field_view->getView()))
-				->addClass($row_class)
+			$field_view->getLabel(),
+			(new CFormField($field_view->getView()))->addClass($field_view->getClass())
 		];
 	}
 }

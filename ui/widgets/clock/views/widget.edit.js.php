@@ -34,6 +34,7 @@ window.widget_clock_form = new class {
 		this._show_time = document.getElementById('show_2');
 		this._show_tzone = document.getElementById('show_3');
 
+		// FIXME
 		this._advanced_configuration = document.getElementById('adv_conf');
 
 		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
@@ -66,24 +67,22 @@ window.widget_clock_form = new class {
 			});
 		}
 
-		this._advanced_configuration.addEventListener('change', () => this.updateForm());
-
 		this.updateForm();
 	}
 
 	updateForm() {
 		const is_digital = this._clock_type.querySelector('input:checked').value == <?= Widget::TYPE_DIGITAL ?>;
 
-		const show_date_row = is_digital && this._advanced_configuration.checked && this._show_date.checked;
-		const show_time_row = is_digital && this._advanced_configuration.checked && this._show_time.checked;
-		const show_tzone_row = is_digital && this._advanced_configuration.checked && this._show_tzone.checked;
+		const show_date_row = is_digital; // && this._advanced_configuration.checked && this._show_date.checked;
+		const show_time_row = is_digital; // && this._advanced_configuration.checked && this._show_time.checked;
+		const show_tzone_row = is_digital; // && this._advanced_configuration.checked && this._show_tzone.checked;
 
 		for (const element of this._form.querySelectorAll('.js-row-show, .js-row-adv-conf')) {
 			element.style.display = is_digital ? '' : 'none';
 		}
 
 		for (const element of this._form.querySelectorAll('.js-row-bg-color')) {
-			element.style.display = is_digital && this._advanced_configuration.checked ? '' : 'none';
+			element.style.display = is_digital; // && this._advanced_configuration.checked ? '' : 'none';
 		}
 
 		for (const element of this._form.querySelectorAll('.fields-group-date')) {

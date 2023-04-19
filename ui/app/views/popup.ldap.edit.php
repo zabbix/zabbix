@@ -281,7 +281,8 @@ $form = (new CForm('post', $form_action))
 			))->addClass('allow-jit-provisioning')
 		])
 		->addItem(
-			(new CFormSectionCollapsible(_('Advanced configuration'), 'advanced-configuration'))
+			(new CFormFieldsetCollapsible(_('Advanced configuration')))
+				->setId('advanced-configuration')
 				->addItem([
 					new CLabel(_('StartTLS'), 'start_tls'),
 					new CFormField(

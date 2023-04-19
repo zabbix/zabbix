@@ -1376,6 +1376,10 @@ class CDashboard {
 				}
 			}, {capture: true});
 
+			for (const fieldset of form.querySelectorAll('fieldset')) {
+				new CFormFieldsetCollapsible(fieldset);
+			}
+
 			try {
 				new TabIndicators();
 			}

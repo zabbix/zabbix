@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$this->addJsFile('class.form.section.collapsible.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 $form = (new CForm())

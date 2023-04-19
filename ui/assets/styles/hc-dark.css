@@ -665,16 +665,26 @@ footer {
   row-gap: 10px;
   column-gap: 10px;
   grid-template-columns: minmax(15%, max-content) auto; }
-  .form-grid .form-section {
+  .form-grid.label-width-true {
+    grid-template-columns: max-content auto; }
+  .form-grid fieldset {
     display: contents; }
-    .form-grid .form-section .form-section-header {
+    .form-grid fieldset legend {
+      grid-column: 2 / -1;
+      margin-top: 10px; }
+      .form-grid fieldset legend span {
+        font-size: 1.167em;
+        color: #ffffff; }
+    .form-grid fieldset > label {
+      padding-left: 24px; }
+    .form-grid fieldset.collapsible legend {
       grid-column: 1 / -1; }
-      .form-grid .form-section .form-section-header .section-toggle {
+      .form-grid fieldset.collapsible legend .toggle {
         position: relative;
         padding: 0 5px 0 24px;
-        border: 0 none;
-        background: none; }
-        .form-grid .form-section .form-section-header .section-toggle::before {
+        border: none;
+        background-color: transparent; }
+        .form-grid fieldset.collapsible legend .toggle::before {
           content: ' ';
           position: absolute;
           top: 0;
@@ -682,60 +692,58 @@ footer {
           width: 24px;
           height: 24px;
           background: url("../img/icon-sprite.svg?20230110") no-repeat -6px -654px; }
-        .form-grid .form-section .form-section-header .section-toggle span {
-          font-size: 1.167em;
-          color: #ffffff;
-          border-bottom: 1px dotted #ffffff; }
-        .form-grid .form-section .form-section-header .section-toggle:focus {
-          box-shadow: none; }
-          .form-grid .form-section .form-section-header .section-toggle:focus span {
-            border-bottom-width: 2px;
-            border-bottom-style: solid; }
-        .form-grid .form-section .form-section-header .section-toggle::after {
+        .form-grid fieldset.collapsible legend .toggle::after {
           content: ' ';
           position: absolute;
-          width: 2px;
           top: 20px;
           left: 11px;
-          pointer-events: none;
-          height: var(--form-section-height, 0);
-          background: #444444; }
-    .form-grid .form-section > label {
-      padding-left: 24px; }
-    .form-grid .form-section.section-collapsed .section-toggle::before {
+          width: 2px;
+          height: var(--fieldset-height, 0);
+          background: #444444;
+          pointer-events: none; }
+        .form-grid fieldset.collapsible legend .toggle span {
+          border-bottom: 1px dotted #ffffff; }
+        .form-grid fieldset.collapsible legend .toggle:hover span {
+          border-bottom-style: solid; }
+        .form-grid fieldset.collapsible legend .toggle:focus {
+          box-shadow: none; }
+          .form-grid fieldset.collapsible legend .toggle:focus span {
+            border-bottom-width: 2px;
+            border-bottom-style: solid; }
+    .form-grid fieldset.collapsible.collapsed .toggle::before {
       background-position: -6px -689px; }
-    .form-grid .form-section.section-collapsed .section-toggle::after {
+    .form-grid fieldset.collapsible.collapsed .toggle::after {
       display: none; }
-    .form-grid .form-section.section-collapsed label,
-    .form-grid .form-section.section-collapsed .form-field,
-    .form-grid .form-section.section-collapsed .fields-group {
-      display: none; }
-  .form-grid.label-width-true {
-    grid-template-columns: max-content auto; }
+    .form-grid fieldset.collapsible.collapsed label,
+    .form-grid fieldset.collapsible.collapsed .fields-group,
+    .form-grid fieldset.collapsible.collapsed .form-field {
+      display: none !important; }
+  .form-grid label {
+    text-align: right;
+    word-wrap: break-word; }
+    .form-grid label.fields-group-label {
+      padding-top: 5px; }
+    .form-grid label .icon-help-hint,
+    .form-grid label .icon-info {
+      margin-left: 5px; }
   .form-grid .fields-group {
     grid-column: 2 / -1;
     padding: 5px;
     border: 1px solid #333333; }
-  .form-grid > label,
-  .form-grid .form-section > label {
-    line-height: 24px;
-    text-align: right;
-    word-wrap: break-word; }
-    .form-grid > label.fields-group-label,
-    .form-grid .form-section > label.fields-group-label {
-      padding-top: 5px; }
-    .form-grid > label .icon-help-hint,
-    .form-grid > label .icon-info,
-    .form-grid .form-section > label .icon-help-hint,
-    .form-grid .form-section > label .icon-info {
-      margin-left: 5px; }
   .form-grid > .form-field,
   .form-grid > .field-fluid,
-  .form-grid .form-section > .form-field,
-  .form-grid .form-section > .field-fluid,
+  .form-grid fieldset > .form-field,
+  .form-grid fieldset > .field-fluid,
   .form-grid .form-actions {
     grid-column: 2 / -1;
-    text-align: left;
+    text-align: left; }
+  .form-grid > label,
+  .form-grid > .form-field,
+  .form-grid > .field-fluid,
+  .form-grid fieldset > .form-field,
+  .form-grid fieldset > .field-fluid,
+  .form-grid fieldset > label,
+  .form-grid .form-actions {
     line-height: 24px; }
   .form-grid .form-actions button:not(:first-of-type) {
     margin-left: 10px; }
@@ -1635,8 +1643,6 @@ form.dashboard-widget-clock .fields-group.fields-group-date, form.dashboard-widg
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-clock .fields-group.fields-group-date label, form.dashboard-widget-clock .fields-group.fields-group-time label, form.dashboard-widget-clock .fields-group.fields-group-tzone label {
-    text-align: right; }
   form.dashboard-widget-clock .fields-group.fields-group-date .field-size input, form.dashboard-widget-clock .fields-group.fields-group-time .field-size input, form.dashboard-widget-clock .fields-group.fields-group-tzone .field-size input {
     margin-right: 5px; }
 form.dashboard-widget-clock .fields-group.fields-group-time .field-format {
@@ -1683,8 +1689,6 @@ form.dashboard-widget-item .fields-group.fields-group-description, form.dashboar
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-item .fields-group.fields-group-description label, form.dashboard-widget-item .fields-group.fields-group-value label, form.dashboard-widget-item .fields-group.fields-group-time label, form.dashboard-widget-item .fields-group.fields-group-change-indicator label {
-    text-align: right; }
   form.dashboard-widget-item .fields-group.fields-group-description hr, form.dashboard-widget-item .fields-group.fields-group-value hr, form.dashboard-widget-item .fields-group.fields-group-time hr, form.dashboard-widget-item .fields-group.fields-group-change-indicator hr {
     grid-column: 1 / -1;
     margin: 0;
@@ -4827,13 +4831,13 @@ button {
   width: 24px;
   height: 24px; }
 
-.form-grid .form-section .form-section-header .section-toggle::before, section .section-toggle, .filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .btn-dashboard-conf, .interfaces .interface-row[data-type="2"] .interface-btn-toggle {
+.form-grid fieldset.collapsible legend .toggle::before, section .section-toggle, .filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .btn-dashboard-conf, .interfaces .interface-row[data-type="2"] .interface-btn-toggle {
   border: 0;
   min-height: 0;
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  .form-grid .form-section .form-section-header [disabled].section-toggle::before, section [disabled].section-toggle, .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle, [disabled].btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, [disabled].btn-dashboard-conf, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle, .form-grid .form-section .form-section-header [disabled].section-toggle:hover::before, section [disabled].section-toggle:hover, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, [disabled].btn-dashboard-conf:hover, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:hover, .form-grid .form-section .form-section-header [disabled].section-toggle:focus::before, section [disabled].section-toggle:focus, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, [disabled].btn-dashboard-conf:focus, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:focus, .form-grid .form-section .form-section-header [disabled].section-toggle:active::before, section [disabled].section-toggle:active, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, [disabled].btn-dashboard-conf:active, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:active {
+  .form-grid fieldset.collapsible legend [disabled].toggle::before, section [disabled].section-toggle, .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle, [disabled].btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, [disabled].btn-dashboard-conf, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle, .form-grid fieldset.collapsible legend [disabled].toggle:hover::before, section [disabled].section-toggle:hover, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, [disabled].btn-dashboard-conf:hover, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:hover, .form-grid fieldset.collapsible legend [disabled].toggle:focus::before, section [disabled].section-toggle:focus, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, [disabled].btn-dashboard-conf:focus, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:focus, .form-grid fieldset.collapsible legend [disabled].toggle:active::before, section [disabled].section-toggle:active, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, [disabled].btn-dashboard-conf:active, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:active {
     background-color: transparent;
     opacity: .25; }
 
@@ -4861,7 +4865,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
 
-.form-grid .form-section .form-section-header .section-toggle:hover::before, section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:hover, .btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .btn-dashboard-conf:hover, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:hover, .form-grid .form-section .form-section-header .section-toggle:focus::before, section .section-toggle:focus, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:focus, .btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .btn-dashboard-conf:focus, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:focus, .form-grid .form-section .form-section-header .section-toggle:active::before, section .section-toggle:active, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:active, .btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .btn-dashboard-conf:active, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:active {
+.form-grid fieldset.collapsible legend .toggle:hover::before, section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:hover, .btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .btn-dashboard-conf:hover, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:hover, .form-grid fieldset.collapsible legend .toggle:focus::before, section .section-toggle:focus, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:focus, .btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .btn-dashboard-conf:focus, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:focus, .form-grid fieldset.collapsible legend .toggle:active::before, section .section-toggle:active, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:active, .btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .btn-dashboard-conf:active, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:active {
   background-color: transparent;
   opacity: 1; }
 

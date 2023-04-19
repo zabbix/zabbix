@@ -155,7 +155,7 @@ window.service_edit_popup = new class {
 
 		this._update();
 
-		new CFormSectionCollapsible(document.getElementById('advanced-configuration'));
+		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	_initTemplates() {

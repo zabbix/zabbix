@@ -162,7 +162,8 @@ $form_grid = (new CFormGrid())
 		))->addClass('js-field-token')
 	])
 	->addItem(
-		(new CFormSectionCollapsible(_('Advanced configuration'), 'advanced-configuration'))
+		(new CFormFieldsetCollapsible(_('Advanced configuration')))
+			->setId('advanced-configuration')
 			->addItem([
 				(new CLabel(_('Max records per message'), 'max_records'))->setAsteriskMark(),
 				new CFormField([

@@ -66,8 +66,6 @@ window.widget_clock_form = new class {
 			});
 		}
 
-		this._advanced_configuration.addEventListener('change', () => this.updateForm());
-
 		this.updateForm();
 	}
 
