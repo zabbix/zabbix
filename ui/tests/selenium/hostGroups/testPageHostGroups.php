@@ -78,7 +78,7 @@ class testPageHostGroups extends CWebTest {
 	 * Prepare data for enable/disable hosts test.
 	 */
 	public static function preparePageHostGroupsData() {
-		// Creata three groups with disabled hosts and two groups with enabled hosts for testing.
+		// Create three groups with disabled hosts and two groups with enabled hosts for testing.
 		CDataHelper::call('hostgroup.create', [
 			[
 				'name' => self::GROUP_DISABLED
@@ -363,7 +363,7 @@ class testPageHostGroups extends CWebTest {
 	/**
 	 * Get and sort group names.
 	 *
-	 * @param string $sort      sort content ascending or descending
+	 * @param string $sort  sort content ascending or descending
 	 */
 	private function getGroupNames($sort = 'asc') {
 		$names = CDBHelper::getColumn('SELECT name FROM hstgrp', 'name');

@@ -982,7 +982,8 @@ class testFormAction extends CLegacyWebTest {
 				case EVENT_SOURCE_TRIGGERS:
 				case EVENT_SOURCE_SERVICE:
 					$this->assertEquals(['Send message', 'Reboot', 'Script for host group testing', 'Selenium script'],
-							$options->getOptions()->asText());
+							$options->getOptions()->asText()
+					);
 					break;
 
 				case EVENT_SOURCE_DISCOVERY:
