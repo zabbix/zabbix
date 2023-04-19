@@ -1390,6 +1390,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 						ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+				/* exporting binary value type history is not supported */
+				break;
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -1988,7 +1990,6 @@ static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
  * Purpose: frees resources allocated to store str/text/log/bin value         *
  *                                                                            *
  * Parameters: history     - [IN] history data                                *
- *             history_num - [IN] number of values in history data            *
  *                                                                            *
  ******************************************************************************/
 static void	dc_history_clean_value(zbx_dc_history_t *history)
