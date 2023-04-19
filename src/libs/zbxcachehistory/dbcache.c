@@ -1296,6 +1296,12 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 	{
 		h = &history[i];
 
+		if (ITEM_VALUE_TYPE_BIN == h->value_type)
+		{
+			/* exporting binary value type history is not supported */
+			continue;
+		}
+
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
 
@@ -1390,8 +1396,6 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 						ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
-				/* exporting binary value type history is not supported */
-				break;
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
