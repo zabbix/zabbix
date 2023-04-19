@@ -624,7 +624,7 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'Group2 with disabled host testPageHostGroups' => ['Disabled host2 testPageHostGroups'],
-					self::GROUP_DISABLED => [self::HOST1, self::HOST2],
+					self::GROUP_DISABLED => [self::HOST1, self::HOST2]
 				]
 			]
 		];
