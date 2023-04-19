@@ -116,7 +116,7 @@ There are no template links in this template.
 |Zabbix proxy |Proxy [{#PROXY.NAME}]: Host count |<p>The number of enabled hosts assigned to a proxy.</p> |DEPENDENT |zabbix.proxy.hosts[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.hosts`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Zabbix proxy |Proxy [{#PROXY.NAME}]: Version |<p>A version of Zabbix proxy.</p> |DEPENDENT |zabbix.proxy.version[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Zabbix proxy |Proxy [{#PROXY.NAME}]: Last seen, in seconds |<p>The time when a proxy was last seen by a server.</p> |DEPENDENT |zabbix.proxy.last_seen[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.last_seen`</p> |
-|Zabbix proxy |Proxy [{#PROXY.NAME}]: Compatibility |<p>The compatibility of Zabbix proxy.</p> |DEPENDENT |zabbix.proxy.compatibility[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.compatibility`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
+|Zabbix proxy |Proxy [{#PROXY.NAME}]: Compatibility |<p>Version of proxy compared to Zabbix server version.</p><p>Possible values:</p><p>0 - Undefined;</p><p>1 - Current version (proxy and server have the same major version);</p><p>2 - Outdated version (proxy version is older than server version, but is partially supported);</p><p>3 - Unsupported version (proxy version is older than server previous LTS release version or server major version is older than proxy major version).</p> |DEPENDENT |zabbix.proxy.compatibility[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.compatibility`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |Zabbix proxy |Proxy [{#PROXY.NAME}]: Required VPS |<p>The required performance of a proxy (the number of values that need to be collected per second).</p> |DEPENDENT |zabbix.proxy.requiredperformance[{#PROXY.NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.requiredperformance`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 
 ### Triggers
@@ -168,9 +168,10 @@ There are no template links in this template.
 |Remote Zabbix server: More than 75% used in the history cache |<p>Consider increasing `HistoryCacheSize` in the `zabbix_server.conf` configuration file.</p> |`max(/Remote Zabbix server health/wcache.history.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 75% used in the history index cache |<p>Consider increasing `HistoryIndexCacheSize` in the `zabbix_server.conf` configuration file.</p> |`max(/Remote Zabbix server health/wcache.index.pused,10m)>75` |AVERAGE | |
 |Remote Zabbix server: More than 75% used in the trends cache |<p>Consider increasing `TrendCacheSize` in the `zabbix_server.conf` configuration file.</p> |`max(/Remote Zabbix server health/wcache.trend.pused,10m)>75` |AVERAGE | |
-|Proxy [{#PROXY.NAME}]: Proxy last seen |<p>Zabbix proxy is not updating the configuration data.</p> |`last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}` |WARNING |<p>**Depends on**:</p><p>- Proxy [{#PROXY.NAME}]: Zabbix proxy never seen</p> |
+|Proxy [{#PROXY.NAME}]: Proxy last seen |<p>Zabbix proxy is not updating the configuration data.</p> |`last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}` |WARNING | |
 |Proxy [{#PROXY.NAME}]: Zabbix proxy never seen |<p>Zabbix proxy is not updating the configuration data.</p> |`last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1` |WARNING | |
-|Proxy [{#PROXY.NAME}]: Zabbix proxy is incompatible |<p>Zabbix proxy is incompatible with the server.</p> |`last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)<>1` |WARNING |<p>**Depends on**:</p><p>- Proxy [{#PROXY.NAME}]: Zabbix proxy never seen</p> |
+|Proxy [{#PROXY.NAME}]: Zabbix proxy is outdated |<p>Zabbix proxy version is older than server version, but is partially supported. Only data collection and remote execution is available.</p> |`last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=2` |WARNING | |
+|Proxy [{#PROXY.NAME}]: Zabbix proxy is not supported |<p>Zabbix proxy version is older than server previous LTS release version or server major version is older than proxy major version.</p> |`last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=3` |HIGH | |
 
 ## Feedback
 

@@ -22,6 +22,21 @@
 
 #include "zbxcommon.h"
 
+#define ZBX_HTTPFIELD_HEADER		0
+#define ZBX_HTTPFIELD_VARIABLE		1
+#define ZBX_HTTPFIELD_POST_FIELD	2
+#define ZBX_HTTPFIELD_QUERY_FIELD	3
+
+#define ZBX_POSTTYPE_RAW		0
+#define ZBX_POSTTYPE_FORM		1
+#define ZBX_POSTTYPE_JSON		2
+#define ZBX_POSTTYPE_XML		3
+#define ZBX_POSTTYPE_NDJSON		4
+
+#define ZBX_RETRIEVE_MODE_CONTENT	0
+#define ZBX_RETRIEVE_MODE_HEADERS	1
+#define ZBX_RETRIEVE_MODE_BOTH		2
+
 int	zbx_http_punycode_encode_url(char **url);
 void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
