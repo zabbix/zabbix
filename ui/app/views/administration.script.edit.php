@@ -24,10 +24,6 @@
  * @var array $data
  */
 
-
-// todo - fix script (multiline) input
-//$this->addJsFile('multilineinput.js');
-
 $csrf_token = CCsrfTokenHelper::get('script');
 
 $form = (new CForm())
@@ -43,14 +39,37 @@ $parameters_table = (new CTable())
 		(new CColHeader(_('Value')))->setWidth('50%'),
 		_('Action')
 	])
-	->setAttribute('style', 'width: 100%;');
+	->setAttribute('style', 'width: 100%;')
+	->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol(
+					(new CSimpleButton(_('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-add')
+						->setId('parameter-add')
+				))->setColSpan(2)
+			)
+	);
 
-$parameters_table->addRow([
-	(new CButton('parameter_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		// todo - rename class
-		->addClass('element-table-add')
-]);
+$row_template = (new CTemplateTag('script-parameter-template'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('script_param', 'name')))
+				->setAttribute('style', 'width: 100%;')
+				->setAttribute('value', '#{name}')
+				->removeId(),
+			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('script_param', 'value')))
+				->setAttribute('style', 'width: 100%;')
+				->setAttribute('value', '#{value}')
+				->removeId(),
+			(new CButton('', _('Remove')))
+				->removeId()
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		]))
+			->addClass('form_row')
+	);
 
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -105,12 +124,12 @@ $form_grid = (new CFormGrid())
 		))->setId('execute-on')
 	])
 	->addItem([
-		(new CLabel(_('Authentication method'), 'authtype'))->setId('auth-type-label'),
+		(new CLabel(_('Authentication method'), 'authentication'))->setId('auth-type-label'),
 		(new CFormField(
 			(new CSelect('authtype'))
 				->setId('authtype')
 				->setValue($data['authtype'])
-				->setFocusableElementId('authtype')
+				->setFocusableElementId('authentication')
 				->addOptions(CSelect::createOptionsFromArray([
 					ITEM_AUTHTYPE_PASSWORD => _('Password'),
 					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
@@ -226,17 +245,16 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('script-label'),
 		(new CFormField(
-			// todo - script multiline input
-//			(new CMultilineInput('script', $data['script'], [
-//				'title' => _('JavaScript'),
-//				'placeholder' => _('script'),
-//				'placeholder_textarea' => 'return value',
-//				'grow' => 'auto',
-//				'rows' => 0,
-//				'maxlength' => DB::getFieldLength('scripts', 'command')
-//			]))
-//				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-//				->setAriaRequired()
+			(new CMultilineInput('script', $data['script'], [
+				'title' => _('JavaScript'),
+				'placeholder' => _('script'),
+				'placeholder_textarea' => 'return value',
+				'grow' => 'auto',
+				'rows' => 0,
+				'maxlength' => DB::getFieldLength('scripts', 'command')
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
 		))->setId('js-item-script-field')
 	])
 	->addItem([
@@ -247,7 +265,7 @@ $form_grid = (new CFormGrid())
 			(new CTextBox('timeout', $data['timeout'], false, DB::getFieldLength('scripts', 'timeout')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
-		))->setId('timeout')
+		))->setId('timeout-field')
 	])
 	->addItem([
 		new CLabel(_('Description'), 'description'),
@@ -377,7 +395,7 @@ else {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete current script?'),
+			'confirmation' => _('Delete script?'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
@@ -388,6 +406,7 @@ else {
 
 $form
 	->addItem($form_grid)
+	->addItem($row_template)
 	->addItem(
 	(new CScriptTag('script_edit_popup.init('.json_encode([
 		'script' => $data

@@ -25,6 +25,7 @@
  */
 
 $this->includeJsFile('administration.script.list.js.php');
+$this->addJsFile('multilineinput.js');
 
 if ($data['uncheck']) {
 	uncheckTableRows('script');

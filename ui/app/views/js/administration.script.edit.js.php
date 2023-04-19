@@ -38,9 +38,41 @@ window.script_edit_popup = new class {
 		this._hideFields('all');
 		this.form.removeAttribute('style');
 
+		this._initActions();
+
+		if (script.parameters.length > 0) {
+			for (const parameter of script.parameters) {
+				this._addParameter(parameter);
+			}
+		}
+	}
+
+	_initActions() {
 		document.querySelector('#scope').dispatchEvent(new Event('change'));
 		document.querySelector('#type').dispatchEvent(new Event('change'));
 		document.querySelector('#enable-confirmation').dispatchEvent(new Event('change'))
+
+		document.getElementById('parameter-add').addEventListener('click', () => {
+			let template = new Template(document.getElementById('script-parameter-template').innerHTML);
+
+			document
+				.querySelector('#parameters-table tbody')
+				.insertAdjacentHTML('beforeend', template.evaluate({}));
+		});
+
+		this.dialogue.addEventListener('click', (e) => {
+			if (e.target.classList.contains('element-table-remove')) {
+				e.target.closest('tr').remove();
+			}
+		});
+	}
+
+	_addParameter(parameter) {
+		let template = new Template(document.getElementById('script-parameter-template').innerHTML);
+
+		document
+			.querySelector('#parameters-table tbody')
+			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
 	}
 
 	_loadView(script) {
@@ -216,7 +248,7 @@ window.script_edit_popup = new class {
 		let show_fields = [];
 		let hide_fields = [
 			'#command-ipmi-label', '#command-ipmi', '#webhook-parameters', '#webhook-parameters-label',
-			'#js-item-script-field', '#script-label', '#timeout-label', '#timeout', '#auth-type-label', '#auth-type',
+			'#js-item-script-field', '#script-label', '#timeout-label', '#timeout-field', '#auth-type-label', '#auth-type',
 			'#username-label', '#username-field', '#password-label', '#password-field', '#publickey-label',
 			'#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label', '#passphrase-field',
 			'#port-label', '#port-field', '#url', '#url-label', '#new-window-label', '#new-window', '#execute-on-label',
@@ -284,8 +316,9 @@ window.script_edit_popup = new class {
 			case <?= ZBX_SCRIPT_TYPE_WEBHOOK ?>:
 				show_fields = [
 					'#webhook-parameters', '#webhook-parameters-label', '#js-item-script-field', '#script-label',
-					'#timeout-label', '#timeout'
+					'#timeout-label', '#timeout-field'
 				];
+
 				break;
 
 			case <?= ZBX_SCRIPT_TYPE_URL ?>:
@@ -369,7 +402,7 @@ window.script_edit_popup = new class {
 				'#new-window-label', '#new-window',
 				'#webhook-parameters', '#webhook-parameters-label',
 				'#js-item-script-field', '#script-label',
-				'#timeout-label', '#timeout',
+				'#timeout-label', '#timeout-field',
 				'#commands-label', '#commands',
 				'#command-ipmi-label', '#command-ipmi',
 				'#auth-type-label', '#auth-type',

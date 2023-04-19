@@ -124,7 +124,6 @@
 		}
 
 		_post(target, scriptids, url) {
-			debugger;
 			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('script')) ?>
 			);
