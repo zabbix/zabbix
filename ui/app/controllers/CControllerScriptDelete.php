@@ -25,7 +25,7 @@ class CControllerScriptDelete extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'scriptids' =>	'required|array_db scripts.scriptid'
 		];
@@ -45,7 +45,7 @@ class CControllerScriptDelete extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS)) {
 			return false;
 		}
@@ -60,7 +60,7 @@ class CControllerScriptDelete extends CController {
 		return ($scripts == count($this->getInput('scriptids')));
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$scriptids = $this->getInput('scriptids');
 		$output = [];
 		$deleted = count($scriptids);

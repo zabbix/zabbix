@@ -64,7 +64,6 @@ class CControllerScriptEdit extends CController {
 	protected function doAction(): void {
 		// Default values.
 		$data = [
-			//'form_refresh' => $this->getInput('form_refresh', 0),
 			'scriptid' => null,
 			'name' => '',
 			'scope' => ZBX_SCRIPT_SCOPE_ACTION,

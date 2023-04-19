@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -97,8 +97,6 @@ window.script_edit_popup = new class {
 		document.querySelector('#enable-confirmation').onchange = function (e) {
 			that._confirmationFields(e);
 		}
-
-		// todo - rewrite jqueries to vanilla js
 
 		// test confirmation button
 		$('#test-confirmation').click(function() {
