@@ -1,3 +1,9 @@
+Changes for 6.4.2rc2
+
+New features:
+.........T [ZBXNEXT-8334] added Event-Driven Ansible media (akotsegubov)
+
+--------------------------------------------------------------------------------
 Changes for 6.4.2rc1
 
 New features:
