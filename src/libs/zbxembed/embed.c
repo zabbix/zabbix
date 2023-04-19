@@ -545,6 +545,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	zbx_timespec(&es->env->start_time);
 	es->env->http_req_objects = 0;
+	es->env->logged_msgs = 0;
 
 	if (NULL != es->env->json)
 	{

@@ -27,7 +27,6 @@
 #include "zbxnix.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
-#include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "../taskmanager/taskmanager.h"
@@ -123,15 +122,16 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *                                                                            *
  * Purpose: receive 'proxy data' request from proxy                           *
  *                                                                            *
- * Parameters: sock           - [IN] connection socket                        *
- *             jp             - [IN] received JSON data                       *
- *             ts             - [IN] connection timestamp                     *
- *             events_cbs     - [IN]                                          *
- *             config_timeout - [IN]                                          *
+ * Parameters: sock                - [IN] connection socket                   *
+ *             jp                  - [IN] received JSON data                  *
+ *             ts                  - [IN] connection timestamp                *
+ *             events_cbs          - [IN]                                     *
+ *             config_timeout      - [IN]                                     *
+ *             proxydata_frequency - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
-		const zbx_events_funcs_t *events_cbs, int config_timeout)
+		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency)
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
 	char			*error = NULL, *version_str = NULL;
@@ -174,7 +174,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zb
 	if (SUCCEED == ret)
 	{
 		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, events_cbs,
-				NULL, &error)))
+				proxydata_frequency, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 					proxy.host, sock->peer, error);
@@ -277,7 +277,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			config_comms->config_tls, config_comms->config_timeout))
+			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;
@@ -407,7 +407,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			config_comms->config_tls, config_comms->config_timeout))
+			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;

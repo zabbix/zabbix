@@ -249,7 +249,8 @@ $condition_table->addItem(
 
 $form_list
 	->addRow((new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'), [
-		(new CSelect('evaltype'))
+		(new CDiv(
+			(new CSelect('evaltype'))
 			->setId('evaltype')
 			->setValue($data['evaltype'])
 			->setFocusableElementId('evaltype_select')
@@ -258,15 +259,18 @@ $form_list
 				CONDITION_EVAL_TYPE_AND => _('And'),
 				CONDITION_EVAL_TYPE_OR => _('Or'),
 				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-			])),
-		(new CDiv())
-			->setId('formula-div')
-			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())->setId('expression'),
-		(new CTextBox('formula', $data['formula']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+			]))
+			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+		))->addClass(ZBX_STYLE_CELL),
+		(new CDiv([
+			(new CSpan())->setId('expression'),
+			(new CTextBox('formula', $data['formula']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setId('formula')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+		]))
+			->addClass(ZBX_STYLE_CELL)
+			->addClass(ZBX_STYLE_CELL_EXPRESSION)
 	])
 	->addRow(
 		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),

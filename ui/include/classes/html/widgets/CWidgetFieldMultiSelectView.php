@@ -23,8 +23,6 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelect;
 
 abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 
-	protected const OBJECT_NAME = '';
-
 	protected ?CMultiSelect $multiselect = null;
 
 	protected array $data;
@@ -39,18 +37,42 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 	}
 
 	public function getId(): string {
-		return $this->multiselect->getId();
+		return $this->getMultiselect()->getId();
 	}
 
 	public function getLabel(): ?CLabel {
 		$label = parent::getLabel();
 
-		return $label !== null
-			? $label->setFor($this->getId().'_ms')
-			: null;
+		if ($label !== null) {
+			$label->setFor($this->getId().'_ms');
+		}
+
+		return $label;
 	}
 
 	public function getView(): CMultiSelect {
+		return $this->getMultiselect();
+	}
+
+	public function getJavaScript(): string {
+		return $this->getMultiselect()->getPostJS();
+	}
+
+	public function setFilterPreselect(array $filter_preselect): self {
+		$this->filter_preselect = $filter_preselect;
+
+		return $this;
+	}
+
+	protected function getObjectName(): string {
+		return '';
+	}
+
+	protected function getPopupParameters(): array {
+		return [];
+	}
+
+	private function getMultiselect(): CMultiSelect {
 		if ($this->multiselect === null) {
 			$multiselect_name = $this->field->getName().($this->field->isMultiple() ? '[]' : '');
 
@@ -84,23 +106,5 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 		}
 
 		return $this->multiselect;
-	}
-
-	public function getJavaScript(): string {
-		return $this->getView()->getPostJS();
-	}
-
-	public function setFilterPreselect(array $filter_preselect): self {
-		$this->filter_preselect = $filter_preselect;
-
-		return $this;
-	}
-
-	protected function getObjectName(): string {
-		return '';
-	}
-
-	protected function getPopupParameters(): array {
-		return [];
 	}
 }

@@ -94,6 +94,7 @@ typedef struct
 {
 	zbx_config_tls_t	*config_tls;
 	const char		*hostname;
+	const char		*server;
 	const int		proxymode;
 	const int		config_timeout;
 }

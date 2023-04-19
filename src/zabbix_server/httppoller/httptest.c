@@ -962,7 +962,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 			zbx_free(page.data);
 		}
 		else
-			err_str = zbx_dsprintf(err_str, "%s: %s", curl_easy_strerror(err), errbuf);
+			err_str = zbx_dsprintf(err_str, "%s", 0 < strlen(errbuf) ? errbuf : curl_easy_strerror(err));
 
 httpstep_error:
 		zbx_free(db_httpstep.status_codes);

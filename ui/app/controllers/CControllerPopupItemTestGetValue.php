@@ -115,6 +115,35 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 					$ret = false;
 				}
 			}
+
+			if ($this->item_type == ITEM_TYPE_CALCULATED) {
+				$expression_parser = new CExpressionParser([
+					'usermacros' => true,
+					'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+					'calculated' => true,
+					'host_macro' => true,
+					'empty_host' => true
+				]);
+
+				if ($expression_parser->parse($this->getInput('params_f')) != CParser::PARSE_SUCCESS) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Formula'),
+						$expression_parser->getError()
+					));
+				}
+				else {
+					$expression_validator = new CExpressionValidator([
+						'usermacros' => true,
+						'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+						'calculated' => true
+					]);
+
+					if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Formula'),
+							$expression_validator->getError()
+						));
+					}
+				}
+			}
 		}
 
 		if ($messages = array_column(get_and_clear_messages(), 'message')) {

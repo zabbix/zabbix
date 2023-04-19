@@ -276,7 +276,6 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
-		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
 		->setArgument('backurl',
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'host.list')
@@ -301,14 +300,16 @@ foreach ($data['hosts'] as $host) {
 		$toggle_status_link = (new CLink(_('Enabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addConfirmation(_('Disable host?'));
+			->addConfirmation(_('Disable host?'))
+			->addCsrfToken($csrf_token_massupdate);
 	}
 	else {
 		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
 		$toggle_status_link = (new CLink(_('Disabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addConfirmation(_('Enable host?'));
+			->addConfirmation(_('Enable host?'))
+			->addCsrfToken($csrf_token_massupdate);
 	}
 
 	if ($maintenance_icon) {
@@ -510,7 +511,7 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
-		(new CUrl('zabbix.php', false))
+		(new CUrl('zabbix.php'))
 			->setArgument('action', 'host.list')
 			->setArgument('page', CPagerHelper::loadPage('host.list', null))
 			->getUrl()
