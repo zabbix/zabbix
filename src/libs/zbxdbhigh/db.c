@@ -3843,22 +3843,23 @@ char	*zbx_db_get_schema_esc(void)
 #endif
 
 #if defined(HAVE_ORACLE)
-#	define COMPAT_TYPE_INT4_STR		"NUMBER"
-#	define COMPAT_TYPE_INT8_STR		"NUMBER"
-#	define COMPAT_TYPE_VARCHAR_STR		"NVARCHAR2"
-#	define COMPAT_TYPE_FLOAT_STR		"BINARY_DOUBLE"
-#	define COMPAT_TYPE_BLOB_STR		"BLOB"
-#	define COMPAT_TYPE_TEXT_STR		"NCLOB"
-
-#	define COMPAT_TYPE_INT4_LEN		10
-#	define COMPAT_TYPE_INT8_LEN		20
-#	define COMPAT_TYPE_FLOAT_LEN		8
-#	define COMPAT_TYPE_SHORTTEXT_LEN	2000
-#	define COMPAT_TYPE_TEXT_LEN		4000
-
-static int validate_db_type_name(const int expected_type, const char *type_name,
+static int	validate_db_type_name(const int expected_type, const char *type_name,
 		const int type_precision, const int type_length)
 {
+#define COMPAT_TYPE_INT4_STR		"NUMBER"
+#define COMPAT_TYPE_INT8_STR		"NUMBER"
+#define COMPAT_TYPE_VARCHAR_STR		"NVARCHAR2"
+#define COMPAT_TYPE_FLOAT_STR		"BINARY_DOUBLE"
+#define COMPAT_TYPE_BLOB_STR		"BLOB"
+#define COMPAT_TYPE_TEXT_STR		"NCLOB"
+
+#define COMPAT_TYPE_INT4_LEN		10
+#define COMPAT_TYPE_INT8_LEN		20
+#define COMPAT_TYPE_FLOAT_LEN		8
+#define COMPAT_TYPE_SHORTTEXT_LEN	2000
+#define COMPAT_TYPE_TEXT_LEN		4000
+#define COMPAT_TYPE_CUID_LEN		75
+
 	switch(expected_type)
 	{
 		case ZBX_TYPE_UINT:
@@ -3895,11 +3896,28 @@ static int validate_db_type_name(const int expected_type, const char *type_name,
 			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name))
 				return SUCCEED;
 			break;
+		case ZBX_TYPE_CUID:
+			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name) && COMPAT_TYPE_CUID_LEN <= type_length)
+				return SUCCEED;
 		default:
 			return FAIL;
 	}
 
 	return FAIL;
+
+#undef COMPAT_TYPE_INT4_STR
+#undef COMPAT_TYPE_INT8_STR
+#undef COMPAT_TYPE_VARCHAR_STR
+#undef COMPAT_TYPE_FLOAT_STR
+#undef COMPAT_TYPE_BLOB_STR
+#undef COMPAT_TYPE_TEXT_STR
+
+#undef COMPAT_TYPE_INT4_LEN
+#undef COMPAT_TYPE_INT8_LEN
+#undef COMPAT_TYPE_FLOAT_LEN
+#undef COMPAT_TYPE_SHORTTEXT_LEN
+#undef COMPAT_TYPE_TEXT_LEN
+#undef COMPAT_TYPE_CUID_LEN
 }
 
 /******************************************************************************
@@ -3917,7 +3935,7 @@ int	zbx_db_check_oracle_colum_type(const char *table_name, const char *column_na
 	int		ret = FAIL;
 
 	if (NULL == (result = zbx_db_select(
-			"select data_type, data_precision, data_length "
+			"select data_type,data_precision,data_length "
 				"from user_tab_columns "
 				"where lower(table_name)='%s' and lower(column_name)='%s'",
 			table_name, column_name)))
@@ -3926,9 +3944,10 @@ int	zbx_db_check_oracle_colum_type(const char *table_name, const char *column_na
 	}
 
 	if (NULL != (row = zbx_db_fetch(result)))
+	{
 		ret = validate_db_type_name(expected_type, row[0], NULL == row[1] ? 0 : atoi(row[1]),
 				NULL == row[2] ? 0 : atoi(row[2]));
-
+	}
 clean:
 	zbx_db_free_result(result);
 
