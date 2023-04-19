@@ -82,7 +82,7 @@
 #include "preproc/preproc_server.h"
 #include "zbxavailability.h"
 #include "zbxdbwrap.h"
-#include "history/history_server.h"
+#include "lld/lld_protocol.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -1255,7 +1255,7 @@ int	main(int argc, char **argv)
 
 	zbx_init_library_cfg(program_type);
 	zbx_init_library_dbupgrade(get_program_type);
-	zbx_init_library_dbwrap(history_process_item_value_server);
+	zbx_init_library_dbwrap(zbx_lld_process_agent_result);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_stats(get_program_type);

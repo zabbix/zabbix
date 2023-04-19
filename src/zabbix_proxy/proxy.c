@@ -62,7 +62,6 @@
 #include "zbxipcservice.h"
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc/preproc_proxy.h"
-#include "history/history_proxy.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -1152,7 +1151,7 @@ int	main(int argc, char **argv)
 
 	zbx_init_library_cfg(program_type);
 	zbx_init_library_dbupgrade(get_program_type);
-	zbx_init_library_dbwrap(history_process_item_value_proxy);
+	zbx_init_library_dbwrap(NULL);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,

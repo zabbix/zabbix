@@ -3,7 +3,6 @@
 SUBDIRS = \
 	diag \
 	housekeeper \
-	history \
 	proxyconfig \
 	preproc \
 	datasender \
@@ -16,7 +15,7 @@ sbin_PROGRAMS = zabbix_proxy
 
 noinst_LIBRARIES = libzbxproxy.a
 
-libzbxproxy_a_SOURCES = 
+libzbxproxy_a_SOURCES =
 
 libzbxproxy_a_CFLAGS = \
 	-DZABBIX_DAEMON \
@@ -26,7 +25,6 @@ zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
-	history/libhistory_proxy.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
