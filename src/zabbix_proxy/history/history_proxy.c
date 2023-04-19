@@ -28,8 +28,11 @@
  *                                                                            *
  * Purpose: processes item value depending on proxy/flags settings            *
  *                                                                            *
- * Parameters: item    - [IN] the item to process                             *
- *             result  - [IN] the item result                                 *
+ * Parameters: item    - [IN] item to process                                 *
+ *             result  - [IN] item result                                     *
+ *             ts      - [IN] value timestamp                                 *
+ *             h_num   - [OUT] number of history entries                      *
+ *             error   - [OUT]                                                *
  *                                                                            *
  * Comments: Values gathered by server are sent to the preprocessing manager, *
  *           while values received from proxy are already preprocessed and    *
@@ -50,7 +53,7 @@ void	history_process_item_value_proxy(const zbx_history_recv_item_t *item, AGENT
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 		{
-			/* nothing to send to lld since proxy do not do that */
+			/* nothing to send to lld since proxy does not do that */
 			*h_num = 0;
 		}
 		else

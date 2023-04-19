@@ -29,8 +29,11 @@
  *                                                                            *
  * Purpose: processes item value depending on proxy/flags settings            *
  *                                                                            *
- * Parameters: item    - [IN] the item to process                             *
- *             result  - [IN] the item result                                 *
+ * Parameters: item    - [IN] item to process                                 *
+ *             result  - [IN] item result                                     *
+ *             ts      - [IN] value timestamp                                 *
+ *             h_num   - [OUT] number of history entries                      *
+ *             error   - [OUT]                                                *
  *                                                                            *
  * Comments: Values gathered by server are sent to the preprocessing manager, *
  *           while values received from proxy are already preprocessed and    *
