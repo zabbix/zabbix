@@ -32,20 +32,20 @@ class CWidgetFieldDatePickerView extends CWidgetFieldView {
 	}
 
 	public function getView(): CDateSelector {
-		$date_selector = (new CDateSelector($this->field->getName(), $this->field->getValue()))
-			->setMaxLength(DB::getFieldLength('widget_field', 'value_str'))
+		$view = (new CDateSelector($this->field->getName(), $this->field->getValue()))
+			->setMaxLength($this->field->getMaxLength())
 			->setAriaRequired($this->isRequired())
 			->setEnabled(!$this->isDisabled());
 
 		if ($this->date_format !== '') {
-			$date_selector->setDateFormat($this->date_format);
+			$view->setDateFormat($this->date_format);
 		}
 
 		if ($this->placeholder !== '') {
-			$date_selector->setPlaceholder($this->placeholder);
+			$view->setPlaceholder($this->placeholder);
 		}
 
-		return $date_selector;
+		return $view;
 	}
 
 	public function setDateFormat(string $date_format): self {

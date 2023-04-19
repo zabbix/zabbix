@@ -61,13 +61,6 @@ zbx_session_type_t;
 #define ZBX_AGENT_UNKNOWN	255
 #define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
 
-extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
-
-extern int	CONFIG_UNREACHABLE_PERIOD;
-extern int	CONFIG_UNREACHABLE_DELAY;
-extern int	CONFIG_PROXYCONFIG_FREQUENCY;
-extern int	CONFIG_PROXYDATA_FREQUENCY;
-
 typedef struct
 {
 	zbx_uint64_t	interfaceid;
@@ -618,15 +611,6 @@ typedef struct
 }
 zbx_connector_t;
 
-typedef struct
-{
-	zbx_uint64_t		connectorid;
-	int			tags_evaltype;
-	zbx_vector_match_tags_t	connector_tags;
-}
-zbx_connector_filter_t;
-
-ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 
 /* the configuration cache statistics */
 typedef struct
@@ -676,9 +660,11 @@ zbx_synced_new_config_t;
 #define ZBX_ITEM_GET_PROCESS		0
 
 void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
-		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault);
+		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
+		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault);
-int	zbx_init_configuration_cache(char **error);
+int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
+		zbx_uint64_t conf_cache_size, char **error);
 void	zbx_free_configuration_cache(void);
 
 void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const zbx_uint64_t *triggerids,
@@ -781,7 +767,8 @@ int	zbx_dc_config_get_proxypoller_nextcheck(void);
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
-void	zbx_dc_requeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err);
+void	zbx_dc_requeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err,
+		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_uint64_t *revision, char **error);
@@ -808,7 +795,8 @@ int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts
 		zbx_agent_availability_t *out);
 
 int	zbx_dc_interface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, int unavailable_delay,
-		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg);
+		int unreachable_period, int unreachable_delay, zbx_agent_availability_t *in,
+		zbx_agent_availability_t *out, const char *error_msg);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
@@ -1182,4 +1170,9 @@ zbx_maintenance_type_t;
 #define ZBX_CORR_CONDITION_EVENT_TAG_PAIR		3
 #define ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE		4
 #define ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE		5
+
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(int *ts_from, int table_group);
+
 #endif

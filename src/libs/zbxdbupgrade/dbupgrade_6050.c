@@ -87,6 +87,46 @@ static int	DBpatch_6050007(void)
 	return DBmodify_field_type("widget_field", &field, NULL);
 }
 
+static int	DBpatch_6050008(void)
+{
+	const zbx_db_field_t	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("history", &field, &field);
+}
+
+static int	DBpatch_6050009(void)
+{
+	const zbx_db_field_t	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050010(void)
+{
+	const zbx_db_field_t	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050011(void)
+{
+	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
 static char	*fix_hist_param_escaping(const char *param, size_t left, size_t right)
 {
 	size_t escaped_len = 0;
@@ -104,7 +144,7 @@ static char	*fix_hist_param_escaping(const char *param, size_t left, size_t righ
 	return escaped;
 }
 
-static int	DBpatch_6050008(void)
+static int	DBpatch_6050012(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -173,7 +213,7 @@ typedef struct {
 ZBX_VECTOR_DECL(fun_stack, expr_fun_call)
 ZBX_VECTOR_IMPL(fun_stack, expr_fun_call)
 
-static int	DBpatch_6050009(void)
+static int	DBpatch_6050013(void)
 {
 	int			ret = SUCCEED;
 	zbx_eval_context_t	ctx;
@@ -296,5 +336,9 @@ DBPATCH_ADD(6050006, 0, 1)
 DBPATCH_ADD(6050007, 0, 1)
 DBPATCH_ADD(6050008, 0, 1)
 DBPATCH_ADD(6050009, 0, 1)
+DBPATCH_ADD(6050010, 0, 1)
+DBPATCH_ADD(6050011, 0, 1)
+DBPATCH_ADD(6050012, 0, 1)
+DBPATCH_ADD(6050013, 0, 1)
 
 DBPATCH_END()
