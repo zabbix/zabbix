@@ -316,7 +316,7 @@ static int	rtc_match_message(const zbx_vector_uint32_t *msgs, zbx_uint32_t code)
  *                                                                            *
  ******************************************************************************/
 int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
-		const unsigned char *data, zbx_uint32_t size)
+		const char *data, zbx_uint32_t size)
 {
 	int	i, notified_num = 0;
 
@@ -337,10 +337,10 @@ int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, 
 		switch (rtc->subs.values[i]->type)
 		{
 			case ZBX_RTC_SUB_CLIENT:
-				rtc_notify_client(rtc->subs.values[i], code, data, size);
+				rtc_notify_client(rtc->subs.values[i], code, (const unsigned char *)data, size);
 				break;
 			case ZBX_RTC_SUB_SERVICE:
-				rtc_notify_service(rtc->subs.values[i], code, data, size);
+				rtc_notify_service(rtc->subs.values[i], code, (const unsigned char *)data, size);
 		}
 
 		notified_num++;

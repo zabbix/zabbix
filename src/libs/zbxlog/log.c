@@ -770,7 +770,7 @@ void	zbx_change_component_log_level(const zbx_log_component_t *component, int di
 		}
 		else
 		{
-			(*component->level) += direction;
+			*component->level += direction;
 			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been decreased to %s",
 					component->name, zabbix_get_log_level_ref_string(component->level));
 		}
@@ -784,7 +784,7 @@ void	zbx_change_component_log_level(const zbx_log_component_t *component, int di
 		}
 		else
 		{
-			(*component->level) += direction;
+			*component->level += direction;
 			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been increased to %s",
 					component->name, zabbix_get_log_level_ref_string(component->level));
 		}
