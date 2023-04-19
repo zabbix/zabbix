@@ -94,7 +94,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		$field_name = $this->field->getName();
 
 		$dataset_head = [
-			new CDiv((new CSimpleButton())->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
+			new CDiv((new CSimpleButton(NBSP()))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
 			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
 
