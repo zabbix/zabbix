@@ -865,11 +865,11 @@ class testFormTags extends CWebTest {
 		// Navigate to host or template for cloning.
 		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
 		$host_form = ($object !== 'host prototype' && $parent !== 'Template')
-			? COverlayDialogElement::find()->asForm()->one()->waitUntilReady()
+			? COverlayDialogElement::find()->one()->waitUntilReady()
 			: $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()->waitUntilPresent()->one();
 
-		$host_form->fill([$parent.' name' => $new_name]);
-		$this->query('button:Clone')->one()->click();
+		$host_form->asForm()->fill([$parent.' name' => $new_name]);
+		$host_form->query('button:Clone')->one()->click();
 		$this->query('xpath://div[@class="overlay-dialogue-footer" or contains(@class, "tfoot-buttons")]//button[text()="Add"]')
 				->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
