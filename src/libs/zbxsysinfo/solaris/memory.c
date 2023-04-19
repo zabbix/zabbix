@@ -31,7 +31,7 @@
 	}													\
 
 #ifdef HAVE_VMINFO_T_UPDATES
-#include "stats.h"
+#include "../common/stats.h"
 #endif
 
 static int	vm_memory_total(AGENT_RESULT *result)

@@ -85,7 +85,6 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #	include "zbxmodules.h"
 #endif
 
-//#include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #	include "zbxwin32.h"

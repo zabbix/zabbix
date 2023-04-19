@@ -21,7 +21,7 @@
 #include "zbx_sysinfo_kstat.h"
 #include "../sysinfo.h"
 
-#include "stats.h"
+#include "../common/stats.h"
 #include "zbxnum.h"
 
 int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)

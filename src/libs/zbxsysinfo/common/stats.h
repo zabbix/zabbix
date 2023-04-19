@@ -66,10 +66,6 @@ extern ZBX_DISKDEVICES_DATA	*diskdevices;
 extern int			my_diskstat_shmid;
 #endif
 
-//ZBX_THREAD_ENTRY(collector_thread, args);
-
-//int	init_collector_data(char **error);
-//void	free_collector_data(void);
 void	diskstat_shm_init(void);
 void	diskstat_shm_reattach(void);
 void	diskstat_shm_extend(void);

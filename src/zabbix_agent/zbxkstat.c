@@ -23,7 +23,6 @@
 
 #include "zbxmutexs.h"
 #include "log.h"
-//#include "stats.h"
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
 

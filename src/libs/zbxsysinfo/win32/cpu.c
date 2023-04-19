@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "stats.h"
+#include "../common/stats.h"
 #include "perfstat.h"
 
 /* shortcut to avoid extra verbosity */

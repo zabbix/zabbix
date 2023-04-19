@@ -20,8 +20,9 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "stats.h"
-#include "diskdevices.h"
+#include "../common/stats.h"
+#include "../common/diskdevices.h"
+
 #include "zbxstr.h"
 
 #define ZBX_DEV_PFX	"/dev/"

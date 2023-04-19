@@ -92,6 +92,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\dns.o \
 	..\..\..\src\libs\zbxsysinfo\common\system.o \
 	..\..\..\src\libs\zbxsysinfo\common\zabbix_stats.o \
+	..\..\..\src\libs\zbxsysinfo\common\stats.o \
 	..\..\..\src\libs\zbxsysinfo\simple\ntp.o \
 	..\..\..\src\libs\zbxsysinfo\simple\simple.o \
 	..\..\..\src\libs\zbxsysinfo\win32\cpu.o \
@@ -122,7 +123,6 @@ OBJS = \
 	..\..\..\src\zabbix_agent\logfiles\persistent_state.o \
 	..\..\..\src\zabbix_agent\logfiles\logfiles.o \
 	..\..\..\src\zabbix_agent\perfstat.o \
-	..\..\..\src\zabbix_agent\stats.o \
 	..\..\..\src\zabbix_agent\zabbix_agentd.o \
 	..\..\..\src\zabbix_agent\zbxconf.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \

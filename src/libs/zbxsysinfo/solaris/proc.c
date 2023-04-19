@@ -22,7 +22,7 @@
 
 #include "zbxregexp.h"
 #include "log.h"
-#include "stats.h"
+#include "../common/stats.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

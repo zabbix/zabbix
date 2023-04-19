@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "stats.h"
+#include "../common/stats.h"
 
 int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
