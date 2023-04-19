@@ -41,7 +41,7 @@ class testPageHostGroups extends testPageGroups {
 	 * Prepare data for enable/disable hosts test.
 	 */
 	public static function preparePageHostGroupsData() {
-		// Creata three groups with disabled hosts and two groups with enabled hosts for testing.
+		// Create three groups with disabled hosts and two groups with enabled hosts for testing.
 		CDataHelper::call('hostgroup.create', [
 			[
 				'name' => self::GROUP

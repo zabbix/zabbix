@@ -42,7 +42,7 @@ class testPageTemplateGroups extends testPageGroups {
 	 * Prepare data for template groups test.
 	 */
 	public static function preparePageTemplateGroupsData() {
-		// Creata three groups with disabled hosts and two groups with enabled hosts for testing.
+		// Create three groups with disabled hosts and two groups with enabled hosts for testing.
 		CDataHelper::call('templategroup.create', [
 			[
 				'name' => 'Templates/testPageTemplateGroup'
