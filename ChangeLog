@@ -1,7 +1,5 @@
 Changes for 6.0.17rc1
 
-New features:
-
 Bug fixes:
 ...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
 ...G...... [ZBX-22373] updated go.mod/sum to allow mixing session and key parameter for Zabbix agent 2 items (esneiders)
