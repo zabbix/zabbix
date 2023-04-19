@@ -29,8 +29,8 @@ $subfilters = $data['subfilters'];
 
 $subfilter_options = [];
 
-foreach (['hostids', 'tagnames', 'data'] as $key) {
-	if (($key === 'hostids' || $key === 'tagnames') && count($subfilters[$key]) == 0) {
+foreach (['hostids', 'tagnames', 'data', 'state'] as $key) {
+	if (($key === 'hostids' || $key === 'tagnames' || $key === 'state') && count($subfilters[$key]) == 0) {
 		$subfilter_options[$key] = null;
 
 		continue;
@@ -204,6 +204,14 @@ else {
 			? [[
 				new CTag('h3', true, _('Tag values')),
 				$subfilter_options['tags']
+			]]
+			: null
+	)
+	->addRow(
+		$subfilter_options['state'] !== null
+			? [[
+				new CTag('h3', true, _('State')),
+				$subfilter_options['state']
 			]]
 			: null
 	)

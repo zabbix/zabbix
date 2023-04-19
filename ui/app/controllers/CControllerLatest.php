@@ -43,6 +43,7 @@ abstract class CControllerLatest extends CController {
 		'show_tags' => SHOW_TAGS_3,
 		'tag_name_format' => TAG_NAME_FULL,
 		'tag_priority' => '',
+		'state' => -1,
 		'show_details' => 0,
 		'page' => null,
 		'sort' => 'name',
@@ -50,7 +51,8 @@ abstract class CControllerLatest extends CController {
 		'subfilter_hostids' => [],
 		'subfilter_tagnames' => [],
 		'subfilter_tags' => [],
-		'subfilter_data' => []
+		'subfilter_data' => [],
+		'subfilter_state' => []
 	];
 
 	/**
@@ -65,6 +67,7 @@ abstract class CControllerLatest extends CController {
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['tags'][]['operator']
+	 * @param int    $filter['state']               Filter state.
 	 * @param string $sort_field                   Sorting field.
 	 * @param string $sort_order                   Sorting order.
 	 *
@@ -99,7 +102,8 @@ abstract class CControllerLatest extends CController {
 				'evaltype' => $filter['evaltype'],
 				'tags' => $filter['tags'] ?: null,
 				'filter' => [
-					'status' => [ITEM_STATUS_ACTIVE]
+					'status' => [ITEM_STATUS_ACTIVE],
+					'state' => $filter['state'] == -1 ? null : $filter['state']
 				],
 				'search' => ($filter['name'] === '') ? null : [
 					'name' => $filter['name']
@@ -270,6 +274,7 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $filter['subfilter_tagnames']  Selected tagname subfilter parameters.
 	 * @param array  $filter['subfilter_tags']      Selected tags subfilter parameters.
 	 * @param array  $filter['subfilter_data']      Selected data subfilter parameters.
+	 * @param array  $filter['subfilter_state']     Selected state subfilter parameters.
 	 *
 	 * @return array
 	 */
@@ -284,7 +289,8 @@ abstract class CControllerLatest extends CController {
 			'hostids' => array_flip($filter['subfilter_hostids']),
 			'tagnames' => array_flip($filter['subfilter_tagnames']),
 			'tags' => $tags,
-			'data' => array_flip($filter['subfilter_data'])
+			'data' => array_flip($filter['subfilter_data']),
+			'state' => $filter['state'] == -1 ? array_flip($filter['subfilter_state']) : []
 		];
 	}
 
@@ -382,6 +388,22 @@ abstract class CControllerLatest extends CController {
 				}
 			}
 
+			// State subfilter.
+			$item_matches = true;
+			foreach ($item['matching_subfilters'] as $filter_name => $match) {
+				if ($filter_name === 'state') {
+					continue;
+				}
+				if (!$match) {
+					$item_matches = false;
+					break;
+				}
+			}
+
+			if ($item_matches) {
+				$subfilter_options['state'][$item['state'] == 1 ? 1 : 0]['count']++;
+			}
+
 			// Data subfilter.
 			if ($subfilters['data']) {
 				$subfilter_options['data'][$item['has_data'] ? 1 : 0]['count']++;
@@ -430,6 +452,7 @@ abstract class CControllerLatest extends CController {
 	 * @param array $subfilter['hostids']                  Selected subfilter hosts.
 	 * @param array $subfilter['tagnames']                 Selected subfilter names.
 	 * @param array $subfilter['tags']                     Selected subfilter tags.
+	 * @param array $subfilter['state']                    Selected subfilter state.
 	 * @param array $subfilter['data']                     Selected subfilter data options.
 	 *
 	 * @return array
@@ -526,6 +549,19 @@ abstract class CControllerLatest extends CController {
 			]
 		];
 
+		$subfilter_options['state'] = [
+			0 => [
+				'name' => _('Normal'),
+				'selected' => array_key_exists(0, $subfilter['state']),
+				'count' => 0
+			],
+			1 => [
+				'name' => _('Not supported'),
+				'selected' => array_key_exists(1, $subfilter['state']),
+				'count' => 0
+			]
+		];
+
 		return $subfilter_options;
 	}
 
@@ -544,6 +580,7 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $subfilter['hostids']                        Selected subfilter hosts.
 	 * @param array  $subfilter['tagnames']                       Selected subfilter tagnames.
 	 * @param array  $subfilter['tags']                           Selected subfilter tags.
+	 * @param array  $subfilter['state']                          Selected subfilter state.
 	 * @param array  $subfilter['data']                           Selected subfilter data options.
 	 *
 	 * @return array
@@ -585,6 +622,11 @@ abstract class CControllerLatest extends CController {
 				$item['matching_subfilters']['data'] = array_key_exists(0, $subfilter['data']) && !$item['has_data']
 					|| array_key_exists(1, $subfilter['data']) && $item['has_data'];
 			}
+
+			if ($subfilter['state']) {
+				$item['matching_subfilters']['state'] = array_key_exists(0, $subfilter['state']) && $item['state'] == 0
+					|| array_key_exists(1, $subfilter['state']) && $item['state'] == 1;
+			}
 		}
 		unset($item);
 
@@ -603,13 +645,14 @@ abstract class CControllerLatest extends CController {
 	 *                                                                subfilter or array of exactly matching
 	 *                                                                tagname/value pairs.
 	 * @param bool       $items[]['matching_subfilters']['data']      (optional) TRUE if item matches data subfilter.
+	 * @param bool       $items[]['matching_subfilters']['state']     (optional) TRUE if item matches state subfilter.
 	 *
 	 * @return array
 	 */
 	protected static function applySubfilters(array $items): array {
 		return array_filter($items, function ($item) {
 			$matches = array_intersect_key($item['matching_subfilters'],
-				array_flip(['hostids', 'tagnames', 'tags', 'data'])
+				array_flip(['hostids', 'tagnames', 'tags', 'state', 'data'])
 			);
 
 			if (array_key_exists('tagnames', $matches)) {

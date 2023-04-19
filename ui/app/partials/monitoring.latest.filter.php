@@ -180,6 +180,15 @@ $right_column = (new CFormGrid())
 		)
 	])
 	->addItem([
+		new CLabel(_('State'), 'state_#{uniqid}'),
+		(new CRadioButtonList('state', (int) $data['state']))
+			->addValue(_('all'), -1, 'state_-1#{uniqid}')
+			->addValue(_('Normal'), ITEM_STATE_NORMAL, 'state_0#{uniqid}')
+			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED, 'state_1#{uniqid}')
+			->setModern(true)
+			->setId('state_#{uniqid}'),
+	])
+	->addItem([
 		new CLabel(_('Show details'), 'show_details'),
 		new CFormField([
 			(new CCheckBox('show_details'))
@@ -338,7 +347,7 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Input, radio and single checkboxes.
-		const fields = ['name', 'evaltype', 'show_details', 'show_tags', 'tag_name_format', 'tag_priority'];
+		const fields = ['name', 'evaltype', 'show_details', 'show_tags', 'state', 'tag_name_format', 'tag_priority'];
 
 		fields.forEach(key => {
 			const elm = $('[name="' + key + '"]', container);
@@ -356,7 +365,9 @@ if (array_key_exists('render_html', $data)) {
 
 		// Render subfilter fields.
 		const form = container.querySelector('form');
-		const subfilter_fields = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'];
+		const subfilter_fields = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data',
+			'subfilter_state'
+		];
 
 		subfilter_fields.forEach(key => {
 			if ((key in data) && data[key].length != 0) {

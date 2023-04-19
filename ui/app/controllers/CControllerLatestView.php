@@ -37,6 +37,7 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
+			'state' =>                  'in -1,'.ITEM_STATE_NORMAL.','.ITEM_STATE_NOTSUPPORTED,
 			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
 			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
 			'tag_priority' =>			'string',
@@ -58,7 +59,8 @@ class CControllerLatestView extends CControllerLatest {
 			'subfilter_tagnames' =>		'array',
 			'subfilter_tags' =>			'array',
 			'subfilter_data' =>			'array',
-			'subfilters_expanded' =>	'array'
+			'subfilters_expanded' =>	'array',
+			'subfilter_state' =>        'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -105,6 +107,14 @@ class CControllerLatestView extends CControllerLatest {
 				return ($val === '0' || $val === '1');
 			});
 			$ret = (count($data) === count($valid));
+		}
+
+		if ($ret && $this->hasInput('subfilter_state')) {
+			$state = $this->getInput('subfilter_state', []);
+			$valid = array_filter($state, function ($val) {
+				return ($val == ITEM_STATE_NORMAL || $val == ITEM_STATE_NOTSUPPORTED);
+			});
+			$ret = (count($state) === count($valid));
 		}
 
 		if (!$ret) {
@@ -158,6 +168,10 @@ class CControllerLatestView extends CControllerLatest {
 		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
+		if ($filter['state'] != -1) {
+			$subfilters['state'] = [];
+		}
+
 		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
 		$paging_arguments = array_filter(array_intersect_key($filter, self::FILTER_FIELDS_DEFAULT));
 		array_map([$view_url, 'setArgument'], array_keys($paging_arguments), $paging_arguments);
@@ -172,6 +186,7 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' => $filter['show_details'] ? 1 : 0,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
+			'state' => $filter['state'],
 			'show_tags' => $filter['show_tags'],
 			'tag_name_format' => $filter['tag_name_format'],
 			'tag_priority' => $filter['tag_priority'],
@@ -179,6 +194,7 @@ class CControllerLatestView extends CControllerLatest {
 			'subfilter_tagnames' => $filter['subfilter_tagnames'],
 			'subfilter_tags' => $filter['tags'],
 			'subfilter_data' => $filter['subfilter_data'],
+			'subfilter_state' => $filter['subfilter_state'],
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'page' => $this->hasInput('page') ? $this->getInput('page') : null
