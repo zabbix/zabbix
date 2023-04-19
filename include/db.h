@@ -533,6 +533,7 @@ void	zbx_db_validate_config(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
 #endif
 int		DBexecute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		DBexecute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
@@ -548,6 +549,7 @@ int		DBend(int ret);
 
 const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
+int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 

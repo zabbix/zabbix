@@ -96,6 +96,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
+				uncheckTableRows('sla');
 				location.href = location.href;
 			});
 		},

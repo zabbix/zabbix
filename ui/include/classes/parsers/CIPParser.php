@@ -50,6 +50,11 @@ class CIPParser extends CParser {
 	private $lld_macro_function_parser;
 
 	/**
+	 * @var CMacroParser
+	 */
+	private $macro_parser;
+
+	/**
 	 * Supported options:
 	 *   'v6' => true          Enabled support of IPv6 addresses;
 	 *   'usermacros' => true  Enabled support of user macros;
