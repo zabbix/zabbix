@@ -399,7 +399,9 @@ class Group extends ScimApiService {
 
 					case 'remove':
 						if (!$do_replace) {
-							$del_userids = array_merge($del_userids, array_column($operation['value'], 'value'));
+							if (array_key_exists('value', $operation)) {
+								$del_userids = array_merge($del_userids, array_column($operation['value'], 'value'));
+							}
 
 							if (!$del_userids) {
 								// Empty 'value' array for 'remove' operation should act as 'replace' operation.
@@ -473,12 +475,11 @@ class Group extends ScimApiService {
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId', 'displayName'])],
 				'op' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'path', 'in' => 'displayName'], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['replace', 'Replace'])],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'])]
 				]],
-				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId', 'displayName'])],
-
 				'value' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'path', 'in' => 'members'], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 										'value' =>		['type' => API_ID]

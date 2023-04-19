@@ -876,7 +876,7 @@ class testScimUser extends CAPIScimTest {
 				],
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-					'detail' => 'Invalid parameter "/Operations": an array is expected.',
+					'detail' => 'Invalid parameter "/": the parameter "Operations" is missing.',
 					'status' => 400
 				]
 			],
