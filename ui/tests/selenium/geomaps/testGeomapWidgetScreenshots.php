@@ -290,10 +290,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 				[
 					'Tile provider' => 'Other',
 					'Tile URL' => 'https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png',
-					'Attribution HTML' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
-							'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
-							'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
-							'OpenStreetMap</a> contributors',
+					'Attribution text' => 'hello',
 					'Max zoom level' => '30'
 				]
 			]
