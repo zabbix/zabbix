@@ -242,7 +242,7 @@ class User extends ScimApiService {
 			$options['active'] = strtolower($options['active']) === 'true';
 		}
 
-		$db_user = $this->validatePut($options);
+		$this->validatePut($options, $db_user);
 		$user_group_names = [];
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 
@@ -297,7 +297,7 @@ class User extends ScimApiService {
 	 *
 	 * @throws APIException if input is invalid or user cannot be modified.
 	 */
-	private function validatePut(array $options): array {
+	private function validatePut(array &$options, array &$db_user = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -318,7 +318,7 @@ class User extends ScimApiService {
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-		[$db_user] = APIRPC::User()->get([
+		$db_user = APIRPC::User()->get([
 			'output' => ['userid', 'userdirectoryid'],
 			'userids' => $options['id'],
 			'filter' => ['userdirectoryid' => $userdirectoryid]
@@ -327,8 +327,9 @@ class User extends ScimApiService {
 		if (!$db_user) {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
 		}
-
-		return $db_user;
+		else {
+			$db_user = $db_user[0];
+		}
 	}
 
 	/**
@@ -433,7 +434,7 @@ class User extends ScimApiService {
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-		[$db_user] = APIRPC::User()->get([
+		$db_user = APIRPC::User()->get([
 			'output' => ['userid', 'name', 'surname', 'userdirectoryid', 'roleid'],
 			'userids' => $options['id'],
 			'filter' => ['userdirectoryid' => $userdirectoryid]
@@ -441,6 +442,9 @@ class User extends ScimApiService {
 
 		if (!$db_user) {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+		}
+		else {
+			$db_user = $db_user[0];
 		}
 
 		foreach ($options['Operations'] as &$operation) {

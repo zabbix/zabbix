@@ -59,7 +59,7 @@ try {
 	// unset wrappers so that calls between methods would be made directly to the services
 	API::setWrapper();
 
-	$jsonRpc = new CJsonRpc($apiClient, $data);
+	$jsonRpc = new CJsonRpc($apiClient, $data, $http_request);
 	echo $jsonRpc->execute();
 }
 catch (Exception $e) {

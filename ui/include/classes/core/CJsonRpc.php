@@ -34,6 +34,7 @@ class CJsonRpc {
 	 * @var CApiClient
 	 */
 	protected $apiClient;
+	protected $request;
 
 	private $_response;
 	private $_error_list;
@@ -46,8 +47,9 @@ class CJsonRpc {
 	 * @param CApiClient $apiClient
 	 * @param string $data
 	 */
-	public function __construct(CApiClient $apiClient, $data) {
+	public function __construct(CApiClient $apiClient, $data, CHttpRequest $request) {
 		$this->apiClient = $apiClient;
+		$this->request = $request;
 
 		$this->initErrors();
 
@@ -83,11 +85,11 @@ class CJsonRpc {
 
 			list($api, $method) = explode('.', $call['method']) + [1 => ''];
 
-			$header = $this->getAuthorizationHeader();
-			if ($header !== null && strpos($header, ZBX_API_HEADER_AUTHENTICATE_PREFIX) === 0) {
+			$header = $this->request->header('AUTHORIZATION');
+			if ($header != null  && strpos($header, ZBX_API_HEADER_AUTHENTICATE_PREFIX) === 0) {
 				$auth = [
 					'type' => self::AUTH_TYPE_HEADER,
-					'auth' => substr($header, strlen(ZBX_API_HEADER_AUTHENTICATE_PREFIX))
+					'auth' => $this->request->getAuthBearerValue()
 				];
 			}
 			elseif ($call['auth'] === null) {
@@ -242,23 +244,5 @@ class CJsonRpc {
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
 			ZBX_API_ERROR_INTERNAL => '-32500'
 		];
-	}
-
-	private function getAuthorizationHeader(): ?string {
-		if (array_key_exists('Authorization', $_SERVER)) {
-			return $_SERVER['Authorization'];
-		}
-		elseif (array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
-			return $_SERVER['HTTP_AUTHORIZATION'];
-		}
-		elseif (function_exists('getallheaders')) {
-			$headers = getallheaders();
-
-			if (array_key_exists('Authorization', $headers)) {
-				return $headers['Authorization'];
-			}
-		}
-
-		return null;
 	}
 }

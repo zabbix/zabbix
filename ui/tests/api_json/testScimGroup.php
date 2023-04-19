@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../include/CAPIScimTest.php';
 
 /**
- * @onBefore prepareUserData
+ * @onBefore prepareGroupData
  *
  * @onAfter clearData
  */

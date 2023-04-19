@@ -27,7 +27,7 @@ class CHttpRequest {
 	/**
 	 * additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal
 	 */
-	private $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH'];
+	private $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'Authorization'];
 
 	private $body;
 	private $method;
@@ -66,19 +66,19 @@ class CHttpRequest {
 		$this->request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : false;
 
 		$this->headers = [];
-		foreach ($_SERVER as $i => $val) {
-			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
-				$name = str_replace(['HTTP_', '_'], ['', '-'], $i);
-				$this->headers[$name] = $val;
-			}
-		}
 
-		if (!array_key_exists('Authorization', $this->headers)
-				&& !array_key_exists('HTTP_AUTHORIZATION', $this->headers) && function_exists('getallheaders')) {
+		if (function_exists('getallheaders')) {
 			$headers = getallheaders();
 
 			if (array_key_exists('Authorization', $headers)) {
 				$this->headers['AUTHORIZATION'] = $headers['Authorization'];
+			}
+		}
+
+		foreach ($_SERVER as $i => $val) {
+			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
+				$name = str_replace(['HTTP_', '_'], ['', '-'], $i);
+				$this->headers[$name] = $val;
 			}
 		}
 	}
