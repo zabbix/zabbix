@@ -188,31 +188,52 @@ class DB {
 	}
 
 	/**
-	 * Returns the array describing the database schema.
+	 * Returns an array describing the database schema.
 	 *
 	 * If the $table parameter is passed, the method will return the schema for the given table,
 	 * otherwise - for the whole database.
 	 *
-	 * @param string $table
+	 * @param string|null $table
 	 *
-	 * @throws APIException if the given table does not exist
+	 * @throws DBException if the given table does not exist.
 	 *
 	 * @return array
 	 */
-	public static function getSchema($table = null) {
-		if (is_null(self::$schema)) {
-			self::$schema = include(dirname(__FILE__).'/../../'.self::SCHEMA_FILE);
+	public static function getSchema(?string $table = null): array {
+		if (self::$schema === null) {
+			$schema = include __DIR__.'/../../'.self::SCHEMA_FILE;
+
+			global $DB;
+
+			if ($DB['TYPE'] === ZBX_DB_ORACLE) {
+				$config = DBfetch(DBselect('SELECT dbversion_status FROM config'));
+				$dbversion_status = $config ? (array) json_decode($config['dbversion_status'], true) : [];
+
+				foreach ($dbversion_status as $dbversion) {
+					if (array_key_exists('schema_diff', $dbversion)
+							&& array_key_exists('tables', $dbversion['schema_diff'])) {
+						foreach ($dbversion['schema_diff']['tables'] as $table_name => $table_params) {
+							foreach ($table_params['fields'] as $field_name => $field) {
+								$schema[$table_name]['fields'][$field_name]['type'] = $field['type'];
+								$schema[$table_name]['fields'][$field_name]['length'] = $field['length'];
+							}
+						}
+					}
+				}
+			}
+
+			self::$schema = $schema;
 		}
 
-		if (is_null($table)) {
+		if ($table === null) {
 			return self::$schema;
 		}
-		elseif (isset(self::$schema[$table])) {
-			return self::$schema[$table];
-		}
-		else {
+
+		if (!array_key_exists($table, self::$schema)) {
 			self::exception(self::SCHEMA_ERROR, _s('Table "%1$s" does not exist.', $table));
 		}
+
+		return self::$schema[$table];
 	}
 
 	/**

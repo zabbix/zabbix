@@ -145,8 +145,6 @@ function unset_all() {
 }
 
 function check_type(&$field, $flags, &$var, $type, $caption = null) {
-	global $DB;
-
 	if ($caption === null) {
 		$caption = $field;
 	}
@@ -210,23 +208,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 		$value = $number_parser->calcValue();
 
-		if ($DB['DOUBLE_IEEE754']) {
-			if (abs($value) > ZBX_FLOAT_MAX) {
-				$error = true;
-				$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));
-			}
-		}
-		else {
-			if (abs($value) >= 1E+16) {
-				$error = true;
-				$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));
-			}
-			elseif ($value != round($value, 4)) {
-				$error = true;
-				$message = _s('Field "%1$s" is not correct: %2$s', $caption,
-					_('a number has too many fractional digits')
-				);
-			}
+		if (abs($value) > ZBX_FLOAT_MAX) {
+			$error = true;
+			$message = _s('Field "%1$s" is not correct: %2$s', $caption, _('a number is too large'));
 		}
 	}
 	elseif ($type == T_ZBX_STR) {
@@ -345,7 +329,8 @@ function check_field(&$fields, &$field, $checks) {
 
 			$csrf_token_form = getRequest(CCsrfTokenHelper::CSRF_TOKEN_NAME, '');
 
-			if (!is_string($csrf_token_form) || !CCsrfTokenHelper::check($csrf_token_form, $action)) {
+			if (!isRequestMethod('post') || !is_string($csrf_token_form) || $csrf_token_form === ''
+					|| !CCsrfTokenHelper::check($csrf_token_form, $action)) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}
