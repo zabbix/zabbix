@@ -157,7 +157,8 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
  *             error      - [OUT] error message                               *
  *                                                                            *
  ******************************************************************************/
-static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, const zbx_dc_item_t *item, char **error)
+static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, const zbx_dc_item_t *item,
+		char **error)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -609,8 +610,8 @@ static void	lld_dump_overrides(const zbx_vector_lld_override_t *overrides)
 	}
 }
 
-static int	lld_overrides_load(zbx_vector_lld_override_t *overrides, zbx_uint64_t lld_ruleid, const zbx_dc_item_t *item,
-		char **error)
+static int	lld_overrides_load(zbx_vector_lld_override_t *overrides, zbx_uint64_t lld_ruleid,
+		const zbx_dc_item_t *item, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
