@@ -62,7 +62,7 @@ class testScimGroup extends CAPIScimTest {
 		'mediatypeid' => '3'
 	];
 
-	public function prepareUserData() {
+	public function prepareGroupData() {
 		// Create userdirectory for SAML.
 		$userdirectory_saml = CDataHelper::call('userdirectory.create', [
 			'idp_type' => IDP_TYPE_SAML,

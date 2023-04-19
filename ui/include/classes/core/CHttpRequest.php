@@ -72,6 +72,15 @@ class CHttpRequest {
 				$this->headers[$name] = $val;
 			}
 		}
+
+		if (!array_key_exists('Authorization', $this->headers)
+				&& !array_key_exists('HTTP_AUTHORIZATION', $this->headers) && function_exists('getallheaders')) {
+			$headers = getallheaders();
+
+			if (array_key_exists('Authorization', $headers)) {
+				$this->headers['AUTHORIZATION'] = $headers['Authorization'];
+			}
+		}
 	}
 
 	/**
@@ -114,7 +123,7 @@ class CHttpRequest {
 	public function getAuthBearerValue() {
 		$auth = $this->header('AUTHORIZATION');
 
-		if (is_string($auth) && substr($auth, 0, 7) === 'Bearer ') {
+		if (is_string($auth) && substr($auth, 0, 7) === ZBX_API_HEADER_AUTHENTICATE_PREFIX) {
 			return substr($auth, 7);
 		}
 
