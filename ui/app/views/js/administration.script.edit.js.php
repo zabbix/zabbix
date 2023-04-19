@@ -99,21 +99,20 @@ window.script_edit_popup = new class {
 		}
 
 		// test confirmation button
-		$('#test-confirmation').click(function() {
-			executeScript(null, $('#confirmation').val(), this);
+		document.querySelector('#test-confirmation').addEventListener('click', (e) => {
+			executeScript(null, document.querySelector('#confirmation').value, e.target);
 		});
 
 		// host group selection
-		$('#hgstype-select')
-			.change(function() {
-				if ($('#hgstype-select').val() == 1) {
-					$('#host-group-selection').show();
-				}
-				else {
-					$('#host-group-selection').hide();
-				}
-			})
-			.change();
+		document.querySelector('#hgstype-select').onchange = function () {
+			if (document.querySelector('#hgstype-select').value == 1) {
+				document.querySelector('#host-group-selection').style.display = '';
+			}
+			else {
+				document.querySelector('#host-group-selection').style.display = 'none';
+			}
+		}
+		document.querySelector('#hgstype-select').dispatchEvent(new Event('change'));
 	}
 
 	clone({title, buttons}) {
