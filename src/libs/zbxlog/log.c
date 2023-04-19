@@ -763,27 +763,31 @@ void	zbx_change_component_log_level(const zbx_log_component_t *component, int di
 {
 	if (0 > direction)
 	{
-		if (LOG_LEVEL_TRACE == *component->level)
+		if (LOG_LEVEL_EMPTY == *component->level)
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot decrease log level:"
 					" minimum level has been already set", component->name);
 		}
-
-		(*component->level) += direction;
-		zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been decreased to %s",
-				component->name, zabbix_get_log_level_ref_string(component->level));
+		else
+		{
+			(*component->level) += direction;
+			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been decreased to %s",
+					component->name, zabbix_get_log_level_ref_string(component->level));
+		}
 	}
 	else
 	{
-		if (LOG_LEVEL_EMPTY == *component->level)
+		if (LOG_LEVEL_TRACE == *component->level)
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot increase log level:"
 					" maximum level has been already set", component->name);
 		}
-
-		(*component->level) += direction;
-		zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been increased to %s",
-				component->name, zabbix_get_log_level_ref_string(component->level));
+		else
+		{
+			(*component->level) += direction;
+			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been increased to %s",
+					component->name, zabbix_get_log_level_ref_string(component->level));
+		}
 	}
 }
 
