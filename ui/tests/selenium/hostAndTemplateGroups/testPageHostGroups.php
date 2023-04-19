@@ -319,7 +319,7 @@ class testPageHostGroups extends testPageGroups {
 			[
 				[
 					'Group2 with disabled host testPageHostGroup' => ['Disabled host2 testPageHostGroup'],
-					self::GROUP => [self::HOST1, self::HOST2],
+					self::GROUP => [self::HOST1, self::HOST2]
 				]
 			]
 		];
