@@ -864,7 +864,7 @@ out:
 }
 
 static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids,
-		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks)
+		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks, const zbx_events_funcs_t *events_cbs)
 {
 #define DISCOVERER_BATCH_RESULTS_NUM	1000
 	int					i;
@@ -939,13 +939,17 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 		memset(&dhost, 0, sizeof(zbx_db_dhost));
 
 		host_status = process_services(result->druleid, &dhost, result->ip, result->dnsname, result->now,
-				result->unique_dcheckid, &result->services);
+				result->unique_dcheckid, &result->services, events_cbs->add_event_cb);
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			zbx_discovery_update_host(&dhost, host_status, result->now);
-			zbx_process_events(NULL, NULL);
-			zbx_clean_events();
+			zbx_discovery_update_host(&dhost, host_status, result->now, events_cbs->add_event_cb);
+
+			if (NULL != events_cbs->process_events_cb)
+				events_cbs->process_events_cb(NULL, NULL);
+
+			if (NULL != events_cbs->clean_events_cb)
+				events_cbs->clean_events_cb();
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		{
@@ -1725,7 +1729,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		discoverer_queue_unlock(&dmanager.queue);
 
 		zbx_vector_uint64_sort(&del_druleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids, &unsaved_checks);
+		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids, &unsaved_checks,
+				discoverer_args_in->events_cbs);
 
 		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_DBL "%% of queue used, " ZBX_FS_UI64
 				" unsaved checks]", get_process_type_string(process_type), process_num,

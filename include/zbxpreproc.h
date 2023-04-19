@@ -162,6 +162,7 @@ ZBX_PTR_VECTOR_DECL(pp_task_ptr, zbx_pp_task_t *)
 typedef struct
 {
 	int	workers_num;
+	int	config_timeout;
 }
 zbx_thread_pp_manager_args;
 

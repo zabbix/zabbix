@@ -43,6 +43,8 @@
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
+#include "zbxrtc.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -1106,6 +1108,37 @@ static void	preprocessor_finished_task_cb(void *data)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: change log level for the specified worker(s)                      *
+ *                                                                            *
+ * Parameters: manager   - [IN] preprocessing manager                         *
+ *             direction - [IN] 1) increase, -1) decrease                     *
+ *             data      - [IN] rtc data in json format                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessor_change_loglevel(zbx_pp_manager_t *manager, int direction, const char *data)
+{
+	char	*error = NULL;
+	pid_t	pid;
+	int	proc_type, proc_num;
+
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, NULL, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot change log level: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	if (0 != pid)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot change log level for preprocessing worker by pid");
+		return;
+	}
+
+	zbx_pp_manager_change_worker_loglevel(manager, proc_num, direction);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: change worker log level                                           *
  *                                                                            *
  ******************************************************************************/
@@ -1146,6 +1179,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	zbx_thread_pp_manager_args	*pp_args = ((zbx_thread_args_t *)args)->args;
 	zbx_pp_manager_t		*manager;
 	zbx_vector_pp_task_ptr_t	tasks;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0,
 					processing_num = 0;
 
@@ -1175,6 +1209,9 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	}
 
 	zbx_vector_pp_task_ptr_create(&tasks);
+
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCESSOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -1230,6 +1267,15 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 				case ZBX_IPC_PREPROCESSOR_USAGE_STATS:
 					preprocessor_reply_usage_stats(manager, pp_args->workers_num, client);
 					break;
+				case ZBX_RTC_LOG_LEVEL_INCREASE:
+					preprocessor_change_loglevel(manager, 1, (const char *)message->data);
+					break;
+				case ZBX_RTC_LOG_LEVEL_DECREASE:
+					preprocessor_change_loglevel(manager, -1, (const char *)message->data);
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					goto out;
 			}
 
 			zbx_ipc_message_free(message);
@@ -1266,7 +1312,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		}
 	}
 
-	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
+out:
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	zbx_vector_pp_task_ptr_destroy(&tasks);
 	zbx_pp_manager_free(manager);

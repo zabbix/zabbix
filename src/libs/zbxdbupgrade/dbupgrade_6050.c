@@ -124,6 +124,21 @@ static int	DBpatch_6050011(void)
 	return DBmodify_field_type("trends", &field, &field);
 }
 
+static int	DBpatch_6050012(void)
+{
+	const zbx_db_field_t	field = {"concurrency_max", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("drules", &field);
+}
+
+static int	DBpatch_6050013(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update drules set concurrency_max=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -142,5 +157,7 @@ DBPATCH_ADD(6050008, 0, 1)
 DBPATCH_ADD(6050009, 0, 1)
 DBPATCH_ADD(6050010, 0, 1)
 DBPATCH_ADD(6050011, 0, 1)
+DBPATCH_ADD(6050012, 0, 1)
+DBPATCH_ADD(6050013, 0, 1)
 
 DBPATCH_END()
