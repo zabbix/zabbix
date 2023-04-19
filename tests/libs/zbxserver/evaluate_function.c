@@ -85,7 +85,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_update_epsilon_to_float_precision();
 
-	err = zbx_vc_init(&error);
+	err = zbx_vc_init(get_zbx_config_value_cache_size(), &error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
 
 	zbx_vc_enable();
