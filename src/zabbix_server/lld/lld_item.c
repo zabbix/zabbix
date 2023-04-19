@@ -27,6 +27,7 @@
 #include "zbxxml.h"
 #include "zbxnum.h"
 #include "zbxdbwrap.h"
+#include "zbxhttp.h"
 
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
@@ -299,8 +300,8 @@ static void	lld_item_free(zbx_lld_item_t *item)
  ******************************************************************************/
 static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_lld_item_t			*item, *master;
 	zbx_lld_item_preproc_t		*preproc_op;
 	const zbx_lld_item_prototype_t	*item_prototype;
@@ -881,8 +882,8 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 				*check_ids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1167,6 +1168,17 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 
 	*err = '\0';
 
+	if (FAIL == zbx_db_validate_field_size("item_preproc", "params", pp->params))
+	{
+		const char	*err_val;
+		char		key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		err_val = zbx_truncate_value(pp->params, VALUE_ERRMSG_MAX, key_short, sizeof(key_short));
+		zbx_snprintf(err, sizeof(err), "parameter \"%s\" is too long.", err_val);
+		ret = FAIL;
+		goto out;
+	}
+
 	if (0 == (pp->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE)
 			|| (SUCCEED == zbx_token_find(pp->params, 0, &token, ZBX_TOKEN_SEARCH_BASIC)
 			&& 0 != (token.type & ZBX_TOKEN_USER_MACRO)))
@@ -1334,7 +1346,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			}
 			break;
 	}
-
+out:
 	if (SUCCEED != ret)
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s item: invalid value for preprocessing step #%d: %s.\n",
@@ -1356,8 +1368,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx_vector_ptr_t *item_prototypes,
 		zbx_vector_ptr_t *item_dependencies, char **error)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			i, j;
 	zbx_lld_item_t		*item;
 	zbx_vector_uint64_t	itemids;
@@ -4058,8 +4070,8 @@ void	lld_item_links_sort(zbx_vector_ptr_t *lld_rows)
  ******************************************************************************/
 static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *item_prototypes)
 {
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_lld_item_prototype_t	*item_prototype;
 	zbx_lld_item_preproc_t		*preproc_op;
 	zbx_item_param_t		*item_param;

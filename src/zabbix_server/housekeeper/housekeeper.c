@@ -264,8 +264,8 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
  ******************************************************************************/
 static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zbx_hashset_create(&rule->item_cache, 1024, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -366,8 +366,8 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rules, zbx_hk_history_
  ******************************************************************************/
 static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*tmp = NULL;
 	zbx_dc_um_handle_t	*um_handle;
 
@@ -523,7 +523,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
 #if defined(HAVE_POSTGRESQL)
 	int		history_seconds;
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
@@ -720,8 +720,8 @@ skip:
  ******************************************************************************/
 static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		keep_from, id_field_str_type, deleted = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
@@ -973,8 +973,8 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t i
  ******************************************************************************/
 static int	housekeeping_cleanup(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			deleted = 0;
 	zbx_vector_uint64_t	housekeeperids;
 	char			*sql = NULL, *table_name_esc;
@@ -1171,8 +1171,8 @@ static int	housekeeping_events(int now)
 static int	housekeeping_problems(int now)
 {
 	int			deleted = 0, rc;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	ids_uint64;
 	size_t			sql_alloc = 0, sql_offset;
 	char			*sql = NULL;

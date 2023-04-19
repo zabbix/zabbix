@@ -47,7 +47,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			return NOTSUPPORTED;
 		}
 
-		SET_UI64_RESULT(result, get_proxy_history_count());
+		SET_UI64_RESULT(result, zbx_get_proxy_history_count());
 	}
 	else
 		return FAIL;

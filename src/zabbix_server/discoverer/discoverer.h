@@ -22,6 +22,7 @@
 
 #include "zbxthreads.h"
 
+#include "zbxdbhigh.h"
 #include "zbxcomms.h"
 
 typedef struct
@@ -30,6 +31,7 @@ typedef struct
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
 	int			workers_num;
+	const zbx_events_funcs_t	*events_cbs;
 }
 zbx_thread_discoverer_args;
 

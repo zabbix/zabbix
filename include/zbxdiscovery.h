@@ -41,9 +41,10 @@ typedef struct
 zbx_dservice_t;
 
 void	zbx_discoverer_init(void);
-void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now);
+void	zbx_discovery_update_host(zbx_db_dhost *dhost, int status, int now, zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
-		zbx_db_dhost *dhost, const char *ip, const char *dns, int port, int status, const char *value, int now);
+		zbx_db_dhost *dhost, const char *ip, const char *dns, int port, int status, const char *value, int now,
+		zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_dcheck_free(zbx_dc_dcheck_t *dcheck);
 void	zbx_discovery_drule_free(zbx_dc_drule_t *drule);
 int	zbx_discovery_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error);

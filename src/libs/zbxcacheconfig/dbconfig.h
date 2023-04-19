@@ -987,7 +987,6 @@ ZBX_DC_CONFIG;
 extern int	sync_in_progress;
 extern ZBX_DC_CONFIG	*config;
 extern zbx_rwlock_t	config_lock;
-extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
 #define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
@@ -1032,8 +1031,8 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
 /* maintenance support */
 
 /* number of slots to store maintenance update flags */
-#define ZBX_MAINTENANCE_UPDATE_FLAGS_NUM()	\
-		((((size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER]) + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
+int	cacheconfig_get_config_forks(unsigned char proc_type);
+size_t	zbx_maintenance_update_flags_num(void);
 
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
@@ -1041,11 +1040,11 @@ char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid
 
 char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num);
 
-void		DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE *src_interface);
+void		DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *src_interface);
 ZBX_DC_HOST	*DCfind_host(const char *host);
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key);
-void		DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src_function);
-void		DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags);
+void		DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src_function);
+void		DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags);
 int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 			char **error);
 
@@ -1056,6 +1055,7 @@ int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interfac
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
-		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault);
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault,
+		unsigned char program_type);
 
 #endif

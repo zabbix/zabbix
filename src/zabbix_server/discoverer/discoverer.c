@@ -28,7 +28,6 @@
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
-#include "../events.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
@@ -306,7 +305,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 	{
 		char		**pvalue;
 		size_t		value_offset = 0;
-		DC_ITEM		item;
+		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN];
 
 		switch (dcheck->type)
@@ -336,7 +335,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
-				memset(&item, 0, sizeof(DC_ITEM));
+				memset(&item, 0, sizeof(zbx_dc_item_t));
 
 				zbx_strscpy(item.key_orig, dcheck->key_);
 				item.key = item.key_orig;
@@ -616,7 +615,8 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 }
 
 static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip, const char *dns,
-		int now, zbx_uint64_t unique_dcheckid, const zbx_vector_discoverer_services_ptr_t *services)
+		int now, zbx_uint64_t unique_dcheckid, const zbx_vector_discoverer_services_ptr_t *services,
+		zbx_add_event_func_t add_event_cb)
 {
 	int	host_status = -1, i;
 
@@ -632,7 +632,7 @@ static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const cha
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			zbx_discovery_update_service(druleid, service->dcheckid, unique_dcheckid, dhost,
-					ip, dns, service->port, service->status, service->value, now);
+					ip, dns, service->port, service->status, service->value, now, add_event_cb);
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		{
@@ -756,8 +756,8 @@ out:
  ******************************************************************************/
 static void	discovery_clean_services(zbx_uint64_t druleid)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*iprange = NULL;
 	zbx_vector_uint64_t	keep_dhostids, del_dhostids, del_dserviceids;
 	zbx_uint64_t		dhostid, dserviceid;

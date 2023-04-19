@@ -39,7 +39,12 @@ require_once dirname(__FILE__).'/authentication/testUsersAuthenticationLdap.php'
 require_once dirname(__FILE__).'/authentication/testUsersAuthenticationSaml.php';
 require_once dirname(__FILE__).'/authentication/testUsersPasswordComplexity.php';
 
+// Connectors.
+require_once dirname(__FILE__).'/connectors/testFormConnectors.php';
+require_once dirname(__FILE__).'/connectors/testPageConnectors.php';
+
 // Dashboards.
+require_once dirname(__FILE__).'/dashboard/testDashboardClockWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteGraphsWidget.php';
@@ -52,6 +57,8 @@ require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.p
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSlaReportWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
@@ -79,6 +86,7 @@ require_once dirname(__FILE__).'/graphs/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
+require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
@@ -159,6 +167,10 @@ require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
 require_once dirname(__FILE__).'/roles/testPageUserRoles.php';
 require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
 
+// Scripts.
+require_once dirname(__FILE__).'/scripts/testFormAlertsScripts.php';
+require_once dirname(__FILE__).'/scripts/testPageAlertsScripts.php';
+
 // Services.
 require_once dirname(__FILE__).'/services/testFormServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServices.php';
@@ -200,7 +212,6 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
-require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
@@ -230,7 +241,6 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
 require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
-require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
@@ -295,7 +305,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testUsersAuthenticationSaml');
 		$suite->addTestSuite('testUsersPasswordComplexity');
 
+		// Connectors.
+		$suite->addTestSuite('testFormConnectors');
+		$suite->addTestSuite('testPageConnectors');
+
 		// Dashboards.
+		$suite->addTestSuite('testDashboardClockWidget');
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
@@ -308,6 +323,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPages');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardProblemsWidget');
+		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
 		$suite->addTestSuite('testDashboardSlaReportWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardTopHostsWidget');
@@ -335,6 +352,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageHostGraph');
+		$suite->addTestSuite('testPageMonitoringHostsGraph');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
@@ -409,6 +427,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUserRoles');
 		$suite->addTestSuite('testUserRolesPermissions');
 
+		// Scripts.
+		$suite->addTestSuite('testFormAlertsScripts');
+		$suite->addTestSuite('testPageAlertsScripts');
+
 		// Services.
 		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testPageServicesServices');
@@ -449,7 +471,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationGeneralModules');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
-		$suite->addTestSuite('testPageAdministrationScripts');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
@@ -483,7 +504,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
-		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormHostGroup');

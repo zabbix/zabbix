@@ -193,6 +193,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
+						$item += array_intersect_key($db_item, array_flip(['url']));
+					}
+
 					$post_types = [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML];
 
 					if (in_array($item['post_type'], $post_types) && !in_array($db_item['post_type'], $post_types)) {
@@ -291,7 +295,8 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $items
 	 */
 	protected static function validateUniqueness(array &$items): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'key_']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
+			'uuid' =>	['type' => API_ANY],
 			'hostid' =>	['type' => API_ANY],
 			'key_' =>	['type' => API_ANY]
 		]];
@@ -419,36 +424,71 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Check and add UUID to all item prototypes on templates, if it doesn't exist.
+	 * Add the UUID to those of the given items that belong to a template and don't have the 'uuid' parameter set.
 	 *
 	 * @param array $items
-	 *
-	 * @throws APIException
 	 */
-	protected static function checkAndAddUuid(array &$items): void {
+	protected static function addUuid(array &$items): void {
 		foreach ($items as &$item) {
 			if ($item['host_status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
 				$item['uuid'] = generateUuidV4();
 			}
 		}
 		unset($item);
+	}
 
-		$uuids = array_column($items, 'uuid');
+	/**
+	 * Verify host prototype UUIDs are not repeated.
+	 *
+	 * @param array      $items
+	 * @param array|null $db_items
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkUuidDuplicates(array $items, array $db_items = null): void {
+		$item_indexes = [];
 
-		if (!$uuids) {
+		foreach ($items as $i => $item) {
+			if (!array_key_exists('uuid', $item)) {
+				continue;
+			}
+
+			if ($db_items === null || $item['uuid'] !== $db_items[$item['itemid']]['uuid']) {
+				$item_indexes[$item['uuid']] = $i;
+			}
+		}
+
+		if (!$item_indexes) {
 			return;
 		}
 
+		$flags = $items[reset($item_indexes)]['flags'];
+
 		$duplicates = DB::select('items', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => $uuids],
+			'filter' => [
+				'flags' => $flags,
+				'uuid' => array_keys($item_indexes)
+			],
 			'limit' => 1
 		]);
 
 		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
-			);
+			switch ($flags) {
+				case ZBX_FLAG_DISCOVERY_NORMAL:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('item with the same UUID already exists')
+					);
+					break;
+
+				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('item prototype with the same UUID already exists')
+					);
+					break;
+			}
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -878,10 +918,6 @@ abstract class CItemGeneral extends CApiService {
 		$ins_item_indexes = [];
 		$interface_types = [];
 
-		$required_interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI,
-			INTERFACE_TYPE_JMX
-		];
-
 		$upd_item_indexes_by_interfaceid = [];
 
 		foreach ($upd_items as $i => $upd_item) {
@@ -891,16 +927,37 @@ abstract class CItemGeneral extends CApiService {
 
 			$interface_type = itemTypeInterface($upd_item['type']);
 
-			if (!in_array($interface_type, $required_interface_types)) {
+			if ($interface_type === false) {
 				continue;
 			}
 
 			if ($upd_db_items[$upd_item['itemid']]['interfaceid'] != 0) {
-				$upd_item_indexes_by_interfaceid[$upd_db_items[$upd_item['itemid']]['interfaceid']][] = $i;
+				$db_interface_type = itemTypeInterface($upd_db_items[$upd_item['itemid']]['type']);
+
+				if ($interface_type != $db_interface_type) {
+					if ($db_interface_type == INTERFACE_TYPE_OPT) {
+						$upd_item_indexes_by_interfaceid[$upd_db_items[$upd_item['itemid']]['interfaceid']][] = $i;
+					}
+					elseif ($interface_type != INTERFACE_TYPE_OPT) {
+						$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
+
+						if ($interface_types !== null) {
+							$interface_types[$interface_type] = true;
+						}
+					}
+				}
 			}
 			else {
 				$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
-				$interface_types[$interface_type] = true;
+
+				if ($interface_types !== null) {
+					if ($interface_type == INTERFACE_TYPE_OPT) {
+						$interface_types = null;
+					}
+					else {
+						$interface_types[$interface_type] = true;
+					}
+				}
 			}
 		}
 
@@ -918,7 +975,10 @@ abstract class CItemGeneral extends CApiService {
 
 					if ($interface_type != $row['type']) {
 						$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
-						$interface_types[$interface_type] = true;
+
+						if ($interface_types !== null) {
+							$interface_types[$interface_type] = true;
+						}
 					}
 				}
 			}
@@ -931,12 +991,20 @@ abstract class CItemGeneral extends CApiService {
 
 			$interface_type = itemTypeInterface($ins_item['type']);
 
-			if (!in_array($interface_type, $required_interface_types)) {
+			if ($interface_type === false) {
 				continue;
 			}
 
 			$ins_item_indexes[$ins_item['hostid']][$interface_type][] = $i;
-			$interface_types[$interface_type] = true;
+
+			if ($interface_types !== null) {
+				if ($interface_type == INTERFACE_TYPE_OPT) {
+					$interface_types = null;
+				}
+				else {
+					$interface_types[$interface_type] = true;
+				}
+			}
 		}
 
 		if (!$upd_item_indexes && !$ins_item_indexes) {
@@ -947,45 +1015,112 @@ abstract class CItemGeneral extends CApiService {
 			'output' => ['interfaceid', 'hostid', 'type'],
 			'filter' => [
 				'hostid' => array_keys($upd_item_indexes + $ins_item_indexes),
-				'type' => array_keys($interface_types),
 				'main' => INTERFACE_PRIMARY
 			]
 		];
+
+		if ($interface_types !== null) {
+			$options['filter']['type'] = array_keys($interface_types);
+		}
+
 		$result = DBselect(DB::makeSql('interface', $options));
 
+		$priority_interfaces = [];
+
 		while ($row = DBfetch($result)) {
-			if (array_key_exists($row['hostid'], $upd_item_indexes)
-					&& array_key_exists($row['type'], $upd_item_indexes[$row['hostid']])) {
-				foreach ($upd_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
-					$upd_items[$i]['interfaceid'] = $row['interfaceid'];
+			$has_opt_type_items = false;
 
-					unset($upd_item_indexes[$row['hostid']][$row['type']][$_i]);
+			if (array_key_exists($row['hostid'], $upd_item_indexes)) {
+				if (array_key_exists(INTERFACE_TYPE_OPT, $upd_item_indexes[$row['hostid']])) {
+					$has_opt_type_items = true;
 				}
 
-				if (!$upd_item_indexes[$row['hostid']][$row['type']]) {
-					unset($upd_item_indexes[$row['hostid']][$row['type']]);
-				}
+				if (array_key_exists($row['type'], $upd_item_indexes[$row['hostid']])) {
+					foreach ($upd_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
+						$upd_items[$i]['interfaceid'] = $row['interfaceid'];
 
-				if (!$upd_item_indexes[$row['hostid']]) {
-					unset($upd_item_indexes[$row['hostid']]);
+						unset($upd_item_indexes[$row['hostid']][$row['type']][$_i]);
+					}
+
+					if (!$upd_item_indexes[$row['hostid']][$row['type']]) {
+						unset($upd_item_indexes[$row['hostid']][$row['type']]);
+					}
+
+					if (!$upd_item_indexes[$row['hostid']]) {
+						unset($upd_item_indexes[$row['hostid']]);
+					}
 				}
 			}
 
-			if (array_key_exists($row['hostid'], $ins_item_indexes)
-					&& array_key_exists($row['type'], $ins_item_indexes[$row['hostid']])) {
-				foreach ($ins_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
-					$ins_items[$i]['interfaceid'] = $row['interfaceid'];
-
-					unset($ins_item_indexes[$row['hostid']][$row['type']][$_i]);
+			if (array_key_exists($row['hostid'], $ins_item_indexes)) {
+				if (array_key_exists(INTERFACE_TYPE_OPT, $ins_item_indexes[$row['hostid']])) {
+					$has_opt_type_items = true;
 				}
 
-				if (!$ins_item_indexes[$row['hostid']][$row['type']]) {
-					unset($ins_item_indexes[$row['hostid']][$row['type']]);
-				}
+				if (array_key_exists($row['type'], $ins_item_indexes[$row['hostid']])) {
+					foreach ($ins_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
+						$ins_items[$i]['interfaceid'] = $row['interfaceid'];
 
-				if (!$ins_item_indexes[$row['hostid']]) {
-					unset($ins_item_indexes[$row['hostid']]);
+						unset($ins_item_indexes[$row['hostid']][$row['type']][$_i]);
+					}
+
+					if (!$ins_item_indexes[$row['hostid']][$row['type']]) {
+						unset($ins_item_indexes[$row['hostid']][$row['type']]);
+					}
+
+					if (!$ins_item_indexes[$row['hostid']]) {
+						unset($ins_item_indexes[$row['hostid']]);
+					}
 				}
+			}
+
+			if ($has_opt_type_items) {
+				$priority_index = array_search($row['type'], self::INTERFACE_TYPES_BY_PRIORITY);
+
+				if (!array_key_exists($row['hostid'], $priority_interfaces)
+						|| $priority_index < $priority_interfaces[$row['hostid']]['priority_index']) {
+					$priority_interfaces[$row['hostid']] = [
+						'interfaceid' => $row['interfaceid'],
+						'type' => $row['type'],
+						'priority_index' => $priority_index
+					];
+				}
+			}
+		}
+
+		foreach ($upd_item_indexes as $hostid => $item_indexes) {
+			if (!array_key_exists(INTERFACE_TYPE_OPT, $item_indexes)) {
+				continue;
+			}
+
+			foreach ($item_indexes[INTERFACE_TYPE_OPT] as $i) {
+				if (array_key_exists($hostid, $priority_interfaces)) {
+					$upd_items[$i]['interfaceid'] = $priority_interfaces[$hostid]['interfaceid'];
+				}
+			}
+
+			unset($upd_item_indexes[$hostid][INTERFACE_TYPE_OPT]);
+
+			if (!$upd_item_indexes[$hostid]) {
+				unset($upd_item_indexes[$hostid]);
+			}
+		}
+
+		foreach ($ins_item_indexes as $hostid => $item_indexes) {
+			if (!array_key_exists(INTERFACE_TYPE_OPT, $item_indexes)) {
+				continue;
+			}
+
+			foreach ($item_indexes[INTERFACE_TYPE_OPT] as $i) {
+				if (array_key_exists($hostid, $priority_interfaces)) {
+					$ins_items[$i]['interfaceid'] = $priority_interfaces[$hostid]['interfaceid'];
+				}
+			}
+
+			unset($ins_item_indexes[$hostid][INTERFACE_TYPE_OPT]);
+
+			if (!$ins_item_indexes[$hostid]) {
+				unset($ins_item_indexes[$hostid]);
 			}
 		}
 

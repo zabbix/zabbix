@@ -21,7 +21,7 @@
 #include "zbxserver.h"
 #include "log.h"
 
-int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
+int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result)
 {
 	int			ret = NOTSUPPORTED;
 	char			*error = NULL;

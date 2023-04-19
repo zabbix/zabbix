@@ -5,7 +5,9 @@
 	"name": "Map navigation tree",
 	"namespace": "NavTree",
 	"version": "1.0",
-	"author": "Zabbix SIA",
+	"author": "Zabbix",
+	"description": "Allows to build a hierarchy of existing maps and display problem statistics for each included map and map group.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/map_tree",
 	"actions": {
 		"widget.navtree.view": {
 			"class": "WidgetView"

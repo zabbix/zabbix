@@ -29,6 +29,7 @@
 #include "zbxnum.h"
 #include "zbxip.h"
 #include "zbxtime.h"
+#include "zbxcrypto.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7

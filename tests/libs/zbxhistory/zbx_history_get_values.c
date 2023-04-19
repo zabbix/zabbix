@@ -31,7 +31,7 @@
 #include "zbxavailability.h"
 
 void	__wrap_zbx_sleep_loop(int sleeptime);
-zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num);
+zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num);
 int	__wrap_zbx_interface_availability_is_set(const zbx_interface_availability_t *ha);
 int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
@@ -44,13 +44,14 @@ void	__wrap_zbx_clean_events(void);
 void	zbx_vcmock_read_values(zbx_mock_handle_t hdata, unsigned char value_type, zbx_vector_history_record_t *values);
 void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 		const zbx_vector_history_record_t *expected_values, const zbx_vector_history_record_t *returned_values);
+void	__wrap_zbx_recalc_time_period(int *ts_from, int table_group);
 
 void	__wrap_zbx_sleep_loop(int sleeptime)
 {
 	ZBX_UNUSED(sleeptime);
 }
 
-zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num)
+zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num)
 {
 	ZBX_UNUSED(table_name);
 	ZBX_UNUSED(num);
@@ -99,6 +100,12 @@ int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_
 
 void	__wrap_zbx_clean_events(void)
 {
+}
+
+void	__wrap_zbx_recalc_time_period(int *ts_from, int table_group)
+{
+	ZBX_UNUSED(ts_from);
+	ZBX_UNUSED(table_group);
 }
 
 /******************************************************************************

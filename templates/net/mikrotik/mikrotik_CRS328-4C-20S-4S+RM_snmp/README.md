@@ -3,14 +3,14 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template for monitoring Switch MikroTik CRS328-4C-20S-4S+RM.
 
 Smart Switch, 20 x SFP cages, 4 x SFP+ cages, 4 x Combo ports (Gigabit Ethernet or SFP), 800MHz CPU, 512MB RAM, 1U rackmount case, Dual Power Supplies, RouterOS L5 or SwitchOS (Dual Boot)
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 

@@ -39,66 +39,60 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 
 	public function getLayoutData() {
 		return [
+			// #0.
 			[
 				[
 					'Tile provider' => 'OpenStreetMap Mapnik',
 					'Tile URL' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-					'Attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 					'Max zoom level' => 19
 				]
 			],
+			// #1.
 			[
 				[
 					'Tile provider' => 'OpenTopoMap',
 					'Tile URL' => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-					'Attribution' => 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">'.
-							'OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | '.
-							'Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> '.
-							'(<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
 					'Max zoom level' => 17
 				]
 			],
+			// #2.
 			[
 				[
 					'Tile provider' => 'Stamen Toner Lite',
 					'Tile URL' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
-					'Attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href='.
-							'"http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; '.
-							'<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 					'Max zoom level' => 20
 				]
 			],
+			// #3.
 			[
 				[
 					'Tile provider' => 'Stamen Terrain',
 					'Tile URL' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png',
-					'Attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href='.
-							'"http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; '.
-							'<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 					'Max zoom level' => 18
 				]
 			],
+			//#4.
 			[
 				[
 					'Tile provider' => 'USGS US Topo',
 					'Tile URL' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
-					'Attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
 					'Max zoom level' => 20
 				]
 			],
+			// #5.
 			[
 				[
 					'Tile provider' => 'USGS US Imagery',
 					'Tile URL' => 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
-					'Attribution' => 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
 					'Max zoom level' => 20
 				]
 			],
+			// #6.
 			[
 				[
 					'Tile provider' => 'Other',
 					'Tile URL' => '',
-					'Attribution' => '',
+					'Attribution text' => '',
 					'Max zoom level' => ''
 				]
 			]
@@ -112,30 +106,32 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=geomaps.edit');
 		$form = $this->query('id:geomaps-form')->asForm()->one();
 
+		$form->fill(['Tile provider' => $data['Tile provider']]);
+		$form->checkValue($data);
+
 		/**
-		 * Check form attributes only for first case, to make test faster, because page
-		 * is not reloaded while changing providers and fields don't change.
+		 * Check form attributes only for last case.
 		 */
-		if ($data['Tile provider'] === 'OpenStreetMap Mapnik') {
+		if ($data['Tile provider'] === 'Other') {
 			// Check dropdown options presence.
 			$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap', 'Stamen Toner Lite', 'Stamen Terrain',
-					'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asDropdown()
-					->getOptions()->asText()
+				'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asDropdown()
+				->getOptions()->asText()
 			);
 
 			// Open hintboxes and compare text.
 			$hintboxes = [
-					'Tile URL' => "The URL template is used to load and display the tile layer on geographical maps.".
-							"\n".
-							"\nExample: https://{s}.example.com/{z}/{x}/{y}{r}.png".
-							"\n".
-							"\nThe following placeholders are supported:".
-							"\n{s} represents one of the available subdomains;".
-							"\n{z} represents zoom level parameter in the URL;".
-							"\n{x} and {y} represent tile coordinates;".
-							"\n{r} can be used to add \"@2x\" to the URL to load retina tiles.",
-					'Attribution' => 'Tile provider attribution data displayed in a small text box on the map.',
-					'Max zoom level' => 'Maximum zoom level of the map.'
+				'Tile URL' => "The URL template is used to load and display the tile layer on geographical maps.".
+					"\n".
+					"\nExample: https://{s}.example.com/{z}/{x}/{y}{r}.png".
+					"\n".
+					"\nThe following placeholders are supported:".
+					"\n{s} represents one of the available subdomains;".
+					"\n{z} represents zoom level parameter in the URL;".
+					"\n{x} and {y} represent tile coordinates;".
+					"\n{r} can be used to add \"@2x\" to the URL to load retina tiles.",
+				'Attribution text' => 'Tile provider attribution data displayed in a small text box on the map.',
+				'Max zoom level' => 'Maximum zoom level of the map.'
 			];
 
 			foreach ($hintboxes as $field => $text) {
@@ -147,17 +143,14 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 
 			// Check Service tab fields' maxlength.
 			$limits = [
-				'Tile URL' => 1024,
-				'Attribution' => 1024,
+				'Tile URL' => 2048,
+				'Attribution text' => 1024,
 				'Max zoom level' => 10
 			];
 			foreach ($limits as $field => $max_length) {
 				$this->assertEquals($max_length, $form->getField($field)->getAttribute('maxlength'));
 			}
 		}
-
-		$form->fill(['Tile provider' => $data['Tile provider']]);
-		$form->checkValue($data);
 
 		$fields = array_keys($data);
 		if ($data['Tile provider'] !== 'Other') {
@@ -176,6 +169,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 
 	public function getFormData() {
 		return [
+			// #0.
 			[
 				[
 					'fields' => [
@@ -184,6 +178,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'db' => 'OpenStreetMap.Mapnik'
 				]
 			],
+			// #1.
 			[
 				[
 					'fields' => [
@@ -192,6 +187,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'db' => 'OpenTopoMap'
 				]
 			],
+			// #2.
 			[
 				[
 					'fields' => [
@@ -200,6 +196,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'db' => 'Stamen.TonerLite'
 				]
 			],
+			// #3.
 			[
 				[
 					'fields' => [
@@ -208,6 +205,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'db' => 'Stamen.Terrain'
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -220,6 +218,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -231,6 +230,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'error' => 'Incorrect value for field "geomaps_max_zoom": cannot be empty.'
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -242,6 +242,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -253,6 +254,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no greater than "30".'
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -264,6 +266,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'error' => 'Incorrect value "aa" for "geomaps_max_zoom" field.'
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -275,6 +278,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'error' => 'Incorrect value "!%:" for "geomaps_max_zoom" field.'
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -286,6 +290,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
 				]
 			],
+			// #11.
 			[
 				[
 					'fields' => [
@@ -295,60 +300,77 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Attribution' => 'aaa',
+						'Attribution text' => 'aaa',
 						'Max zoom level' => 20
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => '111',
-						'Attribution' => '222',
+						'Attribution text' => '222',
 						'Max zoom level' => 1
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'йцу',
-						'Attribution' => 'кен',
+						'Attribution text' => 'кен',
 						'Max zoom level' => 7
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png',
-						'Attribution' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
-								'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
-								'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
-								'OpenStreetMap</a> contributors',
+						'Attribution text' => 'Map <a href="https://memomaps.de/">memomaps.de</a> '.
+							'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, '.
+							'map data &copy; <a href="https://www.openstreetmap.org/copyright">'.
+							'OpenStreetMap</a> contributors',
 						'Max zoom level' => 13
 					]
 				]
+			],
+			// #16.
+			[
+				[
+					'fields' => [
+						'Tile provider' => 'Other',
+						'Tile URL' => '     bbb           ',
+						'Attribution text' => '    aaa    ',
+						'Max zoom level' => 29
+					],
+					'trim' => true
+				]
+			],
+			// #17.
+			[
+				[
+					'fields' => [
+						'Tile provider' => 'Other',
+						'Tile URL' => '     bbb           ',
+						'Attribution text' => '',
+						'Max zoom level' => 29
+					],
+					'trim' => true
+				]
 			]
-			// TODO: uncomment after ZBX-20621 is fixed.
-//			[
-//				[
-//					'fields' => [
-//						'Tile provider' => 'Other',
-//						'Tile URL' => '     bbb           ',
-//						'Max zoom level' => 29
-//					],
-//					'trim' => true
-//				]
-//			]
 		];
 	}
 
@@ -382,6 +404,10 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			// Remove leading and trailing spaces from data for assertion.
 			if (CTestArrayHelper::get($data, 'trim', false)) {
 				$data['fields']['Tile URL'] = trim($data['fields']['Tile URL']);
+
+				if (array_key_exists('Attribution text', $data['fields'])) {
+					$data['fields']['Attribution text'] = trim($data['fields']['Attribution text']);
+				}
 			}
 
 			$form->checkValue($data['fields']);
@@ -391,7 +417,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				$expected_db = [
 					'geomaps_tile_provider' => '',
 					'geomaps_tile_url' => $data['fields']['Tile URL'],
-					'geomaps_attribution' => CTestArrayHelper::get($data['fields'], 'Attribution', ''),
+					'geomaps_attribution' => CTestArrayHelper::get($data['fields'], 'Attribution text', ''),
 					'geomaps_max_zoom' => $data['fields']['Max zoom level']
 				];
 			}
@@ -405,7 +431,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			}
 
 			$this->assertEquals($expected_db, CDBHelper::getRow('SELECT geomaps_tile_provider, geomaps_tile_url, '.
-					'geomaps_attribution, geomaps_max_zoom FROM config'
+				'geomaps_attribution, geomaps_max_zoom FROM config'
 			));
 		}
 	}

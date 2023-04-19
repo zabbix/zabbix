@@ -39,7 +39,7 @@
 			this.setLoading(button);
 
 			const fields = host_edit.preprocessFormFields(getFormFields(this.form), false);
-			const curl = new Curl(this.form.getAttribute('action'), false);
+			const curl = new Curl(this.form.getAttribute('action'));
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -58,7 +58,7 @@
 						postMessageDetails('success', response.success.messages);
 					}
 
-					const url = new Curl('zabbix.php', false);
+					const url = new Curl('zabbix.php');
 					url.setArgument('action', 'host.list');
 
 					location.href = url.getUrl();
@@ -70,7 +70,7 @@
 		},
 
 		clone() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			url.setArgument('clone', 1);
 
 			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
@@ -80,7 +80,7 @@
 		},
 
 		fullClone() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			url.setArgument('full_clone', 1);
 
 			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
@@ -120,7 +120,7 @@
 						postMessageDetails('success', response.success.messages);
 					}
 
-					const url = new Curl('zabbix.php', false);
+					const url = new Curl('zabbix.php');
 					url.setArgument('action', 'host.list');
 
 					location.href = url.getUrl();
