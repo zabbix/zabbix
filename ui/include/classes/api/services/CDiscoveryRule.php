@@ -721,9 +721,10 @@ class CDiscoveryRule extends CItemGeneralOld {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT ii.itemid'.
-			' FROM items i,items ii'.
+			'SELECT ii.itemid,h.status AS host_status'.
+			' FROM items i,items ii,hosts h'.
 			' WHERE i.itemid=ii.templateid'.
+				' AND ii.hostid=h.hostid'.
 				' AND '.dbConditionId('i.hostid', $templateids).
 				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_RULE]).
 				$hostids_condition
@@ -733,8 +734,17 @@ class CDiscoveryRule extends CItemGeneralOld {
 		$ruleids = [];
 
 		while ($row = DBfetch($result)) {
+			$upd_item = [
+				'templateid' => 0,
+				'valuemapid' => 0
+			];
+
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$upd_item += ['uuid' => generateUuidV4()];
+			}
+
 			$upd_items[] = [
-				'values' => ['templateid' => 0],
+				'values' => $upd_item,
 				'where' => ['itemid' => $row['itemid']]
 			];
 
@@ -749,7 +759,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 			 * them.
 			 */
 			CItemPrototype::unlinkTemplateObjects($ruleids);
-			CHostPrototype::unlinkTemplateObjects($ruleids);
+			API::HostPrototype()->unlinkTemplateObjects($ruleids);
 		}
 	}
 
@@ -1594,7 +1604,6 @@ class CDiscoveryRule extends CItemGeneralOld {
 	protected function checkInput(array &$items, $update = false, array $dbItems = []) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 
 			// unset fields that are updated using the 'filter' parameter
@@ -2436,7 +2445,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 		if ($dep_itemids) {
 			$master_items = API::Item()->get([
 				'output' => ['itemid', 'key_'],
-				'itemids' => array_keys($dep_itemids)
+				'itemids' => array_keys($dep_itemids),
+				'webitems' => true
 			]);
 
 			$options = $dst_host['status'] == HOST_STATUS_TEMPLATE
@@ -2445,7 +2455,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 
 			$dst_master_items = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'key_'],
-				'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))]
+				'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))],
+				'webitems' => true
 			] + $options);
 
 			$dst_master_itemids = [];

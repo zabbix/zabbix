@@ -70,7 +70,7 @@ $c{"before"} = "/*
 #include \"zbxdbschema.h\"
 #include \"zbxcommon.h\"
 
-const ZBX_TABLE\ttables[] = {
+ZBX_TABLE\ttables[] = {
 
 #if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_LEN	2048

@@ -74,7 +74,7 @@ SERVICE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_process_events \
 	-Wl,--wrap=zbx_clean_events \
 	-Wl,--wrap=zbx_interface_availability_is_set
-
+	
 # service_get_rootcause_eventids
 
 service_get_rootcause_eventids_SOURCES = \

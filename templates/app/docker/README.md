@@ -3,28 +3,32 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
 The template to monitor Docker engine by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 Template `Docker by Zabbix agent 2` — collects metrics by polling zabbix-agent2.
 
 
+## Tested versions
 
-This template was tested on:
+This template has been tested on:
 
 - Docker, version 19.03.5
 
+## Requirements
+
+For Zabbix version: 6.4 and higher.
+
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
-Setup and configure zabbix-agent2 compiled with the Docker monitoring plugin.
+Setup and configure Zabbix agent 2 compiled with the Docker monitoring plugin. The user by which the Zabbix agent 2 is running should have access permissions to the Docker socket.
 
 Test availability: `zabbix_get -s docker-host -k docker.info`
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -37,18 +41,18 @@ No specific Zabbix configuration is required.
 |{$DOCKER.LLD.FILTER.IMAGE.MATCHES} |<p>Filter of discoverable images</p> |`.*` |
 |{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES} |<p>Filter to exclude discovered images</p> |`CHANGE_IF_NEEDED` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Containers discovery |<p>Discovery for containers metrics</p><p>Parameter:</p><p>true  - Returns all containers</p><p>false - Returns only running containers</p> |ZABBIX_PASSIVE |docker.containers.discovery[false]<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$DOCKER.LLD.FILTER.CONTAINER.NOT_MATCHES}`</p> |
 |Images discovery |<p>Discovery for images metrics</p> |ZABBIX_PASSIVE |docker.images.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$DOCKER.LLD.FILTER.IMAGE.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -136,19 +140,19 @@ There are no template links in this template.
 |Zabbix raw items |Docker: Get images | |ZABBIX_PASSIVE |docker.images |
 |Zabbix raw items |Docker: Get data_usage | |ZABBIX_PASSIVE |docker.data_usage |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Docker: Service is down |<p>-</p> |`last(/Docker by Zabbix agent 2/docker.ping)=0` |AVERAGE |<p>Manual close: YES</p> |
 |Docker: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Docker: Service is down</p> |
-|Docker: Version has changed |<p>Docker version has changed. Ack to close.</p> |`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0` |INFO |<p>Manual close: YES</p> |
+|Docker: Version has changed |<p>The Docker version has changed. Acknowledge to close manually.</p> |`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0` |INFO |<p>Manual close: YES</p> |
 |Container {#NAME}: Container has been stopped with error code |<p>-</p> |`last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0` |AVERAGE |<p>Manual close: YES</p> |
 |Container {#NAME}: An error has occurred in the container |<p>Container {#NAME} has an error. Ack to close.</p> |`last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/435429-discussion-thread-for-official-zabbix-template-docker).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/435429-discussion-thread-for-official-zabbix-template-docker).
 

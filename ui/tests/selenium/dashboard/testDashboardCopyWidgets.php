@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @onBefore getTemplatedIds
  *
- * @backup widget, profiles
+ * @backup widget, profiles, module
  */
 class testDashboardCopyWidgets extends CWebTest {
 
@@ -38,8 +38,10 @@ class testDashboardCopyWidgets extends CWebTest {
 	const TEMPLATED_DASHBOARD_NAME = 'Templated dashboard with all widgets';
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
 	const EMPTY_DASHBOARD_NAME = 'Dashboard without widgets';
+	const MODULES_DASHBOARD_NAME = 'Dashboard for Copying widgets _1';
 	private static $templated_dashboardid;
 	private static $templated_empty_dashboardid;
+	private static $modules_dashboardid;
 
 	// Values for replacing widgets.
 	private static $replaced_widget_name = "Test widget for replace";
@@ -54,7 +56,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		return ['class' => CMessageBehavior::class];
 	}
 
-	/*
+	/**
 	 *  Get all widgets from dashboards with name starting with "Dashboard for Copying widgets".
 	 */
 	public static function getDashboardsData() {
@@ -78,15 +80,18 @@ class testDashboardCopyWidgets extends CWebTest {
 		return $data;
 	}
 
-	/*
-	 * Get ids for templated dashboard cases.
+	/**
+	 * Get ids for template dashboard cases.
 	 */
 	public static function getTemplatedIds() {
-		self::$templated_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+		self::$templated_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name='.
 				zbx_dbstr(self::TEMPLATED_DASHBOARD_NAME)
 		);
-		self::$templated_empty_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+		self::$templated_empty_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name='.
 				zbx_dbstr(self::EMPTY_DASHBOARD_NAME)
+		);
+		self::$modules_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name='.
+				zbx_dbstr(self::MODULES_DASHBOARD_NAME)
 		);
 	}
 
@@ -487,6 +492,143 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		$this->closeDialogues();
+	}
+
+	public static function getModuleDashboardWidgetData() {
+		return [
+			[
+				[
+					'module_name' => 'Action log',
+					'widget_name' => 'Test copy Action log',
+					'action' => 'copy widget'
+				]
+			],
+			[
+				[
+					'module_name' => 'Graph (classic)',
+					'widget_name' => 'Test copy classic Graph',
+					'action' => 'replace',
+					'target' => 'Test copy Graph prototype'
+				]
+			],
+			[
+				[
+					'module_name' => 'Favorite graphs',
+					'widget_name' => 'Test copy Favorite graphs',
+					'action' => 'copy page'
+				]
+			],
+			[
+				[
+					'module_name' => 'Plain text',
+					'widget_name' => 'Plain text widget',
+					'action' => 'copy widget',
+					'template' => true
+				]
+			],
+			[
+				[
+					'module_name' => 'URL',
+					'widget_name' => 'URL widget',
+					'action' => 'replace',
+					'target' => 'Graph prototype widget',
+					'template' => true
+				]
+			],
+			[
+				[
+					'module_name' => 'Item value',
+					'widget_name' => 'Item value widget',
+					'action' => 'copy page',
+					'template' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Function that checks copy of widgets with disabled modules.
+	 *
+	 * @dataProvider getModuleDashboardWidgetData
+	 */
+	public function testDashboardCopyWidgets_CopyDisabledModuleWidgets($data) {
+		$url = CTestArrayHelper::get($data, 'template')
+			? 'zabbix.php?action=template.dashboard.edit&dashboardid='.self::$templated_dashboardid
+			: 'zabbix.php?action=dashboard.view&dashboardid='.self::$modules_dashboardid;
+		$this->page->login()->open($url)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+
+		// Copy widget or dashboard page.
+		if ($data['action'] === 'copy page') {
+			$page_name = CTestArrayHelper::get($data, 'template') ? 'Page with widgets' : 'Page 1';
+			$this->query('xpath://span[text()='.CXPathHelper::escapeQuotes($page_name).']/../button')
+					->waitUntilClickable()->one()->click();
+			CPopupMenuElement::find()->one()->waitUntilVisible()->select('Copy');
+		}
+		else {
+			$dashboard->copyWidget($data['widget_name']);
+		}
+
+		// Disable widget module that corresponds to the copied widget or to one of the widgets on the copied page.
+		$this->page->open('zabbix.php?action=module.list');
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', $data['module_name'])
+				->query('link', 'Enabled')->one()->click();
+		$this->page->waitUntilReady();
+
+		// Open dashboard and execute the required action with the disabled module widget.
+		$this->page->open($url)->waitUntilReady();
+		$dashboard->invalidate();
+
+		// Get count of inaccessible widgets.
+		$inaccessible_xpath = 'xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]';
+		$count = $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count();
+
+		// Template dashbards are always in edit mode, so entering edit mode is only required for regular dashboards.
+		if(!array_key_exists('template', $data)) {
+			$dashboard->edit();
+		}
+
+		switch ($data['action']) {
+			case 'copy widget':
+				$dashboard->pasteWidget();
+
+				// Check that the number on inaccessible widgets is still the same.
+				$this->assertEquals($count, $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count());
+				break;
+
+			case 'replace':
+				$dashboard->replaceWidget($data['target']);
+
+				// Check that the number on inaccessible widgets is still the same.
+				$this->assertEquals($count, $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count());
+
+				// Make sure that the target widget is still present
+				$this->assertTrue($dashboard->getWidget($data['target'])->isValid());
+				break;
+
+			case 'copy page':
+				$this->query('id:dashboard-add')->one()->click();
+				CPopupMenuElement::find()->one()->waitUntilVisible()->select('Paste page');
+				$this->query("xpath:(//span[@title=".CXPathHelper::escapeQuotes($page_name)."])[2]")
+						->waitUntilVisible()->one();
+
+				// Check that no inaccessible widgets are present on the pasted page.
+				$dashboard->selectPage($page_name, 2);
+				$this->assertFalse($dashboard->query($inaccessible_xpath)->one(false)->isValid());
+				break;
+		}
+
+		$message = ($data['action'] === 'copy page')
+			? 'Inaccessible widgets were not pasted.'
+			: 'Cannot paste inaccessible widget.';
+		$this->assertMessage('warning', $message);
+
+		// Cancel editing dashboard not to interfere with following cases from data provider.
+		$this->query('link:Cancel')->one()->click();
+
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
 	}
 
 	/**

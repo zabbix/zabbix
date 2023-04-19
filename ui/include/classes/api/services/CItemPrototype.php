@@ -398,7 +398,7 @@ class CItemPrototype extends CItemGeneral {
 			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>			['type' => API_ANY],
 			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -436,7 +436,9 @@ class CItemPrototype extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
-		self::checkAndAddUuid($items);
+		self::addUuid($items);
+
+		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
 		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
@@ -512,7 +514,6 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'uuid' => 	['type' => API_UUID],
 			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
@@ -535,8 +536,8 @@ class CItemPrototype extends CItemGeneral {
 		 * fields as they stored in database.
 		 */
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
@@ -546,6 +547,7 @@ class CItemPrototype extends CItemGeneral {
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
+			$item['host_status'] = $db_item['host_status'];
 
 			if ($db_item['templateid'] != 0) {
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
@@ -576,12 +578,13 @@ class CItemPrototype extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'host_status', 'flags', 'ruleid']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags', 'ruleid']);
 
 		self::validateUniqueness($items);
 
 		self::addAffectedObjects($items, $db_items);
 
+		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
@@ -601,7 +604,11 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'uuid' => 			['type' => API_UUID],
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			]],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
@@ -637,7 +644,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'uuid' => 			['type' => API_UUID],
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -739,7 +747,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function updateDiscoveredItems(array $item_prototypes, array $db_item_prototypes): void {
 		foreach ($item_prototypes as $i => $item_prototype) {
-			if (!array_key_exists('update_discovered_items', $db_item_prototypes[$item_prototype['itemid']])) {
+			if (!in_array($item_prototype['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+					|| !array_key_exists('update_discovered_items', $db_item_prototypes[$item_prototype['itemid']])) {
 				unset($item_prototype[$i]);
 				continue;
 			}
@@ -984,6 +993,8 @@ class CItemPrototype extends CItemGeneral {
 		if ($ins_items) {
 			self::createForce($ins_items);
 		}
+
+		self::inherit(array_merge($upd_items, $ins_items), $upd_db_items);
 	}
 
 	/**
@@ -1015,6 +1026,10 @@ class CItemPrototype extends CItemGeneral {
 				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
 				$db_item = $db_items[$upd_db_item['templateid']];
 
+				if (array_key_exists('update_discovered_items', $db_item)) {
+					$upd_db_item['update_discovered_items'] = true;
+				}
+
 				$upd_item = [
 					'itemid' => $upd_db_item['itemid'],
 					'type' => $item['type']
@@ -1045,17 +1060,14 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getUpdChildObjectsUsingTemplateid(array $items, array $db_items,
 			array $upd_db_items): array {
+		$parent_indexes = array_flip(array_column($items, 'itemid'));
 
 		foreach ($items as &$item) {
-			if (!array_key_exists($item['itemid'], $db_items)) {
-				continue;
-			}
-
+			unset($item['uuid']);
 			$item = self::unsetNestedObjectIds($item);
 		}
 		unset($item);
 
-		$parent_indexes = array_flip(array_column($items, 'itemid'));
 		$upd_items = [];
 
 		foreach ($upd_db_items as $upd_db_item) {
@@ -1135,8 +1147,8 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
 		];
@@ -1175,7 +1187,9 @@ class CItemPrototype extends CItemGeneral {
 		$parent_indexes = [];
 
 		foreach ($items as $i => &$item) {
+			$item['uuid'] = '';
 			$item = self::unsetNestedObjectIds($item);
+
 			$parent_indexes[$item['hostid']][$item['key_']] = $i;
 		}
 		unset($item);
@@ -1285,33 +1299,54 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function unlinkTemplateObjects(array $ruleids): void {
 		$result = DBselect(
-			'SELECT id.itemid,i.name,i.templateid,i.valuemapid'.
-			' FROM item_discovery id,items i'.
+			'SELECT id.itemid,i.name,i.type,i.key_,i.templateid,i.uuid,i.valuemapid,i.hostid,h.status AS host_status'.
+			' FROM item_discovery id,items i,hosts h'.
 			' WHERE id.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
 				' AND '.dbConditionId('id.parent_itemid', $ruleids).
 				' AND '.dbConditionId('i.templateid', [0], true)
 		);
 
 		$items = [];
 		$db_items = [];
+		$i = 0;
+		$tpl_itemids = [];
 
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'templateid' => 0
+				'type'  => $row['type'],
+				'templateid' => 0,
+				'host_status' => $row['host_status']
 			];
 
-			if ($row['valuemapid'] != 0) {
-				$item['valuemapid'] = 0;
-				$row['update_discovered_items'] = true;
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$item += ['uuid' => generateUuidV4()];
 			}
 
-			$items[] = $item;
+			if ($row['valuemapid'] != 0) {
+				$item += ['valuemapid' => 0];
+				$row['update_discovered_items'] = true;
+
+				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+					$tpl_itemids[$i] = $row['itemid'];
+					$item += array_intersect_key($row, array_flip(['key_', 'hostid']));
+				}
+			}
+
+			$items[$i++] = $item;
 			$db_items[$row['itemid']] = $row;
 		}
 
 		if ($items) {
 			self::updateForce($items, $db_items);
+
+			if ($tpl_itemids) {
+				$items = array_intersect_key($items, $tpl_itemids);
+				$db_items = array_intersect_key($db_items, array_flip($tpl_itemids));
+
+				self::inherit($items, $db_items);
+			}
 		}
 	}
 

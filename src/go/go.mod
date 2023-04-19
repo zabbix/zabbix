@@ -3,11 +3,11 @@ module zabbix.com
 go 1.18
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20230123113819-fed2d1600b4d
+	git.zabbix.com/ap/plugin-support v1.2.2-0.20230328073000-225959e60734
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/Microsoft/go-winio v0.6.0
-	github.com/chromedp/cdproto v0.0.0-20220827030233-358ed4af73cf
-	github.com/chromedp/chromedp v0.8.5
+	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9
+	github.com/chromedp/chromedp v0.8.7
 	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
 	github.com/eclipse/paho.mqtt.golang v1.4.1
 	github.com/fsnotify/fsnotify v1.5.4
@@ -23,7 +23,7 @@ require (
 	github.com/miekg/dns v1.1.50
 	github.com/omeid/go-yarn v0.0.1
 	github.com/sokurenko/go-netstat v1.0.0
-	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64
+	golang.org/x/sys v0.5.0
 )
 
 require (

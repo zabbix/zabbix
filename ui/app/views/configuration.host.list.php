@@ -276,7 +276,6 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
-		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
 		->setArgument('backurl',
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'host.list')
@@ -301,14 +300,16 @@ foreach ($data['hosts'] as $host) {
 		$toggle_status_link = (new CLink(_('Enabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addConfirmation(_('Disable host?'));
+			->addConfirmation(_('Disable host?'))
+			->addCsrfToken($csrf_token_massupdate);
 	}
 	else {
 		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
 		$toggle_status_link = (new CLink(_('Disabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addConfirmation(_('Enable host?'));
+			->addConfirmation(_('Enable host?'))
+			->addCsrfToken($csrf_token_massupdate);
 	}
 
 	if ($maintenance_icon) {
@@ -317,33 +318,70 @@ foreach ($data['hosts'] as $host) {
 
 	order_result($host['parentTemplates'], 'name');
 
-	$templates = [];
+	$hostTemplates = [];
 	$i = 0;
 
 	foreach ($host['parentTemplates'] as $template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$templates[] = ' &hellip;';
+			$hostTemplates[] = ' &hellip;';
+
 			break;
 		}
 
-		if ($templates) {
-			$templates[] = ', ';
-		}
-
-		if (array_key_exists($template['templateid'], $data['editable_templates'])) {
-			$templates[] = (new CLink(CHtml::encode($template['name']),
+		if (array_key_exists($template['templateid'], $data['writable_templates'])
+				&& $data['allowed_ui_conf_templates']) {
+			$caption = [
+				(new CLink(CHtml::encode($template['name']),
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')
 						->setArgument('templateid', $template['templateid'])
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
+					->addClass(ZBX_STYLE_GREY)
+			];
 		}
 		else {
-			$templates[] = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			$caption = [
+				(new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY)
+			];
 		}
+
+		$parent_templates = $data['templates'][$template['templateid']]['parentTemplates'];
+
+		if ($parent_templates) {
+			order_result($parent_templates, 'name');
+
+			$caption[] = ' (';
+
+			foreach ($parent_templates as $parent_template) {
+				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
+						&& $data['allowed_ui_conf_templates']) {
+					$caption[] = (new CLink(CHtml::encode($parent_template['name']),
+						(new CUrl('templates.php'))
+							->setArgument('form', 'update')
+							->setArgument('templateid', $parent_template['templateid'])
+					))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass(ZBX_STYLE_GREY);
+				}
+				else {
+					$caption[] = (new CSpan(CHtml::encode($parent_template['name'])))->addClass(ZBX_STYLE_GREY);
+				}
+
+				$caption[] = ', ';
+			}
+
+			array_pop($caption);
+			$caption[] = ')';
+		}
+
+		if ($hostTemplates) {
+			$hostTemplates[] = ', ';
+		}
+
+		$hostTemplates[] = $caption;
 	}
 
 	$info_icons = [];
@@ -458,7 +496,7 @@ foreach ($data['hosts'] as $host) {
 		],
 		getHostInterface($interface),
 		$monitored_by,
-		$templates,
+		$hostTemplates,
 		$toggle_status_link,
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
@@ -473,7 +511,7 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
-		(new CUrl('zabbix.php', false))
+		(new CUrl('zabbix.php'))
 			->setArgument('action', 'host.list')
 			->setArgument('page', CPagerHelper::loadPage('host.list', null))
 			->getUrl()

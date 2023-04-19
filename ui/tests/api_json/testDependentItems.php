@@ -136,7 +136,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1015: dependent.items.host.8
 				// 2499: this ID does not exist in the DB
-				'request_data' => self::getItems(1015, 2499, 'dependent.item.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1015, 2499, 'dependent.item.1', 2, 2]]
+				]
 			],
 			'Set incorrect master_itemid for item (update).' => [
 				'error' => 'Invalid parameter "/1/master_itemid": an item ID is expected.',
@@ -152,7 +155,10 @@ class testDependentItems extends CAPITest {
 				// 1015: dependent.items.host.8
 				// 2403: dependent.items.host.8:discovery.rule.1
 				// 2499: this ID does not exist in the DB
-				'request_data' => self::getItemPrototypes(1015, 2403, 2499, 'dependent.item.proto.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1015, 2403, 2499, 'dependent.item.proto.1', 2, 2]]
+				]
 			],
 			'Set incorrect master_itemid for item prototype (update).' => [
 				'error' => 'Invalid parameter "/1/master_itemid": an item/item prototype ID is expected.',
@@ -167,7 +173,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'discoveryrule.create',
 				// 1015: dependent.items.host.8
 				// 2499: this ID does not exist in the DB
-				'request_data' => self::getDiscoveryRule(1015, 2499, 'dependent.discovery.rule.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1015, 2499, 'dependent.discovery.rule.1', 2, 2]]
+				]
 			],
 			'Set incorrect master_itemid for discovery rule (update).' => [
 				'error' => 'Incorrect value for field "master_itemid": Item "2499" does not exist or you have no access to this item.',
@@ -182,7 +191,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1015: dependent.items.host.8
 				// 2501: dependent.items.host.9:master.item.1
-				'request_data' => self::getItems(1015, 2501, 'dependent.item.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1015, 2501, 'dependent.item.1', 2, 2]]
+				]
 			],
 			'Set master_itemid from other host for item (update).' => [
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item ID from another host or template.',
@@ -198,7 +210,10 @@ class testDependentItems extends CAPITest {
 				// 1015: dependent.items.host.8
 				// 2403: dependent.items.host.8:discovery.rule.1
 				// 2504: dependent.items.host.9:master.item.proto.1
-				'request_data' => self::getItemPrototypes(1015, 2403, 2504, 'dependent.item.proto.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1015, 2403, 2504, 'dependent.item.proto.1', 2, 2]]
+				]
 			],
 			'Set master_itemid from other host for item prototype (update).' => [
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item/item prototype ID from another host or template.',
@@ -214,7 +229,10 @@ class testDependentItems extends CAPITest {
 				// 1015: dependent.items.host.8
 				// 2403: dependent.items.host.8:discovery.rule.1
 				// 2407: dependent.items.host.8:master.item.proto.2
-				'request_data' => self::getItemPrototypes(1015, 2403, 2407, 'dependent.item.proto.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1015, 2403, 2407, 'dependent.item.proto.1', 2, 2]]
+				]
 			],
 			'Set master_itemid from other discovery rule (update).' => [
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item prototype ID from another LLD rule.',
@@ -229,7 +247,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'discoveryrule.create',
 				// 1015: dependent.items.host.8
 				// 2501: dependent.items.host.9:master.item.1
-				'request_data' => self::getDiscoveryRule(1015, 2501, 'dependent.discovery.rule.1', 2, 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1015, 2501, 'dependent.discovery.rule.1', 2, 2]]
+				]
 			],
 			'Set master_itemid from other host for discovery rule (update).' => [
 				'error' => 'Incorrect value for field "master_itemid": "hostid" of dependent item and master item should match.',
@@ -244,7 +265,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1014: dependent.items.host.7
 				// 2304: dependent.items.host.7:net.if[eth0]
-				'request_data' => self::getItems(1014, 2304, 'item', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1014, 2304, 'item', 1, 1]]
+				]
 			],
 			'Create dependent item prototype, which depends on discovered item.' => [
 				'error' => 'Invalid parameter "/1/master_itemid": an item/item prototype ID is expected.',
@@ -252,14 +276,20 @@ class testDependentItems extends CAPITest {
 				// 1014: dependent.items.host.7
 				// 2301: dependent.items.host.7:net.if.discovery
 				// 2304: dependent.items.host.7:net.if[eth0]
-				'request_data' => self::getItemPrototypes(1014, 2301, 2304, 'item.proto', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1014, 2301, 2304, 'item.proto', 1, 1]]
+				]
 			],
 			'Create dependent discovery rule, which depends on discovered item.' => [
 				'error' => 'Incorrect value for field "master_itemid": Item "2304" does not exist or you have no access to this item.',
 				'method' => 'discoveryrule.create',
 				// 1014: dependent.items.host.7
 				// 2304: dependent.items.host.7:net.if[eth0]
-				'request_data' => self::getDiscoveryRule(1014, 2304, 'discovery.rule', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1014, 2304, 'discovery.rule', 1, 1]]
+				]
 			],
 			'Simple update templated master item.' => [
 				'error' => null,
@@ -401,7 +431,10 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1008: dependent.items.template.1:dependent.item.1.1.1.1
-				'request_data' => self::getItems(1001, 1008, 'dependent.item.1.1.1.1', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1008, 'dependent.item.1.1.1.1', 1, 1]]
+				]
 			],
 			'Check for maximum depth for the item prototypes tree (create). Add 4th level.' => [
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.1.1.1.1.1[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels would be exceeded.',
@@ -409,14 +442,20 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1025: dependent.items.template.1:dependent.item.proto.1.1.1.1
-				'request_data' => self::getItemPrototypes(1001, 1017, 1025, 'dependent.item.1.1.1.1', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1025, 'dependent.item.1.1.1.1', 1, 1]]
+				]
 			],
 			'Check for maximum depth of the discovery rule tree (create). Add 4th level.' => [
 				'error' => 'Incorrect value for field "master_itemid": maximum number of dependency levels reached.',
 				'method' => 'discoveryrule.create',
 				// 1001: dependent.items.template.1
 				// 1008: dependent.items.template.1:dependent.item.1.1.1.1
-				'request_data' => self::getDiscoveryRule(1001, 1008, 'dependent.discovery.rule.1.1.1.1', 1, 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1001, 1008, 'dependent.discovery.rule.1.1.1.1', 1, 1]]
+				]
 			],
 			'Check for maximum depth of the items tree (update). Add 4th level.' => [
 				'error' => 'Cannot set dependency for item with key "trap.1" on the master item with key "dependent.item.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels would be exceeded.',
@@ -497,25 +536,32 @@ class testDependentItems extends CAPITest {
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1001: dependent.items.template.1:master.item.1
-				'request_data' => self::getItems(1001, 1001, 'dependent.item.1', 3, $dep_count_overflow - 3)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1001, 'dependent.item.1', 3, $dep_count_overflow - 3]]
+				]
 			],
 			'Check for maximum count of items in the tree on the template level, combination.' => [
-				'error' => 'Cannot set dependency for item with key "dependent.item.1.2.3" on the master item with key "dependent.item.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.%d.%d" on the master item with key "dependent.item.1.%d" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1002: dependent.items.template.1:dependent.item.1.1
 				// 1003: dependent.items.template.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getItems(1001, 1002, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3),
-					self::getItems(1001, 1003, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1002, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItems'], [1001, 1003, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3]]
+				]
 			],
 			'Check for maximum count of discovery rule in the tree on the template level.' => [
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
 				'method' => 'discoveryrule.create',
 				// 1001: dependent.items.template.1
 				// 1001: dependent.items.template.1:master.item.1
-				'request_data' => self::getDiscoveryRule(1001, 1001, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1001, 1001, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2]]
+				]
 			],
 			'Check for maximum count of discovery rule in the tree on the template level.' => [
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
@@ -523,17 +569,21 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1002: dependent.items.template.1:dependent.item.1.1
 				// 1003: dependent.items.template.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getDiscoveryRule(1001, 1002, 'dependent.discovery.rule.1.1', 1, floor($dep_count_overflow / 2) - 6),
-					self::getDiscoveryRule(1001, 1003, 'dependent.discovery.rule.1.2', 1, ceil($dep_count_overflow / 2))
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1001, 1002, 'dependent.discovery.rule.1.1', 1, floor($dep_count_overflow / 2) - 6]],
+					[[self::class, 'getDiscoveryRule'], [1001, 1003, 'dependent.discovery.rule.1.2', 1, ceil($dep_count_overflow / 2)]]
+				]
 			],
 			'Check for maximum count of items in the tree on the host level.' => [
 				'error' => 'Cannot set dependency for item with key "dependent.item.1.3" on the master item with key "master.item.1" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
 				'method' => 'item.create',
 				// 1004: dependent.items.host.1
 				// 1301: dependent.items.host.1:master.item.1
-				'request_data' => self::getItems(1004, 1301, 'dependent.item.1', 3, $dep_count_overflow - 3 - 6)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1004, 1301, 'dependent.item.1', 3, $dep_count_overflow - 3 - 6]]
+				]
 			],
 			'Check for maximum count of items in the tree on the host level, combination.' => [
 				'error' => 'Cannot set dependency for item with key "dependent.item.1.2.3" on the master item with key "dependent.item.1.2" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
@@ -541,17 +591,21 @@ class testDependentItems extends CAPITest {
 				// 1004: dependent.items.host.1
 				// 1302: dependent.items.host.1:dependent.item.1.1
 				// 1303: dependent.items.host.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getItems(1004, 1302, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3),
-					self::getItems(1004, 1303, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1004, 1302, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItems'], [1004, 1303, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3]]
+				]
 			],
 			'Check for maximum count of discovery rule in the tree on the host level.' => [
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
 				'method' => 'discoveryrule.create',
 				// 1004: dependent.items.host.1
 				// 1301: dependent.items.host.1:master.item.1
-				'request_data' => self::getDiscoveryRule(1004, 1301, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2 - 6)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1004, 1301, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2 - 6]]
+				]
 			],
 			'Check for maximum count of discovery rule in the tree on the host level 2.' => [
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
@@ -559,10 +613,11 @@ class testDependentItems extends CAPITest {
 				// 1004: dependent.items.host.1
 				// 1302: dependent.items.host.1:dependent.item.1.1
 				// 1303: dependent.items.host.1:dependent.item.1.2
-				'request_data' => array_merge(
-					self::getDiscoveryRule(1004, 1302, 'dependent.discovery.rule.1.1', 1, floor($dep_count_overflow / 2) - 6),
-					self::getDiscoveryRule(1004, 1303, 'dependent.discovery.rule.1.2', 1, ceil($dep_count_overflow / 2))
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1004, 1302, 'dependent.discovery.rule.1.1', 1, floor($dep_count_overflow / 2) - 6]],
+					[[self::class, 'getDiscoveryRule'], [1004, 1303, 'dependent.discovery.rule.1.2', 1, ceil($dep_count_overflow / 2)]]
+				]
 			],
 			'Check for maximum count of items in the tree on the template level, fill to max.' => [
 				'error' => null,
@@ -570,24 +625,31 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1002: dependent.items.template.1:dependent.item.1.1 (2 dependents)
 				// 1003: dependent.items.template.1:dependent.item.1.2 (2 dependents)
-				'request_data' => array_merge(
-					self::getItems(1001, 1002, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3),
-					self::getItems(1001, 1003, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3 - 6 /* 4 existing dependents + parent dependent items */)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1002, 'dependent.item.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItems'], [1001, 1003, 'dependent.item.1.2', 3, ceil($dep_count_overflow / 2) - 3 - 6 /* 4 existing dependents + parent dependent items */]]
+				]
 			],
 			'Check for maximum count of items in the tree on the template level, adding overflow via 2nd item.' => [
-				'error' => 'Cannot set dependency for item with key "dependent.item.1.2.30" on the master item with key "dependent.item.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.2.%d" on the master item with key "dependent.item.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1003: dependent.items.template.1:dependent.item.1.2
-				'request_data' => self::getItems(1001, 1003, 'dependent.item.1.2', ceil($dep_count_overflow), ceil($dep_count_overflow) + 1)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItems'], [1001, 1003, 'dependent.item.1.2', ceil($dep_count_overflow), ceil($dep_count_overflow) + 1]]
+				]
 			],
 			'Check for maximum count of items in the tree on the template level, master item.' => [
 				'error' => 'Incorrect value for field "master_itemid": maximum dependent items count reached.',
 				'method' => 'discoveryrule.create',
 				// 1001: dependent.items.template.1
 				// 1001: dependent.items.template.1:master.item.1
-				'request_data' => self::getDiscoveryRule(1001, 1001, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2 - 6)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getDiscoveryRule'], [1001, 1001, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2 - 6]]
+				]
 			],
 			'Check for maximum count of item prototypes in the tree on the template level.' => [
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.3[{#LLD}]" on the master item prototype with key "master.item.proto.1" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
@@ -595,7 +657,10 @@ class testDependentItems extends CAPITest {
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1018: dependent.items.template.1:master.item.proto.1
-				'request_data' => self::getItemPrototypes(1001, 1017, 1018, 'dependent.item.proto.1', 3, $dep_count_overflow - 3)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1018, 'dependent.item.proto.1', 3, $dep_count_overflow - 3]]
+				]
 			],
 			'Check for maximum count of item prototypes in the tree on the template level, combination, fail.' => [
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.3[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
@@ -604,10 +669,11 @@ class testDependentItems extends CAPITest {
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1019: dependent.items.template.1:dependent.item.proto.1.1
 				// 1020: dependent.items.template.1:dependent.item.proto.1.2
-				'request_data' => array_merge(
-					self::getItemPrototypes(1001, 1017, 1019, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3),
-					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1019, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1020, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3]]
+				]
 			],
 			'Check for maximum count of item prototypes in the tree on the host level.' => [
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.3[{#LLD}]" on the master item prototype with key "master.item.proto.1" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
@@ -615,7 +681,10 @@ class testDependentItems extends CAPITest {
 				// 1004: dependent.items.host.1
 				// 1317: dependent.items.template.1:discovery.rule.1
 				// 1318: dependent.items.host.1:master.item.proto.1
-				'request_data' => self::getItemPrototypes(1004, 1317, 1318, 'dependent.item.proto.1', 3, $dep_count_overflow - 3)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1004, 1317, 1318, 'dependent.item.proto.1', 3, $dep_count_overflow - 3]]
+				]
 			],
 			'Check for maximum count of item prototypes in the tree on the host level, combination.' => [
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.3[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
@@ -624,10 +693,11 @@ class testDependentItems extends CAPITest {
 				// 1317: dependent.items.template.1:discovery.rule.1
 				// 1319: dependent.items.host.1:dependent.item.proto.1.1
 				// 1320: dependent.items.host.1:dependent.item.proto.1.2
-				'request_data' => array_merge(
-					self::getItemPrototypes(1004, 1317, 1319, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3),
-					self::getItemPrototypes(1004, 1317, 1320, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1004, 1317, 1319, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3]],
+					[[self::class, 'getItemPrototypes'], [1004, 1317, 1320, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3]]
+				]
 			],
 			'Check for maximum count of item prototypes in the tree on the template level, combination, success.' => [
 				'error' => null,
@@ -636,20 +706,22 @@ class testDependentItems extends CAPITest {
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1019: dependent.items.template.1:dependent.item.proto.1.1 (2 dependents)
 				// 1020: dependent.items.template.1:dependent.item.proto.1.2 (2 dependents)
-				'request_data' => array_merge(
-					self::getItemPrototypes(1001, 1017, 1019, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3 - 2 /* dependents */),
-					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3 - 2 /* dependents */ - 1 /*rule itself*/)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1019, 'dependent.item.proto.1.1', 3, floor($dep_count_overflow / 2) - 3 - 2 /* dependents */]],
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1020, 'dependent.item.proto.1.2', 3, ceil($dep_count_overflow / 2) - 3 - 2 /* dependents */ - 1 /*rule itself*/]]
+				]
 			],
 			'Check for maximum count of item prototypes in the tree on the template.' => [
-				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.11[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.%d[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
 				// 1020: dependent.items.template.1:dependent.item.proto.1.2
-				'request_data' => array_merge(
-					self::getItemPrototypes(1001, 1017, 1020, 'dependent.item.proto.1.2', floor($dep_count_overflow / 2) - 5 + 1 /* from last above */, floor($dep_count_overflow / 2) - 4 + 1)
-				)
+				'request_data' => null,
+				'request_data_funcs' => [
+					[[self::class, 'getItemPrototypes'], [1001, 1017, 1020, 'dependent.item.proto.1.2', floor($dep_count_overflow / 2) - 5 + 1 /* from last above */, floor($dep_count_overflow / 2) - 4 + 1]]
+				]
 			]
 		];
 	}
@@ -657,8 +729,20 @@ class testDependentItems extends CAPITest {
 	/**
 	 * @dataProvider getTestCases
 	 */
-	public function testDependentItems_main($expected_error, $method, $request_data) {
-		static $reg_child_number = '/("dependent[^"]+\.)(\d*)([^"]*")/';
+	public function testDependentItems_main($expected_error, $method, ?array $request_data, array $request_data_funcs = null) {
+		// Skip tests with the default option ZBX_DEPENDENT_ITEM_MAX_COUNT to prevent long running tests.
+		if (ZBX_DEPENDENT_ITEM_MAX_COUNT > 300) {
+			self::markTestSkipped('Lower the ZBX_DEPENDENT_ITEM_MAX_COUNT option to run this test.');
+		}
+
+		if ($request_data === null) {
+			$request_data = [];
+			foreach ($request_data_funcs as $request_data_func) {
+				$request_data = array_merge($request_data,
+					call_user_func_array($request_data_func[0], $request_data_func[1])
+				);
+			}
+		}
 
 		if ($expected_error === null || strrpos($expected_error, 'allowed count of dependent') === false) {
 			return $this->call($method, $request_data, $expected_error);
@@ -672,19 +756,6 @@ class testDependentItems extends CAPITest {
 
 		$this->assertArrayNotHasKey('result', $response);
 		$this->assertArrayHasKey('error', $response);
-
-		/*
-		To allow for varying ZBX_DEPENDENT_ITEM_MAX_COUNT, replace specific dependent "child" numbers, e.g.
-			dependent.item.proto.1.2.46[{#LLD}] becomes
-			dependent.item.proto.1.2.x[{#LLD}].
-		*/
-		$expected_error = preg_replace($reg_child_number, '$1x$3', $expected_error);
-		$received_error = $response['error']['data'];
-
-		if (strrpos($received_error, 'allowed count of dependent') !== false) {
-			$received_error = preg_replace($reg_child_number, '$1x$3', $received_error);
-		}
-
-		$this->assertSame($expected_error, $received_error);
+		$this->assertStringMatchesFormat($expected_error, $response['error']['data']);
 	}
 }

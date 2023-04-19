@@ -89,7 +89,9 @@ $override_evaltype = (new CDiv([
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('overrides_formula')
 			->setAttribute('placeholder', 'A or (B and C) &hellip;')
-	]))->addClass(ZBX_STYLE_CELL)
+	]))
+		->addClass(ZBX_STYLE_CELL)
+		->addClass(ZBX_STYLE_CELL_EXPRESSION)
 ]))
 	->addClass(ZBX_STYLE_ROW)
 	->setId('overrideRow');

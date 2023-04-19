@@ -77,11 +77,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
 			overlay.$dialogue[0].addEventListener('dialogue.configRefresh', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('proxy');
-
-				this._reload(e.detail);
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail));
 		}
 
 		_editHost(hostid) {
@@ -215,6 +211,7 @@
 				postMessageDetails('success', success.messages);
 			}
 
+			uncheckTableRows('proxy');
 			location.href = location.href;
 		}
 	};

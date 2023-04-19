@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-05 06:50+0000\n"
+"PO-Revision-Date: 2023-03-08 03:34+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -412,6 +412,10 @@ msgstr "軽"
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
 msgstr "オーバーライドの追加"
+
+#: tests/selenium/modules/clock32/Widget.php:46
+msgid "ALARM CLOCK"
+msgstr ""
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -1541,6 +1545,10 @@ msgstr "属性"
 msgid "Attribution"
 msgstr "帰属表示"
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -2342,7 +2350,7 @@ msgstr "アイコンのマッピングを作成できません"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "メンテナンス期間を作成できません"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2521,7 +2529,7 @@ msgstr "メンテナンスを削除できません"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
+msgstr[0] "メンテナンス期間を削除できません"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -3622,6 +3630,11 @@ msgstr "ディスカバリされたグラフを更新できません。"
 msgid "Cannot update a discovered host group \"%1$s\"."
 msgstr "ディスカバリされたホストグループ\"%1$s\"を更新できません。"
 
+#: include/classes/api/services/CGraphGeneral.php:82
+#, c-format
+msgid "Cannot update a templated graph \"%1$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
@@ -3766,7 +3779,7 @@ msgstr "メンテナンスを更新できません"
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "メンテナンス期間を更新できません"
 
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
@@ -3927,7 +3940,7 @@ msgstr "snmptrap[]アイテムでキャッチされていないすべてのSNMP�
 #: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
 #: include/events.inc.php:256
 msgid "Cause"
-msgstr "原因"
+msgstr "主要原因の障害"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
@@ -3988,7 +4001,7 @@ msgstr "1秒あたりの差分"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
-msgstr "障害の順位の変更"
+msgstr "障害の種別の変更"
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4857,11 +4870,11 @@ msgstr "JSONへの変換"
 
 #: app/views/popup.acknowledge.edit.php:134
 msgid "Convert to cause"
-msgstr "原因に変換"
+msgstr "副次的な障害から削除"
 
 #: app/views/popup.acknowledge.edit.php:135
 msgid "Converts a symptom event back to cause event"
-msgstr "兆候イベントを原因イベントに戻します"
+msgstr "副次的な障害を通常の障害へ戻します"
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -6011,7 +6024,7 @@ msgstr "選択したアイテムを削除しますか？"
 
 #: app/views/js/maintenance.list.js.php:88
 msgid "Delete selected maintenance period?"
-msgstr ""
+msgstr "選択したメンテナンス期間を削除しますか？"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -10649,7 +10662,7 @@ msgstr "インストーラ名"
 #: include/views/js/item.preprocessing.js.php:180
 #: include/views/js/item.preprocessing.js.php:227
 msgid "Integer from BITS"
-msgstr ""
+msgstr "BITSから整数値"
 
 #: include/classes/helpers/CMenuHelper.php:360
 msgid "Integrations"
@@ -12253,12 +12266,12 @@ msgstr "メンテナンス期間"
 
 #: app/controllers/CControllerMaintenanceCreate.php:142
 msgid "Maintenance period created"
-msgstr ""
+msgstr "メンテナンス期間を作成しました"
 
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
-msgstr[0] ""
+msgstr[0] "メンテナンス期間を削除しました"
 
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
@@ -12266,7 +12279,7 @@ msgstr "メンテナンス期間"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "メンテナンス期間を更新しました"
 
 #: include/views/configuration.maintenance.edit.php:29
 #: include/views/configuration.maintenance.list.php:27
@@ -12293,6 +12306,10 @@ msgstr "データ収集なしのメンテナンス"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "メンテナンス：%1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/popup.token.view.php:51
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -12473,7 +12490,7 @@ msgstr "3月"
 
 #: jsLoader.php:361
 msgid "Mark as cause"
-msgstr "原因としてマーク"
+msgstr "副次的な障害から削除"
 
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
@@ -12489,7 +12506,7 @@ msgstr "選択をマーク"
 
 #: jsLoader.php:362
 msgid "Mark selected as symptoms"
-msgstr "選択したものを兆候としてマーク"
+msgstr "選択したものを副次的な障害として追加"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -13471,7 +13488,7 @@ msgstr "新しいホストグループの作成"
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:259 app/views/maintenance.edit.php:289
 msgid "New maintenance period"
-msgstr ""
+msgstr "新しいメンテナンス期間の作成"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -15121,7 +15138,7 @@ msgstr "パラメーター\"esc_step_from\"と\"esc_step_to\"は一緒に設定�
 
 #: include/views/configuration.host.discovery.edit.php:68
 msgid "Parent discovery rule"
-msgstr ""
+msgstr "親ディスカバリルール"
 
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.prototype.edit.php:64
@@ -15130,11 +15147,11 @@ msgstr "親ディスカバリルール"
 
 #: include/views/configuration.graph.edit.php:88
 msgid "Parent graph"
-msgstr ""
+msgstr "親グラフ"
 
 #: include/views/configuration.graph.edit.php:91
 msgid "Parent graph prototype"
-msgstr ""
+msgstr "親のグラフのプロトタイプ"
 
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
@@ -15142,7 +15159,7 @@ msgstr "親グラフ"
 
 #: include/views/configuration.host.prototype.edit.php:81
 msgid "Parent host prototype"
-msgstr ""
+msgstr "親のホストのプロトタイプ"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
@@ -15150,11 +15167,11 @@ msgstr "親ホストの値"
 
 #: include/views/configuration.item.edit.php:71
 msgid "Parent item"
-msgstr ""
+msgstr "親アイテム"
 
 #: include/views/configuration.item.prototype.edit.php:70
 msgid "Parent item prototype"
-msgstr ""
+msgstr "親のアイテムのプロトタイプ"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -15168,7 +15185,7 @@ msgstr "親サービス"
 
 #: app/partials/configuration.tags.tab.php:38
 msgid "Parent template"
-msgstr ""
+msgstr "親テンプレート"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
@@ -15176,11 +15193,11 @@ msgstr "親テンプレート"
 
 #: include/views/configuration.triggers.edit.php:104
 msgid "Parent trigger"
-msgstr ""
+msgstr "親トリガー"
 
 #: include/views/configuration.trigger.prototype.edit.php:95
 msgid "Parent trigger prototype"
-msgstr ""
+msgstr "親のトリガーのプロトタイプ"
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
@@ -15189,7 +15206,7 @@ msgstr "親トリガー"
 
 #: include/views/configuration.httpconf.edit.php:76
 msgid "Parent web scenario"
-msgstr ""
+msgstr "親Webシナリオ"
 
 #: include/views/configuration.httpconf.edit.php:59
 msgid "Parent web scenarios"
@@ -15299,7 +15316,7 @@ msgstr "メンテナンス中の場合に実行を保留"
 
 #: app/views/popup.action.edit.php:227
 msgid "Pause operations for symptom problems"
-msgstr ""
+msgstr "副次的な障害の場合に実行を保留"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -15499,7 +15516,7 @@ msgstr "位置は、単位がs、uptime、unixtimeの時は無視されます。
 
 #: include/classes/core/ZBase.php:764
 msgid "Possibly the session has expired or the password was changed."
-msgstr ""
+msgstr "セッションの有効期限が切れたか、パスワードが変更された可能性があります。"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15785,7 +15802,7 @@ msgstr "プロパティ"
 
 #: app/views/connector.edit.php:47
 msgid "Protocol"
-msgstr ""
+msgstr "プロトコル"
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -16001,7 +16018,7 @@ msgstr "RMCP+"
 
 #: include/events.inc.php:256 include/events.inc.php:272
 msgid "Rank"
-msgstr ""
+msgstr "障害の種別"
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -17078,11 +17095,11 @@ msgstr "SNMPバージョン"
 
 #: include/items.inc.php:1802
 msgid "SNMP walk to JSON"
-msgstr ""
+msgstr "SNMP walkからJSON"
 
 #: include/items.inc.php:1798
 msgid "SNMP walk value"
-msgstr ""
+msgstr "SNMP walkの値"
 
 #: include/items.inc.php:1299
 #, c-format
@@ -17351,7 +17368,7 @@ msgstr[0] "スクリプトを削除しました"
 
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
-msgstr ""
+msgstr "スクリプトにはパラメータがありません。"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -17747,6 +17764,10 @@ msgstr "サービスの依存関係が循環設定されています。"
 msgid "Services updated"
 msgstr "サービスを更新しました"
 
+#: include/classes/api/services/CUser.php:1709
+msgid "Session ID or token is expected."
+msgstr ""
+
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
@@ -17994,7 +18015,7 @@ msgstr "メンテナンス中の障害を表示"
 #: app/partials/monitoring.problem.filter.php:129
 #: widgets/problems/includes/WidgetForm.php:120
 msgid "Show symptoms"
-msgstr ""
+msgstr "副次的な障害をを表示"
 
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
@@ -18617,7 +18638,7 @@ msgstr "サポート"
 
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
-msgstr ""
+msgstr "古い数値型のサポートは廃止されました。拡張された数値型にアップグレードしてください。"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
@@ -18672,7 +18693,7 @@ msgstr "認証方式の変更を行うと現在のセッション以外はリセ
 #: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
 #: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
 msgid "Symptom"
-msgstr ""
+msgstr "副次的な障害"
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19178,7 +19199,7 @@ msgstr "テキスト、マクロの{INVENTORY.*}と{HOST.*}をサポート"
 #: include/classes/api/clients/CLocalApiClient.php:96
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without authorization header."
-msgstr ""
+msgstr "\"%1$s.%2$s\"メソッドは、認証ヘッダーなしで呼び出す必要があります。"
 
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
@@ -19308,7 +19329,7 @@ msgstr "テーマ"
 #: app/views/administration.mediatype.edit.php:139
 #: app/views/popup.mediatypetest.edit.php:47
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
-msgstr ""
+msgstr "これらのパラメーターは、指定された順序でコマンドライン引数としてスクリプトに渡されます。"
 
 #: include/func.inc.php:2468
 msgid "This day last week"
@@ -19360,7 +19381,7 @@ msgstr "このデータ型はアイテムキーと合ってません。"
 
 #: app/views/administration.user.edit.php:59
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
-msgstr ""
+msgstr "このユーザーはIdPでプロビジョニングされています。プロビジョニングされたフィールドを手動で変更することはできません。"
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -20128,7 +20149,7 @@ msgstr "不明"
 
 #: include/events.inc.php:336 include/events.inc.php:343
 msgid "UPDATING"
-msgstr ""
+msgstr "更新中"
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -20196,7 +20217,7 @@ msgstr "URL"
 #: include/views/js/item.preprocessing.js.php:177
 #: include/views/js/item.preprocessing.js.php:223
 msgid "UTF-8 from Hex-STRING"
-msgstr ""
+msgstr "16進文字列からUTF-8"
 
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
@@ -20306,7 +20327,7 @@ msgstr "選択したユーザーのブロックを解除しますか？"
 #: include/views/js/item.preprocessing.js.php:176
 #: include/views/js/item.preprocessing.js.php:222
 msgid "Unchanged"
-msgstr ""
+msgstr "変更なし"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20640,7 +20661,7 @@ msgstr "ホスト\"%1$s\"のステータスを更新しました。"
 
 #: include/events.inc.php:346
 msgid "Updating"
-msgstr ""
+msgstr "更新中"
 
 #: app/views/administration.image.edit.php:53
 msgid "Upload"
@@ -20672,7 +20693,7 @@ msgstr "アップタイム/ダウンタイム"
 
 #: app/views/popup.ldap.edit.php:169
 msgid "Use %{ref} in group filter to reference value of this user attribute."
-msgstr ""
+msgstr "このユーザー属性の値を参照するには、グループフィルターで%{ref}を使用します。"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -20808,7 +20829,7 @@ msgstr "ユーザーディレクトリ\"%1$s\"はすでに存在します。"
 #: include/classes/api/services/CUser.php:715
 #, c-format
 msgid "User directory with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のユーザーディレクトリは利用できません。"
 
 #: app/views/administration.user.list.php:211
 msgid "User does not have user groups."
@@ -21677,7 +21698,7 @@ msgstr "ベンダー"
 
 #: include/views/configuration.template.edit.php:93
 msgid "Vendor and version"
-msgstr ""
+msgstr "ベンダーとバージョン"
 
 #: include/items.inc.php:43
 msgid "Verbose"
@@ -22028,7 +22049,7 @@ msgstr "表示/設定"
 #: include/classes/core/CModuleManager.php:136
 #, c-format
 msgid "Wrong %1$s.php class name for module located at %2$s."
-msgstr ""
+msgstr "%2$sにあるモジュールの%1$s.phpのクラス名が間違っています。"
 
 #: include/classes/core/CModuleManager.php:203
 #, c-format
@@ -22321,7 +22342,7 @@ msgstr "Zabbixインテグレーション"
 
 #: app/views/connector.edit.php:49
 msgid "Zabbix Streaming Protocol v1.0"
-msgstr ""
+msgstr "Zabbixストリーミングプロトコル v1.0"
 
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
@@ -22414,6 +22435,14 @@ msgstr "[日の値が正しくありません: \"%1$s\"]"
 #, c-format
 msgid "[Wrong value for month: \"%1$s\" ]"
 msgstr "[月の値が正しくありません: \"%1$s\"]"
+
+#: app/views/connector.edit.php:223
+#: include/views/configuration.host.discovery.edit.php:415
+#: include/views/configuration.httpconf.edit.php:110
+#: include/views/configuration.item.edit.php:479
+#: include/views/configuration.item.prototype.edit.php:456
+msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
@@ -23892,11 +23921,11 @@ msgstr "障害のクローズの権限がありません"
 
 #: include/classes/api/services/CEvent.php:1054
 msgid "no permissions to convert cause problems to symptom problems"
-msgstr ""
+msgstr "副次的な障害に変更する権限がありません"
 
 #: include/classes/api/services/CEvent.php:1053
 msgid "no permissions to convert symptom problems to cause problems"
-msgstr ""
+msgstr "副次的な障害から削除する権限がありません"
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"

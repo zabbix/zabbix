@@ -35,12 +35,36 @@ class CConfiguration extends CApiService {
 	 *
 	 * @return string
 	 */
+	private function exportCompare(array $params) {
+		$this->validateExport($params, true);
+
+		return $this->exportForce($params);
+	}
+
+	/**
+	 * @param array $params
+	 *
+	 * @return string
+	 */
 	public function export(array $params) {
+		$this->validateExport($params);
+
+		return $this->exportForce($params);
+	}
+
+	/**
+	 * Validate input parameters for export() and exportCompare() methods.
+	 *
+	 * @param array $params
+	 * @param bool  $with_unlinked_parent_templates
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateExport(array &$params, bool $with_unlinked_parent_templates = false): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'format' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
 			'prettyprint' =>	['type' => API_BOOLEAN, 'default' => false],
 			'options' =>		['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'groups' =>				['type' => API_IDS],
 				'hosts' =>				['type' => API_IDS],
 				'images' =>				['type' => API_IDS],
 				'maps' =>				['type' => API_IDS],
@@ -50,6 +74,13 @@ class CConfiguration extends CApiService {
 				'templates' =>			['type' => API_IDS]
 			]]
 		]];
+
+		if ($with_unlinked_parent_templates) {
+			$api_input_rules['fields'] += ['unlink_parent_templates' => ['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL, 'default' => [], 'fields' => [
+				'templateid' => ['type' => API_ID],
+				'unlink_templateids' => ['type' => API_IDS]
+			]]];
+		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -68,8 +99,19 @@ class CConfiguration extends CApiService {
 				self::exception(ZBX_API_ERROR_INTERNAL, $xml_writer['error']);
 			}
 		}
+	}
 
-		$export = new CConfigurationExport($params['options']);
+	/**
+	 * @param array $params
+	 *
+	 * @return string
+	 */
+	private function exportForce(array $params) {
+		$params['unlink_parent_templates'] = array_key_exists('unlink_parent_templates', $params)
+			? $params['unlink_parent_templates']
+			: [];
+
+		$export = new CConfigurationExport($params['options'], $params['unlink_parent_templates']);
 		$export->setBuilder(new CConfigurationExportBuilder());
 		$writer = CExportWriterFactory::getWriter($params['format']);
 		$writer->formatOutput($params['prettyprint']);
@@ -328,7 +370,7 @@ class CConfiguration extends CApiService {
 			switch ($entity) {
 				case 'host_groups':
 					$imported_ids['host_groups'] = API::HostGroup()->get([
-						'output' => ['groupid'],
+						'output' => [],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
@@ -342,7 +384,7 @@ class CConfiguration extends CApiService {
 
 				case 'template_groups':
 					$imported_ids['template_groups'] = API::TemplateGroup()->get([
-						'output' => ['groupid'],
+						'output' => [],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
@@ -355,17 +397,23 @@ class CConfiguration extends CApiService {
 					break;
 
 				case 'templates':
-					$imported_ids['templates'] = API::Template()->get([
-						'output' => ['templateid'],
+					$options = [
+						'output' => ['templateid', 'uuid', 'name'],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'host' => $data['template']
 						],
 						'preservekeys' => true,
 						'searchByAny' => true
-					]);
+					];
 
-					$imported_ids['templates'] = array_keys($imported_ids['templates']);
+					if ($params['rules']['templateLinkage']['deleteMissing']) {
+						$options['selectParentTemplates'] = ['templateid', 'name'];
+					}
+
+					$db_templates = API::Template()->get($options);
+
+					$imported_ids['templates'] = array_keys($db_templates);
 					break;
 
 				default:
@@ -373,11 +421,48 @@ class CConfiguration extends CApiService {
 			}
 		}
 
+		$unlink_templates_data = [];
+
+		if ($params['rules']['templateLinkage']['deleteMissing']) {
+			$import_tmp_parent_tmp_names = [];
+
+			foreach ($import['templates'] as $template) {
+				if (array_key_exists('templates', $template)) {
+					$parent_tmp = array_column($template['templates'], 'name');
+
+					$import_tmp_parent_tmp_names[$template['name']] = $parent_tmp;
+					$import_tmp_parent_tmp_names[$template['uuid']] = $parent_tmp;
+				}
+				else {
+					$import_tmp_parent_tmp_names[$template['name']] = [];
+					$import_tmp_parent_tmp_names[$template['uuid']] = [];
+				}
+			}
+
+			foreach ($db_templates as $db_template) {
+				$db_parent_tmp_names = array_column($db_template['parentTemplates'], 'name', 'templateid');
+
+				if ($db_parent_tmp_names) {
+					$unlink_templateids = array_key_exists($db_template['uuid'], $import_tmp_parent_tmp_names)
+						? array_diff($db_parent_tmp_names, $import_tmp_parent_tmp_names[$db_template['uuid']])
+						: array_diff($db_parent_tmp_names, $import_tmp_parent_tmp_names[$db_template['name']]);
+
+					if ($unlink_templateids) {
+						$unlink_templates_data[$db_template['templateid']] = [
+							'templateid' => $db_template['templateid'],
+							'unlink_templateids' => array_keys($unlink_templateids)
+						];
+					}
+				}
+			}
+		}
+
 		// Get current state of templates in same format, as import to compare this data.
-		$export = API::Configuration()->export([
+		$export = API::Configuration()->exportCompare([
 			'format' => CExportWriterFactory::RAW,
 			'prettyprint' => false,
-			'options' => $imported_ids
+			'options' => $imported_ids,
+			'unlink_parent_templates' => $unlink_templates_data
 		]);
 
 		// Normalize array keys and strings.

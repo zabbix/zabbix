@@ -91,6 +91,8 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_SNMP_WALK_TO_JSON;
 	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_VALUE"))
 		return ZBX_PREPROC_SNMP_WALK_TO_VALUE;
+	if (0 == strcmp(str, "ZBX_PREPROC_SCRIPT"))
+		return ZBX_PREPROC_SCRIPT;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;
@@ -275,6 +277,11 @@ void	zbx_mock_test_entry(void **state)
 	}
 #endif
 
+#if !defined(HAVE_OPENSSL) && !defined(HAVE_GNUTLS)
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.encryption_required"))
+		skip();
+#endif
+
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
 		read_history_value("in.history", &history_value, &history_ts);
@@ -352,7 +359,8 @@ void	zbx_mock_test_entry(void **state)
 			}
 			else
 			{
-				if (ZBX_VARIANT_NONE != history_value.type)
+				/* history_value will contain duktape bytecode if step is a script */
+				if (ZBX_VARIANT_NONE != history_value.type && ZBX_PREPROC_SCRIPT != step.type)
 					fail_msg("expected empty history, but got %s", zbx_variant_value_desc(&history_value));
 			}
 		}

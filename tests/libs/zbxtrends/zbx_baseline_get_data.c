@@ -33,6 +33,7 @@ DB_ROW	__wrap_zbx_db_fetch(DB_RESULT result);
 DB_RESULT	__wrap_zbx_db_select(const char *fmt, ...);
 zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end,
 		double *value);
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group);
 
 int	__wrap_zbx_db_is_null(const char *field)
 {
@@ -50,6 +51,12 @@ DB_RESULT	__wrap_zbx_db_select(const char *fmt, ...)
 {
 	ZBX_UNUSED(fmt);
 	return NULL;
+}
+
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
+{
+	ZBX_UNUSED(tm_start);
+	ZBX_UNUSED(table_group);
 }
 
 static	zbx_mock_handle_t	hout;

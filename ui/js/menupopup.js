@@ -132,8 +132,8 @@ function getMenuPopupHost(options, trigger_element) {
 		if (options.allowed_ui_problems) {
 			url = new Curl('zabbix.php');
 			url.setArgument('action', 'problem.view');
-			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
 
 			if ('severities' in options) {
 				url.setArgument('severities[]', options.severities);
@@ -165,8 +165,8 @@ function getMenuPopupHost(options, trigger_element) {
 				url.setArgument('evaltype', options.evaltype);
 			}
 
-			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
 
 			items.push({
 				label: t('Latest data'),
@@ -409,7 +409,7 @@ function getMenuPopupMapElementGroup(options) {
 		problems_url = new Curl('zabbix.php');
 
 	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_name', '');
+	problems_url.setArgument('filter_set', '1');
 	problems_url.setArgument('groupids[]', options.groupid);
 	if (typeof options.severities !== 'undefined') {
 		problems_url.setArgument('severities[]', options.severities);
@@ -461,7 +461,7 @@ function getMenuPopupMapElementTrigger(options) {
 	if (options.allowed_ui_problems) {
 		url = new Curl('zabbix.php');
 		url.setArgument('action', 'problem.view');
-		url.setArgument('filter_name', '');
+		url.setArgument('filter_set', '1');
 		url.setArgument('triggerids', options.triggers.map((value) => value.triggerid));
 
 		if ('severities' in options) {
@@ -726,7 +726,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		// events
 		url = new Curl('zabbix.php');
 		url.setArgument('action', 'problem.view');
-		url.setArgument('filter_name', '');
+		url.setArgument('filter_set', '1');
 		url.setArgument('triggerids[]', options.triggerid);
 
 		items.push({
@@ -965,6 +965,7 @@ function getMenuPopupTrigger(options, trigger_element) {
  * @param bool   options['trends']                      Are trends available.
  * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
  * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
+ * @param string options['context']                     Determines whether the menu is made for host or template item.
  *
  * @return array
  */
@@ -974,54 +975,56 @@ function getMenuPopupItem(options) {
 	const items = [];
 	let url;
 
-	// latest data link
-	if (options.allowed_ui_latest_data) {
-		url = new Curl('zabbix.php');
-		url.setArgument('action', 'latest.view');
-		url.setArgument('hostids[]', options.hostid);
-		url.setArgument('name', options.name);
-		url.setArgument('filter_name', '');
+	if (options.context !== 'template') {
+		// latest data link
+		if (options.allowed_ui_latest_data) {
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'latest.view');
+			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('name', options.name);
+			url.setArgument('filter_set', '1');
+
+			items.push({
+				label: t('Latest data'),
+				url: url.getUrl()
+			});
+		}
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showgraph');
+		url.setArgument('itemids[]', options.itemid);
 
 		items.push({
-			label: t('Latest data'),
-			url: url.getUrl()
+			label: t('Graph'),
+			url: url.getUrl(),
+			disabled: !options.showGraph
+		});
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showvalues');
+		url.setArgument('itemids[]', options.itemid);
+
+		items.push({
+			label: t('Values'),
+			url: url.getUrl(),
+			disabled: !options.history && !options.trends
+		});
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showlatest');
+		url.setArgument('itemids[]', options.itemid);
+
+		items.push({
+			label: t('500 latest values'),
+			url: url.getUrl(),
+			disabled: !options.history && !options.trends
+		});
+
+		sections.push({
+			label: t('View'),
+			items: items
 		});
 	}
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showgraph');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('Graph'),
-		url: url.getUrl(),
-		disabled: !options.showGraph
-	});
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showvalues');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('Values'),
-		url: url.getUrl(),
-		disabled: !options.history && !options.trends
-	});
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showlatest');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('500 latest values'),
-		url: url.getUrl(),
-		disabled: !options.history && !options.trends
-	});
-
-	sections.push({
-		label: t('View'),
-		items: items
-	});
 
 	if (options.allowed_ui_conf_hosts) {
 		const config_urls = [];
@@ -1112,25 +1115,27 @@ function getMenuPopupItem(options) {
 		});
 	}
 
-	const execute = {
-		label: t('Execute now'),
-		disabled: !options.isExecutable
-	};
-
-	if (options.isExecutable) {
-		execute.clickCallback = function () {
-			jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-			view.checkNow(options.itemid);
+	if (options.context !== 'template') {
+		const execute = {
+			label: t('Execute now'),
+			disabled: !options.isExecutable
 		};
+
+		if (options.isExecutable) {
+			execute.clickCallback = function() {
+				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+				view.checkNow(options.itemid);
+			};
+		}
+
+		actions.push(execute);
+
+		sections.push({
+			label: t('Actions'),
+			items: actions
+		});
 	}
-
-	actions.push(execute);
-
-	sections.push({
-		label: t('Actions'),
-		items: actions
-	});
 
 	return sections;
 }
@@ -1689,7 +1694,7 @@ jQuery(function($) {
 			// Need to be postponed.
 			setTimeout(function() {
 				$(document)
-					.on('click dragstart contextmenu', {menu: $menu_popup, opener: $opener},
+					.on('click dragstart', {menu: $menu_popup, opener: $opener},
 						menuPopupDocumentCloseHandler
 					)
 					.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
@@ -1710,7 +1715,7 @@ jQuery(function($) {
 				$('[aria-expanded="true"]', menu_popup).attr({'aria-expanded': 'false'});
 
 				$(document)
-					.off('click dragstart contextmenu', menuPopupDocumentCloseHandler)
+					.off('click dragstart', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);

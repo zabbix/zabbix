@@ -346,7 +346,7 @@ class testFormApiTokens extends CWebTest {
 	 */
 	private function checkAuthToken($auth_token, $original_token) {
 		// Get token text.
-		$token_text = str_replace('  Copy to clipboard', '', $auth_token->getText());
+		$token_text = str_replace(' Copy to clipboard', '', $auth_token->getText());
 		$this->assertEquals(64, strlen($token_text));
 
 		if ($original_token) {

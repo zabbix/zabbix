@@ -708,7 +708,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 	$result = (bool) API::DiscoveryRule()->update($lld_rules);
 
 	if ($result) {
-		uncheckTableRows($checkbox_hash);
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
 
 	$updated = count($itemids);
@@ -726,7 +726,7 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));
 
 	if ($result) {
-		uncheckTableRows($checkbox_hash);
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
@@ -918,22 +918,22 @@ else {
 		$options['filter']['state'] = $filter['state'];
 	}
 
-	$data['items'] = API::DiscoveryRule()->get($options);
+	$data['discoveries'] = API::DiscoveryRule()->get($options);
 
 	switch ($sort_field) {
 		case 'delay':
-			orderItemsByDelay($data['items'], $sort_order, ['usermacros' => true]);
+			orderItemsByDelay($data['discoveries'], $sort_order, ['usermacros' => true]);
 			break;
 
 		case 'status':
-			orderItemsByStatus($data['items'], $sort_order);
+			orderItemsByStatus($data['discoveries'], $sort_order);
 			break;
 
 		default:
-			order_result($data['items'], $sort_field, $sort_order);
+			order_result($data['discoveries'], $sort_field, $sort_order);
 	}
 
-	$data['items'] = expandItemNamesWithMasterItems($data['items'], 'items');
+	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
 
 	// pager
 	if (hasRequest('page')) {
@@ -948,13 +948,12 @@ else {
 
 	CPagerHelper::savePage($page['file'], $page_num);
 
-	$data['paging'] = CPagerHelper::paginate($page_num, $data['items'], $sort_order,
+	$data['paging'] = CPagerHelper::paginate($page_num, $data['discoveries'], $sort_order,
 		(new CUrl('host_discovery.php'))->setArgument('context', $data['context'])
 	);
 
-	$data['parent_items'] = getParentLldRules($data['items'],
-		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-	);
+	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
+	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view
 	echo (new CView('configuration.host.discovery.list', $data))->getOutput();

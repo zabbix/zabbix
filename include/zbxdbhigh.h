@@ -488,6 +488,7 @@ void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 
 #ifdef HAVE_ORACLE
 void	zbx_db_statement_prepare(const char *sql);
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
@@ -503,6 +504,7 @@ int		zbx_db_end(int ret);
 
 const ZBX_TABLE	*zbx_db_get_table(const char *tablename);
 const ZBX_FIELD	*zbx_db_get_field(const ZBX_TABLE *table, const char *fieldname);
+int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str);
 #define zbx_db_get_maxid(table)	zbx_db_get_maxid_num(table, 1)
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 
@@ -898,4 +900,4 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
-#endif /* ZABBIX_DBHIGH_H */
+#endif

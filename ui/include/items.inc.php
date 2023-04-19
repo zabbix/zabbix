@@ -412,6 +412,10 @@ function interfaceIdsByType(array $interfaces) {
 function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_template, array $dst_hostids): bool {
 	$options = in_array($src_type, ['templateids', 'hostids']) ? ['inherited' => false] : [];
 
+	if ($src_type === 'hostids') {
+		$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
+	}
+
 	$src_items = API::Item()->get([
 		'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 			'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
@@ -561,14 +565,16 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 	if ($dep_itemids) {
 		$master_items = API::Item()->get([
 			'output' => ['itemid', 'key_'],
-			'itemids' => array_keys($dep_itemids)
+			'itemids' => array_keys($dep_itemids),
+			'webitems' => true
 		]);
 
 		$options = $dst_is_template ? ['templateids' => $dst_hostids] : ['hostids' => $dst_hostids];
 
 		$dst_master_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_'],
-			'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))]
+			'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))],
+			'webitems' => true
 		] + $options);
 
 		$dst_master_itemids = [];
@@ -737,186 +743,241 @@ function get_same_item_for_host($item, $dest_hostids) {
 }
 
 /**
- * Get the necessary data to display the parent LLD rules of the given LLD rules.
+ * Get parent templates for each given item.
  *
- * @param array  $items
- * @param string $items['templateid']
- * @param bool   $allowed_ui_conf_templates
+ * @param array  $items                  An array of items.
+ * @param string $items[]['itemid']      ID of an item.
+ * @param string $items[]['templateid']  ID of parent template item.
+ * @param int    $flag                   Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
+ *                                       ZBX_FLAG_DISCOVERY_PROTOTYPE).
  *
  * @return array
  */
-function getParentLldRules(array $items, bool $allowed_ui_conf_templates): array {
-	$parent_items = [];
+function getItemParentTemplates(array $items, $flag) {
+	$parent_itemids = [];
+	$data = [
+		'links' => [],
+		'templates' => []
+	];
 
 	foreach ($items as $item) {
 		if ($item['templateid'] != 0) {
-			$parent_items[$item['templateid']] = [];
+			$parent_itemids[$item['templateid']] = true;
+			$data['links'][$item['itemid']] = ['itemid' => $item['templateid']];
 		}
 	}
 
-	if (!$parent_items) {
-		return [];
+	if (!$parent_itemids) {
+		return $data;
 	}
 
-	$db_items = API::DiscoveryRule()->get([
-		'output' => ['hostid'],
-		'selectHosts' => ['name'],
-		'itemids' => array_keys($parent_items),
-		'preservekeys' => true
-	]);
-
-	if ($allowed_ui_conf_templates && $db_items) {
-		$editable_items = API::DiscoveryRule()->get([
-			'output' => [],
-			'itemids' => array_keys($parent_items),
-			'editable' => true,
-			'preservekeys' => true
-		]);
+	$all_parent_itemids = [];
+	$hostids = [];
+	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		$lld_ruleids = [];
 	}
 
-	foreach ($parent_items as $itemid => &$parent_item) {
-		if (array_key_exists($itemid, $db_items)) {
-			$parent_item = [
-				'editable' => $allowed_ui_conf_templates && array_key_exists($itemid, $editable_items),
-				'template_name' => $db_items[$itemid]['hosts'][0]['name'],
-				'templateid' => $db_items[$itemid]['hostid']
-			];
+	do {
+		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
+			$db_items = API::DiscoveryRule()->get([
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'itemids' => array_keys($parent_itemids)
+			]);
 		}
+		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$db_items = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'itemids' => array_keys($parent_itemids),
+				'selectDiscoveryRule' => ['itemid']
+			]);
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$parent_item = [
-				'editable' => false,
-				'template_name' => _('Inaccessible template')
-			];
+			$db_items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'itemids' => array_keys($parent_itemids),
+				'webitems' => true
+			]);
 		}
-	}
-	unset($parent_item);
 
-	return $parent_items;
-}
+		$all_parent_itemids += $parent_itemids;
+		$parent_itemids = [];
 
-/**
- * Get the necessary data to display the parent item prototypes of the given item prototypes.
- *
- * @param array  $items
- * @param string $items['templateid']
- * @param bool   $allowed_ui_conf_templates
- *
- * @return array
- */
-function getParentItemPrototypes(array $items, bool $allowed_ui_conf_templates): array {
-	$parent_items = [];
+		foreach ($db_items as $db_item) {
+			$data['templates'][$db_item['hostid']] = [];
+			$hostids[$db_item['itemid']] = $db_item['hostid'];
 
-	foreach ($items as $item) {
-		if ($item['templateid'] != 0) {
-			$parent_items[$item['templateid']] = [];
-		}
-	}
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$lld_ruleids[$db_item['itemid']] = $db_item['discoveryRule']['itemid'];
+			}
 
-	if (!$parent_items) {
-		return [];
-	}
+			if ($db_item['templateid'] != 0) {
+				if (!array_key_exists($db_item['templateid'], $all_parent_itemids)) {
+					$parent_itemids[$db_item['templateid']] = true;
+				}
 
-	$db_items = API::ItemPrototype()->get([
-		'output' => ['hostid'],
-		'selectHosts' => ['name'],
-		'itemids' => array_keys($parent_items),
-		'preservekeys' => true
-	]);
-
-	if ($allowed_ui_conf_templates && $db_items) {
-		$editable_items = API::ItemPrototype()->get([
-			'output' => [],
-			'selectDiscoveryRule' => ['itemid'],
-			'itemids' => array_keys($parent_items),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-	}
-
-	foreach ($parent_items as $itemid => &$parent_item) {
-		if (array_key_exists($itemid, $db_items)) {
-			$editable = $allowed_ui_conf_templates && array_key_exists($itemid, $editable_items);
-
-			$parent_item = [
-				'editable' => $editable,
-				'template_name' => $db_items[$itemid]['hosts'][0]['name'],
-				'templateid' => $db_items[$itemid]['hostid']
-			];
-
-			if ($editable) {
-				$parent_item['ruleid'] = $editable_items[$itemid]['discoveryRule']['itemid'];
+				$data['links'][$db_item['itemid']] = ['itemid' => $db_item['templateid']];
 			}
 		}
-		else {
-			$parent_item = [
-				'editable' => false,
-				'template_name' => _('Inaccessible template')
-			];
+	}
+	while ($parent_itemids);
+
+	foreach ($data['links'] as &$parent_item) {
+		$parent_item['hostid'] = array_key_exists($parent_item['itemid'], $hostids)
+			? $hostids[$parent_item['itemid']]
+			: 0;
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$parent_item['lld_ruleid'] = array_key_exists($parent_item['itemid'], $lld_ruleids)
+				? $lld_ruleids[$parent_item['itemid']]
+				: 0;
 		}
 	}
 	unset($parent_item);
 
-	return $parent_items;
+	$db_templates = $data['templates']
+		? API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templates']),
+			'preservekeys' => true
+		])
+		: [];
+
+	$rw_templates = $db_templates
+		? API::Template()->get([
+			'output' => [],
+			'templateids' => array_keys($db_templates),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$data['templates'][0] = [];
+
+	foreach ($data['templates'] as $hostid => &$template) {
+		$template = array_key_exists($hostid, $db_templates)
+			? [
+				'hostid' => $hostid,
+				'name' => $db_templates[$hostid]['name'],
+				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
+			]
+			: [
+				'hostid' => $hostid,
+				'name' => _('Inaccessible template'),
+				'permission' => PERM_DENY
+			];
+	}
+	unset($template);
+
+	return $data;
 }
 
 /**
- * Get the necessary data to display the parent items of the given items.
+ * Returns a template prefix for selected item.
  *
- * @param array  $items
- * @param string $items[]['templateid']
- * @param bool   $allowed_ui_conf_templates
+ * @param string $itemid
+ * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
+ * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
+ *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
+ *
+ * @return array|null
+ */
+function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $provide_links) {
+	if (!array_key_exists($itemid, $parent_templates['links'])) {
+		return null;
+	}
+
+	while (array_key_exists($parent_templates['links'][$itemid]['itemid'], $parent_templates['links'])) {
+		$itemid = $parent_templates['links'][$itemid]['itemid'];
+	}
+
+	$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
+
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
+		if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
+			$url = (new CUrl('host_discovery.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$template['hostid']])
+				->setArgument('context', 'template');
+		}
+		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$url = (new CUrl('disc_prototypes.php'))
+				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+				->setArgument('context', 'template');
+		}
+		// ZBX_FLAG_DISCOVERY_NORMAL
+		else {
+			$url = (new CUrl('items.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_hostids', [$template['hostid']])
+				->setArgument('context', 'template');
+		}
+
+		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
+	}
+	else {
+		$name = new CSpan(CHtml::encode($template['name']));
+	}
+
+	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+}
+
+/**
+ * Returns a list of item templates.
+ *
+ * @param string $itemid
+ * @param array  $parent_templates  The list of the templates, prepared by getItemParentTemplates() function.
+ * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE,
+ *                                  ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
  * @return array
  */
-function getParentItems(array $items, bool $allowed_ui_conf_templates): array {
-	$parent_items = [];
+function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $provide_links) {
+	$list = [];
 
-	foreach ($items as $item) {
-		if ($item['templateid'] != 0) {
-			$parent_items[$item['templateid']] = [];
-		}
-	}
+	while (array_key_exists($itemid, $parent_templates['links'])) {
+		$template = $parent_templates['templates'][$parent_templates['links'][$itemid]['hostid']];
 
-	if (!$parent_items) {
-		return [];
-	}
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
+			if ($flag == ZBX_FLAG_DISCOVERY_RULE) {
+				$url = (new CUrl('host_discovery.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setArgument('context', 'template');
+			}
+			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url = (new CUrl('disc_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setArgument('context', 'template');
+			}
+			// ZBX_FLAG_DISCOVERY_NORMAL
+			else {
+				$url = (new CUrl('items.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setArgument('context', 'template');
+			}
 
-	$db_items = API::Item()->get([
-		'output' => ['hostid'],
-		'selectHosts' => ['name'],
-		'itemids' => array_keys($parent_items),
-		'webitems' => true,
-		'preservekeys' => true
-	]);
-
-	if ($allowed_ui_conf_templates && $db_items) {
-		$editable_items = API::Item()->get([
-			'output' => [],
-			'itemids' => array_keys($parent_items),
-			'webitems' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-	}
-
-	foreach ($parent_items as $itemid => &$parent_item) {
-		if (array_key_exists($itemid, $db_items)) {
-			$parent_item = [
-				'editable' => $allowed_ui_conf_templates && array_key_exists($itemid, $editable_items),
-				'template_name' => $db_items[$itemid]['hosts'][0]['name'],
-				'templateid' => $db_items[$itemid]['hostid']
-			];
+			$name = new CLink(CHtml::encode($template['name']), $url);
 		}
 		else {
-			$parent_item = [
-				'editable' => false,
-				'template_name' => _('Inaccessible template')
-			];
+			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 		}
-	}
-	unset($parent_item);
 
-	return $parent_items;
+		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+
+		$itemid = $parent_templates['links'][$itemid]['itemid'];
+	}
+
+	if ($list) {
+		array_pop($list);
+	}
+
+	return $list;
 }
 
 /**
@@ -2484,7 +2545,11 @@ function getTypeItemFieldNames(array $input): array {
 			return ['interfaceid'];
 
 		case ITEM_TYPE_DEPENDENT:
-			return ['master_itemid'];
+			if ($input['templateid'] == 0) {
+				return ['master_itemid'];
+			}
+
+			return [];
 
 		case ITEM_TYPE_HTTPAGENT:
 			if ($input['templateid'] == 0) {

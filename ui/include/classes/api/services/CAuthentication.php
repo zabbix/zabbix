@@ -135,20 +135,6 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (array_key_exists('ldap_userdirectoryid', $auth) && $auth['ldap_userdirectoryid'] != 0) {
-			$exists = API::UserDirectory()->get([
-				'countOutput' => true,
-				'userdirectoryids' => [$auth['ldap_userdirectoryid']],
-				'filter' => ['idp_type' => IDP_TYPE_LDAP]
-			]);
-
-			if (!$exists) {
-				static::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('referred object does not exist'))
-				);
-			}
-		}
-
 		$output_fields = $this->output_fields;
 		$output_fields[] = 'configid';
 
@@ -156,12 +142,41 @@ class CAuthentication extends CApiService {
 		$db_auth = reset($db_auth);
 		$auth += $db_auth;
 
+		// Check if at least one LDAP server exists.
+		if ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED) {
+			$ldap_servers_exists = (bool) API::UserDirectory()->get([
+				'countOutput' => true,
+				'filter' => ['idp_type' => IDP_TYPE_LDAP]
+			]);
+
+			if (!$ldap_servers_exists) {
+				static::exception(ZBX_API_ERROR_PARAMETERS, _('At least one LDAP server must exist.'));
+			}
+		}
+
+		// Check if default LDAP server exists.
+		if ($auth['ldap_userdirectoryid'] != 0) {
+			$default_ldap_exists = (bool) API::UserDirectory()->get([
+				'countOutput' => true,
+				'userdirectoryids' => [$auth['ldap_userdirectoryid']],
+				'filter' => ['idp_type' => IDP_TYPE_LDAP]
+			]);
+
+			if (!$default_ldap_exists) {
+				static::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('referred object does not exist'))
+				);
+			}
+		}
+
+		// Check if no disabled LDAP is set as default authentication method.
 		if ($auth['authentication_type'] == ZBX_AUTH_LDAP && $auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_DISABLED) {
 			static::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', '/authentication_type', _('LDAP must be enabled'))
 			);
 		}
 
+		// Check if deprovisioning user group exists and is set properly.
 		if ($auth['disabled_usrgrpid']) {
 			$groups = API::UserGroup()->get([
 				'output' => ['users_status'],
@@ -178,9 +193,15 @@ class CAuthentication extends CApiService {
 				static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be enabled.'));
 			}
 		}
-		elseif ($auth['ldap_jit_status'] == JIT_PROVISIONING_ENABLED
-				|| $auth['saml_jit_status'] == JIT_PROVISIONING_ENABLED) {
-			static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be empty.'));
+		else {
+			$ldap_jit_enabled = $auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED
+				&& $auth['ldap_jit_status'] == JIT_PROVISIONING_ENABLED;
+			$saml_jit_enabled = $auth['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED
+				&& $auth['saml_jit_status'] == JIT_PROVISIONING_ENABLED;
+
+			if ($ldap_jit_enabled || $saml_jit_enabled) {
+				static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be empty.'));
+			}
 		}
 
 		return $db_auth;
