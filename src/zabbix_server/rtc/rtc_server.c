@@ -483,8 +483,8 @@ int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char 
 			rtc_ha_remove_node((const char *)data, result);
 			return SUCCEED;
 		case ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD:
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD, data,
-					(zbx_uint32_t)strlen((const char *)data) + 1);
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD,
+					(const char *)data, (zbx_uint32_t)strlen((const char *)data) + 1);
 			return SUCCEED;
 		case ZBX_RTC_PROXYPOLLER_PROCESS:
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
