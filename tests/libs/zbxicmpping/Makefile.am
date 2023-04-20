@@ -1,5 +1,5 @@
 if SERVER
-SERVER_tests = icmpping
+SERVER_tests = line_process
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -31,19 +31,19 @@ ICMPPING_LIBS = \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	-lz -lssl -lcrypto
 
-icmpping_SOURCES = \
+line_process_SOURCES = \
 	line_process.c \
 	../../zbxmocktest.h \
 	../../zbxmockexit.c \
 	../../zbxmockdir.c
 
-icmpping_WRAP_FUNCS = \
+line_process_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_fgets
 
-icmpping_LDADD = $(ICMPPING_LIBS)
-icmpping_LDFLAGS = @SERVER_LDFLAGS@
+line_process_LDADD = $(ICMPPING_LIBS)
+line_process_LDFLAGS = @SERVER_LDFLAGS@
 
-icmpping_CFLAGS = \
+line_process_CFLAGS = \
 	-I@top_srcdir@/tests \
-	$(icmpping_WRAP_FUNCS)
+	$(line_process_WRAP_FUNCS)
 endif
