@@ -31,10 +31,10 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}|<p>Filter of discoverable containers</p>|`.*`|
-|{$DOCKER.LLD.FILTER.CONTAINER.NOT_MATCHES}|<p>Filter to exclude discovered containers</p>|`CHANGE_IF_NEEDED`|
-|{$DOCKER.LLD.FILTER.IMAGE.MATCHES}|<p>Filter of discoverable images</p>|`.*`|
-|{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}|<p>Filter to exclude discovered images</p>|`CHANGE_IF_NEEDED`|
+|{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}|<p>Filter of discoverable containers.</p>|`.*`|
+|{$DOCKER.LLD.FILTER.CONTAINER.NOT_MATCHES}|<p>Filter to exclude discovered containers.</p>|`CHANGE_IF_NEEDED`|
+|{$DOCKER.LLD.FILTER.IMAGE.MATCHES}|<p>Filter of discoverable images.</p>|`.*`|
+|{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}|<p>Filter to exclude discovered images.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -45,12 +45,12 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Docker: Get containers||Zabbix agent|docker.containers|
 |Docker: Get images||Zabbix agent|docker.images|
 |Docker: Get data_usage||Zabbix agent|docker.data_usage|
-|Docker: Containers total|<p>Total number of containers on this host</p>|Dependent item|docker.containers.total<p>**Preprocessing**</p><ul><li>JSON Path: `$.Containers`</li></ul>|
-|Docker: Containers running|<p>Total number of containers running on this host</p>|Dependent item|docker.containers.running<p>**Preprocessing**</p><ul><li>JSON Path: `$.ContainersRunning`</li></ul>|
-|Docker: Containers stopped|<p>Total number of containers stopped on this host</p>|Dependent item|docker.containers.stopped<p>**Preprocessing**</p><ul><li>JSON Path: `$.ContainersStopped`</li></ul>|
-|Docker: Containers paused|<p>Total number of containers paused on this host</p>|Dependent item|docker.containers.paused<p>**Preprocessing**</p><ul><li>JSON Path: `$.ContainersPaused`</li></ul>|
-|Docker: Images total|<p>Number of images with intermediate image layers</p>|Dependent item|docker.images.total<p>**Preprocessing**</p><ul><li>JSON Path: `$.Images`</li></ul>|
-|Docker: Storage driver|<p>Docker storage driver </p><p> https://docs.docker.com/storage/storagedriver/</p>|Dependent item|docker.driver<p>**Preprocessing**</p><ul><li>JSON Path: `$.Driver`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Docker: Containers total|<p>Total number of containers on this host.</p>|Dependent item|docker.containers.total<p>**Preprocessing**</p><ul><li>JSON Path: `$.Containers`</li></ul>|
+|Docker: Containers running|<p>Total number of containers running on this host.</p>|Dependent item|docker.containers.running<p>**Preprocessing**</p><ul><li>JSON Path: `$.ContainersRunning`</li></ul>|
+|Docker: Containers stopped|<p>Total number of containers stopped on this host.</p>|Dependent item|docker.containers.stopped<p>**Preprocessing**</p><ul><li>JSON Path: `$.ContainersStopped`</li></ul>|
+|Docker: Containers paused|<p>Total number of containers paused on this host.</p>|Dependent item|docker.containers.paused<p>**Preprocessing**</p><ul><li>JSON Path: `$.ContainersPaused`</li></ul>|
+|Docker: Images total|<p>Number of images with intermediate image layers.</p>|Dependent item|docker.images.total<p>**Preprocessing**</p><ul><li>JSON Path: `$.Images`</li></ul>|
+|Docker: Storage driver|<p>Docker storage driver.</p><p>https://docs.docker.com/storage/storagedriver/</p>|Dependent item|docker.driver<p>**Preprocessing**</p><ul><li>JSON Path: `$.Driver`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Docker: Memory limit enabled||Dependent item|docker.mem_limit.enabled<p>**Preprocessing**</p><ul><li>JSON Path: `$.MemoryLimit`</li><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Docker: Swap limit enabled||Dependent item|docker.swap_limit.enabled<p>**Preprocessing**</p><ul><li>JSON Path: `$.SwapLimit`</li><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Docker: Kernel memory enabled||Dependent item|docker.kernel_mem.enabled<p>**Preprocessing**</p><ul><li>JSON Path: `$.KernelMemory`</li><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
@@ -62,9 +62,9 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Docker: Pids limit enabled||Dependent item|docker.pids_limit.enabled<p>**Preprocessing**</p><ul><li>JSON Path: `$.PidsLimit`</li><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Docker: IPv4 Forwarding enabled||Dependent item|docker.ipv4_forwarding.enabled<p>**Preprocessing**</p><ul><li>JSON Path: `$.IPv4Forwarding`</li><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Docker: Debug enabled||Dependent item|docker.debug.enabled<p>**Preprocessing**</p><ul><li>JSON Path: `$.Debug`</li><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Docker: Nfd|<p>Number of used File Descriptors</p>|Dependent item|docker.nfd<p>**Preprocessing**</p><ul><li>JSON Path: `$.NFd`</li></ul>|
+|Docker: Nfd|<p>Number of used File Descriptors.</p>|Dependent item|docker.nfd<p>**Preprocessing**</p><ul><li>JSON Path: `$.NFd`</li></ul>|
 |Docker: OomKill disabled||Dependent item|docker.oomkill.disabled<p>**Preprocessing**</p><ul><li>JSON Path: `$.OomKillDisable`</li><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Docker: Goroutines|<p>Number of goroutines</p>|Dependent item|docker.goroutines<p>**Preprocessing**</p><ul><li>JSON Path: `$.NGoroutines`</li></ul>|
+|Docker: Goroutines|<p>Number of goroutines.</p>|Dependent item|docker.goroutines<p>**Preprocessing**</p><ul><li>JSON Path: `$.NGoroutines`</li></ul>|
 |Docker: Logging driver||Dependent item|docker.logging_driver<p>**Preprocessing**</p><ul><li>JSON Path: `$.LoggingDriver`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Docker: Cgroup driver||Dependent item|docker.cgroup_driver<p>**Preprocessing**</p><ul><li>JSON Path: `$.CgroupDriver`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Docker: NEvents listener||Dependent item|docker.nevents_listener<p>**Preprocessing**</p><ul><li>JSON Path: `$.NEventsListener`</li></ul>|
@@ -83,21 +83,21 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Docker: Images size||Dependent item|docker.images_size<p>**Preprocessing**</p><ul><li>JSON Path: `$.Images[*].Size.sum()`</li></ul>|
 |Docker: Containers size||Dependent item|docker.containers_size<p>**Preprocessing**</p><ul><li>JSON Path: `$.Containers[*].SizeRw.sum()`</li></ul>|
 |Docker: Volumes size||Dependent item|docker.volumes_size<p>**Preprocessing**</p><ul><li>JSON Path: `$.Volumes[*].UsageData.Size.sum()`</li></ul>|
-|Docker: Images available|<p>Number of top-level images</p>|Dependent item|docker.images.top_level<p>**Preprocessing**</p><ul><li>JSON Path: `$.length()`</li></ul>|
+|Docker: Images available|<p>Number of top-level images.</p>|Dependent item|docker.images.top_level<p>**Preprocessing**</p><ul><li>JSON Path: `$.length()`</li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Docker: Service is down||`last(/Docker by Zabbix agent 2/docker.ping)=0`|Average|**Manual close**: Yes|
-|Docker: Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes</p>|`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Docker: Service is down</li></ul>|
-|Docker: Version has changed|<p>Docker version has changed. Acknowledge to close manually.</p>|`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0`|Info|**Manual close**: Yes|
+|Docker: Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Docker: Service is down</li></ul>|
+|Docker: Version has changed|<p>Docker version has changed. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Images discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Images discovery|<p>Discovery for images metrics</p>|Zabbix agent|docker.images.discovery|
+|Images discovery|<p>Discovery of images metrics.</p>|Zabbix agent|docker.images.discovery|
 
 ### Item prototypes for Images discovery
 
@@ -110,21 +110,21 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Containers discovery|<p>Discovery for containers metrics</p><p></p><p>Parameter:</p><p>true  - Returns all containers</p><p>false - Returns only running containers</p>|Zabbix agent|docker.containers.discovery[false]|
+|Containers discovery|<p>Discovery of containers metrics.</p><p></p><p>Parameter:</p><p>true  - Returns all containers</p><p>false - Returns only running containers</p>|Zabbix agent|docker.containers.discovery[false]|
 
 ### Item prototypes for Containers discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Container {#NAME}: Get stats|<p>Get container stats based on resource usage</p>|Zabbix agent|docker.container_stats["{#NAME}"]|
-|Container {#NAME}: CPU total usage per second||Dependent item|docker.container_stats.cpu_usage.total.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.cpu_usage.total_usage`</li><li>Change per second</li><li>Custom multiplier: `1e-09`</li></ul>|
+|Container {#NAME}: Get stats|<p>Get container stats based on resource usage.</p>|Zabbix agent|docker.container_stats["{#NAME}"]|
+|Container {#NAME}: CPU total usage per second||Dependent item|docker.container_stats.cpu_usage.total.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.cpu_usage.total_usage`</li><li>Change per second</li><li>Custom multiplier: `1.0E-9`</li></ul>|
 |Container {#NAME}: CPU percent usage||Dependent item|docker.container_stats.cpu_pct_usage["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.cpu_usage.percent_usage`</li></ul>|
-|Container {#NAME}: CPU kernelmode usage per second||Dependent item|docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.cpu_usage.usage_in_kernelmode`</li><li>Change per second</li><li>Custom multiplier: `1e-09`</li></ul>|
-|Container {#NAME}: CPU usermode usage per second||Dependent item|docker.container_stats.cpu_usage.user.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.cpu_usage.usage_in_usermode`</li><li>Change per second</li><li>Custom multiplier: `1e-09`</li></ul>|
+|Container {#NAME}: CPU kernelmode usage per second||Dependent item|docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.cpu_usage.usage_in_kernelmode`</li><li>Change per second</li><li>Custom multiplier: `1.0E-9`</li></ul>|
+|Container {#NAME}: CPU usermode usage per second||Dependent item|docker.container_stats.cpu_usage.user.rate["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.cpu_usage.usage_in_usermode`</li><li>Change per second</li><li>Custom multiplier: `1.0E-9`</li></ul>|
 |Container {#NAME}: Online CPUs||Dependent item|docker.container_stats.online_cpus["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.online_cpus`</li></ul>|
-|Container {#NAME}: Throttling periods|<p>Number of periods with throttling active</p>|Dependent item|docker.container_stats.cpu_usage.throttling_periods["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.throttling_data.periods`</li></ul>|
-|Container {#NAME}: Throttled periods|<p>Number of periods when the container hits its throttling limit</p>|Dependent item|docker.container_stats.cpu_usage.throttled_periods["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.throttling_data.throttled_periods`</li></ul>|
-|Container {#NAME}: Throttled time|<p>Aggregate time the container was throttled for in nanoseconds</p>|Dependent item|docker.container_stats.cpu_usage.throttled_time["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.throttling_data.throttled_time`</li><li>Custom multiplier: `1e-09`</li></ul>|
+|Container {#NAME}: Throttling periods|<p>Number of periods with throttling active.</p>|Dependent item|docker.container_stats.cpu_usage.throttling_periods["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.throttling_data.periods`</li></ul>|
+|Container {#NAME}: Throttled periods|<p>Number of periods when the container hits its throttling limit.</p>|Dependent item|docker.container_stats.cpu_usage.throttled_periods["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.throttling_data.throttled_periods`</li></ul>|
+|Container {#NAME}: Throttled time|<p>Aggregate time the container was throttled for in nanoseconds.</p>|Dependent item|docker.container_stats.cpu_usage.throttled_time["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.cpu_stats.throttling_data.throttled_time`</li><li>Custom multiplier: `1.0E-9`</li></ul>|
 |Container {#NAME}: Memory usage||Dependent item|docker.container_stats.memory.usage["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.memory_stats.usage`</li></ul>|
 |Container {#NAME}: Memory maximum usage||Dependent item|docker.container_stats.memory.max_usage["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.memory_stats.max_usage`</li></ul>|
 |Container {#NAME}: Memory commit bytes||Dependent item|docker.container_stats.memory.commit_bytes["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.memory_stats.commitbytes`</li></ul>|
@@ -139,12 +139,12 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |Container {#NAME}: Networks packets sent per second||Dependent item|docker.networks.tx_packets["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_packets.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Networks errors sent per second||Dependent item|docker.networks.tx_errors["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_errors.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |Container {#NAME}: Networks outgoing packets dropped per second||Dependent item|docker.networks.tx_dropped["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks[*].tx_dropped.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
-|Container {#NAME}: Get info|<p>Return low-level information about a container</p>|Zabbix agent|docker.container_info["{#NAME}",full]|
+|Container {#NAME}: Get info|<p>Return low-level information about a container.</p>|Zabbix agent|docker.container_info["{#NAME}",full]|
 |Container {#NAME}: Created||Dependent item|docker.container_info.created["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Image||Dependent item|docker.container_info.image["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.Names[0] == "{#NAME}")].Image.first()`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
 |Container {#NAME}: Restart count||Dependent item|docker.container_info.restart_count["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.RestartCount`</li></ul>|
 |Container {#NAME}: Status||Dependent item|docker.container_info.state.status["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Status`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Container {#NAME}: Health status|<p>The container `HEALTHCHECK`.</p>|Dependent item|docker.container_info.state.health["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li><p>In range: `1 -> 4`</p><p>⛔️Custom on fail: Set value to: `4`</p></li></ul>|
+|Container {#NAME}: Health status|<p>Container's `HEALTHCHECK`.</p>|Dependent item|docker.container_info.state.health["{#NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li><p>In range: `1 -> 4`</p><p>⛔️Custom on fail: Set value to: `4`</p></li></ul>|
 |Container {#NAME}: Health failing streak||Dependent item|docker.container_info.state.health.failing["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.State.Health.FailingStreak`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
 |Container {#NAME}: Running||Dependent item|docker.container_info.state.running["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Running`</li><li>Boolean to decimal</li></ul>|
 |Container {#NAME}: Paused||Dependent item|docker.container_info.state.paused["{#NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State.Paused`</li><li>Boolean to decimal</li></ul>|
@@ -161,9 +161,9 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Container {#NAME}: Health state container is unhealthy|<p>The container health state is unhealthy.</p>|`count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],2m,,2)>=2`|High||
+|Container {#NAME}: Health state container is unhealthy|<p>Container health state is unhealthy.</p>|`count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],2m,,2)>=2`|High||
 |Container {#NAME}: Container has been stopped with error code||`last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0`|Average|**Manual close**: Yes|
-|Container {#NAME}: An error has occurred in the container|<p>Container {#NAME} has an error. Ack to close.</p>|`last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0`|Warning|**Manual close**: Yes|
+|Container {#NAME}: An error has occurred in the container|<p>Container {#NAME} has an error. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

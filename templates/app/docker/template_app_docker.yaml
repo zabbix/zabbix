@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-15T13:17:55Z'
+  date: '2023-04-16T20:41:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -86,7 +86,7 @@ zabbix_export:
           key: docker.containers.paused
           delay: '0'
           history: 7d
-          description: 'Total number of containers paused on this host'
+          description: 'Total number of containers paused on this host.'
           preprocessing:
             -
               type: JSONPATH
@@ -105,7 +105,7 @@ zabbix_export:
           key: docker.containers.running
           delay: '0'
           history: 7d
-          description: 'Total number of containers running on this host'
+          description: 'Total number of containers running on this host.'
           preprocessing:
             -
               type: JSONPATH
@@ -124,7 +124,7 @@ zabbix_export:
           key: docker.containers.stopped
           delay: '0'
           history: 7d
-          description: 'Total number of containers stopped on this host'
+          description: 'Total number of containers stopped on this host.'
           preprocessing:
             -
               type: JSONPATH
@@ -143,7 +143,7 @@ zabbix_export:
           key: docker.containers.total
           delay: '0'
           history: 7d
-          description: 'Total number of containers on this host'
+          description: 'Total number of containers on this host.'
           preprocessing:
             -
               type: JSONPATH
@@ -366,8 +366,8 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: |
-            Docker storage driver 
-             https://docs.docker.com/storage/storagedriver/
+            Docker storage driver.
+            https://docs.docker.com/storage/storagedriver/
           preprocessing:
             -
               type: JSONPATH
@@ -390,7 +390,7 @@ zabbix_export:
           key: docker.goroutines
           delay: '0'
           history: 7d
-          description: 'Number of goroutines'
+          description: 'Number of goroutines.'
           preprocessing:
             -
               type: JSONPATH
@@ -420,7 +420,7 @@ zabbix_export:
           key: docker.images.top_level
           delay: '0'
           history: 7d
-          description: 'Number of top-level images'
+          description: 'Number of top-level images.'
           preprocessing:
             -
               type: JSONPATH
@@ -439,7 +439,7 @@ zabbix_export:
           key: docker.images.total
           delay: '0'
           history: 7d
-          description: 'Number of images with intermediate image layers'
+          description: 'Number of images with intermediate image layers.'
           preprocessing:
             -
               type: JSONPATH
@@ -737,7 +737,7 @@ zabbix_export:
               name: 'Docker: Failed to fetch info data'
               event_name: 'Docker: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -790,7 +790,7 @@ zabbix_export:
           key: docker.nfd
           delay: '0'
           history: 7d
-          description: 'Number of used File Descriptors'
+          description: 'Number of used File Descriptors.'
           preprocessing:
             -
               type: JSONPATH
@@ -989,7 +989,7 @@ zabbix_export:
               name: 'Docker: Version has changed'
               event_name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Docker version has changed. Acknowledge to close manually.'
+              description: 'Docker version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1064,7 +1064,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: |
-            Discovery for containers metrics
+            Discovery of containers metrics.
             
             Parameter:
             true  - Returns all containers
@@ -1272,7 +1272,7 @@ zabbix_export:
                   name: 'Container {#NAME}: An error has occurred in the container'
                   event_name: 'Container {#NAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Container {#NAME} has an error. Ack to close.'
+                  description: 'Container {#NAME} has an error. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1338,7 +1338,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The container `HEALTHCHECK`.'
+              description: 'Container''s `HEALTHCHECK`.'
               valuemap:
                 name: 'Docker container health state'
               preprocessing:
@@ -1374,7 +1374,7 @@ zabbix_export:
                   name: 'Container {#NAME}: Health state container is unhealthy'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'The container health state is unhealthy.'
+                  description: 'Container health state is unhealthy.'
                   tags:
                     -
                       tag: scope
@@ -1546,7 +1546,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: CHAR
-              description: 'Return low-level information about a container'
+              description: 'Return low-level information about a container.'
               tags:
                 -
                   tag: component
@@ -1615,7 +1615,7 @@ zabbix_export:
               key: 'docker.container_stats.cpu_usage.throttled_periods["{#NAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of periods when the container hits its throttling limit'
+              description: 'Number of periods when the container hits its throttling limit.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1639,7 +1639,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              description: 'Aggregate time the container was throttled for in nanoseconds'
+              description: 'Aggregate time the container was throttled for in nanoseconds.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1665,7 +1665,7 @@ zabbix_export:
               key: 'docker.container_stats.cpu_usage.throttling_periods["{#NAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of periods with throttling active'
+              description: 'Number of periods with throttling active.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1902,7 +1902,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: CHAR
-              description: 'Get container stats based on resource usage'
+              description: 'Get container stats based on resource usage.'
               tags:
                 -
                   tag: component
@@ -2270,7 +2270,7 @@ zabbix_export:
                 value: '{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery for images metrics'
+          description: 'Discovery of images metrics.'
           item_prototypes:
             -
               uuid: 63b19204b1d0459b9969234a719dab93
@@ -2331,19 +2331,19 @@ zabbix_export:
         -
           macro: '{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable containers'
+          description: 'Filter of discoverable containers.'
         -
           macro: '{$DOCKER.LLD.FILTER.CONTAINER.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered containers'
+          description: 'Filter to exclude discovered containers.'
         -
           macro: '{$DOCKER.LLD.FILTER.IMAGE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable images'
+          description: 'Filter of discoverable images.'
         -
           macro: '{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered images'
+          description: 'Filter to exclude discovered images.'
       dashboards:
         -
           uuid: 7eb6472d07ac4c379e6b730b59a12507
