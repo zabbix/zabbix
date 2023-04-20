@@ -503,7 +503,7 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	ZBX_FPING_HOST	*host;
 	char		*linebuf_p;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() linebuf = \"%s\"", __func__, resp->linebuf);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() linebuf: \"%s\"", __func__, resp->linebuf);
 
 	if (SUCCEED != redirect_detect(args, resp))
 		return;
@@ -807,8 +807,8 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 				goto out;
 			}
 
-			zbx_snprintf(linebuf, linebuf_size, "%s %s 2>&1 <%s", config_icmpping->get_fping_location(), params,
-					filename);
+			zbx_snprintf(linebuf, linebuf_size, "%s %s 2>&1 <%s", config_icmpping->get_fping_location(),
+					params, filename);
 		}
 		else
 		{
@@ -819,8 +819,8 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 				goto out;
 			}
 
-			zbx_snprintf(linebuf, linebuf_size, "%s %s 2>&1 <%s", config_icmpping->get_fping6_location(), params6,
-					filename);
+			zbx_snprintf(linebuf, linebuf_size, "%s %s 2>&1 <%s", config_icmpping->get_fping6_location(),
+					params6, filename);
 		}
 	}
 	else
@@ -924,7 +924,6 @@ out:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize library                                                *
@@ -981,8 +980,3 @@ int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count, int per
 
 	return ret;
 }
-
-#ifdef HAVE_IPV6
-#	undef FPING_EXISTS
-#	undef FPING6_EXISTS
-#endif
