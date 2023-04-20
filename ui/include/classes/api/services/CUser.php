@@ -1740,7 +1740,7 @@ class CUser extends CApiService {
 
 		$db_user = $db_users[0];
 
-		$permissions = $this->getUserGroupsPermissions($userid);
+		$permissions = $this->getUserGroupsPermissions($db_user);
 
 		$db_user = $this->addExtraFields($db_user, $permissions);
 		$this->setTimezone($db_user['timezone']);
@@ -2060,11 +2060,11 @@ class CUser extends CApiService {
 	/**
 	 * Returns user groups permissions of specific user.
 	 *
-	 * @param string $userid
+	 * @param array $user
 	 *
 	 * @return array
 	 */
-	private function getUserGroupsPermissions(string $userid): array {
+	private function getUserGroupsPermissions(array $user): array {
 		$permissions = [
 			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
 			'users_status' => GROUP_STATUS_ENABLED,
@@ -2078,7 +2078,7 @@ class CUser extends CApiService {
 			'SELECT g.usrgrpid,g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
 			' FROM usrgrp g,users_groups ug'.
 			' WHERE g.usrgrpid=ug.usrgrpid'.
-				' AND ug.userid='.$userid
+				' AND ug.userid='.$user['userid']
 		);
 
 		$has_user_groups = false;
@@ -2091,7 +2091,7 @@ class CUser extends CApiService {
 				$permissions['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
 			}
 
-			if ($db_usrgrp['usrgrpid'] == $deprovision_groupid) {
+			if ($db_usrgrp['usrgrpid'] == $deprovision_groupid && $user['userdirectoryid'] !== '0') {
 				$permissions['deprovisioned'] = true;
 
 				continue;
@@ -2345,7 +2345,7 @@ class CUser extends CApiService {
 			if ($do_group_check) {
 				// Users with ZBX_AUTH_INTERNAL access attribute 'username' is always case sensitive.
 				foreach($db_users_rows as $db_user_row) {
-					$permissions = $this->getUserGroupsPermissions($db_user_row['userid']);
+					$permissions = $this->getUserGroupsPermissions($db_user_row);
 
 					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
 							|| $db_user_row['username'] === $username) {
@@ -2370,7 +2370,7 @@ class CUser extends CApiService {
 			];
 		}
 
-		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
+		$permissions = $this->getUserGroupsPermissions($db_user);
 
 		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
 			return ['error' => _('No permissions for system access.'), 'db_user' => $db_user];

@@ -34,7 +34,6 @@ class CJsonRpc {
 	 * @var CApiClient
 	 */
 	protected $apiClient;
-	protected $request;
 
 	private $_response;
 	private $_error_list;
@@ -47,9 +46,8 @@ class CJsonRpc {
 	 * @param CApiClient $apiClient
 	 * @param string $data
 	 */
-	public function __construct(CApiClient $apiClient, $data, CHttpRequest $request) {
+	public function __construct(CApiClient $apiClient, $data) {
 		$this->apiClient = $apiClient;
-		$this->request = $request;
 
 		$this->initErrors();
 
@@ -60,9 +58,11 @@ class CJsonRpc {
 	/**
 	 * Executes API requests.
 	 *
+	 * @param CHttpRequest $request
+	 *
 	 * @return string JSON encoded value
 	 */
-	public function execute() {
+	public function execute(CHttpRequest $request) {
 		if (json_last_error()) {
 			$this->jsonError([], '-32700', null, null, true);
 			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
@@ -85,11 +85,11 @@ class CJsonRpc {
 
 			list($api, $method) = explode('.', $call['method']) + [1 => ''];
 
-			$header = $this->request->header('AUTHORIZATION');
-			if ($header != null  && strpos($header, ZBX_API_HEADER_AUTHENTICATE_PREFIX) === 0) {
+			$header = $request->getAuthBearerValue();
+			if ($header != null) {
 				$auth = [
 					'type' => self::AUTH_TYPE_HEADER,
-					'auth' => $this->request->getAuthBearerValue()
+					'auth' => $header
 				];
 			}
 			elseif ($call['auth'] === null) {

@@ -78,7 +78,7 @@ class CHttpRequest {
 		foreach ($_SERVER as $i => $val) {
 			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
 				$name = str_replace(['HTTP_', '_'], ['', '-'], $i);
-				$this->headers[$name] = $val;
+				$this->headers[strtoupper($name)] = $val;
 			}
 		}
 	}
