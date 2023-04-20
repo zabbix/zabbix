@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -26,9 +27,19 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @dataSource ScheduledReports, Proxies, Services, Sla
  *
- * @onBefore prepareApiTokenData
+ * @onBefore prepareData
  */
 class testPermissionsWithoutCSRF extends CWebTest {
+
+	const INCORRECT_REQUEST = [
+		'message' => 'Zabbix has received an incorrect request.',
+		'details' => 'Operation cannot be performed due to unauthorized request.'
+	];
+
+	const ACCESS_DENIED = [
+		'message' => 'Access denied',
+		'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
+	];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -39,7 +50,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	public function prepareApiTokenData() {
+	public function prepareData() {
 		$tokens = CDataHelper::call('token.create', [
 			'name' => 'api_token_update',
 			'userid' => '1'
@@ -60,10 +71,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM sysmaps',
 					'link' => 'sysmaps.php?form=Create+map',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #1 Map update.
@@ -71,10 +79,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM sysmaps',
 					'link' => 'sysmaps.php?form=update&sysmapid=3',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #2 Host group create.
@@ -110,10 +115,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'templates.php?form=create',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #7 Template update.
@@ -121,10 +123,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'templates.php?form=update&templateid=10169',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #8 Host create.
@@ -146,10 +145,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM items',
 					'link' => 'items.php?form=update&hostid=50011&itemid=99086&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #11 Item create.
@@ -157,10 +153,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM items',
 					'link' => 'items.php?form=create&hostid=50011&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #12 Trigger update.
@@ -168,10 +161,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM triggers',
 					'link' => 'triggers.php?form=update&triggerid=100034&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #13 Trigger create.
@@ -179,10 +169,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM triggers',
 					'link' => 'triggers.php?hostid=50011&form=create&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #14 Graph update.
@@ -190,10 +177,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM graphs',
 					'link' => 'graphs.php?form=update&graphid=700026&filter_hostids%5B0%5D=99202&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #15 Graph create.
@@ -201,10 +185,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM graphs',
 					'link' => 'graphs.php?hostid=50011&form=create&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #16 Discovery rule update.
@@ -212,10 +193,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM drules',
 					'link' => 'host_discovery.php?form=update&itemid=99107&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #17 Discovery rule create.
@@ -223,10 +201,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM drules',
 					'link' => 'host_discovery.php?form=create&hostid=99202&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #18 Web scenario update.
@@ -234,10 +209,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM httptest',
 					'link' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #19 Web scenario create.
@@ -245,10 +217,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM httptest',
 					'link' => 'httpconf.php?form=create&hostid=50001&context=host',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'incorrect_request' => true
 				]
 			],
 			// #20 Maintenance create.
@@ -491,7 +460,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #50 create.
+			// #50 Media create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
@@ -655,6 +624,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	}
 
 	/**
+	 * Test function for checking the "POST" form, but with the deleted CSRF token element.
+	 *
 	 * @dataProvider getElementRemoveData
 	 */
 	public function testPermissionsWithoutCSRF_ElementRemove($data) {
@@ -663,25 +634,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// If form opens in the overlay dialog - open that dialog.
 		if (array_key_exists('overlay', $data)) {
-			switch ($data['overlay']) {
-				case 'create':
-					$clickable_element = $this->query("xpath://div[@class=\"header-controls\"]//button");
-					break;
+			$selectors = [
+				'create' => "//div[@class=\"header-controls\"]//button",
+				'update' => "//table[@class=\"list-table\"]//tr[1]/td[2]/a",
+				'problem' => '//table[@class="list-table"]//tr[1]//a[text()="Update"]',
+				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
+			];
 
-				case 'update':
-					$clickable_element = $this->query('xpath://table[@class="list-table"]//tr[1]/td[2]/a');
-					break;
-
-				case 'problem':
-					$clickable_element = $this->query('xpath://table[@class="list-table"]//tr[1]//a[text()="Update"]') ;
-					break;
-
-				case 'service':
-					$clickable_element = $this->query('xpath://table[@class="list-table"]//tr[1]//button[@title="Edit"]') ;
-					break;
-			}
-
-			$clickable_element->one()->waitUntilClickable()->click();
+			$this->query('xpath', $selectors[$data['overlay']])->one()->waitUntilClickable()->click();
 			$element = COverlayDialogElement::find()->waitUntilReady()->one();
 		}
 		else {
@@ -697,18 +657,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				' //div[contains(@class, "form-actions")]//button[text()="Update"]';
 		$add_button = 'xpath://button[text()="Add" and @type="submit"] | '.
 				' //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
-		$query = ($this->query($update_button)->exists())
-			? $update_button
-			: $add_button;
+		$query = ($this->query($update_button)->exists()) ? $update_button : $add_button;
 		$this->query($query)->waitUntilClickable()->one()->click();
 
 		// Check the error message depending on case.
-		$error = CTestArrayHelper::get($data, 'error',
-			[
-				'message' => 'Access denied',
-				'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
-			]
-		);
+		$error = CTestArrayHelper::get($data, 'incorrect_request') ? self::INCORRECT_REQUEST  : self::ACCESS_DENIED;
 		$this->assertMessage(TEST_BAD, $error['message'], $error['details']);
 		$this->checkReturnButton($data);
 
@@ -732,10 +685,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'link' => 'items.php?form=update&hostid=99134&itemid=99114&context=host&name=4_item&description='.
 							'&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT&update=Update'.
 							'&_csrf_token=',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'error' => self::INCORRECT_REQUEST
 				]
 			],
 			// #1 Correct token (update global macros).
@@ -760,10 +710,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'db' => 'SELECT * FROM graphs',
 					'link' => 'graphs.php?&form_refresh=1&form=create&hostid=99015&yaxismin=0&yaxismax=100'
 						.'&name=Test&width=900&height=200&graphtype=0&context=host&add=Add&_csrf_token=',
-					'error' => [
-						'message' => 'Zabbix has received an incorrect request.',
-						'details' => 'Operation cannot be performed due to unauthorized request.'
-					]
+					'error' => self::INCORRECT_REQUEST
 				]
 			],
 			// #3 No token.
@@ -784,10 +731,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 							'&subscriptions%5B1%5D%5Bcreatorid%5D=0&subscriptions%5B1%5D%5Bcreator_type%5D=1'.
 							'&subscriptions%5B1%5D%5Bcreator_name%5D=Recipient&subscriptions%5B1%5D%5Bcreator_inaccessible%5D=0'.
 							'&description=&status=0&action=scheduledreport.update',
-					'error' => [
-						'message' => 'Access denied',
-						'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
-					],
+					'error' => self::ACCESS_DENIED,
 					'return_button' => true
 				]
 			],
@@ -819,10 +763,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 							'&actions_suppress_problems=1&actions_close_problems=1&actions_execute_scripts=1&actions_manage_api_tokens=1'.
 							'&actions_manage_scheduled_reports=1&actions_manage_sla=1&actions_invoke_execute_now=1&actions_change_problem_ranking=1'.
 							'&actions_default_access=1&action=userrole.update',
-					'error' => [
-						'message' => 'Access denied',
-						'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
-					],
+					'error' => self::ACCESS_DENIED,
 					'return_button' => true
 				]
 			],
@@ -832,10 +773,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'db' => 'SELECT * FROM config',
 					'link' => 'zabbix.php?_csrf_token=12345abcd&tls_accept=1&tls_in_none=1&tls_psk_identity=&tls_psk='.
 							'&action=autoreg.update',
-					'error' => [
-						'message' => 'Access denied',
-						'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
-					],
+					'error' => self::ACCESS_DENIED,
 					'return_button' => true
 				]
 			]
@@ -843,6 +781,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	}
 
 	/**
+	 * Test function for checking the "GET" form (direct url), with the different types of CSRF tokens.
+	 *
 	 * @dataProvider getCheckTokenData
 	 */
 	public function testPermissionsWithoutCSRF_CheckToken($data) {
@@ -855,8 +795,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			$this->page->open($data['link'].$this->query('xpath:.//input[@name="_csrf_token"]')
 					->one()->getAttribute('value'))->waitUntilReady();
 		}
-
-		$this->page->open($data['link'])->waitUntilReady();
+		else {
+			$this->page->open($data['link'])->waitUntilReady();
+		}
 
 		// Check the error message depending on case.
 		$this->assertMessage(TEST_BAD, $data['error']['message'], $data['error']['details']);
