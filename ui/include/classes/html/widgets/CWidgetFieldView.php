@@ -35,8 +35,6 @@ abstract class CWidgetFieldView {
 	protected ?CTag $hint = null;
 	protected $help_hint;
 
-
-
 	public function setFormName($form_name): self {
 		$this->form_name = $form_name;
 
@@ -70,8 +68,8 @@ abstract class CWidgetFieldView {
 
 		return (new CLabel([$label, $this->hint, $this->help_hint !== null ? makeHelpIcon($this->help_hint) : null]))
 			->setFor(zbx_formatDomId($this->field->getName()))
-			->addClass($this->label_class ? implode(' ', $this->label_class) : null)
-			->setAsteriskMark($this->isRequired());
+			->setAsteriskMark($this->isRequired())
+			->addClass($this->label_class ? implode(' ', $this->label_class) : null);
 	}
 
 	/**
