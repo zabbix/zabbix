@@ -84,9 +84,6 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))
-			)
-			->addField(
 				(new CWidgetFieldColor('bg_color', _('Background color')))->allowInherited()
 			)
 			->addField(

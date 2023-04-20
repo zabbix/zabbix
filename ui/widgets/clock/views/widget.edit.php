@@ -45,7 +45,7 @@ $form
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addField(
-				(new CWidgetFieldColorView($data['fields']['bg_color']))->addRowClass('js-row-bg-color'),
+				new CWidgetFieldColorView($data['fields']['bg_color'])
 			)
 			->addFieldsGroup(
 				getDateFieldsGroupViews($form, $data['fields'])
@@ -56,6 +56,7 @@ $form
 			->addFieldsGroup(
 				getTimeZoneFieldsGroupViews($form, $data['fields'])
 			)
+			->addClass('js-fieldset-adv-conf')
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_clock_form.init();')
@@ -82,9 +83,10 @@ function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetF
 	$time_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
 
 	return (new CWidgetFieldsGroupView(_('Time')))
-		->addItem(
-			[$time_size->getLabel(), (new CFormField([$time_size->getView(), '%']))->addClass('field-size')]
-		)
+		->addItem([
+			$time_size->getLabel(),
+			(new CFormField([$time_size->getView(), '%']))->addClass('field-size')
+		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['time_bold'])
 		)
@@ -104,9 +106,10 @@ function getTimeZoneFieldsGroupViews(CWidgetFormView $form, array $fields): CWid
 	$tzone_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['tzone_size']));
 
 	return (new CWidgetFieldsGroupView(_('Time zone')))
-		->addItem(
-			[$tzone_size->getLabel(), (new CFormField([$tzone_size->getView(), '%']))->addClass('field-size')]
-		)
+		->addItem([
+			$tzone_size->getLabel(),
+			(new CFormField([$tzone_size->getView(), '%']))->addClass('field-size')
+		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['tzone_bold'])
 		)
