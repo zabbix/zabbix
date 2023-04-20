@@ -1225,8 +1225,7 @@ class testScimUser extends CAPIScimTest {
 		// Delete userdirectories.
 		CDataHelper::call('userdirectory.delete', array_values(self::$data['userdirectoryid']));
 
-		// Delete scim groups and its members.
-		DB::delete('user_scim_group', ['userid' => array_values(self::$data['user_scim_groupids'])]);
+		// Delete scim groups.
 		DB::delete('scim_group', ['scim_groupid' => array_values(self::$data['scim_groupids'])]);
 
 		// Delete token.

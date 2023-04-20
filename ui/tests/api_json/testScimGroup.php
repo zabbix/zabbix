@@ -1362,6 +1362,7 @@ class testScimGroup extends CAPIScimTest {
 		$this->resolveData($expected_result);
 
 		$result = $this->call('groups.patch', $group);
+		CTestArrayHelper::usort($result['members'], ['value']);
 
 		// Compare response with expected response.
 		$this->assertEquals($expected_result, $result, 'Returned response should match.');
