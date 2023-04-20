@@ -25,7 +25,7 @@ class CControllerDiscoveryUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'druleid' =>				'required|db drules.druleid',
 			'name' =>					'required|db drules.name|not_empty',
@@ -55,20 +55,11 @@ class CControllerDiscoveryUpdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)) {
-			return false;
-		}
-
-		return (bool) API::DRule()->get([
-			'output' => [],
-			'druleids' => $this->getInput('druleid'),
-			'countOutput' => true,
-			'editable' => true
-		]);
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$drule = [];
 		$this->getInputs($drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks']);
 		$uniq = $this->getInput('uniqueness_criteria', 0);

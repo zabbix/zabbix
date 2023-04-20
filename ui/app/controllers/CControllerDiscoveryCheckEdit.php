@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -29,11 +29,11 @@ class CControllerDiscoveryCheckEdit extends CController {
 	 */
 	const DEFAULT_TYPE = SVC_FTP;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'update' =>					'in 1',
 			'dcheckid' =>				'string',
@@ -66,11 +66,11 @@ class CControllerDiscoveryCheckEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = array_merge([
 			'type' => self::DEFAULT_TYPE,
 			'ports' => svc_default_port(self::DEFAULT_TYPE)

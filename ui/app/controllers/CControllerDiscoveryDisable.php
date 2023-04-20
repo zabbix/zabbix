@@ -25,7 +25,7 @@ class CControllerDiscoveryDisable extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'druleids' =>	'required|array_db drules.druleid'
 		];
@@ -45,11 +45,11 @@ class CControllerDiscoveryDisable extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$drules = [];
 
 		foreach ($this->getInput('druleids') as $druleid) {

@@ -112,8 +112,7 @@ $uniqueness_template = (new CTemplateTag('unique-row-tmpl'))->addItem(
 			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 			->setId('uniqueness_criteria_#{dcheckid}'),
 		(new CLabel([new CSpan(), '#{name}'], 'uniqueness_criteria_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
-	]))
-		->setId('uniqueness_criteria_row_#{dcheckid}')
+	]))->setId('uniqueness_criteria_row_#{dcheckid}')
 );
 
 // Append host source to form list.
@@ -137,8 +136,7 @@ $host_source_template = (new CTemplateTag('host-source-row-tmpl'))->addItem(
 			->setAttribute('data-id', '#{dcheckid}')
 			->setId('host_source_#{dcheckid}'),
 		(new CLabel([new CSpan(), '#{name}'], 'host_source_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
-	]))
-		->setId('host_source_row_#{dcheckid}')
+	]))->setId('host_source_row_#{dcheckid}')
 );
 
 // Append name source to form list.
@@ -163,8 +161,7 @@ $name_source_template = (new CTemplateTag('name-source-row-tmpl'))->addItem(
 			->setAttribute('data-id', '#{dcheckid}')
 			->setId('name_source_#{dcheckid}'),
 		(new CLabel([new CSpan(), '#{name}'], 'name_source_#{dcheckid}'))->addClass(ZBX_STYLE_WORDWRAP)
-	]))
-		->setId('name_source_row_#{dcheckid}')
+	]))->setId('name_source_row_#{dcheckid}')
 );
 
 $discoveryFormGrid->addItem([
