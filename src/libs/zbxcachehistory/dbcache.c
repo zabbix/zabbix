@@ -1946,6 +1946,9 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const zbx_
 		case ITEM_VALUE_TYPE_TEXT:
 			zbx_strscpy(value, h->value.str);
 			break;
+		case ITEM_VALUE_TYPE_LOG:
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
 		default:
 			return;
 	}
@@ -2505,7 +2508,8 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 					select_uint = {.table_name = "history_uint"},
 					select_str = {.table_name = "history_str"},
 					select_log = {.table_name = "history_log"},
-					select_text = {.table_name = "history_text"};
+					select_text = {.table_name = "history_text"},
+					select_bin = {.table_name = "history_bin"};
 	zbx_vector_ptr_t		duplicates, history_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2532,6 +2536,8 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 			select_ptr = &select_log;
 		else if (h->value_type == ITEM_VALUE_TYPE_TEXT)
 			select_ptr = &select_text;
+		else if (h->value_type == ITEM_VALUE_TYPE_BIN)
+			select_ptr = &select_bin;
 		else
 			continue;
 
@@ -2554,6 +2560,7 @@ static void	remove_history_duplicates(zbx_vector_ptr_t *history)
 	db_fetch_duplicates(&select_str, ITEM_VALUE_TYPE_STR, &duplicates);
 	db_fetch_duplicates(&select_log, ITEM_VALUE_TYPE_LOG, &duplicates);
 	db_fetch_duplicates(&select_text, ITEM_VALUE_TYPE_TEXT, &duplicates);
+	db_fetch_duplicates(&select_bin, ITEM_VALUE_TYPE_BIN, &duplicates);
 
 	vc_flag_duplicates(&history_index, &duplicates);
 
@@ -4170,6 +4177,8 @@ static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, const zbx_tim
 
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
+	item_value->item_value_type = ITEM_VALUE_TYPE_NONE;
+	item_value->value_type = ITEM_VALUE_TYPE_NONE;
 	item_value->state = ITEM_STATE_NOTSUPPORTED;
 	item_value->flags = flags;
 
@@ -4195,6 +4204,8 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->state = ITEM_STATE_NORMAL;
+	item_value->item_value_type = ITEM_VALUE_TYPE_NONE;
+	item_value->value_type = ITEM_VALUE_TYPE_NONE;
 	item_value->flags = ZBX_DC_FLAG_LLD;
 	item_value->value.value_str.len = strlen(value_orig) + 1;
 
