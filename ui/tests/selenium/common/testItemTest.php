@@ -529,10 +529,43 @@ class testItemTest extends CWebTest {
 		return array_merge($this->getCommonTestItemData(), [
 			[
 				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated0'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated1',
+						'Formula' => '((),9'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "),9".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated2',
+						'Formula' => '{{?{{?{{?'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "{{?{{?{{?".'
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Calculated',
-						'Key' => 'test.calculated'
+						'Key' => 'test.calculated',
+						'Formula' => 'avg(/Zabbix Server/zabbix[wcache,values],10m)'
 					]
 				]
 			],
@@ -1026,6 +1059,11 @@ class testItemTest extends CWebTest {
 				}
 				break;
 			case TEST_BAD:
+				if (CTestArrayHelper::get($data, 'test_error')) {
+					$overlay->query('button:Get value and test')->one()->click();
+					$data['error'] = $data['test_error'];
+				}
+
 				$error_message = ($lld) ? $data['lld_error'] : $data['error'];
 				$this->assertMessage(TEST_BAD, null, $error_message);
 				$overlay->close();
