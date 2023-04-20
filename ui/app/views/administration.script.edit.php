@@ -75,7 +75,6 @@ $form_grid = (new CFormGrid())
 		new CFormField(
 			(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('autofocus', 'autofocus')
 				->setAriaRequired())
 	])
 	->addItem(([

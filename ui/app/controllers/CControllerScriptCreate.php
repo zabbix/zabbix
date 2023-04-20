@@ -52,8 +52,7 @@ class CControllerScriptCreate extends CController {
 			'usrgrpid' =>				'db scripts.usrgrpid',
 			'hgstype' =>				'in 0,1',
 			'confirmation' =>			'db scripts.confirmation|not_empty',
-			'enable_confirmation' =>	'in 1',
-			'form_refresh' =>			'int32'
+			'enable_confirmation' =>	'in 1'
 		];
 
 		$ret = $this->validateInput($fields);

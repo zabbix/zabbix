@@ -147,21 +147,6 @@ class CControllerScriptEdit extends CController {
 			}
 		}
 
-		// Overwrite with input variables.
-		$this->getInputs($data, ['name', 'command', 'commandipmi', 'script', 'host_access', 'usrgrpid', 'hgstype',
-			'groupid', 'description', 'enable_confirmation', 'confirmation', 'type', 'execute_on', 'timeout', 'scope',
-			'port', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'passphrase', 'menu_path',
-			'parameters', 'url', 'new_window'
-		]);
-
-		if ($this->hasInput('form_refresh') && array_key_exists('name', $data['parameters'])
-				&& array_key_exists('value', $data['parameters'])) {
-			$data['parameters'] = array_map(function ($name, $value) {
-					return compact('name', 'value');
-				}, $data['parameters']['name'], $data['parameters']['value']
-			);
-		}
-
 		// Get host group.
 		if ($data['groupid'] == 0) {
 			$data['hostgroup'] = null;

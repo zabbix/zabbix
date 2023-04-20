@@ -115,6 +115,7 @@ window.script_edit_popup = new class {
 
 		hgstype.dispatchEvent(new Event('change'));
 		this.form.removeAttribute('style');
+		document.getElementById('name').focus();
 	}
 
 	clone({title, buttons}) {
@@ -122,6 +123,8 @@ window.script_edit_popup = new class {
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
+
+		document.getElementById('name').focus();
 	}
 
 	delete() {
