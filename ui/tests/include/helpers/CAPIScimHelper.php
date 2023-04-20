@@ -130,7 +130,7 @@ class CAPIScimHelper extends CAPIHelper {
 	public static function call($method, $params) {
 		return static::callRaw([
 			'method' => $method,
-			'params' => $params,
+			'params' => $params
 		], static::$token);
 	}
 }

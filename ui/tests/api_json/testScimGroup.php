@@ -170,8 +170,7 @@ class testScimGroup extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['ldap_user'],
-				'userdirectoryid' => self::$data['userdirectoryids']['ldap'],
-
+				'userdirectoryid' => self::$data['userdirectoryids']['ldap']
 			]
 		]);
 		$this->assertArrayHasKey('userids', $user);
