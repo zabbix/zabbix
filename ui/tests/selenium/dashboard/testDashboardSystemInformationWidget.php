@@ -121,10 +121,10 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 	public function testDashboardSystemInformationWidget_checkDisabledHA() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		// Waits for loading the widget.
-		sleep(1);
 		$this->assertScreenshotExcept(CDashboardElement::find()->one()->waitUntilReady(),
-				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one(), 'widget_without_ha');
+				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')
+				->waitUntilVisible()->one(), 'widget_without_ha'
+		);
 	}
 
 	public function testDashboardSystemInformationWidget_Create() {
@@ -257,10 +257,10 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		}
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		// Wait for load the widget.
-		sleep(1);
-		$this->assertScreenshotExcept($dashboard,
-				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one(), $action.'_widgets');
+
+		$this->assertScreenshotExcept(CDashboardElement::find()->one()->waitUntilReady(),
+				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->waitUntilVisible()->one(),
+			$action.'_widgets');
 
 		foreach ($widgets as $widget_data) {
 			// Check widget refresh interval.
