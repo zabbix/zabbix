@@ -22,6 +22,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 /*#include "stats.h"*/
+#include "zbxthreads.h"
 #include "log.h"
 
 static ZBX_THREAD_LOCAL zbx_perf_counter_id_t	*PerfCounterList = NULL;
