@@ -108,6 +108,104 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Detect if response was redirected or not and if redirected        *
+ *          response is treated as host down.                                 *
+ *                                                                            *
+ * Parameters: allow_redirect - [IN] 0: redirected response treated as host   *
+ *                                      down                                  *
+ *                                   1: redirected response is not treated    *
+ *                                      as host                               *
+ *             linebuf        - [IN]    bufuer containing fping output line   *
+ *                                                                            *
+ * Return value: SUCCEED - no redirect was detected or                        *
+ *                         redirect was detected and redirect is allowed      *
+ *               FAIL    - redirect was detected and redirect is not allowed  *
+ *                         (target host down)                                 *
+ *                                                                            *
+ * Comments: Redirected response is a situation when the target that is being *
+ *           ICMP pinged responds from a different IP address.                *
+ *                                                                            *
+ ******************************************************************************/
+static int	redirect_detect(const char *linebuf, unsigned char allow_redirect)
+{
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	/* In case of a redirected response, fping would add the response IP address in square        */
+	/* brackets with left triangular bracket and a dash: '[<- AAA.BBB.CCC.DDD]'.                  */
+
+	if (0 == allow_redirect && NULL != strstr(linebuf, " [<-"))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "treating redirected response as target host down: \"%s\"",
+				linebuf);
+		ret = FAIL;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Remove redirected response source address '[<- AAA.BBB.CCC.DDD]'  *
+ *          from fping output line buffer, if present                         *
+ *                                                                            *
+ * Parameters: linebuf        - [IN/OUT] buffer containing fping output line  *
+ *                                                                            *
+ * Return value: SUCCEED - no format error was detected                       *
+ *               FAIL    - unexpected format was detected                     *
+ *                                                                            *
+ * Comments: Redirected response is a situation when the target that is being *
+ *           ICMP pinged responds from a different IP address.                *
+ *                                                                            *
+ *           Format error should never happen unless fping output format is   *
+ *           changed in future versions.                                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	resp_src_remove(char *linebuf)
+{
+	int	ret = SUCCEED;
+	char	*p_start;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	/* In case of a redirected response, fping would add the response IP address in square        */
+	/* brackets with left triangular bracket and a dash: '[<- AAA.BBB.CCC.DDD]'.                  */
+	/*                                                                                            */
+	/* Before fping 3.11, fping appends response source address at the end of the line:           */
+	/* '192.168.1.1 : [0], 84 bytes, 0.61 ms (0.61 avg, 0% loss) [<- 192.168.1.2]'                */
+	/*                                                                                            */
+	/* Since fping 3.11, fping prepends response source address at the beginning of the line:     */
+	/* ' [<- 192.168.1.2]192.168.1.1 : [0], 84 bytes, 0.65 ms (0.65 avg, 0% loss)'                */
+
+	if (NULL != (p_start = strstr(linebuf, " [<-")))
+	{
+		char	*p_end;
+
+		if (NULL == (p_end = strchr(p_start, ']')))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "should never happen; unexpected syntax in response from fping:"
+					" \"%s\"; \"]\" after \" [<-\" was expected", linebuf);
+			ret = FAIL;
+			goto out;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "removing redirected response source address from line: \"%s\"", linebuf);
+
+		p_end++;
+
+		memmove(p_start, p_end, strlen(p_end) + 1);	/* include zero-termination character */
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: detect minimal possible fping packet interval                     *
  *                                                                            *
  * Parameters: fping         - [IN] the location of fping program             *
@@ -213,11 +311,18 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 			/* unless we hit the help message which is always bigger than 1 Kb             */
 			if (ZBX_KIBIBYTE > strlen(out))
 			{
+				if (SUCCEED != resp_src_remove(out))
+				{
+					zbx_rtrim(out, "\n");
+					zbx_strlcpy(error, out, max_error_len);
+					goto out;
+				}
+
 				/* skip white spaces */
 				for (p = out; '\0' != *p && isspace(*p); p++)
 					;
 
-				if (strlen(p) >= strlen(dst) && NULL != strstr(p, dst))
+				if (strlen(p) >= strlen(dst) && 0 == strncmp(p, dst, strlen(dst)))
 				{
 					*value = (int)intervals[j];
 					ret = SUCCEED;
@@ -286,71 +391,6 @@ static int	get_ipv6_support(const char *fping, const char *dst)
 
 }
 #endif	/* HAVE_IPV6 */
-
-/******************************************************************************
- *                                                                            *
- * Purpose: detect if response was redirected or not and if redirected        *
- *          response is treated as host down                                  *
- *                                                                            *
- * Parameters: args - [IN] host data and fping settings                       *
- *             resp - [IN/OUT] fping output                                   *
- *                                                                            *
- * Return value: SUCCEED - no redirect was detected or                        *
- *                         redirect was detected and redirect is allowed      *
- *               FAIL    - redirect was detected and redirect is not allowed  *
- *                         or invalid syntax was detected (host down)         *
- *                                                                            *
- * Comments: Redirected response is a situation when the target that is being *
- *           ICMP pinged responds from a different IP address.                *
- *                                                                            *
- ******************************************************************************/
-static int	redirect_detect(zbx_fping_args *args, zbx_fping_resp *resp)
-{
-	int	ret = SUCCEED;
-	char	*p_start;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	/* In case of a redirected response, fping would add the response IP address in square        */
-	/* brackets with left triangular bracket and a dash: '[<- AAA.BBB.CCC.DDD]'.                  */
-	/*                                                                                            */
-	/* Before fping 3.11, fping appends response source address at the end of the line:           */
-	/* '192.168.1.1 : [0], 84 bytes, 0.61 ms (0.61 avg, 0% loss) [<- 192.168.1.2]'                */
-	/*                                                                                            */
-	/* Since fping 3.11, fping prepends response source address at the beginning of the line:     */
-	/* ' [<- 192.168.1.2]192.168.1.1 : [0], 84 bytes, 0.65 ms (0.65 avg, 0% loss)'                */
-
-	if (NULL != (p_start = strstr(resp->linebuf, " [<-")))
-	{
-		char	*p_end;
-
-		if (0 == args->allow_redirect)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "treating redirected response as target host down: \"%s\"",
-					resp->linebuf);
-			ret = FAIL;
-			goto out;
-		}
-
-		if (NULL == (p_end = strchr(p_start, ']')))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "ignoring a response from fping with unexpected syntax: \"%s\";"
-					" \"]\" after \" [<-\" was expected", resp->linebuf);
-			ret = FAIL;
-			goto out;
-		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "redirected response is allowed for host: \"%s\"", resp->linebuf);
-
-		p_end++;
-
-		memmove(p_start, p_end, strlen(p_end) + 1);	/* include zero-termination character */
-	}
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -505,7 +545,10 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() linebuf: \"%s\"", __func__, resp->linebuf);
 
-	if (SUCCEED != redirect_detect(args, resp))
+	if (SUCCEED != redirect_detect(resp->linebuf, args->allow_redirect))
+		return;
+
+	if (SUCCEED != resp_src_remove(resp->linebuf))
 		return;
 
 	if (SUCCEED != host_get(resp, args, &host))
