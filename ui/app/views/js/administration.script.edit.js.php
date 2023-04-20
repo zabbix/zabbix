@@ -50,9 +50,9 @@ window.script_edit_popup = new class {
 	_initActions() {
 		document.querySelector('#scope').dispatchEvent(new Event('change'));
 		document.querySelector('#type').dispatchEvent(new Event('change'));
-		document.querySelector('#enable-confirmation').dispatchEvent(new Event('change'))
+		document.querySelector('#enable-confirmation').dispatchEvent(new Event('change'));
 
-		document.getElementById('parameter-add').addEventListener('click', () => {
+		document.getElementById('js-add').addEventListener('click', () => {
 			let template = new Template(document.getElementById('script-parameter-template').innerHTML);
 
 			document
@@ -61,7 +61,7 @@ window.script_edit_popup = new class {
 		});
 
 		this.dialogue.addEventListener('click', (e) => {
-			if (e.target.classList.contains('element-table-remove')) {
+			if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
 			}
 		});
@@ -76,10 +76,10 @@ window.script_edit_popup = new class {
 	}
 
 	_loadView(script) {
-		const that = this;
 		this.scope = parseInt(script.scope);
 		this.type = parseInt(script.type);
 		this.confirmation = script.enable_confirmation;
+		const that = this;
 
 		// Load scope fields.
 		document.querySelector('#scope').onchange = function (e) {
@@ -245,11 +245,11 @@ window.script_edit_popup = new class {
 		let show_fields = [];
 		let hide_fields = [
 			'#command-ipmi-label', '#command-ipmi', '#webhook-parameters', '#webhook-parameters-label',
-			'#js-item-script-field', '#script-label', '#timeout-label', '#timeout-field', '#auth-type-label', '#auth-type',
-			'#username-label', '#username-field', '#password-label', '#password-field', '#publickey-label',
-			'#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label', '#passphrase-field',
-			'#port-label', '#port-field', '#url', '#url-label', '#new-window-label', '#new-window', '#execute-on-label',
-			'#execute-on', '#commands-label', '#commands'
+			'#js-item-script-field', '#script-label', '#timeout-label', '#timeout-field', '#auth-type-label',
+			'#auth-type', '#username-label', '#username-field', '#password-label', '#password-field',
+			'#publickey-label', '#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label',
+			'#passphrase-field', '#port-label', '#port-field', '#url', '#url-label', '#new-window-label', '#new-window',
+			'#execute-on-label', '#execute-on', '#commands-label', '#commands'
 		];
 
 		hide_fields.forEach((field) => {
@@ -295,7 +295,6 @@ window.script_edit_popup = new class {
 				}
 
 				document.querySelector('#authtype').dispatchEvent(new Event('change'));
-
 				break;
 
 			case <?= ZBX_SCRIPT_TYPE_TELNET ?>:

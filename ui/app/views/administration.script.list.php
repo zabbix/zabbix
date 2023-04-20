@@ -47,19 +47,29 @@ $html_page = (new CHtmlPage())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			),
-			(new CFormList())->addRow(_('Scope'),
-				(new CRadioButtonList('filter_scope', (int) $data['filter']['scope']))
-					->addValue(_('Any'), -1)
-					->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
-					->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
-					->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
-					->setModern(true)
-			)
+			(new CFormGrid())
+				->addStyle('margin-top: 5px; margin-bottom: 5px;')
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Name'), 'filter_name'),
+					(new CTextBox('filter_name', $data['filter']['name']))
+						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+						->setAttribute('autofocus', 'autofocus')
+				]),
+			(new CFormGrid())
+				->addStyle('margin-top: 5px; margin-bottom: 5px;')
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Scope')),
+					new CFormField(
+						(new CRadioButtonList('filter_scope', (int) $data['filter']['scope']))
+							->addValue(_('Any'), -1)
+							->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
+							->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
+							->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
+							->setModern(true)
+				)
+			])
 		])
 		->addVar('action', 'script.list')
 	);

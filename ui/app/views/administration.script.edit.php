@@ -46,8 +46,7 @@ $parameters_table = (new CTable())
 				(new CCol(
 					(new CSimpleButton(_('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-add')
-						->setId('parameter-add')
+						->setId('js-add')
 				))->setColSpan(2)
 			)
 	);
@@ -66,9 +65,8 @@ $row_template = (new CTemplateTag('script-parameter-template'))
 			(new CButton('', _('Remove')))
 				->removeId()
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		]))
-			->addClass('form_row')
+				->addClass('js-remove')
+		]))->addClass('form_row')
 	);
 
 $form_grid = (new CFormGrid())
@@ -87,7 +85,7 @@ $form_grid = (new CFormGrid())
 				->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
 				->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
 				->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
-				->setModern(true)
+				->setModern()
 				->setEnabled(!$data['actions']))
 	]))
 	->addItem([
@@ -109,7 +107,7 @@ $form_grid = (new CFormGrid())
 				->addValue(_('SSH'), ZBX_SCRIPT_TYPE_SSH)
 				->addValue(_('Telnet'), ZBX_SCRIPT_TYPE_TELNET)
 				->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
-				->setModern(true)
+				->setModern()
 		)
 	])
 	->addItem([
@@ -119,7 +117,7 @@ $form_grid = (new CFormGrid())
 				->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 				->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
 				->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-				->setModern(true)
+				->setModern()
 				->setId('execute-on')
 		))->setId('execute-on')
 	])
@@ -324,7 +322,7 @@ $form_grid
 			(new CRadioButtonList('host_access', (int) $data['host_access']))
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Write'), PERM_READ_WRITE)
-				->setModern(true)
+				->setModern()
 				->setId('host-access')
 		))->setId('host-access-field')
 	])
@@ -342,8 +340,7 @@ $form_grid
 			(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
 				->setAttribute('disabled', $data['enable_confirmation'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			// todo - fix space
-			SPACE,
+			'&nbsp;',
 			(new CButton('testConfirmation', _('Test confirmation')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->setAttribute('disabled', $data['enable_confirmation'])
@@ -408,10 +405,10 @@ $form
 	->addItem($form_grid)
 	->addItem($row_template)
 	->addItem(
-	(new CScriptTag('script_edit_popup.init('.json_encode([
-		'script' => $data
-	]).');'))->setOnDocumentReady()
-)
+		(new CScriptTag('script_edit_popup.init('.json_encode([
+			'script' => $data
+		]).');'))->setOnDocumentReady()
+	)
 	->addStyle('display: none;');
 
 $output = [

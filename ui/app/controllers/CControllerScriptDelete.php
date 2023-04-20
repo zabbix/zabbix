@@ -50,14 +50,7 @@ class CControllerScriptDelete extends CController {
 			return false;
 		}
 
-		// todo - check this:
-		$scripts = API::Script()->get([
-			'countOutput' => true,
-			'scriptids' => $this->getInput('scriptids'),
-			'editable' => true
-		]);
-
-		return ($scripts == count($this->getInput('scriptids')));
+		return true;
 	}
 
 	protected function doAction(): void {

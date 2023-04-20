@@ -78,11 +78,7 @@ class CControllerScriptUpdate extends CController {
 			return false;
 		}
 
-		return (bool) API::Script()->get([
-			'output' => [],
-			'scriptids' => $this->getInput('scriptid'),
-			'editable' => true
-		]);
+		return true;
 	}
 
 	protected function doAction(): void {
