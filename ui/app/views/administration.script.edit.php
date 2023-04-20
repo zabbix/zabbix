@@ -89,8 +89,7 @@ $form_grid = (new CFormGrid())
 				->setEnabled(!$data['actions']))
 	]))
 	->addItem([
-		(new CLabel(_('Menu path'), 'menu_path'))
-			->setId('menu-path-label'),
+		(new CLabel(_('Menu path'), 'menu_path'))->setId('menu-path-label'),
 		(new CFormField(
 			(new CTextBox('menu_path', $data['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -209,14 +208,11 @@ $form_grid = (new CFormGrid())
 		))->setId('command-ipmi')
 	])
 	->addItem([
-		(new CLabel(_('Parameters'), $parameters_table->getId()))
-			->setId('webhook-parameters-label'),
+		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('webhook-parameters-label'),
 		(new CFormField(
 			(new CDiv($parameters_table))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-			// todo - fix this
-			'row-webhook-parameters'
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('webhook-parameters')
 	])
 
@@ -312,8 +308,7 @@ $form_grid
 		))->setId('host-group-selection')
 	)
 	->addItem([
-		(new CLabel(_('User group'), $select_usrgrpid->getFocusableElementId()))
-		->setId('usergroup-label'),
+		(new CLabel(_('User group'), $select_usrgrpid->getFocusableElementId()))->setId('usergroup-label'),
 		(new CFormField($select_usrgrpid))->setId('usergroup')
 	])
 	->addItem([

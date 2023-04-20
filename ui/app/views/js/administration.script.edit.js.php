@@ -35,7 +35,7 @@ window.script_edit_popup = new class {
 		this.scriptid = script.scriptid;
 
 		this._loadView(script);
-		this._hideFields('all');
+		this._hideFormFields('all');
 		this.form.removeAttribute('style');
 
 		this._initActions();
@@ -75,6 +75,9 @@ window.script_edit_popup = new class {
 			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
 	}
 
+	/**
+	 * Compiles necessary fields for popup based on scope, type, confirmation and host group type fields.
+	 */
 	_loadView(script) {
 		this.scope = parseInt(script.scope);
 		this.type = parseInt(script.type);
@@ -83,19 +86,19 @@ window.script_edit_popup = new class {
 
 		// Load scope fields.
 		document.querySelector('#scope').onchange = function (e) {
-			that._hideFields('all');
-			that._loadScope(e);
+			that._hideFormFields('all');
+			that._loadScopeFields(e);
 			document.querySelector('#type').dispatchEvent(new Event('change'));
 		}
 
 		// Load type fields.
 		document.querySelector('#type').onchange = function (e) {
-			that._loadType(script, e);
+			that._loadTypeFields(script, e);
 		}
 
 		// Update confirmation fields
 		document.querySelector('#enable-confirmation').onchange = function (e) {
-			that._confirmationFields(e);
+			that._loadConfirmationFields(e);
 		}
 
 		// test confirmation button
@@ -104,15 +107,19 @@ window.script_edit_popup = new class {
 		});
 
 		// host group selection
-		document.querySelector('#hgstype-select').onchange = function () {
-			if (document.querySelector('#hgstype-select').value == 1) {
-				document.querySelector('#host-group-selection').style.display = '';
+		const hgstype = document.querySelector('#hgstype-select');
+		const hostgroup_selection = document.querySelector('#host-group-selection');
+
+		hgstype.onchange = function () {
+			if (hgstype.value === '1') {
+				hostgroup_selection.style.display = '';
 			}
 			else {
-				document.querySelector('#host-group-selection').style.display = 'none';
+				hostgroup_selection.style.display = 'none';
 			}
 		}
-		document.querySelector('#hgstype-select').dispatchEvent(new Event('change'));
+
+		hgstype.dispatchEvent(new Event('change'));
 	}
 
 	clone({title, buttons}) {
@@ -196,7 +203,10 @@ window.script_edit_popup = new class {
 			});
 	}
 
-	_loadScope(event) {
+	/**
+	 * Displays or hides fields in the popup based on the value of selected scope.
+	 */
+	_loadScopeFields(event) {
 		if (event.target.value) {
 			this.scope = parseInt(event.target.value);
 		}
@@ -237,7 +247,10 @@ window.script_edit_popup = new class {
 		}
 	}
 
-	_loadType(script, event) {
+	/**
+	 * Displays or hides fields in the popup based on the value of selected type.
+	 */
+	_loadTypeFields(script, event) {
 		if (event.target.value) {
 			this.type = parseInt(event.target.value);
 		}
@@ -256,29 +269,32 @@ window.script_edit_popup = new class {
 			document.querySelector(field).style.display = 'none';
 		})
 
+		const command_ipmi = document.querySelector('#commandipmi');
+		const command = document.querySelector('#command');
+
 		switch (this.type) {
 			case <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>:
-				if (document.querySelector('#commandipmi').value !== '') {
-					document.querySelector('#command').value = document.querySelector('#commandipmi').value;
-					document.querySelector('#commandipmi').value = '';
+				if (command_ipmi.value !== '') {
+					command.value = command_ipmi.value;
+					command_ipmi.value = '';
 				}
 
 				show_fields = ['#execute-on-label', '#execute-on', '#commands-label', '#commands'];
 				break;
 
 			case <?= ZBX_SCRIPT_TYPE_IPMI ?>:
-				if (document.querySelector('#command').value !== '') {
-					document.querySelector('#commandipmi').value = document.querySelector('#command').value;
-					document.querySelector('#command').value = '';
+				if (command.value !== '') {
+					command_ipmi.value = command.value;
+					command.value = '';
 				}
 
 				show_fields = ['#command-ipmi-label', '#command-ipmi'];
 				break;
 
 			case <?= ZBX_SCRIPT_TYPE_SSH ?>:
-				if (document.querySelector('#commandipmi').value !== '') {
-					document.querySelector('#command').value = document.querySelector('#commandipmi').value;
-					document.querySelector('#commandipmi').value = '';
+				if (command_ipmi.value !== '') {
+					command.value = command_ipmi.value;
+					command_ipmi.value = '';
 				}
 
 				show_fields = [
@@ -291,16 +307,16 @@ window.script_edit_popup = new class {
 				const that = this;
 
 				document.querySelector('#authtype').onchange = function (e) {
-					that._authFields(e);
+					that._loadAuthFields(e);
 				}
 
 				document.querySelector('#authtype').dispatchEvent(new Event('change'));
 				break;
 
 			case <?= ZBX_SCRIPT_TYPE_TELNET ?>:
-				if (document.querySelector('#commandipmi').value !== '') {
-					document.querySelector('#command').value = document.querySelector('#commandipmi').value;
-					document.querySelector('#commandipmi').value = '';
+				if (command_ipmi.value !== '') {
+					command.value = command_ipmi.value;
+					command_ipmi.value = '';
 				}
 
 				show_fields = [
@@ -327,8 +343,12 @@ window.script_edit_popup = new class {
 		})
 	}
 
-	_authFields(e) {
-		this._hideFields('auth');
+	/**
+	 * Displays or hides fields in the popup based on the value of selected authentication method.
+	 * This is relevant only when the script type is SSH.
+	 */
+	_loadAuthFields(e) {
+		this._hideFormFields('auth');
 
 		let show_fields = [];
 
@@ -354,7 +374,11 @@ window.script_edit_popup = new class {
 		})
 	}
 
-	_confirmationFields(e) {
+	/**
+	 * Displays or hides confirmation fields in the popup based on the value of selected scope.
+	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION
+	 */
+	_loadConfirmationFields(e) {
 		if (e.target.value) {
 			this.confirmation = e.target.checked;
 		}
@@ -379,7 +403,7 @@ window.script_edit_popup = new class {
 		}
 	}
 
-	_hideFields(type) {
+	_hideFormFields(type) {
 		let fields = [];
 
 		if (type === 'auth') {
