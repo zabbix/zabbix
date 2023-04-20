@@ -419,12 +419,11 @@ $sharing_tab = (new CFormList('sharing_form'))
 $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab, TAB_INDICATOR_SHARING);
 
 // Append buttons to form.
-if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'full_clone') {
+if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'clone') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new	CButton('clone', _('Clone')),
-			new CButton('full_clone', _('Full clone')),
 			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
 				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
 			),
