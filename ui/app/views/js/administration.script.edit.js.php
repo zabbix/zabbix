@@ -35,15 +35,12 @@ window.script_edit_popup = new class {
 		this.scriptid = script.scriptid;
 
 		this._loadView(script);
-		this._hideFormFields('all');
 		this.form.removeAttribute('style');
 
 		this._initActions();
 
-		if (script.parameters.length > 0) {
-			for (const parameter of script.parameters) {
-				this._addParameter(parameter);
-			}
+		for (const parameter of script.parameters) {
+			this._addParameter(parameter);
 		}
 	}
 
