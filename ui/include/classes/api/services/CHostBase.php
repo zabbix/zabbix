@@ -552,18 +552,18 @@ abstract class CHostBase extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected static function getInsTemplateIds(array $templateids, array $tpl_map): array {
-		$ins_templateids = $templateids;
+	protected static function getRootTemplateIds(array $templateids, array $tpl_map): array {
+		$root_templateids = $templateids;
 
 		foreach ($templateids as $templateid => $foo) {
 			if (array_key_exists($templateid, $tpl_map)) {
-				unset($ins_templateids[$templateid]);
+				unset($root_templateids[$templateid]);
 
-				$ins_templateids += self::getInsTemplateIds($tpl_map[$templateid], $tpl_map);
+				$root_templateids += self::getRootTemplateIds($tpl_map[$templateid], $tpl_map);
 			}
 		}
 
-		return $ins_templateids;
+		return $root_templateids;
 	}
 
 	/**
@@ -607,7 +607,7 @@ abstract class CHostBase extends CApiService {
 					continue;
 				}
 
-				foreach (self::getInsTemplateIds([$link['hostid'] => true], $tpl_map) as $ins_templateid => $foo) {
+				foreach (self::getRootTemplateIds([$link['hostid'] => true], $tpl_map) as $ins_templateid => $foo) {
 					foreach ($ins_templates[$ins_templateid] as $hostid => &$templateids) {
 						if (in_array($link['templateid'], $templateids)) {
 							$objects = DB::select('hosts', [
@@ -694,7 +694,7 @@ abstract class CHostBase extends CApiService {
 					continue;
 				}
 
-				foreach (self::getInsTemplateIds([$link['templateid'] => true], $tpl_map) as $ins_hostid => $foo) {
+				foreach (self::getRootTemplateIds([$link['templateid'] => true], $tpl_map) as $ins_hostid => $foo) {
 					if (array_key_exists($link['other_templateid'], $ins_hosts[$ins_hostid])) {
 						$objects = DB::select('hosts', [
 							'output' => ['host', 'status', 'flags'],
