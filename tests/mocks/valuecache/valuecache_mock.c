@@ -55,7 +55,7 @@ void	__wrap_zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info);
 int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
-int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
+void	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type);
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
 void	__wrap_zbx_elastic_version_extract(void);
 int	__wrap_zbx_elastic_version_get(void);
@@ -670,13 +670,10 @@ int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history)
 	return SUCCEED;
 }
 
-int	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
+void	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type)
 {
 	ZBX_UNUSED(hist);
 	ZBX_UNUSED(value_type);
-	ZBX_UNUSED(error);
-
-	return SUCCEED;
 }
 
 int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)

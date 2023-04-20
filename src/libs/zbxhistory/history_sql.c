@@ -690,20 +690,13 @@ static int	sql_flush(zbx_history_iface_t *hist)
  *                                                                                  *
  * Purpose: initializes history storage interface                                   *
  *                                                                                  *
- * Parameters:  hist       - [IN] the history storage interface                     *
- *              value_type - [IN] the target value type                             *
- *              error      - [OUT] the error message                                *
- *                                                                                  *
- * Return value: SUCCEED - the history storage interface was initialized            *
- *               FAIL    - otherwise                                                *
+ * Parameters:  hist       - [IN] history storage interface                         *
+ *              value_type - [IN] target value type                                 *
  *                                                                                  *
  ************************************************************************************/
-int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
+void	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type)
 {
-	ZBX_UNUSED(error);
-
 	hist->value_type = value_type;
-
 	hist->destroy = sql_destroy;
 	hist->add_values = sql_add_values;
 	hist->flush = sql_flush;
@@ -736,6 +729,4 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 	}
 
 	hist->requires_trends = 1;
-
-	return SUCCEED;
 }

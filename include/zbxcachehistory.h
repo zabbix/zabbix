@@ -89,6 +89,8 @@ int	zbx_get_proxy_history_count(void);
 #define ZBX_STATS_HISTORY_INDEX_FREE	19
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
+#define ZBX_STATS_HISTORY_BIN_COUNTER	22
+
 void	*zbx_dc_get_stats(int request);
 void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);
 

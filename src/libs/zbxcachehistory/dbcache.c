@@ -317,6 +317,10 @@ void	*zbx_dc_get_stats(int request)
 			value_double = 100 * (double)hc_index_mem->free_size / hc_index_mem->total_size;
 			ret = (void *)&value_double;
 			break;
+		case ZBX_STATS_HISTORY_BIN_COUNTER:
+			value_uint = cache->stats.history_bin_counter;
+			ret = (void *)&value_uint;
+			break;
 		default:
 			ret = NULL;
 	}
@@ -1296,12 +1300,6 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 	{
 		h = &history[i];
 
-		if (ITEM_VALUE_TYPE_BIN == h->value_type)
-		{
-			/* exporting binary value type history is not supported */
-			continue;
-		}
-
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
 
@@ -1335,6 +1333,12 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 			if (0 == connector_object.ids.values_num && FAIL == history_export_enabled)
 				continue;
+		}
+
+		if (ITEM_VALUE_TYPE_BIN == h->value_type)
+		{
+			/* exporting binary value type history is not supported */
+			continue;
 		}
 
 		zbx_json_clean(&json);

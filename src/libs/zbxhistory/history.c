@@ -37,26 +37,34 @@ zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
  *                                                                                  *
  * Comments: History interfaces are created for all values types based on           *
  *           configuration. Every value type can have different history storage     *
- *           backend.                                                               *
+ *           backend. (binary is not supported for ElasticSearch)                   *
  *                                                                                  *
  ************************************************************************************/
 int	zbx_history_init(char **error)
 {
-	int		i, ret;
-
 	/* TODO: support per value type specific configuration */
 
-	const char	*opts[] = {"dbl", "str", "log", "uint", "text"};
+	const char	*opts[] = {"dbl", "str", "log", "uint", "text", "bin"};
 
-	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
-		if (NULL == CONFIG_HISTORY_STORAGE_URL || NULL == strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))
-			ret = zbx_history_sql_init(&history_ifaces[i], i, error);
-		else
-			ret = zbx_history_elastic_init(&history_ifaces[i], i, error);
 
-		if (FAIL == ret)
-			return FAIL;
+		if (NULL == CONFIG_HISTORY_STORAGE_URL || NULL == strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))
+		{
+			zbx_history_sql_init(&history_ifaces[i], i);
+		}
+		else
+		{
+			if (ITEM_VALUE_TYPE_BIN == i)
+			{
+				*error = zbx_strdup(*error, "Binary value type is not supported for ElasticSearch"
+						" history storage");
+				return FAIL;
+			}
+
+			if (FAIL == zbx_history_elastic_init(&history_ifaces[i], i, error))
+				return FAIL;
+		}
 	}
 
 	return SUCCEED;
