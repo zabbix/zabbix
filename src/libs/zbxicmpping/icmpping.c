@@ -47,8 +47,6 @@ static int		packet_interval;
 #ifdef HAVE_IPV6
 static int		packet_interval6;
 static int		fping_ipv6_supported;
-#	define FPING_EXISTS	0x1
-#	define FPING6_EXISTS	0x2
 #endif
 
 static time_t	fping_check_reset_at;	/* time of the last fping options expiration */
@@ -60,6 +58,8 @@ typedef struct
 	int		requests_count;
 	unsigned char	allow_redirect;
 #ifdef HAVE_IPV6
+#	define FPING_EXISTS	0x1
+#	define FPING6_EXISTS	0x2
 	char		fping_existence;
 #endif
 }
