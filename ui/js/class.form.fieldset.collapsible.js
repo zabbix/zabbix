@@ -32,7 +32,10 @@ class CFormFieldsetCollapsible {
 
 	_init() {
 		this._toggle.addEventListener('click', () => {
-			this._target.classList.toggle(ZBX_STYLE_COLLAPSED);
+			const is_collapsed = this._target.classList.contains(ZBX_STYLE_COLLAPSED);
+
+			this._target.classList.toggle(ZBX_STYLE_COLLAPSED, !is_collapsed);
+			this._toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 		});
 
 		for (const element of this._target.querySelectorAll('.form-field')) {
