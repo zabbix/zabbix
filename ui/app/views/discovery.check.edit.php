@@ -28,8 +28,7 @@ $discovery_check_types = discovery_check_type2str();
 order_result($discovery_check_types);
 $inline_js = getPagePostJs().$this->readJsFile('discovery.check.edit.js.php');
 
-$form = (new CForm())
-	->setName('dcheck_form');
+$form = (new CForm())->setName('dcheck_form');
 
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
@@ -124,10 +123,10 @@ $form_list = (new CFormList())
 
 $form
 	->addItem([
-	$form_list,
-	(new CInput('submit', 'submit'))->addStyle('display: none;'),
-	(new CScriptTag('check_popup.init();'))->setOnDocumentReady()
-])
+		$form_list,
+		(new CInput('submit', 'submit'))->addStyle('display: none;'),
+		(new CScriptTag('check_popup.init();'))->setOnDocumentReady()
+	])
 	->addStyle('display: none;');
 
 $output = [

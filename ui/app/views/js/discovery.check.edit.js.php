@@ -58,50 +58,37 @@ window.check_popup = new class {
 			SVC_TELNET => ['row_dcheck_ports']
 		], JSON_THROW_ON_ERROR) ?>);
 
-		var $type = jQuery('#type-select'),
-			$snmpv3_securitylevel = jQuery('#snmpv3-securitylevel');
-
-		$type.on('change', function() {
-			$snmpv3_securitylevel.off('change');
-
-			if (jQuery(this).val() == <?= SVC_SNMPv3 ?>) {
-				new CViewSwitcher('snmpv3-securitylevel', 'change', <?= json_encode([
-					ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => [],
-					ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => ['row_dcheck_snmpv3_authprotocol',
-						'row_dcheck_snmpv3_authpassphrase'
-					],
-					ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => [
-						'row_dcheck_snmpv3_authprotocol', 'row_dcheck_snmpv3_authpassphrase',
-						'row_dcheck_snmpv3_privprotocol', 'row_dcheck_snmpv3_privpassphrase'
-					]
-				], JSON_THROW_ON_ERROR) ?>);
-
-				$snmpv3_securitylevel.on('change', function() {
-					jQuery(window).trigger('resize');
-				});
-			}
-
-			jQuery(window).trigger('resize');
-		});
-
+		let type = document.querySelector('#type-select');
+		let snmpv3_securitylevel = document.querySelector('#snmpv3-securitylevel');
 		const that = this;
 
-		if ($type.val() == <?= SVC_SNMPv3 ?>) {
-			// Fires the change event to initialize CViewSwitcher.
-			$type.trigger('change');
+		snmpv3_securitylevel.onchange = function (e) {
+			that._loadSecurityLevelView();
+		}
 
-			// Now we can add the event to clear the form on type change.
-			$type.on('change', function() {
-				that._clearDCheckForm();
-				that._setDCheckDefaultPort();
-			});
+		type.onchange = function (e) {
+			if (e.target.value == <?= SVC_SNMPv3 ?>) {
+				snmpv3_securitylevel.dispatchEvent(new Event('change'));
+			}
+
+			that._clearDCheckForm();
+			that._setDCheckDefaultPort();
 		}
-		else {
-			$type.on('change', function() {
-				that._clearDCheckForm();
-				that._setDCheckDefaultPort();
-			});
-		}
+
+		snmpv3_securitylevel.dispatchEvent(new Event('change'));
+	}
+
+	_loadSecurityLevelView() {
+		new CViewSwitcher('snmpv3-securitylevel', 'change', <?= json_encode([
+			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => [],
+			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => ['row_dcheck_snmpv3_authprotocol',
+				'row_dcheck_snmpv3_authpassphrase'
+			],
+			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => [
+				'row_dcheck_snmpv3_authprotocol', 'row_dcheck_snmpv3_authpassphrase',
+				'row_dcheck_snmpv3_privprotocol', 'row_dcheck_snmpv3_privpassphrase'
+			]
+		], JSON_THROW_ON_ERROR) ?>);
 	}
 
 	/**
