@@ -22,7 +22,6 @@
 /**
  * @var CView $this
  */
-
 ?>
 
 window.script_edit_popup = new class {
@@ -35,8 +34,6 @@ window.script_edit_popup = new class {
 		this.scriptid = script.scriptid;
 
 		this._loadView(script);
-		this.form.removeAttribute('style');
-
 		this._initActions();
 
 		for (const parameter of script.parameters) {
@@ -86,17 +83,17 @@ window.script_edit_popup = new class {
 			that._hideFormFields('all');
 			that._loadScopeFields(e);
 			document.querySelector('#type').dispatchEvent(new Event('change'));
-		}
+		};
 
 		// Load type fields.
 		document.querySelector('#type').onchange = function (e) {
 			that._loadTypeFields(script, e);
-		}
+		};
 
 		// Update confirmation fields
 		document.querySelector('#enable-confirmation').onchange = function (e) {
 			that._loadConfirmationFields(e);
-		}
+		};
 
 		// test confirmation button
 		document.querySelector('#test-confirmation').addEventListener('click', (e) => {
@@ -117,6 +114,7 @@ window.script_edit_popup = new class {
 		}
 
 		hgstype.dispatchEvent(new Event('change'));
+		this.form.removeAttribute('style');
 	}
 
 	clone({title, buttons}) {
@@ -215,11 +213,11 @@ window.script_edit_popup = new class {
 					'#menu-path', '#menu-path-label', '#usergroup-label', '#usergroup', '#host-access-label',
 					'#host-access-field', '#enable-confirmation-label', '#enable-confirmation-field',
 					'#confirmation-label', '#confirmation-field'
-				]
+				];
 
 				show_fields.forEach((field) => {
 					document.querySelector(field).style.display = '';
-				})
+				});
 
 				document.querySelector('#type input[type="radio"][value="6"]').closest('li').style.display = '';
 
@@ -230,7 +228,7 @@ window.script_edit_popup = new class {
 
 				hide_fields.forEach((field) => {
 					document.querySelector(field).style.display = 'none';
-				})
+				});
 
 				document.querySelector('#type input[type="radio"][value="6"]').closest('li').style.display = 'none';
 
@@ -305,7 +303,7 @@ window.script_edit_popup = new class {
 
 				document.querySelector('#authtype').onchange = function (e) {
 					that._loadAuthFields(e);
-				}
+				};
 
 				document.querySelector('#authtype').dispatchEvent(new Event('change'));
 				break;
@@ -362,13 +360,13 @@ window.script_edit_popup = new class {
 				show_fields = [
 					'#publickey-label', '#publickey-field', '#privatekey-label', '#privatekey-field',
 					'#passphrase-label', '#passphrase-field'
-				]
+				];
 				break;
 		}
 
 		show_fields.forEach((field) => {
 			document.querySelector(field).style.display = '';
-		})
+		});
 	}
 
 	/**
@@ -438,7 +436,7 @@ window.script_edit_popup = new class {
 
 		fields.forEach((field) => {
 			document.querySelector(field).style.display = 'none';
-		})
+		});
 	}
 }
 
