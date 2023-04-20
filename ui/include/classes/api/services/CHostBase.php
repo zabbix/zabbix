@@ -552,7 +552,7 @@ abstract class CHostBase extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function getInsTemplateIds(array $templateids, array $tpl_map): array {
+	protected static function getInsTemplateIds(array $templateids, array $tpl_map): array {
 		$ins_templateids = $templateids;
 
 		foreach ($templateids as $templateid => $foo) {
@@ -576,30 +576,43 @@ abstract class CHostBase extends CApiService {
 	 * @throws APIException
 	 */
 	protected function checkDoubleLinkageNew(array $ins_templates, array $del_links): void {
-		$_templateids = array_fill_keys(array_keys($ins_templates), true);
+		$ins_hosts = [];
+
+		foreach ($ins_templates as $templateid => $_ins_hosts) {
+			foreach ($_ins_hosts as $hostid => $foo) {
+				$ins_hosts[$hostid][$templateid] = [];
+			}
+		}
+
+		$_templateids = $ins_templates;
 		$tpl_map = [];
 
 		do {
-			$options = [
+			$links = DB::select('hosts_templates', [
 				'output' => ['templateid', 'hostid'],
 				'filter' => ['hostid' => array_keys($_templateids)]
-			];
-			$result = DBselect(DB::makeSql('hosts_templates', $options));
+			]);
+
+			foreach (array_intersect_key($ins_hosts, $_templateids) as $hostid => $templateids) {
+				foreach ($templateids as $templateid => $foo) {
+					$links[] = ['templateid' => $templateid, 'hostid' => $hostid];
+				}
+			}
 
 			$_templateids = [];
 
-			while ($row = DBfetch($result)) {
-				if (array_key_exists($row['templateid'], $del_links)
-						&& array_key_exists($row['hostid'], $del_links[$row['templateid']])) {
+			foreach ($links as $link) {
+				if (array_key_exists($link['templateid'], $del_links)
+						&& array_key_exists($link['hostid'], $del_links[$link['templateid']])) {
 					continue;
 				}
 
-				foreach (self::getInsTemplateIds([$row['hostid'] => true], $tpl_map) as $ins_templateid => $foo) {
+				foreach (self::getInsTemplateIds([$link['hostid'] => true], $tpl_map) as $ins_templateid => $foo) {
 					foreach ($ins_templates[$ins_templateid] as $hostid => &$templateids) {
-						if (in_array($row['templateid'], $templateids)) {
+						if (in_array($link['templateid'], $templateids)) {
 							$objects = DB::select('hosts', [
 								'output' => ['host', 'status', 'flags'],
-								'hostids' => [$ins_templateid, $hostid, $row['templateid']],
+								'hostids' => [$ins_templateid, $hostid, $link['templateid']],
 								'preservekeys' => true
 							]);
 
@@ -614,34 +627,27 @@ abstract class CHostBase extends CApiService {
 							}
 
 							self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$ins_templateid]['host'],
-								$objects[$hostid]['host'], $objects[$row['templateid']]['host']
+								$objects[$hostid]['host'], $objects[$link['templateid']]['host']
 							));
 						}
 						else {
-							$templateids[] = $row['templateid'];
+							$templateids[] = $link['templateid'];
+							$ins_hosts[$hostid][$ins_templateid][] = $link['templateid'];
 						}
 					}
 					unset($templateids);
 				}
 
-				if (!array_key_exists($row['templateid'], $tpl_map)) {
-					$_templateids[$row['templateid']] = true;
+				if (!array_key_exists($link['templateid'], $tpl_map)) {
+					$_templateids[$link['templateid']] = true;
 				}
 
-				$tpl_map[$row['templateid']][$row['hostid']] = true;
+				$tpl_map[$link['templateid']][$link['hostid']] = true;
 			}
 		} while ($_templateids);
 
 		if (!$this instanceof CTemplate) {
 			return;
-		}
-
-		$ins_hosts = [];
-
-		foreach ($ins_templates as $templateid => $_ins_hosts) {
-			foreach ($_ins_hosts as $hostid => $templateids) {
-				$ins_hosts[$hostid][] = $templateid;
-			}
 		}
 
 		$_templateids = $ins_hosts;
@@ -658,17 +664,41 @@ abstract class CHostBase extends CApiService {
 
 			$_templateids = [];
 
+			$links = [];
+			$host_templates = [];
+
 			while ($row = DBfetch($result)) {
-				if (array_key_exists($row['other_templateid'], $del_links)
-						&& array_key_exists($row['hostid'], $del_links[$row['other_templateid']])) {
+				$links[] = $row;
+				$host_templates[$row['hostid']][$row['templateid']] = true;
+			}
+
+			foreach (array_intersect_key($ins_hosts, $host_templates) as $hostid => $_ins_templates) {
+				foreach ($host_templates[$hostid] as $templateid => $foo) {
+					foreach ($_ins_templates as $ins_templateid => $foo) {
+						if (bccomp($ins_templateid, $templateid) == 0) {
+							continue;
+						}
+
+						$links[] = [
+							'templateid' => $templateid,
+							'hostid' => $hostid,
+							'other_templateid' => $ins_templateid
+						];
+					}
+				}
+			}
+
+			foreach ($links as $link) {
+				if (array_key_exists($link['other_templateid'], $del_links)
+						&& array_key_exists($link['hostid'], $del_links[$link['other_templateid']])) {
 					continue;
 				}
 
-				foreach (self::getInsTemplateIds([$row['templateid'] => true], $tpl_map) as $ins_hostid => $foo) {
-					if (in_array($row['other_templateid'], $ins_hosts[$ins_hostid])) {
+				foreach (self::getInsTemplateIds([$link['templateid'] => true], $tpl_map) as $ins_hostid => $foo) {
+					if (array_key_exists($link['other_templateid'], $ins_hosts[$ins_hostid])) {
 						$objects = DB::select('hosts', [
 							'output' => ['host', 'status', 'flags'],
-							'hostids' => [$row['other_templateid'], $ins_hostid, $row['hostid']],
+							'hostids' => [$link['other_templateid'], $ins_hostid, $link['hostid']],
 							'preservekeys' => true
 						]);
 
@@ -683,17 +713,43 @@ abstract class CHostBase extends CApiService {
 						}
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
-							$objects[$row['other_templateid']]['host'], $objects[$ins_hostid]['host'],
-							$objects[$row['hostid']]['host']
+							$objects[$link['other_templateid']]['host'], $objects[$ins_hostid]['host'],
+							$objects[$link['hostid']]['host']
 						));
+					}
+					else {
+						foreach ($ins_hosts[$ins_hostid] as $templateid => $templateids) {
+							if (in_array($link['other_templateid'], $templateids)) {
+								$objects = DB::select('hosts', [
+									'output' => ['host', 'status', 'flags'],
+									'hostids' => [$link['other_templateid'], $ins_hostid, $link['hostid'], $templateid],
+									'preservekeys' => true
+								]);
+
+								if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
+									$error = _('Cannot link template "%1$s" to template "%2$s", because its parent template "%3$s" would be linked to template "%4$s" twice.');
+								}
+								elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+									$error = _('Cannot link template "%1$s" to template "%2$s", because its parent template "%3$s" would be linked to host prototype "%4$s" twice.');
+								}
+								else {
+									$error = _('Cannot link template "%1$s" to template "%2$s", because its parent template "%3$s" would be linked to host "%4$s" twice.');
+								}
+
+								self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$templateid]['host'],
+									$objects[$ins_hostid]['host'], $objects[$link['other_templateid']]['host'],
+									$objects[$link['hostid']]['host']
+								));
+							}
+						}
 					}
 				}
 
-				if (!array_key_exists($row['hostid'], $tpl_map)) {
-					$_templateids[$row['hostid']] = true;
+				if (!array_key_exists($link['hostid'], $tpl_map)) {
+					$_templateids[$link['hostid']] = true;
 				}
 
-				$tpl_map[$row['hostid']][$row['templateid']] = true;
+				$tpl_map[$link['hostid']][$link['templateid']] = true;
 			}
 		} while ($_templateids);
 	}
