@@ -18,23 +18,24 @@
 **/
 
 
-const ZBX_STYLE_COLLAPSED = 'collapsed';
-const ZBX_STYLE_TOGGLE = 'toggle';
-
 class CFormFieldsetCollapsible {
+
+	static ZBX_STYLE_COLLAPSIBLE = 'collapsible';
+	static ZBX_STYLE_COLLAPSED = 'collapsed';
+	static ZBX_STYLE_TOGGLE = 'toggle';
 
 	constructor(target) {
 		this._target = target;
-		this._toggle = this._target.querySelector(`.${ZBX_STYLE_TOGGLE}`);
+		this._toggle = this._target.querySelector(`.${CFormFieldsetCollapsible.ZBX_STYLE_TOGGLE}`);
 
 		this._init();
 	}
 
 	_init() {
 		this._toggle.addEventListener('click', () => {
-			const is_collapsed = this._target.classList.contains(ZBX_STYLE_COLLAPSED);
+			const is_collapsed = this._target.classList.contains(CFormFieldsetCollapsible.ZBX_STYLE_COLLAPSED);
 
-			this._target.classList.toggle(ZBX_STYLE_COLLAPSED, !is_collapsed);
+			this._target.classList.toggle(CFormFieldsetCollapsible.ZBX_STYLE_COLLAPSED, !is_collapsed);
 			this._toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 		});
 
