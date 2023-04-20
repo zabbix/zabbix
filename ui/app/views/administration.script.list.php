@@ -52,9 +52,11 @@ $html_page = (new CHtmlPage())
 				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 				->addItem([
 					new CLabel(_('Name'), 'filter_name'),
-					(new CTextBox('filter_name', $data['filter']['name']))
-						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-						->setAttribute('autofocus', 'autofocus')
+					new CFormField(
+						(new CTextBox('filter_name', $data['filter']['name']))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setAttribute('autofocus', 'autofocus')
+					)
 				]),
 			(new CFormGrid())
 				->addStyle('margin-top: 5px; margin-bottom: 5px;')
@@ -67,7 +69,7 @@ $html_page = (new CHtmlPage())
 							->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
 							->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
 							->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
-							->setModern(true)
+							->setModern()
 				)
 			])
 		])
