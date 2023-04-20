@@ -786,11 +786,21 @@ class CSvgGraphHelper {
 			}
 		}
 
+		$item_ids = [];
+
+		foreach ($metrics as $metric) {
+			foreach ($metric['items'] as $item) {
+				if (!in_array($item['itemid'], $item_ids)) {
+					$item_ids[] = $item['itemid'];
+				}
+			}
+		}
+
 		$options['objectids'] = array_keys(API::Trigger()->get([
 			'output' => [],
 			'hostids' => $options['hostids'] ?? null,
 			'itemids' => $problem_options['graph_item_problems']
-				? array_unique(array_column($metrics, 'itemid'))
+				? $item_ids
 				: null,
 			'monitored' => true,
 			'preservekeys' => true
