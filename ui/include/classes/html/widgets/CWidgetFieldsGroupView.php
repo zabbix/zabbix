@@ -21,14 +21,17 @@
 
 class CWidgetFieldsGroupView extends CDiv {
 
-	protected ?CLabel $label;
+	protected array $label_class = [];
+
+	protected string $label;
+	protected $help_hint;
 
 	protected array $fields = [];
 
-	public function __construct($label, array $fields = []) {
+	public function __construct(string $label, array $fields = []) {
 		parent::__construct();
 
-		$this->label = (new CLabel($label))->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP_LABEL);
+		$this->label = $label;
 
 		foreach ($fields as $field) {
 			$this->addItem($field);
@@ -55,12 +58,22 @@ class CWidgetFieldsGroupView extends CDiv {
 		return $this;
 	}
 
-	public function getLabel(): ?CLabel {
-		return $this->label;
+	public function setHelpHint($help_hint): self {
+		$this->help_hint = $help_hint;
+
+		return $this;
+	}
+
+	public function getLabel(): CLabel {
+		return (new CLabel([$this->label, $this->help_hint !== null ? makeHelpIcon($this->help_hint) : null]))
+			->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP_LABEL)
+			->addClass($this->label_class ? implode(' ', $this->label_class) : null);
 	}
 
 	public function addLabelClass(?string $label_class): self {
-		$this->label->addClass($label_class);
+		if ($label_class !== null) {
+			$this->label_class[] = $label_class;
+		}
 
 		return $this;
 	}

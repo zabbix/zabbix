@@ -27,11 +27,15 @@ abstract class CWidgetFieldView {
 
 	protected string $form_name = '';
 
+	protected array $class = [];
+	protected array $label_class = [];
+
+	protected bool $has_label = true;
+
 	protected ?CTag $hint = null;
 	protected $help_hint;
 
-	protected array $class = [];
-	protected array $label_class = [];
+
 
 	public function setFormName($form_name): self {
 		$this->form_name = $form_name;
@@ -51,10 +55,16 @@ abstract class CWidgetFieldView {
 		return $this;
 	}
 
+	public function removeLabel(): self {
+		$this->has_label = false;
+
+		return $this;
+	}
+
 	public function getLabel(): ?CLabel {
 		$label = $this->field->getLabel();
 
-		if ($label === null) {
+		if ($label === null || !$this->has_label) {
 			return null;
 		}
 

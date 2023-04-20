@@ -65,9 +65,10 @@ function getDateFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetF
 	$date_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['date_size']));
 
 	return (new CWidgetFieldsGroupView(_('Date')))
-		->addItem(
-			[$date_size->getLabel(), (new CFormField([$date_size->getView(), '%']))->addClass('field-size')]
-		)
+		->addItem([
+			$date_size->getLabel(),
+			(new CFormField([$date_size->getView(), '%']))->addClass('field-size')
+		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['date_bold'])
 		)

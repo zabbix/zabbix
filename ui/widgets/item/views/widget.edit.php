@@ -42,19 +42,8 @@ $form
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['adv_conf'])
 	)
-	->addFieldsGroup([
-		_('Description'),
-		makeHelpIcon([
-			_('Supported macros:'),
-			(new CList([
-				'{HOST.*}',
-				'{ITEM.*}',
-				'{INVENTORY.*}',
-				_('User macros')
-			]))->addClass(ZBX_STYLE_LIST_DASHED)
-		])
-	], getDescriptionFieldsGroupViews($form, $data['fields']),
-		'fields-group-description'
+	->addFieldsGroup(
+		getDescriptionFieldsGroupViews($form, $data['fields'])
 	)
 	->addFieldsGroup(_('Value'), getValueFieldsGroupViews($form, $data['fields']),
 		'fields-group-value'
@@ -86,35 +75,41 @@ $form
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$description = (new CWidgetFieldTextAreaView($fields['description']))
-		->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 38);
-	$desc_size = new CWidgetFieldIntegerBoxView($fields['desc_size']);
-	$desc_color = new CWidgetFieldColorView($fields['desc_color']);
+function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$desc_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
-	return [
-		$form->makeCustomField($description, [
-			new CFormField(
-				$description->getView()->setAttribute('maxlength', DB::getFieldLength('widget_field', 'value_str'))
-			)
-		]),
-
-		new CWidgetFieldRadioButtonListView($fields['desc_h_pos']),
-
-		$form->makeCustomField($desc_size, [
+	return (new CWidgetFieldsGroupView(_('Description')))
+		->setHelpHint([
+			_('Supported macros:'),
+			(new CList([
+				'{HOST.*}',
+				'{ITEM.*}',
+				'{INVENTORY.*}',
+				_('User macros')
+			]))->addClass(ZBX_STYLE_LIST_DASHED)
+		])
+		->addField(
+			(new CWidgetFieldTextAreaView($fields['description']))
+				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 38)
+				->removeLabel()
+		)
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['desc_h_pos'])
+		)
+		->addItem([
 			$desc_size->getLabel(),
 			(new CFormField([$desc_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CWidgetFieldRadioButtonListView($fields['desc_v_pos']),
-
-		new CWidgetFieldCheckBoxView($fields['desc_bold']),
-
-		$form->makeCustomField($desc_color, [
-			$desc_color->getLabel()->addClass('offset-3'),
-			new CFormField($desc_color->getView())
 		])
-	];
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['desc_v_pos'])
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['desc_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['desc_color']))->addLabelClass('offset-3')
+		)
+		->addRowClass('fields-group-description');
 }
 
 function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): array {
