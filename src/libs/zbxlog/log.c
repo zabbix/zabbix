@@ -75,7 +75,7 @@ static int	get_config_log_file_size(void)
 
 #ifndef _WINDOWS
 
-const char	*zabbix_get_log_level_ref_string(int loglevel)
+static const char	*zabbix_get_log_level_ref_string(int loglevel)
 {
 	switch (loglevel)
 	{

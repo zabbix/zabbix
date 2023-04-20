@@ -448,7 +448,7 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
  *                         rtc command handler                                *
  *                                                                            *
  ******************************************************************************/
-int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex_server(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data, char **result)
 {
 	switch (code)
 	{

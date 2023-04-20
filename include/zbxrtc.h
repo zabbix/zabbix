@@ -70,7 +70,7 @@ typedef struct
 }
 zbx_rtc_t;
 
-typedef int	(*zbx_rtc_process_request_ex_func_t)(zbx_rtc_t *, int, const unsigned char *, char **);
+typedef int	(*zbx_rtc_process_request_ex_func_t)(zbx_rtc_t *, zbx_uint32_t, const unsigned char *, char **);
 
 /* provider API */
 int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error);
