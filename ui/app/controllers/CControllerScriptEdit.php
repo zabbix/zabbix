@@ -172,6 +172,7 @@ class CControllerScriptEdit extends CController {
 		CArrayHelper::sort($usergroups, ['name']);
 
 		$data['usergroups'] = array_column($usergroups, 'name', 'usrgrpid');
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of scripts'));
