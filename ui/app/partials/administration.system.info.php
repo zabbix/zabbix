@@ -37,6 +37,16 @@ $info_table = (new CTableInfo())
 		$data['system_info']['server_details']
 	])
 	->addRow([
+		_('Zabbix server version'),
+		$status['has_status'] ? $status['server_version'] : '',
+		''
+	])
+	->addRow([
+		_('Zabbix frontend version'),
+		ZABBIX_VERSION,
+		''
+	])
+	->addRow([
 		_('Number of hosts (enabled/disabled)'),
 		$status['has_status'] ? $status['hosts_count'] : '',
 		$status['has_status']
