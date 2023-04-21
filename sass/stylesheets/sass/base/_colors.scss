@@ -162,44 +162,23 @@ $form-search-focused-color: $form-search-color !default;
 $form-search-focused-bg-color: $form-search-bg-color !default;
 $form-search-focused-border-color: lighten($sidebar-bg-color, 20%) !default;
 
-// Error messages
-$msg-bad-color: #dc3545 !default;
-$msg-good-color: #28a745 !default;
-$msg-warning-color: #ffc107 !default;
-$msg-btn-text-color: darken(desaturate($red, 10%), 20%) !default;
-
-// Icons
-$icon-color: #768d99 !default;
-
-$icon-btn-color: lighten($icon-color, 25%) !default;
-$icon-btn-hover-color: $icon-color !default;
-$icon-btn-disabled-color: lighten($icon-color, 35%) !default;
-
-// FIXME need to check color variables
-$icon-hint-color: #768d99 !default;
-$icon-calendar-color: #acbbc2 !default;
-$icon-action-arrow-up: #e33734 !default;
-$icon-action-check: #009900 !default;
-$icon-action-severity-down: #009900 !default;
-$icon-action-severety-up: #e33734 !default;
-$icon-action-severety-changed: #768d99 !default;
-$icon-action-list-table-color: #768d99 !default;
-$icon-remove-fav-color: #f3a914 !default;
-$icon-event-action-red: #e33734 !default;
-$icon-event-action-yellow: #af6b00 !default;
-$icon-event-action-gray: #768d99 !default;
-$icon-maintenance: #f3a914 !default;
-
 // Buttons
 $btn-color: #ffffff !default;
 $btn-bg-color: #0275b8 !default;
-$btn-border-color: #0275b8 !default;
+$btn-border-color: $btn-bg-color !default;
 $btn-hover-bg-color: #02659f !default;
-$btn-hover-border-color: #02659f !default;
+$btn-hover-border-color: $btn-hover-bg-color !default;
+$btn-focus-bg-color: $btn-hover-bg-color !default;
+$btn-focus-border-color: $btn-focus-bg-color !default;
 $btn-focus-outline-color: rgba(#1e87e3, .35) !default;
 
 $btn-alt-color: #0275b8 !default;
 $btn-alt-bg-color: transparent !default;
+$btn-alt-border-color: $btn-border-color !default;
+$btn-alt-hover-bg-color: $btn-hover-bg-color !default;
+$btn-alt-hover-border-color: $btn-alt-hover-bg-color !default;
+$btn-alt-focus-bg-color: $btn-alt-hover-bg-color !default;
+$btn-alt-focus-border-color: $btn-alt-focus-bg-color !default;
 
 $btn-form-font-color: #1f2c33 !default;
 $btn-form-bg-color: $form-bg-color !default;
@@ -226,6 +205,34 @@ $link-main-subnav-color: rgba(#ffffff, .8) !default;
 $link-main-subnav-hover-color: rgba(#ffffff, 1) !default;
 $link-main-subnav-active-color: rgba(#ffffff, 1) !default;
 $link-main-subnav-visited-color: rgba(#ffffff, .8) !default;
+
+// Icons
+$icon-color: #768d99 !default;
+
+$icon-btn-color: lighten($icon-color, 25%) !default;
+$icon-btn-hover-color: $icon-color !default;
+$icon-btn-disabled-color: lighten($icon-color, 35%) !default;
+
+// FIXME need to check color variables
+$icon-hint-color: #768d99 !default;
+$icon-calendar-color: #acbbc2 !default;
+$icon-action-arrow-up: #e33734 !default;
+$icon-action-check: #009900 !default;
+$icon-action-severity-down: #009900 !default;
+$icon-action-severety-up: #e33734 !default;
+$icon-action-severety-changed: #768d99 !default;
+$icon-action-list-table-color: #768d99 !default;
+$icon-remove-fav-color: #f3a914 !default;
+$icon-event-action-red: #e33734 !default;
+$icon-event-action-yellow: #af6b00 !default;
+$icon-event-action-gray: #768d99 !default;
+$icon-maintenance: #f3a914 !default;
+
+// Error messages
+$msg-bad-color: #dc3545 !default;
+$msg-bad-btn-color: $msg-bad-color !default;
+$msg-good-color: #28a745 !default;
+$msg-warning-color: #ffc107 !default;
 
 // Tabfilter
 $tab-label-color: $btn-color;

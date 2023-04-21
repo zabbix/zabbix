@@ -22,24 +22,22 @@
 class CWarning extends Ctag {
 
 	public function __construct($header, $messages = [], $buttons = []) {
-		parent::__construct('output', true);
+		parent::__construct('output', true, $header);
 
 		$this
-			->addItem($header)
 			->addClass(ZBX_STYLE_MSG_GLOBAL)
-			->addClass(ZBX_STYLE_MSG_BAD)
-			->addClass(ZBX_ICON_CIRCLE_INFO_FILLED);
+			->addClass(ZBX_STYLE_MSG_BAD);
 
 		if ($messages) {
-			parent::addItem(
+			$this->addItem(
 				(new CDiv(
-					(new CList($messages))
-						->addClass(ZBX_STYLE_LIST_DASHED)
-						->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
+					(new CList($messages))->addClass(ZBX_STYLE_LIST_DASHED)
 				))->addClass(ZBX_STYLE_MSG_DETAILS)
 			);
 		}
 
-		parent::addItem((new CDiv($buttons))->addClass('msg-buttons'));
+		$this->addItem(
+			(new CDiv($buttons))->addClass('msg-buttons')
+		);
 	}
 }

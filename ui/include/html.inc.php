@@ -759,8 +759,7 @@ function makeServerStatusOutput(): CTag {
 	return (new CTag('output', true))
 		->setId('msg-global-footer')
 		->addClass(ZBX_STYLE_MSG_GLOBAL_FOOTER)
-		->addClass(ZBX_STYLE_MSG_WARNING)
-		->addClass(ZBX_ICON_CIRCLE_INFO_FILLED);
+		->addClass(ZBX_STYLE_MSG_WARNING);
 }
 
 /**

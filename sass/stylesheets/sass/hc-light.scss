@@ -160,21 +160,14 @@ $form-search-focused-icon-hover-bg-position: $form-search-focused-icon-bg-positi
 
 $input-placeholder-color: #777777;
 
-// Error messages
-$msg-bad-color: $red;
-$msg-btn-text-color: #990000;
-$msg-good-color: $green;
-$msg-warning-color: #b37e12;
-
 // Buttons
-$btn-color: #ffffff;
 $btn-bg-color: #555555;
-$btn-border-color: #333333;
-$btn-focus-outline-color: #000000;
+$btn-hover-bg-color: #484848;
+$btn-focus-bg-color: #6f6f6f;
+$btn-focus-border-color: #484848;
+$btn-focus-outline-color: #111111;
 
-$btn-alt-color: #000000;
-$btn-alt-bg-color: transparent;
-$btn-alt-border-color: $btn-border-color;
+$btn-alt-color: $font-color;
 
 $btn-form-font-color: #333333;
 $btn-form-bg-color: $form-bg-color;
@@ -445,13 +438,15 @@ $arrow-fill-up-down: #000000;
 }
 
 // Colors and general.
-button {
-	&:focus {
-		background-color: lighten($btn-bg-color, 10%);
-		box-shadow: 0 0 0 2px $blue;
-	}
-}
+// TODO - check
+// button {
+//	&:focus {
+//		background-color: lighten($btn-bg-color, 10%);
+//		box-shadow: 0 0 0 2px $blue;
+//	}
+//}
 
+// TODO-check
 .btn-alt {
 	&:focus {
 		box-shadow: 0 0 0 2px $blue;

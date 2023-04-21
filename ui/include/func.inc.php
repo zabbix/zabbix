@@ -1781,21 +1781,16 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
 				)
 				->setAttribute('aria-expanded', $show_details ? 'true' : 'false')
-				->onClick('javascript: '.
-					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
-						'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));'.
-					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'.
-					'jQuery(this).attr(\'aria-expanded\', jQuery(this).find(\'.'.ZBX_STYLE_ARROW_DOWN.'\').length == 0)'
-				);
+				->onClick('
+					showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\'));
+					jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");
+					jQuery(this).attr(\'aria-expanded\', jQuery(this).find(\'.'.ZBX_STYLE_ARROW_DOWN.'\').length == 0);
+				');
 		}
 
 		$list = (new CList())->addClass(ZBX_STYLE_LIST_DASHED);
-		if ($title !== null) {
-			$list->addClass(ZBX_STYLE_MSG_DETAILS_BORDER);
-
-			if (!$show_details) {
-				$list->setAttribute('style', 'display: none;');
-			}
+		if ($title !== null && !$show_details) {
+			$list->setAttribute('style', 'display: none;');
 		}
 
 		foreach ($messages as $message) {
@@ -1807,26 +1802,15 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 			->addItem($list);
 	}
 
-	if ($title !== null) {
-		$title = new CSpan($title);
-	}
-
 	$aria_labels = [
 		ZBX_STYLE_MSG_GOOD => _('Success message'),
 		ZBX_STYLE_MSG_BAD => _('Error message'),
 		ZBX_STYLE_MSG_WARNING => _('Warning message')
 	];
 
-	$icons = [
-		ZBX_STYLE_MSG_GOOD => ZBX_ICON_CIRCLE_CHECK_FILLED,
-		ZBX_STYLE_MSG_BAD => ZBX_ICON_CIRCLE_INFO_FILLED,
-		ZBX_STYLE_MSG_WARNING => ZBX_ICON_CIRCLE_INFO_FILLED // TODO - AS: maybe wrong icon (ZBX_ICON_TRIANGLE_WARNING)
-	];
-
 	// Details link should be in front of title.
-	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
+	$msg_box = (new CTag('output', true, [$link_details, $title !== null ? new CSpan($title) : null, $msg_details]))
 		->addClass($class)
-		->addClass($icons[$class])
 		->setAttribute('role', 'contentinfo')
 		->setAttribute('aria-label', $aria_labels[$class]);
 

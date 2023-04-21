@@ -167,21 +167,15 @@ $form-search-focused-icon-hover-bg-position: $form-search-focused-icon-bg-positi
 
 $input-placeholder-color: #bbbbbb;
 
-// Error messages
-$msg-bad-color: $light-red;
-$msg-btn-text-color: #ffffff;
-$msg-good-color: $light-green;
-$msg-warning-color: #ffb319;
-
 // Buttons
 $btn-color: #333333;
 $btn-bg-color: #e0e0e0;
-$btn-border-color: #333333;
+$btn-hover-bg-color: #d3d3d3;
+$btn-focus-bg-color: #c7c7c7;
+$btn-focus-border-color: #d3d3d3;
 $btn-focus-outline-color: #ffffff;
 
-$btn-alt-color: #ffffff;
-$btn-alt-bg-color: transparent;
-$btn-alt-border-color: $btn-border-color;
+$btn-alt-color: $font-color;
 
 $btn-form-font-color: #f2f2f2;
 $btn-form-bg-color: $form-bg-color;
@@ -213,6 +207,9 @@ $link-main-subnav-color: rgba(#000000, .8);
 $link-main-subnav-hover-color: #000000;
 $link-main-subnav-active-color: #000000;
 $link-main-subnav-visited-color: rgba(#000000, .8);
+
+// Error messages
+$msg-bad-btn-color: $font-color;
 
 // Analog clock
 $clock-face-color: #000000;
@@ -558,18 +555,20 @@ $icon-widget-btn: (
 }
 
 // Colors and general.
-button {
-	&:focus {
-		background-color: darken($btn-bg-color, 10%);
-		box-shadow: 0 0 0 2px $blue;
-	}
-}
+// TODO - CHECK
+// button {
+//	&:focus {
+//		background-color: darken($btn-bg-color, 10%);
+//		box-shadow: 0 0 0 2px $blue;
+//	}
+//}
 
-.btn-alt {
-	&:focus {
-		box-shadow: 0 0 0 2px $blue;
-	}
-}
+// TODO - CHECK
+//.btn-alt {
+//	&:focus {
+//		box-shadow: 0 0 0 2px $blue;
+//	}
+//}
 
 .radio-list-control {
 	.normal-bg,

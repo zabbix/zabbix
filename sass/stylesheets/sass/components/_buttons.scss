@@ -25,15 +25,17 @@ button {
 		transition: border-color .2s ease-out, background-color .2s ease-out;
 	}
 
-	&:hover,
-	&:focus,
-	&:active {
+	&:hover {
 		color: $btn-color;
 		background-color: $btn-hover-bg-color;
 		border-color: $btn-hover-border-color;
 	}
 
+	&:active,
 	&:focus {
+		color: $btn-color;
+		background-color: $btn-focus-bg-color;
+		border-color: $btn-focus-border-color;
 		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
 
@@ -82,6 +84,19 @@ button {
 .btn-alt {
 	color: $btn-alt-color;
 	background-color: $btn-alt-bg-color;
+	border-color: $btn-alt-border-color;
+
+	&:hover {
+		background-color: $btn-alt-hover-bg-color;
+		border-color: $btn-alt-hover-border-color;
+	}
+
+	&:active,
+	&:focus {
+		background-color: $btn-alt-focus-bg-color;
+		border-color: $btn-alt-focus-border-color;
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
+	}
 }
 
 .btn-grey {

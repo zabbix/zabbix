@@ -721,15 +721,10 @@ function parseUrlString(url_string) {
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
 	const classes = {
-			good: 'msg-good',
-			bad: 'msg-bad',
-			warning: 'msg-warning'
-		},
-		icons = {
-			good: ZBX_ICON_CIRCLE_CHECK_FILLED,
-			bad: ZBX_ICON_CIRCLE_INFO_FILLED,
-			warning: ZBX_ICON_TRIANGLE_WARNING
-		};
+		good: 'msg-good',
+		bad: 'msg-bad',
+		warning: 'msg-warning'
+	};
 
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'warning';
@@ -742,7 +737,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			.append($list),
 		aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')},
 		$msg_box = jQuery('<output>')
-			.addClass([classes[type], icons[type]]).attr('role', 'contentinfo')
+			.addClass(classes[type]).attr('role', 'contentinfo')
 			.attr('aria-label', aria_labels[type]),
 		$details_arrow = jQuery('<span>')
 			.attr('id', 'details-arrow')
@@ -756,10 +751,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			.attr('aria-expanded', show_details ? 'true' : 'false');
 
 		$link_details.click(function() {
-			showHide(jQuery(this)
-				.siblings('.msg-details')
-				.find('.msg-details-border')
-			);
+			showHide(jQuery(this).siblings('.msg-details'));
 			jQuery('#details-arrow', jQuery(this)).toggleClass('arrow-up arrow-down');
 			jQuery(this).attr('aria-expanded', jQuery(this)
 				.find('.arrow-down')
@@ -774,8 +766,6 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 		jQuery('<span>')
 			.text(title)
 			.appendTo($msg_box);
-
-		$list.addClass('msg-details-border');
 
 		if (!show_details) {
 			$list.hide();
