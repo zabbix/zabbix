@@ -1,6 +1,9 @@
 Changes for 7.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-8235] implemented simplified cloning in the UI by leaving only one Clone button for Hosts, Templates and Maps (dpetra)
+..F.....S. [ZBXNEXT-8326] added Zabbix server and Zabbix frontend version to system information report (ddauksa, mprihodko)
+.........T [ZBXNEXT-8334] added Event-Driven Ansible media (akotsegubov)
 .........T [ZBXNEXT-8394] created separate proxy compatibility triggers in Zabbix health templates, removed unnecessary dependencies (drasikhov)
 A.F....PS. [ZBXNEXT-8324] dropped support for floats of limited range (jfreibergs, kprutkovs)
 ...G...... [ZBXNEXT-7569] fixed a possible NULL pointer deref (jxl)
