@@ -665,7 +665,7 @@ void	zbx_pp_manager_get_worker_usage(zbx_pp_manager_t *manager, zbx_vector_dbl_t
  ******************************************************************************/
 void	zbx_pp_manager_change_worker_loglevel(zbx_pp_manager_t *manager, int worker_num, int direction)
 {
-	if (0 > worker_num || manager->workers_num <= worker_num)
+	if (0 > worker_num || manager->workers_num < worker_num)
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "Cannot change log level for preprocessing worker #%d:"
 				" no such instance", worker_num);
