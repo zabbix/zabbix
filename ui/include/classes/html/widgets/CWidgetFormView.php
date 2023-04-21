@@ -88,7 +88,10 @@ class CWidgetFormView {
 		if ($field !== null) {
 			$this->registerField($field);
 
-			$this->form_grid->addItem($this->makeField($field));
+			$this->form_grid->addItem([
+				$field->getLabel(),
+				(new CFormField($field->getView()))->addClass($field->getClass())
+			]);
 		}
 
 		return $this;
@@ -124,23 +127,6 @@ class CWidgetFormView {
 		}
 
 		return $field;
-	}
-
-	/**
-	 * Prepare CWidgetFieldView for addFieldGroup() items array in default view or by custom CHTML.
-	 *
-	 * @param CWidgetFieldView $field_view
-	 * @param array            $items
-	 * @param string|null      $row_class
-	 *
-	 * @return array  Label and field views taken from field object or $items array if not empty.
-	 */
-	public function makeCustomField(CWidgetFieldView $field_view, array $items = [], string $row_class = null): array {
-		$this->registerFieldView($field_view);
-
-		$field_view->addRowClass($row_class);
-
-		return $items ?: $this->makeField($field_view);
 	}
 
 	public function addJavaScript(string $javascript): self {
@@ -227,16 +213,6 @@ class CWidgetFormView {
 		}
 	}
 
-	private function registerFieldView(CWidgetFieldView $field_view): void {
-		$field_view->setFormName($this->name);
-
-		$this->addJavaScript($field_view->getJavaScript());
-
-		foreach ($field_view->getTemplates() as $template) {
-			$this->addTemplate($template);
-		}
-	}
-
 	private function makeFormGrid(): void {
 		$types_select = (new CSelect('type'))
 			->setFocusableElementId('label-type')
@@ -287,12 +263,5 @@ class CWidgetFormView {
 		if (array_key_exists('rf_rate', $this->data['fields'])) {
 			$this->addField(new CWidgetFieldSelectView($this->data['fields']['rf_rate']));
 		}
-	}
-
-	private function makeField(CWidgetFieldView $field_view): array {
-		return [
-			$field_view->getLabel(),
-			(new CFormField($field_view->getView()))->addClass($field_view->getClass())
-		];
 	}
 }

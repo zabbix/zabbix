@@ -26,10 +26,7 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\{
-	CWidgetFieldColumnsList,
-	CWidgetFieldSelect
-};
+use Zabbix\Widgets\Fields\CWidgetFieldSelect;
 
 $form = (new CWidgetFormView($data));
 
@@ -49,8 +46,8 @@ $form
 	->addField(
 		new CWidgetFieldTagsView($data['fields']['tags'])
 	)
-	->addItem(
-		getColumnsField($form, $data['fields']['columns'])
+	->addField(
+		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['order'])
@@ -65,21 +62,12 @@ $form
 	->addJavaScript('widget_tophosts_form.init();')
 	->show();
 
-function getColumnsField(CWidgetFormView $form, CWidgetFieldColumnsList $field): array {
-	$columns = new CWidgetFieldColumnsListView($field);
-
-	return $form->makeCustomField($columns, [
-		$columns->getLabel(),
-		(new CFormField($columns->getView()))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	]);
-}
-
 function getColumnField(CWidgetFormView $form, CWidgetFieldSelect $field): array {
-	$column = new CWidgetFieldSelectView($field);
+	$column = $form->registerField(new CWidgetFieldSelectView($field));
 
-	return $form->makeCustomField($column, [
+	return [
 		$column->getLabel(),
 		(new CFormField($field->getValues() ? $column->getView() : _('Add item column')))
 			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
-	]);
+	];
 }
