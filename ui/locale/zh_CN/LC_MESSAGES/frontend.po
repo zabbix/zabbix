@@ -1560,6 +1560,10 @@ msgstr "根因"
 msgid "Attribution HTML"
 msgstr "HTML属性"
 
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -22897,6 +22901,10 @@ msgstr "Zabbix 客户端"
 msgid "Zabbix agent (active)"
 msgstr "Zabbix客户端(主动式)"
 
+#: app/partials/administration.system.info.php:45
+msgid "Zabbix frontend version"
+msgstr ""
+
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix已接收到一个错误的请求."
@@ -22955,6 +22963,10 @@ msgstr "Zabbix服务器端运行中"
 #: include/classes/setup/CSetupWizard.php:747
 msgid "Zabbix server name"
 msgstr "Zabbix主机名称"
+
+#: app/partials/administration.system.info.php:40
+msgid "Zabbix server version"
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
