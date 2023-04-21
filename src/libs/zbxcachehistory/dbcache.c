@@ -1303,6 +1303,12 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_MODULES & h->flags))
 			continue;
 
+		if (ITEM_VALUE_TYPE_BIN == h->value_type)
+		{
+			/* exporting binary value type history is not supported */
+			continue;
+		}
+
 		if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &h->itemid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1333,12 +1339,6 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 			if (0 == connector_object.ids.values_num && FAIL == history_export_enabled)
 				continue;
-		}
-
-		if (ITEM_VALUE_TYPE_BIN == h->value_type)
-		{
-			/* exporting binary value type history is not supported */
-			continue;
 		}
 
 		zbx_json_clean(&json);
