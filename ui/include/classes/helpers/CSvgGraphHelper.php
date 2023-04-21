@@ -82,9 +82,16 @@ class CSvgGraphHelper {
 				$options['problems']['itemids'] = [];
 
 				foreach ($metrics as $metric) {
-					foreach ($metric['items'] as $item) {
-						if (!in_array($item['itemid'], $options['problems']['itemids'])) {
-							$options['problems']['itemids'][] = $item['itemid'];
+					if ($metric['options']['aggregate_function'] != GRAPH_AGGREGATE_NONE) {
+						foreach ($metric['items'] as $item) {
+							if (!in_array($item['itemid'], $options['problems']['itemids'])) {
+								$options['problems']['itemids'][] = $item['itemid'];
+							}
+						}
+					}
+					else {
+						if (!in_array($metric['itemid'], $options['problems']['itemids'])) {
+							$options['problems']['itemids'][] = $metric['itemid'];
 						}
 					}
 				}
