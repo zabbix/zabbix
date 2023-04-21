@@ -164,7 +164,7 @@ static int	redirect_detect(const char *linebuf, unsigned char allow_redirect)
  *           changed in future versions.                                      *
  *                                                                            *
  ******************************************************************************/
-static int	resp_src_remove(char *linebuf)
+static int	redirect_remove(char *linebuf)
 {
 	int	ret = SUCCEED;
 	char	*p_start;
@@ -311,12 +311,9 @@ static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hos
 			/* unless we hit the help message which is always bigger than 1 Kb             */
 			if (ZBX_KIBIBYTE > strlen(out))
 			{
-				if (SUCCEED != resp_src_remove(out))
-				{
-					zbx_rtrim(out, "\n");
-					zbx_strlcpy(error, out, max_error_len);
-					goto out;
-				}
+				int	unused = redirect_remove(out);
+
+				ZBX_UNUSED(unused);
 
 				/* skip white spaces */
 				for (p = out; '\0' != *p && isspace(*p); p++)
@@ -548,7 +545,7 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	if (SUCCEED != redirect_detect(resp->linebuf, args->allow_redirect))
 		return;
 
-	if (SUCCEED != resp_src_remove(resp->linebuf))
+	if (SUCCEED != redirect_remove(resp->linebuf))
 		return;
 
 	if (SUCCEED != host_get(resp, args, &host))
