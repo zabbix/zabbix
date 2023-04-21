@@ -193,6 +193,10 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
+						$item += array_intersect_key($db_item, array_flip(['url']));
+					}
+
 					$post_types = [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML];
 
 					if (in_array($item['post_type'], $post_types) && !in_array($db_item['post_type'], $post_types)) {
@@ -291,7 +295,8 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $items
 	 */
 	protected static function validateUniqueness(array &$items): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'key_']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
+			'uuid' =>	['type' => API_ANY],
 			'hostid' =>	['type' => API_ANY],
 			'key_' =>	['type' => API_ANY]
 		]];
@@ -419,36 +424,71 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Check and add UUID to all item prototypes on templates, if it doesn't exist.
+	 * Add the UUID to those of the given items that belong to a template and don't have the 'uuid' parameter set.
 	 *
 	 * @param array $items
-	 *
-	 * @throws APIException
 	 */
-	protected static function checkAndAddUuid(array &$items): void {
+	protected static function addUuid(array &$items): void {
 		foreach ($items as &$item) {
 			if ($item['host_status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
 				$item['uuid'] = generateUuidV4();
 			}
 		}
 		unset($item);
+	}
 
-		$uuids = array_column($items, 'uuid');
+	/**
+	 * Verify host prototype UUIDs are not repeated.
+	 *
+	 * @param array      $items
+	 * @param array|null $db_items
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkUuidDuplicates(array $items, array $db_items = null): void {
+		$item_indexes = [];
 
-		if (!$uuids) {
+		foreach ($items as $i => $item) {
+			if (!array_key_exists('uuid', $item)) {
+				continue;
+			}
+
+			if ($db_items === null || $item['uuid'] !== $db_items[$item['itemid']]['uuid']) {
+				$item_indexes[$item['uuid']] = $i;
+			}
+		}
+
+		if (!$item_indexes) {
 			return;
 		}
 
+		$flags = $items[reset($item_indexes)]['flags'];
+
 		$duplicates = DB::select('items', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => $uuids],
+			'filter' => [
+				'flags' => $flags,
+				'uuid' => array_keys($item_indexes)
+			],
 			'limit' => 1
 		]);
 
 		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
-			);
+			switch ($flags) {
+				case ZBX_FLAG_DISCOVERY_NORMAL:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('item with the same UUID already exists')
+					);
+					break;
+
+				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('item prototype with the same UUID already exists')
+					);
+					break;
+			}
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 

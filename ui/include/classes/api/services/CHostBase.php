@@ -233,7 +233,7 @@ abstract class CHostBase extends CApiService {
 			' WHERE i.itemid=f.itemid'.
 				' AND f.triggerid=ff.triggerid'.
 				' AND ff.itemid=ii.itemid'.
-				' AND '.dbConditionInt('i.hostid', array_keys($del_templates))
+				' AND '.dbConditionId('i.hostid', array_keys($del_templates))
 		);
 
 		while ($row = DBfetch($result)) {
@@ -352,7 +352,7 @@ abstract class CHostBase extends CApiService {
 					' FROM triggers t,functions f,items i'.
 					' WHERE t.triggerid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
-						' AND '.dbConditionInt('t.templateid', array_keys($trigger_hosts))
+						' AND '.dbConditionId('t.templateid', array_keys($trigger_hosts))
 				);
 
 				$_trigger_hosts = [];
@@ -772,7 +772,7 @@ abstract class CHostBase extends CApiService {
 				' AND td.triggerid_up=ff.triggerid'.
 				' AND ff.itemid=ii.itemid'.
 				' AND ii.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.hostid', array_keys($ins_templates)).
+				' AND '.dbConditionId('i.hostid', array_keys($ins_templates)).
 				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
 		);
 
@@ -780,7 +780,7 @@ abstract class CHostBase extends CApiService {
 			foreach ($ins_templates[$row['ins_templateid']] as $hostid => $templateids) {
 				if (bccomp($row['hostid'], $hostid) == 0 && $this instanceof CTemplate) {
 					$objects = DB::select('hosts', [
-						'output' => ['host', 'status', 'flags'],
+						'output' => ['host'],
 						'hostids' => [$row['ins_templateid'], $hostid],
 						'preservekeys' => true
 					]);
@@ -790,19 +790,12 @@ abstract class CHostBase extends CApiService {
 						'triggerids' => $row['triggerid_down']
 					]);
 
-					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
-					}
-					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
-					}
-					else {
-						$error = _('Cannot link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
-					}
-
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
-						$objects[$hostid]['host'], $triggers[0]['description']
-					));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".',
+							$objects[$row['ins_templateid']]['host'], $objects[$hostid]['host'],
+							$triggers[0]['description']
+						)
+					);
 				}
 
 				if (!in_array($row['hostid'], $templateids)) {
@@ -850,14 +843,14 @@ abstract class CHostBase extends CApiService {
 					' AND f.triggerid=td.triggerid_up'.
 					' AND td.triggerid_down=ff.triggerid'.
 					' AND ff.itemid=ii.itemid'.
-					' AND '.dbConditionInt('i.hostid', array_keys($ins_templates)).
-					' AND '.dbConditionInt('ii.hostid', array_keys($hostids))
+					' AND '.dbConditionId('i.hostid', array_keys($ins_templates)).
+					' AND '.dbConditionId('ii.hostid', array_keys($hostids))
 			);
 
 			while ($row = DBfetch($result)) {
 				if (array_key_exists($row['hostid'], $ins_templates[$row['ins_templateid']])) {
 					$objects = DB::select('hosts', [
-						'output' => ['host', 'status', 'flags'],
+						'output' => ['host'],
 						'hostids' => [$row['ins_templateid'], $row['hostid']],
 						'preservekeys' => true
 					]);
@@ -867,19 +860,12 @@ abstract class CHostBase extends CApiService {
 						'triggerids' => $row['triggerid_down']
 					]);
 
-					if ($objects[$row['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
-					}
-					elseif ($objects[$row['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
-					}
-					else {
-						$error = _('Cannot link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
-					}
-
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
-						$objects[$row['hostid']]['host'], $triggers[0]['description']
-					));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".',
+							$objects[$row['ins_templateid']]['host'], $objects[$row['hostid']]['host'],
+							$triggers[0]['description']
+						)
+					);
 				}
 			}
 		}
@@ -900,14 +886,14 @@ abstract class CHostBase extends CApiService {
 			' WHERE i.itemid=f.itemid'.
 				' AND f.triggerid=ff.triggerid'.
 				' AND ff.itemid=ii.itemid'.
-				' AND '.dbConditionInt('i.hostid', array_keys($ins_templates))
+				' AND '.dbConditionId('i.hostid', array_keys($ins_templates))
 		);
 
 		while ($row = DBfetch($result)) {
 			foreach ($ins_templates[$row['ins_templateid']] as $hostid => $templateids) {
 				if (bccomp($row['hostid'], $hostid) == 0 && $this instanceof CTemplate) {
 					$objects = DB::select('hosts', [
-						'output' => ['host', 'status', 'flags'],
+						'output' => ['host'],
 						'hostids' => [$row['ins_templateid'], $hostid],
 						'preservekeys' => true
 					]);
@@ -917,19 +903,12 @@ abstract class CHostBase extends CApiService {
 						'triggerids' => $row['triggerid']
 					]);
 
-					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" to template "%2$s" due to expression of trigger "%3$s".');
-					}
-					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to expression of trigger "%3$s".');
-					}
-					else {
-						$error = _('Cannot link template "%1$s" to host "%2$s" due to expression of trigger "%3$s".');
-					}
-
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
-						$objects[$hostid]['host'], $triggers[0]['description']
-					));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot link template "%1$s" to template "%2$s" due to expression of trigger "%3$s".',
+							$objects[$row['ins_templateid']]['host'], $objects[$hostid]['host'],
+							$triggers[0]['description']
+						)
+					);
 				}
 
 				if (!in_array($row['hostid'], $templateids)) {
