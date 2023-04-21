@@ -661,7 +661,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		$this->query($query)->waitUntilClickable()->one()->click();
 
 		// Check the error message depending on case.
-		$error = CTestArrayHelper::get($data, 'incorrect_request') ? self::INCORRECT_REQUEST  : self::ACCESS_DENIED;
+		$error = CTestArrayHelper::get($data, 'incorrect_request') ? self::INCORRECT_REQUEST : self::ACCESS_DENIED;
 		$this->assertMessage(TEST_BAD, $error['message'], $error['details']);
 		$this->checkReturnButton($data);
 
