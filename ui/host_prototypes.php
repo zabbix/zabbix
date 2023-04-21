@@ -265,7 +265,12 @@ elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelet
 	if ($result) {
 		uncheckTableRows($discoveryRule['itemid']);
 	}
-	show_messages($result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
+
+	$host_prototypes_count = count(getRequest('group_hostid'));
+	$messageSuccess = _n('Host prototype deleted', 'Host prototypes deleted', $host_prototypes_count);
+	$messageFailed = _n('Cannot delete host prototype', 'Cannot delete host prototypes', $host_prototypes_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 if (hasRequest('action') && hasRequest('group_hostid') && !$result) {

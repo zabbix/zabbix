@@ -121,6 +121,7 @@ class CControllerPopupMassupdateItem extends CController {
 	 * @return CControllerResponse
 	 */
 	protected function update(): CControllerResponse {
+		$items_count = count($this->getInput('ids'));
 		$item_prototypes = (bool) $this->getInput('prototype', false);
 
 		try {
@@ -267,13 +268,18 @@ class CControllerPopupMassupdateItem extends CController {
 		catch (Exception $e) {
 			$result = false;
 			CMessageHelper::setErrorTitle(
-				$item_prototypes ? _('Cannot update item prototypes') : _('Cannot update items')
+				$item_prototypes
+					? _n('Cannot update item prototype', 'Cannot update item prototypes', $items_count)
+					: _n('Cannot update item', 'Cannot update items', $items_count)
 			);
 		}
 
 		if ($result) {
 			$messages = CMessageHelper::getMessages();
-			$output = ['title' => $item_prototypes ? _('Item prototypes updated') : _('Items updated')];
+			$output = ['title' => $item_prototypes
+				? _n('Item prototype updated', 'Item prototypes updated', $items_count)
+				: _n('Item updated', 'Items updated', $items_count)
+			];
 
 			if (count($messages)) {
 				$output['messages'] = array_column($messages, 'message');
