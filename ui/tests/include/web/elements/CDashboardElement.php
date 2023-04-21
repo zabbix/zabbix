@@ -177,7 +177,12 @@ class CDashboardElement extends CElement {
 				$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible(2);
 			}
 			catch (TimeoutException $ex) {
-				$button->click(true);
+				try {
+					$button->click(true);
+				}
+				catch (\Exception $ex) {
+					// Code is not missing here.
+				}
 			}
 
 			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();

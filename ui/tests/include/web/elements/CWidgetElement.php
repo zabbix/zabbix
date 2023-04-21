@@ -33,8 +33,10 @@ class CWidgetElement extends CElement {
 	 * @return integer
 	 */
 	public function getRefreshInterval() {
+		$this->getHeader()->hoverMouse();
 		$this->query('xpath:.//button[contains(@class, "btn-widget-action")]')->waitUntilPresent()->one()->click(true);
-		$aria_label = explode(', ', CPopupMenuElement::getSelected()->getAttribute('aria-label'), 3);
+		$menu = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$aria_label = explode(', ', $menu->getSelected()->getAttribute('aria-label'), 3);
 
 		return $aria_label[1];
 	}
@@ -42,11 +44,20 @@ class CWidgetElement extends CElement {
 	/**
 	 * Get header of widget.
 	 *
+	 * @return CElement
+	 */
+	public function getHeader() {
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
+				' contains(@class, "dashboard-grid-iterator-head")]/h4')->one();
+	}
+
+	/**
+	 * Get header text of widget.
+	 *
 	 * @return string
 	 */
 	public function getHeaderText() {
-		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
-				' contains(@class, "dashbrd-grid-iterator-head")]/h4')->one()->getText();
+		return $this->getHeader()->getText();
 	}
 
 	/**

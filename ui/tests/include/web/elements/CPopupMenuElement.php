@@ -150,8 +150,7 @@ class CPopupMenuElement extends CElement {
 	 *
 	 * @return CElement
 	 */
-	public static function getSelected() {
-		$menu = self::find()->waitUntilVisible()->one();
-		return $menu->query('xpath:.//a[contains(@aria-label, "selected")]')->one();
+	public function getSelected() {
+		return $this->query('xpath:.//a[contains(@aria-label, "selected")]')->one();
 	}
 }

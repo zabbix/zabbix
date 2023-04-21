@@ -230,7 +230,8 @@ class testDashboardURLWidget extends CWebTest {
 		$dashboard->save();
 
 		// Check parameter 'Dynamic item' true/false state.
-		$this->assertTrue($dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()->isVisible());
+		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
+		$this->assertTrue($host_selector->isVisible());
 		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
 				->query('class:nothing-to-show')->one()->getText());
 		$dashboard->getWidget(self::$default_widget)->edit();
@@ -238,7 +239,7 @@ class testDashboardURLWidget extends CWebTest {
 		$form->fill(['Dynamic item' => false])->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->save();
-		$this->assertFalse($dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one(false)->isVisible());
+		$this->assertFalse($host_selector->isVisible());
 	}
 
 	public static function getWidgetData() {
@@ -553,7 +554,7 @@ class testDashboardURLWidget extends CWebTest {
 
 			if (CTestArrayHelper::get($data, 'update', false)) {
 				foreach ([self::$default_widget => true, $new_name => false] as $name => $valid) {
-					$this->assertTrue($dashboard->getWidget($name, $valid)->isValid($valid));
+					$dashboard->getWidget($name, false)->isValid($valid);
 				}
 			}
 

@@ -765,7 +765,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 *
 	 * @return boolean
 	 */
-	function hasClass($class) {
+	public function hasClass($class) {
 		$attribute = parent::getAttribute('class');
 		$classes = ($attribute !== null) ? explode(' ', $attribute) : [];
 
@@ -774,5 +774,15 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		return (count(array_diff($class, $classes)) === 0);
+	}
+
+	/**
+	 * Hover mouse over the element
+	 */
+	public function hoverMouse() {
+		$mouse = CElementQuery::getDriver()->getMouse();
+		$mouse->mouseMove($this->getCoordinates());
+
+		return $this;
 	}
 }
