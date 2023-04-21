@@ -204,13 +204,13 @@ $triggersForm->addItem([
 		[
 			'triggerprototype.massenable' => [
 				'name' => _('Create enabled'),
-				'confirm_singular' => _('Create trigger from selected prototypes as enabled?'),
+				'confirm_singular' => _('Create triggers from selected prototype as enabled?'),
 				'confirm_plural' => _('Create triggers from selected prototypes as enabled?'),
 				'csrf_token' => $csrf_token
 			],
 			'triggerprototype.massdisable' => [
 				'name' => _('Create disabled'),
-				'confirm_singular' => _('Create trigger from selected prototypes as disabled?'),
+				'confirm_singular' => _('Create triggers from selected prototype as disabled?'),
 				'confirm_plural' => _('Create triggers from selected prototypes as disabled?'),
 				'csrf_token' => $csrf_token
 			],
