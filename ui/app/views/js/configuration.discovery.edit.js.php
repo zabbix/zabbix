@@ -99,7 +99,7 @@ window.drule_edit_popup = new class {
 
 		overlay.$dialogue[0].addEventListener('check.submit', (e) => {
 			if (row !== null) {
-				this._updateCheck(row, e.detail)
+				this._updateCheck(row, e.detail);
 			}
 			else {
 				this.dcheckid = getUniqueId()
@@ -137,7 +137,7 @@ window.drule_edit_popup = new class {
 
 			document.querySelector(
 				'[name="dchecks[' + target.dataset.id + '][' + name + ']"]'
-			)
+			);
 
 			document.querySelector(
 				'[name="dchecks[' + target.dataset.id + '][' + name + ']"]'
@@ -263,6 +263,8 @@ window.drule_edit_popup = new class {
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
+
+		document.getElementById('name').focus();
 	}
 
 	delete() {

@@ -45,7 +45,7 @@ class CControllerDiscoveryUpdate extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Cannot create discovery rule'),
+						'title' => _('Cannot update discovery rule'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				], JSON_THROW_ON_ERROR)])

@@ -38,13 +38,15 @@ if (!empty($this->data['drule']['druleid'])) {
 }
 
 // Create form grid.
-$discoveryFormGrid = (new CFormGrid())
+$form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $this->data['drule']['name']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
+		new CFormGrid(
+			(new CTextBox('name', $this->data['drule']['name']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
+		)
 	]);
 
 // Append proxy to form list.
@@ -57,7 +59,7 @@ foreach ($this->data['proxies'] as $proxy) {
 	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['host']));
 }
 
-$discoveryFormGrid
+$form_grid
 	->addItem([new CLabel(_('Discovery by proxy'), $proxy_select->getFocusableElementId()), $proxy_select])
 	->addItem([(new CLabel(_('IP range'), 'iprange'))->setAsteriskMark(),
 		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))->setAriaRequired()
@@ -68,7 +70,7 @@ $discoveryFormGrid
 			->setAriaRequired()
 	]);
 
-$discoveryFormGrid->addItem([
+$form_grid->addItem([
 	(new CLabel(_('Checks'), 'dcheckList'))->setAsteriskMark(),
 	new CFormField(
 		(new CDiv(
@@ -94,7 +96,7 @@ $discoveryFormGrid->addItem([
 ]);
 
 // Append uniqueness criteria to form list.
-$discoveryFormGrid->addItem([
+$form_grid->addItem([
 	new CLabel(_('Device uniqueness criteria')),
 	(new CDiv(
 		(new CRadioButtonList('uniqueness_criteria', (int) $this->data['drule']['uniqueness_criteria']))
@@ -116,7 +118,7 @@ $uniqueness_template = (new CTemplateTag('unique-row-tmpl'))->addItem(
 );
 
 // Append host source to form list.
-$discoveryFormGrid->addItem([
+$form_grid->addItem([
 	new CLabel(_('Host name')),
 	(new CDiv(
 		(new CRadioButtonList('host_source', (int) $this->data['drule']['host_source']))
@@ -140,7 +142,7 @@ $host_source_template = (new CTemplateTag('host-source-row-tmpl'))->addItem(
 );
 
 // Append name source to form list.
-$discoveryFormGrid->addItem([
+$form_grid->addItem([
 	new CLabel(_('Visible name')),
 	(new CDiv(
 		(new CRadioButtonList('name_source', (int) $this->data['drule']['name_source']))
@@ -164,7 +166,7 @@ $name_source_template = (new CTemplateTag('name-source-row-tmpl'))->addItem(
 	]))->setId('name_source_row_#{dcheckid}')
 );
 
-$discoveryFormGrid->addItem([
+$form_grid->addItem([
 	new CLabel(_('Enabled'), 'status'),
 	new CFormField((new CCheckBox('status', DRULE_STATUS_ACTIVE))
 		->setUncheckedValue(DRULE_STATUS_DISABLED)
@@ -179,10 +181,10 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH)
 			->setId('dcheckCell_#{dcheckid}'),
 		new CHorList([
-			(new CButton(null, _('Edit')))
+			(new CSimpleButton(_('Edit')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('js-edit'),
-			(new CButton(null, _('Remove')))
+			(new CSimpleButton(_('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('js-remove')
 		])
@@ -192,7 +194,7 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 );
 
 $form
-	->addItem($discoveryFormGrid)
+	->addItem($form_grid)
 	->addItem($check_template_default)
 	->addItem($uniqueness_template)
 	->addItem($host_source_template)
@@ -268,5 +270,10 @@ $output = [
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('configuration.discovery.edit.js.php')
 ];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
 
 echo json_encode($output);

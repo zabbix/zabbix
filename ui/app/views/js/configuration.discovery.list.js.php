@@ -31,15 +31,15 @@
 			document.getElementById('js-create').addEventListener('click', () => this._edit());
 
 			document.getElementById('js-massenable').addEventListener('click', (e) => {
-				this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+				this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 			});
 
 			document.getElementById('js-massdisable').addEventListener('click', (e) => {
-				this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+				this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 			});
 
 			document.getElementById('js-massdelete').addEventListener('click', (e) => {
-				this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+				this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 			});
 
 			document.addEventListener('click', (e) => {
@@ -52,7 +52,7 @@
 				else if (e.target.classList.contains('js-disable-drule')) {
 					this._disable(e.target, [e.target.dataset.druleid]);
 				}
-			})
+			});
 		}
 
 		_edit(parameters = {}) {
@@ -180,5 +180,5 @@
 					target.classList.remove('is-loading');
 				});
 		}
-};
+	};
 </script>

@@ -45,18 +45,28 @@ $html_page = (new CHtmlPage())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormGrid())->addItem([_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			]),
-			(new CFormGrid())->addItem([_('Status'),
-				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-					->addValue(_('Any'), -1)
-					->addValue(_('Enabled'), DRULE_STATUS_ACTIVE)
-					->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
-					->setModern(true)
-			])
+			(new CFormGrid())
+				->addStyle('margin-top: 5px; margin-bottom: 5px;')
+				->addItem([
+					new CLabel(_('Name')),
+					new CFormField(
+						(new CTextBox('filter_name', $data['filter']['name']))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setAttribute('autofocus', 'autofocus')
+					)
+				]),
+			(new CFormGrid())
+				->addStyle('margin-top: 5px; margin-bottom: 5px;')
+				->addItem([
+					new CLabel(_('Status')),
+					new CFormField(
+						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+							->addValue(_('Any'), -1)
+							->addValue(_('Enabled'), DRULE_STATUS_ACTIVE)
+							->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
+							->setModern()
+					)
+				])
 		])
 		->addVar('action', 'discovery.list')
 	);
@@ -98,7 +108,7 @@ foreach ($data['drules'] as $drule) {
 		new CCheckBox('druleids['.$drule['druleid'].']', $drule['druleid']),
 		(new CLink($drule['name']))
 			->addClass('js-discovery-edit')
-			->setAttribute('data-druleid',$drule['druleid']),
+			->setAttribute('data-druleid', $drule['druleid']),
 		$drule['iprange'],
 		$drule['proxy'],
 		$drule['delay'],
