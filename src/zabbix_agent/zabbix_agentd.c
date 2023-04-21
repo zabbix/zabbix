@@ -1148,8 +1148,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 
-	SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)&zbx_win_seh_handler);
+#ifdef _M_X64
 	AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_veh_handler);
+#endif /* _M_X64 */
 #endif
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{

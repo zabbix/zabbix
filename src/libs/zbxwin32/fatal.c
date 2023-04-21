@@ -272,6 +272,7 @@ LONG	zbx_win_seh_handler(struct _EXCEPTION_POINTERS *ep)
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
+#ifdef _M_X64
 LONG	zbx_win_veh_handler(struct _EXCEPTION_POINTERS *ep)
 {
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
@@ -279,3 +280,4 @@ LONG	zbx_win_veh_handler(struct _EXCEPTION_POINTERS *ep)
 
 	return EXCEPTION_CONTINUE_SEARCH;
 }
+#endif /* _M_X64 */
