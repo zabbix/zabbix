@@ -55,20 +55,24 @@ class CActionButtonList extends CObject {
 	protected $selected_count_element = null;
 
 	/**
-	 * @param string       $action_name                   Name of submit buttons.
-	 * @param string       $checkboxes_name               Name of parameter into which checked checkboxes will be put
-	 *                                                    in.
-	 * @param array        $buttons_data                  Buttons data array.
-	 * @param string       $buttons_data[]['name']        Button caption.
-	 * @param string       $buttons_data[]['confirm']     Confirmation text (optional).
-	 * @param string       $buttons_data[]['redirect']    Redirect URL (optional).
-	 * @param string       $buttons_data[]['csrf_token']  CSRF token (optional).
-	 * @param bool         $buttons_data[]['disabled']    Set button state disabled (optional).
-	 * @param array        $buttons_data[]['attributes']  Set additional HTML attributes where array key is attribute
-	 *                                                    name array value is the attribute value.
-	 * @param CTag         $buttons_data[]['content']     A HTML tag. For example a CButton wrapped in CList object.
-	 * @param string|null  $name_prefix                   Prefix for sessionStorage used for storing currently selected
-	 *                                                    checkboxes.
+	 * @param string       $action_name                   		Name of submit buttons.
+	 * @param string       $checkboxes_name               		Name of parameter into which checked checkboxes will be
+	 *                                                    		put in.
+	 * @param array        $buttons_data                  		Buttons data array.
+	 * @param string       $buttons_data[]['name']        		Button caption.
+	 * @param string       $buttons_data[]['confirm_singular']	Confirmation text in the singular (optional). If this is
+	 *                                  						provided, 'confirm_plural' also must be provided.
+	 * @param string       $buttons_data[]['confirm_plural']	Confirmation text in the plural (optional). If this is
+	 *                                  						provided, 'confirm_singular' also must be provided.
+	 * @param string       $buttons_data[]['redirect']    		Redirect URL (optional).
+	 * @param string       $buttons_data[]['csrf_token']  		CSRF token (optional).
+	 * @param bool         $buttons_data[]['disabled']    		Set button state disabled (optional).
+	 * @param array        $buttons_data[]['attributes']  		Set additional HTML attributes where array key is
+	 *                                                    		attribute name array value is the attribute value.
+	 * @param CTag         $buttons_data[]['content']     		A HTML tag. For example a CButton wrapped in CList
+	 *                                  						object.
+	 * @param string|null  $name_prefix                   		Prefix for sessionStorage used for storing currently
+	 *                                                    		selected checkboxes.
 	 */
 	function __construct($action_name, $checkboxes_name, array $buttons_data, $name_prefix = null) {
 		$this->checkboxes_name = $checkboxes_name;
@@ -128,8 +132,10 @@ class CActionButtonList extends CObject {
 						->setAttribute('data-disabled', $button_data['disabled']);
 				}
 
-				if (array_key_exists('confirm', $button_data)) {
-					$button->setAttribute('confirm', $button_data['confirm']);
+				if (array_key_exists('confirm_singular', $button_data)
+					&& array_key_exists('confirm_plural', $button_data)) {
+					$button->setAttribute('confirm_singular', $button_data['confirm_singular']);
+					$button->setAttribute('confirm_plural', $button_data['confirm_plural']);
 				}
 			}
 

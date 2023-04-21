@@ -301,13 +301,20 @@ $form->addItem([
 		'user.provision' => [
 			'name' => _('Provision now'),
 			'attributes' => ['data-required' => 'ldap'],
-			'confirm' => _('Provision selected LDAP users?'),
+			'confirm_singular' => _('Provision selected LDAP user?'),
+			'confirm_plural' => _('Provision selected LDAP users?'),
 			'csrf_token' => $csrf_token
 		],
-		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?'),
+		'user.unblock' => [
+			'name' => _('Unblock'),
+			'confirm_singular' => _('Unblock selected user?'),
+			'confirm_plural' => _('Unblock selected users?'),
 			'csrf_token' => $csrf_token
 		],
-		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?'),
+		'user.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected user?'),
+			'confirm_plural' => _('Delete selected users?'),
 			'csrf_token' => $csrf_token
 		]
 	], 'user')

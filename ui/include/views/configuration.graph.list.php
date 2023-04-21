@@ -263,9 +263,14 @@ if (!$this->data['parent_discoveryid']) {
 			->removeId()
 	];
 }
-$buttons['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
-	? _('Delete selected graph prototypes?')
-	: _('Delete selected graphs?'),
+$buttons['graph.massdelete'] = [
+	'name' => _('Delete'),
+	'confirm_singular' => $this->data['parent_discoveryid']
+		? _('Delete selected graph prototype?')
+		: _('Delete selected graph?'),
+	'confirm_plural' => $this->data['parent_discoveryid']
+		? _('Delete selected graph prototypes?')
+		: _('Delete selected graphs?'),
 	'csrf_token' => $csrf_token
 ];
 

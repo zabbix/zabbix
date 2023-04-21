@@ -194,14 +194,23 @@ $itemForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'group_hostid',
 		[
-			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create hosts from selected prototypes as enabled?'), 'csrf_token' => $csrf_token
+			'hostprototype.massenable' => [
+				'name' => _('Create enabled'),
+				'confirm_singular' => _('Create hosts from selected prototype as enabled?'),
+				'confirm_plural' => _('Create hosts from selected prototypes as enabled?'),
+				'csrf_token' => $csrf_token
 			],
-			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create hosts from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
+			'hostprototype.massdisable' => [
+				'name' => _('Create disabled'),
+				'confirm_singular' => _('Create hosts from selected prototype as disabled?'),
+				'confirm_plural' => _('Create hosts from selected prototypes as disabled?'),
+				'csrf_token' => $csrf_token
 			],
-			'hostprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected host prototypes?'), 'csrf_token' => $csrf_token
+			'hostprototype.massdelete' => [
+				'name' => _('Delete'),
+				'confirm_singular' => _('Delete selected host prototype?'),
+				'confirm_plural' => _('Delete selected host prototypes?'),
+				'csrf_token' => $csrf_token
 			]
 		],
 		$data['discovery_rule']['itemid']

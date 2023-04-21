@@ -337,10 +337,16 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 $button_list = [
-	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?'),
+	'discoveryrule.massenable' => [
+		'name' => _('Enable'),
+		'confirm_singular' =>_('Enable selected discovery rule?'),
+		'confirm_plural' =>_('Enable selected discovery rules?'),
 		'csrf_token' => $csrf_token
 	],
-	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?'),
+	'discoveryrule.massdisable' => [
+		'name' => _('Disable'),
+		'confirm_singular' =>_('Disable selected discovery rule?'),
+		'confirm_plural' =>_('Disable selected discovery rules?'),
 		'csrf_token' => $csrf_token
 	]
 ];
@@ -358,7 +364,10 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?'),
+	'discoveryrule.massdelete' => [
+		'name' => _('Delete'),
+		'confirm_singular' =>_('Delete selected discovery rule?'),
+		'confirm_plural' =>_('Delete selected discovery rules?'),
 		'csrf_token' => $csrf_token
 	]
 ];
