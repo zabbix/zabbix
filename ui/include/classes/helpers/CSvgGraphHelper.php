@@ -789,9 +789,16 @@ class CSvgGraphHelper {
 		$item_ids = [];
 
 		foreach ($metrics as $metric) {
-			foreach ($metric['items'] as $item) {
-				if (!in_array($item['itemid'], $item_ids)) {
-					$item_ids[] = $item['itemid'];
+			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
+				foreach ($metric['items'] as $item) {
+					if (!in_array($item['itemid'], $item_ids)) {
+						$item_ids[] = $item['itemid'];
+					}
+				}
+			}
+			else {
+				if (!in_array($metric['itemid'], $item_ids)) {
+					$item_ids[] = $metric['itemid'];
 				}
 			}
 		}
