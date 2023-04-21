@@ -350,6 +350,9 @@ class CZabbixServer {
 					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
 				'count' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]	// API_FLOAT 0-n
+			]],
+			'server stats' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'version' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]]
 		]];
 

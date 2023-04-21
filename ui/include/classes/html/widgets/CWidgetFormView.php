@@ -195,7 +195,9 @@ class CWidgetFormView {
 					'action' => 'ZABBIX.Dashboard.applyWidgetProperties();'
 				]
 			],
-			'doc_url' => CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT),
+			'doc_url' => $this->data['url'] === ''
+				? CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT)
+				: CHtml::encode($this->data['url']),
 			'data' => [
 				'original_properties' => [
 					'type' => $this->data['type'],
