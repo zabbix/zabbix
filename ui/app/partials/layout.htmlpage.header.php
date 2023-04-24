@@ -37,7 +37,8 @@ $page_header = new CHtmlPageHeader($page_title, CWebUser::getLang());
 
 if (!empty($DB['DB'])) {
 	$page_header
-		->setTheme(getUserTheme($data['user']))
+//		->setTheme(getUserTheme($data['user']))
+		->setTheme(isset($_GET['theme']) ? $_GET['theme'] : getUserTheme($data['user']))
 		->addStyle(getTriggerSeverityCss())
 		->addStyle(getTriggerStatusCss());
 
