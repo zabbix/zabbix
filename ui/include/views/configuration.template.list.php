@@ -316,8 +316,10 @@ $form->addItem([
 			],
 			'template.massdeleteclear' => [
 				'name' => _('Delete and clear'),
-				'confirm_singular' => _('Delete and clear selected template? (Warning: all linked hosts will be cleared!)'),
-				'confirm_plural' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
+				'confirm_singular' =>
+					_('Delete and clear selected template? (Warning: all linked hosts will be cleared!)'),
+				'confirm_plural' =>
+					_('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
 				'csrf_token' => CCsrfTokenHelper::get('templates.php')
 			]
 		]
