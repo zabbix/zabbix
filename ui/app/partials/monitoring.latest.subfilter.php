@@ -39,7 +39,7 @@ foreach (['hostids', 'tagnames', 'data', 'state'] as $key) {
 	$subfilter_options[$key] = [];
 
 	// Remove non-selected filter fields with 0 occurrences (for hosts and tag names).
-	if ($key === 'hostids' || $key === 'tagnames') {
+	if ($key === 'hostids' || $key === 'tagnames' || $key === 'state') {
 		$subfilters[$key] = array_filter($subfilters[$key], function ($field) {
 			return $field['selected'] || $field['count'] > 0;
 		});
