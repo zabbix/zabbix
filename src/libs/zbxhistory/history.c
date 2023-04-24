@@ -37,7 +37,7 @@ zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
  *                                                                                  *
  * Comments: History interfaces are created for all values types based on           *
  *           configuration. Every value type can have different history storage     *
- *           backend. (binary is not supported for ElasticSearch)                   *
+ *           backend. (Binary value type is not supported for ElasticSearch)        *
  *                                                                                  *
  ************************************************************************************/
 int	zbx_history_init(char **error)
@@ -46,7 +46,7 @@ int	zbx_history_init(char **error)
 
 	const char	*opts[] = {"dbl", "str", "log", "uint", "text", "bin"};
 
-	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = ITEM_VALUE_TYPE_FLOAT; i <= ITEM_VALUE_TYPE_BIN; i++)
 	{
 
 		if (NULL == CONFIG_HISTORY_STORAGE_URL || NULL == strstr(CONFIG_HISTORY_STORAGE_OPTS, opts[i]))
