@@ -1222,6 +1222,32 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int 
 		*result = values->values[0].value.dbl;
 }
 
+static void	evaluate_history_func_last_var(zbx_vector_history_record_t *values, int value_type, zbx_vector_var_t *results_vector)
+{
+	zbx_variant_t	result;
+
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_UINT64:
+			zbx_variant_set_ui64(&result, values->values[0].value.ui64);
+			break;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			zbx_variant_set_str(&result, zbx_strdup(NULL, values->values[0].value.str));
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_variant_set_str(&result, zbx_strdup(NULL, values->values[0].value.log->value));
+			break;
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_variant_set_dbl(&result, values->values[0].value.dbl);
+			break;
+		case ITEM_VALUE_TYPE_NONE:
+			return;
+	}
+
+	zbx_vector_var_append(results_vector, result);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: calculate function with values from value vector                  *
@@ -1581,7 +1607,8 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 	zbx_expression_query_many_t	*data;
 	int				ret = FAIL, item_func, count, seconds, i;
 	zbx_vector_history_record_t	values;
-	zbx_vector_dbl_t		*results_vector;
+	zbx_vector_dbl_t		*results_dbl_vector;
+	zbx_vector_var_t		*results_var_vector;
 	double				result;
 	char				*operator = NULL, *pattern = NULL;
 
@@ -1694,8 +1721,16 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			goto out;
 	}
 
-	results_vector = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
-	zbx_vector_dbl_create(results_vector);
+	if (ZBX_VALUE_FUNC_LAST == item_func)
+	{
+		results_var_vector = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
+		zbx_vector_var_create(results_var_vector);
+	}
+	else
+	{
+		results_dbl_vector = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
+		zbx_vector_dbl_create(results_dbl_vector);
+	}
 
 	for (i = 0; i < data->itemids.values_num; i++)
 	{
@@ -1714,32 +1749,44 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			continue;
 
 		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
-			continue;
+		{
+			if (item_func != ZBX_VALUE_FUNC_LAST && item_func != ZBX_VALUE_FUNC_COUNT)
+				continue;
+		}
 
 		zbx_history_record_vector_create(&values);
 
 		if (ZBX_VALUE_FUNC_COUNT == item_func)
 		{
 			if (FAIL == (ret = evaluate_count_many(operator, pattern, dcitem, &values, seconds, count, ts,
-					results_vector, error)))
+					results_dbl_vector, error)))
 			{
-				zbx_vector_dbl_destroy(results_vector);
-				zbx_free(results_vector);
+				zbx_vector_dbl_destroy(results_dbl_vector);
+				zbx_free(results_dbl_vector);
 				goto out;
 			}
 		}
 		else if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts)
 				&& 0 < values.values_num)
 		{
-			evaluate_history_func(&values, dcitem->value_type, item_func, &result);
-
-			zbx_vector_dbl_append(results_vector, result);
+			if (ZBX_VALUE_FUNC_LAST == item_func)
+			{
+				evaluate_history_func_last_var(&values, dcitem->value_type, results_var_vector);
+			}
+			else
+			{
+				evaluate_history_func(&values, dcitem->value_type, item_func, &result);
+				zbx_vector_dbl_append(results_dbl_vector, result);
+			}
 		}
 
 		zbx_history_record_vector_destroy(&values, dcitem->value_type);
 	}
 
-	zbx_variant_set_dbl_vector(value, results_vector);
+	if (ZBX_VALUE_FUNC_LAST == item_func)
+		zbx_variant_set_var_vector(value, results_var_vector);
+	else
+		zbx_variant_set_dbl_vector(value, results_dbl_vector);
 
 	ret = SUCCEED;
 out:

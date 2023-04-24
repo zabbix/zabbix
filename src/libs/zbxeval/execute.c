@@ -2616,17 +2616,21 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 	arg_vector = &output->values[output->values_num - token->opt];
 
-	if (ZBX_VARIANT_DBL_VECTOR != arg_vector->type)
+	if (arg_vector->type != ZBX_VARIANT_DBL_VECTOR)
 	{
-		*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
-				ctx->expression + token->loc.l);
-		return FAIL;
+		if (arg_vector->type != ZBX_VARIANT_VAR_VECTOR)
+		{
+			*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
+					ctx->expression + token->loc.l);
+			return FAIL;
+		}
 	}
 
 	if (1 < token->opt)
 	{
 		zbx_variant_t			*arg_operator;
 		zbx_eval_count_pattern_data_t	pdata;
+		unsigned char			value_type;
 
 		arg_operator = &output->values[output->values_num - token->opt + 1];
 
@@ -2656,7 +2660,9 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 		zbx_vector_expression_create(&pdata.regexps);
 
-		if (FAIL == zbx_validate_count_pattern(operator, pattern, ITEM_VALUE_TYPE_FLOAT, &pdata, error))
+		value_type = (ZBX_VARIANT_VAR_VECTOR == arg_vector->type ? ITEM_VALUE_TYPE_STR : ITEM_VALUE_TYPE_FLOAT);
+
+		if (FAIL == zbx_validate_count_pattern(operator, pattern, value_type, &pdata, error))
 		{
 			ret = FAIL;
 		}
@@ -2664,7 +2670,11 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 		{
 			int	result = 0;
 
-			zbx_count_dbl_vector_with_pattern(&pdata, pattern, arg_vector->data.dbl_vector, &result);
+			if (ZBX_VARIANT_VAR_VECTOR == arg_vector->type)
+				zbx_count_var_vector_with_pattern(&pdata, pattern, arg_vector->data.var_vector, &result);
+			else
+				zbx_count_dbl_vector_with_pattern(&pdata, pattern, arg_vector->data.dbl_vector, &result);
+
 			zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)result);
 		}
 
@@ -2672,7 +2682,16 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 		zbx_vector_expression_destroy(&pdata.regexps);
 	}
 	else
-		zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)arg_vector->data.dbl_vector->values_num);
+	{
+		int value_count;
+
+		if (ZBX_VARIANT_VAR_VECTOR == arg_vector->type)
+			value_count = (zbx_uint64_t)arg_vector->data.var_vector->values_num;
+		else
+			value_count = (zbx_uint64_t)arg_vector->data.dbl_vector->values_num;
+
+		zbx_variant_set_ui64(&ret_value, value_count);
+	}
 
 	if (FAIL != ret)
 		eval_function_return(token->opt, &ret_value, output);

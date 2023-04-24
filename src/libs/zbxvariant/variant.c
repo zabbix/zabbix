@@ -75,6 +75,11 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			zbx_vector_dbl_destroy(value->data.dbl_vector);
 			zbx_free(value->data.dbl_vector);
 			break;
+		case ZBX_VARIANT_VAR_VECTOR:
+			zbx_vector_var_clear(value->data.var_vector);
+			zbx_vector_var_destroy(value->data.var_vector);
+			zbx_free(value->data.var_vector);
+			break;
 	}
 
 	value->type = ZBX_VARIANT_NONE;
@@ -131,6 +136,12 @@ void	zbx_variant_set_dbl_vector(zbx_variant_t *value, zbx_vector_dbl_t *dbl_vect
 {
 	value->data.dbl_vector = dbl_vector;
 	value->type = ZBX_VARIANT_DBL_VECTOR;
+}
+
+void	zbx_variant_set_var_vector(zbx_variant_t *value, zbx_vector_var_t *var_vector)
+{
+	value->data.var_vector = var_vector;
+	value->type = ZBX_VARIANT_VAR_VECTOR;
 }
 
 /******************************************************************************
@@ -362,6 +373,9 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 		case ZBX_VARIANT_DBL_VECTOR:
 			zbx_snprintf(buffer, sizeof(buffer), "double vector[0:%d]", value->data.dbl_vector->values_num);
 			return buffer;
+		case ZBX_VARIANT_VAR_VECTOR:
+			zbx_snprintf(buffer, sizeof(buffer), "var vector[0:%d]", value->data.var_vector->values_num);
+			return buffer;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
@@ -386,6 +400,8 @@ const char	*zbx_get_variant_type_desc(unsigned char type)
 			return "error";
 		case ZBX_VARIANT_DBL_VECTOR:
 			return "double vector";
+		case ZBX_VARIANT_VAR_VECTOR:
+			return "var vector";
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;

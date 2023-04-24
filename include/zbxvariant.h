@@ -28,6 +28,8 @@
 #define ZBX_UNKNOWN_STR		"ZBX_UNKNOWN"	/* textual representation of ZBX_UNKNOWN */
 #define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
 
+ZBX_VECTOR_DECL(var, zbx_variant_t)
+
 typedef union
 {
 	zbx_uint64_t		ui64;
@@ -43,6 +45,8 @@ typedef union
 
 	/* null terminated error message */
 	char			*err;
+
+	zbx_vector_var_t	*var_vector;
 }
 zbx_variant_data_t;
 
@@ -58,7 +62,8 @@ struct zbx_variant
 #define ZBX_VARIANT_UI64	3
 #define ZBX_VARIANT_BIN		4
 #define ZBX_VARIANT_DBL_VECTOR	5
-#define ZBX_VARIANT_ERR		6
+#define ZBX_VARIANT_VAR_VECTOR	6
+#define ZBX_VARIANT_ERR		7
 
 void		zbx_variant_clear(zbx_variant_t *value);
 void		zbx_variant_set_none(zbx_variant_t *value);
@@ -84,7 +89,7 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 
 int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
 
-ZBX_VECTOR_DECL(var, zbx_variant_t)
+void		zbx_variant_set_var_vector(zbx_variant_t *value, zbx_vector_var_t *var_vector);
 
 typedef union
 {
