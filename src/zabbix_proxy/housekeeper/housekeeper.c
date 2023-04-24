@@ -46,9 +46,9 @@ static int	hk_period;
  ******************************************************************************/
 static int	delete_history(const char *table, const char *fieldname, int now)
 {
-	DB_RESULT       result;
-	DB_ROW          row;
-	int             minclock, records = 0;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		minclock, records = 0, minclock_unsent;
 	zbx_uint64_t	lastid, maxid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);
@@ -68,13 +68,15 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 	ZBX_STR2UINT64(lastid, row[0]);
 	DBfree_result(result);
 
-	result = DBselect("select min(clock) from %s",
-			table);
+	minclock_unsent = now - CONFIG_PROXY_OFFLINE_BUFFER * SEC_PER_HOUR;
+	/* skip erroneous clock that can be much older than offline buffer (assume that it is very old) */
+	result = DBselect("select min(clock) from %s where clock>=%d",
+			table, minclock_unsent);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-		goto rollback;
-
-	minclock = atoi(row[0]);
+		minclock = now;
+	else
+		minclock = atoi(row[0]);
 	DBfree_result(result);
 
 	result = DBselect("select max(id) from %s",
@@ -92,7 +94,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 				" and (clock<%d"
 					" or (id<=" ZBX_FS_UI64 " and clock<%d))",
 			table, maxid,
-			now - CONFIG_PROXY_OFFLINE_BUFFER * SEC_PER_HOUR,
+			minclock_unsent,
 			lastid,
 			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR,
 					minclock + HK_MAX_DELETE_PERIODS * hk_period));
