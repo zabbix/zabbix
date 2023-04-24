@@ -1580,6 +1580,10 @@ msgstr "יחוס"
 msgid "Attribution HTML"
 msgstr ""
 
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -23050,6 +23054,10 @@ msgstr "סוכן Zabbix"
 msgid "Zabbix agent (active)"
 msgstr "סוכן Zabbix (פעיל)"
 
+#: app/partials/administration.system.info.php:45
+msgid "Zabbix frontend version"
+msgstr ""
+
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
 msgstr "מערכת ה־Zabbix קיבלה בקשה שגויה."
@@ -23108,6 +23116,10 @@ msgstr "שרת ה־Zabbix פעיל"
 #: include/classes/setup/CSetupWizard.php:747
 msgid "Zabbix server name"
 msgstr "שם שרת ה־Zabbix"
+
+#: app/partials/administration.system.info.php:40
+msgid "Zabbix server version"
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
