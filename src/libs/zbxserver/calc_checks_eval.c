@@ -1222,7 +1222,7 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int 
 		*result = values->values[0].value.dbl;
 }
 
-static void	evaluate_history_func_last_var(zbx_vector_history_record_t *values, int value_type, zbx_vector_var_t *results_vector)
+static void	history_record_to_variant(zbx_vector_history_record_t *values, int value_type, zbx_vector_var_t *results_vector)
 {
 	zbx_variant_t	result;
 
@@ -1771,7 +1771,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		{
 			if (ZBX_VALUE_FUNC_LAST == item_func)
 			{
-				evaluate_history_func_last_var(&values, dcitem->value_type, results_var_vector);
+				history_record_to_variant(&values, dcitem->value_type, results_var_vector);
 			}
 			else
 			{
