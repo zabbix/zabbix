@@ -430,12 +430,12 @@ class CScreenHistory extends CScreenBase {
 
 					$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
-						: CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']);
+						: zbx_nl2br(CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']));
 
 					$history_table->addRow([
 						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_row['clock'])))
 							->addClass(ZBX_STYLE_NOWRAP),
-						new CPre(zbx_nl2br($value))
+						new CPre($value)
 					]);
 				}
 

@@ -1722,51 +1722,43 @@ class CItem extends CItemGeneral {
 			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
 		}
 
-		// adding history data
-		$requested_output = [
+		$requested_output = array_filter([
 			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
 			'lastns' => $this->outputIsRequested('lastns', $options['output']),
 			'lastvalue' => $this->outputIsRequested('lastvalue', $options['output']),
 			'prevvalue' => $this->outputIsRequested('prevvalue', $options['output'])
-		];
+		]);
 
-		if (array_filter($requested_output)) {
+		if ($requested_output) {
 			$history = Manager::History()->getLastValues($result, 2, timeUnitToSeconds(CSettingsHelper::get(
 				CSettingsHelper::HISTORY_PERIOD
 			)));
 
 			foreach ($result as &$item) {
-				$last_history = false;
-				$prev_history = false;
+				$last_history = null;
+				$prev_history = null;
 				$no_value = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]) ? '0' : '';
 
 				if (array_key_exists($item['itemid'], $history)) {
+					[$last_history, $prev_history] = $history[$item['itemid']] + [null, null];
+
 					if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-						foreach ($history[$item['itemid']] as &$row) {
-							$row['value'] = base64_encode($row['value']);
+						if ($last_history) {
+							$last_history['value'] = base64_encode($last_history['value']);
 						}
-						unset($row);
+
+						if ($prev_history) {
+							$prev_history['value'] = base64_encode($prev_history['value']);
+						}
 					}
-
-					$last_history = reset($history[$item['itemid']]);
-					$prev_history = end($history[$item['itemid']]);
 				}
 
-				if ($requested_output['lastclock']) {
-					$item['lastclock'] = $last_history ? $last_history['clock'] : '0';
-				}
-
-				if ($requested_output['lastns']) {
-					$item['lastns'] = $last_history ? $last_history['ns'] : '0';
-				}
-
-				if ($requested_output['lastvalue']) {
-					$item['lastvalue'] = $last_history ? $last_history['value'] : $no_value;
-				}
-
-				if ($requested_output['prevvalue']) {
-					$item['prevvalue'] = $prev_history ? $prev_history['value'] : $no_value;
-				}
+				$item += array_intersect_key([
+					'lastclock' => $last_history ? $last_history['clock'] : '0',
+					'lastns' => $last_history ? $last_history['ns'] : '0',
+					'lastvalue' => $last_history ? $last_history['value'] : $no_value,
+					'prevvalue' => $prev_history ? $prev_history['value'] : $no_value
+				], $requested_output);
 			}
 			unset($item);
 		}
