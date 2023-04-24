@@ -21,7 +21,6 @@
 #define ZABBIX_LLD_H
 
 #include "zbxalgo.h"
-#include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxdbhigh.h"
 
