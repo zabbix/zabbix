@@ -71,7 +71,9 @@ $row_template = (new CTemplateTag('script-parameter-template'))
 
 $form_grid = (new CFormGrid())
 	->addItem([
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CLabel(_('Name'), 'name'))
+			->addStyle('width: '.ZBX_SCRIPT_POPUP_LABEL_WIDTH. 'px')
+			->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -303,7 +305,7 @@ $form_grid
 						'dstfld1' => 'groupid'
 					]
 				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_HG_SELECT_WIDTH)
 		))->setId('host-group-selection')
 	)
 	->addItem([
@@ -333,7 +335,7 @@ $form_grid
 		(new CFormField([
 			(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
 				->setAttribute('disabled', $data['enable_confirmation'])
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				->setWidth(ZBX_TEXTAREA_CONFIRMATION_WIDTH),
 			'&nbsp;',
 			(new CButton('testConfirmation', _('Test confirmation')))
 				->addClass(ZBX_STYLE_BTN_GREY)

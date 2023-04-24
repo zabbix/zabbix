@@ -1633,6 +1633,8 @@ define('ZBX_TEXTAREA_INTERFACE_DNS_WIDTH',		175);
 define('ZBX_TEXTAREA_INTERFACE_PORT_WIDTH',		100);
 define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
 define('ZBX_TEXTAREA_PREPROC_TREAT_SELECT',		120);
+define('ZBX_TEXTAREA_CONFIRMATION_WIDTH',		330);
+define('ZBX_TEXTAREA_HG_SELECT_WIDTH',			392);
 
 // decoration borders
 define('ZBX_HOST_INTERFACE_WIDTH',				750);
@@ -1646,6 +1648,9 @@ define('ZBX_ACTION_RENAME',		4);
 
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
+
+// Script modal form label width.
+define('ZBX_SCRIPT_POPUP_LABEL_WIDTH',			150);
 
 define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 
