@@ -1222,6 +1222,15 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int 
 		*result = values->values[0].value.dbl;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert history record to variant and append to variant vector    *
+ *                                                                            *
+ * Parameters: values         - [IN] vector containing history values         *
+ *             value_type     - [IN] type of an item                          *
+ *             result_vector  - [OUT] resulting vector                        *
+ *                                                                            *
+ ******************************************************************************/
 static void	history_record_to_variant(zbx_vector_history_record_t *values, int value_type, zbx_vector_var_t *results_vector)
 {
 	zbx_variant_t	result;
