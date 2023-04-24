@@ -756,7 +756,9 @@ void	DCrequeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num);
 void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+#ifdef HAVE_OPENIPMI
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
+#endif
 
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
