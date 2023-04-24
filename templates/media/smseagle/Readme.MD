@@ -23,14 +23,13 @@ The configuration consists of a _media type_ in Zabbix, which will invoke the we
 The following parameters are required:<br>
 **access_token** - API access token created in SMSEagle<br>
 **url** - actual URL of your SMSEagle device (for example: http://10.10.0.100 or https://sms.mycompany.com)<br>
-**message** - SMS alert message<br>
-**recipient** - SMS recipient. Available recipient formats:<br>
-Contact: <code>contact_name:c</code><br>
-Group: <code>group_name:g</code><br>
-Phone number: <code>phone_number</code>
 
 
-3\. in the **Administration > Users** click on a User, and add a new media called **SMSEagle**. Enter destination phone number, and press Save.
+3\. in the **Administration > Users** click on a User, and add a new media called **SMSEagle**. Enter SMS recipient. Available recipient formats:<br>
+Phone number: <code>phone_number</code><br>
+Contact in SMSEagle Phonebook: <code>contact_name:c</code><br>
+Group in SMSEagle Phonebook: <code>group_name:g</code><br>
+
 
 <br/><br/>
 For more information, please see [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [SMSEagle](https://www.smseagle.eu/integration-plugins/zabbix-sms-integration/) documentation.
