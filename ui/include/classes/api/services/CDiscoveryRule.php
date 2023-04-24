@@ -759,7 +759,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 			 * them.
 			 */
 			CItemPrototype::unlinkTemplateObjects($ruleids);
-			CHostPrototype::unlinkTemplateObjects($ruleids);
+			API::HostPrototype()->unlinkTemplateObjects($ruleids);
 		}
 	}
 
@@ -1604,7 +1604,6 @@ class CDiscoveryRule extends CItemGeneralOld {
 	protected function checkInput(array &$items, $update = false, array $dbItems = []) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 
 			// unset fields that are updated using the 'filter' parameter

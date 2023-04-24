@@ -84,6 +84,7 @@ m4/conf_tests.m4
 frontend.mo
 include/common/config.h
 include/common/config.h.in
+include/common/stamp-h1
 include/stamp-h1
 misc/images/inkscape.log.txt
 misc/images/pngcrush.log.txt

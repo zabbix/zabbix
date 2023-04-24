@@ -31,18 +31,18 @@ typedef struct
 	unsigned char		poller_type;
 	int			config_startup_time;
 	int			config_unavailable_delay;
+	int			config_unreachable_period;
+	int			config_unreachable_delay;
 }
 zbx_thread_poller_args;
-
-extern int	CONFIG_UNREACHABLE_PERIOD;
-extern int	CONFIG_UNREACHABLE_DELAY;
 
 ZBX_THREAD_ENTRY(poller_thread, args);
 
 void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsigned char **data, size_t *data_alloc,
 		size_t *data_offset);
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsigned char **data, size_t *data_alloc,
-		size_t *data_offset, int unavailable_delay, const char *error);
+		size_t *data_offset, int unavailable_delay, int unreachable_period, int unreachable_delay,
+		const char *error);
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros);
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,

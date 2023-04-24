@@ -46,7 +46,7 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 				->removeId()
 		];
 
-		$table = (new CTable())
+		$view = (new CTable())
 			->setId('list_'.$this->field->getName())
 			->setHeader($header);
 
@@ -70,7 +70,7 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 				$label = '';
 			}
 
-			$table->addRow((new CRow([
+			$view->addRow((new CRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CDiv($column['name']))->addClass('text'),
 				(new CDiv($label))->addClass('text'),
@@ -78,7 +78,7 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 			]))->addClass('sortable'));
 		}
 
-		$table->addRow(
+		$view->addRow(
 			(new CCol(
 				(new CButton('add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -86,6 +86,6 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 			))->setColSpan(count($header))
 		);
 
-		return $table;
+		return $view;
 	}
 }
