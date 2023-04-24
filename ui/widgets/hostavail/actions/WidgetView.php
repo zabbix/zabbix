@@ -52,41 +52,43 @@ class WidgetView extends CControllerDashboardWidgetView {
 			INTERFACE_AVAILABLE_FALSE => 0
 		]);
 
-		$options = [
-			'output' => [],
-			'selectInterfaces' => ['type', 'available'],
-			'filter' => $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
-				? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
-				: ['status' => HOST_STATUS_MONITORED]
-		];
+		if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid') || !$this->isTemplateDashboard()) {
+			$options = [
+				'output' => [],
+				'selectInterfaces' => ['type', 'available'],
+				'filter' => $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
+					? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
+					: ['status' => HOST_STATUS_MONITORED]
+			];
 
-		if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid')) {
-			$options['hostids'] = [$this->getInput('dynamic_hostid')];
-		}
-		else {
-			$options['groupids'] = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-				? getSubGroups($this->fields_values['groupids'])
-				: null;
-		}
-
-		$db_hosts = API::Host()->get($options);
-
-		$availability_priority = [INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_UNKNOWN, INTERFACE_AVAILABLE_TRUE];
-
-		foreach ($db_hosts as $host) {
-			$host_interfaces = array_fill_keys($interface_types, []);
-
-			foreach ($host['interfaces'] as $interface) {
-				$host_interfaces[$interface['type']][] = $interface['available'];
+			if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid')) {
+				$options['hostids'] = [$this->getInput('dynamic_hostid')];
+			}
+			else {
+				$options['groupids'] = !$this->isTemplateDashboard() && $this->fields_values['groupids']
+					? getSubGroups($this->fields_values['groupids'])
+					: null;
 			}
 
-			$host_interfaces = array_filter($host_interfaces);
+			$db_hosts = API::Host()->get($options);
 
-			foreach ($host_interfaces as $type => $interfaces) {
-				$interfaces_availability = array_intersect($availability_priority, $interfaces);
-				$available = reset($interfaces_availability);
-				$hosts_count[$type][$available]++;
-				$hosts_total[$type]++;
+			$availability_priority = [INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_UNKNOWN, INTERFACE_AVAILABLE_TRUE];
+
+			foreach ($db_hosts as $host) {
+				$host_interfaces = array_fill_keys($interface_types, []);
+
+				foreach ($host['interfaces'] as $interface) {
+					$host_interfaces[$interface['type']][] = $interface['available'];
+				}
+
+				$host_interfaces = array_filter($host_interfaces);
+
+				foreach ($host_interfaces as $type => $interfaces) {
+					$interfaces_availability = array_intersect($availability_priority, $interfaces);
+					$available = reset($interfaces_availability);
+					$hosts_count[$type][$available]++;
+					$hosts_total[$type]++;
+				}
 			}
 		}
 
