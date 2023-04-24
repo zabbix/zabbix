@@ -1,25 +1,40 @@
-# SMSEagle webhook
+# SMSEagle webhook 
 
-## SMSEagle Setup
+This guide describes how to integrate your Zabbix installation with SMSEagle hardware SMS gateway using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+<br/><br/>
+## In SMSEagle
 
-1. Create a user for HTTP API or use an existing one.
+1\. Create a new user in SMSEagle.
 
-2. Open the API Access menu to generate access token and grant access to sending methods.
+2\. Grant API access to the created user.
 
-## Zabbix Setup
+3\. Enable API Access token. Generate new token.
 
-1. Go to "Administration" > "Media types" menu and import the "media_smseagle.yaml" file.
+<br/><br/>
+## In Zabbix
 
-2. Configure added media type (required fields: <b>recipient, message, url, access_token</b>).
+The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to SMSEagle device through the Rest API.
 
-<b>URL format:</b><br>
-Address of your SMSEagle device, IP or domain name<br>
-(e.g. http://192.168.0.2 or http://smseagle-url.com)
 
-<b>Recipient formats:</b><br>
+1\. In the **Administration > Media types** section, import the [media_smseagle.yaml](media_smseagle.yaml).
+
+
+2\. Open the newly added **SMSEagle** media type and replace all *&lt;PLACEHOLDERS&gt;* with your values.<br>
+The following parameters are required:<br>
+**access_token** - API access token created in SMSEagle<br>
+**url** - actual URL of your SMSEagle device (for example: http://10.10.0.100 or https://sms.mycompany.com)<br>
+**message** - SMS alert message<br>
+**recipient** - SMS recipient. Available recipient formats:<br>
 Contact: <code>contact_name:c</code><br>
 Group: <code>group_name:g</code><br>
 Phone number: <code>phone_number</code>
 
-For more information please refer to the SMSEagle API article:<br>
-https://www.smseagle.eu/api/
+
+3\. in the **Administration > Users** click on a User, and add a new media called **SMSEagle**. Enter destination phone number, and press Save.
+
+<br/><br/>
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [SMSEagle](https://www.smseagle.eu/integration-plugins/zabbix-sms-integration/) documentation.
+<br/><br/>
+## Supported Versions
+
+Zabbix 6.2
