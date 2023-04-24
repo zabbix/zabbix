@@ -65,13 +65,14 @@ func TestMetric_EvalParams(t *testing.T) {
 		sessions  interface{}
 	}
 	tests := []struct {
-		name      string
-		m         *Metric
-		args      args
-		want      map[string]string
-		wantExtra []string
-		wantErr   bool
-		wantPanic bool
+		name          string
+		m             *Metric
+		args          args
+		want          map[string]string
+		wantHardcoded map[string]bool
+		wantExtra     []string
+		wantErr       bool
+		wantPanic     bool
 	}{
 		{
 			name: "Must fail if too many parameters passed",
@@ -80,9 +81,10 @@ func TestMetric_EvalParams(t *testing.T) {
 				rawParams: []string{"localhost", "user", "password", "15", "excessParam"},
 				sessions:  map[string]conf.Session{},
 			},
-			want:      nil,
-			wantErr:   true,
-			wantPanic: false,
+			want:          nil,
+			wantHardcoded: nil,
+			wantErr:       true,
+			wantPanic:     false,
 		},
 		{
 			name: "Must not fail if passed more parameters than described, but the metric has the varParam enabled",
@@ -91,10 +93,11 @@ func TestMetric_EvalParams(t *testing.T) {
 				rawParams: []string{"localhost", "user", "password", "queryName", "queryParam1", "queryParam2"},
 				sessions:  map[string]conf.Session{},
 			},
-			want:      map[string]string{"Password": "password", "QueryName": "queryName", "URI": "localhost", "User": "user"},
-			wantExtra: []string{"queryParam1", "queryParam2"},
-			wantErr:   false,
-			wantPanic: false,
+			want:          map[string]string{"Password": "password", "QueryName": "queryName", "URI": "localhost", "User": "user"},
+			wantExtra:     []string{"queryParam1", "queryParam2"},
+			wantHardcoded: map[string]bool{},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 		{
 			name: "Must not fail if passed more parameters than described, " +
@@ -109,9 +112,10 @@ func TestMetric_EvalParams(t *testing.T) {
 			want: map[string]string{
 				"Password": "password", "QueryName": "queryName", "URI": "localhost", "User": "user", "sessionName": "Session1",
 			},
-			wantExtra: []string{"queryParam1", "queryParam2"},
-			wantErr:   false,
-			wantPanic: false,
+			wantExtra:     []string{"queryParam1", "queryParam2"},
+			wantHardcoded: map[string]bool{},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 		{
 			name: "Must not fail if passed session only parameters none strict",
@@ -125,9 +129,10 @@ func TestMetric_EvalParams(t *testing.T) {
 			want: map[string]string{
 				"Password": "password", "URI": "localhost", "User": "user", "sessionName": "Session1",
 			},
-			wantExtra: []string{"queryParam1"},
-			wantErr:   false,
-			wantPanic: false,
+			wantExtra:     []string{"queryParam1"},
+			wantHardcoded: map[string]bool{},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 		{
 			name: "Must not fail if missing session only parameters none strict",
@@ -141,9 +146,10 @@ func TestMetric_EvalParams(t *testing.T) {
 			want: map[string]string{
 				"Password": "", "URI": "localhost", "User": "user", "sessionName": "Session1",
 			},
-			wantExtra: []string{"queryParam1"},
-			wantErr:   false,
-			wantPanic: false,
+			wantExtra:     []string{"queryParam1"},
+			wantHardcoded: map[string]bool{},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 		{
 			name: "Must not fail if passed session only parameters none strict",
@@ -157,9 +163,10 @@ func TestMetric_EvalParams(t *testing.T) {
 			want: map[string]string{
 				"Password": "password", "URI": "localhost", "User": "user", "sessionName": "Session1",
 			},
-			wantExtra: []string{"queryParam1"},
-			wantErr:   false,
-			wantPanic: false,
+			wantExtra:     []string{"queryParam1"},
+			wantHardcoded: map[string]bool{},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 		{
 			name: "Must pass if a connection parameter passed along with a session",
@@ -173,8 +180,9 @@ func TestMetric_EvalParams(t *testing.T) {
 			want: map[string]string{
 				"Param1": "60", "Password": "password", "URI": "localhost", "User": "user", "sessionName": "Session1",
 			},
-			wantErr:   false,
-			wantPanic: false,
+			wantHardcoded: map[string]bool{"Param1": true},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 		{
 			name: "Must pass if a connection parameter overwritten from key",
@@ -188,8 +196,9 @@ func TestMetric_EvalParams(t *testing.T) {
 			want: map[string]string{
 				"Param1": "60", "Password": "new_password", "URI": "localhost", "User": "user", "sessionName": "Session1",
 			},
-			wantErr:   false,
-			wantPanic: false,
+			wantHardcoded: map[string]bool{"Param1": true},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 		{
 			name: "Must fail if session only parameter passed in key",
@@ -198,10 +207,11 @@ func TestMetric_EvalParams(t *testing.T) {
 				rawParams: []string{"localhost", "user", "password", "param1"},
 				sessions:  map[string]conf.Session{},
 			},
-			want:      nil,
-			wantExtra: nil,
-			wantErr:   true,
-			wantPanic: false,
+			want:          nil,
+			wantExtra:     nil,
+			wantHardcoded: nil,
+			wantErr:       true,
+			wantPanic:     false,
 		},
 		{
 			name: "Must fail if a required parameter is not specified",
@@ -210,9 +220,10 @@ func TestMetric_EvalParams(t *testing.T) {
 				rawParams: []string{"localhost", "user", "password", "", "queryParam1"},
 				sessions:  map[string]conf.Session{},
 			},
-			want:      nil,
-			wantErr:   true,
-			wantPanic: false,
+			want:          nil,
+			wantHardcoded: nil,
+			wantErr:       true,
+			wantPanic:     false,
 		},
 		{
 			name: "Must fail if validation failed",
@@ -221,9 +232,10 @@ func TestMetric_EvalParams(t *testing.T) {
 				rawParams: []string{"localhost", "user", "password", "wrongValue"},
 				sessions:  map[string]conf.Session{},
 			},
-			want:      nil,
-			wantErr:   true,
-			wantPanic: false,
+			want:          nil,
+			wantHardcoded: nil,
+			wantErr:       true,
+			wantPanic:     false,
 		},
 		{
 			name: "Must fail if a session parameter did not pass validation",
@@ -234,9 +246,10 @@ func TestMetric_EvalParams(t *testing.T) {
 					"Session1": {URI: "localhost", User: "bob", Password: "password"},
 				},
 			},
-			want:      nil,
-			wantErr:   true,
-			wantPanic: false,
+			want:          nil,
+			wantHardcoded: nil,
+			wantErr:       true,
+			wantPanic:     false,
 		},
 		{
 			name: "Must fail if a required parameter is omitted in a session",
@@ -247,9 +260,10 @@ func TestMetric_EvalParams(t *testing.T) {
 					"Session1": {URI: "localhost", Password: "password"},
 				},
 			},
-			want:      nil,
-			wantErr:   true,
-			wantPanic: false,
+			want:          nil,
+			wantHardcoded: nil,
+			wantErr:       true,
+			wantPanic:     false,
 		},
 		{
 			name: "Must panic if cannot find any session's parameter in a schema",
@@ -260,9 +274,10 @@ func TestMetric_EvalParams(t *testing.T) {
 					"Session1": {URI: "localhost", User: "user", Password: "password"},
 				},
 			},
-			want:      nil,
-			wantErr:   false,
-			wantPanic: true,
+			want:          nil,
+			wantHardcoded: nil,
+			wantErr:       false,
+			wantPanic:     true,
 		},
 		{
 			name: "Must successfully return parsed parameters (without session)",
@@ -271,9 +286,10 @@ func TestMetric_EvalParams(t *testing.T) {
 				rawParams: []string{"localhost", "user", "password", "15"},
 				sessions:  map[string]conf.Session{},
 			},
-			want:      map[string]string{"URI": "localhost", "User": "user", "Password": "password", "Param1": "15"},
-			wantErr:   false,
-			wantPanic: false,
+			want:          map[string]string{"URI": "localhost", "User": "user", "Password": "password", "Param1": "15"},
+			wantHardcoded: map[string]bool{},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 		{
 			name: "Must successfully return parsed parameters (with session)",
@@ -287,8 +303,25 @@ func TestMetric_EvalParams(t *testing.T) {
 			want: map[string]string{
 				"URI": "localhost", "User": "user", "Password": "password", "Param1": "15", "sessionName": "Session1",
 			},
-			wantErr:   false,
-			wantPanic: false,
+			wantHardcoded: map[string]bool{},
+			wantErr:       false,
+			wantPanic:     false,
+		},
+		{
+			name: "Must successfully return parsed parameters (with hardcoded)",
+			m:    metricSet["metric.foo"],
+			args: args{
+				rawParams: []string{"Session1", "", ""},
+				sessions: map[string]conf.Session{
+					"Session1": {URI: "localhost", User: "user", Password: "password"},
+				},
+			},
+			want: map[string]string{
+				"URI": "localhost", "User": "user", "Password": "password", "Param1": "60", "sessionName": "Session1",
+			},
+			wantHardcoded: map[string]bool{"Param1": true},
+			wantErr:       false,
+			wantPanic:     false,
 		},
 	}
 	for _, tt := range tests {
@@ -301,7 +334,7 @@ func TestMetric_EvalParams(t *testing.T) {
 				}()
 			}
 
-			gotParams, gotExtraParams, _, err := tt.m.EvalParams(tt.args.rawParams, tt.args.sessions)
+			gotParams, gotExtraParams, hc, err := tt.m.EvalParams(tt.args.rawParams, tt.args.sessions)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EvalParams() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -309,8 +342,11 @@ func TestMetric_EvalParams(t *testing.T) {
 			if !reflect.DeepEqual(gotParams, tt.want) {
 				t.Errorf("EvalParams() got = %v, want %v", gotParams, tt.want)
 			}
+			if !reflect.DeepEqual(hc, tt.wantHardcoded) {
+				t.Errorf("EvalParams() gotHardcoded = %v, wantHardcoded %v", hc, tt.wantHardcoded)
+			}
 			if !reflect.DeepEqual(gotExtraParams, tt.wantExtra) {
-				t.Errorf("EvalParams() got extraParams = %v, want %v", gotExtraParams, tt.wantExtra)
+				t.Errorf("EvalParams() got extraParams = %v, wantExtra %v", gotExtraParams, tt.wantExtra)
 			}
 		})
 	}
@@ -500,7 +536,7 @@ func TestSetDefaults(t *testing.T) {
 			"with_hardcoded",
 			args{
 				map[string]string{"Foo": "A", "Bar": "B"},
-				map[string]bool{"A": true},
+				map[string]bool{"Foo": true},
 				struct {
 					Foo string
 					Bar string
@@ -677,7 +713,7 @@ func Test_setDefaults(t *testing.T) {
 			args{
 				map[string]string{"foo": "abc"},
 				map[string]string{"foo": "bar"},
-				map[string]bool{"abc": true},
+				map[string]bool{"foo": true},
 			},
 			map[string]string{"foo": "bar"},
 		},
