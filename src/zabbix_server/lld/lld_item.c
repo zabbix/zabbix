@@ -267,8 +267,8 @@ static void	lld_item_free(zbx_lld_item_full_t *item)
  *                                                                            *
  * Purpose: retrieves existing items for the specified item prototypes        *
  *                                                                            *
- * Parameters: item_prototypes - [IN] item prototypes                         *
- *             items           - [OUT] list of items                          *
+ * Parameters: item_prototypes - [IN]                                         *
+ *             items           - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_lld_item_full_t *items)
@@ -815,8 +815,8 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
  * Purpose: add a new dependency                                              *
  *                                                                            *
  * Parameters: item_dependencies - [IN\OUT] list of dependencies              *
- *             itemid            - [IN] item id                               *
- *             master_itemid     - [IN] master item id                        *
+ *             itemid            - [IN]                                       *
+ *             master_itemid     - [IN]                                       *
  *             item_flags        - [IN] item flags (ZBX_FLAG_DISCOVERY_*)     *
  *                                                                            *
  * Returns: item dependence                                                   *
@@ -844,7 +844,7 @@ static zbx_item_dependence_t	*lld_item_dependence_add(zbx_vector_ptr_t *item_dep
  * Purpose: recursively get dependencies with dependent items taking into     *
  *          account item prototypes                                           *
  *                                                                            *
- * Parameters: item_prototypes   - [IN] item prototypes                       *
+ * Parameters: item_prototypes   - [IN]                                       *
  *             item_dependencies - [OUT] list of dependencies                 *
  *                                                                            *
  ******************************************************************************/
@@ -978,8 +978,8 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
  * Parameters: itemid            - [IN] item ID to be checked                 *
  *             dependencies      - [IN] item dependencies                     *
  *             processed_itemids - [IN\OUT] list of checked item ids          *
- *             dependencies_num  - [IN\OUT] number of dependencies            *
- *             depth_level       - [IN\OUT] depth level                       *
+ *             dependencies_num  - [IN\OUT]                                   *
+ *             depth_level       - [IN\OUT]                                   *
  *                                                                            *
  * Returns: SUCCEED - the number of dependencies was successfully counted     *
  *          FAIL    - the limit of dependencies is reached                    *
@@ -1056,7 +1056,7 @@ static int	lld_item_dependencies_check(const zbx_lld_item_full_t *item,
 		const zbx_lld_item_prototype_t *item_prototype, zbx_vector_ptr_t *dependencies)
 {
 	zbx_item_dependence_t	*dependence = NULL, *top_dependence = NULL, *tmp_dep;
-	int 			ret = FAIL, i, dependence_num = 0, item_in_deps = FAIL;
+	int			ret = FAIL, i, dependence_num = 0, item_in_deps = FAIL;
 	unsigned char		depth_level = 0;
 	zbx_vector_uint64_t	processed_itemids;
 
@@ -1335,10 +1335,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Parameters: hostid            - [IN] host id                               *
- *             items             - [IN] list of items                         *
- *             item_prototypes   - [IN] item prototypes                       *
- *             item_dependencies - [IN] list of dependencies                  *
+ * Parameters: hostid            - [IN]                                       *
+ *             items             - [IN]                                       *
+ *             item_prototypes   - [IN]                                       *
+ *             item_dependencies - [IN]                                       *
  *             error             - [OUT] error message                        *
  *                                                                            *
  *****************************************************************************/
@@ -1651,8 +1651,8 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
  *                                                                            *
  * Purpose: creates a new item based on item prototype and lld data row       *
  *                                                                            *
- * Parameters: item_prototype  - [IN] item prototype                          *
- *             lld_row         - [IN] lld row                                 *
+ * Parameters: item_prototype  - [IN]                                         *
+ *             lld_row         - [IN]                                         *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             error           - [OUT] error message                          *
  *                                                                            *
@@ -1880,10 +1880,10 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
  *                                                                            *
  * Purpose: updates an existing item based on item prototype and lld data row *
  *                                                                            *
- * Parameters: item_prototype  - [IN] item prototype                          *
- *             lld_row         - [IN] lld row                                 *
+ * Parameters: item_prototype  - [IN]                                         *
+ *             lld_row         - [IN]                                         *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             item            - [IN] an existing item or NULL                *
+ *             item            - [IN] existing item or NULL                   *
  *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
@@ -2228,7 +2228,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  * Purpose: updates existing items and creates new ones based on item,        *
  *          item prototypes and lld data                                      *
  *                                                                            *
- * Parameters: item_prototypes - [IN] item prototypes                         *
+ * Parameters: item_prototypes - [IN]                                         *
  *             lld_rows        - [IN] lld data rows                           *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
@@ -2425,7 +2425,7 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
  * Purpose: updates existing items preprocessing operations and create new    *
  *          based on item item prototypes                                     *
  *                                                                            *
- * Parameters: item_prototypes - [IN] item prototypes                         *
+ * Parameters: item_prototypes - [IN]                                         *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
  *                                                                            *
@@ -2544,7 +2544,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
  * Purpose: updates existing items parameters and create new based on item    *
  *          prototypes                                                        *
  *                                                                            *
- * Parameters: item_prototypes - [IN] item prototypes                         *
+ * Parameters: item_prototypes - [IN]                                         *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
  *             error           - [OUT] error message                          *
@@ -2613,7 +2613,7 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
  * Purpose: updates existing items tags and create new based on item          *
  *          prototypes                                                        *
  *                                                                            *
- * Parameters: item_prototypes - [IN] item prototypes                         *
+ * Parameters: item_prototypes - [IN]                                         *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
  *             error           - [OUT] error message                          *
@@ -2686,7 +2686,7 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const z
  *          update dependent items with their masters                         *
  *                                                                            *
  * Parameters: hostid               - [IN] parent host id                     *
- *             item_prototypes      - [IN] item prototypes                    *
+ *             item_prototypes      - [IN]                                    *
  *             item                 - [IN/OUT] item to be saved and set       *
  *                                             master for dependentent items  *
  *             itemid               - [IN/OUT] item id used for insert        *
@@ -2762,7 +2762,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
  *                                                                            *
  * Purpose: prepare sql to update LLD item                                    *
  *                                                                            *
- * Parameters: item_prototype       - [IN] item prototype                     *
+ * Parameters: item_prototype       - [IN]                                    *
  *             item                 - [IN] item to be updated                 *
  *             sql                  - [IN/OUT] sql buffer pointer used for    *
  *                                             update operations              *
@@ -3150,7 +3150,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
  *                                                                            *
  * Purpose: prepare sql to update key in LLD item discovery                   *
  *                                                                            *
- * Parameters: item_prototype       - [IN] item prototype                     *
+ * Parameters: item_prototype       - [IN]                                    *
  *             item                 - [IN] item to be updated                 *
  *             sql                  - [IN/OUT] sql buffer pointer used for    *
  *                                             update operations              *
@@ -3182,7 +3182,7 @@ static void lld_item_discovery_prepare_update(const zbx_lld_item_prototype_t *it
 /******************************************************************************
  *                                                                            *
  * Parameters: hostid          - [IN] parent host id                          *
- *             item_prototypes - [IN] item prototypes                         *
+ *             item_prototypes - [IN]                                         *
  *             items           - [IN/OUT] items to save                       *
  *             items_index     - [IN] LLD item index                          *
  *             host_locked     - [IN/OUT] host record is locked               *
@@ -3402,7 +3402,7 @@ out:
  * Purpose: saves/updates/removes item preprocessing operations               *
  *                                                                            *
  * Parameters: hostid      - [IN] parent host id                              *
- *             items       - [IN] items                                       *
+ *             items       - [IN]                                             *
  *             host_locked - [IN/OUT] host record is locked                   *
  *                                                                            *
  ******************************************************************************/
@@ -3615,7 +3615,7 @@ out:
  * Purpose: saves/updates/removes item parameters                             *
  *                                                                            *
  * Parameters: hostid      - [IN] parent host id                              *
- *             items       - [IN] items                                       *
+ *             items       - [IN]                                             *
  *             host_locked - [IN/OUT] host record is locked                   *
  *                                                                            *
  ******************************************************************************/
@@ -3797,7 +3797,7 @@ out:
  * Purpose: saves/updates/removes item tags                                   *
  *                                                                            *
  * Parameters: hostid      - [IN] parent host id                              *
- *             items       - [IN] items                                       *
+ *             items       - [IN]                                             *
  *             host_locked - [IN/OUT] host record is locked                   *
  *                                                                            *
  ******************************************************************************/
@@ -4038,8 +4038,8 @@ void	lld_item_links_sort(zbx_vector_lld_row_t *lld_rows)
  *                                                                            *
  * Purpose: load discovery rule item prototypes                               *
  *                                                                            *
- * Parameters: lld_ruleid      - [IN] the discovery rule id                   *
- *             item_prototypes - [OUT] the item prototypes                    *
+ * Parameters: lld_ruleid      - [IN] discovery rule id                       *
+ *             item_prototypes - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *item_prototypes)

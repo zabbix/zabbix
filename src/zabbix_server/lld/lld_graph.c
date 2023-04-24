@@ -36,19 +36,19 @@ typedef struct
 	zbx_uint64_t		ymin_itemid;
 	zbx_uint64_t		ymax_itemid_orig;
 	zbx_uint64_t		ymax_itemid;
-	int 			width_orig;
-	int 			height_orig;
-	double 			yaxismin_orig;
-	double 			yaxismax_orig;
-	unsigned char 		show_work_period_orig;
-	unsigned char 		show_triggers_orig;
-	unsigned char 		graphtype_orig;
-	unsigned char 		show_legend_orig;
-	unsigned char 		show_3d_orig;
-	double 			percent_left_orig;
-	double 			percent_right_orig;
-	unsigned char 		ymin_type_orig;
-	unsigned char 		ymax_type_orig;
+	int			width_orig;
+	int			height_orig;
+	double			yaxismin_orig;
+	double			yaxismax_orig;
+	unsigned char		show_work_period_orig;
+	unsigned char		show_triggers_orig;
+	unsigned char		graphtype_orig;
+	unsigned char		show_legend_orig;
+	unsigned char		show_3d_orig;
+	double			percent_left_orig;
+	double			percent_right_orig;
+	unsigned char		ymin_type_orig;
+	unsigned char		ymax_type_orig;
 	zbx_vector_ptr_t	gitems;
 #define ZBX_FLAG_LLD_GRAPH_UNSET			__UINT64_C(0x00000000)
 #define ZBX_FLAG_LLD_GRAPH_DISCOVERED			__UINT64_C(0x00000001)
@@ -666,7 +666,7 @@ out:
  * Purpose: create a graph based on lld rule and add it to the list           *
  *                                                                            *
  ******************************************************************************/
-static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
+static void	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
 		unsigned char discover_proto, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
 {
@@ -987,7 +987,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
 	int			ret = SUCCEED, i, j, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
-	zbx_vector_ptr_t	upd_gitems; 	/* the ordered list of graphs_items which will be updated */
+	zbx_vector_ptr_t	upd_gitems;	/* the ordered list of graphs_items which will be updated */
 	zbx_vector_uint64_t	del_gitemids;
 
 	zbx_uint64_t		graphid = 0, gitemid = 0;

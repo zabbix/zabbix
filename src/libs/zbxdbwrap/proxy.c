@@ -123,7 +123,7 @@ static zbx_history_table_t	areg = {
 		}
 };
 
-static zbx_lld_process_agent_result_func_t lld_process_agent_result_cb = NULL;
+static zbx_lld_process_agent_result_func_t	lld_process_agent_result_cb = NULL;
 
 void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func)
 {
@@ -1157,7 +1157,6 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j)
 
 	return records_num;
 }
-
 
 /******************************************************************************
  *                                                                            *

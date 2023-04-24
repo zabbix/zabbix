@@ -2525,20 +2525,20 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
 
 /******************************************************************************
  *                                                                            *
- * Parameters: parent_hostid    - [IN] parent host id                         *
- *             hosts            - [IN] list of hosts;                         *
- *             host_proto       - [IN] host proto                             *
- *             proxy_hostid     - [IN] proxy host id                          *
- *             ipmi_authtype    - [IN] ipmi authtype                          *
- *             ipmi_privilege   - [IN] ipmi privilege                         *
- *             ipmi_username    - [IN] ipmi username                          *
- *             ipmi_password    - [IN] ipmi password                          *
- *             tls_connect      - [IN] tls connect                            *
- *             tls_accept       - [IN] tls accept                             *
+ * Parameters: parent_hostid    - [IN]                                        *
+ *             hosts            - [IN]                                        *
+ *             host_proto       - [IN]                                        *
+ *             proxy_hostid     - [IN]                                        *
+ *             ipmi_authtype    - [IN]                                        *
+ *             ipmi_privilege   - [IN]                                        *
+ *             ipmi_username    - [IN]                                        *
+ *             ipmi_password    - [IN]                                        *
+ *             tls_connect      - [IN]                                        *
+ *             tls_accept       - [IN]                                        *
  *             tls_issuer       - [IN] tls cert issuer                        *
  *             tls_subject      - [IN] tls cert subject                       *
- *             tls_psk_identity - [IN] tls psk identity                       *
- *             tls_psk          - [IN] tls psk                                *
+ *             tls_psk_identity - [IN]                                        *
+ *             tls_psk          - [IN]                                        *
  *             del_hostgroupids - [IN] host groups which should be deleted    *
  *                                                                            *
  ******************************************************************************/
@@ -3816,8 +3816,8 @@ static void	lld_interfaces_get(zbx_uint64_t id, zbx_vector_ptr_t *interfaces, un
  * Purpose: check if two interfaces match by comparing all fields (including  *
  *          prototype interface id)                                           *
  *                                                                            *
- * Parameters: ifold - [IN] the old (existing) interface                      *
- *             ifnew - [IN] the new (discovered) interface                    *
+ * Parameters: ifold - [IN] old (existing) interface                          *
+ *             ifnew - [IN] new (discovered) interface                        *
  *                                                                            *
  * Return value: The interface fields update bitmask in low 32 bits and       *
  *               snmp fields update bitmask in high 32 bits                   *
@@ -4080,7 +4080,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
  *                               should be present on the each                *
  *                               discovered host                              *
  *             hosts      - [IN/OUT] sorted list of hosts                     *
- *             lld_macros - [IN] list of LLD macros                           *
+ *             lld_macros - [IN]                                              *
  *                                                                            *
  ******************************************************************************/
 static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts,
@@ -4314,7 +4314,7 @@ static int	another_main_interface_exists(const zbx_vector_ptr_t *interfaces, con
 
 /******************************************************************************
  *                                                                            *
- * Parameters: hosts - [IN/OUT] list of hosts                                 *
+ * Parameters: hosts - [IN/OUT]                                               *
  *             error - [OUT]                                                  *
  *                                                                            *
  ******************************************************************************/

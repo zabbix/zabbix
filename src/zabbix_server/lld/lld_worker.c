@@ -205,10 +205,8 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
-
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
 			zbx_setproctitle("%s #%d [processed " ZBX_FS_UI64 " LLD rules, idle " ZBX_FS_DBL " sec during "
@@ -219,9 +217,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 			time_idle = 0;
 			processed_num = 0;
 		}
-
 #undef STAT_INTERVAL
-
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		if (SUCCEED != zbx_ipc_socket_read(&lld_socket, &message))
 		{

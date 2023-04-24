@@ -46,10 +46,10 @@ void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_oper
  *                                                                            *
  * Purpose: load tag override operations from database                        *
  *                                                                            *
- * Parameters: overrideids - [IN] the lld overrideids, sorted                 *
- *             sql         - [IN/OUT] the sql query buffer                    *
- *             sql_alloc   - [IN/OUT] the sql query buffer size               *
- *             ops         - [IN/OUT] the lld override operations, sorted by  *
+ * Parameters: overrideids - [IN] lld overrideids, sorted                     *
+ *             sql         - [IN/OUT] sql query buffer                        *
+ *             sql_alloc   - [IN/OUT] sql query buffer size                   *
+ *             ops         - [IN/OUT] lld override operations, sorted by      *
  *                                    override_operationid                    *
  *                                                                            *
  ******************************************************************************/
@@ -107,10 +107,10 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
  *                                                                            *
  * Purpose: load template lld override operations from database               *
  *                                                                            *
- * Parameters: overrideids - [IN] the lld overrideids, sorted                 *
- *             sql         - [IN/OUT] the sql query buffer                    *
- *             sql_alloc   - [IN/OUT] the sql query buffer size               *
- *             ops         - [IN/OUT] the lld override operations, sorted by  *
+ * Parameters: overrideids - [IN] lld overrideids, sorted                     *
+ *             sql         - [IN/OUT] sql query buffer                        *
+ *             sql_alloc   - [IN/OUT] sql query buffer size                   *
+ *             ops         - [IN/OUT] lld override operations, sorted by      *
  *                                    override_operationid                    *
  *                                                                            *
  ******************************************************************************/
@@ -166,10 +166,10 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
  *                                                                            *
  * Purpose: load lld override operations from database                        *
  *                                                                            *
- * Parameters: overrideids - [IN] the lld overrideids, sorted                 *
- *             sql         - [IN/OUT] the sql query buffer                    *
- *             sql_alloc   - [IN/OUT] the sql query buffer size               *
- *             ops         - [OUT] the lld override operations, sorted by     *
+ * Parameters: overrideids - [IN] lld overrideids, sorted                     *
+ *             sql         - [IN/OUT] sql query buffer                        *
+ *             sql_alloc   - [IN/OUT] sql query buffer size                   *
+ *             ops         - [OUT] lld override operations, sorted by         *
  *                                    override_operationid                    *
  *                                                                            *
  ******************************************************************************/
