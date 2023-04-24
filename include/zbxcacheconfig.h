@@ -742,7 +742,9 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
 void	zbx_dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num);
 void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+#ifdef HAVE_OPENIPMI
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
+#endif
 
 int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
 
