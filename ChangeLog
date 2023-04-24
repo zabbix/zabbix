@@ -1,3 +1,10 @@
+Changes for 6.0.17
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 6.0.17rc2
 
 New features:
@@ -2494,9 +2501,15 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.34
+
+5.0.34rc1 was released as 5.0.34 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.34rc1
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
 ...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
 ........S. [ZBX-22492] removed size limitation for logged messages in JS (dgoloscapov)
 ...G...... [ZBX-22373] allowed mixing session and key parameter for Zabbix agent 2 items (esneiders)
