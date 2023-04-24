@@ -544,6 +544,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		// Check the error message and that the LDAP server is still present in DB.
 		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Cannot delete default user directory.');
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
+
+		// Turn off LDAP authentication afterwards.
+		$this->query('id:ldap_auth_enabled')->asCheckbox()->one()->set(false);
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
 	}
 
 	/**
