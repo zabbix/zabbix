@@ -31,8 +31,8 @@ if ($data['error'] !== null) {
 }
 else {
 	$table = $data['style'] == STYLE_TOP
-		? (new CPartial('dataoverview.table.top', $data))->getOutput()
-		: (new CPartial('dataoverview.table.left', $data))->getOutput();
+		? (new CPartial('table.top', $data))->getOutput()
+		: (new CPartial('table.left', $data))->getOutput();
 }
 
 (new CWidgetView($data))

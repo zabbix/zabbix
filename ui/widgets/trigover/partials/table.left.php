@@ -21,20 +21,22 @@
 
 /**
  * @var CPartial $this
+ * @var array $data
  */
+
 $table = (new CTableInfo())
 	->makeVerticalRotation()
 	->setHeadingColumn(0);
 
-$headings[] = $data['is_template_dashboard'] ? _('Host') : _('Hosts');
+$header[] = $data['is_template_dashboard'] ? _('Host') : _('Hosts');
 
 foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
-	$headings[] = (new CColHeader($trigname))
+	$header[] = (new CColHeader($trigname))
 		->addClass('vertical_rotation')
 		->setTitle($trigname);
 }
 
-$table->setHeader($headings);
+$table->setHeader($header);
 
 foreach ($data['hosts_by_name'] as $hostname => $hostid) {
 	$name = (new CLinkAction($data['db_hosts'][$hostid]['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));

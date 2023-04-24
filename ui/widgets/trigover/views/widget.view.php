@@ -27,8 +27,7 @@
  */
 
 if ($data['error'] !== null) {
-	$table = new CTableInfo();
-	$table->setNoDataMessage($data['error']);
+	$table = (new CTableInfo())->setNoDataMessage($data['error']);
 }
 else {
 	$table = $data['style'] == STYLE_TOP
