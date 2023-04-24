@@ -192,3 +192,35 @@ button {
 		content: $zi-remove;
 	}
 }
+
+.btn-debug {
+	position: fixed;
+	bottom: 4px;
+	right: 31px;
+	z-index: 15000;
+	color: $btn-form-font-color;
+	background-color: $btn-form-bg-color;
+	border-color: $btn-form-border-color;
+	opacity: 0;
+
+	@if $ui-transitions {
+		transition: opacity $ui-transition-duration ease-out;
+	}
+
+	&.visible {
+		opacity: 0.75;
+	}
+
+	&:hover {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $btn-form-border-color;
+	}
+
+	&:active,
+	&:focus {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $form-border-focus-color;
+	}
+}

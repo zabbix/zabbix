@@ -1226,6 +1226,27 @@ button.btn-overlay-close, a.btn-overlay-close.btn-icon, button.zi-remove, a.zi-r
   .btn-overlay-close::before {
     content: ""; }
 
+.btn-debug {
+  position: fixed;
+  bottom: 4px;
+  right: 31px;
+  z-index: 15000;
+  color: #f2f2f2;
+  background-color: #383838;
+  border-color: #4f4f4f;
+  opacity: 0;
+  transition: opacity 0.3s ease-out; }
+  .btn-debug.visible {
+    opacity: 0.75; }
+  .btn-debug:hover {
+    color: #f2f2f2;
+    background-color: #414141;
+    border-color: #4f4f4f; }
+  .btn-debug:active, .btn-debug:focus {
+    color: #f2f2f2;
+    background-color: #414141;
+    border-color: #768d99; }
+
 .checkbox-list {
   display: grid;
   grid-column-gap: 10px;
@@ -5498,31 +5519,6 @@ button.icon-info.status-red:hover, a.icon-info.status-red.btn-icon:hover, .btn-s
   margin: 10px;
   background-color: #2f280a;
   border: 1px solid #303030; }
-
-.btn-debug {
-  position: fixed;
-  bottom: 10px;
-  right: 35px;
-  z-index: 15000;
-  color: #f2f2f2;
-  background-color: #383838;
-  border-color: #4f4f4f;
-  opacity: 0;
-  transition: opacity .2s ease-out; }
-  .btn-debug.visible {
-    opacity: 0.75; }
-  .btn-debug:hover {
-    color: #f2f2f2;
-    background-color: #414141;
-    border-color: #4f4f4f; }
-  .btn-debug:focus {
-    color: #f2f2f2;
-    background-color: #414141;
-    border-color: #768d99; }
-  .btn-debug:active {
-    color: #f2f2f2;
-    background-color: #414141;
-    border-color: #768d99; }
 
 .overlay-descr {
   max-height: 150px;

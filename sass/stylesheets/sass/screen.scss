@@ -3104,41 +3104,6 @@ button {
 	@extend %webkit-scrollbar;
 }
 
-// ZBX_STYLE_BTN_DEBUG
-.btn-debug {
-	position: fixed;
-	bottom: 10px;
-	right: 35px;
-	z-index: 15000;
-	color: $btn-form-font-color;
-	background-color: $btn-form-bg-color;
-	border-color: $btn-form-border-color;
-	opacity: 0;
-	transition: opacity .2s ease-out;
-
-	&.visible {
-		opacity: 0.75;
-	}
-
-	&:hover {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $btn-form-border-color;
-	}
-
-	&:focus {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $form-border-focus-color;
-	}
-
-	&:active {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $form-border-focus-color;
-	}
-}
-
 .overlay-descr {
 	max-height: 150px;
 	overflow-y: auto;
