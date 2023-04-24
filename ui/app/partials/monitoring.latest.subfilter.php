@@ -45,6 +45,12 @@ foreach (['hostids', 'tagnames', 'data', 'state'] as $key) {
 		});
 	}
 
+	if ($key === 'state' && count($subfilters[$key]) <= 1) {
+		$subfilter_options[$key] = null;
+
+		continue;
+	}
+
 	$subfilter_used = (bool) array_filter($subfilters[$key], function ($field) {
 		return $field['selected'];
 	});
