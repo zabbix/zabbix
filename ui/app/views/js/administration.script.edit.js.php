@@ -76,23 +76,22 @@ window.script_edit_popup = new class {
 		this.scope = parseInt(script.scope);
 		this.type = parseInt(script.type);
 		this.confirmation = script.enable_confirmation;
-		const that = this;
 
 		// Load scope fields.
-		document.querySelector('#scope').onchange = function (e) {
-			that._hideFormFields('all');
-			that._loadScopeFields(e);
+		document.querySelector('#scope').onchange = (e) => {
+			this._hideFormFields('all');
+			this._loadScopeFields(e);
 			document.querySelector('#type').dispatchEvent(new Event('change'));
 		};
 
 		// Load type fields.
-		document.querySelector('#type').onchange = function (e) {
-			that._loadTypeFields(script, e);
+		document.querySelector('#type').onchange = (e) => {
+			this._loadTypeFields(script, e);
 		};
 
 		// Update confirmation fields
-		document.querySelector('#enable-confirmation').onchange = function (e) {
-			that._loadConfirmationFields(e);
+		document.querySelector('#enable-confirmation').onchange = (e) => {
+			this._loadConfirmationFields(e);
 		};
 
 		// test confirmation button
@@ -302,10 +301,9 @@ window.script_edit_popup = new class {
 
 				// Load authentication fields.
 				this.authtype = parseInt(script.authtype);
-				const that = this;
 
-				document.querySelector('#authtype').onchange = function (e) {
-					that._loadAuthFields(e);
+				document.querySelector('#authtype').onchange = (e) => {
+					this._loadAuthFields(e);
 				};
 
 				document.querySelector('#authtype').dispatchEvent(new Event('change'));
