@@ -1725,7 +1725,7 @@ class CItem extends CItemGeneral {
 		// adding history data
 		$requested_output = [
 			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
-			'lastnds' => $this->outputIsRequested('lastns', $options['output']),
+			'lastns' => $this->outputIsRequested('lastns', $options['output']),
 			'lastvalue' => $this->outputIsRequested('lastvalue', $options['output']),
 			'prevvalue' => $this->outputIsRequested('prevvalue', $options['output'])
 		];
