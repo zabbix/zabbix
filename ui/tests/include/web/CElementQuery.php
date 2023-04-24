@@ -185,23 +185,23 @@ class CElementQuery implements IWaitable {
 			$locator = implode('|', $selectors);
 		}
 
+		$text_function = function ($tag) use ($locator) {
+			if ($locator === null) {
+				return WebDriverBy::tagName($tag);
+			}
+
+			return WebDriverBy::xpath('.//'.$tag.'[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
+		};
+
 		$mapping = [
 			'css' => 'cssSelector',
 			'class' => 'className',
 			'tag' => 'tagName',
-			'link' => function () use ($locator) {
-				if ($locator === null) {
-					return WebDriverBy::tagName('a');
-				}
-
-				return WebDriverBy::xpath('.//a[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
+			'link' => function () use ($text_function) {
+				return $text_function('a');
 			},
-			'button' => function () use ($locator) {
-				if ($locator === null) {
-					return WebDriverBy::tagName('button');
-				}
-
-				return WebDriverBy::xpath('.//button[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
+			'button' => function () use ($text_function) {
+				return $text_function('button');
 			}
 		];
 
