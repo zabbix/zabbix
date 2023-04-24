@@ -157,7 +157,7 @@ class CElementQuery implements IWaitable {
 
 		if ($locator === null) {
 			if (!is_array($type)) {
-				if ($type !== 'button') {
+				if ($type !== 'button' && $type !== 'link') {
 					$parts = explode(':', $type, 2);
 					if (count($parts) !== 2) {
 						throw new Exception('Element selector "'.$type.'" is not well formatted.');
@@ -189,7 +189,13 @@ class CElementQuery implements IWaitable {
 			'css' => 'cssSelector',
 			'class' => 'className',
 			'tag' => 'tagName',
-			'link' => 'linkText',
+			'link' => function () use ($locator) {
+				if ($locator === null) {
+					return WebDriverBy::tagName('a');
+				}
+
+				return WebDriverBy::xpath('.//a[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
+			},
 			'button' => function () use ($locator) {
 				if ($locator === null) {
 					return WebDriverBy::tagName('button');
