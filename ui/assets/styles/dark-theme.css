@@ -2759,7 +2759,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   transform: rotate(-180deg); }
 .menu-main [class^="zi-"]::before, .menu-main [class*=" zi-"]::before {
   margin-right: 10px;
-  color: #b1b1b1;
+  color: #9c9c9c;
   font-size: 24px;
   line-height: 0; }
 .menu-main a {
