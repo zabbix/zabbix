@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T15:23:39Z'
+  date: '2023-04-24T08:22:13Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -569,7 +569,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'HP-UX by Zabbix agent'
-                        name: 'CPU load'
+                        name: 'HP-UX: CPU load'
                 -
                   type: GRAPH_CLASSIC
                   name: 'CPU utilization'
@@ -582,7 +582,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'HP-UX by Zabbix agent'
-                        name: 'CPU utilization'
+                        name: 'HP-UX: CPU utilization'
                 -
                   type: GRAPH_CLASSIC
                   name: 'Memory usage'
@@ -595,7 +595,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'HP-UX by Zabbix agent'
-                        name: 'Memory usage'
+                        name: 'HP-UX: Memory usage'
       valuemaps:
         -
           uuid: 663bea44626447b5a72a71238dfda919
@@ -620,7 +620,7 @@ zabbix_export:
   graphs:
     -
       uuid: 808ceffbcb844def962b03d6fa7a3496
-      name: 'CPU load'
+      name: 'HP-UX: CPU load'
       graph_items:
         -
           color: 199C0D
@@ -641,7 +641,7 @@ zabbix_export:
             key: 'system.cpu.load[percpu,avg15]'
     -
       uuid: 8c47ac69fba642f4827fcad01b3a0379
-      name: 'CPU utilization'
+      name: 'HP-UX: CPU utilization'
       graph_items:
         -
           color: 199C0D
@@ -668,7 +668,7 @@ zabbix_export:
             key: 'system.cpu.util[,idle]'
     -
       uuid: 4cf12f1ea3934cb99f76c20916067a71
-      name: 'Memory usage'
+      name: 'HP-UX: Memory usage'
       graph_items:
         -
           color: 199C0D

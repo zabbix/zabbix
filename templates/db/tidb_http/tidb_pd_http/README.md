@@ -47,40 +47,40 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |----|-----------|----|-----------------------|
 |PD: Get instance metrics|<p>Get TiDB PD instance metrics.</p>|HTTP agent|pd.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
 |PD: Get instance status|<p>Get TiDB PD instance status info.</p>|HTTP agent|pd.get_status<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"status": "0"}`</p></li></ul>|
-|PD: Status|<p>Status of PD instance.</p>|Dependent item|pd.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `1`</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|PD: Status|<p>Status of PD instance.</p>|Dependent item|pd.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |PD: GRPC Commands total, rate|<p>The rate at which gRPC commands are completed.</p>|Dependent item|pd.grpc_command.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
-|PD: Version|<p>Version of the PD instance.</p>|Dependent item|pd.version<p>**Preprocessing**</p><ul><li>JSON Path: `$.version`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|PD: Uptime|<p>The runtime of each PD instance.</p>|Dependent item|pd.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$.start_timestamp`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|PD: Version|<p>Version of the PD instance.</p>|Dependent item|pd.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|PD: Uptime|<p>The runtime of each PD instance.</p>|Dependent item|pd.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.start_timestamp`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |PD: Instance is not responding||`last(/TiDB PD by HTTP/pd.status)=0`|Average||
-|PD: Version has changed|<p>PD version has changed. Acknowledge to close manually.</p>|`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0`|Info|**Manual close**: Yes|
+|PD: Version has changed|<p>PD version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0`|Info|**Manual close**: Yes|
 |PD: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB PD by HTTP/pd.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Cluster metrics discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cluster metrics discovery|<p>Discovery cluster specific metrics.</p>|Dependent item|pd.cluster.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="pd_cluster_status")]`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Cluster metrics discovery|<p>Discovery cluster specific metrics.</p>|Dependent item|pd.cluster.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="pd_cluster_status")]`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Cluster metrics discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB cluster: Offline stores||Dependent item|pd.cluster_status.store_offline[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|TiDB cluster: Tombstone stores|<p>The count of tombstone stores.</p>|Dependent item|pd.cluster_status.store_tombstone[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|TiDB cluster: Down stores|<p>The count of down stores.</p>|Dependent item|pd.cluster_status.store_down[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|TiDB cluster: Lowspace stores|<p>The count of low space stores.</p>|Dependent item|pd.cluster_status.store_low_space[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|TiDB cluster: Unhealth stores|<p>The count of unhealthy stores.</p>|Dependent item|pd.cluster_status.store_unhealth[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|TiDB cluster: Disconnect stores|<p>The count of disconnected stores.</p>|Dependent item|pd.cluster_status.store_disconnected[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|TiDB cluster: Normal stores|<p>The count of healthy storage instances.</p>|Dependent item|pd.cluster_status.store_up[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|TiDB cluster: Storage capacity|<p>The total storage capacity for this TiDB cluster.</p>|Dependent item|pd.cluster_status.storage_capacity[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|TiDB cluster: Storage size|<p>The storage size that is currently used by the TiDB cluster.</p>|Dependent item|pd.cluster_status.storage_size[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|TiDB cluster: Number of regions|<p>The total count of cluster Regions.</p>|Dependent item|pd.cluster_status.leader_count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|TiDB cluster: Current peer count|<p>The current count of all cluster peers.</p>|Dependent item|pd.cluster_status.region_count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|TiDB cluster: Offline stores||Dependent item|pd.cluster_status.store_offline[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|TiDB cluster: Tombstone stores|<p>The count of tombstone stores.</p>|Dependent item|pd.cluster_status.store_tombstone[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|TiDB cluster: Down stores|<p>The count of down stores.</p>|Dependent item|pd.cluster_status.store_down[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|TiDB cluster: Lowspace stores|<p>The count of low space stores.</p>|Dependent item|pd.cluster_status.store_low_space[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|TiDB cluster: Unhealth stores|<p>The count of unhealthy stores.</p>|Dependent item|pd.cluster_status.store_unhealth[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|TiDB cluster: Disconnect stores|<p>The count of disconnected stores.</p>|Dependent item|pd.cluster_status.store_disconnected[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|TiDB cluster: Normal stores|<p>The count of healthy storage instances.</p>|Dependent item|pd.cluster_status.store_up[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|TiDB cluster: Storage capacity|<p>The total storage capacity for this TiDB cluster.</p>|Dependent item|pd.cluster_status.storage_capacity[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|TiDB cluster: Storage size|<p>The storage size that is currently used by the TiDB cluster.</p>|Dependent item|pd.cluster_status.storage_size[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|TiDB cluster: Number of regions|<p>The total count of cluster Regions.</p>|Dependent item|pd.cluster_status.leader_count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|TiDB cluster: Current peer count|<p>The current count of all cluster peers.</p>|Dependent item|pd.cluster_status.region_count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Cluster metrics discovery
 
@@ -95,25 +95,25 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Region labels discovery|<p>Discovery region labels specific metrics.</p>|Dependent item|pd.region_labels.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_regions_label_level")]`</p><p>⛔️Custom on fail: Discard value</p></li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Region labels discovery|<p>Discovery region labels specific metrics.</p>|Dependent item|pd.region_labels.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_regions_label_level")]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Region labels discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB cluster: Regions label: {#TYPE}|<p>The number of Regions in different label levels.</p>|Dependent item|pd.region_labels[{#TYPE}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|TiDB cluster: Regions label: {#TYPE}|<p>The number of Regions in different label levels.</p>|Dependent item|pd.region_labels[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Region status discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Region status discovery|<p>Discovery region status specific metrics.</p>|Dependent item|pd.region_status.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_regions_status")]`</p><p>⛔️Custom on fail: Discard value</p></li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Region status discovery|<p>Discovery region status specific metrics.</p>|Dependent item|pd.region_status.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_regions_status")]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Region status discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB cluster: Regions status: {#TYPE}|<p>The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.</p>|Dependent item|pd.region_status[{#TYPE}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|TiDB cluster: Regions status: {#TYPE}|<p>The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.</p>|Dependent item|pd.region_status[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Region status discovery
 
@@ -126,7 +126,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Running scheduler discovery|<p>Discovery scheduler specific metrics.</p>|Dependent item|pd.scheduler.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Running scheduler discovery|<p>Discovery scheduler specific metrics.</p>|Dependent item|pd.scheduler.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Running scheduler discovery
 
@@ -138,19 +138,19 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|gRPC commands discovery|<p>Discovery grpc commands specific metrics.</p>|Dependent item|pd.grpc_command.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "grpc_server_handling_seconds_count")]`</p><p>⛔️Custom on fail: Discard value</p></li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|gRPC commands discovery|<p>Discovery grpc commands specific metrics.</p>|Dependent item|pd.grpc_command.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "grpc_server_handling_seconds_count")]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for gRPC commands discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PD: GRPC Commands: {#GRPC_METHOD}, rate|<p>The rate per command type at which gRPC commands are completed.</p>|Dependent item|pd.grpc_command.rate[{#GRPC_METHOD}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
+|PD: GRPC Commands: {#GRPC_METHOD}, rate|<p>The rate per command type at which gRPC commands are completed.</p>|Dependent item|pd.grpc_command.rate[{#GRPC_METHOD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 
 ### LLD rule Region discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Region discovery|<p>Discovery region specific metrics.</p>|Dependent item|pd.region.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_scheduler_region_heartbeat")]`</p><p>⛔️Custom on fail: Discard value</p></li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Region discovery|<p>Discovery region specific metrics.</p>|Dependent item|pd.region.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_scheduler_region_heartbeat")]`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Region discovery
 
@@ -163,6 +163,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

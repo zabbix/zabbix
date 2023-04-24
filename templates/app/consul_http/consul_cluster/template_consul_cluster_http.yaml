@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:53:37Z'
+  date: '2023-04-18T12:45:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -123,7 +123,7 @@ zabbix_export:
               name: 'Consul cluster: Leader has been changed'
               event_name: 'Consul cluster: Leader has been changed (new value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Consul cluster version has changed. Acknowledge to close manually.'
+              description: 'Consul cluster version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

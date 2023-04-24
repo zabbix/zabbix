@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:56:47Z'
+  date: '2023-04-24T08:06:19Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -148,7 +148,7 @@ zabbix_export:
               name: 'WildFly: Version has changed'
               event_name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'WildFly version has changed. Acknowledge to close manually.'
+              description: 'WildFly version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -242,14 +242,14 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           lld_macro_paths:
             -
+              lld_macro: '{#SERVER_GROUP}'
+              path: '$.properties.["server-group"]'
+            -
               lld_macro: '{#DEPLOYMENT}'
               path: $.properties.deployment
             -
               lld_macro: '{#JMXOBJ}'
               path: $.object
-            -
-              lld_macro: '{#SERVER_GROUP}'
-              path: '$.properties.["server-group"]'
         -
           uuid: da7f7dfad0c1440a8980693870364baa
           name: 'Servers discovery'
@@ -331,7 +331,7 @@ zabbix_export:
                   name: 'WildFly domain: Server {#SERVER}: Server group has changed'
                   event_name: 'WildFly domain: Server {#SERVER}: Server group has changed (new group: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'Server group has changed. Ack to close.'
+                  description: 'Server group has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -368,7 +368,7 @@ zabbix_export:
                   name: 'WildFly domain: Server {#SERVER}: Server status has changed'
                   event_name: 'WildFly domain: Server {#SERVER}: Server status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Server status has changed. Ack to close.'
+                  description: 'Server status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -377,11 +377,11 @@ zabbix_export:
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           lld_macro_paths:
             -
-              lld_macro: '{#JMXOBJ}'
-              path: $.object
-            -
               lld_macro: '{#SERVER}'
               path: '$.properties.["server-config"]'
+            -
+              lld_macro: '{#JMXOBJ}'
+              path: $.object
       tags:
         -
           tag: class

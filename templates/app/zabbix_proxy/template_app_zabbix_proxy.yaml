@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:20:08Z'
+  date: '2023-04-18T12:49:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -757,7 +757,7 @@ zabbix_export:
               name: 'Zabbix proxy: Version has changed'
               event_name: 'Zabbix proxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Zabbix proxy version has changed. Acknowledge to close manually.'
+              description: 'Zabbix proxy version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

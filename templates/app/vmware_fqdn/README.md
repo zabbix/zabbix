@@ -47,8 +47,8 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |VMware: Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
-|VMware: Full name|<p>VMware service full name.</p>|Simple check|vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|VMware: Version|<p>VMware service version.</p>|Simple check|vmware.version[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|VMware: Full name|<p>VMware service full name.</p>|Simple check|vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|VMware: Version|<p>VMware service version.</p>|Simple check|vmware.version[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### LLD rule Discover VMware clusters
 
@@ -66,7 +66,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Discover VMware datastores| |Simple check|vmware.datastore.discovery[{$VMWARE.URL}]|
+|Discover VMware datastores||Simple check|vmware.datastore.discovery[{$VMWARE.URL}]|
 
 ### Item prototypes for Discover VMware datastores
 
@@ -103,12 +103,12 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|VMware: Cluster name|<p>Cluster name of the guest VM.</p>|Simple check|vmware.vm.cluster.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|VMware: Number of virtual CPUs|<p>Number of virtual CPUs assigned to the guest.</p>|Simple check|vmware.vm.cpu.num[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|VMware: Cluster name|<p>Cluster name of the guest VM.</p>|Simple check|vmware.vm.cluster.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|VMware: Number of virtual CPUs|<p>Number of virtual CPUs assigned to the guest.</p>|Simple check|vmware.vm.cpu.num[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |VMware: CPU ready|<p>Time that the virtual machine was ready, but could not get scheduled to run on the physical CPU during last measurement interval (VMware vCenter/ESXi Server performance counter sampling interval - 20 seconds)</p>|Simple check|vmware.vm.cpu.ready[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |VMware: CPU usage|<p>Current upper-bound on CPU usage. The upper-bound is based on the host the virtual machine is current running on, as well as limits configured on the virtual machine itself or any parent resource pool. Valid while the virtual machine is running.</p>|Simple check|vmware.vm.cpu.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
-|VMware: Datacenter name|<p>Datacenter name of the guest VM.</p>|Simple check|vmware.vm.datacenter.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|VMware: Hypervisor name|<p>Hypervisor name of the guest VM.</p>|Simple check|vmware.vm.hv.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|VMware: Datacenter name|<p>Datacenter name of the guest VM.</p>|Simple check|vmware.vm.datacenter.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|VMware: Hypervisor name|<p>Hypervisor name of the guest VM.</p>|Simple check|vmware.vm.hv.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |VMware: Ballooned memory|<p>The amount of guest physical memory that is currently reclaimed through the balloon driver.</p>|Simple check|vmware.vm.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |VMware: Compressed memory|<p>The amount of memory currently in the compression cache for this VM.</p>|Simple check|vmware.vm.memory.size.compressed[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |VMware: Private memory|<p>Amount of memory backed by host memory and not being shared.</p>|Simple check|vmware.vm.memory.size.private[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
@@ -116,8 +116,8 @@ This template has been tested on:
 |VMware: Swapped memory|<p>The amount of guest physical memory swapped out to the VM's swap device by ESX.</p>|Simple check|vmware.vm.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |VMware: Guest memory usage|<p>The amount of guest physical memory that is being used by the VM.</p>|Simple check|vmware.vm.memory.size.usage.guest[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |VMware: Host memory usage|<p>The amount of host physical memory allocated to the VM, accounting for saving from memory sharing with other VMs.</p>|Simple check|vmware.vm.memory.size.usage.host[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
-|VMware: Memory size|<p>Total size of configured memory.</p>|Simple check|vmware.vm.memory.size[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|VMware: Power state|<p>The current power state of the virtual machine.</p>|Simple check|vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|VMware: Memory size|<p>Total size of configured memory.</p>|Simple check|vmware.vm.memory.size[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|VMware: Power state|<p>The current power state of the virtual machine.</p>|Simple check|vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |VMware: Committed storage space|<p>Total storage space, in bytes, committed to this virtual machine across all datastores.</p>|Simple check|vmware.vm.storage.committed[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |VMware: Uncommitted storage space|<p>Additional storage space, in bytes, potentially used by this virtual machine on all datastores.</p>|Simple check|vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |VMware: Unshared storage space|<p>Total storage space, in bytes, occupied by the virtual machine across all datastores, that is not shared with any other virtual machine.</p>|Simple check|vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
@@ -135,7 +135,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware: VM has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m`|Warning|**Manual close**: Yes|
+|VMware: VM has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m`|Warning|**Manual close**: Yes|
 
 ### LLD rule Network device discovery
 
@@ -151,7 +151,7 @@ This template has been tested on:
 |VMware: Number of packets received on interface {#IFDESC}|<p>VMware virtual machine network interface input statistics (packets per second).</p>|Simple check|vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]|
 |VMware: Number of bytes transmitted on interface {#IFDESC}|<p>VMware virtual machine network interface output statistics (bytes per second).</p>|Simple check|vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]|
 |VMware: Number of packets transmitted on interface {#IFDESC}|<p>VMware virtual machine network interface output statistics (packets per second).</p>|Simple check|vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]|
-|VMware: Network utilization on interface {#IFDESC}|<p>VMware virtual machine network utilization (combined transmit-rates and receive-rates) during the interval.</p>|Simple check|vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1024`</li></ul>|
+|VMware: Network utilization on interface {#IFDESC}|<p>VMware virtual machine network utilization (combined transmit-rates and receive-rates) during the interval.</p>|Simple check|vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 
 ### LLD rule Disk device discovery
 
@@ -184,7 +184,7 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |VMware: Free disk space on {#FSNAME}|<p>VMware virtual machine file system statistics (bytes).</p>|Simple check|vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},free]|
 |VMware: Free disk space on {#FSNAME} (percentage)|<p>VMware virtual machine file system statistics (percentages).</p>|Simple check|vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree]|
-|VMware: Total disk space on {#FSNAME}|<p>VMware virtual machine total disk space (bytes).</p>|Simple check|vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},total]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|VMware: Total disk space on {#FSNAME}|<p>VMware virtual machine total disk space (bytes).</p>|Simple check|vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},total]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |VMware: Used disk space on {#FSNAME}|<p>VMware virtual machine used disk space (bytes).</p>|Simple check|vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},used]|
 
 # VMware Hypervisor
@@ -201,18 +201,18 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|VMware: Hypervisor ping|<p>Checks if the hypervisor is running and accepting ICMP pings.</p>|Simple check|icmpping[]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|VMware: Cluster name|<p>Cluster name of the guest VM.</p>|Simple check|vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|VMware: Hypervisor ping|<p>Checks if the hypervisor is running and accepting ICMP pings.</p>|Simple check|icmpping[]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|VMware: Cluster name|<p>Cluster name of the guest VM.</p>|Simple check|vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |VMware: CPU usage|<p>Aggregated CPU usage across all cores on the host in Hz. This is only available if the host is connected.</p>|Simple check|vmware.hv.cpu.usage[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
 |VMware: CPU usage in percents|<p>CPU usage as a percentage during the interval.</p>|Simple check|vmware.hv.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
 |VMware: CPU utilization|<p>CPU usage as a percentage during the interval depends on power management or HT.</p>|Simple check|vmware.hv.cpu.utilization[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
 |VMware: Power usage|<p>Current power usage.</p>|Simple check|vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
-|VMware: Power usage maximum allowed|<p>Maximum allowed power usage.</p>|Simple check|vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID},max]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|VMware: Datacenter name|<p>Datacenter name of the hypervisor.</p>|Simple check|vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|VMware: Full name|<p>The complete product name, including the version information.</p>|Simple check|vmware.hv.fullname[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|VMware: Power usage maximum allowed|<p>Maximum allowed power usage.</p>|Simple check|vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID},max]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|VMware: Datacenter name|<p>Datacenter name of the hypervisor.</p>|Simple check|vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|VMware: Full name|<p>The complete product name, including the version information.</p>|Simple check|vmware.hv.fullname[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |VMware: CPU frequency|<p>The speed of the CPU cores. This is an average value if there are multiple speeds. The product of CPU frequency and number of cores is approximately equal to the sum of the MHz for all the individual cores on the host.</p>|Simple check|vmware.hv.hw.cpu.freq[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
 |VMware: CPU model|<p>The CPU model.</p>|Simple check|vmware.hv.hw.cpu.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
-|VMware: CPU cores|<p>Number of physical CPU cores on the host. Physical CPU cores are the processors contained by a CPU package.</p>|Simple check|vmware.hv.hw.cpu.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|VMware: CPU cores|<p>Number of physical CPU cores on the host. Physical CPU cores are the processors contained by a CPU package.</p>|Simple check|vmware.hv.hw.cpu.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |VMware: CPU threads|<p>Number of physical CPU threads on the host.</p>|Simple check|vmware.hv.hw.cpu.threads[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
 |VMware: Total memory|<p>The physical memory size.</p>|Simple check|vmware.hv.hw.memory[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
 |VMware: Model|<p>The system model identification.</p>|Simple check|vmware.hv.hw.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
@@ -235,13 +235,13 @@ This template has been tested on:
 |VMware: Hypervisor is down|<p>The service is unavailable or does not accept ICMP ping.</p>|`last(/VMware Hypervisor/icmpping[])=0`|Average|**Manual close**: Yes|
 |VMware: The {$VMWARE.HV.UUID} health is Red|<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p>|`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3`|High||
 |VMware: The {$VMWARE.HV.UUID} health is Yellow|<p>One or more components in the appliance might become overloaded soon.</p>|`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2`|Average|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
-|VMware: Hypervisor has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m`|Warning|**Manual close**: Yes|
+|VMware: Hypervisor has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m`|Warning|**Manual close**: Yes|
 
 ### LLD rule Datastore discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Datastore discovery| |Simple check|vmware.hv.datastore.discovery[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
+|Datastore discovery||Simple check|vmware.hv.datastore.discovery[{$VMWARE.URL},{$VMWARE.HV.UUID}]|
 
 ### Item prototypes for Datastore discovery
 
@@ -263,13 +263,13 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Healthcheck discovery|<p>VMware Rollup Health State sensor discovery</p>|Dependent item|vmware.hv.healthcheck.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Healthcheck discovery|<p>VMware Rollup Health State sensor discovery</p>|Dependent item|vmware.hv.healthcheck.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Healthcheck discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|VMware: Health state rollup|<p>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p>|Dependent item|vmware.hv.sensor.health.state[{#SINGLETON}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|VMware: Health state rollup|<p>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p>|Dependent item|vmware.hv.sensor.health.state[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Healthcheck discovery
 
@@ -280,6 +280,7 @@ This template has been tested on:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:00:55Z'
+  date: '2023-04-18T12:57:37Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -207,7 +207,7 @@ zabbix_export:
               name: 'PD: Version has changed'
               event_name: 'PD: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'PD version has changed. Acknowledge to close manually.'
+              description: 'PD version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

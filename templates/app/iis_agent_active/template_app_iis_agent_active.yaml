@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:54:35Z'
+  date: '2023-04-18T12:46:44Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -461,7 +461,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Service uptime in seconds.'
+          description: 'The service uptime expressed in seconds.'
           tags:
             -
               tag: component

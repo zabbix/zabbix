@@ -27,14 +27,14 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Intel SR1530 IPMI: BB +1.8V SM| |IPMI agent|bb_1.8v_sm|
-|Intel SR1530 IPMI: BB +3.3V| |IPMI agent|bb_3.3v|
-|Intel SR1530 IPMI: BB +3.3V STBY| |IPMI agent|bb_3.3v_stby|
-|Intel SR1530 IPMI: BB +5.0V| |IPMI agent|bb_5.0v|
-|Intel SR1530 IPMI: BB Ambient Temp| |IPMI agent|bb_ambient_temp|
-|Intel SR1530 IPMI: Power| |IPMI agent|power|
-|Intel SR1530 IPMI: Processor Vcc| |IPMI agent|processor_vcc|
-|Intel SR1530 IPMI: System Fan 3| |IPMI agent|system_fan_3|
+|Intel SR1530 IPMI: BB +1.8V SM||IPMI agent|bb_1.8v_sm|
+|Intel SR1530 IPMI: BB +3.3V||IPMI agent|bb_3.3v|
+|Intel SR1530 IPMI: BB +3.3V STBY||IPMI agent|bb_3.3v_stby|
+|Intel SR1530 IPMI: BB +5.0V||IPMI agent|bb_5.0v|
+|Intel SR1530 IPMI: BB Ambient Temp||IPMI agent|bb_ambient_temp|
+|Intel SR1530 IPMI: Power||IPMI agent|power|
+|Intel SR1530 IPMI: Processor Vcc||IPMI agent|processor_vcc|
+|Intel SR1530 IPMI: System Fan 3||IPMI agent|system_fan_3|
 
 ### Triggers
 
@@ -54,6 +54,7 @@ Refer to the vendor documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

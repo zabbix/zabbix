@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-16T20:21:43Z'
+  date: '2023-04-24T08:03:03Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -50,7 +50,7 @@ zabbix_export:
           name: 'ES: Get cluster health'
           type: HTTP_AGENT
           key: es.cluster.get_health
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           authtype: BASIC
@@ -68,7 +68,7 @@ zabbix_export:
           name: 'ES: Get cluster stats'
           type: HTTP_AGENT
           key: es.cluster.get_stats
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           authtype: BASIC
@@ -554,7 +554,7 @@ zabbix_export:
           name: 'ES: Get nodes stats'
           type: HTTP_AGENT
           key: es.nodes.get_stats
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           authtype: BASIC

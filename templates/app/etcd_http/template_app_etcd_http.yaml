@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:53:58Z'
+  date: '2023-04-24T08:03:12Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -50,7 +50,7 @@ zabbix_export:
               name: 'Etcd: Cluster version has changed'
               event_name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Etcd version has changed. Acknowledge to close manually.'
+              description: 'Etcd version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -526,7 +526,7 @@ zabbix_export:
               name: 'Etcd: Failed to fetch info data'
               event_name: 'Etcd: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1008,7 +1008,7 @@ zabbix_export:
               name: 'Etcd: Server version has changed'
               event_name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Etcd version has changed. Acknowledge to close manually.'
+              description: 'Etcd version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1249,14 +1249,14 @@ zabbix_export:
               parameters:
                 - |
                   var data = JSON.parse(value),
-                   lookup = {},
-                   result =[];
+                      lookup = {},
+                      result = [];
                   for (var item, i = 0; item = data[i++];) {
-                   var code = item.labels.grpc_code;
-                   if (!(code in lookup)) {
-                    lookup[code] = 1;
-                    result.push({ "{#GRPC.CODE}": code});
-                  }
+                    var code = item.labels.grpc_code;
+                    if (!(code in lookup)) {
+                      lookup[code] = 1;
+                      result.push({ "{#GRPC.CODE}": code });
+                    }
                   }
                   return JSON.stringify(result);
             -

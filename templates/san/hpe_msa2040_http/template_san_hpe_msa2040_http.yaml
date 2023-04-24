@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:38:15Z'
+  date: '2023-04-24T08:24:04Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -3516,8 +3516,8 @@ zabbix_export:
             key: hpe.msa.get.fru
           lld_macro_paths:
             -
-              lld_macro: '{#DESCRIPTION}'
-              path: '$.[''description'']'
+              lld_macro: '{#TYPE}'
+              path: '$.[''name'']'
             -
               lld_macro: '{#ENCLOSURE.ID}'
               path: '$.[''enclosure-id'']'
@@ -3525,8 +3525,8 @@ zabbix_export:
               lld_macro: '{#LOCATION}'
               path: '$.[''fru-location'']'
             -
-              lld_macro: '{#TYPE}'
-              path: '$.[''name'']'
+              lld_macro: '{#DESCRIPTION}'
+              path: '$.[''description'']'
         -
           uuid: 082c1cfb851548928911b9ab69f6f75e
           name: 'Pools discovery'
@@ -4712,7 +4712,7 @@ zabbix_export:
         -
           macro: '{$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$HPE.MSA.DATA.TIMEOUT}'
           value: 30s

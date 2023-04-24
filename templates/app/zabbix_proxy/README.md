@@ -38,7 +38,7 @@
 |Zabbix proxy: Utilization of unreachable poller data collector processes, in %|<p>Average percentage of time unreachable poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,unreachable poller,avg,busy]|
 |Zabbix proxy: Utilization of vmware data collector processes, in %|<p>Average percentage of time vmware collector processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,vmware collector,avg,busy]|
 |Zabbix proxy: Configuration cache, % used|<p>Availability statistics of Zabbix configuration cache. Percentage of used buffer.</p>|Zabbix internal|zabbix[rcache,buffer,pused]|
-|Zabbix proxy: Version|<p>Version of Zabbix proxy.</p>|Zabbix internal|zabbix[version]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Zabbix proxy: Version|<p>Version of Zabbix proxy.</p>|Zabbix internal|zabbix[version]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Zabbix proxy: VMware cache, % used|<p>Availability statistics of Zabbix vmware cache. Percentage of used buffer.</p>|Zabbix internal|zabbix[vmware,buffer,pused]|
 |Zabbix proxy: History write cache, % used|<p>Statistics and availability of Zabbix write cache. Percentage of used history buffer.</p><p>History cache is used to store item values. A high number indicates performance problems on the database side.</p>|Zabbix internal|zabbix[wcache,history,pused]|
 |Zabbix proxy: History index cache, % used|<p>Statistics and availability of Zabbix write cache. Percentage of used history index buffer.</p><p>History index cache is used to index values stored in history cache.</p>|Zabbix internal|zabbix[wcache,index,pused]|
@@ -83,7 +83,7 @@
 |Zabbix proxy: Utilization of unreachable poller processes is high||`avg(/Zabbix proxy health/zabbix[process,unreachable poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of vmware collector processes is high||`avg(/Zabbix proxy health/zabbix[process,vmware collector,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache|<p>Consider increasing CacheSize in the zabbix_proxy.conf configuration file.</p>|`max(/Zabbix proxy health/zabbix[rcache,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
-|Zabbix proxy: Version has changed|<p>Zabbix proxy version has changed. Acknowledge to close manually.</p>|`last(/Zabbix proxy health/zabbix[version],#1)<>last(/Zabbix proxy health/zabbix[version],#2) and length(last(/Zabbix proxy health/zabbix[version]))>0`|Info|**Manual close**: Yes|
+|Zabbix proxy: Version has changed|<p>Zabbix proxy version has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix proxy health/zabbix[version],#1)<>last(/Zabbix proxy health/zabbix[version],#2) and length(last(/Zabbix proxy health/zabbix[version]))>0`|Info|**Manual close**: Yes|
 |Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache|<p>Consider increasing VMwareCacheSize in the zabbix_proxy.conf configuration file.</p>|`max(/Zabbix proxy health/zabbix[vmware,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
 |Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history cache|<p>Consider increasing HistoryCacheSize in the zabbix_proxy.conf configuration file.</p>|`max(/Zabbix proxy health/zabbix[wcache,history,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
 |Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history index cache|<p>Consider increasing HistoryIndexCacheSize in the zabbix_proxy.conf configuration file.</p>|`max(/Zabbix proxy health/zabbix[wcache,index,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
@@ -91,6 +91,7 @@
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

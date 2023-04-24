@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T15:24:10Z'
+  date: '2023-04-18T13:12:03Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -663,7 +663,7 @@ zabbix_export:
               name: 'NetApp AFF A700: Version has changed'
               event_name: 'NetApp AFF A700: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The NetApp AFF A700 version has changed. Acknowledge to close manually.'
+              description: 'The NetApp AFF A700 version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1248,7 +1248,7 @@ zabbix_export:
                   name: '{#NODENAME}: Version has changed'
                   event_name: '{#NODENAME}: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
-                  description: '{#NODENAME} version has changed. Acknowledge to close manually.'
+                  description: '{#NODENAME} version has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

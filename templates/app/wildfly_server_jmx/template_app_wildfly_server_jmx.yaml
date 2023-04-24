@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-17T21:06:41Z'
+  date: '2023-04-24T08:06:26Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -159,7 +159,7 @@ zabbix_export:
               name: 'WildFly: Version has changed'
               event_name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'WildFly version has changed. Acknowledge to close manually.'
+              description: 'WildFly version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -595,7 +595,7 @@ zabbix_export:
                   name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed'
                   event_name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Deployment status has changed. Ack to close.'
+                  description: 'Deployment status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:55:20Z'
+  date: '2023-04-18T12:47:49Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -374,7 +374,7 @@ zabbix_export:
               name: 'Nginx: Version has changed'
               event_name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Nginx version has changed. Acknowledge to close manually.'
+              description: 'The Nginx version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

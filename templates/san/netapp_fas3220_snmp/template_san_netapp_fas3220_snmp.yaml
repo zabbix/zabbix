@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:16:29Z'
+  date: '2023-04-24T08:24:39Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -266,7 +266,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -339,7 +339,7 @@ zabbix_export:
               name: 'NetApp FAS3220: System name has changed'
               event_name: 'NetApp FAS3220: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -356,7 +356,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -796,7 +796,7 @@ zabbix_export:
                   event_name: 'Node {#NODE.NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -893,7 +893,7 @@ zabbix_export:
               key: 'fas3220.fs[df64TotalKBytes, "{#VSERVER}{#FSNAME}"]'
               history: 7d
               units: B
-              description: 'The total capacity in Bytes for {#FSNAME}.'
+              description: 'The total capacity in bytes for {#FSNAME}.'
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -1539,7 +1539,7 @@ zabbix_export:
               event_name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+              description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
               manual_close: 'YES'
               tags:
                 -
@@ -1680,7 +1680,7 @@ zabbix_export:
         -
           macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$FAS3220.FS.AVAIL.MIN.CRIT}'
           value: 10G

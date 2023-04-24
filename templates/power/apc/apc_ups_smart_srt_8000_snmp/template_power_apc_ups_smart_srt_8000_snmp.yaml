@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:15:24Z'
+  date: '2023-04-24T08:23:36Z'
   groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -691,7 +691,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -786,7 +786,7 @@ zabbix_export:
               name: 'APC Smart-UPS SRT 8000: System name has changed'
               event_name: 'APC Smart-UPS SRT 8000: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -803,7 +803,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB

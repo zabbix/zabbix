@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:12:47Z'
+  date: '2023-04-24T08:20:13Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -247,7 +247,7 @@ zabbix_export:
               name: 'Velocloud: Failed to fetch aggregate data'
               event_name: 'Velocloud: Failed to fetch aggregate data (or no data for 30m)'
               priority: AVERAGE
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -2007,14 +2007,14 @@ zabbix_export:
             key: velocloud.get.clear_metrics
           lld_macro_paths:
             -
+              lld_macro: '{#SOURCE}'
+              path: $.source.deviceName
+            -
               lld_macro: '{#DESTINATION}'
               path: $.destination.deviceName
             -
               lld_macro: '{#NAME}'
               path: $.source.linkName
-            -
-              lld_macro: '{#SOURCE}'
-              path: $.source.deviceName
           preprocessing:
             -
               type: JSONPATH
@@ -2293,12 +2293,6 @@ zabbix_export:
             key: velocloud.get.clear_metrics
           lld_macro_paths:
             -
-              lld_macro: '{#EDGE.ID}'
-              path: $.edgeId
-            -
-              lld_macro: '{#EDGE}'
-              path: $.edgeName
-            -
               lld_macro: '{#ID}'
               path: $.deviceLogicalId
             -
@@ -2307,6 +2301,12 @@ zabbix_export:
             -
               lld_macro: '{#TYPE}'
               path: $.peerType
+            -
+              lld_macro: '{#EDGE.ID}'
+              path: $.edgeId
+            -
+              lld_macro: '{#EDGE}'
+              path: $.edgeName
           preprocessing:
             -
               type: JSONPATH

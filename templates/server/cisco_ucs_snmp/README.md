@@ -61,25 +61,25 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cisco UCS: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.01`</li></ul>|
-|Cisco UCS: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.01`</li></ul>|
+|Cisco UCS: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Cisco UCS: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Cisco UCS: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
-|Cisco UCS: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|Cisco UCS: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|Cisco UCS: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|Cisco UCS: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|Cisco UCS: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
+|Cisco UCS: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Cisco UCS: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Cisco UCS: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Cisco UCS: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Cisco UCS: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Cisco UCS: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
-|Cisco UCS: ICMP ping| |Simple check|icmpping|
-|Cisco UCS: ICMP loss| |Simple check|icmppingloss|
-|Cisco UCS: ICMP response time| |Simple check|icmppingsec|
+|Cisco UCS: ICMP ping||Simple check|icmpping|
+|Cisco UCS: ICMP loss||Simple check|icmppingloss|
+|Cisco UCS: ICMP response time||Simple check|icmppingsec|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Cisco UCS: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco UCS: No SNMP data collection</li></ul>|
-|Cisco UCS: System name has changed|<p>System name has changed. Ack to close.</p>|`last(/Cisco UCS by SNMP/system.name,#1)<>last(/Cisco UCS by SNMP/system.name,#2) and length(last(/Cisco UCS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Cisco UCS: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco UCS by SNMP/system.name,#1)<>last(/Cisco UCS by SNMP/system.name,#2) and length(last(/Cisco UCS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
 |Cisco UCS: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Cisco UCS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Cisco UCS: Unavailable by ICMP ping</li></ul>|
 |Cisco UCS: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Cisco UCS by SNMP/icmpping,#3)=0`|High||
 |Cisco UCS: High ICMP ping loss||`min(/Cisco UCS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco UCS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Cisco UCS: Unavailable by ICMP ping</li></ul>|
@@ -89,7 +89,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Temperature Discovery| |SNMP agent|temp.discovery|
+|Temperature Discovery||SNMP agent|temp.discovery|
 
 ### Item prototypes for Temperature Discovery
 
@@ -121,7 +121,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Temperature CPU Discovery| |SNMP agent|temp.cpu.discovery|
+|Temperature CPU Discovery||SNMP agent|temp.cpu.discovery|
 
 ### Item prototypes for Temperature CPU Discovery
 
@@ -141,7 +141,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PSU Discovery| |SNMP agent|psu.discovery|
+|PSU Discovery||SNMP agent|psu.discovery|
 
 ### Item prototypes for PSU Discovery
 
@@ -160,15 +160,15 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Unit Discovery| |SNMP agent|unit.discovery|
+|Unit Discovery||SNMP agent|unit.discovery|
 
 ### Item prototypes for Unit Discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |{#UNIT_LOCATION}: Overall system health status|<p>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB</p><p>Cisco UCS compute:RackUnit:operState managed object property</p>|SNMP agent|system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}]|
-|{#UNIT_LOCATION}: Hardware model name|<p>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB</p><p>Cisco UCS compute:RackUnit:model managed object property</p>|SNMP agent|system.hw.model[cucsComputeRackUnitModel.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|{#UNIT_LOCATION}: Hardware serial number|<p>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB</p><p>Cisco UCS compute:RackUnit:serial managed object property</p>|SNMP agent|system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|{#UNIT_LOCATION}: Hardware model name|<p>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB</p><p>Cisco UCS compute:RackUnit:model managed object property</p>|SNMP agent|system.hw.model[cucsComputeRackUnitModel.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|{#UNIT_LOCATION}: Hardware serial number|<p>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB</p><p>Cisco UCS compute:RackUnit:serial managed object property</p>|SNMP agent|system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Trigger prototypes for Unit Discovery
 
@@ -176,13 +176,13 @@ Refer to the vendor documentation.
 |----|-----------|----------|--------|--------------------------------|
 |{#UNIT_LOCATION}: System status is in critical state|<p>Please check the device for errors</p>|`count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"computeFailed\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"configFailure\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"unconfigFailure\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"inoperable\"}")=1`|High||
 |{#UNIT_LOCATION}: System status is in warning state|<p>Please check the device for warnings</p>|`count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"testFailed\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"thermalProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"powerProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"voltageProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"diagnosticsFailed\"}")=1`|Warning|**Depends on**:<br><ul><li>{#UNIT_LOCATION}: System status is in critical state</li></ul>|
-|{#UNIT_LOCATION}: Device has been replaced|<p>Device serial number has changed. Ack to close</p>|`last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|{#UNIT_LOCATION}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule FAN Discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FAN Discovery| |SNMP agent|fan.discovery|
+|FAN Discovery||SNMP agent|fan.discovery|
 
 ### Item prototypes for FAN Discovery
 
@@ -210,7 +210,7 @@ Refer to the vendor documentation.
 |{#DISK_LOCATION}: Physical disk status|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalDisk:diskState managed object property.</p>|SNMP agent|system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}]|
 |{#DISK_LOCATION}: Physical disk model name|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalDisk:serial managed object property. Actually returns part number code</p>|SNMP agent|system.hw.physicaldisk.model[cucsStorageLocalDiskSerial.{#SNMPINDEX}]|
 |{#DISK_LOCATION}: Physical disk media type|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalDisk:model managed object property. Actually returns 'HDD' or 'SSD'</p>|SNMP agent|system.hw.physicaldisk.media_type[cucsStorageLocalDiskModel.{#SNMPINDEX}]|
-|{#DISK_LOCATION}: Disk size|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalDisk:size managed object property. In MB.</p>|SNMP agent|system.hw.physicaldisk.size[cucsStorageLocalDiskSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
+|{#DISK_LOCATION}: Disk size|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalDisk:size managed object property. In MB.</p>|SNMP agent|system.hw.physicaldisk.size[cucsStorageLocalDiskSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
 
 ### Trigger prototypes for Physical Disk Discovery
 
@@ -231,7 +231,7 @@ Refer to the vendor documentation.
 |----|-----------|----|-----------------------|
 |{#VDISK_LOCATION}: Status|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalLun:presence managed object property</p>|SNMP agent|system.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}]|
 |{#VDISK_LOCATION}: Layout type|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalLun:type managed object property</p>|SNMP agent|system.hw.virtualdisk.layout[cucsStorageLocalLunType.{#SNMPINDEX}]|
-|{#VDISK_LOCATION}: Disk size|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalLun:size managed object property in MB.</p>|SNMP agent|system.hw.virtualdisk.size[cucsStorageLocalLunSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
+|{#VDISK_LOCATION}: Disk size|<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalLun:size managed object property in MB.</p>|SNMP agent|system.hw.virtualdisk.size[cucsStorageLocalLunSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
 
 ### Trigger prototypes for Virtual Disk Discovery
 
@@ -281,6 +281,7 @@ Refer to the vendor documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

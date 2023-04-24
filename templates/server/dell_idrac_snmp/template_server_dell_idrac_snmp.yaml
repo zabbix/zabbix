@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:16:48Z'
+  date: '2023-04-24T08:24:58Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -208,7 +208,7 @@ zabbix_export:
               name: 'Dell iDRAC: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'Firmware version has changed. Ack to close'
+              description: 'Firmware version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -267,7 +267,7 @@ zabbix_export:
               name: 'Dell iDRAC: Device has been replaced'
               event_name: 'Dell iDRAC: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -281,7 +281,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -354,7 +354,7 @@ zabbix_export:
               name: 'Dell iDRAC: System name has changed'
               event_name: 'Dell iDRAC: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -371,7 +371,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -415,7 +415,7 @@ zabbix_export:
           key: 'system.status[globalSystemStatus.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           description: |
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.
@@ -508,7 +508,7 @@ zabbix_export:
               expression: 'last(/Dell iDRAC by SNMP/system.sw.os[systemOSName],#1)<>last(/Dell iDRAC by SNMP/system.sw.os[systemOSName],#2) and length(last(/Dell iDRAC by SNMP/system.sw.os[systemOSName]))>0'
               name: 'Dell iDRAC: Operating system description has changed'
               priority: INFO
-              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -572,7 +572,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]'
               history: 1w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 Current state of battery.
@@ -693,7 +693,7 @@ zabbix_export:
               key: 'sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0012.0001.0005 This attribute defines the probe status of the cooling device.
@@ -775,7 +775,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
               key: 'system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
               history: 1w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The status of the controller itself without the propagation of any contained component status.
@@ -869,7 +869,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The media type of the physical disk. Possible Values:
@@ -952,7 +952,7 @@ zabbix_export:
                   name: '{#DISK_NAME}: Disk has been replaced'
                   event_name: '{#DISK_NAME}: Disk has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Disk serial number has changed. Ack to close'
+                  description: 'Disk serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -966,7 +966,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -991,7 +991,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
               delay: 3m
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 Indicates whether the physical disk has received a predictive failure alert.
@@ -1031,7 +1031,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The status of the physical disk itself without the propagation of any contained component status.
@@ -1101,7 +1101,7 @@ zabbix_export:
               key: 'sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0600.0012.0001.0005 This attribute defines the status of the power supply.
@@ -1167,7 +1167,7 @@ zabbix_export:
               key: 'sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.
@@ -1294,7 +1294,7 @@ zabbix_export:
               key: 'sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.
@@ -1468,7 +1468,7 @@ zabbix_export:
               key: 'system.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: IDRAC-MIB-SMIv2

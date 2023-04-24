@@ -42,13 +42,13 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Tomcat: Version|<p>The version of the Tomcat.</p>|JMX agent|jmx["Catalina:type=Server",serverInfo]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Tomcat: Version|<p>The version of the Tomcat.</p>|JMX agent|jmx["Catalina:type=Server",serverInfo]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Tomcat: Version has been changed|<p>The Tomcat version has changed. Acknowledge to close manually.</p>|`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0`|Info|**Manual close**: Yes|
+|Tomcat: Version has been changed|<p>The Tomcat version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Global request processors discovery
 
@@ -64,7 +64,7 @@ Metrics are collected by JMX.
 |{#JMXNAME}: Bytes sent per second|<p>Bytes sent rate by processor {#JMXNAME}</p>|JMX agent|jmx[{#JMXOBJ},bytesSent]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |{#JMXNAME}: Errors per second|<p>Error rate of request processor {#JMXNAME}</p>|JMX agent|jmx[{#JMXOBJ},errorCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |{#JMXNAME}: Requests per second|<p>Rate of requests served by request processor {#JMXNAME}</p>|JMX agent|jmx[{#JMXOBJ},requestCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|{#JMXNAME}: Requests processing time|<p>The total time to process all incoming requests of request processor</p><p>{#JMXNAME}</p>|JMX agent|jmx[{#JMXOBJ},processingTime]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
+|{#JMXNAME}: Requests processing time|<p>The total time to process all incoming requests of request processor</p><p>{#JMXNAME}</p>|JMX agent|jmx[{#JMXOBJ},processingTime]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 
 ### LLD rule Protocol handlers discovery
 
@@ -76,7 +76,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#JMXVALUE}: Gzip compression status|<p>Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.</p>|JMX agent|jmx[{#JMXOBJ},compression]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|{#JMXVALUE}: Gzip compression status|<p>Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.</p>|JMX agent|jmx[{#JMXOBJ},compression]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Protocol handlers discovery
 
@@ -94,8 +94,8 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#JMXNAME}: Threads count|<p>Amount of threads the thread pool has right now, both busy and free.</p>|JMX agent|jmx[{#JMXOBJ},currentThreadCount]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|{#JMXNAME}: Threads limit|<p>Limit of the threads count. When currentThreadsBusy counter reaches the maxThreads limit, no more requests could be handled, and the application chokes.</p>|JMX agent|jmx[{#JMXOBJ},maxThreads]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|{#JMXNAME}: Threads count|<p>Amount of threads the thread pool has right now, both busy and free.</p>|JMX agent|jmx[{#JMXOBJ},currentThreadCount]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|{#JMXNAME}: Threads limit|<p>Limit of the threads count. When currentThreadsBusy counter reaches the maxThreads limit, no more requests could be handled, and the application chokes.</p>|JMX agent|jmx[{#JMXOBJ},maxThreads]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |{#JMXNAME}: Threads busy|<p>Number of the requests that are being currently handled.</p>|JMX agent|jmx[{#JMXOBJ},currentThreadsBusy]|
 
 ### Trigger prototypes for Thread pools discovery
@@ -122,6 +122,7 @@ Metrics are collected by JMX.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

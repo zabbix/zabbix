@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:21:29Z'
+  date: '2023-04-24T08:08:49Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1069,7 +1069,7 @@ zabbix_export:
               name: 'MongoDB: Version has changed'
               event_name: 'MongoDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'MongoDB version has changed. Acknowledge to close manually.'
+              description: 'MongoDB version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -2799,7 +2799,7 @@ zabbix_export:
                   name: 'MongoDB: Node in ReplicaSet changed the state'
                   event_name: 'MongoDB: Node in ReplicaSet changed the state (new state: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'Node in ReplicaSet  changed the state. Ack to close.'
+                  description: 'Node in ReplicaSet  changed the state. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2932,21 +2932,6 @@ zabbix_export:
                 - 1h
           overrides:
             -
-              name: 'Arbiter metrics'
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#NODE_STATE}'
-                    value: '7'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
-                  value: 'Replication lag'
-                  discover: NO_DISCOVER
-            -
               name: 'Primary metrics'
               step: '1'
               filter:
@@ -2974,6 +2959,21 @@ zabbix_export:
                   value: 'Number of unhealthy replicas'
                   status: ENABLED
                   discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Replication lag'
+                  discover: NO_DISCOVER
+            -
+              name: 'Arbiter metrics'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#NODE_STATE}'
+                    value: '7'
+                    formulaid: A
+              operations:
                 -
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE

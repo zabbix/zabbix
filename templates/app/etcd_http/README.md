@@ -68,44 +68,44 @@ Additional points to consider:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Etcd: Service's TCP port state| |Simple check|net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Etcd: Get node metrics| |HTTP agent|etcd.get_metrics|
-|Etcd: Node health| |HTTP agent|etcd.health<p>**Preprocessing**</p><ul><li>JSON Path: `$.health`</li><li><p>Boolean to decimal</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Etcd: Server is a leader|<p>It defines - whether or not this member is a leader:</p><p>1 - it is;</p><p>0 - otherwise.</p>|Dependent item|etcd.is.leader<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_is_leader)`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Etcd: Server has a leader|<p>It defines - whether or not a leader exists:</p><p>1 - it exists;</p><p>0 - it does not.</p>|Dependent item|etcd.has.leader<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_server_has_leader)`</li><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Etcd: Leader changes|<p>The number of leader changes the member has seen since its start.</p>|Dependent item|etcd.leader.changes<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_server_leader_changes_seen_total)`</li></ul>|
-|Etcd: Proposals committed per second|<p>The number of consensus proposals committed.</p>|Dependent item|etcd.proposals.committed.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_server_proposals_committed_total)`</li><li>Change per second</li></ul>|
-|Etcd: Proposals applied per second|<p>The number of consensus proposals applied.</p>|Dependent item|etcd.proposals.applied.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_server_proposals_applied_total)`</li><li>Change per second</li></ul>|
-|Etcd: Proposals failed per second|<p>The number of failed proposals seen.</p>|Dependent item|etcd.proposals.failed.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_server_proposals_failed_total)`</li><li>Change per second</li></ul>|
-|Etcd: Proposals pending|<p>The current number of pending proposals to commit.</p>|Dependent item|etcd.proposals.pending<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_server_proposals_pending)`</li></ul>|
-|Etcd: Reads per second|<p>The number of read actions by `get/getRecursive`, local to this member.</p>|Dependent item|etcd.reads.rate<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `etcd_debugging_store_reads_total`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
-|Etcd: Writes per second|<p>The number of writes (e.g., `set/compareAndDelete`) seen by this member.</p>|Dependent item|etcd.writes.rate<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `etcd_debugging_store_writes_total`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
-|Etcd: Client gRPC received bytes per second|<p>The number of bytes received from gRPC clients per second.</p>|Dependent item|etcd.network.grpc.received.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_network_client_grpc_received_bytes_total)`</li><li>Change per second</li></ul>|
-|Etcd: Client gRPC sent bytes per second|<p>The number of bytes sent from gRPC clients per second.</p>|Dependent item|etcd.network.grpc.sent.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_network_client_grpc_sent_bytes_total)`</li><li>Change per second</li></ul>|
-|Etcd: HTTP requests received|<p>The number of requests received into the system (successfully parsed and `authd`).</p>|Dependent item|etcd.http.requests.rate<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `etcd_http_received_total`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
-|Etcd: HTTP 5XX|<p>The number of handled failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `5XX`.</p>|Dependent item|etcd.http.requests.5xx.rate<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `etcd_http_failed_total{code=~"5.+"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
-|Etcd: HTTP 4XX|<p>The number of handled failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `4XX`.</p>|Dependent item|etcd.http.requests.4xx.rate<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `etcd_http_failed_total{code=~"4.+"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
-|Etcd: RPCs received per second|<p>The number of RPC stream messages received on the server.</p>|Dependent item|etcd.grpc.received.rate<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `grpc_server_msg_received_total`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
-|Etcd: RPCs sent per second|<p>The number of gRPC stream messages sent by the server.</p>|Dependent item|etcd.grpc.sent.rate<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `grpc_server_msg_sent_total`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
-|Etcd: RPCs started per second|<p>The number of RPCs started on the server.</p>|Dependent item|etcd.grpc.started.rate<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `grpc_server_started_total`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
-|Etcd: Get version| |HTTP agent|etcd.get_version|
-|Etcd: Server version|<p>The version of the `etcd server`.</p>|Dependent item|etcd.server.version<p>**Preprocessing**</p><ul><li>JSON Path: `$.etcdserver`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Etcd: Cluster version|<p>The version of the `etcd cluster`.</p>|Dependent item|etcd.cluster.version<p>**Preprocessing**</p><ul><li>JSON Path: `$.etcdcluster`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Etcd: DB size|<p>The total size of the underlying database.</p>|Dependent item|etcd.db.size<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_mvcc_db_total_size_in_bytes)`</li></ul>|
+|Etcd: Service's TCP port state||Simple check|net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Etcd: Get node metrics||HTTP agent|etcd.get_metrics|
+|Etcd: Node health||HTTP agent|etcd.health<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health`</p></li><li><p>Boolean to decimal</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Etcd: Server is a leader|<p>It defines - whether or not this member is a leader:</p><p>1 - it is;</p><p>0 - otherwise.</p>|Dependent item|etcd.is.leader<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_is_leader)`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Etcd: Server has a leader|<p>It defines - whether or not a leader exists:</p><p>1 - it exists;</p><p>0 - it does not.</p>|Dependent item|etcd.has.leader<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_has_leader)`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Etcd: Leader changes|<p>The number of leader changes the member has seen since its start.</p>|Dependent item|etcd.leader.changes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_leader_changes_seen_total)`</p></li></ul>|
+|Etcd: Proposals committed per second|<p>The number of consensus proposals committed.</p>|Dependent item|etcd.proposals.committed.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_proposals_committed_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Proposals applied per second|<p>The number of consensus proposals applied.</p>|Dependent item|etcd.proposals.applied.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_proposals_applied_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Proposals failed per second|<p>The number of failed proposals seen.</p>|Dependent item|etcd.proposals.failed.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_proposals_failed_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Proposals pending|<p>The current number of pending proposals to commit.</p>|Dependent item|etcd.proposals.pending<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_proposals_pending)`</p></li></ul>|
+|Etcd: Reads per second|<p>The number of read actions by `get/getRecursive`, local to this member.</p>|Dependent item|etcd.reads.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `etcd_debugging_store_reads_total`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Etcd: Writes per second|<p>The number of writes (e.g., `set/compareAndDelete`) seen by this member.</p>|Dependent item|etcd.writes.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `etcd_debugging_store_writes_total`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Etcd: Client gRPC received bytes per second|<p>The number of bytes received from gRPC clients per second.</p>|Dependent item|etcd.network.grpc.received.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_network_client_grpc_received_bytes_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Client gRPC sent bytes per second|<p>The number of bytes sent from gRPC clients per second.</p>|Dependent item|etcd.network.grpc.sent.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_network_client_grpc_sent_bytes_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: HTTP requests received|<p>The number of requests received into the system (successfully parsed and `authd`).</p>|Dependent item|etcd.http.requests.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `etcd_http_received_total`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Etcd: HTTP 5XX|<p>The number of handled failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `5XX`.</p>|Dependent item|etcd.http.requests.5xx.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `etcd_http_failed_total{code=~"5.+"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Etcd: HTTP 4XX|<p>The number of handled failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `4XX`.</p>|Dependent item|etcd.http.requests.4xx.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `etcd_http_failed_total{code=~"4.+"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Etcd: RPCs received per second|<p>The number of RPC stream messages received on the server.</p>|Dependent item|etcd.grpc.received.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `grpc_server_msg_received_total`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Etcd: RPCs sent per second|<p>The number of gRPC stream messages sent by the server.</p>|Dependent item|etcd.grpc.sent.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `grpc_server_msg_sent_total`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Etcd: RPCs started per second|<p>The number of RPCs started on the server.</p>|Dependent item|etcd.grpc.started.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `grpc_server_started_total`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Etcd: Get version||HTTP agent|etcd.get_version|
+|Etcd: Server version|<p>The version of the `etcd server`.</p>|Dependent item|etcd.server.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.etcdserver`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Etcd: Cluster version|<p>The version of the `etcd cluster`.</p>|Dependent item|etcd.cluster.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.etcdcluster`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Etcd: DB size|<p>The total size of the underlying database.</p>|Dependent item|etcd.db.size<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_mvcc_db_total_size_in_bytes)`</p></li></ul>|
 |Etcd: Keys compacted per second|<p>The number of DB keys compacted per second.</p>|Dependent item|etcd.keys.compacted.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_debugging_mvcc_db_compaction_keys_total)`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
-|Etcd: Keys expired per second|<p>The number of expired keys per second.</p>|Dependent item|etcd.keys.expired.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_debugging_store_expires_total)`</li><li>Change per second</li></ul>|
-|Etcd: Keys total|<p>The total number of keys.</p>|Dependent item|etcd.keys.total<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_debugging_mvcc_keys_total)`</li></ul>|
-|Etcd: Uptime|<p>`Etcd` server uptime.</p>|Dependent item|etcd.uptime<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_start_time_seconds)`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|Etcd: Virtual memory|<p>The size of virtual memory expressed in bytes.</p>|Dependent item|etcd.virtual.bytes<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_virtual_memory_bytes)`</li></ul>|
-|Etcd: Resident memory|<p>The size of resident memory expressed in bytes.</p>|Dependent item|etcd.res.bytes<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_resident_memory_bytes)`</li></ul>|
-|Etcd: CPU|<p>The total user and system CPU time spent in seconds.</p>|Dependent item|etcd.cpu.util<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_cpu_seconds_total)`</li><li>Change per second</li></ul>|
-|Etcd: Open file descriptors|<p>The number of open file descriptors.</p>|Dependent item|etcd.open.fds<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_open_fds)`</li></ul>|
-|Etcd: Maximum open file descriptors|<p>The Maximum number of open file descriptors.</p>|Dependent item|etcd.max.fds<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_max_fds)`</li></ul>|
-|Etcd: Deletes per second|<p>The number of deletes seen by this member per second.</p>|Dependent item|etcd.delete.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_mvcc_delete_total)`</li><li>Change per second</li></ul>|
-|Etcd: PUT per second|<p>The number of puts seen by this member per second.</p>|Dependent item|etcd.put.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_mvcc_put_total)`</li><li>Change per second</li></ul>|
-|Etcd: Range per second|<p>The number of ranges seen by this member per second.</p>|Dependent item|etcd.range.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_debugging_mvcc_range_total)`</li><li>Change per second</li></ul>|
-|Etcd: Transaction per second|<p>The number of transactions seen by this member per second.</p>|Dependent item|etcd.txn.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_debugging_mvcc_range_total)`</li><li>Change per second</li></ul>|
-|Etcd: Pending events|<p>The total number of pending events to be sent.</p>|Dependent item|etcd.events.sent.rate<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(etcd_debugging_mvcc_pending_events_total)`</li></ul>|
+|Etcd: Keys expired per second|<p>The number of expired keys per second.</p>|Dependent item|etcd.keys.expired.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_debugging_store_expires_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Keys total|<p>The total number of keys.</p>|Dependent item|etcd.keys.total<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_debugging_mvcc_keys_total)`</p></li></ul>|
+|Etcd: Uptime|<p>`Etcd` server uptime.</p>|Dependent item|etcd.uptime<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_start_time_seconds)`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Etcd: Virtual memory|<p>The size of virtual memory expressed in bytes.</p>|Dependent item|etcd.virtual.bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_virtual_memory_bytes)`</p></li></ul>|
+|Etcd: Resident memory|<p>The size of resident memory expressed in bytes.</p>|Dependent item|etcd.res.bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_resident_memory_bytes)`</p></li></ul>|
+|Etcd: CPU|<p>The total user and system CPU time spent in seconds.</p>|Dependent item|etcd.cpu.util<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_cpu_seconds_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Open file descriptors|<p>The number of open file descriptors.</p>|Dependent item|etcd.open.fds<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_open_fds)`</p></li></ul>|
+|Etcd: Maximum open file descriptors|<p>The Maximum number of open file descriptors.</p>|Dependent item|etcd.max.fds<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_max_fds)`</p></li></ul>|
+|Etcd: Deletes per second|<p>The number of deletes seen by this member per second.</p>|Dependent item|etcd.delete.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_mvcc_delete_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: PUT per second|<p>The number of puts seen by this member per second.</p>|Dependent item|etcd.put.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_mvcc_put_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Range per second|<p>The number of ranges seen by this member per second.</p>|Dependent item|etcd.range.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_debugging_mvcc_range_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Transaction per second|<p>The number of transactions seen by this member per second.</p>|Dependent item|etcd.txn.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_debugging_mvcc_range_total)`</p></li><li>Change per second</li></ul>|
+|Etcd: Pending events|<p>The total number of pending events to be sent.</p>|Dependent item|etcd.events.sent.rate<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_debugging_mvcc_pending_events_total)`</p></li></ul>|
 
 ### Triggers
 
@@ -113,14 +113,14 @@ Additional points to consider:
 |----|-----------|----------|--------|--------------------------------|
 |Etcd: Service is unavailable||`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0`|Average|**Manual close**: Yes|
 |Etcd: Node healthcheck failed|<p>See more details on https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check.</p>|`last(/Etcd by HTTP/etcd.health)=0`|Average|**Depends on**:<br><ul><li>Etcd: Service is unavailable</li></ul>|
-|Etcd: Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Etcd: Service is unavailable</li></ul>|
+|Etcd: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Etcd: Service is unavailable</li></ul>|
 |Etcd: Member has no leader|<p>If a member does not have a leader, it is totally unavailable.</p>|`last(/Etcd by HTTP/etcd.has.leader)=0`|Average||
 |Etcd: Instance has seen too many leader changes|<p>Rapid leadership changes impact the performance of `etcd` significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the `etcd cluster`.</p>|`(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}`|Warning||
 |Etcd: Too many proposal failures|<p>Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.</p>|`min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}`|Warning||
 |Etcd: Too many proposals are queued to commit|<p>Rising pending proposals suggests there is a high client load, or the member cannot commit proposals.</p>|`min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}`|Warning||
 |Etcd: Too many HTTP requests failures|<p>Too many requests failed on `etcd` instance with the `5xx HTTP code`.</p>|`min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}`|Warning||
-|Etcd: Server version has changed|<p>Etcd version has changed. Acknowledge to close manually.</p>|`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0`|Info|**Manual close**: Yes|
-|Etcd: Cluster version has changed|<p>Etcd version has changed. Acknowledge to close manually.</p>|`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0`|Info|**Manual close**: Yes|
+|Etcd: Server version has changed|<p>Etcd version has changed. Acknowledge to close the problem manually.</p>|`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0`|Info|**Manual close**: Yes|
+|Etcd: Cluster version has changed|<p>Etcd version has changed. Acknowledge to close the problem manually.</p>|`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0`|Info|**Manual close**: Yes|
 |Etcd: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Etcd by HTTP/etcd.uptime)<10m`|Info|**Manual close**: Yes|
 |Etcd: Current number of open files is too high|<p>Heavy usage of a file descriptor (i.e., near the limit of the process's file descriptor) indicates a potential file descriptor exhaustion issue.If the file descriptors are exhausted, `etcd` may panic because it cannot create new WAL files.</p>|`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}`|Warning||
 
@@ -128,13 +128,13 @@ Additional points to consider:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|gRPC codes discovery| |Dependent item|etcd.grpc_code.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `grpc_server_handled_total`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|gRPC codes discovery||Dependent item|etcd.grpc_code.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `grpc_server_handled_total`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for gRPC codes discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Etcd: RPCs completed with code {#GRPC.CODE}|<p>The number of RPCs completed on the server with grpc_code {#GRPC.CODE}.</p>|Dependent item|etcd.grpc.handled.rate[{#GRPC.CODE}]<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `grpc_server_handled_total{grpc_method="{#GRPC.CODE}"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Change per second</li></ul>|
+|Etcd: RPCs completed with code {#GRPC.CODE}|<p>The number of RPCs completed on the server with grpc_code {#GRPC.CODE}.</p>|Dependent item|etcd.grpc.handled.rate[{#GRPC.CODE}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `grpc_server_handled_total{grpc_method="{#GRPC.CODE}"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 
 ### Trigger prototypes for gRPC codes discovery
 
@@ -146,7 +146,7 @@ Additional points to consider:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Peers discovery| |Dependent item|etcd.peer.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `etcd_network_peer_sent_bytes_total`</li></ul>|
+|Peers discovery||Dependent item|etcd.peer.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `etcd_network_peer_sent_bytes_total`</p></li></ul>|
 
 ### Item prototypes for Peers discovery
 
@@ -159,6 +159,7 @@ Additional points to consider:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

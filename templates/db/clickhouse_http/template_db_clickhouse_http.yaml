@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:20:57Z'
+  date: '2023-04-24T08:08:20Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -727,6 +727,7 @@ zabbix_export:
               parameters:
                 - 10m
           url: '{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/ping'
+          status_codes: ''
           tags:
             -
               tag: component
@@ -1156,7 +1157,7 @@ zabbix_export:
               name: 'ClickHouse: Configuration has been changed'
               event_name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'ClickHouse configuration has been changed. Ack to close.'
+              description: 'ClickHouse configuration has been changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1223,7 +1224,7 @@ zabbix_export:
               name: 'ClickHouse: Failed to fetch info data'
               event_name: 'ClickHouse: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1282,7 +1283,7 @@ zabbix_export:
               name: 'ClickHouse: Version has changed'
               event_name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The ClickHouse version has changed. Acknowledge to close manually.'
+              description: 'The ClickHouse version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

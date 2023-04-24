@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:58:28Z'
+  date: '2023-04-18T12:56:00Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -218,7 +218,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'CPU utilization in %.'
+          description: 'The CPU utilization expressed in %.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN

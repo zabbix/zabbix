@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:56:15Z'
+  date: '2023-04-18T12:48:55Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -132,7 +132,7 @@ zabbix_export:
               name: 'Travis: Failed to fetch home page'
               event_name: 'Travis: Failed to fetch home page (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               tags:
                 -

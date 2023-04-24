@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:22:58Z'
+  date: '2023-04-24T08:10:11Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -38,7 +38,7 @@ zabbix_export:
               key: 'sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: 'MIB: CISCO-ENVMON-MIB'
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
@@ -96,7 +96,7 @@ zabbix_export:
               key: 'sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: 'MIB: CISCO-ENVMON-MIB'
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
@@ -156,7 +156,7 @@ zabbix_export:
               key: 'sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CISCO-ENVMON-MIB
                 The current state of the test point being instrumented.
@@ -483,7 +483,7 @@ zabbix_export:
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -564,7 +564,7 @@ zabbix_export:
                   event_name: '{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -651,7 +651,7 @@ zabbix_export:
               name: 'Cisco Inventory: Device has been replaced'
               event_name: 'Cisco Inventory: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -689,7 +689,7 @@ zabbix_export:
               expression: 'last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0]))>0'
               name: 'Cisco Inventory: Operating system description has changed'
               priority: INFO
-              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -742,7 +742,7 @@ zabbix_export:
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Device serial number has changed. Ack to close'
+                  description: 'Device serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -789,7 +789,7 @@ zabbix_export:
               event_name: 'Cisco OLD-CISCO-CPU-MIB: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope

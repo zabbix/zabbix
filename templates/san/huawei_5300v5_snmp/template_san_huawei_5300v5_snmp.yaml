@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:38:40Z'
+  date: '2023-04-24T08:24:29Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -110,7 +110,7 @@ zabbix_export:
               name: 'OceanStor 5300 V5: Storage version has been changed'
               event_name: 'OceanStor 5300 V5: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'OceanStor 5300 V5 version has changed. Acknowledge to close manually.'
+              description: 'OceanStor 5300 V5 version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -280,7 +280,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -353,7 +353,7 @@ zabbix_export:
               name: 'OceanStor 5300 V5: System name has changed'
               event_name: 'OceanStor 5300 V5: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -370,7 +370,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -567,7 +567,7 @@ zabbix_export:
                   event_name: 'Controller {#ID}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -640,7 +640,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.34774.4.1.23.5.2.1.6.{#SNMPINDEX}'
               key: 'huawei.5300.v5[hwInfoControllerRole, "{#ID}"]'
               history: 7d
-              description: 'Controller role..'
+              description: 'Controller role.'
               valuemap:
                 name: 'Huawei storage: Controller role'
               preprocessing:
@@ -1393,7 +1393,7 @@ zabbix_export:
                   event_name: 'Node {#NODE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -1802,7 +1802,7 @@ zabbix_export:
         -
           macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$HUAWEI.5300.DISK.TEMP.MAX.TIME}'
           value: 5m

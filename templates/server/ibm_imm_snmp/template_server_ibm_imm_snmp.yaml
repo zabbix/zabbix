@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:40:42Z'
+  date: '2023-04-24T08:26:23Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -248,7 +248,7 @@ zabbix_export:
               name: 'IBM IMM: Device has been replaced'
               event_name: 'IBM IMM: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -262,7 +262,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -335,7 +335,7 @@ zabbix_export:
               name: 'IBM IMM: System name has changed'
               event_name: 'IBM IMM: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -352,7 +352,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -396,7 +396,7 @@ zabbix_export:
           key: 'system.status[systemHealthStat.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           description: |
             MIB: IMM-MIB
             Indicates status of system health for the system in which the IMM resides. Value of 'nonRecoverable' indicates a severe error has occurred and the system may not be functioning. A value of 'critical' indicates that a error has occurred but the system is currently functioning properly. A value of 'nonCritical' indicates that a condition has occurred that may change the state of the system in the future but currently the system is working properly. A value of 'normal' indicates that the system is operating normally.

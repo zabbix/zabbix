@@ -52,53 +52,53 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GridGain kernal metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|GridGain kernal metrics||JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for GridGain kernal metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Uptime|<p>Uptime of GridGain instance.</p>|JMX agent|jmx["{#JMXOBJ}",UpTime]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Version|<p>Version of GridGain instance.</p>|JMX agent|jmx["{#JMXOBJ}",FullVersion]<p>**Preprocessing**</p><ul><li>Regular expression: `(.*)-\d+ \1`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Local node ID|<p>Unique identifier for this node within grid.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeId]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Uptime|<p>Uptime of GridGain instance.</p>|JMX agent|jmx["{#JMXOBJ}",UpTime]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Version|<p>Version of GridGain instance.</p>|JMX agent|jmx["{#JMXOBJ}",FullVersion]<p>**Preprocessing**</p><ul><li><p>Regular expression: `(.*)-\d+ \1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Local node ID|<p>Unique identifier for this node within grid.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeId]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for GridGain kernal metrics
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted|<p>Uptime is less than 10 minutes</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
 |GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes.</p>|`nodata(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1`|Warning|**Manual close**: Yes|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0`|Info|**Manual close**: Yes|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Cluster metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cluster metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Cluster metrics||JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Cluster metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Baseline|<p>Total baseline nodes that are registered in the baseline topology.</p>|JMX agent|jmx["{#JMXOBJ}",TotalBaselineNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Active baseline|<p>The number of nodes that are currently active in the baseline topology.</p>|JMX agent|jmx["{#JMXOBJ}",ActiveBaselineNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Client|<p>The number of client nodes in the cluster.</p>|JMX agent|jmx["{#JMXOBJ}",TotalClientNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, total|<p>Total number of nodes.</p>|JMX agent|jmx["{#JMXOBJ}",TotalNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Server|<p>The number of server nodes in the cluster.</p>|JMX agent|jmx["{#JMXOBJ}",TotalServerNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Baseline|<p>Total baseline nodes that are registered in the baseline topology.</p>|JMX agent|jmx["{#JMXOBJ}",TotalBaselineNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Active baseline|<p>The number of nodes that are currently active in the baseline topology.</p>|JMX agent|jmx["{#JMXOBJ}",ActiveBaselineNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Client|<p>The number of client nodes in the cluster.</p>|JMX agent|jmx["{#JMXOBJ}",TotalClientNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, total|<p>Total number of nodes.</p>|JMX agent|jmx["{#JMXOBJ}",TotalNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes, Server|<p>The number of server nodes in the cluster.</p>|JMX agent|jmx["{#JMXOBJ}",TotalServerNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Cluster metrics
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology|<p>One or more server node left the topology. Ack to close.</p>|`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0`|Warning|**Manual close**: Yes|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology|<p>One or more server node added to the topology. Ack to close.</p>|`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0`|Info|**Manual close**: Yes|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology|<p>One or more server node left the topology. Ack to close.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])`|Info|**Manual close**: Yes|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology|<p>One or more server node left the topology. Acknowledge to close the problem manually.</p>|`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0`|Warning|**Manual close**: Yes|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology|<p>One or more server node added to the topology. Acknowledge to close the problem manually.</p>|`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0`|Info|**Manual close**: Yes|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology|<p>One or more server node left the topology. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])`|Info|**Manual close**: Yes|
 
 ### LLD rule Local node metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Local node metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Local node metrics||JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Local node metrics
 
@@ -128,13 +128,13 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TCP discovery SPI| |JMX agent|jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|TCP discovery SPI||JMX agent|jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for TCP discovery SPI
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator|<p>Current coordinator UUID.</p>|JMX agent|jmx["{#JMXOBJ}",Coordinator]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator|<p>Current coordinator UUID.</p>|JMX agent|jmx["{#JMXOBJ}",Coordinator]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes left|<p>Nodes left count.</p>|JMX agent|jmx["{#JMXOBJ}",NodesLeft]|
 |GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes joined|<p>Nodes join count.</p>|JMX agent|jmx["{#JMXOBJ}",NodesJoined]|
 |GridGain [{#JMXIGNITEINSTANCENAME}]: Nodes failed|<p>Nodes failed count.</p>|JMX agent|jmx["{#JMXOBJ}",NodesFailed]|
@@ -147,13 +147,13 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0`|Warning|**Manual close**: Yes|
+|GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0`|Warning|**Manual close**: Yes|
 
 ### LLD rule TCP Communication SPI metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TCP Communication SPI metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|TCP Communication SPI metrics||JMX agent|jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for TCP Communication SPI metrics
 
@@ -168,7 +168,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Transaction metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Transaction metrics||JMX agent|jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Transaction metrics
 
@@ -184,7 +184,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cache metrics| |JMX agent|jmx.discovery[beans,"org.apache:name=\"org.apache.gridgain.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Cache metrics||JMX agent|jmx.discovery[beans,"org.apache:name=\"org.apache.gridgain.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Cache metrics
 
@@ -206,13 +206,13 @@ This template works with standalone and cluster instances. Metrics are collected
 |----|-----------|----------|--------|--------------------------------|
 |Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m||`min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0`|Average||
 |Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m||`min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m) > max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)`|Warning|**Depends on**:<br><ul><li>Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m</li></ul>|
-|Cache group [{#JMXGROUP}]: All entries are in heap|<p>All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Ack to close.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/GridGain by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])`|Info|**Manual close**: Yes|
+|Cache group [{#JMXGROUP}]: All entries are in heap|<p>All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/GridGain by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])`|Info|**Manual close**: Yes|
 
 ### LLD rule Data region metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Data region metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Data region metrics||JMX agent|jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Data region metrics
 
@@ -234,7 +234,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Data region {#JMXNAME}: Node started to evict pages|<p>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0`|Info|**Manual close**: Yes|
+|Data region {#JMXNAME}: Node started to evict pages|<p>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Acknowledge to close the problem manually.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0`|Info|**Manual close**: Yes|
 |Data region {#JMXNAME}: Data region utilization is too high|<p>Data region utilization is high. Increase data region size or delete any data.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Data region {#JMXNAME}: Data region utilization is too high</li></ul>|
 |Data region {#JMXNAME}: Data region utilization is too high|<p>Data region utilization is high. Increase data region size or delete any data.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}`|High||
 |Data region {#JMXNAME}: Pages replace rate more than 0|<p>There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",PagesReplaceRate],5m)>0`|Warning||
@@ -245,7 +245,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cache groups| |JMX agent|jmx.discovery[beans,"org.apache:group=\"Cache groups\",*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Cache groups||JMX agent|jmx.discovery[beans,"org.apache:group=\"Cache groups\",*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Cache groups
 
@@ -253,7 +253,7 @@ This template works with standalone and cluster instances. Metrics are collected
 |----|-----------|----|-----------------------|
 |Cache group [{#JMXNAME}]: Backups|<p>Count of backups configured for cache group.</p>|JMX agent|jmx["{#JMXOBJ}",Backups]|
 |Cache group [{#JMXNAME}]: Partitions|<p>Count of partitions for cache group.</p>|JMX agent|jmx["{#JMXOBJ}",Partitions]|
-|Cache group [{#JMXNAME}]: Caches|<p>List of caches.</p>|JMX agent|jmx["{#JMXOBJ}",Caches]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Cache group [{#JMXNAME}]: Caches|<p>List of caches.</p>|JMX agent|jmx["{#JMXOBJ}",Caches]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Cache group [{#JMXNAME}]: Local node partitions, moving|<p>Count of partitions with state MOVING for this cache group located on this node.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount]|
 |Cache group [{#JMXNAME}]: Local node partitions, renting|<p>Count of partitions with state RENTING for this cache group located on this node.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeRentingPartitionsCount]|
 |Cache group [{#JMXNAME}]: Local node entries, renting|<p>Count of entries remains to evict in RENTING partitions located on this node for this cache group.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeRentingEntriesCount]|
@@ -266,15 +266,15 @@ This template works with standalone and cluster instances. Metrics are collected
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Cache group [{#JMXNAME}]: One or more backups are unavailable||`min(/GridGain by JMX/jmx["{#JMXOBJ}",Backups],5m)>=max(/GridGain by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],5m)`|Warning||
-|Cache group [{#JMXNAME}]: List of caches has changed|<p>List of caches has changed. Significant changes have occurred in the cluster. Ack to close.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches]))>0`|Info|**Manual close**: Yes|
-|Cache group [{#JMXNAME}]: Rebalance in progress|<p>Ack to close.</p>|`max(/GridGain by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0`|Info|**Manual close**: Yes|
+|Cache group [{#JMXNAME}]: List of caches has changed|<p>List of caches has changed. Significant changes have occurred in the cluster. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches]))>0`|Info|**Manual close**: Yes|
+|Cache group [{#JMXNAME}]: Rebalance in progress|<p>Acknowledge to close the problem manually.</p>|`max(/GridGain by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0`|Info|**Manual close**: Yes|
 |Cache group [{#JMXNAME}]: There is no copy for partitions||`max(/GridGain by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],30m)=0`|Warning||
 
 ### LLD rule Thread pool metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Thread pool metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=\"Thread Pools\",*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Thread pool metrics||JMX agent|jmx.discovery[beans,"org.apache:group=\"Thread Pools\",*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Thread pool metrics
 
@@ -293,6 +293,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

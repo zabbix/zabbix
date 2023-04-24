@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:38:34Z'
+  date: '2023-04-24T08:24:23Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -62,7 +62,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.get.cpgs
           delay: '0'
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Common provisioning groups data.'
@@ -83,7 +83,7 @@ zabbix_export:
           name: 'HPE Primera: Get data'
           type: SCRIPT
           key: hpe.primera.get.data
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -262,7 +262,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.get.disks
           delay: '0'
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Disks data.'
@@ -325,7 +325,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.get.hosts
           delay: '0'
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Hosts data.'
@@ -347,7 +347,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.get.ports
           delay: '0'
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Ports data.'
@@ -369,7 +369,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.get.system
           delay: '0'
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'System data.'
@@ -391,7 +391,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.get.tasks
           delay: '0'
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Tasks data.'
@@ -413,7 +413,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.get.volumes
           delay: '0'
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Volumes data.'
@@ -1732,7 +1732,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.primera.cpg["{#ID}",data]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'CPG {#NAME} data'
@@ -1930,7 +1930,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",data]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Disk [{#POSITION}] data'
@@ -2539,7 +2539,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.primera.host["{#ID}",data]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Host [{#NAME}] data'
@@ -2716,7 +2716,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",data]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}] data'
@@ -3003,7 +3003,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.primera.task["{#ID}",data]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Task [{#NAME}] data'
@@ -4234,7 +4234,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.primera.volume["{#ID}",data]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Volume [{#NAME}] data'

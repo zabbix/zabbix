@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:20:31Z'
+  date: '2023-04-18T12:50:01Z'
   groups:
     -
       uuid: d37f71c7e3f7469bab645852a69a2018
@@ -100,7 +100,7 @@ zabbix_export:
               event_name: 'Hikvision camera: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -366,7 +366,7 @@ zabbix_export:
               name: 'Hikvision camera: Version has changed'
               event_name: 'Hikvision camera: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Hikvision camera version has changed. Ack to close.'
+              description: 'Hikvision camera version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -712,7 +712,7 @@ zabbix_export:
               name: 'Hikvision camera: Camera has been replaced'
               event_name: 'Hikvision camera: Camera has been replaced (new serial number received)'
               priority: INFO
-              description: 'Camera serial number has changed. Ack to close'
+              description: 'Camera serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -828,7 +828,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           units: uptime
-          description: 'System uptime in ''N days, hh:mm:ss'' format.'
+          description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
           preprocessing:
             -
               type: JSONPATH
@@ -848,7 +848,7 @@ zabbix_export:
               name: 'Hikvision camera: has been restarted'
               event_name: 'Hikvision camera: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T15:22:38Z'
+  date: '2023-04-18T12:48:50Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -178,7 +178,7 @@ zabbix_export:
                   name: '{#UNIT.NAME}: has been restarted'
                   event_name: '{#UNIT.NAME}: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -

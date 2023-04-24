@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:20:12Z'
+  date: '2023-04-24T08:06:39Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -980,7 +980,7 @@ zabbix_export:
               name: 'Remote Zabbix proxy: Version has changed'
               event_name: 'Remote Zabbix proxy: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Zabbix proxy version has changed. Acknowledge to close manually.'
+              description: 'Zabbix proxy version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1327,7 +1327,7 @@ zabbix_export:
           name: 'Remote Zabbix proxy: Zabbix stats'
           type: INTERNAL
           key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Zabbix server statistics master item.'

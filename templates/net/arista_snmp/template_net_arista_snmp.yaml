@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T16:33:58Z'
+  date: '2023-04-24T09:44:20Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -194,7 +194,7 @@ zabbix_export:
               value: system
         -
           uuid: fde390cc8671441194fb274209a8c190
-          name: 'CPU: CPU utilization'
+          name: 'Arista: CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CPU.UTIL},1.3.6.1.2.1.25.3.3.1.2]'
           key: system.cpu.util
@@ -218,11 +218,11 @@ zabbix_export:
             -
               uuid: 6737f0672c244e048509358d220874a6
               expression: 'min(/Arista by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'CPU: High CPU utilization'
-              event_name: 'CPU: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'Arista: High CPU utilization'
+              event_name: 'Arista: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -259,7 +259,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -332,7 +332,7 @@ zabbix_export:
               name: 'Arista: System name has changed'
               event_name: 'Arista: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -349,7 +349,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -484,7 +484,7 @@ zabbix_export:
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Device serial number has changed. Ack to close'
+                  description: 'Device serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -601,7 +601,7 @@ zabbix_export:
               key: 'sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: ENTITY-SENSORS-MIB
                 The operational status of the sensor {#SENSOR_INFO}
@@ -630,34 +630,19 @@ zabbix_export:
             key: sensors.get
           overrides:
             -
-              name: 'trigger THRESHOLD_HI_CRIT'
-              step: '4'
+              name: 'trigger THRESHOLD_LO_WARN'
+              step: '1'
               filter:
                 conditions:
                   -
-                    macro: '{#THRESHOLD_HI_CRIT}'
+                    macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
                     formulaid: A
               operations:
                 -
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
-                  value: 'Fan speed is above the critical threshold'
-                  discover: NO_DISCOVER
-            -
-              name: 'trigger THRESHOLD_HI_WARN'
-              step: '3'
-              filter:
-                conditions:
-                  -
-                    macro: '{#THRESHOLD_HI_WARN}'
-                    value: ^$
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: 'Fan speed is above the warning threshold'
+                  value: 'Fan speed is below the warning threshold'
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_CRIT'
@@ -675,19 +660,34 @@ zabbix_export:
                   value: 'Fan speed is below the critical threshold'
                   discover: NO_DISCOVER
             -
-              name: 'trigger THRESHOLD_LO_WARN'
-              step: '1'
+              name: 'trigger THRESHOLD_HI_WARN'
+              step: '3'
               filter:
                 conditions:
                   -
-                    macro: '{#THRESHOLD_LO_WARN}'
+                    macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
                     formulaid: A
               operations:
                 -
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
-                  value: 'Fan speed is below the warning threshold'
+                  value: 'Fan speed is above the warning threshold'
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_HI_CRIT'
+              step: '4'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Fan speed is above the critical threshold'
                   discover: NO_DISCOVER
         -
           uuid: 9b75135925654cedbd5a270b67e68d51
@@ -937,7 +937,7 @@ zabbix_export:
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
               delay: 5m
               history: 7d
-              trends: 0d
+              trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -1001,11 +1001,11 @@ zabbix_export:
                   priority: AVERAGE
                   description: |
                     This trigger expression works as follows:
-                    1. Can be triggered if operations status is down.
-                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    1. It can be triggered if the operations status is down.
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
                     
-                    WARNING: if closed manually - won't fire again on next poll, because of .diff.
+                    WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
                   tags:
                     -
@@ -1019,7 +1019,7 @@ zabbix_export:
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
               delay: 1h
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IF-MIB
                 The type of interface.
@@ -1064,7 +1064,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1089,7 +1089,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1113,7 +1113,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+              description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1290,7 +1290,7 @@ zabbix_export:
               key: 'sensor.psu.status[entStateOper.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: 'MIB: ENTITY-STATE-MIB'
               valuemap:
                 name: 'ENTITY-STATE-MIB::EntityOperState'
@@ -1340,7 +1340,7 @@ zabbix_export:
               key: 'sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: ENTITY-SENSORS-MIB
                 The operational status of the sensor {#SENSOR_INFO}
@@ -1435,34 +1435,19 @@ zabbix_export:
             key: sensors.get
           overrides:
             -
-              name: 'trigger THRESHOLD_HI_CRIT'
-              step: '4'
+              name: 'trigger THRESHOLD_LO_WARN'
+              step: '1'
               filter:
                 conditions:
                   -
-                    macro: '{#THRESHOLD_HI_CRIT}'
+                    macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
                     formulaid: A
               operations:
                 -
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
-                  value: 'Temperature is above the critical threshold'
-                  discover: NO_DISCOVER
-            -
-              name: 'trigger THRESHOLD_HI_WARN'
-              step: '3'
-              filter:
-                conditions:
-                  -
-                    macro: '{#THRESHOLD_HI_WARN}'
-                    value: ^$
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: 'Temperature is above the warning threshold'
+                  value: 'Temperature is below the warning threshold'
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_CRIT'
@@ -1480,19 +1465,34 @@ zabbix_export:
                   value: 'Temperature is below the critical threshold'
                   discover: NO_DISCOVER
             -
-              name: 'trigger THRESHOLD_LO_WARN'
-              step: '1'
+              name: 'trigger THRESHOLD_HI_WARN'
+              step: '3'
               filter:
                 conditions:
                   -
-                    macro: '{#THRESHOLD_LO_WARN}'
+                    macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
                     formulaid: A
               operations:
                 -
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
-                  value: 'Temperature is below the warning threshold'
+                  value: 'Temperature is above the warning threshold'
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_HI_CRIT'
+              step: '4'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Temperature is above the critical threshold'
                   discover: NO_DISCOVER
         -
           uuid: 77e7bb250b714e8ea3fff7ec1f3ac2c3
@@ -1533,7 +1533,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: '(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
-              description: 'Space utilization in % for {#FSNAME}'
+              description: 'The space utilization expressed in % for {#FSNAME}.'
               tags:
                 -
                   tag: component
@@ -1600,10 +1600,11 @@ zabbix_export:
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
-                 - The disk will be full in less than 24 hours.
+                Two conditions should match:
+                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.
+                2. The second condition should be one of the following:
+                - the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;
+                - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
                 -
@@ -1622,10 +1623,11 @@ zabbix_export:
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
-                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
-                 Second condition should be one of the following:
-                 - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
-                 - The disk will be full in less than 24 hours.
+                Two conditions should match:
+                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.
+                2. The second condition should be one of the following:
+                - the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;
+                - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 -
@@ -1871,34 +1873,19 @@ zabbix_export:
             key: sensors.get
           overrides:
             -
-              name: 'trigger THRESHOLD_HI_CRIT'
-              step: '4'
+              name: 'trigger THRESHOLD_LO_WARN'
+              step: '1'
               filter:
                 conditions:
                   -
-                    macro: '{#THRESHOLD_HI_CRIT}'
+                    macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
                     formulaid: A
               operations:
                 -
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
-                  value: 'Voltage is above the critical threshold'
-                  discover: NO_DISCOVER
-            -
-              name: 'trigger THRESHOLD_HI_WARN'
-              step: '3'
-              filter:
-                conditions:
-                  -
-                    macro: '{#THRESHOLD_HI_WARN}'
-                    value: ^$
-                    formulaid: A
-              operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
-                  operator: REGEXP
-                  value: 'Voltage is above the warning threshold'
+                  value: 'Voltage is below the warning threshold'
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_CRIT'
@@ -1916,19 +1903,34 @@ zabbix_export:
                   value: 'Voltage is below the critical threshold'
                   discover: NO_DISCOVER
             -
-              name: 'trigger THRESHOLD_LO_WARN'
-              step: '1'
+              name: 'trigger THRESHOLD_HI_WARN'
+              step: '3'
               filter:
                 conditions:
                   -
-                    macro: '{#THRESHOLD_LO_WARN}'
+                    macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
                     formulaid: A
               operations:
                 -
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
-                  value: 'Voltage is below the warning threshold'
+                  value: 'Voltage is above the warning threshold'
+                  discover: NO_DISCOVER
+            -
+              name: 'trigger THRESHOLD_HI_CRIT'
+              step: '4'
+              filter:
+                conditions:
+                  -
+                    macro: '{#THRESHOLD_HI_CRIT}'
+                    value: ^$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: 'Voltage is above the critical threshold'
                   discover: NO_DISCOVER
       tags:
         -
@@ -2074,7 +2076,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Arista by SNMP'
-                        name: 'CPU: CPU utilization'
+                        name: 'Arista: CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   name: 'disk space usage'
@@ -3109,7 +3111,7 @@ zabbix_export:
   graphs:
     -
       uuid: 9d75893b596e448e9fe0fb3a851b0ab2
-      name: 'CPU: CPU utilization'
+      name: 'Arista: CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:

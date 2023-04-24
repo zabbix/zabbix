@@ -41,15 +41,15 @@ Install Zabbix agent on the HP-UX OS according to Zabbix documentation.
 |HP-UX: CPU nice time|<p>The time the CPU has spent running users' processes that have been niced.</p>|Zabbix agent|system.cpu.util[,nice]|
 |HP-UX: CPU system time|<p>The time the CPU has spent running the kernel and its processes.</p>|Zabbix agent|system.cpu.util[,system]|
 |HP-UX: CPU user time|<p>The time the CPU has spent running users' processes that are not niced.</p>|Zabbix agent|system.cpu.util[,user]|
-|HP-UX: Host name|<p>A host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|HP-UX: Host local time| |Zabbix agent|system.localtime|
-|HP-UX: System information|<p>The information as normally returned by the 'uname -a'.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|HP-UX: Host name|<p>A host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|HP-UX: Host local time||Zabbix agent|system.localtime|
+|HP-UX: System information|<p>The information as normally returned by the 'uname -a'.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |HP-UX: Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
-|HP-UX: Checksum of /etc/passwd| |Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|HP-UX: Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |HP-UX: Available memory|<p>The available memory is defined as free+cached+buffers memory.</p>|Zabbix agent|vm.memory.size[available]|
-|HP-UX: Total memory| |Zabbix agent|vm.memory.size[total]|
-|HP-UX: Version of Zabbix agent running| |Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|HP-UX: Host name of Zabbix agent running| |Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|HP-UX: Total memory||Zabbix agent|vm.memory.size[total]|
+|HP-UX: Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|HP-UX: Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |HP-UX: Zabbix agent ping|<p>The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.</p>|Zabbix agent|agent.ping|
 |HP-UX: Zabbix agent availability|<p>Monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
 
@@ -74,8 +74,8 @@ Install Zabbix agent on the HP-UX OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface {#IFNAME}: Incoming network traffic| |Zabbix agent|net.if.in[{#IFNAME}]<p>**Preprocessing**</p><ul><li>Change per second: ``</li><li>Custom multiplier: `8`</li></ul>|
-|Interface {#IFNAME}: Outgoing network traffic| |Zabbix agent|net.if.out[{#IFNAME}]<p>**Preprocessing**</p><ul><li>Change per second: ``</li><li>Custom multiplier: `8`</li></ul>|
+|Interface {#IFNAME}: Incoming network traffic||Zabbix agent|net.if.in[{#IFNAME}]<p>**Preprocessing**</p><ul><li>Change per second: </li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface {#IFNAME}: Outgoing network traffic||Zabbix agent|net.if.out[{#IFNAME}]<p>**Preprocessing**</p><ul><li>Change per second: </li><li><p>Custom multiplier: `8`</p></li></ul>|
 
 ### LLD rule Mounted filesystem discovery
 
@@ -87,11 +87,11 @@ Install Zabbix agent on the HP-UX OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#FSNAME}: Free inodes, %| |Zabbix agent|vfs.fs.inode[{#FSNAME},pfree]|
-|{#FSNAME}: Free disk space| |Zabbix agent|vfs.fs.size[{#FSNAME},free]|
-|{#FSNAME}: Free disk space, %| |Zabbix agent|vfs.fs.size[{#FSNAME},pfree]|
-|{#FSNAME}: Total disk space| |Zabbix agent|vfs.fs.size[{#FSNAME},total]|
-|{#FSNAME}: Used disk space| |Zabbix agent|vfs.fs.size[{#FSNAME},used]|
+|{#FSNAME}: Free inodes, %||Zabbix agent|vfs.fs.inode[{#FSNAME},pfree]|
+|{#FSNAME}: Free disk space||Zabbix agent|vfs.fs.size[{#FSNAME},free]|
+|{#FSNAME}: Free disk space, %||Zabbix agent|vfs.fs.size[{#FSNAME},pfree]|
+|{#FSNAME}: Total disk space||Zabbix agent|vfs.fs.size[{#FSNAME},total]|
+|{#FSNAME}: Used disk space||Zabbix agent|vfs.fs.size[{#FSNAME},used]|
 
 ### Trigger prototypes for Mounted filesystem discovery
 
@@ -102,6 +102,7 @@ Install Zabbix agent on the HP-UX OS according to Zabbix documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

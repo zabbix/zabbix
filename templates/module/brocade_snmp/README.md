@@ -19,11 +19,12 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Brocade Foundry Performance: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Brocade_Foundry Performance by SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Brocade Foundry Performance: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Brocade_Foundry Performance by SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}`|Warning||
 |Brocade Foundry Performance: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Brocade_Foundry Performance by SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

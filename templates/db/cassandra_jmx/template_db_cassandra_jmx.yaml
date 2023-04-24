@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T15:22:44Z'
+  date: '2023-04-18T12:55:47Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -70,7 +70,7 @@ zabbix_export:
               name: 'Apache Cassandra: Version has changed'
               event_name: 'Apache Cassandra: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Cassandra version has changed. Ack to close.'
+              description: 'Cassandra version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

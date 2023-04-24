@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:59:45Z'
+  date: '2023-04-18T12:56:50Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1240,7 +1240,7 @@ zabbix_export:
               name: 'MySQL: Failed to fetch info data'
               event_name: 'MySQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
                 -
                   name: 'MySQL: Service is down'
@@ -1289,7 +1289,7 @@ zabbix_export:
               name: 'MySQL: Version has changed'
               event_name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'MySQL version has changed. Ack to close.'
+              description: 'MySQL version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

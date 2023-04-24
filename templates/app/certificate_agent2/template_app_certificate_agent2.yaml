@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:53:28Z'
+  date: '2023-04-24T08:02:41Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,8 +13,7 @@ zabbix_export:
       description: |
         The template to monitor TLS/SSL certificate on the website by Zabbix agent 2 that works without any external scripts.
         
-        Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns
-        JSON with certificate attributes.
+        Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns JSON with certificate attributes.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring
         
@@ -213,7 +212,7 @@ zabbix_export:
               event_name: 'Cert: Fingerprint has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: |
-                The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.
+                The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Acknowledge to close the problem manually.
                 There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.
               manual_close: 'YES'
               tags:
@@ -320,7 +319,7 @@ zabbix_export:
           name: 'Cert: Get'
           key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           delay: 15m
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Returns the JSON with attributes of a certificate of the requested site.'

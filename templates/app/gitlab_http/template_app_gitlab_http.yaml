@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:54:11Z'
+  date: '2023-04-24T08:03:25Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -219,7 +219,7 @@ zabbix_export:
               name: 'GitLab: Version has changed'
               event_name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The GitLab version has changed. Acknowledge to close manually.'
+              description: 'The GitLab version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1115,7 +1115,7 @@ zabbix_export:
           type: HTTP_AGENT
           key: gitlab.puma.discovery
           delay: 3h
-          description: 'Discovery Puma specific metrics, when Puma is used.'
+          description: 'Discovery of Puma specific metrics when Puma is used.'
           item_prototypes:
             -
               uuid: 6b6ebfe9326247c8a57fb8c96125bcee

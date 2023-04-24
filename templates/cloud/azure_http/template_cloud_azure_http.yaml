@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:57:54Z'
+  date: '2023-04-24T08:07:50Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -78,7 +78,7 @@ zabbix_export:
           type: SCRIPT
           key: azure.get.resources
           delay: 10m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -261,7 +261,7 @@ zabbix_export:
           type: SCRIPT
           key: azure.get.storage.acc
           delay: 10m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -513,26 +513,26 @@ zabbix_export:
             key: azure.get.resources
           lld_macro_paths:
             -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
-            -
               lld_macro: '{#ID}'
               path: $.id
-            -
-              lld_macro: '{#LOCATION}'
-              path: $.location
             -
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#SIZE}'
-              path: $.sku.name
+              lld_macro: '{#LOCATION}'
+              path: $.location
             -
               lld_macro: '{#TYPE}'
               path: $.type
             -
+              lld_macro: '{#SIZE}'
+              path: $.sku.name
+            -
               lld_macro: '{#VERSION}'
               path: $.kind
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             -
               type: JSONPATH
@@ -543,22 +543,6 @@ zabbix_export:
               parameters:
                 - 6h
           overrides:
-            -
-              name: Server
-              step: '2'
-              filter:
-                conditions:
-                  -
-                    macro: '{#VERSION}'
-                    value: '^((?!serverless).)*$'
-                    formulaid: A
-              operations:
-                -
-                  operationobject: HOST_PROTOTYPE
-                  operator: REGEXP
-                  templates:
-                    -
-                      name: 'Azure Microsoft SQL database by HTTP'
             -
               name: Serverless
               step: '1'
@@ -575,6 +559,22 @@ zabbix_export:
                   templates:
                     -
                       name: 'Azure Microsoft SQL serverless database by HTTP'
+            -
+              name: Server
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#VERSION}'
+                    value: '^((?!serverless).)*$'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure Microsoft SQL database by HTTP'
         -
           uuid: 7fafbef68f8b46d083eb43da7cd1e2cc
           name: 'MySQL servers discovery'
@@ -646,26 +646,26 @@ zabbix_export:
             key: azure.get.resources
           lld_macro_paths:
             -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
-            -
               lld_macro: '{#ID}'
               path: $.id
-            -
-              lld_macro: '{#LOCATION}'
-              path: $.location
             -
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#SIZE}'
-              path: $.sku.name
+              lld_macro: '{#LOCATION}'
+              path: $.location
             -
               lld_macro: '{#TYPE}'
               path: $.type
             -
+              lld_macro: '{#SIZE}'
+              path: $.sku.name
+            -
               lld_macro: '{#VERSION}'
               path: $.properties.version
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             -
               type: JSONPATH
@@ -779,26 +779,26 @@ zabbix_export:
             key: azure.get.resources
           lld_macro_paths:
             -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
-            -
               lld_macro: '{#ID}'
               path: $.id
-            -
-              lld_macro: '{#LOCATION}'
-              path: $.location
             -
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#SIZE}'
-              path: $.sku.name
+              lld_macro: '{#LOCATION}'
+              path: $.location
             -
               lld_macro: '{#TYPE}'
               path: $.type
             -
+              lld_macro: '{#SIZE}'
+              path: $.sku.name
+            -
               lld_macro: '{#VERSION}'
               path: $.properties.version
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             -
               type: JSONPATH
@@ -884,7 +884,7 @@ zabbix_export:
               name: 'Azure: Storage account [{#NAME}]: Get data'
               type: SCRIPT
               key: 'azure.get.storage.acc[{#NAME}]'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               params: |
@@ -2607,17 +2607,17 @@ zabbix_export:
             key: azure.get.storage.acc
           lld_macro_paths:
             -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
-            -
               lld_macro: '{#ID}'
               path: $.id
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
             -
               lld_macro: '{#LOCATION}'
               path: $.location
             -
-              lld_macro: '{#NAME}'
-              path: $.name
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
             -
               lld_macro: '{#TOKEN}'
               path: $.token
@@ -2700,26 +2700,26 @@ zabbix_export:
             key: azure.get.resources
           lld_macro_paths:
             -
-              lld_macro: '{#GROUP}'
-              path: $.resourceGroup
-            -
               lld_macro: '{#ID}'
               path: $.id
-            -
-              lld_macro: '{#LOCATION}'
-              path: $.location
             -
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#OS}'
-              path: $.properties.storageProfile.osDisk.osType
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
             -
               lld_macro: '{#SIZE}'
               path: $.properties.hardwareProfile.vmSize
             -
-              lld_macro: '{#TYPE}'
-              path: $.type
+              lld_macro: '{#OS}'
+              path: $.properties.storageProfile.osDisk.osType
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             -
               type: JSONPATH
@@ -3150,7 +3150,7 @@ zabbix_export:
           name: 'Azure Microsoft SQL: Get data'
           type: SCRIPT
           key: azure.db.mssql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -4222,7 +4222,7 @@ zabbix_export:
           name: 'Azure Microsoft SQL: Get data'
           type: SCRIPT
           key: azure.db.mssql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -5152,7 +5152,7 @@ zabbix_export:
           name: 'Azure MySQL: Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -5897,7 +5897,7 @@ zabbix_export:
           name: 'Azure MySQL: Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -6752,7 +6752,7 @@ zabbix_export:
           name: 'Azure PostgreSQL: Get data'
           type: SCRIPT
           key: azure.db.pgsql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -7619,7 +7619,7 @@ zabbix_export:
           name: 'Azure PostgreSQL: Get data'
           type: SCRIPT
           key: azure.db.pgsql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -8757,7 +8757,7 @@ zabbix_export:
           name: 'Azure: Get data'
           type: SCRIPT
           key: azure.vm.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -9880,21 +9880,6 @@ zabbix_export:
             host: 'Azure Microsoft SQL serverless database by HTTP'
             key: azure.db.mssql.firewall.blocked
     -
-      uuid: fe250a5f509d45babea9fcd12accbcac
-      name: 'Azure Microsoft SQL: CPU usage'
-      graph_items:
-        -
-          color: 199C0D
-          item:
-            host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.cpu.limit
-        -
-          sortorder: '1'
-          color: F63100
-          item:
-            host: 'Azure Microsoft SQL database by HTTP'
-            key: azure.db.mssql.cpu.used
-    -
       uuid: 083d307db8954fc59e8e5cfccefc16c1
       name: 'Azure Microsoft SQL: CPU usage'
       graph_items:
@@ -9908,6 +9893,21 @@ zabbix_export:
           color: F63100
           item:
             host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.cpu.used
+    -
+      uuid: fe250a5f509d45babea9fcd12accbcac
+      name: 'Azure Microsoft SQL: CPU usage'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.cpu.limit
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
             key: azure.db.mssql.cpu.used
     -
       uuid: f541b6591683433aba4b3e58a8ad1e5c
@@ -9940,6 +9940,21 @@ zabbix_export:
             host: 'Azure Microsoft SQL database by HTTP'
             key: azure.db.mssql.storage.allocated
     -
+      uuid: 360a24b56be74cf48df3135008437824
+      name: 'Azure MySQL: Connections'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.connections.active
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.connections.failed
+    -
       uuid: 750ae48e6ef749c19a06f4bbe716f92f
       name: 'Azure MySQL: Connections'
       graph_items:
@@ -9960,21 +9975,6 @@ zabbix_export:
           item:
             host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.connections.aborted
-    -
-      uuid: 360a24b56be74cf48df3135008437824
-      name: 'Azure MySQL: Connections'
-      graph_items:
-        -
-          color: 199C0D
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.connections.active
-        -
-          sortorder: '1'
-          color: F63100
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.connections.failed
     -
       uuid: dc6840162405481ebc1c3c98fdfcaef1
       name: 'Azure MySQL: Network traffic'
@@ -10021,21 +10021,6 @@ zabbix_export:
             host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.server.log.limit
     -
-      uuid: bdc178e6faaa4850badc0c60c7c80d40
-      name: 'Azure MySQL: Storage utilization'
-      graph_items:
-        -
-          color: 199C0D
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.storage.used
-        -
-          sortorder: '1'
-          color: F63100
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.storage.limit
-    -
       uuid: 4210e6b4ed8744589dce88217e961a56
       name: 'Azure MySQL: Storage utilization'
       graph_items:
@@ -10049,6 +10034,21 @@ zabbix_export:
           color: F63100
           item:
             host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.storage.limit
+    -
+      uuid: bdc178e6faaa4850badc0c60c7c80d40
+      name: 'Azure MySQL: Storage utilization'
+      graph_items:
+        -
+          color: 199C0D
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.used
+        -
+          sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.limit
     -
       uuid: 2b60e8b1fd7c43f4ac61812e43c0e1ca

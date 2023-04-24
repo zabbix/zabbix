@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:55:24Z'
+  date: '2023-04-24T08:04:45Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -47,7 +47,7 @@ zabbix_export:
           type: SCRIPT
           key: openweathermap.get.data
           delay: 10m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -333,7 +333,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'openweathermap.location.data[{#ID}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'JSON with result of OpenWeatherMap API request by location.'
@@ -658,11 +658,11 @@ zabbix_export:
               lld_macro: '{#COUNTRY}'
               path: $.sys.country
             -
-              lld_macro: '{#ID}'
-              path: $.id
-            -
               lld_macro: '{#LOCATION}'
               path: $.name
+            -
+              lld_macro: '{#ID}'
+              path: $.id
             -
               lld_macro: '{#TEMP.UNIT}'
               path: $.temp_unit

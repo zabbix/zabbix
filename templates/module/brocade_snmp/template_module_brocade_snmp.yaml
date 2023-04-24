@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:22:53Z'
+  date: '2023-04-18T12:57:44Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -45,7 +45,7 @@ zabbix_export:
               event_name: 'Brocade Foundry Performance: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope

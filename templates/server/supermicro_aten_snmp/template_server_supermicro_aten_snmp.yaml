@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:40:48Z'
+  date: '2023-04-24T08:26:29Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -187,7 +187,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -260,7 +260,7 @@ zabbix_export:
               name: 'Supermicro Aten: System name has changed'
               event_name: 'Supermicro Aten: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -277,7 +277,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -510,34 +510,6 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '50'
-      dashboards:
-        -
-          uuid: 5a0f824a61fe481bb8d86d274ecb3340
-          name: 'Supermicro Aten: Generic'
-          pages:
-            -
-              name: '{{RESOURCE}}: Generic'
-              widgets:
-                -
-                  type: ITEM
-                  name: 'Uptime (hardware)'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: show
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Supermicro Aten by SNMP'
-                        key: 'system.hw.uptime[hrSystemUptime.0]'
       valuemaps:
         -
           uuid: e6794dc7602149a3b4fdbfeef45f6e8e

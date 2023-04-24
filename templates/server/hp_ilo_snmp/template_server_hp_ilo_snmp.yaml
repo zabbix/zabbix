@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:40:23Z'
+  date: '2023-04-24T08:26:04Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -126,7 +126,7 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
           key: 'sensor.temp.status[cpqHeThermalCondition.0]'
           history: 7d
-          trends: 0d
+          trends: '0'
           description: |
             MIB: CPQHLTH-MIB
             This value specifies the overall condition of the system's thermal environment.
@@ -258,7 +258,7 @@ zabbix_export:
               name: 'HP iLO: Device has been replaced'
               event_name: 'HP iLO: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Ack to close'
+              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -272,7 +272,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -345,7 +345,7 @@ zabbix_export:
               name: 'HP iLO: System name has changed'
               event_name: 'HP iLO: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -362,7 +362,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -405,7 +405,7 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
           key: 'system.status[cpqHeMibCondition.0]'
           history: 7d
-          trends: 0d
+          trends: '0'
           description: |
             MIB: CPQHLTH-MIB
             The overall condition. This object represents the overall status of the server information represented by this MIB.
@@ -507,7 +507,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.6.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 Cache Module Board Backup Power Status. This monitors the status of each backup power source on the board.
@@ -587,7 +587,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.2.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 Cache Module/Operations Status. This describes the status of the cache module and/or cache operations.
@@ -715,7 +715,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.2.{#SNMPINDEX}'
               key: 'system.hw.diskarray.model[cpqDaCntlrModel.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 Array Controller Model. The type of controller card.
@@ -743,7 +743,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.6.{#SNMPINDEX}'
               key: 'system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 This value represents the overall condition of this controller,
@@ -819,7 +819,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.7.1.9.{#SNMPINDEX}'
               key: 'sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQHLTH-MIB
                 The condition of the fan.
@@ -893,7 +893,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.69.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.media_type[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 Drive Array Physical Drive Media Type.The following values are defined:
@@ -975,7 +975,7 @@ zabbix_export:
                   name: '{#DISK_LOCATION}: Disk has been replaced'
                   event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Disk serial number has changed. Ack to close'
+                  description: 'Disk serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -988,7 +988,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.45.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.size[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: CPQIDA-MIB
@@ -1022,7 +1022,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.57.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 Physical Drive S.M.A.R.T Status.The following values are defined:
@@ -1069,7 +1069,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.6.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 Physical Drive Status. This shows the status of the physical drive. The following values are valid for the physical drive status:
@@ -1146,7 +1146,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.6.2.9.3.1.4.{#SNMPINDEX}'
               key: 'sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQHLTH-MIB
                 The condition of the power supply. This value will be one of the following:
@@ -1289,7 +1289,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}'
               key: 'sensor.temp.locale[cpqHeTemperatureLocale.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CPQHLTH-MIB
                 This specifies the location of the temperature sensor present in the system.
@@ -2002,7 +2002,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.9.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.size[cpqDaLogDrvSize.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 Logical Drive Size.

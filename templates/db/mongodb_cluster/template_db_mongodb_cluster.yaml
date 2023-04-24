@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:21:34Z'
+  date: '2023-04-18T12:56:28Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -833,7 +833,7 @@ zabbix_export:
               name: 'MongoDB cluster: Version has changed'
               event_name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'MongoDB cluster version has changed. Acknowledge to close manually.'
+              description: 'MongoDB cluster version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

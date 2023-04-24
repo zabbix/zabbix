@@ -46,28 +46,28 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Status: Uptime (network)|<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|status.net.uptime<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.01`</li></ul>|
-|Status: Uptime (hardware)|<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|status.hw.uptime<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.01`</li></ul>|
+|Status: Uptime (network)|<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|status.net.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Status: Uptime (hardware)|<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|status.hw.uptime<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Array: Voltage|<p>MIB: PROSTAR-MPPT</p><p>Array Voltage</p><p>  Description:Array Voltage</p><p>  Scaling Factor:1.0</p><p>  Units:V</p><p>  Range:[0, 80]</p><p>  Modbus address:0x0013</p>|SNMP agent|array.voltage[arrayVoltage.0]|
 |Array: Sweep Vmp|<p>MIB: PROSTAR-MPPT</p><p>Array Vmp</p><p>  Description:Array Max. Power Point Voltage</p><p>  Scaling Factor:1.0</p><p>  Units:V</p><p>  Range:[0.0, 5000.0]</p><p>  Modbus address:0x003D</p>|SNMP agent|array.sweep_vmp[arrayVmp.0]|
 |Array: Sweep Voc|<p>MIB: PROSTAR-MPPT</p><p>Array Voc</p><p> Description:Array Open Circuit Voltage</p><p> Scaling Factor:1.0</p><p> Units:V</p><p> Range:[0.0, 80.0]</p><p> Modbus address:0x003F</p>|SNMP agent|array.sweep_voc[arrayVoc.0]|
 |Array: Sweep Pmax|<p>MIB: PROSTAR-MPPT</p><p>Array Max. Power (sweep)</p><p> Description:Array Max. Power (last sweep)</p><p> Scaling Factor:1.0</p><p> Units:W</p><p> Range:[0.0, 500]</p><p> Modbus address:0x003E</p>|SNMP agent|array.sweep_pmax[arrayMaxPowerSweep.0]|
-|Battery: Charge State|<p>MIB: PROSTAR-MPPT</p><p>Charge State</p><p>  Description:Control State</p><p>  Modbus address:0x0021</p><p></p><p>  0: Start</p><p>  1: NightCheck</p><p>  2: Disconnect</p><p>  3: Night</p><p>  4: Fault</p><p>  5: BulkMppt</p><p>  6: Absorption</p><p>  7: Float</p><p>  8: Equalize</p><p>  9: Slave</p><p>  10: Fixed</p>|SNMP agent|charge.state[chargeState.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Battery: Charge State|<p>MIB: PROSTAR-MPPT</p><p>Charge State</p><p>  Description:Control State</p><p>  Modbus address:0x0021</p><p></p><p>  0: Start</p><p>  1: NightCheck</p><p>  2: Disconnect</p><p>  3: Night</p><p>  4: Fault</p><p>  5: BulkMppt</p><p>  6: Absorption</p><p>  7: Float</p><p>  8: Equalize</p><p>  9: Slave</p><p>  10: Fixed</p>|SNMP agent|charge.state[chargeState.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Battery: Battery Voltage discovery|<p>MIB: PROSTAR-MPPT</p>|SNMP agent|battery.voltage.discovery[batteryTerminalVoltage.0]|
-|Battery: Target Voltage|<p>MIB: PROSTAR-MPPT</p><p>Target Voltage</p><p> Description:Target Regulation Voltage</p><p> Scaling Factor:1.0</p><p> Units:V</p><p> Range:[0.0, 80.0]</p><p> Modbus address:0x0024</p>|SNMP agent|target.voltage[targetVoltage.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Battery: Target Voltage|<p>MIB: PROSTAR-MPPT</p><p>Target Voltage</p><p> Description:Target Regulation Voltage</p><p> Scaling Factor:1.0</p><p> Units:V</p><p> Range:[0.0, 80.0]</p><p> Modbus address:0x0024</p>|SNMP agent|target.voltage[targetVoltage.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Battery: Charge Current|<p>MIB: PROSTAR-MPPT</p><p>Charge Current</p><p>  Description:Charge Current</p><p>  Scaling Factor:1.0</p><p>  Units:A</p><p>  Range:[0, 40]</p><p>  Modbus address:0x0010</p>|SNMP agent|charge.current[chargeCurrent.0]|
-|Load: State|<p>MIB: PROSTAR-MPPT</p><p>Load State</p><p> Description:Load State</p><p> Modbus address:0x002E</p><p></p><p> 0: Start</p><p>1: Normal</p><p>2: LvdWarning</p><p>3: Lvd</p><p>4: Fault</p><p>5: Disconnect</p><p>6: NormalOff</p><p>7: Override</p><p>8: NotUsed</p>|SNMP agent|load.state[loadState.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Load: State|<p>MIB: PROSTAR-MPPT</p><p>Load State</p><p> Description:Load State</p><p> Modbus address:0x002E</p><p></p><p> 0: Start</p><p>1: Normal</p><p>2: LvdWarning</p><p>3: Lvd</p><p>4: Fault</p><p>5: Disconnect</p><p>6: NormalOff</p><p>7: Override</p><p>8: NotUsed</p>|SNMP agent|load.state[loadState.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Load: Voltage|<p>MIB: PROSTAR-MPPT</p><p>Load Voltage</p><p> Description:Load Voltage</p><p> Scaling Factor:1.0</p><p> Units:V</p><p> Range:[0, 80]</p><p> Modbus address:0x0014</p>|SNMP agent|load.voltage[loadVoltage.0]|
 |Load: Current|<p>MIB: PROSTAR-MPPT</p><p>Load Current</p><p> Description:Load Current</p><p> Scaling Factor:1.0</p><p> Units:A</p><p> Range:[0, 60]</p><p> Modbus address:0x0016</p>|SNMP agent|load.current[loadCurrent.0]|
 |Temperature: Ambient|<p>MIB: PROSTAR-MPPT</p><p>Ambient Temperature</p><p> Description:Ambient Temperature</p><p> Scaling Factor:1.0</p><p> Units:deg C</p><p> Range:[-128, 127]</p><p> Modbus address:0x001C</p>|SNMP agent|temp.ambient[ambientTemperature.0]|
 |Temperature: Battery|<p>MIB: PROSTAR-MPPT</p><p>Battery Temperature</p><p>  Description:Battery Temperature</p><p>  Scaling Factor:1.0</p><p>  Units:deg C</p><p>  Range:[-128, 127]</p><p>  Modbus address:0x001B</p>|SNMP agent|temp.battery[batteryTemperature.0]|
 |Temperature: Heatsink|<p>MIB: PROSTAR-MPPT</p><p>Heatsink Temperature</p><p> Description:Heatsink Temperature</p><p> Scaling Factor:1.0</p><p> Units:deg C</p><p> Range:[-128, 127]</p><p> Modbus address:0x001A</p>|SNMP agent|temp.heatsink[heatsinkTemperature.0]|
-|Counter: Charge Amp-hours|<p>MIB: PROSTAR-MPPT</p><p>Ah Charge (Resettable)</p><p> Description:Ah Charge (Resettable)</p><p> Scaling Factor:0.1</p><p> Units:Ah</p><p> Range:[0.0, 4294967294]</p><p> Modbus addresses:H=0x0026 L=0x0027</p>|SNMP agent|counter.charge_amp_hours[ahChargeResettable.0]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.1`</li></ul>|
+|Counter: Charge Amp-hours|<p>MIB: PROSTAR-MPPT</p><p>Ah Charge (Resettable)</p><p> Description:Ah Charge (Resettable)</p><p> Scaling Factor:0.1</p><p> Units:Ah</p><p> Range:[0.0, 4294967294]</p><p> Modbus addresses:H=0x0026 L=0x0027</p>|SNMP agent|counter.charge_amp_hours[ahChargeResettable.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li></ul>|
 |Counter: Charge KW-hours|<p>MIB: PROSTAR-MPPT</p><p>kWh Charge (Resettable)</p><p>Description:Kilowatt Hours Charge (Resettable)</p><p>Scaling Factor:1.0</p><p>Units:kWh</p><p>Range:[0.0, 65535]</p><p>Modbus address:0x002A</p>|SNMP agent|counter.charge_kw_hours[kwhChargeResettable.0]|
-|Counter: Load Amp-hours|<p>MIB: PROSTAR-MPPT</p><p>Description:Ah Load (Resettable)</p><p>Scaling Factor:0.1</p><p>Units:Ah</p><p>Range:[0.0, 4294967294]</p><p>Modbus addresses:H=0x0032 L=0x0033</p>|SNMP agent|counter.load_amp_hours[ahLoadResettable.0]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.1`</li></ul>|
-|Status: Array Faults|<p>MIB: PROSTAR-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p>|SNMP agent|status.array_faults[arrayFaults.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|Status: Load Faults|<p>MIB: PROSTAR-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p>|SNMP agent|status.load_faults[loadFaults.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|Status: Alarms|<p>MIB: PROSTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x0038 L=0x0039</p>|SNMP agent|status.alarms[alarms.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Counter: Load Amp-hours|<p>MIB: PROSTAR-MPPT</p><p>Description:Ah Load (Resettable)</p><p>Scaling Factor:0.1</p><p>Units:Ah</p><p>Range:[0.0, 4294967294]</p><p>Modbus addresses:H=0x0032 L=0x0033</p>|SNMP agent|counter.load_amp_hours[ahLoadResettable.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li></ul>|
+|Status: Array Faults|<p>MIB: PROSTAR-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p>|SNMP agent|status.array_faults[arrayFaults.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Status: Load Faults|<p>MIB: PROSTAR-MPPT</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p>|SNMP agent|status.load_faults[loadFaults.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Status: Alarms|<p>MIB: PROSTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x0038 L=0x0039</p>|SNMP agent|status.alarms[alarms.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
@@ -133,7 +133,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Battery voltage discovery|<p>Discovery for battery voltage triggers</p>|Dependent item|battery.voltage.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Battery voltage discovery|<p>Discovery for battery voltage triggers</p>|Dependent item|battery.voltage.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Battery voltage discovery
 
@@ -152,6 +152,7 @@ Refer to the vendor documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

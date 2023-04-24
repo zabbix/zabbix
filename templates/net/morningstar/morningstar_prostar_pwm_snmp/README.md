@@ -46,25 +46,25 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Status: Uptime (network)|<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|status.net.uptime<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.01`</li></ul>|
-|Status: Uptime (hardware)|<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|status.hw.uptime<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.01`</li></ul>|
+|Status: Uptime (network)|<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|status.net.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Status: Uptime (hardware)|<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|status.hw.uptime<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Array: Voltage|<p>MIB: PROSTAR-PWM</p><p>Description:Array Voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[0, 80]</p><p>Modbus address:0x0013</p>|SNMP agent|array.voltage[arrayVoltage.0]|
-|Battery: Charge State|<p>MIB: PROSTAR-PWM</p><p>Description:Control State</p><p>Modbus address:0x0021</p><p></p><p>0: Start</p><p>1: NightCheck</p><p>2: Disconnect</p><p>3: Night</p><p>4: Fault</p><p>5: Bulk</p><p>6: Pwm</p><p>7: Float</p><p>8: Equalize</p>|SNMP agent|charge.state[chargeState.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Battery: Charge State|<p>MIB: PROSTAR-PWM</p><p>Description:Control State</p><p>Modbus address:0x0021</p><p></p><p>0: Start</p><p>1: NightCheck</p><p>2: Disconnect</p><p>3: Night</p><p>4: Fault</p><p>5: Bulk</p><p>6: Pwm</p><p>7: Float</p><p>8: Equalize</p>|SNMP agent|charge.state[chargeState.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Battery: Battery Voltage discovery|<p>MIB: PROSTAR-PWM</p>|SNMP agent|battery.voltage.discovery[batteryTerminalVoltage.0]|
-|Battery: Target Voltage|<p>MIB: PROSTAR-PWM</p><p>Description:Target Regulation Voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[0.0, 80.0]</p><p>Modbus address:0x0024</p>|SNMP agent|target.voltage[targetVoltage.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Battery: Target Voltage|<p>MIB: PROSTAR-PWM</p><p>Description:Target Regulation Voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[0.0, 80.0]</p><p>Modbus address:0x0024</p>|SNMP agent|target.voltage[targetVoltage.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Battery: Charge Current|<p>MIB: PROSTAR-PWM</p><p>Description:Charge Current</p><p>Scaling Factor:1.0</p><p>Units:A</p><p>Range:[0, 40]</p><p>Modbus address:0x0011</p>|SNMP agent|charge.current[chargeCurrent.0]|
-|Load: State|<p>MIB: PROSTAR-PWM</p><p>Description:Load State</p><p>Modbus address:0x002E</p><p></p><p>0: Start</p><p>1: Normal</p><p>2: LvdWarning</p><p>3: Lvd</p><p>4: Fault</p><p>5: Disconnect</p><p>6: NormalOff</p><p>7: Override</p><p>8: NotUsed</p>|SNMP agent|load.state[loadState.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Load: State|<p>MIB: PROSTAR-PWM</p><p>Description:Load State</p><p>Modbus address:0x002E</p><p></p><p>0: Start</p><p>1: Normal</p><p>2: LvdWarning</p><p>3: Lvd</p><p>4: Fault</p><p>5: Disconnect</p><p>6: NormalOff</p><p>7: Override</p><p>8: NotUsed</p>|SNMP agent|load.state[loadState.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Load: Voltage|<p>MIB: PROSTAR-PWM</p><p>Description:Load Voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[0, 80]</p><p>Modbus address:0x0014</p>|SNMP agent|load.voltage[loadVoltage.0]|
 |Load: Current|<p>MIB: PROSTAR-PWM</p><p>Description:Load Current</p><p>Scaling Factor:1.0</p><p>Units:A</p><p>Range:[0, 60]</p><p>Modbus address:0x0016</p>|SNMP agent|load.current[loadCurrent.0]|
 |Temperature: Ambient|<p>MIB: PROSTAR-PWM</p><p>Description:Ambient Temperature</p><p>Scaling Factor:1.0</p><p>Units:deg C</p><p>Range:[-128, 127]</p><p>Modbus address:0x001C</p>|SNMP agent|temp.ambient[ambientTemperature.0]|
 |Temperature: Battery|<p>MIB: PROSTAR-PWM</p><p>Description:Battery Temperature</p><p>Scaling Factor:1.0</p><p>Units:deg C</p><p>Range:[-128, 127]</p><p>Modbus address:0x001B</p>|SNMP agent|temp.battery[batteryTemperature.0]|
 |Temperature: Heatsink|<p>MIB: PROSTAR-PWM</p><p>Description:Heatsink Temperature</p><p>Scaling Factor:1.0</p><p>Units:deg C</p><p>Range:[-128, 127]</p><p>Modbus address:0x001A</p>|SNMP agent|temp.heatsink[heatsinkTemperature.0]|
-|Counter: Charge Amp-hours|<p>MIB: PROSTAR-PWM</p><p>Description:Ah Charge (Resettable)</p><p>Scaling Factor:0.1</p><p>Units:Ah</p><p>Range:[0.0, 4294967294]</p><p>Modbus addresses:H=0x0026 L=0x0027</p>|SNMP agent|counter.charge_amp_hours[ahChargeResettable.0]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.1`</li></ul>|
+|Counter: Charge Amp-hours|<p>MIB: PROSTAR-PWM</p><p>Description:Ah Charge (Resettable)</p><p>Scaling Factor:0.1</p><p>Units:Ah</p><p>Range:[0.0, 4294967294]</p><p>Modbus addresses:H=0x0026 L=0x0027</p>|SNMP agent|counter.charge_amp_hours[ahChargeResettable.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li></ul>|
 |Counter: Charge KW-hours|<p>MIB: PROSTAR-PWM</p><p>Description:Kilowatt Hours Charge (Resettable)</p><p>Scaling Factor:1.0</p><p>Units:kWh</p><p>Range:[0.0, 65535]</p><p>Modbus address:0x002A</p>|SNMP agent|counter.charge_kw_hours[kwhChargeResettable.0]|
-|Counter: Load Amp-hours|<p>MIB: PROSTAR-PWM</p><p>Description:Ah Load (Resettable)</p><p>Scaling Factor:0.1</p><p>Units:Ah</p><p>Range:[0.0, 4294967294]</p><p>Modbus addresses:H=0x0032 L=0x0033</p>|SNMP agent|counter.load_amp_hours[ahLoadResettable.0]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.1`</li></ul>|
-|Status: Array Faults|<p>MIB: PROSTAR-PWM</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p>|SNMP agent|status.array_faults[arrayFaults.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|Status: Load Faults|<p>MIB: PROSTAR-PWM</p><p>Description:Load Faults</p><p>Modbus address:0x002F</p>|SNMP agent|status.load_faults[loadFaults.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|Status: Alarms|<p>MIB: PROSTAR-PWM</p><p>Description:Alarms</p><p>Modbus addresses:H=0x0038 L=0x0039</p>|SNMP agent|status.alarms[alarms.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Counter: Load Amp-hours|<p>MIB: PROSTAR-PWM</p><p>Description:Ah Load (Resettable)</p><p>Scaling Factor:0.1</p><p>Units:Ah</p><p>Range:[0.0, 4294967294]</p><p>Modbus addresses:H=0x0032 L=0x0033</p>|SNMP agent|counter.load_amp_hours[ahLoadResettable.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li></ul>|
+|Status: Array Faults|<p>MIB: PROSTAR-PWM</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p>|SNMP agent|status.array_faults[arrayFaults.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Status: Load Faults|<p>MIB: PROSTAR-PWM</p><p>Description:Load Faults</p><p>Modbus address:0x002F</p>|SNMP agent|status.load_faults[loadFaults.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Status: Alarms|<p>MIB: PROSTAR-PWM</p><p>Description:Alarms</p><p>Modbus addresses:H=0x0038 L=0x0039</p>|SNMP agent|status.alarms[alarms.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
@@ -129,7 +129,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Battery voltage discovery|<p>Discovery for battery voltage triggers</p>|Dependent item|battery.voltage.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Battery voltage discovery|<p>Discovery for battery voltage triggers</p>|Dependent item|battery.voltage.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Battery voltage discovery
 
@@ -148,6 +148,7 @@ Refer to the vendor documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

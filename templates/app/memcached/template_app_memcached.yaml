@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:55:10Z'
+  date: '2023-04-24T08:04:32Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -303,7 +303,7 @@ zabbix_export:
               name: 'Memcached: Failed to fetch info data'
               event_name: 'Memcached: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -626,7 +626,7 @@ zabbix_export:
               name: 'Memcached: has been restarted'
               event_name: 'Memcached: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -664,7 +664,7 @@ zabbix_export:
               name: 'Memcached: Version has changed'
               event_name: 'Memcached: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Memcached version has changed. Acknowledge to close manually.'
+              description: 'The Memcached version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

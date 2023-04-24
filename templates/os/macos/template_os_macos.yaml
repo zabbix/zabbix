@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:14:27Z'
+  date: '2023-04-24T08:22:40Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: f895df5b37494f668cde1a2388d7af8b
-      template: macOS
-      name: macOS
+      template: 'macOS by Zabbix agent'
+      name: 'macOS by Zabbix agent'
       description: |
         It is an official macOS template. It requires Zabbix agent 6.0 or newer.
         
@@ -80,7 +80,7 @@ zabbix_export:
           triggers:
             -
               uuid: 933b14ead0974a9c96d36c833da90ebb
-              expression: last(/macOS/kernel.maxfiles)<1024
+              expression: 'last(/macOS by Zabbix agent/kernel.maxfiles)<1024'
               name: 'macOS: Configured max number of opened files is too low'
               priority: INFO
               tags:
@@ -104,7 +104,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0e89b2e0cad948c0b81bc223d2ed673c
-              expression: last(/macOS/kernel.maxproc)<256
+              expression: 'last(/macOS by Zabbix agent/kernel.maxproc)<256'
               name: 'macOS: Configured max number of processes is too low'
               priority: INFO
               tags:
@@ -177,7 +177,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3cf40421e61b41bab7697bbf9a2649d6
-              expression: 'avg(/macOS/system.cpu.load[percpu,avg1],5m)>5'
+              expression: 'avg(/macOS by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
               name: 'macOS: Processor load is too high'
               priority: WARNING
               tags:
@@ -231,7 +231,7 @@ zabbix_export:
           triggers:
             -
               uuid: ffb713a281a543879e4196e4207bdd62
-              expression: 'last(/macOS/system.hostname,#1)<>last(/macOS/system.hostname,#2)'
+              expression: 'last(/macOS by Zabbix agent/system.hostname,#1)<>last(/macOS by Zabbix agent/system.hostname,#2)'
               name: 'macOS: Hostname was changed'
               priority: INFO
               tags:
@@ -270,7 +270,7 @@ zabbix_export:
           triggers:
             -
               uuid: 55d8650af70d4aeea56345985e454df9
-              expression: 'last(/macOS/system.uname,#1)<>last(/macOS/system.uname,#2)'
+              expression: 'last(/macOS by Zabbix agent/system.uname,#1)<>last(/macOS by Zabbix agent/system.uname,#2)'
               name: 'macOS: Host information was changed'
               priority: INFO
               tags:
@@ -291,7 +291,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1f0cc03186cc4bb98483927f425df8e9
-              expression: change(/macOS/system.uptime)<0
+              expression: 'change(/macOS by Zabbix agent/system.uptime)<0'
               name: 'macOS: Server has just been restarted'
               priority: INFO
               tags:
@@ -331,7 +331,7 @@ zabbix_export:
           triggers:
             -
               uuid: 39cfe50a3d2a46ad9a53b9ec7443ec18
-              expression: 'last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#2)'
+              expression: 'last(/macOS by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: 'macOS: /etc/passwd has been changed'
               priority: WARNING
               tags:
@@ -352,7 +352,7 @@ zabbix_export:
           triggers:
             -
               uuid: c38dfc1b95d1463585d378f60d6a689a
-              expression: 'last(/macOS/vm.memory.size[available])<20M'
+              expression: 'last(/macOS by Zabbix agent/vm.memory.size[available])<20M'
               name: 'macOS: Lack of available memory on server'
               priority: AVERAGE
               tags:
@@ -389,7 +389,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0766e9c2a02f46e7adbb86dbef67556f
-              expression: 'max(/macOS/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
+              expression: 'max(/macOS by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
               name: 'macOS: Zabbix agent is not available'
               event_name: 'macOS: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
@@ -430,7 +430,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 91cccd7935854a47bf4ca184b1d4d09a
-                  expression: 'last(/macOS/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  expression: 'last(/macOS by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free inodes is less than 20%'
                   priority: WARNING
                   tags:
@@ -470,7 +470,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 673dbc5aec474abda3a3b392d31b6c11
-                  expression: 'last(/macOS/vfs.fs.size[{#FSNAME},pfree])<20'
+                  expression: 'last(/macOS by Zabbix agent/vfs.fs.size[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free disk space is less than 20%'
                   priority: WARNING
                   tags:
@@ -511,24 +511,17 @@ zabbix_export:
             -
               uuid: 6ce28b13df4e4494a4d39750afb25290
               name: '{#FSNAME}: Disk space usage'
-              width: '600'
-              height: '340'
-              show_work_period: 'NO'
-              show_triggers: 'NO'
-              type: PIE
-              show_3d: 'YES'
               graph_items:
                 -
-                  color: C80000
-                  type: GRAPH_SUM
+                  color: 199C0D
                   item:
-                    host: macOS
+                    host: 'macOS by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
-                  color: 00C800
+                  color: F63100
                   item:
-                    host: macOS
+                    host: 'macOS by Zabbix agent'
                     key: 'vfs.fs.size[{#FSNAME},free]'
           overrides:
             -
@@ -575,7 +568,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: macOS
+                        host: 'macOS by Zabbix agent'
                         name: 'macOS: CPU load'
                 -
                   type: GRAPH_CLASSIC
@@ -588,7 +581,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: macOS
+                        host: 'macOS by Zabbix agent'
                         name: 'macOS: Memory usage'
       valuemaps:
         -
@@ -620,19 +613,19 @@ zabbix_export:
         -
           color: '009900'
           item:
-            host: macOS
+            host: 'macOS by Zabbix agent'
             key: 'system.cpu.load[percpu,avg1]'
         -
           sortorder: '1'
           color: '000099'
           item:
-            host: macOS
+            host: 'macOS by Zabbix agent'
             key: 'system.cpu.load[percpu,avg5]'
         -
           sortorder: '2'
           color: '990000'
           item:
-            host: macOS
+            host: 'macOS by Zabbix agent'
             key: 'system.cpu.load[percpu,avg15]'
     -
       uuid: 5c942cb1fe5b440aa9428d45ee85e09c
@@ -640,14 +633,14 @@ zabbix_export:
       ymin_type_1: FIXED
       ymax_type_1: ITEM
       ymax_item_1:
-        host: macOS
+        host: 'macOS by Zabbix agent'
         key: 'vm.memory.size[total]'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 00C800
           item:
-            host: macOS
+            host: 'macOS by Zabbix agent'
             key: 'vm.memory.size[available]'
     -
       uuid: 5c4b08f992c541dbb02835bbd4f0a55e
@@ -658,12 +651,12 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 00AA00
           item:
-            host: macOS
+            host: 'macOS by Zabbix agent'
             key: 'net.if.in[en0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 3333FF
           item:
-            host: macOS
+            host: 'macOS by Zabbix agent'
             key: 'net.if.out[en0]'

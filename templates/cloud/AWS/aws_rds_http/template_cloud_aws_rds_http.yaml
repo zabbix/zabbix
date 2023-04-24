@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:57:28Z'
+  date: '2023-04-18T12:50:12Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -245,7 +245,7 @@ zabbix_export:
               event_name: 'AWS RDS: High CPU utilization (over {$AWS.RDS.CPU.UTIL.WARN.MAX}% for 15m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -3413,7 +3413,7 @@ zabbix_export:
         -
           macro: '{$AWS.RDS.CPU.UTIL.WARN.MAX}'
           value: '85'
-          description: 'The warning threshold of the CPU utilization in %.'
+          description: 'The warning threshold of the CPU utilization expressed in %.'
         -
           macro: '{$AWS.RDS.INSTANCE.ID}'
           description: 'RDS DB Instance identifier.'

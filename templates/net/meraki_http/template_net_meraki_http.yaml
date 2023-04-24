@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:05:38Z'
+  date: '2023-04-24T08:13:33Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -230,26 +230,26 @@ zabbix_export:
           timeout: 30s
           lld_macro_paths:
             -
-              lld_macro: '{#MAC}'
-              path: $.mac
-            -
-              lld_macro: '{#MODEL}'
-              path: $.model
-            -
               lld_macro: '{#NAME}'
               path: $.name
             -
               lld_macro: '{#NETWORK.ID}'
               path: $.networkId
             -
+              lld_macro: '{#MAC}'
+              path: $.mac
+            -
+              lld_macro: '{#MODEL}'
+              path: $.model
+            -
+              lld_macro: '{#SERIAL}'
+              path: $.serial
+            -
               lld_macro: '{#ORGANIZATION_ID}'
               path: $.organizationId
             -
               lld_macro: '{#PRODUCT_TYPE}'
               path: $.productType
-            -
-              lld_macro: '{#SERIAL}'
-              path: $.serial
           preprocessing:
             -
               type: JSONPATH
@@ -302,11 +302,11 @@ zabbix_export:
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#REGION}'
-              path: $.cloud.region.name
-            -
               lld_macro: '{#URL}'
               path: $.url
+            -
+              lld_macro: '{#REGION}'
+              path: $.cloud.region.name
           preprocessing:
             -
               type: JSONPATH
@@ -727,17 +727,17 @@ zabbix_export:
           timeout: 30s
           lld_macro_paths:
             -
-              lld_macro: '{#IP}'
-              path: $.ip
-            -
               lld_macro: '{#NETWORK.ID}'
               path: $.networkId
             -
-              lld_macro: '{#SERIAL}'
-              path: $.serial
-            -
               lld_macro: '{#UPLINK}'
               path: $.uplink
+            -
+              lld_macro: '{#IP}'
+              path: $.ip
+            -
+              lld_macro: '{#SERIAL}'
+              path: $.serial
           preprocessing:
             -
               type: JSONPATH
@@ -1540,17 +1540,17 @@ zabbix_export:
               lld_macro: '{#NETWORK.NAME}'
               path: $.networkName
             -
+              lld_macro: '{#UPLINK.ROLE}'
+              path: $.role
+            -
+              lld_macro: '{#UPLINK.DEVICE.SERIAL}'
+              path: $.serial
+            -
               lld_macro: '{#PRIVATE.IP}'
               path: $.ip
             -
               lld_macro: '{#PUBLIC.IP}'
               path: $.publicIp
-            -
-              lld_macro: '{#UPLINK.DEVICE.SERIAL}'
-              path: $.serial
-            -
-              lld_macro: '{#UPLINK.ROLE}'
-              path: $.role
           preprocessing:
             -
               type: JSONPATH
@@ -1896,23 +1896,23 @@ zabbix_export:
           timeout: 30s
           lld_macro_paths:
             -
-              lld_macro: '{#NETWORK.ID}'
-              path: $.networkId
-            -
-              lld_macro: '{#NETWORK.NAME}'
-              path: $.networkName
-            -
-              lld_macro: '{#PEER.NETWORK.ID}'
-              path: $.peerNetworkId
-            -
-              lld_macro: '{#PEER.NETWORK.NAME}'
-              path: $.peerNetworkName
+              lld_macro: '{#SENDER.UPLINK}'
+              path: $.senderUplink
             -
               lld_macro: '{#RECEIVER.UPLINK}'
               path: $.receiverUplink
             -
-              lld_macro: '{#SENDER.UPLINK}'
-              path: $.senderUplink
+              lld_macro: '{#NETWORK.NAME}'
+              path: $.networkName
+            -
+              lld_macro: '{#PEER.NETWORK.NAME}'
+              path: $.peerNetworkName
+            -
+              lld_macro: '{#NETWORK.ID}'
+              path: $.networkId
+            -
+              lld_macro: '{#PEER.NETWORK.ID}'
+              path: $.peerNetworkId
           preprocessing:
             -
               type: JSONPATH

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:39:05Z'
+  date: '2023-04-24T08:24:52Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -190,7 +190,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -263,7 +263,7 @@ zabbix_export:
               name: 'Cisco UCS: System name has changed'
               event_name: 'Cisco UCS: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -280,7 +280,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -370,7 +370,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.11.1.9.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}]'
               history: 1w
-              trends: 0d
+              trends: '0'
               description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
@@ -453,7 +453,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.1.1.6.{#SNMPINDEX}'
               key: 'system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}]'
               history: 1w
-              trends: 0d
+              trends: '0'
               description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
               valuemap:
                 name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'
@@ -537,7 +537,7 @@ zabbix_export:
               key: 'sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
                 Cisco UCS equipment:Fan:operState managed object property
@@ -637,7 +637,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.size[cucsStorageLocalDiskSize.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
@@ -661,7 +661,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.18.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}]'
               delay: 3m
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
                 Cisco UCS storage:LocalDisk:diskState managed object property.
@@ -723,7 +723,7 @@ zabbix_export:
               key: 'sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
                 Cisco UCS equipment:Psu:operState managed object property
@@ -1201,7 +1201,7 @@ zabbix_export:
                   name: '{#UNIT_LOCATION}: Device has been replaced'
                   event_name: '{#UNIT_LOCATION}: Device has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Device serial number has changed. Ack to close'
+                  description: 'Device serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1215,7 +1215,7 @@ zabbix_export:
               key: 'system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}]'
               delay: 30s
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
                 Cisco UCS compute:RackUnit:operState managed object property
@@ -1295,7 +1295,7 @@ zabbix_export:
               key: 'system.hw.virtualdisk.size[cucsStorageLocalLunSize.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB

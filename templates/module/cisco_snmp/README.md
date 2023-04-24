@@ -51,7 +51,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|#{#SNMPINDEX}: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco CISCO-PROCESS-MIB by SNMP/system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|#{#SNMPINDEX}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco CISCO-PROCESS-MIB by SNMP/system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 # Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 by SNMP
 
@@ -77,7 +77,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|{#SNMPVALUE}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 # Cisco OLD-CISCO-CPU-MIB by SNMP
 
@@ -97,7 +97,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cisco OLD-CISCO-CPU-MIB: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco OLD-CISCO-CPU-MIB by SNMP/system.cpu.util[avgBusy5],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Cisco OLD-CISCO-CPU-MIB: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco OLD-CISCO-CPU-MIB by SNMP/system.cpu.util[avgBusy5],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 # Cisco Inventory by SNMP
 
@@ -106,34 +106,34 @@
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cisco Inventory: Hardware model name|<p>MIB: ENTITY-MIB</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Cisco Inventory: Hardware serial number|<p>MIB: ENTITY-MIB</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Cisco Inventory: Operating system|<p>MIB: SNMPv2-MIB</p>|SNMP agent|system.sw.os[sysDescr.0]<p>**Preprocessing**</p><ul><li>Regular expression: `Version (.+), RELEASE \1`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Cisco Inventory: Hardware model name|<p>MIB: ENTITY-MIB</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Cisco Inventory: Hardware serial number|<p>MIB: ENTITY-MIB</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Cisco Inventory: Operating system|<p>MIB: SNMPv2-MIB</p>|SNMP agent|system.sw.os[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Regular expression: `Version (.+), RELEASE \1`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cisco Inventory: Device has been replaced|<p>Device serial number has changed. Ack to close</p>|`last(/Cisco Inventory by SNMP/system.hw.serialnumber,#1)<>last(/Cisco Inventory by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Inventory by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|Cisco Inventory: Operating system description has changed|<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</p>|`last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0]))>0`|Info|**Manual close**: Yes|
+|Cisco Inventory: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Inventory by SNMP/system.hw.serialnumber,#1)<>last(/Cisco Inventory by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Inventory by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|Cisco Inventory: Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Cisco Inventory by SNMP/system.sw.os[sysDescr.0]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Entity Serial Numbers Discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Entity Serial Numbers Discovery| |SNMP agent|entity_sn.discovery|
+|Entity Serial Numbers Discovery||SNMP agent|entity_sn.discovery|
 
 ### Item prototypes for Entity Serial Numbers Discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#ENT_NAME}: Hardware serial number|<p>MIB: ENTITY-MIB</p>|SNMP agent|system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|{#ENT_NAME}: Hardware serial number|<p>MIB: ENTITY-MIB</p>|SNMP agent|system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Trigger prototypes for Entity Serial Numbers Discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Device has been replaced|<p>Device serial number has changed. Ack to close</p>|`last(/Cisco Inventory by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco Inventory by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Cisco Inventory by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|{#ENT_NAME}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Inventory by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco Inventory by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Cisco Inventory by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 # Cisco CISCO-ENVMON-MIB by SNMP
 
@@ -219,6 +219,7 @@
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

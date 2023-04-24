@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T11:01:00Z'
+  date: '2023-04-18T12:57:40Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -919,7 +919,7 @@ zabbix_export:
               name: 'TiDB: Version has changed'
               event_name: 'TiDB: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'TiDB version has changed. Acknowledge to close manually.'
+              description: 'TiDB version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -

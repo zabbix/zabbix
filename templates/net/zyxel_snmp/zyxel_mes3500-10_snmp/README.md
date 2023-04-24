@@ -50,16 +50,16 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ZYXEL MES3500-10: SNMP agent availability| |Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|ZYXEL MES3500-10: Hardware model name|<p>MIB: RFC1213-MIB</p><p>A textual description of the entity.  This value</p><p>should include the full name and version</p><p>identification of the system's hardware type,</p><p>software operating-system, and networking</p><p>software.  It is mandatory that this only contain</p><p>printable ASCII characters.</p>|SNMP agent|zyxel.3500_10.model<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Contact|<p>MIB: RFC1213-MIB</p><p>The textual identification of the contact person</p><p>for this managed node, together with information</p><p>on how to contact this person.</p>|SNMP agent|zyxel.3500_10.contact<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Host name|<p>MIB: RFC1213-MIB</p><p>An administratively-assigned name for this</p><p>managed node.  By convention, this is the node's</p><p>fully-qualified domain name.</p>|SNMP agent|zyxel.3500_10.name<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Location|<p>MIB: RFC1213-MIB</p><p>The physical location of this node (e.g.,</p><p>`telephone closet, 3rd floor').</p>|SNMP agent|zyxel.3500_10.location<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: MAC address|<p>MIB: IF-MIB</p><p>The interface's address at the protocol layer</p><p>immediately `below' the network layer in the</p><p>protocol stack.  For interfaces which do not have</p><p>such an address (e.g., a serial line), this object</p><p>should contain an octet string of zero length.</p>|SNMP agent|zyxel.3500_10.mac<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Uptime (network)|<p>MIB: RFC1213-MIB</p><p>The time (in hundredths of a second) since the</p><p>network management portion of the system was last</p><p>re-initialized.</p>|SNMP agent|zyxel.3500_10.net.uptime<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.01`</li></ul>|
-|ZYXEL MES3500-10: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized.</p><p>Note that this is different from sysUpTime in the SNMPv2-MIB</p><p>[RFC1907] because sysUpTime is the uptime of the</p><p>network management portion of the system.</p>|SNMP agent|zyxel.3500_10.hw.uptime<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.01`</li></ul>|
-|ZYXEL MES3500-10: ZyNOS F/W Version|<p>MIB: ZYXEL-MES3500-10-MIB</p>|SNMP agent|zyxel.3500_10.fwversion<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|ZYXEL MES3500-10: Hardware serial number|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Serial number</p>|SNMP agent|zyxel.3500_10.serialnumber<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|ZYXEL MES3500-10: SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ZYXEL MES3500-10: Hardware model name|<p>MIB: RFC1213-MIB</p><p>A textual description of the entity.  This value</p><p>should include the full name and version</p><p>identification of the system's hardware type,</p><p>software operating-system, and networking</p><p>software.  It is mandatory that this only contain</p><p>printable ASCII characters.</p>|SNMP agent|zyxel.3500_10.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Contact|<p>MIB: RFC1213-MIB</p><p>The textual identification of the contact person</p><p>for this managed node, together with information</p><p>on how to contact this person.</p>|SNMP agent|zyxel.3500_10.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Host name|<p>MIB: RFC1213-MIB</p><p>An administratively-assigned name for this</p><p>managed node.  By convention, this is the node's</p><p>fully-qualified domain name.</p>|SNMP agent|zyxel.3500_10.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Location|<p>MIB: RFC1213-MIB</p><p>The physical location of this node (e.g.,</p><p>`telephone closet, 3rd floor').</p>|SNMP agent|zyxel.3500_10.location<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: MAC address|<p>MIB: IF-MIB</p><p>The interface's address at the protocol layer</p><p>immediately `below' the network layer in the</p><p>protocol stack.  For interfaces which do not have</p><p>such an address (e.g., a serial line), this object</p><p>should contain an octet string of zero length.</p>|SNMP agent|zyxel.3500_10.mac<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Uptime (network)|<p>MIB: RFC1213-MIB</p><p>The time (in hundredths of a second) since the</p><p>network management portion of the system was last</p><p>re-initialized.</p>|SNMP agent|zyxel.3500_10.net.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|ZYXEL MES3500-10: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized.</p><p>Note that this is different from sysUpTime in the SNMPv2-MIB</p><p>[RFC1907] because sysUpTime is the uptime of the</p><p>network management portion of the system.</p>|SNMP agent|zyxel.3500_10.hw.uptime<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|ZYXEL MES3500-10: ZyNOS F/W Version|<p>MIB: ZYXEL-MES3500-10-MIB</p>|SNMP agent|zyxel.3500_10.fwversion<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|ZYXEL MES3500-10: Hardware serial number|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Serial number</p>|SNMP agent|zyxel.3500_10.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |ZYXEL MES3500-10: CPU utilization|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Show device CPU load in %, it's the snapshot of CPU load when</p><p>getting the values.</p>|SNMP agent|zyxel.3500_10.cpuusage|
 
 ### Triggers
@@ -69,21 +69,21 @@ Refer to the vendor documentation.
 |ZYXEL MES3500-10: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL MES3500-10 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 |ZYXEL MES3500-10: Template does not match hardware|<p>This template is for Zyxel MES3500-10, but connected to {ITEM.VALUE}</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.model)<>"MES3500-10"`|Info|**Manual close**: Yes|
 |ZYXEL MES3500-10: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.hw.uptime)>0 and last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.hw.uptime)<10m) or (last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.hw.uptime)=0 and last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|ZYXEL MES3500-10: Firmware has changed|<p>Firmware version has changed. Ack to close</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion,#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion,#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion))>0`|Info|**Manual close**: Yes|
-|ZYXEL MES3500-10: Device has been replaced|<p>Device serial number has changed. Ack to close</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber,#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber,#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber))>0`|Info|**Manual close**: Yes|
-|ZYXEL MES3500-10: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|ZYXEL MES3500-10: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion,#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion,#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion))>0`|Info|**Manual close**: Yes|
+|ZYXEL MES3500-10: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber,#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber,#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber))>0`|Info|**Manual close**: Yes|
+|ZYXEL MES3500-10: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule Temperature discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Temperature discovery|<p>An entry in tempTable.</p><p>Index of temperature unit. 1:MAC, 2:CPU, 3:PHY</p>|SNMP agent|zyxel.3500_10.temp.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Temperature discovery|<p>An entry in tempTable.</p><p>Index of temperature unit. 1:MAC, 2:CPU, 3:PHY</p>|SNMP agent|zyxel.3500_10.temp.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Temperature discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ZYXEL MES3500-10: Temperature "{#ZYXEL.TEMP.ID}"|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>The current temperature measured at this sensor</p>|SNMP agent|zyxel.3500_10.temp[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|ZYXEL MES3500-10: Temperature "{#ZYXEL.TEMP.ID}"|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>The current temperature measured at this sensor</p>|SNMP agent|zyxel.3500_10.temp[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Temperature discovery
 
@@ -95,13 +95,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Voltage discovery|<p>An entry in voltageTable.</p>|SNMP agent|zyxel.3500_10.volt.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Voltage discovery|<p>An entry in voltageTable.</p>|SNMP agent|zyxel.3500_10.volt.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Voltage discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ZYXEL MES3500-10: Nominal "{#ZYXEL.VOLT.NOMINAL}"|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>The current voltage reading.</p>|SNMP agent|zyxel.3500_10.volt[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|ZYXEL MES3500-10: Nominal "{#ZYXEL.VOLT.NOMINAL}"|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>The current voltage reading.</p>|SNMP agent|zyxel.3500_10.volt[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Voltage discovery
 
@@ -113,35 +113,35 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface discovery| |SNMP agent|zyxel.3500_10.net.if.discovery|
+|Interface discovery||SNMP agent|zyxel.3500_10.net.if.discovery|
 
 ### Item prototypes for Interface discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Speed Duplex|<p>MIB:  ZYXEL-MES3500-10-MIB</p><p>Transmission mode</p>|SNMP agent|zyxel.3500_10.net.if.speed_duplex[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Interface description|<p>MIB:  ZYXEL-MES3500-10-MIB</p><p>A textual string containing information about the interface</p>|SNMP agent|zyxel.3500_10.net.if.name[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Link type|<p>MIB:  ZYXEL-MES3500-10-MIB</p><p>Physical connection type</p>|SNMP agent|zyxel.3500_10.net.if.link_type[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Interface name|<p>MIB: IF-MIB</p><p>A textual string containing information about the interface</p>|SNMP agent|zyxel.3500_10.net.if.descr[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Operational status|<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>The testing(3) state indicates that no operational</p><p>packets can be passed.</p>|SNMP agent|zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Administrative status|<p>MIB: IF-MIB</p><p>The desired state of the interface.  The</p><p>testing(3) state indicates that no operational</p><p>packets can be passed.</p>|SNMP agent|zyxel.3500_10.net.if.adminstatus[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming traffic|<p>MIB: IF-MIB</p><p>The total number of octets received on the interface,</p><p>including framing characters.</p>|SNMP agent|zyxel.3500_10.net.if.in.traffic[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `8`</li><li>Change per second</li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Speed Duplex|<p>MIB:  ZYXEL-MES3500-10-MIB</p><p>Transmission mode</p>|SNMP agent|zyxel.3500_10.net.if.speed_duplex[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Interface description|<p>MIB:  ZYXEL-MES3500-10-MIB</p><p>A textual string containing information about the interface</p>|SNMP agent|zyxel.3500_10.net.if.name[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Link type|<p>MIB:  ZYXEL-MES3500-10-MIB</p><p>Physical connection type</p>|SNMP agent|zyxel.3500_10.net.if.link_type[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Interface name|<p>MIB: IF-MIB</p><p>A textual string containing information about the interface</p>|SNMP agent|zyxel.3500_10.net.if.descr[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Operational status|<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>The testing(3) state indicates that no operational</p><p>packets can be passed.</p>|SNMP agent|zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Administrative status|<p>MIB: IF-MIB</p><p>The desired state of the interface.  The</p><p>testing(3) state indicates that no operational</p><p>packets can be passed.</p>|SNMP agent|zyxel.3500_10.net.if.adminstatus[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming traffic|<p>MIB: IF-MIB</p><p>The total number of octets received on the interface,</p><p>including framing characters.</p>|SNMP agent|zyxel.3500_10.net.if.in.traffic[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `8`</p></li><li>Change per second</li></ul>|
 |ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming unicast packages|<p>MIB: IF-MIB</p><p>The number of packets, delivered by this sub-layer to a</p><p>higher (sub-)layer, which were not addressed to a multicast</p><p>or broadcast address at this sub-layer</p>|SNMP agent|zyxel.3500_10.net.if.in.ucastpkts[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming multicast packages|<p>MIB: IF-MIB</p><p>The number of packets, delivered by this sub-layer to a</p><p>higher (sub-)layer, which were addressed to a multicast</p><p>address at this sub-layer.  For a MAC layer protocol, this</p><p>includes both Group and Functional addresses.</p>|SNMP agent|zyxel.3500_10.net.if.in.multicastpkts[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming broadcast packages|<p>MIB: IF-MIB</p><p>The number of packets, delivered by this sub-layer to a</p><p>higher (sub-)layer, which were addressed to a broadcast</p><p>address at this sub-layer.</p>|SNMP agent|zyxel.3500_10.net.if.in.broadcastpkts[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing traffic|<p>MIB: IF-MIB</p><p>The total number of octets transmitted out of the</p><p>interface, including framing characters.  This object is a</p><p>64-bit version of ifOutOctets.</p>|SNMP agent|zyxel.3500_10.net.if.out.traffic[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `8`</li><li>Change per second</li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing traffic|<p>MIB: IF-MIB</p><p>The total number of octets transmitted out of the</p><p>interface, including framing characters.  This object is a</p><p>64-bit version of ifOutOctets.</p>|SNMP agent|zyxel.3500_10.net.if.out.traffic[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `8`</p></li><li>Change per second</li></ul>|
 |ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing unicast packages|<p>MIB: IF-MIB</p><p>The total number of packets that higher-level protocols</p><p>requested be transmitted, and which were not addressed to a</p><p>multicast or broadcast address at this sub-layer, including</p><p>those that were discarded or not sent.</p>|SNMP agent|zyxel.3500_10.net.if.out.ucastpkts[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing multicast packages|<p>MIB: IF-MIB</p><p>The total number of packets that higher-level protocols</p><p>requested be transmitted, and which were addressed to a</p><p>multicast address at this sub-layer, including those that</p><p>were discarded or not sent.  For a MAC layer protocol, this</p><p>includes both Group and Functional addresses.</p>|SNMP agent|zyxel.3500_10.net.if.out.multicastpkts[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing broadcast packages|<p>MIB: IF-MIB</p><p>The total number of packets that higher-level protocols</p><p>requested be transmitted, and which were addressed to a</p><p>broadcast address at this sub-layer, including those that</p><p>were discarded or not sent.</p>|SNMP agent|zyxel.3500_10.net.if.out.broadcastpkts[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Link speed|<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in bits per second</p>|SNMP agent|zyxel.3500_10.net.if.highspeed[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1000000`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming utilization|<p>Interface utilization percentage</p>|Calculated|zyxel.3500_10.net.if.in.util[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>In range: `0 -> 100`</p><p>⛔️Custom on fail: Discard value</p></li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing utilization|<p>Interface utilization percentage</p>|Calculated|zyxel.3500_10.net.if.out.util[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>In range: `0 -> 100`</p><p>⛔️Custom on fail: Discard value</p></li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Link speed|<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in bits per second</p>|SNMP agent|zyxel.3500_10.net.if.highspeed[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000000`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming utilization|<p>Interface utilization percentage</p>|Calculated|zyxel.3500_10.net.if.in.util[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>In range: `0 -> 100`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing utilization|<p>Interface utilization percentage</p>|Calculated|zyxel.3500_10.net.if.out.util[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>In range: `0 -> 100`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Interface discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|ZYXEL MES3500-10: Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:1. Can be triggered if operations status is down.2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)WARNING: if closed manually - won't fire again on next poll, because of .diff.</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|ZYXEL MES3500-10: Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:1. It can be triggered if the operations status is down.2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule SFP without DDM discovery
 
@@ -153,31 +153,31 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Status|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module status.</p>|SNMP agent|zyxel.3500_10.sfp.status[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Vendor|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module vendor name.</p>|SNMP agent|zyxel.3500_10.sfp.vendor[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Part number|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Part number provided by transceiver module vendor.</p>|SNMP agent|zyxel.3500_10.sfp.part[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Serial number|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Serial number provided by transceiver module vendor.</p>|SNMP agent|zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Revision|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Revision level for part number provided by transceiver module vendor.</p>|SNMP agent|zyxel.3500_10.sfp.revision[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Date code|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module vendor's manufacturing date code.</p>|SNMP agent|zyxel.3500_10.sfp.datecode[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Transceiver|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module type names.</p>|SNMP agent|zyxel.3500_10.sfp.transceiver[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Status|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module status.</p>|SNMP agent|zyxel.3500_10.sfp.status[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Vendor|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module vendor name.</p>|SNMP agent|zyxel.3500_10.sfp.vendor[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Part number|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Part number provided by transceiver module vendor.</p>|SNMP agent|zyxel.3500_10.sfp.part[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Serial number|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Serial number provided by transceiver module vendor.</p>|SNMP agent|zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Revision|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Revision level for part number provided by transceiver module vendor.</p>|SNMP agent|zyxel.3500_10.sfp.revision[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Date code|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module vendor's manufacturing date code.</p>|SNMP agent|zyxel.3500_10.sfp.datecode[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ZYXEL MES3500-10: SFP {#SNMPINDEX}: Transceiver|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module type names.</p>|SNMP agent|zyxel.3500_10.sfp.transceiver[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for SFP without DDM discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|ZYXEL MES3500-10: SFP {#SNMPINDEX} has been replaced|<p>SFP {#SNMPINDEX} serial number has changed. Ack to close</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL MES3500-10: SFP {#SNMPINDEX} has been replaced|<p>SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule SFP with DDM discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SFP with DDM discovery|<p>SFP DDM module discovery.</p>|SNMP agent|zyxel.3500_10.sfp.ddm.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|SFP with DDM discovery|<p>SFP DDM module discovery.</p>|SNMP agent|zyxel.3500_10.sfp.ddm.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for SFP with DDM discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ZYXEL MES3500-10: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).</p>|SNMP agent|zyxel.3500_10.sfp.ddm[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.01`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|ZYXEL MES3500-10: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).</p>|SNMP agent|zyxel.3500_10.sfp.ddm[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for SFP with DDM discovery
 
@@ -190,13 +190,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Memory pool discovery| |SNMP agent|zyxel.3500_10.memory.discovery|
+|Memory pool discovery||SNMP agent|zyxel.3500_10.memory.discovery|
 
 ### Item prototypes for Memory pool discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ZYXEL MES3500-10: Memory "{#ZYXEL.MEMORY.NAME}" utilization|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Utilization of memory pool in %.</p>|SNMP agent|zyxel.3500_10.memory[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|ZYXEL MES3500-10: Memory "{#ZYXEL.MEMORY.NAME}" utilization|<p>MIB: ZYXEL-MES3500-10-MIB</p><p>Utilization of memory pool in %.</p>|SNMP agent|zyxel.3500_10.memory[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Memory pool discovery
 
@@ -206,6 +206,7 @@ Refer to the vendor documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+
