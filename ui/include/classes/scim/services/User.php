@@ -327,9 +327,8 @@ class User extends ScimApiService {
 		if (!$db_user) {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
 		}
-		else {
-			$db_user = $db_user[0];
-		}
+
+		$db_user = $db_user[0];
 	}
 
 	/**
@@ -447,9 +446,8 @@ class User extends ScimApiService {
 		if (!$db_user) {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
 		}
-		else {
-			$db_user = $db_user[0];
-		}
+
+		$db_user = $db_user[0];
 
 		foreach ($options['Operations'] as &$operation) {
 			$operation['op'] = strtolower($operation['op']);
