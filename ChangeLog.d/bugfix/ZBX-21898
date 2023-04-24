@@ -1,0 +1,1 @@
+..F....... [ZBX-21898] fixed expression validation, history function parser to accept backslash without escaping (epulke)
