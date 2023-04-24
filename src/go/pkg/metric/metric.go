@@ -332,14 +332,15 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 // * incorrect number of parameters are passed;
 // * missing required parameter;
 // * value validation is failed.
-func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params map[string]string, extraParams []string,
-	err error) {
+func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (
+	params map[string]string, extraParams []string, hardcodedParams map[string]bool, err error) {
 	session, err := m.parseRawParams(rawParams, sessions)
 	if err != nil {
 		return
 	}
 
 	params = make(map[string]string)
+	hardcodedParams = make(map[string]bool)
 
 	var i int
 	for _, p := range m.params {
@@ -362,11 +363,12 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 
 		if i >= len(rawParams) || rawParams[i] == "" {
 			if p.required && skipConnIfSessionIsSet {
-				return nil, nil, zbxerr.ErrorTooFewParameters.Wrap(
+				return nil, nil, nil, zbxerr.ErrorTooFewParameters.Wrap(
 					fmt.Errorf("%s parameter %q is required", ordNum, p.name))
 			}
 
 			if p.defaultValue != nil && skipConnIfSessionIsSet {
+				hardcodedParams[p.name] = true
 				val = p.defaultValue
 			}
 		} else {
@@ -381,7 +383,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 
 		if p.validator != nil && skipConnIfSessionIsSet {
 			if err = p.validator.Validate(val); err != nil {
-				return nil, nil, zbxerr.New(fmt.Sprintf("invalid %s parameter %q", ordNum, p.name)).Wrap(err)
+				return nil, nil, nil, zbxerr.New(fmt.Sprintf("invalid %s parameter %q", ordNum, p.name)).Wrap(err)
 			}
 		}
 
@@ -393,7 +395,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 	// Fill connection parameters with data from a session
 	if session != nil {
 		if err = mergeWithSessionData(params, m.params, session); err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 
 		params["sessionName"] = rawParams[0]
@@ -403,7 +405,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (params ma
 		extraParams = rawParams[i:]
 	}
 
-	return params, extraParams, nil
+	return params, extraParams, hardcodedParams, nil
 }
 
 func (m *Metric) parseRawParams(rawParams []string, sessions interface{}) (interface{}, error) {
@@ -438,13 +440,13 @@ func (ml MetricSet) List() (list []string) {
 	return
 }
 
-func SetDefaults(params map[string]string, defaults interface{}) error {
+func SetDefaults(params map[string]string, hardcoded map[string]bool, defaults interface{}) error {
 	def, err := sessionToMap(defaults)
 	if err != nil {
 		return err
 	}
 
-	setDefaults(params, def)
+	setDefaults(params, hardcoded, def)
 
 	return nil
 }
@@ -461,9 +463,9 @@ func sessionToMap(session interface{}) (out map[string]string, err error) {
 	return
 }
 
-func setDefaults(params map[string]string, defaults map[string]string) {
+func setDefaults(params map[string]string, hardcoded map[string]bool, defaults map[string]string) {
 	for k, v := range params {
-		if d, ok := defaults[k]; ok && v == "" {
+		if d, ok := defaults[k]; ok && (v == "" || hardcoded[v]) {
 			params[k] = d
 		}
 	}

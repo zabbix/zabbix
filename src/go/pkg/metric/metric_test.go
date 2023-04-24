@@ -301,7 +301,7 @@ func TestMetric_EvalParams(t *testing.T) {
 				}()
 			}
 
-			gotParams, gotExtraParams, err := tt.m.EvalParams(tt.args.rawParams, tt.args.sessions)
+			gotParams, gotExtraParams, _, err := tt.m.EvalParams(tt.args.rawParams, tt.args.sessions)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EvalParams() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -392,8 +392,9 @@ func TestNew(t *testing.T) {
 
 func TestSetDefaults(t *testing.T) {
 	type args struct {
-		params   map[string]string
-		defaults interface{}
+		params    map[string]string
+		hardCoded map[string]bool
+		defaults  interface{}
 	}
 	tests := []struct {
 		name    string
@@ -405,6 +406,7 @@ func TestSetDefaults(t *testing.T) {
 			"only_defaults",
 			args{
 				map[string]string{"Foo": "", "Bar": ""},
+				nil,
 				struct {
 					Foo string
 					Bar string
@@ -417,6 +419,7 @@ func TestSetDefaults(t *testing.T) {
 			"default_overrides_empty",
 			args{
 				map[string]string{"Foo": "bar", "Abc": ""},
+				nil,
 				struct{ Abc string }{"foo"},
 			},
 			map[string]string{"Foo": "bar", "Abc": "foo"},
@@ -426,6 +429,7 @@ func TestSetDefaults(t *testing.T) {
 			"default_does_not_override_empty",
 			args{
 				map[string]string{"Foo": "bar", "Abc": "def"},
+				nil,
 				struct {
 					Foo string
 					Abc string
@@ -438,6 +442,7 @@ func TestSetDefaults(t *testing.T) {
 			"set_param_not_in_default",
 			args{
 				map[string]string{"foo": "bar", "abc": "def"},
+				nil,
 				struct {
 					A string
 					B string
@@ -450,6 +455,7 @@ func TestSetDefaults(t *testing.T) {
 			"set_default_not_in_param",
 			args{
 				map[string]string{"foo": "bar"},
+				nil,
 				struct {
 					Bar string
 				}{"A"},
@@ -461,6 +467,7 @@ func TestSetDefaults(t *testing.T) {
 			"empty_default",
 			args{
 				map[string]string{"foo": "bar"},
+				nil,
 				struct{}{},
 			},
 			map[string]string{"foo": "bar"},
@@ -470,6 +477,7 @@ func TestSetDefaults(t *testing.T) {
 			"empty_params",
 			args{
 				map[string]string{},
+				nil,
 				struct {
 					Foo string
 					Bar string
@@ -479,9 +487,33 @@ func TestSetDefaults(t *testing.T) {
 			false,
 		},
 		{
+			"empty_defaults",
+			args{
+				map[string]string{"Foo": "A", "Bar": "B"},
+				nil,
+				nil,
+			},
+			map[string]string{"Foo": "A", "Bar": "B"},
+			false,
+		},
+		{
+			"with_hardcoded",
+			args{
+				map[string]string{"Foo": "A", "Bar": "B"},
+				map[string]bool{"A": true},
+				struct {
+					Foo string
+					Bar string
+				}{"C", "G"},
+			},
+			map[string]string{"Foo": "C", "Bar": "B"},
+			false,
+		},
+		{
 			"fail_with_int",
 			args{
 				map[string]string{"Foo": "bar"},
+				nil,
 				struct {
 					Foo string
 					Bar int
@@ -492,7 +524,7 @@ func TestSetDefaults(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := SetDefaults(tt.args.params, tt.args.defaults); (err != nil) != tt.wantErr {
+			if err := SetDefaults(tt.args.params, tt.args.hardCoded, tt.args.defaults); (err != nil) != tt.wantErr {
 				t.Errorf("SetDefaults() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
@@ -568,8 +600,9 @@ func TestSessionToMap(t *testing.T) {
 
 func Test_setDefaults(t *testing.T) {
 	type args struct {
-		params   map[string]string
-		defaults map[string]string
+		params    map[string]string
+		defaults  map[string]string
+		hardCoded map[string]bool
 	}
 	tests := []struct {
 		name string
@@ -581,6 +614,7 @@ func Test_setDefaults(t *testing.T) {
 			args{
 				map[string]string{"foo": "", "bar": ""},
 				map[string]string{"foo": "abc", "bar": "def"},
+				nil,
 			},
 			map[string]string{"foo": "abc", "bar": "def"},
 		},
@@ -589,6 +623,7 @@ func Test_setDefaults(t *testing.T) {
 			args{
 				map[string]string{"foo": "bar", "abc": ""},
 				map[string]string{"foo": "bar", "abc": "foo"},
+				nil,
 			},
 			map[string]string{"foo": "bar", "abc": "foo"},
 		},
@@ -597,6 +632,7 @@ func Test_setDefaults(t *testing.T) {
 			args{
 				map[string]string{"foo": "bar", "abc": "def"},
 				map[string]string{"foo": "bar", "abc": "foo"},
+				nil,
 			},
 			map[string]string{"foo": "bar", "abc": "def"},
 		},
@@ -605,6 +641,7 @@ func Test_setDefaults(t *testing.T) {
 			args{
 				map[string]string{"foo": "bar", "abc": "def"},
 				map[string]string{"bar": "foo"},
+				nil,
 			},
 			map[string]string{"foo": "bar", "abc": "def"},
 		},
@@ -613,6 +650,7 @@ func Test_setDefaults(t *testing.T) {
 			args{
 				map[string]string{"foo": "bar"},
 				map[string]string{"foo": "bar", "bar": "foo"},
+				nil,
 			},
 			map[string]string{"foo": "bar"},
 		},
@@ -621,6 +659,7 @@ func Test_setDefaults(t *testing.T) {
 			args{
 				map[string]string{"foo": "bar"},
 				map[string]string{},
+				nil,
 			},
 			map[string]string{"foo": "bar"},
 		},
@@ -629,13 +668,23 @@ func Test_setDefaults(t *testing.T) {
 			args{
 				map[string]string{},
 				map[string]string{"foo": "bar"},
+				nil,
 			},
 			map[string]string{},
+		},
+		{
+			"hardcoded",
+			args{
+				map[string]string{"foo": "abc"},
+				map[string]string{"foo": "bar"},
+				map[string]bool{"abc": true},
+			},
+			map[string]string{"foo": "bar"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setDefaults(tt.args.params, tt.args.defaults)
+			setDefaults(tt.args.params, tt.args.hardCoded, tt.args.defaults)
 			if !reflect.DeepEqual(tt.args.params, tt.want) {
 				t.Errorf("SetDefaults() got = %v, want %v", tt.args.params, tt.want)
 			}
