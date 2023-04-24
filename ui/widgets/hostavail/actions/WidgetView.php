@@ -43,20 +43,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			array_intersect($interface_types, $this->fields_values['interface_type'])
 		);
 
-		$groupids = null;
-
-		if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid')) {
-			$host_group = API::HostGroup()->get([
-				'output' => [],
-				'hostids' => $this->getInput('dynamic_hostid'),
-				'preservekeys' => true
-			]);
-			$groupids = array_keys($host_group);
-		}
-		elseif (!$this->isTemplateDashboard() && $this->fields_values['groupids']) {
-			$groupids = getSubGroups($this->fields_values['groupids']);
-		}
-
 		$hosts_types = $this->fields_values['interface_type'] ?: $interface_types;
 
 		$hosts_total = array_fill_keys($interface_types, 0);
@@ -66,14 +52,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 			INTERFACE_AVAILABLE_FALSE => 0
 		]);
 
-		$db_hosts = API::Host()->get([
+		$options = [
 			'output' => [],
 			'selectInterfaces' => ['type', 'available'],
-			'groupids' => $groupids,
 			'filter' => $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
 				? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
 				: ['status' => HOST_STATUS_MONITORED]
-		]);
+		];
+
+		if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid')) {
+			$options['hostids'] = [$this->getInput('dynamic_hostid')];
+		}
+		else {
+			$options['groupids'] = !$this->isTemplateDashboard() && $this->fields_values['groupids']
+				? getSubGroups($this->fields_values['groupids'])
+				: null;
+		}
+
+		$db_hosts = API::Host()->get($options);
 
 		$availability_priority = [INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_UNKNOWN, INTERFACE_AVAILABLE_TRUE];
 
