@@ -208,7 +208,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_LOG:
 					case ITEM_VALUE_TYPE_BINARY:
 						$value = $value_type == ITEM_VALUE_TYPE_BINARY
-							? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+							? italic(_('binary value'))
 							: formatHistoryValue($last_value, $items[$itemid], false);
 
 						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
