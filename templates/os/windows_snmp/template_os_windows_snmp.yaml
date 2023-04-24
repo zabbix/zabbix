@@ -142,7 +142,7 @@ zabbix_export:
           key: snmptrap.fallback
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -158,7 +158,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -216,7 +216,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -240,7 +240,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -268,7 +268,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -291,7 +291,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -330,7 +330,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -352,7 +352,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -650,8 +650,9 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
+              delay: 5m
               history: 7d
-              trends: 0d
+              trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -733,7 +734,7 @@ zabbix_export:
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
               delay: 1h
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IF-MIB
                 The type of interface.
@@ -923,7 +924,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: '(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
-              description: 'Space utilization in % for {#FSNAME}'
+              description: 'The space utilization expressed in % for {#FSNAME}.'
               tags:
                 -
                   tag: component

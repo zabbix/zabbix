@@ -72,7 +72,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Veeam: Get metrics|<p>The result of API requests is expressed in the JSON.</p>|Script|veeam.get.metrics|
-|Veeam: Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Veeam: Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -84,47 +84,47 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Proxies discovery|<p>Discovery of proxies.</p>|Dependent item|veeam.proxies.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.proxies.data`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Proxies discovery|<p>Discovery of proxies.</p>|Dependent item|veeam.proxies.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.proxies.data`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Proxies discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam: Server [{#NAME}]: Get data|<p>Gets raw data collected by the proxy server.</p>|Dependent item|veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</li></ul>|
-|Veeam: Proxy [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.proxy.raw[{#NAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.proxies.data.[?(@.id=='{#ID}')].first()`</li></ul>|
-|Veeam: Proxy [{#NAME}] [{#TYPE}]: Max Task Count|<p>The maximum number of concurrent tasks.</p>|Dependent item|veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.server.maxTaskCount`</li></ul>|
-|Veeam: Proxy [{#NAME}] [{#TYPE}]: Host name|<p>The name of the proxy server.</p>|Dependent item|veeam.proxy.server.name[{#NAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.name`</li></ul>|
-|Veeam: Proxy [{#NAME}] [{#TYPE}]: Host type|<p>The type of the proxy server.</p>|Dependent item|veeam.proxy.server.type[{#NAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.type`</li></ul>|
+|Veeam: Server [{#NAME}]: Get data|<p>Gets raw data collected by the proxy server.</p>|Dependent item|veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</p></li></ul>|
+|Veeam: Proxy [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.proxy.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.proxies.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
+|Veeam: Proxy [{#NAME}] [{#TYPE}]: Max Task Count|<p>The maximum number of concurrent tasks.</p>|Dependent item|veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.server.maxTaskCount`</p></li></ul>|
+|Veeam: Proxy [{#NAME}] [{#TYPE}]: Host name|<p>The name of the proxy server.</p>|Dependent item|veeam.proxy.server.name[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.name`</p></li></ul>|
+|Veeam: Proxy [{#NAME}] [{#TYPE}]: Host type|<p>The type of the proxy server.</p>|Dependent item|veeam.proxy.server.type[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.type`</p></li></ul>|
 
 ### LLD rule Repositories discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Repositories discovery|<p>Discovery of repositories.</p>|Dependent item|veeam.repositories.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.repositories_states.data`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Repositories discovery|<p>Discovery of repositories.</p>|Dependent item|veeam.repositories.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.repositories_states.data`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Repositories discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam: Repository [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.repositories.raw[{#NAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</li></ul>|
-|Veeam: Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]|<p>Used space by repositories expressed in gigabytes (GB).</p>|Dependent item|veeam.repository.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.usedSpaceGB`</li></ul>|
-|Veeam: Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]|<p>Free space of repositories expressed in gigabytes (GB).</p>|Dependent item|veeam.repository.free.space[{#NAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.freeGB`</li></ul>|
+|Veeam: Repository [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.repositories.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
+|Veeam: Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]|<p>Used space by repositories expressed in gigabytes (GB).</p>|Dependent item|veeam.repository.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usedSpaceGB`</p></li></ul>|
+|Veeam: Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]|<p>Free space of repositories expressed in gigabytes (GB).</p>|Dependent item|veeam.repository.free.space[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.freeGB`</p></li></ul>|
 
 ### LLD rule Sessions discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Sessions discovery|<p>Discovery of sessions.</p>|Dependent item|veeam.sessions.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.sessions.data`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Sessions discovery|<p>Discovery of sessions.</p>|Dependent item|veeam.sessions.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sessions.data`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Sessions discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Veeam: Session [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.sessions.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Veeam: Session [{#NAME}] [{#TYPE}]: State|<p>The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.</p>|Dependent item|veeam.sessions.state[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.state`</li></ul>|
-|Veeam: Session [{#NAME}] [{#TYPE}]: Result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.sessions.result[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.result.result`</li></ul>|
-|Veeam: Session [{#NAME}] [{#TYPE}]: Message|<p>A message that explains the session result.</p>|Dependent item|veeam.sessions.message[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.result.message`</li></ul>|
-|Veeam: Session progress percent [{#NAME}] [{#TYPE}]|<p>The progress of the session expressed as percentage.</p>|Dependent item|veeam.sessions.progress.percent[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.progressPercent`</li></ul>|
+|Veeam: Session [{#NAME}] [{#TYPE}]: State|<p>The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.</p>|Dependent item|veeam.sessions.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li></ul>|
+|Veeam: Session [{#NAME}] [{#TYPE}]: Result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.sessions.result[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.result`</p></li></ul>|
+|Veeam: Session [{#NAME}] [{#TYPE}]: Message|<p>A message that explains the session result.</p>|Dependent item|veeam.sessions.message[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.message`</p></li></ul>|
+|Veeam: Session progress percent [{#NAME}] [{#TYPE}]|<p>The progress of the session expressed as percentage.</p>|Dependent item|veeam.sessions.progress.percent[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.progressPercent`</p></li></ul>|
 
 ### Trigger prototypes for Sessions discovery
 
@@ -136,15 +136,15 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Jobs states discovery|<p>Discovery of the jobs states.</p>|Dependent item|veeam.job.state.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.jobs_states.data`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Jobs states discovery|<p>Discovery of the jobs states.</p>|Dependent item|veeam.job.state.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs_states.data`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Jobs states discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam: Job states [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from the job states with the name `[{#NAME}]`.</p>|Dependent item|veeam.jobs.states.raw[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.jobs_states.data.[?(@.id=='{#ID}')].first()`</li></ul>|
-|Veeam: Job states [{#NAME}] [{#TYPE}]: Status|<p>The current status of the job. The enums used: `running`, `inactive`, `disabled`.</p>|Dependent item|veeam.jobs.status[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.status`</li></ul>|
-|Veeam: Job states [{#NAME}] [{#TYPE}]: Last result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.jobs.last.result[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.lastResult`</li></ul>|
+|Veeam: Job states [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from the job states with the name `[{#NAME}]`.</p>|Dependent item|veeam.jobs.states.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs_states.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
+|Veeam: Job states [{#NAME}] [{#TYPE}]: Status|<p>The current status of the job. The enums used: `running`, `inactive`, `disabled`.</p>|Dependent item|veeam.jobs.status[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li></ul>|
+|Veeam: Job states [{#NAME}] [{#TYPE}]: Last result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.jobs.last.result[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastResult`</p></li></ul>|
 
 ### Trigger prototypes for Jobs states discovery
 
@@ -154,6 +154,7 @@ This template has been tested on:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

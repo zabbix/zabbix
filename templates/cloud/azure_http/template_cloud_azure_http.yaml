@@ -81,7 +81,7 @@ zabbix_export:
           type: SCRIPT
           key: azure.get.resources
           delay: 10m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -264,7 +264,7 @@ zabbix_export:
           type: SCRIPT
           key: azure.get.storage.acc
           delay: 10m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -887,7 +887,7 @@ zabbix_export:
               name: 'Azure: Storage account [{#NAME}]: Get data'
               type: SCRIPT
               key: 'azure.get.storage.acc[{#NAME}]'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               params: |
@@ -3156,7 +3156,7 @@ zabbix_export:
           name: 'Azure Microsoft SQL: Get data'
           type: SCRIPT
           key: azure.db.mssql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -4231,7 +4231,7 @@ zabbix_export:
           name: 'Azure Microsoft SQL: Get data'
           type: SCRIPT
           key: azure.db.mssql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -5164,7 +5164,7 @@ zabbix_export:
           name: 'Azure MySQL: Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -5912,7 +5912,7 @@ zabbix_export:
           name: 'Azure MySQL: Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -6770,7 +6770,7 @@ zabbix_export:
           name: 'Azure PostgreSQL: Get data'
           type: SCRIPT
           key: azure.db.pgsql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -7640,7 +7640,7 @@ zabbix_export:
           name: 'Azure PostgreSQL: Get data'
           type: SCRIPT
           key: azure.db.pgsql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -8781,7 +8781,7 @@ zabbix_export:
           name: 'Azure: Get data'
           type: SCRIPT
           key: azure.vm.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |

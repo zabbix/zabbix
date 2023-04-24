@@ -35,7 +35,7 @@ zabbix_export:
           key: 'dell.server.contact[sysContact]'
           delay: 1h
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -58,7 +58,7 @@ zabbix_export:
           key: 'dell.server.descr[sysDescr]'
           delay: 1h
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -173,7 +173,7 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'dell.server.hw.uptime[hrSystemUptime]'
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -201,7 +201,7 @@ zabbix_export:
           key: 'dell.server.location[sysLocation]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -224,7 +224,7 @@ zabbix_export:
           key: 'dell.server.name[sysName]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -259,7 +259,7 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'dell.server.net.uptime[sysUpTime]'
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -281,7 +281,7 @@ zabbix_export:
           key: 'dell.server.objectid[sysObjectID]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -302,7 +302,7 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
           key: 'dell.server.status[globalSystemStatus]'
           history: 7d
-          trends: 0d
+          trends: '0'
           description: |
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.
@@ -400,7 +400,7 @@ zabbix_export:
           key: snmptrap.fallback
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -457,7 +457,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 Current state of battery.
@@ -549,7 +549,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -573,7 +573,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The status of the controller itself without the propagation of any contained component status.
@@ -690,7 +690,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 This attribute defines the probe status of the cooling device.
@@ -753,7 +753,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The media type of the physical disk. Possible Values:
@@ -781,7 +781,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -805,7 +805,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -842,7 +842,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -870,7 +870,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 Indicates whether the physical disk has received a predictive failure alert.
@@ -911,7 +911,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The status of the physical disk itself without the propagation of any contained component status.
@@ -984,7 +984,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0600.0012.0001.0005 This attribute defines the status of the power supply.
@@ -1047,7 +1047,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: FLOAT
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -1225,7 +1225,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: IDRAC-MIB-SMIv2

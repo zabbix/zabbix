@@ -53,11 +53,11 @@ Custom processes set in macros:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Process [{#NAME}]: Get data|<p>Summary metrics collected during the process {#NAME}.</p>|Dependent item|custom.proc.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️Custom on fail: Set value to: `Failed to retrieve process {#NAME} data.`</p></li></ul>|
+|Process [{#NAME}]: Get data|<p>Summary metrics collected during the process {#NAME}.</p>|Dependent item|custom.proc.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️Custom on fail: Set value to: `Failed to retrieve process {#NAME} data`</p></li></ul>|
 |Process [{#NAME}]: Memory usage (rss)|<p>The summary of Resident Set Size (RSS) memory used by the process {#NAME} in bytes.</p>|Dependent item|custom.proc.rss[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rss`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Process [{#NAME}]: Memory usage (vsize)|<p>The summary of virtual memory used by process {#NAME} in bytes.</p>|Dependent item|custom.proc.vmem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vsize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Process [{#NAME}]: Memory usage, %|<p>The percentage of real memory used by the process {#NAME}.</p>|Dependent item|custom.proc.pmem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pmem`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Process [{#NAME}]: Number of running processes|<p>The number of running processes {#NAME}.</p>|Dependent item|custom.proc.num[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.processes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Process [{#NAME}]: Number of running processes|<p>The number of running processes {#NAME}.</p>|Dependent item|custom.proc.num[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.processes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Process [{#NAME}]: Number of threads|<p>The number of threads {#NAME}.</p>|Dependent item|custom.proc.thread[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.threads`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Process [{#NAME}]: Number of page faults|<p>The number of page faults {#NAME}.</p>|Dependent item|custom.proc.page[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.page_faults`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Process [{#NAME}]: Size of locked memory|<p>The size of locked memory {#NAME}.</p>|Dependent item|custom.proc.mem.locked[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lck`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -71,6 +71,7 @@ Custom processes set in macros:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

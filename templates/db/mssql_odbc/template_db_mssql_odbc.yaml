@@ -2019,7 +2019,7 @@ zabbix_export:
           key: mssql.uptime
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: 'MS SQL Server uptime in ''N days, hh:mm:ss'' format.'
           preprocessing:

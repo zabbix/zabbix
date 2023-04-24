@@ -441,7 +441,7 @@ zabbix_export:
           key: system.hostname
           delay: 1h
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: 'The host name of the system.'
           inventory_link: NAME
@@ -457,7 +457,7 @@ zabbix_export:
           triggers:
             -
               uuid: c2fc80044fa94f0d97c72bd1d749b731
-              expression: 'last(/Linux by Zabbix agent active/system.hostname,#1)<>last(/Linux by Zabbix agent active/system.hostname,#2) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
+              expression: 'change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
               name: 'Linux: System name has changed'
               event_name: 'Linux: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -539,7 +539,7 @@ zabbix_export:
           triggers:
             -
               uuid: e27cb7063ca841a2b78aa547ec0d001c
-              expression: 'last(/Linux by Zabbix agent active/system.sw.os,#1)<>last(/Linux by Zabbix agent active/system.sw.os,#2) and length(last(/Linux by Zabbix agent active/system.sw.os))>0'
+              expression: 'change(/Linux by Zabbix agent active/system.sw.os) and length(last(/Linux by Zabbix agent active/system.sw.os))>0'
               name: 'Linux: Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
@@ -547,29 +547,42 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Linux: System name has changed'
-                  expression: 'last(/Linux by Zabbix agent active/system.hostname,#1)<>last(/Linux by Zabbix agent active/system.hostname,#2) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
+                  expression: 'change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
               tags:
                 -
                   tag: scope
                   value: notice
         -
           uuid: 16b1e5ab950040ef8c29139e0649d622
-          name: 'Linux: Software installed'
+          name: 'Linux: Number of installed packages'
           type: ZABBIX_ACTIVE
-          key: system.sw.packages
+          key: system.sw.packages.get
           delay: 1h
-          history: 2w
-          trends: '0'
-          value_type: TEXT
+          history: 7d
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
           tags:
             -
               tag: component
               value: os
+          triggers:
+            -
+              uuid: bd57d37531ac48f5b96a9f45453f3c35
+              expression: 'change(/Linux by Zabbix agent active/system.sw.packages.get)<>0'
+              name: 'Linux: Number of installed packages has been changed'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: f08e1de57cbd4b08b9fd3294d0d95906
           name: 'Linux: Free swap space'
@@ -623,7 +636,7 @@ zabbix_export:
           key: system.uname
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: 'The information as normally returned by `uname -a`.'
           preprocessing:
@@ -642,7 +655,7 @@ zabbix_export:
           key: system.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
           tags:
@@ -701,14 +714,27 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Linux: Operating system description has changed'
-                  expression: 'last(/Linux by Zabbix agent active/system.sw.os,#1)<>last(/Linux by Zabbix agent active/system.sw.os,#2) and length(last(/Linux by Zabbix agent active/system.sw.os))>0'
+                  expression: 'change(/Linux by Zabbix agent active/system.sw.os) and length(last(/Linux by Zabbix agent active/system.sw.os))>0'
                 -
                   name: 'Linux: System name has changed'
-                  expression: 'last(/Linux by Zabbix agent active/system.hostname,#1)<>last(/Linux by Zabbix agent active/system.hostname,#2) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
+                  expression: 'change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
               tags:
                 -
                   tag: scope
                   value: security
+        -
+          uuid: 6c1de983421846c9acef8f465ff2f196
+          name: 'Linux: Get filesystems'
+          type: ZABBIX_ACTIVE
+          key: vfs.fs.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 5bf94ec3debc459fa3e13449199052ee
           name: 'Linux: Available memory'
@@ -791,6 +817,39 @@ zabbix_export:
                 -
                   tag: scope
                   value: performance
+        -
+          uuid: 090fb1a5698e4e7080abf379b377b6f5
+          name: 'Linux: Active agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,active_agent,available]'
+          history: 7d
+          description: |
+            Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - unknown
+            1 - available
+            2 - not available
+          valuemap:
+            name: zabbix.host.active_agent.available
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: a022259fc3cf454f93bc82cca27391f1
+              expression: 'min(/Linux by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
+              name: 'Linux: Active checks are not available'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 0b47631fb1334f78a7fe5207194a5476
@@ -998,7 +1057,7 @@ zabbix_export:
                     1. It can be triggered if the operations status is down.
                     2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
                     3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
-                              
+                    
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
                   tags:
@@ -1012,11 +1071,12 @@ zabbix_export:
               key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]'
               delay: 5m
               history: 7d
-              trends: 0d
+              trends: '0'
               units: bps
               description: |
                 It indicates the latest or current speed value of the interface. The value is an integer representing the link speed expressed in bits/sec.
                 This attribute is only valid for the interfaces that implement the ethtool `get_link_ksettings` method (mostly Ethernet).
+                
                 Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
               preprocessing:
                 -
@@ -1041,7 +1101,7 @@ zabbix_export:
               key: 'vfs.file.contents["/sys/class/net/{#IFNAME}/type"]'
               delay: 1h
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 It indicates the interface protocol type as a decimal value.
                 See `include/uapi/linux/if_arp.h` for all possible values.
@@ -1125,7 +1185,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold..'
+              description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1512,9 +1572,9 @@ zabbix_export:
         -
           uuid: 5c9b5dbed44c4af0957ff9316f8fb761
           name: 'Mounted filesystem discovery'
-          type: ZABBIX_ACTIVE
-          key: vfs.fs.discovery
-          delay: 1h
+          type: DEPENDENT
+          key: vfs.fs.dependent.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1541,11 +1601,19 @@ zabbix_export:
             -
               uuid: 5cc9099851ee4f4498fd74ec2c377eb4
               name: '{#FSNAME}: Free inodes in %'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.inodes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -1556,14 +1624,16 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 98e196ffb6f0422baf007fcff5f45b60
-                  expression: 'min(/Linux by Zabbix agent active/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                  expression: 'min(/Linux by Zabbix agent active/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes'
                   event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
-                    It may become impossible to write to disk if there are no index nodes left.
-                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                    It may become impossible to write to a disk if there are no index nodes left.
+                    The following error messages may be returned as symptoms, even though the free space is available:
+                    - 'No space left on device';
+                    - 'Disk is full'.
                   tags:
                     -
                       tag: scope
@@ -1573,18 +1643,20 @@ zabbix_export:
                       value: performance
                 -
                   uuid: a17e14a65c53447a9ce607799a62e7dd
-                  expression: 'min(/Linux by Zabbix agent active/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
+                  expression: 'min(/Linux by Zabbix agent active/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes'
                   event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: |
-                    It may become impossible to write to disk if there are no index nodes left.
-                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                    It may become impossible to write to a disk if there are no index nodes left.
+                    The following error messages may be returned as symptoms, even though the free space is available:
+                    - 'No space left on device';
+                    - 'Disk is full'.
                   dependencies:
                     -
                       name: '{#FSNAME}: Running out of free inodes'
-                      expression: 'min(/Linux by Zabbix agent active/vfs.fs.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                      expression: 'min(/Linux by Zabbix agent active/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     -
                       tag: scope
@@ -1595,12 +1667,20 @@ zabbix_export:
             -
               uuid: b33989051217493cb9124302297e409f
               name: '{#FSNAME}: Space utilization'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.fs.size[{#FSNAME},pused]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Space utilization in % for {#FSNAME}'
+              description: 'Space utilization expressed in % for `{#FSNAME}`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.pused
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -1611,11 +1691,19 @@ zabbix_export:
             -
               uuid: 5cee504041e347719b35ee2c5a6056b8
               name: '{#FSNAME}: Total space'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.fs.size[{#FSNAME},total]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},total]'
+              delay: '0'
               history: 7d
               units: B
-              description: 'Total space in bytes'
+              description: 'The total space expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.total
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -1626,11 +1714,19 @@ zabbix_export:
             -
               uuid: f23970d301be4085ab9038d3078b3871
               name: '{#FSNAME}: Used space'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.fs.size[{#FSNAME},used]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+              delay: '0'
               history: 7d
               units: B
-              description: 'Used storage in bytes'
+              description: 'Used storage expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.used
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -1638,12 +1734,85 @@ zabbix_export:
                 -
                   tag: filesystem
                   value: '{#FSNAME}'
+            -
+              uuid: 7eb5cb610b1e4c438af380383c75047f
+              name: '{#FSNAME}: Get filesystem data'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},data]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
+              master_item:
+                key: vfs.fs.get
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: e335d40e5d0e4e41b29f1b355018dd91
+              name: '{#FSNAME}: Filesystem is read-only'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},readonly]'
+              delay: '0'
+              history: 7d
+              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.options
+                  error_handler: DISCARD_VALUE
+                -
+                  type: REGEX
+                  parameters:
+                    - '(?:^|,)ro\b'
+                    - '1'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 001c20d581824f0380244745ce0fae9e
+                  expression: 'last(/Linux by Zabbix agent active/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/Linux by Zabbix agent active/vfs.fs.dependent[{#FSNAME},readonly])=1'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Linux by Zabbix agent active/vfs.fs.dependent[{#FSNAME},readonly])=0'
+                  name: '{#FSNAME}: Filesystem has become read-only'
+                  priority: AVERAGE
+                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           trigger_prototypes:
             -
               uuid: cf4079132a9d4124aa5e29d6839ae35b
               expression: |
-                last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low'
               event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1665,8 +1834,8 @@ zabbix_export:
             -
               uuid: b56b8cad3bb34fab8132e07a32c432d9
               expression: |
-                last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low'
               event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1682,8 +1851,8 @@ zabbix_export:
                 -
                   name: '{#FSNAME}: Disk space is critically low'
                   expression: |
-                    last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                    last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1706,14 +1875,23 @@ zabbix_export:
                   type: GRAPH_SUM
                   item:
                     host: 'Linux by Zabbix agent active'
-                    key: 'vfs.fs.size[{#FSNAME},total]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
                     host: 'Linux by Zabbix agent active'
-                    key: 'vfs.fs.size[{#FSNAME},used]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+          master_item:
+            key: vfs.fs.get
+          lld_macro_paths:
+            -
+              lld_macro: '{#FSNAME}'
+              path: $.fsname
+            -
+              lld_macro: '{#FSTYPE}'
+              path: $.fstype
           overrides:
             -
               name: 'Skip metadata collection for dynamic FS'
@@ -1742,6 +1920,10 @@ zabbix_export:
           macro: '{$AGENT.NODATA_TIMEOUT}'
           value: 30m
           description: 'No data timeout for active agents. Consider to keep it relatively high.'
+        -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 5m
+          description: 'Timeout after which agent is considered unavailable.'
         -
           macro: '{$CPU.UTIL.CRIT}'
           value: '90'
@@ -2245,6 +2427,19 @@ zabbix_export:
             -
               value: '826'
               newvalue: 'Vsock monitor header'
+        -
+          uuid: d4a5821461a243c9bf320ea58be1af23
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
         -
           uuid: e815d397c5e44f1791622fd598bc1131
           name: 'Zabbix agent ping status'

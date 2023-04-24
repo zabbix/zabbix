@@ -729,6 +729,7 @@ zabbix_export:
               parameters:
                 - 10m
           url: '{$CLICKHOUSE.SCHEME}://{HOST.CONN}:{$CLICKHOUSE.PORT}/ping'
+          status_codes: ''
           tags:
             -
               tag: component
@@ -742,7 +743,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.process.elapsed
           history: 7d
-          trends: '0'
           value_type: FLOAT
           units: s
           description: 'Get longest running query.'
@@ -1226,7 +1226,7 @@ zabbix_export:
               name: 'ClickHouse: Failed to fetch info data'
               event_name: 'ClickHouse: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -

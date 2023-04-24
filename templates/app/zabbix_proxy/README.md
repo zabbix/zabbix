@@ -18,7 +18,6 @@
 |Zabbix proxy: Utilization of availability manager internal processes, in %|<p>Average percentage of time availability manager processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,availability manager,avg,busy]|
 |Zabbix proxy: Utilization of configuration syncer internal processes, in %|<p>Average percentage of time configuration syncer processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,configuration syncer,avg,busy]|
 |Zabbix proxy: Utilization of discoverer data collector processes, in %|<p>Average percentage of time discoverer processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,discoverer,avg,busy]|
-|Zabbix proxy: Utilization of heartbeat sender internal processes, in %|<p>Average percentage of time heartbeat sender processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,heartbeat sender,avg,busy]|
 |Zabbix proxy: Utilization of ODBC poller data collector processes, in %|<p>Average percentage of time ODBC poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,odbc poller,avg,busy]|
 |Zabbix proxy: Utilization of history poller data collector processes, in %|<p>Average percentage of time history poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,history poller,avg,busy]|
 |Zabbix proxy: Utilization of history syncer internal processes, in %|<p>Average percentage of time history syncer processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,history syncer,avg,busy]|
@@ -38,7 +37,7 @@
 |Zabbix proxy: Utilization of unreachable poller data collector processes, in %|<p>Average percentage of time unreachable poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,unreachable poller,avg,busy]|
 |Zabbix proxy: Utilization of vmware data collector processes, in %|<p>Average percentage of time vmware collector processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,vmware collector,avg,busy]|
 |Zabbix proxy: Configuration cache, % used|<p>Availability statistics of Zabbix configuration cache. Percentage of used buffer.</p>|Zabbix internal|zabbix[rcache,buffer,pused]|
-|Zabbix proxy: Version|<p>Version of Zabbix proxy.</p>|Zabbix internal|zabbix[version]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Zabbix proxy: Version|<p>Version of Zabbix proxy.</p>|Zabbix internal|zabbix[version]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Zabbix proxy: VMware cache, % used|<p>Availability statistics of Zabbix vmware cache. Percentage of used buffer.</p>|Zabbix internal|zabbix[vmware,buffer,pused]|
 |Zabbix proxy: History write cache, % used|<p>Statistics and availability of Zabbix write cache. Percentage of used history buffer.</p><p>History cache is used to store item values. A high number indicates performance problems on the database side.</p>|Zabbix internal|zabbix[wcache,history,pused]|
 |Zabbix proxy: History index cache, % used|<p>Statistics and availability of Zabbix write cache. Percentage of used history index buffer.</p><p>History index cache is used to index values stored in history cache.</p>|Zabbix internal|zabbix[wcache,index,pused]|
@@ -63,7 +62,6 @@
 |Zabbix proxy: Utilization of availability manager processes is high||`avg(/Zabbix proxy health/zabbix[process,availability manager,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"availability manager"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of configuration syncer processes is high||`avg(/Zabbix proxy health/zabbix[process,configuration syncer,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"configuration syncer"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of discoverer processes is high||`avg(/Zabbix proxy health/zabbix[process,discoverer,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"discoverer"}`|Average|**Manual close**: Yes|
-|Zabbix proxy: Utilization of heartbeat sender processes is high||`avg(/Zabbix proxy health/zabbix[process,heartbeat sender,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"heartbeat sender"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of ODBC poller processes is high||`avg(/Zabbix proxy health/zabbix[process,odbc poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"ODBC poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of history poller processes is high||`avg(/Zabbix proxy health/zabbix[process,history poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"history poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of history syncer processes is high||`avg(/Zabbix proxy health/zabbix[process,history syncer,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"history syncer"}`|Average|**Manual close**: Yes|
@@ -91,6 +89,7 @@
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

@@ -54,16 +54,16 @@ In case of Open Source version leave this macro empty.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Consul cluster: Cluster leader|<p>Current leader address.</p>|HTTP agent|consul.get_leader<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Trim: `"`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Consul cluster: Nodes: peers|<p>The number of Raft peers for the datacenter in which the agent is running.</p>|HTTP agent|consul.get_peers<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>JSON Path: `$.length()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Consul cluster: Cluster leader|<p>Current leader address.</p>|HTTP agent|consul.get_leader<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Trim: `"`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Consul cluster: Nodes: peers|<p>The number of Raft peers for the datacenter in which the agent is running.</p>|HTTP agent|consul.get_peers<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Consul cluster: Get nodes|<p>Catalog of nodes registered in a given datacenter.</p>|HTTP agent|consul.get_nodes<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Consul cluster: Get nodes Serf health status|<p>Get Serf Health Status for all agents in cluster.</p>|HTTP agent|consul.get_cluster_serf<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Consul: Nodes: total|<p>Number of nodes on current dc.</p>|Dependent item|consul.nodes_total<p>**Preprocessing**</p><ul><li>JSON Path: `$.length()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Consul: Nodes: passing|<p>Number of agents on current dc with serf health status 'passing'.</p>|Dependent item|consul.nodes_passing<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.Status == "passing")].length()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Consul: Nodes: critical|<p>Number of agents on current dc with serf health status 'critical'.</p>|Dependent item|consul.nodes_critical<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.Status == "critical")].length()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Consul: Nodes: warning|<p>Number of agents on current dc with serf health status 'warning'.</p>|Dependent item|consul.nodes_warning<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.Status == "warning")].length()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Consul: Nodes: total|<p>Number of nodes on current dc.</p>|Dependent item|consul.nodes_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Consul: Nodes: passing|<p>Number of agents on current dc with serf health status 'passing'.</p>|Dependent item|consul.nodes_passing<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "passing")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Consul: Nodes: critical|<p>Number of agents on current dc with serf health status 'critical'.</p>|Dependent item|consul.nodes_critical<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "critical")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Consul: Nodes: warning|<p>Number of agents on current dc with serf health status 'warning'.</p>|Dependent item|consul.nodes_warning<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "warning")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Consul cluster: Get services|<p>Catalog of services registered in a given datacenter.</p>|HTTP agent|consul.get_catalog_services<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Consul: Services: total|<p>Number of services on current dc.</p>|Dependent item|consul.services_total<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Consul: Services: total|<p>Number of services on current dc.</p>|Dependent item|consul.services_total<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Triggers
 
@@ -77,27 +77,27 @@ In case of Open Source version leave this macro empty.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Consul cluster nodes discovery| |Dependent item|consul.lld_nodes<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Consul cluster nodes discovery||Dependent item|consul.lld_nodes<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Consul cluster nodes discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Consul: Node ["{#NODE_NAME}"]: Serf Health|<p>Node Serf Health Status.</p>|Dependent item|consul.serf.health["{#NODE_NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Consul: Node ["{#NODE_NAME}"]: Serf Health|<p>Node Serf Health Status.</p>|Dependent item|consul.serf.health["{#NODE_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### LLD rule Consul cluster services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Consul cluster services discovery| |Dependent item|consul.lld_services<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Consul cluster services discovery||Dependent item|consul.lld_services<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Consul cluster services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Consul: Service ["{#SERVICE_NAME}"]: Nodes passing|<p>The number of nodes with service status `passing` from those registered.</p>|Dependent item|consul.service.nodes_passing["{#SERVICE_NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Consul: Service ["{#SERVICE_NAME}"]: Nodes warning|<p>The number of nodes with service status `warning` from those registered.</p>|Dependent item|consul.service.nodes_warning["{#SERVICE_NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Consul: Service ["{#SERVICE_NAME}"]: Nodes critical|<p>The number of nodes with service status `critical` from those registered.</p>|Dependent item|consul.service.nodes_critical["{#SERVICE_NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Consul: Service ["{#SERVICE_NAME}"]: Nodes passing|<p>The number of nodes with service status `passing` from those registered.</p>|Dependent item|consul.service.nodes_passing["{#SERVICE_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Consul: Service ["{#SERVICE_NAME}"]: Nodes warning|<p>The number of nodes with service status `warning` from those registered.</p>|Dependent item|consul.service.nodes_warning["{#SERVICE_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Consul: Service ["{#SERVICE_NAME}"]: Nodes critical|<p>The number of nodes with service status `critical` from those registered.</p>|Dependent item|consul.service.nodes_critical["{#SERVICE_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Consul cluster: ["{#SERVICE_NAME}"]: Get raw service state|<p>Retrieve service instances providing the service indicated on the path.</p>|HTTP agent|consul.get_service_stats["{#SERVICE_NAME}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Trigger prototypes for Consul cluster services discovery
@@ -108,6 +108,7 @@ In case of Open Source version leave this macro empty.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

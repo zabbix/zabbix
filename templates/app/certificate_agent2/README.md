@@ -45,19 +45,19 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cert: Get|<p>Returns the JSON with attributes of a certificate of the requested site.</p>|Zabbix agent|web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|Cert: Validation result|<p>The certificate validation result. Possible values: valid/invalid/valid-but-self-signed</p>|Dependent item|cert.validation<p>**Preprocessing**</p><ul><li>JSON Path: `$.result.value`</li></ul>|
-|Cert: Last validation status|<p>Last check result message.</p>|Dependent item|cert.message<p>**Preprocessing**</p><ul><li>JSON Path: `$.result.message`</li></ul>|
-|Cert: Version|<p>The version of the encoded certificate.</p>|Dependent item|cert.version<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.version`</li></ul>|
-|Cert: Serial number|<p>The serial number is a positive integer assigned by the CA to each certificate. It is unique for each certificate issued by a given CA. Non-conforming CAs may issue certificates with serial numbers that are negative or zero.</p>|Dependent item|cert.serial_number<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.serial_number`</li></ul>|
-|Cert: Signature algorithm|<p>The algorithm identifier for the algorithm used by the CA to sign the certificate.</p>|Dependent item|cert.signature_algorithm<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.signature_algorithm`</li></ul>|
-|Cert: Issuer|<p>The field identifies the entity that has signed and issued the certificate.</p>|Dependent item|cert.issuer<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.issuer`</li></ul>|
-|Cert: Valid from|<p>The date on which the certificate validity period begins.</p>|Dependent item|cert.not_before<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.not_before.timestamp`</li></ul>|
-|Cert: Expires on|<p>The date on which the certificate validity period ends.</p>|Dependent item|cert.not_after<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.not_after.timestamp`</li></ul>|
-|Cert: Subject|<p>The field identifies the entity associated with the public key stored in the subject public key field.</p>|Dependent item|cert.subject<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.subject`</li></ul>|
-|Cert: Subject alternative name|<p>The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).</p>|Dependent item|cert.alternative_names<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.alternative_names`</li></ul>|
-|Cert: Public key algorithm|<p>The digital signature algorithm is used to verify the signature of a certificate.</p>|Dependent item|cert.public_key_algorithm<p>**Preprocessing**</p><ul><li>JSON Path: `$.x509.public_key_algorithm`</li></ul>|
-|Cert: Fingerprint|<p>The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.</p>|Dependent item|cert.sha1_fingerprint<p>**Preprocessing**</p><ul><li>JSON Path: `$.sha1_fingerprint`</li></ul>|
+|Cert: Get|<p>Returns the JSON with attributes of a certificate of the requested site.</p>|Zabbix agent|web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Cert: Validation result|<p>The certificate validation result. Possible values: valid/invalid/valid-but-self-signed</p>|Dependent item|cert.validation<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.value`</p></li></ul>|
+|Cert: Last validation status|<p>Last check result message.</p>|Dependent item|cert.message<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.message`</p></li></ul>|
+|Cert: Version|<p>The version of the encoded certificate.</p>|Dependent item|cert.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.version`</p></li></ul>|
+|Cert: Serial number|<p>The serial number is a positive integer assigned by the CA to each certificate. It is unique for each certificate issued by a given CA. Non-conforming CAs may issue certificates with serial numbers that are negative or zero.</p>|Dependent item|cert.serial_number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.serial_number`</p></li></ul>|
+|Cert: Signature algorithm|<p>The algorithm identifier for the algorithm used by the CA to sign the certificate.</p>|Dependent item|cert.signature_algorithm<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.signature_algorithm`</p></li></ul>|
+|Cert: Issuer|<p>The field identifies the entity that has signed and issued the certificate.</p>|Dependent item|cert.issuer<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.issuer`</p></li></ul>|
+|Cert: Valid from|<p>The date on which the certificate validity period begins.</p>|Dependent item|cert.not_before<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.not_before.timestamp`</p></li></ul>|
+|Cert: Expires on|<p>The date on which the certificate validity period ends.</p>|Dependent item|cert.not_after<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.not_after.timestamp`</p></li></ul>|
+|Cert: Subject|<p>The field identifies the entity associated with the public key stored in the subject public key field.</p>|Dependent item|cert.subject<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.subject`</p></li></ul>|
+|Cert: Subject alternative name|<p>The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).</p>|Dependent item|cert.alternative_names<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.alternative_names`</p></li></ul>|
+|Cert: Public key algorithm|<p>The digital signature algorithm is used to verify the signature of a certificate.</p>|Dependent item|cert.public_key_algorithm<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.x509.public_key_algorithm`</p></li></ul>|
+|Cert: Fingerprint|<p>The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.</p>|Dependent item|cert.sha1_fingerprint<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sha1_fingerprint`</p></li></ul>|
 
 ### Triggers
 
@@ -69,6 +69,7 @@ This template has been tested on:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

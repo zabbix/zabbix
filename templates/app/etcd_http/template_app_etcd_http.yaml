@@ -1251,14 +1251,14 @@ zabbix_export:
               parameters:
                 - |
                   var data = JSON.parse(value),
-                   lookup = {},
-                   result =[];
+                      lookup = {},
+                      result = [];
                   for (var item, i = 0; item = data[i++];) {
-                   var code = item.labels.grpc_code;
-                   if (!(code in lookup)) {
-                    lookup[code] = 1;
-                    result.push({ "{#GRPC.CODE}": code});
-                  }
+                    var code = item.labels.grpc_code;
+                    if (!(code in lookup)) {
+                      lookup[code] = 1;
+                      result.push({ "{#GRPC.CODE}": code });
+                    }
                   }
                   return JSON.stringify(result);
             -

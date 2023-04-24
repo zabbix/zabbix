@@ -43,20 +43,20 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|InfluxDB: Get instance metrics| |HTTP agent|influx.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
-|InfluxDB: Instance status|<p>Get the health of an instance.</p>|HTTP agent|influx.healthcheck<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"status":"fail"}]}`</p></li><li>JavaScript: `return JSON.parse(value).status == 'pass' ? 1: 0`</li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
+|InfluxDB: Get instance metrics||HTTP agent|influx.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
+|InfluxDB: Instance status|<p>Get the health of an instance.</p>|HTTP agent|influx.healthcheck<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"status":"fail"}]}`</p></li><li><p>JavaScript: `return JSON.parse(value).status == 'pass' ? 1: 0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
 |InfluxDB: Boltdb reads, rate|<p>Total number of boltdb reads per second.</p>|Dependent item|influxdb.boltdb_reads.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="boltdb_reads_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 |InfluxDB: Boltdb writes, rate|<p>Total number of boltdb writes per second.</p>|Dependent item|influxdb.boltdb_writes.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="boltdb_writes_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
-|InfluxDB: Buckets, total|<p>Number of total buckets on the server.</p>|Dependent item|influxdb.buckets.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_buckets_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|InfluxDB: Dashboards, total|<p>Number of total dashboards on the server.</p>|Dependent item|influxdb.dashboards.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_dashboards_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|InfluxDB: Organizations, total|<p>Number of total organizations on the server.</p>|Dependent item|influxdb.organizations.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_organizations_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|InfluxDB: Scrapers, total|<p>Number of total scrapers on the server.</p>|Dependent item|influxdb.scrapers.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_scrapers_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|InfluxDB: Telegraf plugins, total|<p>Number of individual telegraf plugins configured.</p>|Dependent item|influxdb.telegraf_plugins.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_telegraf_plugins_count")].value.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|InfluxDB: Telegrafs, total|<p>Number of total telegraf configurations on the server.</p>|Dependent item|influxdb.telegrafs.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_telegrafs_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|InfluxDB: Tokens, total|<p>Number of total tokens on the server.</p>|Dependent item|influxdb.tokens.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_tokens_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|InfluxDB: Users, total|<p>Number of total users on the server.</p>|Dependent item|influxdb.users.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_users_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|InfluxDB: Version|<p>Version of the InfluxDB instance.</p>|Dependent item|influxdb.version<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.name=="influxdb_info")].labels.version.first()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|InfluxDB: Uptime|<p>InfluxDB process uptime in seconds.</p>|Dependent item|influxdb.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.name=="influxdb_uptime_seconds")].value.first()`</li></ul>|
+|InfluxDB: Buckets, total|<p>Number of total buckets on the server.</p>|Dependent item|influxdb.buckets.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_buckets_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|InfluxDB: Dashboards, total|<p>Number of total dashboards on the server.</p>|Dependent item|influxdb.dashboards.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_dashboards_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|InfluxDB: Organizations, total|<p>Number of total organizations on the server.</p>|Dependent item|influxdb.organizations.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_organizations_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|InfluxDB: Scrapers, total|<p>Number of total scrapers on the server.</p>|Dependent item|influxdb.scrapers.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_scrapers_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|InfluxDB: Telegraf plugins, total|<p>Number of individual telegraf plugins configured.</p>|Dependent item|influxdb.telegraf_plugins.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_telegraf_plugins_count")].value.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|InfluxDB: Telegrafs, total|<p>Number of total telegraf configurations on the server.</p>|Dependent item|influxdb.telegrafs.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_telegrafs_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|InfluxDB: Tokens, total|<p>Number of total tokens on the server.</p>|Dependent item|influxdb.tokens.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_tokens_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|InfluxDB: Users, total|<p>Number of total users on the server.</p>|Dependent item|influxdb.users.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_users_total")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|InfluxDB: Version|<p>Version of the InfluxDB instance.</p>|Dependent item|influxdb.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_info")].labels.version.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|InfluxDB: Uptime|<p>InfluxDB process uptime in seconds.</p>|Dependent item|influxdb.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="influxdb_uptime_seconds")].value.first()`</p></li></ul>|
 |InfluxDB: Workers currently running|<p>Total number of workers currently running tasks.</p>|Dependent item|influxdb.task_executor_runs_active.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |InfluxDB: Workers busy, pct|<p>Percent of total available workers that are currently busy.</p>|Dependent item|influxdb.task_executor_workers_busy.pct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="task_executor_workers_busy")].value.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |InfluxDB: Task runs failed, rate|<p>Total number of failure runs across all tasks.</p>|Dependent item|influxdb.task_executor_complete.failed.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
@@ -75,7 +75,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Organizations discovery|<p>Discovery of organizations metrics.</p>|HTTP agent|influxdb.orgs.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Organizations discovery|<p>Discovery of organizations metrics.</p>|HTTP agent|influxdb.orgs.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Organizations discovery
 
@@ -96,6 +96,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

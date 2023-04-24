@@ -27,7 +27,7 @@ zabbix_export:
           name: 'Hadoop: Get DataNodes states'
           type: HTTP_AGENT
           key: hadoop.datanodes.get
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           preprocessing:
@@ -166,7 +166,7 @@ zabbix_export:
           name: 'Hadoop: Get NameNode stats'
           type: HTTP_AGENT
           key: hadoop.namenode.get
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           url: '{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx'
@@ -528,7 +528,7 @@ zabbix_export:
           name: 'Hadoop: Get NodeManagers states'
           type: HTTP_AGENT
           key: hadoop.nodemanagers.get
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           preprocessing:
@@ -546,7 +546,7 @@ zabbix_export:
           name: 'Hadoop: Get ResourceManager stats'
           type: HTTP_AGENT
           key: hadoop.resourcemanager.get
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx'
@@ -997,7 +997,7 @@ zabbix_export:
               name: 'Hadoop DataNode {#HOSTNAME}: Get stats'
               type: HTTP_AGENT
               key: 'hadoop.datanode.get[{#HOSTNAME}]'
-              history: 0h
+              history: '0'
               trends: '0'
               value_type: TEXT
               url: '{#INFOADDR}/jmx'
@@ -1337,7 +1337,7 @@ zabbix_export:
               name: 'Hadoop NodeManager {#HOSTNAME}: Get stats'
               type: HTTP_AGENT
               key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
-              history: 0h
+              history: '0'
               trends: '0'
               value_type: TEXT
               url: '{#NODEHTTPADDRESS}/jmx'

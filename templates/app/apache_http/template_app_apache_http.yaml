@@ -59,7 +59,8 @@ zabbix_export:
           units: Bps
           description: |
             It is calculated as a rate of change for total bytes statistics.
-            `ReqPerSec` is not used, as it counts the average since the last Apache server start.
+            `BytesPerSec` is not used, as it counts the average since the last Apache server start.
+            
           preprocessing:
             -
               type: JSONPATH
@@ -89,7 +90,7 @@ zabbix_export:
           value_type: TEXT
           description: |
             Getting data from a machine-readable version of the Apache status page.
-            https://httpd.apache.org/docs/current/mod/mod_status.html
+            For more information see Apache Module [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html).
           preprocessing:
             -
               type: JAVASCRIPT
@@ -186,7 +187,9 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'It is calculated as a rate of change for the "Total requests" statistics.</p><p>`ReqPerSec` is not used, as it counts the average since the last Apache server start.'
+          description: |
+            It is calculated as a rate of change for the "Total requests" statistics.
+            `ReqPerSec` is not used, as it counts the average since the last Apache server start.
           preprocessing:
             -
               type: JSONPATH
@@ -226,8 +229,8 @@ zabbix_export:
             -
               uuid: 76cfa6ebf39f4c8fbd8fde9e0f36d3ed
               expression: 'last(/Apache by HTTP/apache.uptime)<10m'
-              name: 'Apache: has been restarted'
-              event_name: 'Apache: has been restarted (uptime < 10m)'
+              name: 'Apache: Host has been restarted'
+              event_name: 'Apache: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -590,8 +593,8 @@ zabbix_export:
           key: apache.mpm.event.discovery
           delay: '0'
           description: |
-            Additional metrics if event MPM is used
-            https://httpd.apache.org/docs/current/mod/event.html
+            The discovery of additional metrics if the event Multi-Processing Module (MPM) is used.
+            For more details see [Apache MPM event](https://httpd.apache.org/docs/current/mod/event.html).
           item_prototypes:
             -
               uuid: f52700379f9a4ee8b378a2eb9caea070
@@ -772,19 +775,19 @@ zabbix_export:
         -
           macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'
           value: '10'
-          description: 'Maximum Apache response time in seconds for trigger expression'
+          description: 'The maximum Apache response time expressed in seconds for a trigger expression.'
         -
           macro: '{$APACHE.STATUS.PATH}'
           value: 'server-status?auto'
-          description: 'The URL path'
+          description: 'The URL path.'
         -
           macro: '{$APACHE.STATUS.PORT}'
           value: '80'
-          description: 'The port of Apache status page'
+          description: 'The port of the Apache status page.'
         -
           macro: '{$APACHE.STATUS.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'The request scheme, which may be either HTTP or HTTPS.'
       dashboards:
         -
           uuid: a328c9e713424465a8e1adec7322b0dc

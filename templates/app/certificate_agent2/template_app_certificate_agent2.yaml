@@ -12,8 +12,7 @@ zabbix_export:
       description: |
         The template to monitor TLS/SSL certificate on the website by Zabbix agent 2 that works without any external scripts.
         
-        Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns
-        JSON with certificate attributes.
+        Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns JSON with certificate attributes.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring
         
@@ -322,7 +321,7 @@ zabbix_export:
           name: 'Cert: Get'
           key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           delay: 15m
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Returns the JSON with attributes of a certificate of the requested site.'

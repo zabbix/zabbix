@@ -12,9 +12,9 @@
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ICMP: ICMP ping| |Simple check|icmpping|
-|ICMP: ICMP loss| |Simple check|icmppingloss|
-|ICMP: ICMP response time| |Simple check|icmppingsec|
+|ICMP: ICMP ping||Simple check|icmpping|
+|ICMP: ICMP loss||Simple check|icmppingloss|
+|ICMP: ICMP response time||Simple check|icmppingsec|
 
 ### Triggers
 
@@ -26,6 +26,7 @@
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

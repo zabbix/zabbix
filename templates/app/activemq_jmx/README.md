@@ -72,13 +72,13 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Broker {#JMXBROKERNAME}: Version|<p>The version of the broker.</p>|JMX agent|jmx[{#JMXOBJ},BrokerVersion]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Broker {#JMXBROKERNAME}: Uptime|<p>The uptime of the broker.</p>|JMX agent|jmx[{#JMXOBJ},UptimeMillis]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|Broker {#JMXBROKERNAME}: Memory limit|<p>Memory limit, in bytes, used for holding undelivered messages before paging to temporary storage.</p>|JMX agent|jmx[{#JMXOBJ},MemoryLimit]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Broker {#JMXBROKERNAME}: Version|<p>The version of the broker.</p>|JMX agent|jmx[{#JMXOBJ},BrokerVersion]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Broker {#JMXBROKERNAME}: Uptime|<p>The uptime of the broker.</p>|JMX agent|jmx[{#JMXOBJ},UptimeMillis]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Broker {#JMXBROKERNAME}: Memory limit|<p>Memory limit, in bytes, used for holding undelivered messages before paging to temporary storage.</p>|JMX agent|jmx[{#JMXOBJ},MemoryLimit]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Broker {#JMXBROKERNAME}: Memory usage in percents|<p>Percent of memory limit used.</p>|JMX agent|jmx[{#JMXOBJ}, MemoryPercentUsage]|
-|Broker {#JMXBROKERNAME}: Storage limit|<p>Disk limit, in bytes, used for persistent messages before producers are blocked.</p>|JMX agent|jmx[{#JMXOBJ},StoreLimit]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Broker {#JMXBROKERNAME}: Storage limit|<p>Disk limit, in bytes, used for persistent messages before producers are blocked.</p>|JMX agent|jmx[{#JMXOBJ},StoreLimit]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Broker {#JMXBROKERNAME}: Storage usage in percents|<p>Percent of store limit used.</p>|JMX agent|jmx[{#JMXOBJ},StorePercentUsage]|
-|Broker {#JMXBROKERNAME}: Temp limit|<p>Disk limit, in bytes, used for non-persistent messages and temporary data before producers are blocked.</p>|JMX agent|jmx[{#JMXOBJ},TempLimit]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Broker {#JMXBROKERNAME}: Temp limit|<p>Disk limit, in bytes, used for non-persistent messages and temporary data before producers are blocked.</p>|JMX agent|jmx[{#JMXOBJ},TempLimit]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Broker {#JMXBROKERNAME}: Temp usage in percents|<p>Percent of temp limit used.</p>|JMX agent|jmx[{#JMXOBJ},TempPercentUsage]|
 |Broker {#JMXBROKERNAME}: Messages enqueue rate|<p>Rate of messages that have been sent to the broker.</p>|JMX agent|jmx[{#JMXOBJ},TotalEnqueueCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Broker {#JMXBROKERNAME}: Messages dequeue rate|<p>Rate of messages that have been delivered by the broker and acknowledged by consumers.</p>|JMX agent|jmx[{#JMXOBJ},TotalDequeueCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
@@ -112,14 +112,14 @@ Metrics are collected by JMX.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count|<p>Number of consumers attached to this destination.</p>|JMX agent|jmx[{#JMXOBJ},ConsumerCount]|
-|{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count total on {#JMXBROKERNAME}|<p>Number of consumers attached to the broker of this destination. Used to suppress destination's triggers when the count of consumers on the broker is lower than threshold.</p>|JMX agent|jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}]<p>**Preprocessing**</p><ul><li><p>In range: `0 -> {$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH}`</p><p>⛔️Custom on fail: Set value to: `{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH}`</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Consumers count total on {#JMXBROKERNAME}|<p>Number of consumers attached to the broker of this destination. Used to suppress destination's triggers when the count of consumers on the broker is lower than threshold.</p>|JMX agent|jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.CONSUMERS.COUNT: "{#JMXDESTINATIONNAME}"}]<p>**Preprocessing**</p><ul><li><p>In range: `0 -> {$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH}`</p><p>⛔️Custom on fail: Set value to: `{$ACTIVEMQ.BROKER.CONSUMERS.MIN.HIGH}`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count|<p>Number of producers attached to this destination.</p>|JMX agent|jmx[{#JMXOBJ},ProducerCount]|
-|{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count total on {#JMXBROKERNAME}|<p>Number of producers attached to the broker of this destination. Used to suppress destination's triggers when the count of producers on the broker is lower than threshold.</p>|JMX agent|jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}]<p>**Preprocessing**</p><ul><li><p>In range: `0 -> {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH}`</p><p>⛔️Custom on fail: Set value to: `{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH}`</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Producers count total on {#JMXBROKERNAME}|<p>Number of producers attached to the broker of this destination. Used to suppress destination's triggers when the count of producers on the broker is lower than threshold.</p>|JMX agent|jmx["org.apache.activemq:type=Broker,brokerName={#JMXBROKERNAME}",{$ACTIVEMQ.TOTAL.PRODUCERS.COUNT: "{#JMXDESTINATIONNAME}"}]<p>**Preprocessing**</p><ul><li><p>In range: `0 -> {$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH}`</p><p>⛔️Custom on fail: Set value to: `{$ACTIVEMQ.BROKER.PRODUCERS.MIN.HIGH}`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Memory usage in percents|<p>The percentage of the memory limit used.</p>|JMX agent|jmx[{#JMXOBJ},MemoryPercentUsage]|
 |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Messages enqueue rate|<p>Rate of messages that have been sent to the destination.</p>|JMX agent|jmx[{#JMXOBJ},EnqueueCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Messages dequeue rate|<p>Rate of messages that has been acknowledged (and removed) from the destination.</p>|JMX agent|jmx[{#JMXOBJ},DequeueCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Queue size|<p>Number of messages on this destination, including any that have been dispatched but not acknowledged.</p>|JMX agent|jmx[{#JMXOBJ},QueueSize]|
-|{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count|<p>Number of messages that have been expired.</p>|JMX agent|jmx[{#JMXOBJ},ExpiredCount]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|{#JMXBROKERNAME}: {#JMXDESTINATIONTYPE} {#JMXDESTINATIONNAME}: Expired messages count|<p>Number of messages that have been expired.</p>|JMX agent|jmx[{#JMXOBJ},ExpiredCount]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Destinations discovery
 
@@ -135,6 +135,7 @@ Metrics are collected by JMX.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

@@ -42,7 +42,7 @@ Metrics are collected by JMX.
 |----|-----------|----|-----------------------|
 |Kafka: Leader election per second|<p>Number of leader elections per second.</p>|JMX agent|jmx["kafka.controller:type=ControllerStats,name=LeaderElectionRateAndTimeMs","Count"]|
 |Kafka: Unclean leader election per second|<p>Number of “unclean” elections per second.</p>|JMX agent|jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Kafka: Controller state on broker|<p>One indicates that the broker is the controller for the cluster.</p>|JMX agent|jmx["kafka.controller:type=KafkaController,name=ActiveControllerCount","Value"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Kafka: Controller state on broker|<p>One indicates that the broker is the controller for the cluster.</p>|JMX agent|jmx["kafka.controller:type=KafkaController,name=ActiveControllerCount","Value"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Kafka: Ineligible pending replica deletes|<p>The number of ineligible pending replica deletes.</p>|JMX agent|jmx["kafka.controller:type=KafkaController,name=ReplicasIneligibleToDeleteCount","Value"]|
 |Kafka: Pending replica deletes|<p>The number of pending replica deletes.</p>|JMX agent|jmx["kafka.controller:type=KafkaController,name=ReplicasToDeleteCount","Value"]|
 |Kafka: Ineligible pending topic deletes|<p>The number of ineligible pending topic deletes.</p>|JMX agent|jmx["kafka.controller:type=KafkaController,name=TopicsIneligibleToDeleteCount","Value"]|
@@ -55,7 +55,7 @@ Metrics are collected by JMX.
 |Kafka: Bytes rejected per second|<p>The rate at which bytes rejected per second by the broker.</p>|JMX agent|jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec","Count"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Kafka: Client fetch request failed per second|<p>Number of client fetch request failures per second.</p>|JMX agent|jmx["kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec","Count"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Kafka: Produce requests failed per second|<p>Number of failed produce requests per second.</p>|JMX agent|jmx["kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec","Count"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Kafka: Request handler average idle percent|<p>Indicates the percentage of time that the request handler (IO) threads are not in use.</p>|JMX agent|jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `100`</li></ul>|
+|Kafka: Request handler average idle percent|<p>Indicates the percentage of time that the request handler (IO) threads are not in use.</p>|JMX agent|jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `100`</p></li></ul>|
 |Kafka: Fetch-Consumer response send time, mean|<p>Average time taken, in milliseconds, to send the response.</p>|JMX agent|jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","Mean"]|
 |Kafka: Fetch-Consumer response send time, p95|<p>The time taken, in milliseconds, to send the response for 95th percentile.</p>|JMX agent|jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","95thPercentile"]|
 |Kafka: Fetch-Consumer response send time, p99|<p>The time taken, in milliseconds, to send the response for 99th percentile.</p>|JMX agent|jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","99thPercentile"]|
@@ -82,7 +82,7 @@ Metrics are collected by JMX.
 |Kafka: Temporary memory size in bytes (Produce), max|<p>The maximum of temporary memory used for converting message formats and decompressing messages.</p>|JMX agent|jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Max"]|
 |Kafka: Temporary memory size in bytes (Produce), avg|<p>The amount of temporary memory used for converting message formats and decompressing messages.</p>|JMX agent|jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Mean"]|
 |Kafka: Temporary memory size in bytes (Produce), min|<p>The minimum of temporary memory used for converting message formats and decompressing messages.</p>|JMX agent|jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Min"]|
-|Kafka: Network processor average idle percent|<p>The average percentage of time that the network processors are idle.</p>|JMX agent|jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `100`</li></ul>|
+|Kafka: Network processor average idle percent|<p>The average percentage of time that the network processors are idle.</p>|JMX agent|jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `100`</p></li></ul>|
 |Kafka: Requests in producer purgatory|<p>Number of requests waiting in producer purgatory.</p>|JMX agent|jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Fetch","Value"]|
 |Kafka: Requests in fetch purgatory|<p>Number of requests waiting in fetch purgatory.</p>|JMX agent|jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Produce","Value"]|
 |Kafka: Replication maximum lag|<p>The maximum lag between the time that messages are received by the leader replica and by the follower replicas.</p>|JMX agent|jmx["kafka.server:type=ReplicaFetcherManager,name=MaxLag,clientId=Replica","Value"]|
@@ -94,10 +94,10 @@ Metrics are collected by JMX.
 |Kafka: Partition count|<p>The number of partitions in the broker.</p>|JMX agent|jmx["kafka.server:type=ReplicaManager,name=PartitionCount","Value"]|
 |Kafka: Number of reassigning partitions|<p>The number of reassigning leader partitions on a broker.</p>|JMX agent|jmx["kafka.server:type=ReplicaManager,name=ReassigningPartitions","Value"]|
 |Kafka: Request queue size|<p>The size of the delay queue.</p>|JMX agent|jmx["kafka.server:type=Request","queue-size"]|
-|Kafka: Version|<p>Current version of broker.</p>|JMX agent|jmx["kafka.server:type=app-info","version"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Kafka: Uptime|<p>The service uptime expressed in seconds.</p>|JMX agent|jmx["kafka.server:type=app-info","start-time-ms"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Kafka: Version|<p>Current version of broker.</p>|JMX agent|jmx["kafka.server:type=app-info","version"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Kafka: Uptime|<p>The service uptime expressed in seconds.</p>|JMX agent|jmx["kafka.server:type=app-info","start-time-ms"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Kafka: ZooKeeper client request latency|<p>Latency in milliseconds for ZooKeeper requests from broker.</p>|JMX agent|jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"]|
-|Kafka: ZooKeeper connection status|<p>Connection status of broker's ZooKeeper session.</p>|JMX agent|jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Kafka: ZooKeeper connection status|<p>Connection status of broker's ZooKeeper session.</p>|JMX agent|jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Kafka: ZooKeeper disconnect rate|<p>ZooKeeper client disconnect per second.</p>|JMX agent|jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Kafka: ZooKeeper session expiration rate|<p>ZooKeeper client session expiration per second.</p>|JMX agent|jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Kafka: ZooKeeper readonly rate|<p>ZooKeeper client readonly per second.</p>|JMX agent|jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
@@ -123,7 +123,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Topic Metrics (write)| |JMX agent|jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*"]|
+|Topic Metrics (write)||JMX agent|jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic=*"]|
 
 ### Item prototypes for Topic Metrics (write)
 
@@ -136,7 +136,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Topic Metrics (read)| |JMX agent|jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*"]|
+|Topic Metrics (read)||JMX agent|jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic=*"]|
 
 ### Item prototypes for Topic Metrics (read)
 
@@ -148,7 +148,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Topic Metrics (errors)| |JMX agent|jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic=*"]|
+|Topic Metrics (errors)||JMX agent|jmx.discovery[beans,"kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic=*"]|
 
 ### Item prototypes for Topic Metrics (errors)
 
@@ -158,6 +158,7 @@ Metrics are collected by JMX.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

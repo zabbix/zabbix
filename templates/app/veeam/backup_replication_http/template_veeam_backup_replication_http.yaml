@@ -74,7 +74,7 @@ zabbix_export:
           type: SCRIPT
           key: veeam.get.metrics
           delay: 5m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -288,7 +288,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.jobs.states.raw[{#ID}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Gets raw data from the job states with the name `[{#NAME}]`.'
@@ -420,7 +420,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.raw[{#NAME}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.'
@@ -471,7 +471,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.server.raw[{#NAME}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Gets raw data collected by the proxy server.'
@@ -578,7 +578,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.repositories.raw[{#NAME}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.'
@@ -769,7 +769,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.raw[{#ID}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.'

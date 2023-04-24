@@ -1146,7 +1146,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Global write Bytes per second'
+          description: 'The global write bytes per second.'
           preprocessing:
             -
               type: JSONPATH

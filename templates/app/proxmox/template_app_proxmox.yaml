@@ -508,7 +508,7 @@ zabbix_export:
               key: 'proxmox.lxc.uptime[{#LXC.ID}]'
               delay: '0'
               history: 2w
-              trends: 0d
+              trends: '0'
               units: uptime
               description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
               preprocessing:
@@ -1258,7 +1258,7 @@ zabbix_export:
               key: 'proxmox.node.uptime[{#NODE.NAME}]'
               delay: '0'
               history: 2w
-              trends: 0d
+              trends: '0'
               units: uptime
               description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
               preprocessing:
@@ -1769,7 +1769,7 @@ zabbix_export:
               key: 'proxmox.qemu.uptime[{#QEMU.ID}]'
               delay: '0'
               history: 2w
-              trends: 0d
+              trends: '0'
               units: uptime
               description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
               preprocessing:

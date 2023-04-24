@@ -52,7 +52,7 @@ zabbix_export:
           name: 'ES: Get cluster health'
           type: HTTP_AGENT
           key: es.cluster.get_health
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           authtype: BASIC
@@ -70,7 +70,7 @@ zabbix_export:
           name: 'ES: Get cluster stats'
           type: HTTP_AGENT
           key: es.cluster.get_stats
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           authtype: BASIC
@@ -556,7 +556,7 @@ zabbix_export:
           name: 'ES: Get nodes stats'
           type: HTTP_AGENT
           key: es.nodes.get_stats
-          history: 0h
+          history: '0'
           trends: '0'
           value_type: TEXT
           authtype: BASIC

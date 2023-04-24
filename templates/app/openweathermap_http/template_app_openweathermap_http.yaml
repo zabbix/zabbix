@@ -49,7 +49,7 @@ zabbix_export:
           type: SCRIPT
           key: openweathermap.get.data
           delay: 10m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -335,7 +335,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'openweathermap.location.data[{#ID}]'
               delay: '0'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'JSON with result of OpenWeatherMap API request by location.'

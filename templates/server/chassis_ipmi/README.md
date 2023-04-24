@@ -55,7 +55,7 @@ You can set {$IPMI.USER} and {$IPMI.PASSWORD} macros in the template for using o
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IPMI: {#SENSOR_ID}|<p>It is a state of the discrete IPMI sensor.</p>|Dependent item|ipmi.state_text[{#SENSOR_ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.[?(@.id=='{#SENSOR_ID}')].state.text.first()`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|IPMI: {#SENSOR_ID}|<p>It is a state of the discrete IPMI sensor.</p>|Dependent item|ipmi.state_text[{#SENSOR_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.id=='{#SENSOR_ID}')].state.text.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Trigger prototypes for Discrete sensors discovery
 
@@ -73,7 +73,7 @@ You can set {$IPMI.USER} and {$IPMI.PASSWORD} macros in the template for using o
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IPMI: {#SENSOR_ID}, {#SENSOR_UNIT}|<p>It is a state of the threshold IPMI sensor.</p>|Dependent item|ipmi.value[{#SENSOR_ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.[?(@.id=='{#SENSOR_ID}')].value.first()`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|IPMI: {#SENSOR_ID}, {#SENSOR_UNIT}|<p>It is a state of the threshold IPMI sensor.</p>|Dependent item|ipmi.value[{#SENSOR_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.id=='{#SENSOR_ID}')].value.first()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Threshold sensors discovery
 
@@ -88,6 +88,7 @@ You can set {$IPMI.USER} and {$IPMI.PASSWORD} macros in the template for using o
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

@@ -52,15 +52,15 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Ignite kernal metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Ignite kernal metrics||JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=IgniteKernal,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Ignite kernal metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Uptime|<p>Uptime of Ignite instance.</p>|JMX agent|jmx["{#JMXOBJ}",UpTime]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Version|<p>Version of Ignite instance.</p>|JMX agent|jmx["{#JMXOBJ}",FullVersion]<p>**Preprocessing**</p><ul><li>Regular expression: `(.*)-\d+ \1`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Local node ID|<p>Unique identifier for this node within grid.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeId]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Uptime|<p>Uptime of Ignite instance.</p>|JMX agent|jmx["{#JMXOBJ}",UpTime]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Version|<p>Version of Ignite instance.</p>|JMX agent|jmx["{#JMXOBJ}",FullVersion]<p>**Preprocessing**</p><ul><li><p>Regular expression: `(.*)-\d+ \1`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Local node ID|<p>Unique identifier for this node within grid.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeId]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Ignite kernal metrics
 
@@ -74,17 +74,17 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cluster metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Cluster metrics||JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterMetricsMXBeanImpl,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Cluster metrics
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Baseline|<p>Total baseline nodes that are registered in the baseline topology.</p>|JMX agent|jmx["{#JMXOBJ}",TotalBaselineNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Active baseline|<p>The number of nodes that are currently active in the baseline topology.</p>|JMX agent|jmx["{#JMXOBJ}",ActiveBaselineNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Client|<p>The number of client nodes in the cluster.</p>|JMX agent|jmx["{#JMXOBJ}",TotalClientNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, total|<p>Total number of nodes.</p>|JMX agent|jmx["{#JMXOBJ}",TotalNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Server|<p>The number of server nodes in the cluster.</p>|JMX agent|jmx["{#JMXOBJ}",TotalServerNodes]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Baseline|<p>Total baseline nodes that are registered in the baseline topology.</p>|JMX agent|jmx["{#JMXOBJ}",TotalBaselineNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Active baseline|<p>The number of nodes that are currently active in the baseline topology.</p>|JMX agent|jmx["{#JMXOBJ}",ActiveBaselineNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Client|<p>The number of client nodes in the cluster.</p>|JMX agent|jmx["{#JMXOBJ}",TotalClientNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, total|<p>Total number of nodes.</p>|JMX agent|jmx["{#JMXOBJ}",TotalNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes, Server|<p>The number of server nodes in the cluster.</p>|JMX agent|jmx["{#JMXOBJ}",TotalServerNodes]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Cluster metrics
 
@@ -98,7 +98,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Local node metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Local node metrics||JMX agent|jmx.discovery[beans,"org.apache:group=Kernal,name=ClusterLocalNodeMetricsMXBeanImpl,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Local node metrics
 
@@ -128,13 +128,13 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TCP discovery SPI| |JMX agent|jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|TCP discovery SPI||JMX agent|jmx.discovery[beans,"org.apache:group=SPIs,name=TcpDiscoverySpi,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for TCP discovery SPI
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator|<p>Current coordinator UUID.</p>|JMX agent|jmx["{#JMXOBJ}",Coordinator]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator|<p>Current coordinator UUID.</p>|JMX agent|jmx["{#JMXOBJ}",Coordinator]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes left|<p>Nodes left count.</p>|JMX agent|jmx["{#JMXOBJ}",NodesLeft]|
 |Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes joined|<p>Nodes join count.</p>|JMX agent|jmx["{#JMXOBJ}",NodesJoined]|
 |Ignite [{#JMXIGNITEINSTANCENAME}]: Nodes failed|<p>Nodes failed count.</p>|JMX agent|jmx["{#JMXOBJ}",NodesFailed]|
@@ -153,7 +153,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TCP Communication SPI metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|TCP Communication SPI metrics||JMX agent|jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for TCP Communication SPI metrics
 
@@ -167,7 +167,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Transaction metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Transaction metrics||JMX agent|jmx.discovery[beans,"org.apache:group=TransactionMetrics,name=TransactionMetricsMxBeanImpl,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Transaction metrics
 
@@ -183,7 +183,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cache metrics| |JMX agent|jmx.discovery[beans,"org.apache:name=\"org.apache.ignite.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Cache metrics||JMX agent|jmx.discovery[beans,"org.apache:name=\"org.apache.ignite.internal.processors.cache.CacheLocalMetricsMXBeanImpl\",*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Cache metrics
 
@@ -211,7 +211,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Data region metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Data region metrics||JMX agent|jmx.discovery[beans,"org.apache:group=DataRegionMetrics,*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Data region metrics
 
@@ -244,7 +244,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cache groups| |JMX agent|jmx.discovery[beans,"org.apache:group=\"Cache groups\",*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Cache groups||JMX agent|jmx.discovery[beans,"org.apache:group=\"Cache groups\",*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Cache groups
 
@@ -252,7 +252,7 @@ This template works with standalone and cluster instances. Metrics are collected
 |----|-----------|----|-----------------------|
 |Cache group [{#JMXNAME}]: Backups|<p>Count of backups configured for cache group.</p>|JMX agent|jmx["{#JMXOBJ}",Backups]|
 |Cache group [{#JMXNAME}]: Partitions|<p>Count of partitions for cache group.</p>|JMX agent|jmx["{#JMXOBJ}",Partitions]|
-|Cache group [{#JMXNAME}]: Caches|<p>List of caches.</p>|JMX agent|jmx["{#JMXOBJ}",Caches]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Cache group [{#JMXNAME}]: Caches|<p>List of caches.</p>|JMX agent|jmx["{#JMXOBJ}",Caches]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Cache group [{#JMXNAME}]: Local node partitions, moving|<p>Count of partitions with state MOVING for this cache group located on this node.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount]|
 |Cache group [{#JMXNAME}]: Local node partitions, renting|<p>Count of partitions with state RENTING for this cache group located on this node.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeRentingPartitionsCount]|
 |Cache group [{#JMXNAME}]: Local node entries, renting|<p>Count of entries remains to evict in RENTING partitions located on this node for this cache group.</p>|JMX agent|jmx["{#JMXOBJ}",LocalNodeRentingEntriesCount]|
@@ -273,7 +273,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Thread pool metrics| |JMX agent|jmx.discovery[beans,"org.apache:group=\"Thread Pools\",*"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Thread pool metrics||JMX agent|jmx.discovery[beans,"org.apache:group=\"Thread Pools\",*"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Thread pool metrics
 
@@ -292,6 +292,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

@@ -47,13 +47,13 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|WildFly: Launch type|<p>The manner in which the server process was launched. Either "DOMAIN" for a domain mode server launched by a Host Controller, "STANDALONE" for a standalone server launched from the command line, or "EMBEDDED" for a standalone server launched as an embedded part of an application running in the same virtual machine.</p>|JMX agent|jmx["jboss.as:management-root=server","launchType"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly: Name|<p>For standalone mode: The name of this server. If not set, defaults to the runtime value of InetAddress.getLocalHost().getHostName().</p><p>For domain mode: The name given to this domain.</p>|JMX agent|jmx["jboss.as:management-root=server","name"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly: Process type|<p>The type of process represented by this root resource.</p>|JMX agent|jmx["jboss.as:management-root=server","processType"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly: Runtime configuration state|<p>The current persistent configuration state, one of starting, ok, reload-required, restart-required, stopping or stopped.</p>|JMX agent|jmx["jboss.as:management-root=server","runtimeConfigurationState"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly: Server controller state|<p>The current state of the server controller; either STARTING, RUNNING, RESTART_REQUIRED, RELOAD_REQUIRED or STOPPING.</p>|JMX agent|jmx["jboss.as:management-root=server","serverState"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly: Version|<p>The version of the WildFly Core based product release.</p>|JMX agent|jmx["jboss.as:management-root=server","productVersion"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly: Uptime|<p>WildFly server uptime.</p>|JMX agent|jmx["java.lang:type=Runtime","Uptime"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
+|WildFly: Launch type|<p>The manner in which the server process was launched. Either "DOMAIN" for a domain mode server launched by a Host Controller, "STANDALONE" for a standalone server launched from the command line, or "EMBEDDED" for a standalone server launched as an embedded part of an application running in the same virtual machine.</p>|JMX agent|jmx["jboss.as:management-root=server","launchType"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly: Name|<p>For standalone mode: The name of this server. If not set, defaults to the runtime value of InetAddress.getLocalHost().getHostName().</p><p>For domain mode: The name given to this domain.</p>|JMX agent|jmx["jboss.as:management-root=server","name"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly: Process type|<p>The type of process represented by this root resource.</p>|JMX agent|jmx["jboss.as:management-root=server","processType"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly: Runtime configuration state|<p>The current persistent configuration state, one of starting, ok, reload-required, restart-required, stopping or stopped.</p>|JMX agent|jmx["jboss.as:management-root=server","runtimeConfigurationState"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly: Server controller state|<p>The current state of the server controller; either STARTING, RUNNING, RESTART_REQUIRED, RELOAD_REQUIRED or STOPPING.</p>|JMX agent|jmx["jboss.as:management-root=server","serverState"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly: Version|<p>The version of the WildFly Core based product release.</p>|JMX agent|jmx["jboss.as:management-root=server","productVersion"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly: Uptime|<p>WildFly server uptime.</p>|JMX agent|jmx["java.lang:type=Runtime","Uptime"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |WildFly: Transactions: Total, rate|<p>The total number of transactions (top-level and nested) created per second.</p>|JMX agent|jmx["jboss.as:subsystem=transactions","numberOfTransactions"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |WildFly: Transactions: Aborted, rate|<p>The number of aborted (i.e. rolledback) transactions per second.</p>|JMX agent|jmx["jboss.as:subsystem=transactions","numberOfAbortedTransactions"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |WildFly: Transactions: Application rollbacks, rate|<p>The number of transactions that have been rolled back by application request. This includes those that timeout, since the timeout behavior is considered an attribute of the application configuration.</p>|JMX agent|jmx["jboss.as:subsystem=transactions","numberOfApplicationRollbacks"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
@@ -85,11 +85,11 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|WildFly deployment [{#DEPLOYMENT}]: Status|<p>The current runtime status of a deployment.</p><p>Possible status modes are OK, FAILED, and STOPPED.</p><p>FAILED indicates a dependency is missing or a service could not start.</p><p>STOPPED indicates that the deployment was not enabled or was manually stopped.</p>|JMX agent|jmx["{#JMXOBJ}",status]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly deployment [{#DEPLOYMENT}]: Enabled|<p>Boolean indicating whether the deployment content is currently deployed in the runtime (or should be deployed in the runtime the next time the server starts).</p>|JMX agent|jmx["{#JMXOBJ}",enabled]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly deployment [{#DEPLOYMENT}]: Managed|<p>Indicates if the deployment is managed (aka uses the ContentRepository).</p>|JMX agent|jmx["{#JMXOBJ}",managed]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly deployment [{#DEPLOYMENT}]: Persistent|<p>Indicates if the deployment is managed (aka uses the ContentRepository).</p>|JMX agent|jmx["{#JMXOBJ}",persistent]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|WildFly deployment [{#DEPLOYMENT}]: Enabled time|<p>Indicates if the deployment is managed (aka uses the ContentRepository).</p>|JMX agent|jmx["{#JMXOBJ}",enabledTime]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|WildFly deployment [{#DEPLOYMENT}]: Status|<p>The current runtime status of a deployment.</p><p>Possible status modes are OK, FAILED, and STOPPED.</p><p>FAILED indicates a dependency is missing or a service could not start.</p><p>STOPPED indicates that the deployment was not enabled or was manually stopped.</p>|JMX agent|jmx["{#JMXOBJ}",status]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly deployment [{#DEPLOYMENT}]: Enabled|<p>Boolean indicating whether the deployment content is currently deployed in the runtime (or should be deployed in the runtime the next time the server starts).</p>|JMX agent|jmx["{#JMXOBJ}",enabled]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly deployment [{#DEPLOYMENT}]: Managed|<p>Indicates if the deployment is managed (aka uses the ContentRepository).</p>|JMX agent|jmx["{#JMXOBJ}",managed]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly deployment [{#DEPLOYMENT}]: Persistent|<p>Indicates if the deployment is managed (aka uses the ContentRepository).</p>|JMX agent|jmx["{#JMXOBJ}",persistent]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|WildFly deployment [{#DEPLOYMENT}]: Enabled time|<p>Indicates if the deployment is managed (aka uses the ContentRepository).</p>|JMX agent|jmx["{#JMXOBJ}",enabledTime]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Deployments discovery
 
@@ -101,7 +101,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|JDBC metrics discovery| |JMX agent|jmx.get[beans,"jboss.as:subsystem=datasources,data-source=*,statistics=jdbc"]|
+|JDBC metrics discovery||JMX agent|jmx.get[beans,"jboss.as:subsystem=datasources,data-source=*,statistics=jdbc"]|
 
 ### Item prototypes for JDBC metrics discovery
 
@@ -113,7 +113,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 |WildFly {#JMX_DATA_SOURCE}: Cache delete, rate|<p>The number of statements discarded from the cache per second.</p>|JMX agent|jmx["{#JMXOBJ}",PreparedStatementCacheDeleteCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |WildFly {#JMX_DATA_SOURCE}: Cache hit, rate|<p>The number of times that statements from the cache were used per second.</p>|JMX agent|jmx["{#JMXOBJ}",PreparedStatementCacheHitCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |WildFly {#JMX_DATA_SOURCE}: Cache miss, rate|<p>The number of times that a statement request could not be satisfied with a statement from the cache per second.</p>|JMX agent|jmx["{#JMXOBJ}",PreparedStatementCacheMissCount]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|WildFly {#JMX_DATA_SOURCE}: Statistics enabled|<p>Define whether runtime statistics are enabled or not.</p>|JMX agent|jmx["{#JMXOBJ}",statisticsEnabled, "JDBC"]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|WildFly {#JMX_DATA_SOURCE}: Statistics enabled|<p>Define whether runtime statistics are enabled or not.</p>|JMX agent|jmx["{#JMXOBJ}",statisticsEnabled, "JDBC"]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for JDBC metrics discovery
 
@@ -125,7 +125,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Pools metrics discovery| |JMX agent|jmx.get[beans,"jboss.as:subsystem=datasources,data-source=*,statistics=pool"]|
+|Pools metrics discovery||JMX agent|jmx.get[beans,"jboss.as:subsystem=datasources,data-source=*,statistics=pool"]|
 
 ### Item prototypes for Pools metrics discovery
 
@@ -144,7 +144,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 |WildFly {#JMX_DATA_SOURCE}: Connections: Idle|<p>The number of physical connections currently idle.</p>|JMX agent|jmx["{#JMXOBJ}",IdleCount]|
 |WildFly {#JMX_DATA_SOURCE}: Connections: In use|<p>The number of physical connections currently in use.</p>|JMX agent|jmx["{#JMXOBJ}",InUseCount]|
 |WildFly {#JMX_DATA_SOURCE}: Connections: Used, max|<p>The maximum number of connections used.</p>|JMX agent|jmx["{#JMXOBJ}",MaxUsedCount]|
-|WildFly {#JMX_DATA_SOURCE}: Statistics enabled|<p>Define whether runtime statistics are enabled or not.</p>|JMX agent|jmx["{#JMXOBJ}",statisticsEnabled]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|WildFly {#JMX_DATA_SOURCE}: Statistics enabled|<p>Define whether runtime statistics are enabled or not.</p>|JMX agent|jmx["{#JMXOBJ}",statisticsEnabled]<p>**Preprocessing**</p><ul><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |WildFly {#JMX_DATA_SOURCE}: Connections: Timed out, rate|<p>The timed out connections per second.</p>|JMX agent|jmx["{#JMXOBJ}",TimedOut]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |WildFly {#JMX_DATA_SOURCE}: Connections: Wait|<p>The number of requests that had to wait to obtain a physical connection.</p>|JMX agent|jmx["{#JMXOBJ}",WaitCount]|
 |WildFly {#JMX_DATA_SOURCE}: XA: Commit time, avg|<p>The average time for a XAResource commit invocation.</p>|JMX agent|jmx["{#JMXOBJ}",XACommitAverageTime]|
@@ -176,7 +176,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Undertow metrics discovery| |JMX agent|jmx.get[beans,"jboss.as:subsystem=undertow,server=*,http-listener=*"]|
+|Undertow metrics discovery||JMX agent|jmx.get[beans,"jboss.as:subsystem=undertow,server=*,http-listener=*"]|
 
 ### Item prototypes for Undertow metrics discovery
 
@@ -195,6 +195,7 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

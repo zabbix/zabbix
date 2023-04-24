@@ -70,8 +70,8 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Windows: Version of Zabbix agent running| |Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Windows: Host name of Zabbix agent running| |Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Windows: Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Windows: Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Windows: Zabbix agent ping|<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p>|Zabbix agent|agent.ping|
 |Windows: Zabbix agent availability|<p>Monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
 |Windows: CPU utilization|<p>The CPU utilization expressed in %.</p>|Zabbix agent|system.cpu.util|
@@ -87,21 +87,23 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |Windows: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util|
 |Windows: Cache bytes|<p>Cache Bytes is the sum of the Memory\\System Cache Resident Bytes, Memory\\System Driver Resident Bytes,</p><p>Memory\\System Code Resident Bytes, and Memory\\Pool Paged Resident Bytes counters. This counter displays</p><p>the last observed value only; it is not an average.</p>|Zabbix agent|perf_counter_en["\Memory\Cache Bytes"]|
 |Windows: Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Calculated|system.swap.free|
-|Windows: Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Dependent item|system.swap.pfree<p>**Preprocessing**</p><ul><li>JavaScript: `return (100 - value)`</li></ul>|
+|Windows: Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Dependent item|system.swap.pfree<p>**Preprocessing**</p><ul><li><p>JavaScript: `return (100 - value)`</p></li></ul>|
 |Windows: Used swap space in %|<p>The used space of swap volume/file in percent.</p>|Zabbix agent|perf_counter_en["\Paging file(_Total)\% Usage"]|
 |Windows: Total swap space|<p>The total space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,total]|
 |Windows: Free system page table entries|<p>This indicates the number of page table entries not currently in use by the system. If the number is less</p><p>than 5,000, there may well be a memory leak or you running out of memory.</p>|Zabbix agent|perf_counter_en["\Memory\Free System Page Table Entries"]|
 |Windows: Memory page faults per second|<p>Page Faults/sec is the average number of pages faulted per second. It is measured in number of pages</p><p>faulted per second because only one page is faulted in each fault operation, hence this is also equal</p><p>to the number of page fault operations. This counter includes both hard faults (those that require</p><p>disk access) and soft faults (where the faulted page is found elsewhere in physical memory.) Most</p><p>processors can handle large numbers of soft faults without significant consequence. However, hard faults,</p><p>which require disk access, can cause significant delays.</p>|Zabbix agent|perf_counter_en["\Memory\Page Faults/sec"]|
 |Windows: Memory pages per second|<p>This measures the rate at which pages are read from or written to disk to resolve hard page faults.</p><p>If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.</p>|Zabbix agent|perf_counter_en["\Memory\Pages/sec"]|
 |Windows: Memory pool non-paged|<p>This measures the size, in bytes, of the non-paged pool. This is an area of system memory for objects</p><p>that cannot be written to disk but instead must remain in physical memory as long as they are allocated.</p><p>There is a possible memory leak if the value is greater than 175MB (or 100MB with the /3GB switch).</p><p>A typical Event ID 2019 is recorded in the system event log.</p>|Zabbix agent|perf_counter_en["\Memory\Pool Nonpaged Bytes"]|
+|Windows: Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
 |Windows: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Zabbix agent|system.uptime|
 |Windows: System local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
-|Windows: System name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Windows: System description|<p>System description of the host.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Windows: System name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Windows: System description|<p>System description of the host.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Windows: Number of processes|<p>The number of processes.</p>|Zabbix agent|proc.num[]|
 |Windows: Number of threads|<p>The number of threads used by all running processes.</p>|Zabbix agent|perf_counter_en["\System\Threads"]|
-|Windows: Operating system architecture|<p>The architecture of the operating system.</p>|Zabbix agent|system.sw.arch<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Windows: Network interfaces WMI get|<p>Raw data of win32_networkadapter.</p>|Zabbix agent|wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Windows: Operating system architecture|<p>The architecture of the operating system.</p>|Zabbix agent|system.sw.arch<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Windows: Operating system||Zabbix agent|system.sw.os<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Windows: Network interfaces WMI get|<p>Raw data of win32_networkadapter.</p>|Zabbix agent|wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -118,34 +120,36 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |Windows: The Memory Pages/sec is too high|<p>The Memory Pages/sec in the last 5 minutes exceeds {$MEM.PAGE_SEC.CRIT.MAX}. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.</p>|`min(/Windows by Zabbix agent/perf_counter_en["\Memory\Pages/sec"],5m)>{$MEM.PAGE_SEC.CRIT.MAX}`|Warning|**Depends on**:<br><ul><li>Windows: High memory utilization</li></ul>|
 |Windows: Host has been restarted|<p>The device uptime is less than 10 minutes.</p>|`last(/Windows by Zabbix agent/system.uptime)<10m`|Warning|**Manual close**: Yes|
 |Windows: System time is out of sync|<p>The host's system time is different from Zabbix server time.</p>|`fuzzytime(/Windows by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0`|Warning|**Manual close**: Yes|
-|Windows: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Windows by Zabbix agent/system.hostname,#1)<>last(/Windows by Zabbix agent/system.hostname,#2) and length(last(/Windows by Zabbix agent/system.hostname))>0`|Info|**Manual close**: Yes|
+|Windows: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`change(/Windows by Zabbix agent/system.hostname) and length(last(/Windows by Zabbix agent/system.hostname))>0`|Info|**Manual close**: Yes|
+|Windows: Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`change(/Windows by Zabbix agent/system.sw.os) and length(last(/Windows by Zabbix agent/system.sw.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Windows: System name has changed</li></ul>|
 
 ### LLD rule Mounted filesystem discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Mounted filesystem discovery|<p>Discovery of file systems of different types.</p>|Zabbix agent|vfs.fs.discovery|
+|Mounted filesystem discovery|<p>Discovery of file systems of different types.</p>|Dependent item|vfs.fs.dependent.discovery|
 
 ### Item prototypes for Mounted filesystem discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#FSLABEL}({#FSNAME}): Used space|<p>Used storage in bytes</p>|Zabbix agent|vfs.fs.size[{#FSNAME},used]|
-|{#FSLABEL}({#FSNAME}): Total space|<p>Total space in bytes</p>|Zabbix agent|vfs.fs.size[{#FSNAME},total]|
-|{#FSLABEL}({#FSNAME}): Space utilization|<p>Space utilization in % for {#FSNAME}</p>|Zabbix agent|vfs.fs.size[{#FSNAME},pused]|
+|{#FSLABEL}({#FSNAME}): Get filesystem data||Dependent item|vfs.fs.dependent[{#FSNAME},data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.fsname=='{#FSNAME}')].first()`</p></li></ul>|
+|{#FSLABEL}({#FSNAME}): Used space|<p>Used storage expressed in bytes.</p>|Dependent item|vfs.fs.dependent.size[{#FSNAME},used]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes.used`</p></li></ul>|
+|{#FSLABEL}({#FSNAME}): Total space|<p>The total space expressed in bytes.</p>|Dependent item|vfs.fs.dependent.size[{#FSNAME},total]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes.total`</p></li></ul>|
+|{#FSLABEL}({#FSNAME}): Space utilization|<p>Space utilization expressed in % for `{#FSNAME}`.</p>|Dependent item|vfs.fs.dependent.size[{#FSNAME},pused]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes.pused`</p></li></ul>|
 
 ### Trigger prototypes for Mounted filesystem discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#FSLABEL}({#FSNAME}): Disk space is critically low|<p>Two conditions should match:1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.2. The second condition should be one of the following:- the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;- the disk will be full in less than 24 hours.</p>|`last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)`|Average|**Manual close**: Yes|
-|{#FSLABEL}({#FSNAME}): Disk space is low|<p>Two conditions should match:1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.2. The second condition should be one of the following:- the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;- the disk will be full in less than 24 hours.</p>|`last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#FSLABEL}({#FSNAME}): Disk space is critically low</li></ul>|
+|{#FSLABEL}({#FSNAME}): Disk space is critically low|<p>Two conditions should match:1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.2. The second condition should be one of the following:- the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;- the disk will be full in less than 24 hours.</p>|`last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)`|Average|**Manual close**: Yes|
+|{#FSLABEL}({#FSNAME}): Disk space is low|<p>Two conditions should match:1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.2. The second condition should be one of the following:- the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;- the disk will be full in less than 24 hours.</p>|`last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#FSLABEL}({#FSNAME}): Disk space is critically low</li></ul>|
 
 ### LLD rule Physical disks discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Physical disks discovery|<p>Discovery of installed physical disks.</p>|Zabbix agent|perf_instance_en.discovery[PhysicalDisk]<p>**Preprocessing**</p><ul><li>Replace: `{#INSTANCE} -> {#DEVNAME}`</li></ul>|
+|Physical disks discovery|<p>Discovery of installed physical disks.</p>|Zabbix agent|perf_instance_en.discovery[PhysicalDisk]<p>**Preprocessing**</p><ul><li><p>Replace: `{#INSTANCE} -> {#DEVNAME}`</p></li></ul>|
 
 ### Item prototypes for Physical disks discovery
 
@@ -154,7 +158,7 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |{#DEVNAME}: Disk read rate|<p>Rate of read operations on the disk.</p>|Zabbix agent|perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Reads/sec",60]|
 |{#DEVNAME}: Disk write rate|<p>Rate of write operations on the disk.</p>|Zabbix agent|perf_counter_en["\PhysicalDisk({#DEVNAME})\Disk Writes/sec",60]|
 |{#DEVNAME}: Disk average queue size (avgqu-sz)|<p>The current average disk queue; the number of requests outstanding on the disk while the performance data is being collected.</p>|Zabbix agent|perf_counter_en["\PhysicalDisk({#DEVNAME})\Current Disk Queue Length",60]|
-|{#DEVNAME}: Disk utilization by idle time|<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests based on idle time.</p>|Zabbix agent|perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]<p>**Preprocessing**</p><ul><li>JavaScript: `return (100 - value)`</li></ul>|
+|{#DEVNAME}: Disk utilization by idle time|<p>This item is the percentage of elapsed time that the selected disk drive was busy servicing read or writes requests based on idle time.</p>|Zabbix agent|perf_counter_en["\PhysicalDisk({#DEVNAME})\% Idle Time",60]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return (100 - value)`</p></li></ul>|
 |{#DEVNAME}: Disk read request avg waiting time|<p>The average time for read requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</p>|Zabbix agent|perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60]|
 |{#DEVNAME}: Disk write request avg waiting time|<p>The average time for write requests issued to the device to be served. This includes the time spent by the requests in queue and the time spent servicing them.</p>|Zabbix agent|perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Write",60]|
 |{#DEVNAME}: Average disk read queue length|<p>Average disk read queue, the number of requests outstanding on the disk at the time the performance data is collected.</p>|Zabbix agent|perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60]|
@@ -172,21 +176,21 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Network interfaces discovery|<p>Discovery of installed network interfaces.</p>|Dependent item|net.if.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Network interfaces discovery|<p>Discovery of installed network interfaces.</p>|Dependent item|net.if.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Network interfaces discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface {#IFNAME}({#IFALIAS}): Bits received|<p>Incoming traffic on the network interface.</p>|Zabbix agent|net.if.in["{#IFGUID}"]<p>**Preprocessing**</p><ul><li>Change per second</li><li>Custom multiplier: `8`</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Bits sent|<p>Outgoing traffic on the network interface.</p>|Zabbix agent|net.if.out["{#IFGUID}"]<p>**Preprocessing**</p><ul><li>Change per second</li><li>Custom multiplier: `8`</li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Bits received|<p>Incoming traffic on the network interface.</p>|Zabbix agent|net.if.in["{#IFGUID}"]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Bits sent|<p>Outgoing traffic on the network interface.</p>|Zabbix agent|net.if.out["{#IFGUID}"]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded|<p>The number of incoming packets dropped on the network interface.</p>|Zabbix agent|net.if.in["{#IFGUID}",dropped]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded|<p>The number of outgoing packets dropped on the network interface.</p>|Zabbix agent|net.if.out["{#IFGUID}",dropped]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors|<p>The number of incoming packets with errors on the network interface.</p>|Zabbix agent|net.if.in["{#IFGUID}",errors]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors|<p>The number of outgoing packets with errors on the network interface.</p>|Zabbix agent|net.if.out["{#IFGUID}",errors]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Speed|<p>Estimated bandwidth of the network interface if any.</p>|Dependent item|net.if.speed["{#IFGUID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.GUID == "{#IFGUID}")].Speed.first()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>JavaScript: `return (value=='9223372036854775807' ? 0 : value)`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Interface type|<p>The type of the network interface.</p>|Dependent item|net.if.type["{#IFGUID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.GUID == "{#IFGUID}")].AdapterTypeId.first()`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Operational status|<p>The operational status of the network interface.</p>|Dependent item|net.if.status["{#IFGUID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$[?(@.GUID == "{#IFGUID}")].NetConnectionStatus.first()`</li><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Speed|<p>Estimated bandwidth of the network interface if any.</p>|Dependent item|net.if.speed["{#IFGUID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.GUID == "{#IFGUID}")].Speed.first()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>JavaScript: `return (value=='9223372036854775807' ? 0 : value)`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Interface type|<p>The type of the network interface.</p>|Dependent item|net.if.type["{#IFGUID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.GUID == "{#IFGUID}")].AdapterTypeId.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Operational status|<p>The operational status of the network interface.</p>|Dependent item|net.if.status["{#IFGUID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.GUID == "{#IFGUID}")].NetConnectionStatus.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Trigger prototypes for Network interfaces discovery
 
@@ -207,7 +211,7 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|State of service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME})| |Zabbix agent|service.info["{#SERVICE.NAME}",state]|
+|State of service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME})||Zabbix agent|service.info["{#SERVICE.NAME}",state]|
 
 ### Trigger prototypes for Windows services discovery
 
@@ -217,6 +221,7 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

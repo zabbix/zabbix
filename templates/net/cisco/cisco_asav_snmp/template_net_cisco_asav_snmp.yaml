@@ -141,7 +141,7 @@ zabbix_export:
           key: cisco.asav.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: RFC1213-MIB
@@ -379,7 +379,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.adminstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The desired state of the interface.  The
@@ -436,7 +435,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.highspeed[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -582,7 +580,6 @@ zabbix_export:
               type: CALCULATED
               key: 'cisco.asav.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '%'
               params: 'last(//cisco.asav.net.if.in.traffic[{#SNMPINDEX}]) * (last(//cisco.asav.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//cisco.asav.net.if.highspeed[{#SNMPINDEX}]) + (last(//cisco.asav.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -642,7 +639,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.operstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
@@ -811,7 +807,6 @@ zabbix_export:
               type: CALCULATED
               key: 'cisco.asav.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '%'
               params: 'last(//cisco.asav.net.if.out.traffic[{#SNMPINDEX}]) * (last(//cisco.asav.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//cisco.asav.net.if.highspeed[{#SNMPINDEX}]) + (last(//cisco.asav.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'

@@ -145,7 +145,7 @@ zabbix_export:
           key: snmptrap.fallback
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -161,7 +161,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -184,7 +184,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -265,7 +265,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -293,7 +293,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -316,7 +316,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -355,7 +355,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -377,7 +377,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -399,7 +399,7 @@ zabbix_export:
           key: 'system.status[systemHealthStat.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           description: |
             MIB: IMM-MIB
             Indicates status of system health for the system in which the IMM resides. Value of 'nonRecoverable' indicates a severe error has occurred and the system may not be functioning. A value of 'critical' indicates that a error has occurred but the system is currently functioning properly. A value of 'nonCritical' indicates that a condition has occurred that may change the state of the system in the future but currently the system is working properly. A value of 'normal' indicates that the system is operating normally.
@@ -541,7 +541,7 @@ zabbix_export:
               key: 'sensor.fan.status[fanHealthStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IMM-MIB
@@ -578,7 +578,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.part_number[diskFruName.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IMM-MIB
@@ -598,7 +598,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.status[diskHealthStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: 'MIB: IMM-MIB'
               tags:
@@ -640,7 +640,7 @@ zabbix_export:
               key: 'sensor.psu.status[powerHealthStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IMM-MIB

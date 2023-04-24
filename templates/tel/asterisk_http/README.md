@@ -48,32 +48,32 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Asterisk: Service status|<p>Asterisk Manager API port availability.</p>|Simple check|net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|Asterisk: Service status|<p>Asterisk Manager API port availability.</p>|Simple check|net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Asterisk: Service response time|<p>Asterisk Manager API performance.</p>|Simple check|net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"]|
-|Asterisk: Get stats|<p>Asterisk system information in JSON format.</p>|HTTP agent|asterisk.get_stats<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|Asterisk: Version|<p>Service version</p>|Dependent item|asterisk.version<p>**Preprocessing**</p><ul><li>JSON Path: `$.version`</li></ul>|
-|Asterisk: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|asterisk.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$.uptime`</li></ul>|
-|Asterisk: Uptime after reload|<p>System uptime after a config reload in 'N days, hh:mm:ss' format.</p>|Dependent item|asterisk.uptime_reload<p>**Preprocessing**</p><ul><li>JSON Path: `$.uptime_reload`</li></ul>|
-|Asterisk: Active channels|<p>The number of active channels at the moment.</p>|Dependent item|asterisk.active_channels<p>**Preprocessing**</p><ul><li>JSON Path: `$.active_channels`</li></ul>|
-|Asterisk: Active calls|<p>The number of active calls at the moment.</p>|Dependent item|asterisk.active_calls<p>**Preprocessing**</p><ul><li>JSON Path: `$.active_calls`</li></ul>|
-|Asterisk: Calls processed|<p>The number of calls processed after the last service restart.</p>|Dependent item|asterisk.calls_processed<p>**Preprocessing**</p><ul><li>JSON Path: `$.calls_processed`</li></ul>|
-|Asterisk: Calls processed per second|<p>The number of calls processed per second.</p>|Dependent item|asterisk.calls_processed.rate<p>**Preprocessing**</p><ul><li>JSON Path: `$.calls_processed`</li><li>Change per second</li></ul>|
-|Asterisk: Total queues|<p>The number of configured queues.</p>|Dependent item|asterisk.total_queues<p>**Preprocessing**</p><ul><li>JSON Path: `$.queue.total`</li></ul>|
-|Asterisk: SIP monitored online|<p>The number of monitored online SIP peers.</p>|Dependent item|asterisk.sip.monitored_online<p>**Preprocessing**</p><ul><li>JSON Path: `$.sip.monitored_online`</li></ul>|
-|Asterisk: SIP monitored offline|<p>The number of monitored offline SIP peers.</p>|Dependent item|asterisk.sip.monitored_offline<p>**Preprocessing**</p><ul><li>JSON Path: `$.sip.monitored_offline`</li></ul>|
-|Asterisk: SIP unmonitored online|<p>The number of unmonitored online SIP peers.</p>|Dependent item|asterisk.sip.unmonitored_online<p>**Preprocessing**</p><ul><li>JSON Path: `$.sip.unmonitored_online`</li></ul>|
-|Asterisk: SIP unmonitored offline|<p>The number of unmonitored offline SIP peers.</p>|Dependent item|asterisk.sip.unmonitored_offline<p>**Preprocessing**</p><ul><li>JSON Path: `$.sip.unmonitored_offline`</li></ul>|
-|Asterisk: SIP peers|<p>The total number of SIP peers.</p>|Dependent item|asterisk.sip.total<p>**Preprocessing**</p><ul><li>JSON Path: `$.sip.total`</li></ul>|
-|Asterisk: SIP trunks active channels|<p>The total number of SIP trunks active channels.</p>|Dependent item|asterisk.sip.active_channels<p>**Preprocessing**</p><ul><li>JSON Path: `$.sip.active_channels`</li></ul>|
-|Asterisk: IAX online peers|<p>The number of online IAX peers.</p>|Dependent item|asterisk.iax.online<p>**Preprocessing**</p><ul><li>JSON Path: `$.iax.online`</li></ul>|
-|Asterisk: IAX offline peers|<p>The number of offline IAX peers.</p>|Dependent item|asterisk.iax.offline<p>**Preprocessing**</p><ul><li>JSON Path: `$.iax.offline`</li></ul>|
-|Asterisk: IAX unmonitored peers|<p>The number of unmonitored IAX peers.</p>|Dependent item|asterisk.iax.unmonitored<p>**Preprocessing**</p><ul><li>JSON Path: `$.iax.unmonitored`</li></ul>|
-|Asterisk: IAX peers|<p>The total number of IAX peers.</p>|Dependent item|asterisk.iax.total<p>**Preprocessing**</p><ul><li>JSON Path: `$.iax.total`</li></ul>|
-|Asterisk: IAX trunks active channels|<p>The total number of IAX trunks active channels.</p>|Dependent item|asterisk.iax.active_channels<p>**Preprocessing**</p><ul><li>JSON Path: `$.iax.active_channels`</li></ul>|
-|Asterisk: PJSIP available endpoints|<p>The number of available PJSIP peers.</p>|Dependent item|asterisk.pjsip.available<p>**Preprocessing**</p><ul><li>JSON Path: `$.pjsip.available`</li></ul>|
-|Asterisk: PJSIP unavailable endpoints|<p>The number of unavailable PJSIP peers.</p>|Dependent item|asterisk.pjsip.unavailable<p>**Preprocessing**</p><ul><li>JSON Path: `$.pjsip.unavailable`</li></ul>|
-|Asterisk: PJSIP endpoints|<p>The total number of PJSIP peers.</p>|Dependent item|asterisk.pjsip.total<p>**Preprocessing**</p><ul><li>JSON Path: `$.pjsip.total`</li></ul>|
-|Asterisk: PJSIP trunks active channels|<p>The total number of PJSIP trunks active channels.</p>|Dependent item|asterisk.pjsip.active_channels<p>**Preprocessing**</p><ul><li>JSON Path: `$.pjsip.active_channels`</li></ul>|
+|Asterisk: Get stats|<p>Asterisk system information in JSON format.</p>|HTTP agent|asterisk.get_stats<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Asterisk: Version|<p>Service version</p>|Dependent item|asterisk.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li></ul>|
+|Asterisk: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|asterisk.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime`</p></li></ul>|
+|Asterisk: Uptime after reload|<p>System uptime after a config reload in 'N days, hh:mm:ss' format.</p>|Dependent item|asterisk.uptime_reload<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime_reload`</p></li></ul>|
+|Asterisk: Active channels|<p>The number of active channels at the moment.</p>|Dependent item|asterisk.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_channels`</p></li></ul>|
+|Asterisk: Active calls|<p>The number of active calls at the moment.</p>|Dependent item|asterisk.active_calls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_calls`</p></li></ul>|
+|Asterisk: Calls processed|<p>The number of calls processed after the last service restart.</p>|Dependent item|asterisk.calls_processed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.calls_processed`</p></li></ul>|
+|Asterisk: Calls processed per second|<p>The number of calls processed per second.</p>|Dependent item|asterisk.calls_processed.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.calls_processed`</p></li><li>Change per second</li></ul>|
+|Asterisk: Total queues|<p>The number of configured queues.</p>|Dependent item|asterisk.total_queues<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.total`</p></li></ul>|
+|Asterisk: SIP monitored online|<p>The number of monitored online SIP peers.</p>|Dependent item|asterisk.sip.monitored_online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.monitored_online`</p></li></ul>|
+|Asterisk: SIP monitored offline|<p>The number of monitored offline SIP peers.</p>|Dependent item|asterisk.sip.monitored_offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.monitored_offline`</p></li></ul>|
+|Asterisk: SIP unmonitored online|<p>The number of unmonitored online SIP peers.</p>|Dependent item|asterisk.sip.unmonitored_online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.unmonitored_online`</p></li></ul>|
+|Asterisk: SIP unmonitored offline|<p>The number of unmonitored offline SIP peers.</p>|Dependent item|asterisk.sip.unmonitored_offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.unmonitored_offline`</p></li></ul>|
+|Asterisk: SIP peers|<p>The total number of SIP peers.</p>|Dependent item|asterisk.sip.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.total`</p></li></ul>|
+|Asterisk: SIP trunks active channels|<p>The total number of SIP trunks active channels.</p>|Dependent item|asterisk.sip.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.active_channels`</p></li></ul>|
+|Asterisk: IAX online peers|<p>The number of online IAX peers.</p>|Dependent item|asterisk.iax.online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.online`</p></li></ul>|
+|Asterisk: IAX offline peers|<p>The number of offline IAX peers.</p>|Dependent item|asterisk.iax.offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.offline`</p></li></ul>|
+|Asterisk: IAX unmonitored peers|<p>The number of unmonitored IAX peers.</p>|Dependent item|asterisk.iax.unmonitored<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.unmonitored`</p></li></ul>|
+|Asterisk: IAX peers|<p>The total number of IAX peers.</p>|Dependent item|asterisk.iax.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.total`</p></li></ul>|
+|Asterisk: IAX trunks active channels|<p>The total number of IAX trunks active channels.</p>|Dependent item|asterisk.iax.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.active_channels`</p></li></ul>|
+|Asterisk: PJSIP available endpoints|<p>The number of available PJSIP peers.</p>|Dependent item|asterisk.pjsip.available<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.available`</p></li></ul>|
+|Asterisk: PJSIP unavailable endpoints|<p>The number of unavailable PJSIP peers.</p>|Dependent item|asterisk.pjsip.unavailable<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.unavailable`</p></li></ul>|
+|Asterisk: PJSIP endpoints|<p>The total number of PJSIP peers.</p>|Dependent item|asterisk.pjsip.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.total`</p></li></ul>|
+|Asterisk: PJSIP trunks active channels|<p>The total number of PJSIP trunks active channels.</p>|Dependent item|asterisk.pjsip.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.active_channels`</p></li></ul>|
 
 ### Triggers
 
@@ -93,14 +93,14 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SIP peers discovery| |Dependent item|asterisk.sip_peers.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.sip.trunks`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|SIP peers discovery||Dependent item|asterisk.sip_peers.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.trunks`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for SIP peers discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SIP trunk "{#OBJECTNAME}": Status|<p>SIP trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.sip.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|SIP trunk "{#OBJECTNAME}": Active channels|<p>The total number of active SIP trunk channels.</p>|Dependent item|asterisk.sip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|SIP trunk "{#OBJECTNAME}": Status|<p>SIP trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.sip.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SIP trunk "{#OBJECTNAME}": Active channels|<p>The total number of active SIP trunk channels.</p>|Dependent item|asterisk.sip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for SIP peers discovery
 
@@ -113,14 +113,14 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IAX peers discovery| |Dependent item|asterisk.iax_peers.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.iax.trunks`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|IAX peers discovery||Dependent item|asterisk.iax_peers.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.trunks`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for IAX peers discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IAX trunk "{#OBJECTNAME}": Status|<p>IAX trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.iax.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|IAX trunk "{#OBJECTNAME}": Active channels|<p>The total number of active IAX trunk channels.</p>|Dependent item|asterisk.iax.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|IAX trunk "{#OBJECTNAME}": Status|<p>IAX trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.iax.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|IAX trunk "{#OBJECTNAME}": Active channels|<p>The total number of active IAX trunk channels.</p>|Dependent item|asterisk.iax.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for IAX peers discovery
 
@@ -133,14 +133,14 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PJSIP endpoints discovery| |Dependent item|asterisk.pjsip_endpoints.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.pjsip.trunks`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|PJSIP endpoints discovery||Dependent item|asterisk.pjsip_endpoints.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.trunks`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for PJSIP endpoints discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PJSIP trunk "{#OBJECTNAME}": Device state|<p>PJSIP trunk status. Here are the possible states that a device state may have:</p><p>Unavailable</p><p>Not in use</p><p>In use</p>|Dependent item|asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|PJSIP trunk "{#OBJECTNAME}": Active channels|<p>The total number of active PJSIP trunk channels.</p>|Dependent item|asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|PJSIP trunk "{#OBJECTNAME}": Device state|<p>PJSIP trunk status. Here are the possible states that a device state may have:</p><p>Unavailable</p><p>Not in use</p><p>In use</p>|Dependent item|asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|PJSIP trunk "{#OBJECTNAME}": Active channels|<p>The total number of active PJSIP trunk channels.</p>|Dependent item|asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for PJSIP endpoints discovery
 
@@ -153,15 +153,15 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Queues discovery| |Dependent item|asterisk.queues.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.queue.queues`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Queues discovery||Dependent item|asterisk.queues.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.queues`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Queues discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|"{#QUEUE}": Logged in|<p>The number of queue members.</p>|Dependent item|asterisk.queue.loggedin[{#QUEUE}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].LoggedIn.first()`</li></ul>|
-|"{#QUEUE}": Available|<p>The number of available queue members.</p>|Dependent item|asterisk.queue.available[{#QUEUE}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Available.first()`</li></ul>|
-|"{#QUEUE}": Callers|<p>The number incoming calls in queue.</p>|Dependent item|asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()`</li></ul>|
+|"{#QUEUE}": Logged in|<p>The number of queue members.</p>|Dependent item|asterisk.queue.loggedin[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].LoggedIn.first()`</p></li></ul>|
+|"{#QUEUE}": Available|<p>The number of available queue members.</p>|Dependent item|asterisk.queue.available[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Available.first()`</p></li></ul>|
+|"{#QUEUE}": Callers|<p>The number incoming calls in queue.</p>|Dependent item|asterisk.queue.callers[{#QUEUE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.queues[?(@.Queue=='{#QUEUE}')].Callers.first()`</p></li></ul>|
 
 ### Trigger prototypes for Queues discovery
 
@@ -171,6 +171,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

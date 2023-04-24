@@ -48,8 +48,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Aranet: Sensors discovery|<p>Discovery for Aranet Cloud sensors</p>|Dependent item|aranet.sensor.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `15m`</li></ul>|
-|Aranet: Get data| |Script|aranet.get_data|
+|Aranet: Sensors discovery|<p>Discovery for Aranet Cloud sensors</p>|Dependent item|aranet.sensor.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
+|Aranet: Get data||Script|aranet.get_data|
 
 ### LLD rule Temperature discovery
 
@@ -61,7 +61,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.temp["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.temp["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Humidity discovery
 
@@ -73,7 +73,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Humidity discovery
 
@@ -92,7 +92,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.rssi["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.rssi["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Battery voltage discovery
 
@@ -104,7 +104,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Battery voltage discovery
 
@@ -123,7 +123,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for CO2 discovery
 
@@ -142,7 +142,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.pressure["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.pressure["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Voltage discovery
 
@@ -154,7 +154,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Weight discovery
 
@@ -166,7 +166,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.weight["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.weight["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Volumetric Water Content discovery
 
@@ -178,7 +178,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.volumetric.water.content["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.volumetric.water.content["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule PPFD discovery
 
@@ -190,7 +190,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.ppfd["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.ppfd["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Distance discovery
 
@@ -202,7 +202,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.distance["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.distance["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Illuminance discovery
 
@@ -214,7 +214,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.illuminance["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.illuminance["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule pH discovery
 
@@ -226,7 +226,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.ph["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.ph["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Current discovery
 
@@ -238,7 +238,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.current["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.current["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Soil Dielectric Permittivity discovery
 
@@ -250,7 +250,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.soil_dielectric_perm["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.soil_dielectric_perm["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Soil Electrical Conductivity discovery
 
@@ -262,7 +262,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.soil_electric_cond["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.soil_electric_cond["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Pore Electrical Conductivity discovery
 
@@ -274,7 +274,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.pore_electric_cond["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.pore_electric_cond["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Pulses discovery
 
@@ -286,7 +286,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.pulses["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.pulses["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Pulses Cumulative discovery
 
@@ -298,7 +298,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.pulses_cumulative["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.pulses_cumulative["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Differential Pressure discovery
 
@@ -310,7 +310,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.diff_pressure["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.diff_pressure["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Last update discovery
 
@@ -322,7 +322,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}| |Dependent item|aranet.last_update["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|{#METRIC}: [{#GATEWAY_NAME}] {#SENSOR_NAME}||Dependent item|aranet.last_update["{#GATEWAY_ID}", "{#SENSOR_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Last update discovery
 
@@ -332,6 +332,7 @@ Refer to the vendor documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

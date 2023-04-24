@@ -173,7 +173,7 @@ zabbix_export:
           key: zyxel.4728f.hw.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -319,7 +319,7 @@ zabbix_export:
           key: zyxel.4728f.net.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: RFC1213-MIB
@@ -502,7 +502,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.4728f.net.if.adminstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The desired state of the interface.  The
@@ -559,7 +558,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -705,7 +703,6 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.4728f.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.4728f.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -738,7 +735,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.23.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.4728f.net.if.link_type[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB:  ZYXEL-XGS4728F-MIB
                 Physical connection type
@@ -793,7 +789,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.4728f.net.if.operstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
@@ -963,7 +958,6 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.4728f.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.4728f.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.4728f.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -996,7 +990,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.46.23.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.4728f.net.if.speed_duplex[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB:  ZYXEL-XGS4728F-MIB
                 Transmission mode
@@ -1135,7 +1128,6 @@ zabbix_export:
               key: 'zyxel.4728f.sfp.ddm[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '!{#ZYXEL.SFP.UNIT}'
               description: |
@@ -1369,7 +1361,6 @@ zabbix_export:
               key: 'zyxel.4728f.sfp.status[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               history: 7d
-              trends: '0'
               description: |
                 MIB: ZYXEL-XGS4728F-MIB
                 Transceiver module status.

@@ -709,7 +709,7 @@ zabbix_export:
                   event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold..'
+                  description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
                   dependencies:
                     -
                       name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
@@ -1060,7 +1060,7 @@ zabbix_export:
                   event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
                   priority: WARNING
-                  description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold..'
+                  description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
                   dependencies:
                     -
                       name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'

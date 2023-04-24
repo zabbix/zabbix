@@ -52,10 +52,10 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |{#UNIT.NAME}: Get unit info|<p>Returns all properties of a systemd service unit.</p><p> Unit description: {#UNIT.DESCRIPTION}.</p>|Zabbix agent|systemd.unit.get["{#UNIT.NAME}"]|
-|{#UNIT.NAME}: Active state|<p>State value that reflects whether the unit is currently active or not. The following states are currently defined: "active", "reloading", "inactive", "failed", "activating", and "deactivating".</p>|Dependent item|systemd.service.active_state["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.ActiveState.state`</li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|{#UNIT.NAME}: Load state|<p>State value that reflects whether the configuration file of this unit has been loaded. The following states are currently defined: "loaded", "error", and "masked".</p>|Dependent item|systemd.service.load_state["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.LoadState.state`</li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|{#UNIT.NAME}: Unit file state|<p>Encodes the install state of the unit file of FragmentPath. It currently knows the following states: "enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", and "invalid".</p>|Dependent item|systemd.service.unitfile_state["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.UnitFileState.state`</li><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|{#UNIT.NAME}: Active time|<p>Number of seconds since unit entered the active state.</p>|Dependent item|systemd.service.uptime["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|{#UNIT.NAME}: Active state|<p>State value that reflects whether the unit is currently active or not. The following states are currently defined: "active", "reloading", "inactive", "failed", "activating", and "deactivating".</p>|Dependent item|systemd.service.active_state["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ActiveState.state`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|{#UNIT.NAME}: Load state|<p>State value that reflects whether the configuration file of this unit has been loaded. The following states are currently defined: "loaded", "error", and "masked".</p>|Dependent item|systemd.service.load_state["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LoadState.state`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|{#UNIT.NAME}: Unit file state|<p>Encodes the install state of the unit file of FragmentPath. It currently knows the following states: "enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", and "invalid".</p>|Dependent item|systemd.service.unitfile_state["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.UnitFileState.state`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|{#UNIT.NAME}: Active time|<p>Number of seconds since unit entered the active state.</p>|Dependent item|systemd.service.uptime["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Service units discovery
 
@@ -75,11 +75,12 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |{#UNIT.NAME}: Get unit info|<p>Returns all properties of a systemd socket unit.</p><p> Unit description: {#UNIT.DESCRIPTION}.</p>|Zabbix agent|systemd.unit.get["{#UNIT.NAME}",Socket]|
-|{#UNIT.NAME}: Connections accepted per sec|<p>The number of accepted socket connections (NAccepted) per second.</p>|Dependent item|systemd.socket.conn_accepted.rate["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.NAccepted`</li><li>Change per second</li></ul>|
-|{#UNIT.NAME}: Connections connected|<p>The current number of socket connections (NConnections).</p>|Dependent item|systemd.socket.conn_count["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li>JSON Path: `$.NConnections`</li></ul>|
+|{#UNIT.NAME}: Connections accepted per sec|<p>The number of accepted socket connections (NAccepted) per second.</p>|Dependent item|systemd.socket.conn_accepted.rate["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NAccepted`</p></li><li>Change per second</li></ul>|
+|{#UNIT.NAME}: Connections connected|<p>The current number of socket connections (NConnections).</p>|Dependent item|systemd.socket.conn_count["{#UNIT.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NConnections`</p></li></ul>|
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

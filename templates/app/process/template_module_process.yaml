@@ -76,7 +76,7 @@ zabbix_export:
                   parameters:
                     - '$.[?(@["name"]=="{#NAME}")].first()'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: 'Failed to retrieve process {#NAME} data.'
+                  error_handler_params: 'Failed to retrieve process {#NAME} data'
               master_item:
                 key: 'proc.get[,,,summary]'
               tags:

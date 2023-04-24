@@ -97,7 +97,7 @@ zabbix_export:
           key: zyxel.ies500x.hw.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -243,7 +243,7 @@ zabbix_export:
           key: zyxel.ies500x.net.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: RFC1213-MIB
@@ -549,7 +549,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.adsl.adminstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The desired state of the interface.  The
@@ -579,7 +578,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.5.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.adsl.atuc.atn[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: dB
               description: |
@@ -625,7 +623,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.adsl.atuc.outpwr[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: dB
               description: |
@@ -658,7 +655,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.4.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.adsl.atuc.snrmgn[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: dB
               description: |
@@ -704,7 +700,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.5.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.adsl.atur.atn[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: dB
               description: |
@@ -750,7 +745,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.7.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.adsl.atur.outpwr[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: dB
               description: |
@@ -783,7 +777,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.4.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.adsl.atur.snrmgn[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: dB
               description: |
@@ -999,7 +992,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
@@ -1288,7 +1280,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.if.adminstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The desired state of the interface.  The
@@ -1345,7 +1336,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.if.highspeed[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -1491,7 +1481,6 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.ies500x.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.ies500x.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.ies500x.net.if.highspeed[{#SNMPINDEX}]) <> 0) /( last(//zyxel.ies500x.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.ies500x.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -1551,7 +1540,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
@@ -1721,7 +1709,6 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.ies500x.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.ies500x.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.ies500x.net.if.highspeed[{#SNMPINDEX}]) <> 0) /( last(//zyxel.ies500x.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.ies500x.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -2218,7 +2205,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.7.{#SNMPINDEX}'
               key: 'zyxel.ies500x.slot.status[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: ZYXEL-IES5000-MIB
                 The module state of the plug-in card.
@@ -2243,7 +2229,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.2.{#SNMPINDEX}'
               key: 'zyxel.ies500x.slot.type[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: ZYXEL-IES5000-MIB
                 Card type of the plug-in card.

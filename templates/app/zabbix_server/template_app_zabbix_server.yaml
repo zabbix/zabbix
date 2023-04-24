@@ -36,12 +36,22 @@ zabbix_export:
               tag: component
               value: raw
         -
+          uuid: 1a185ce77d4e4dd49be5b9ded51c1460
+          name: 'Zabbix server: Connector queue'
+          type: INTERNAL
+          key: 'zabbix[connector_queue]'
+          history: 1w
+          description: 'The count of values enqueued in the connector queue.'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: d596a84dece14aa59ca53e9f53b21edb
           name: 'Zabbix server: LLD queue'
           type: INTERNAL
           key: 'zabbix[lld_queue]'
           history: 1w
-          trends: '0'
           description: 'The count of values enqueued in the low-level discovery processing queue.'
           tags:
             -
@@ -53,7 +63,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[preprocessing_queue]'
           history: 1w
-          trends: '0'
           description: 'The count of values enqueued in the preprocessing queue.'
           tags:
             -
@@ -184,6 +193,58 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)<65'
               name: 'Zabbix server: Utilization of configuration syncer processes is high'
               event_name: 'Zabbix server: Utilization of configuration syncer processes over 75%'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 2fcfd911ae8647149bad91c883abf41d
+          name: 'Zabbix server: Utilization of connector manager internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,connector manager,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the connector manager processes have been busy for the last minute.'
+          tags:
+            -
+              tag: component
+              value: internal-process
+          triggers:
+            -
+              uuid: 5d72f9b951144e6797e19315b3a2da2b
+              expression: 'avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of connector manager processes is high'
+              event_name: 'Zabbix server: Utilization of connector manager processes over 75%'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 1c8c3b3045384a39af8baa9e40f2b487
+          name: 'Zabbix server: Utilization of connector worker internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,connector worker,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the connector worker processes have been busy for the last minute.'
+          tags:
+            -
+              tag: component
+              value: internal-process
+          triggers:
+            -
+              uuid: c6322f7a90d847b5a630bc9c64ce3c1b
+              expression: 'avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)<65'
+              name: 'Zabbix server: Utilization of connector worker processes is high'
+              event_name: 'Zabbix server: Utilization of connector worker processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -918,6 +979,19 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
+          uuid: 6fb9d6a8d3f84c679e7af4b9ef437239
+          name: 'Zabbix server: Zabbix proxies stats'
+          type: INTERNAL
+          key: 'zabbix[proxy,discovery]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The master item of Zabbix proxies'' statistics.'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 2b2f695ed1ef4a7a871c80df9c911e90
           name: 'Zabbix server: Queue over 10 minutes'
           type: INTERNAL
@@ -956,7 +1030,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[rcache,buffer,pused]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: '%'
           description: 'The availability statistics of Zabbix configuration cache. The percentage of used data buffer.'
@@ -984,7 +1057,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[tcache,cache,pitems]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -1000,7 +1072,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[tcache,cache,pmisses]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: '%'
           description: 'The effectiveness statistics of Zabbix trend function cache. The percentage of cache misses.'
@@ -1014,7 +1085,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[vcache,buffer,pused]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: '%'
           description: 'The availability statistics of Zabbix value cache. The percentage of used data buffer.'
@@ -1042,7 +1112,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[vcache,cache,hits]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: vps
           description: 'The effectiveness statistics of Zabbix value cache. The number of cache hits (history values taken from the cache).'
@@ -1061,7 +1130,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[vcache,cache,misses]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: vps
           description: 'The effectiveness statistics of Zabbix value cache. The number of cache misses (history values taken from the database).'
@@ -1080,7 +1148,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[vcache,cache,mode]'
           history: 1w
-          trends: '0'
           description: 'The operating mode of the value cache.'
           valuemap:
             name: 'Value cache operating mode'
@@ -1139,7 +1206,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[vmware,buffer,pused]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: '%'
           description: 'The availability statistics of Zabbix vmware cache. The percentage of used data buffer.'
@@ -1167,7 +1233,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,history,pused]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -1197,7 +1262,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,index,pused]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -1227,7 +1291,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,trend,pused]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -1257,7 +1320,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,values,float]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1277,7 +1339,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,values,log]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1297,7 +1358,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,values,not supported]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1317,7 +1377,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,values,str]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1337,7 +1396,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,values,text]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1357,7 +1415,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,values,uint]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1377,7 +1434,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[wcache,values]'
           history: 1w
-          trends: '0'
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1551,7 +1607,7 @@ zabbix_export:
                   name: 'Cluster node [{#NODE.NAME}]: Status changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
-                  description: 'The state of the node has changed. Confirm to close.'
+                  description: 'The state of the node has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1566,6 +1622,422 @@ zabbix_export:
             -
               lld_macro: '{#NODE.NAME}'
               path: $.name
+        -
+          uuid: d6e3db2614914c1b977c7eb1b748bda6
+          name: 'Zabbix proxy discovery'
+          type: DEPENDENT
+          key: zabbix.proxy.discovery
+          delay: '0'
+          description: 'LLD rule with item and trigger prototypes for the proxy discovery.'
+          item_prototypes:
+            -
+              uuid: 5cf1d8eae42740c88e2700ec619fc0e7
+              name: 'Proxy [{#PROXY.NAME}]: Certificate'
+              type: DEPENDENT
+              key: 'zabbix.proxy.cert[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The encryption status for connections from a proxy.'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.cert
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 38498bb9fc884b2082ff5ecf76cc401e
+              name: 'Proxy [{#PROXY.NAME}]: Compatibility'
+              type: DEPENDENT
+              key: 'zabbix.proxy.compatibility[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: |
+                Version of proxy compared to Zabbix server version.
+                
+                Possible values:
+                0 - Undefined;
+                1 - Current version (proxy and server have the same major version);
+                2 - Outdated version (proxy version is older than server version, but is partially supported);
+                3 - Unsupported version (proxy version is older than server previous LTS release version or server major version is older than proxy major version).
+              valuemap:
+                name: Compatibility
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.compatibility
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: d3b969b57fc74a2e96b8cf90f3159847
+                  expression: 'last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=3'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy is not supported'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'Zabbix proxy version is older than server previous LTS release version or server major version is older than proxy major version.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 519cd429ab184d9ba08a50968dc3e1e6
+                  expression: 'last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=2'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy is outdated'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy version is older than server version, but is partially supported. Only data collection and remote execution is available.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 5983273711b64a93bd30c7ba983f2b35
+              name: 'Proxy [{#PROXY.NAME}]: Compression'
+              type: DEPENDENT
+              key: 'zabbix.proxy.compression[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The compression status of a proxy.'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.compression
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 01c4a2f48dce46e0a931fc7ab906800d
+              name: 'Proxy [{#PROXY.NAME}]: Host count'
+              type: DEPENDENT
+              key: 'zabbix.proxy.hosts[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The number of enabled hosts assigned to a proxy.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.hosts
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 187a005cd52c4ed69919b0356c1ccd39
+              name: 'Proxy [{#PROXY.NAME}]: Item count'
+              type: DEPENDENT
+              key: 'zabbix.proxy.items[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The number of enabled items on enabled hosts assigned to a proxy.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.items
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: f8c915861df843bc9c95ec8034d66fb7
+              name: 'Proxy [{#PROXY.NAME}]: Last seen, in seconds'
+              type: DEPENDENT
+              key: 'zabbix.proxy.last_seen[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              value_type: FLOAT
+              description: 'The time when a proxy was last seen by a server.'
+              valuemap:
+                name: 'Last seen'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.last_seen
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: ee5eb0e4962b4bb59ac316a4110c86e3
+                  expression: 'last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}'
+                  name: 'Proxy [{#PROXY.NAME}]: Proxy last seen'
+                  event_name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy last seen more than {$PROXY.LAST_SEEN.MAX} seconds ago'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy is not updating the configuration data.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 541732183fa747d6b7a05351172720bc
+                  expression: 'last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy is not updating the configuration data.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 357461ce5cd24632a1359c8ab31e0422
+              name: 'Proxy [{#PROXY.NAME}]: Mode'
+              type: DEPENDENT
+              key: 'zabbix.proxy.mode[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The mode of Zabbix proxy.'
+              valuemap:
+                name: 'Proxy mode'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.passive
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: a68564ff50284903bdc38432638a653b
+              name: 'Proxy [{#PROXY.NAME}]: PSK'
+              type: DEPENDENT
+              key: 'zabbix.proxy.psk[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The encryption status for connections from a proxy.'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.psk
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 3e45db48df464b91a4951f13dd298cd5
+              name: 'Proxy [{#PROXY.NAME}]: Required VPS'
+              type: DEPENDENT
+              key: 'zabbix.proxy.requiredperformance[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              value_type: FLOAT
+              units: '!vps'
+              description: 'The required performance of a proxy (the number of values that need to be collected per second).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.requiredperformance
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 76b3dc42b38b4f4a9d6979a64e8f6a4b
+              name: 'Proxy [{#PROXY.NAME}]: Stats'
+              type: DEPENDENT
+              key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The statistics for the discovered proxy.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].first()'
+              master_item:
+                key: 'zabbix[proxy,discovery]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 8986a7d452c448de88dcb054541064e4
+              name: 'Proxy [{#PROXY.NAME}]: Unencrypted'
+              type: DEPENDENT
+              key: 'zabbix.proxy.unencrypted[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The encryption status for connections from a proxy.'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.unencrypted
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 22da7ee85c044e128ceb47225ce7aaba
+              name: 'Proxy [{#PROXY.NAME}]: Version'
+              type: DEPENDENT
+              key: 'zabbix.proxy.version[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              trends: '0'
+              value_type: CHAR
+              description: 'A version of Zabbix proxy.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.version
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.stats[{#PROXY.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+          master_item:
+            key: 'zabbix[proxy,discovery]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#PROXY.NAME}'
+              path: $.name
       tags:
         -
           tag: class
@@ -1576,6 +2048,11 @@ zabbix_export:
         -
           tag: target
           value: zabbix
+      macros:
+        -
+          macro: '{$PROXY.LAST_SEEN.MAX}'
+          value: '600'
+          description: 'The maximum number of seconds that Zabbix proxy has not been seen.'
       dashboards:
         -
           uuid: 6815a90fb9b745fd8f1b1f47697893d6
@@ -1728,6 +2205,49 @@ zabbix_export:
               value: '3'
               newvalue: Active
         -
+          uuid: b985f0f026be4889923f5d16393e5383
+          name: Compatibility
+          mappings:
+            -
+              value: '0'
+              newvalue: Undefined
+            -
+              value: '1'
+              newvalue: Current
+            -
+              value: '2'
+              newvalue: Outdated
+            -
+              value: '3'
+              newvalue: Unsupported
+        -
+          uuid: 3b60aa68965f47baba665e354e0e79de
+          name: 'Last seen'
+          mappings:
+            -
+              value: '-1'
+              newvalue: Never
+        -
+          uuid: 7c52b5e2d2434edeba089e136a7eb845
+          name: 'Proxy mode'
+          mappings:
+            -
+              value: '0'
+              newvalue: Active
+            -
+              value: '1'
+              newvalue: Passive
+        -
+          uuid: 0d2da53a4e404248b9d156b5a7342002
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Off'
+            -
+              value: '1'
+              newvalue: 'On'
+        -
           uuid: 97bbea700550483bbd8405b4dd9d8005
           name: 'Value cache operating mode'
           mappings:
@@ -1849,6 +2369,18 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,lld manager,avg,busy]'
+        -
+          sortorder: '5'
+          color: CE93D8
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector worker,avg,busy]'
+        -
+          sortorder: '6'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector manager,avg,busy]'
     -
       uuid: df8944bf1e2f4149b5fbfe945548d1d8
       name: 'Zabbix server: Internal processes'
@@ -2222,6 +2754,18 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[process,trigger housekeeper,avg,busy]'
+        -
+          sortorder: '20'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector manager,avg,busy]'
+        -
+          sortorder: '21'
+          color: CE93D8
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,connector worker,avg,busy]'
     -
       uuid: b053dc416ee3422b94e46fb415ea87e6
       name: 'Zabbix server: Zabbix internal queues'
@@ -2237,6 +2781,12 @@ zabbix_export:
           item:
             host: 'Zabbix server health'
             key: 'zabbix[lld_queue]'
+        -
+          sortorder: '2'
+          color: '274482'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[connector_queue]'
     -
       uuid: 3d256a358da74f469700eea05173343a
       name: 'Zabbix server: Zabbix server performance'

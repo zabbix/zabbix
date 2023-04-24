@@ -63,7 +63,7 @@ zabbix_export:
               name: 'RabbitMQ: Failed to fetch overview data'
               event_name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -590,7 +590,7 @@ zabbix_export:
                 value: '{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Individual exchange metrics'
+          description: 'The metrics for an individual exchange.'
           item_prototypes:
             -
               uuid: d8cdcef7ad324aebb597e9d2cd32bdf2
@@ -1119,7 +1119,7 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.healthcheck.v3810.discovery
           delay: '0'
-          description: 'Version 3.8.10+ specific metrics'
+          description: 'Specific metrics for the versions: up to and including 3.8.10.'
           item_prototypes:
             -
               uuid: 90db70de99454f7b924d84174a5951fb
@@ -1127,6 +1127,9 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.alarms[{#SINGLETON}]'
               history: 7d
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
               description: 'Responds a 200 OK if there are no alarms in effect in the cluster, otherwise responds with a 503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1149,6 +1152,8 @@ zabbix_export:
                   parameters:
                     - 3h
               url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/alarms'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -1197,22 +1202,22 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
-          description: 'The port of RabbitMQ API endpoint'
+          description: 'The port of the RabbitMQ API endpoint.'
         -
           macro: '{$RABBITMQ.API.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'The request scheme, which may be HTTP or HTTPS.'
         -
           macro: '{$RABBITMQ.API.USER}'
           value: zbx_monitor
         -
           macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable exchanges'
+          description: 'This macro is used in the discovery of exchanges. It can be overridden at host level or its linked template level.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered exchanges'
+          description: 'This macro is used in the discovery of exchanges. It can be overridden at host level or its linked template level.'
       dashboards:
         -
           uuid: 1b64af348f284f74a1f7f03de1d55f7b
@@ -1491,7 +1496,7 @@ zabbix_export:
               event_name: 'RabbitMQ: Free disk space alarm (Free space threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'https://www.rabbitmq.com/disk-alarms.html'
+              description: 'For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).'
               tags:
                 -
                   tag: scope
@@ -1568,7 +1573,7 @@ zabbix_export:
               event_name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'https://www.rabbitmq.com/memory.html'
+              description: 'For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).'
               tags:
                 -
                   tag: scope
@@ -1707,7 +1712,7 @@ zabbix_export:
               event_name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'https://www.rabbitmq.com/partitions.html#detecting'
+              description: 'For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).'
               tags:
                 -
                   tag: scope
@@ -1744,7 +1749,7 @@ zabbix_export:
               name: 'RabbitMQ: Node is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'RabbitMQ node is not running'
+              description: 'RabbitMQ node is not running.'
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
@@ -1855,7 +1860,7 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.healthcheck.v389.discovery
           delay: '0'
-          description: 'Specific metrics up to and including version 3.8.4'
+          description: 'Specific metrics for the versions: up to and including 3.8.4.'
           item_prototypes:
             -
               uuid: 22f9a51fd0ea41148846ecde7dbf4d99
@@ -1895,7 +1900,7 @@ zabbix_export:
                   name: 'RabbitMQ: Node healthcheck failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'https://www.rabbitmq.com/monitoring.html#health-checks'
+                  description: 'For more details see [Health Checks](https://www.rabbitmq.com/monitoring.html#health-checks).'
                   tags:
                     -
                       tag: scope
@@ -1921,7 +1926,7 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.healthcheck.v3810.discovery
           delay: '0'
-          description: 'Version 3.8.10+ specific metrics'
+          description: 'Specific metrics for the versions: up to and including 3.8.10.'
           item_prototypes:
             -
               uuid: d18cd1fd8cd749e4a00b8186fd93345f
@@ -1929,7 +1934,13 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}]'
               history: 7d
-              description: 'Checks the expiration date on the certificates for every listener configured to use TLS. Responds a 200 OK if all certificates are valid (have not expired), otherwise responds with a 503 Service Unavailable.'
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: |
+                It checks the expiration date on the certificates for every listener configured to use the Transport Layer Security (TLS).
+                It responds with a status code `200 OK` if all the certificates are valid (have not expired).
+                Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1951,6 +1962,8 @@ zabbix_export:
                   parameters:
                     - 3h
               url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -1976,7 +1989,12 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.local_alarms[{#SINGLETON}]'
               history: 7d
-              description: 'Responds a 200 OK if there are no local alarms in effect on the target node, otherwise responds with a 503 Service Unavailable.'
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: |
+                It responds with a status code`200 OK` if there are no alarms in effect in the cluster. 
+                Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1998,6 +2016,8 @@ zabbix_export:
                   parameters:
                     - 3h
               url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2023,7 +2043,13 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.mirror_sync[{#SINGLETON}]'
               history: 7d
-              description: 'Checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down). Responds a 200 OK if there are no such classic mirrored queues, otherwise responds with a 503 Service Unavailable.'
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: |
+                It checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down).
+                It responds with a status code `200 OK` if there are no such classic mirrored queues. 
+                Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -2045,6 +2071,8 @@ zabbix_export:
                   parameters:
                     - 3h
               url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2070,7 +2098,13 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.quorum[{#SINGLETON}]'
               history: 7d
-              description: 'Checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). Responds a 200 OK if there are no such quorum queues, otherwise responds with a 503 Service Unavailable.'
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: |
+                It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). 
+                It responds with a status code `200 OK` if there are no such quorum queues. 
+                Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -2092,6 +2126,8 @@ zabbix_export:
                   parameters:
                     - 3h
               url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2117,7 +2153,12 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}]'
               history: 7d
-              description: 'Responds a 200 OK if all virtual hosts and running on the target node, otherwise responds with a 503 Service Unavailable.'
+              authtype: BASIC
+              username: '{$RABBITMQ.API.USER}'
+              password: '{$RABBITMQ.API.PASSWORD}'
+              description: |
+                It responds with It responds with a status code `200 OK` if all virtual hosts are running on the target node. 
+                Otherwise it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -2139,6 +2180,8 @@ zabbix_export:
                   parameters:
                     - 3h
               url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts'
+              status_codes: '200,503,404'
+              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2195,7 +2238,7 @@ zabbix_export:
                 macro: '{#NODE}'
                 value: '{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}'
                 formulaid: A
-          description: 'Individual queue metrics'
+          description: 'The metrics for an individual queue.'
           item_prototypes:
             -
               uuid: 335ed3ef31e2471b9cdb25537cee4fe8
@@ -2838,34 +2881,34 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
-          description: 'The port of RabbitMQ API endpoint'
+          description: 'The port of the RabbitMQ API endpoint.'
         -
           macro: '{$RABBITMQ.API.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'The request scheme, which may be HTTP or HTTPS.'
         -
           macro: '{$RABBITMQ.API.USER}'
           value: zbx_monitor
         -
           macro: '{$RABBITMQ.CLUSTER.NAME}'
           value: rabbit
-          description: 'The name of RabbitMQ cluster'
+          description: 'The name of the RabbitMQ cluster.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable queues'
+          description: 'This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered queues'
+          description: 'This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.'
         -
           macro: '{$RABBITMQ.MESSAGES.MAX.WARN}'
           value: '1000'
-          description: 'Maximum number of messages in the queue for trigger expression'
+          description: 'The maximum number of messages in the queue for a trigger expression.'
         -
           macro: '{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
           value: '10'
-          description: 'Maximum RabbitMQ response time in seconds for trigger expression'
+          description: 'The maximum response time by the RabbitMQ expressed in seconds for a trigger expression.'
       dashboards:
         -
           uuid: 5e70f5ff6706442abc83ec1b206d9fe4

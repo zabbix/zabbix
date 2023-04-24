@@ -127,7 +127,7 @@ zabbix_export:
           key: snmptrap.fallback
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -143,7 +143,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -166,7 +166,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -190,7 +190,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -218,7 +218,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -241,7 +241,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -280,7 +280,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -302,7 +302,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -513,34 +513,6 @@ zabbix_export:
         -
           macro: '{$TEMP_WARN}'
           value: '50'
-      dashboards:
-        -
-          uuid: 5a0f824a61fe481bb8d86d274ecb3340
-          name: 'Supermicro Aten: Generic'
-          pages:
-            -
-              name: '{{RESOURCE}}: Generic'
-              widgets:
-                -
-                  type: item
-                  name: 'Uptime (hardware)'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    -
-                      type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    -
-                      type: INTEGER
-                      name: show
-                      value: '1'
-                    -
-                      type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Supermicro Aten by SNMP'
-                        key: 'system.hw.uptime[hrSystemUptime.0]'
       valuemaps:
         -
           uuid: e6794dc7602149a3b4fdbfeef45f6e8e

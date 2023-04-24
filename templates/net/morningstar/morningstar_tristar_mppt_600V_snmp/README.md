@@ -46,24 +46,24 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Status: Uptime (network)|<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|status.net.uptime<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.01`</li></ul>|
-|Status: Uptime (hardware)|<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|status.hw.uptime<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.01`</li></ul>|
+|Status: Uptime (network)|<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|status.net.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Status: Uptime (hardware)|<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|status.hw.uptime<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Array: Voltage|<p>MIB: TRISTAR-MPPT</p><p>Description:Array Voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 650]</p><p>Modbus address:0x001b</p>|SNMP agent|array.voltage[arrayVoltage.0]|
 |Array: Array Current|<p>MIB: TRISTAR-MPPT</p><p>Description:Array Current</p><p>Scaling Factor:1.0</p><p>Units:A</p><p>Range:[-10, 80]</p><p>Modbus address:0x001d</p>|SNMP agent|array.current[arrayCurrent.0]|
 |Array: Sweep Vmp|<p>MIB: TRISTAR-MPPT</p><p>Description:Vmp (last sweep)</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 650.0]</p><p>Modbus address:0x003d</p>|SNMP agent|array.sweep_vmp[arrayVmpLastSweep.0]|
 |Array: Sweep Voc|<p>MIB: TRISTAR-MPPT</p><p>Description:Voc (last sweep)</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 650.0]</p><p>Modbus address:0x003e</p>|SNMP agent|array.sweep_voc[arrayVocLastSweep.0]|
 |Array: Sweep Pmax|<p>MIB: TRISTAR-MPPT</p><p>Description:Pmax (last sweep)</p><p>Scaling Factor:1.0</p><p>Units:W</p><p>Range:[-10, 5000]</p><p>Modbus address:0x003c</p>|SNMP agent|array.sweep_pmax[arrayPmaxLastSweep.0]|
-|Battery: Charge State|<p>MIB: TRISTAR-MPPT</p><p>Description:Charge State</p><p>Modbus address:0x0032</p><p></p><p>0: Start</p><p>1: NightCheck</p><p>2: Disconnect</p><p>3: Night</p><p>4: Fault</p><p>5: Mppt</p><p>6: Absorption</p><p>7: Float</p><p>8: Equalize</p><p>9: Slave</p><p>10: Fixed</p>|SNMP agent|charge.state[chargeState.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Battery: Charge State|<p>MIB: TRISTAR-MPPT</p><p>Description:Charge State</p><p>Modbus address:0x0032</p><p></p><p>0: Start</p><p>1: NightCheck</p><p>2: Disconnect</p><p>3: Night</p><p>4: Fault</p><p>5: Mppt</p><p>6: Absorption</p><p>7: Float</p><p>8: Equalize</p><p>9: Slave</p><p>10: Fixed</p>|SNMP agent|charge.state[chargeState.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Battery: Battery Voltage discovery|<p>MIB: TRISTAR-MPPT</p><p>Description:Battery voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 80]</p><p>Modbus address:0x0018</p>|SNMP agent|battery.voltage.discovery[batteryVoltage.0]|
-|Battery: Target Voltage|<p>MIB: TRISTAR-MPPT</p><p>Description:Target Voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 650.0]</p><p>Modbus address:0x0033</p>|SNMP agent|target.voltage[targetRegulationVoltage.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Battery: Target Voltage|<p>MIB: TRISTAR-MPPT</p><p>Description:Target Voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[-10, 650.0]</p><p>Modbus address:0x0033</p>|SNMP agent|target.voltage[targetRegulationVoltage.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Battery: Charge Current|<p>MIB: TRISTAR-MPPT</p><p>Description:Battery Current</p><p>Scaling Factor:1.0</p><p>Units:A</p><p>Range:[-10, 80]</p><p>Modbus address:0x001c</p>|SNMP agent|charge.current[batteryCurrent.0]|
 |Battery: Output Power|<p>MIB: TRISTAR-MPPT</p><p>Description:Output Power</p><p>Scaling Factor:1.0</p><p>Units:W</p><p>Range:[-10, 4000]</p><p>Modbus address:0x003a</p>|SNMP agent|charge.output_power[ outputPower.0]|
 |Temperature: Battery|<p>MIB: TRISTAR-MPPT</p><p>Description:Batt. Temp</p><p>Scaling Factor:1.0</p><p>Units:C</p><p>Range:[-40, 80]</p><p>Modbus address:0x0025</p>|SNMP agent|temp.battery[batteryTemperature.0]|
 |Temperature: Heatsink|<p>MIB: TRISTAR-MPPT</p><p>Description:HS Temp</p><p>Scaling Factor:1.0</p><p>Units:C</p><p>Range:[-40, 80]</p><p>Modbus address:0x0023</p>|SNMP agent|temp.heatsink[heatsinkTemperature.0]|
 |Counter: Charge Amp-hours|<p>MIB: TRISTAR-MPPT</p><p>Description:Ah Charge Resettable</p><p>Scaling Factor:1.0</p><p>Units:Ah</p><p>Range:[0.0, 5000]</p><p>Modbus addresses:H=0x0034 L=0x0035</p>|SNMP agent|counter.charge_amp_hours[ahChargeResetable.0]|
 |Counter: Charge KW-hours|<p>MIB: TRISTAR-MPPT</p><p>Description:kWh Charge Resettable</p><p>Scaling Factor:1.0</p><p>Units:kWh</p><p>Range:[0.0, 65535.0]</p><p>Modbus address:0x0038</p>|SNMP agent|counter.charge_kw_hours[kwhChargeResetable.0]|
-|Status: Faults|<p>MIB: TRISTAR-MPPT</p><p>Description:Faults</p><p>Modbus addresses:H=0x002c L=0x002d</p>|SNMP agent|status.faults[faults.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|Status: Alarms|<p>MIB: TRISTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x002e L=0x002f</p>|SNMP agent|status.alarms[alarms.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1h`</li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Status: Faults|<p>MIB: TRISTAR-MPPT</p><p>Description:Faults</p><p>Modbus addresses:H=0x002c L=0x002d</p>|SNMP agent|status.faults[faults.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Status: Alarms|<p>MIB: TRISTAR-MPPT</p><p>Description:Alarms</p><p>Modbus addresses:H=0x002e L=0x002f</p>|SNMP agent|status.alarms[alarms.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
@@ -139,7 +139,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Battery voltage discovery|<p>Discovery for battery voltage triggers</p>|Dependent item|battery.voltage.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Battery voltage discovery|<p>Discovery for battery voltage triggers</p>|Dependent item|battery.voltage.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Battery voltage discovery
 
@@ -158,6 +158,7 @@ Refer to the vendor documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

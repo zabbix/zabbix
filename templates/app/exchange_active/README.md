@@ -52,12 +52,13 @@ Note that template doesn't provide information about Windows services state. Rec
 |{$MS.EXCHANGE.RPC.COUNT.WARN}|<p>Threshold for LDAP triggers.</p>|`70`|
 |{$MS.EXCHANGE.LDAP.TIME}|<p>The time during which the LDAP metrics may exceed the threshold.</p>|`5m`|
 |{$MS.EXCHANGE.LDAP.WARN}|<p>Threshold for LDAP triggers.</p>|`0.05`|
+|{$AGENT.TIMEOUT}|<p>Timeout after which agent is considered unavailable.</p>|`5m`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|MS Exchange: Databases total mounted|<p>Shows the number of active database copies on the server.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Active Manager(_total)\Database Mounted"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|MS Exchange: Databases total mounted|<p>Shows the number of active database copies on the server.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Active Manager(_total)\Database Mounted"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |MS Exchange [Client Access Server]: ActiveSync: ping command pending|<p>Shows the number of ping commands currently pending in the queue.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange ActiveSync\Ping Commands Pending", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |MS Exchange [Client Access Server]: ActiveSync: requests per second|<p>Shows the number of HTTP requests received from the client via ASP.NET per second. Determines the current Exchange ActiveSync request rate. Used only to determine current user load.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange ActiveSync\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |MS Exchange [Client Access Server]: ActiveSync: sync commands per second|<p>Shows the number of sync commands processed per second. Clients use this command to synchronize items within a folder.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange ActiveSync\Sync Commands/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
@@ -66,32 +67,39 @@ Note that template doesn't provide information about Windows services state. Rec
 |MS Exchange [Client Access Server]: Outlook Web App: current unique users|<p>Shows the number of unique users currently logged on to Outlook Web App. This value monitors the number of unique active user sessions, so that users are only removed from this counter after they log off or their session times out. Determines current user load.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange OWA\Current Unique Users", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |MS Exchange [Client Access Server]: Outlook Web App: requests per second|<p>Shows the number of requests handled by Outlook Web App per second. Determines current user load.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange OWA\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |MS Exchange [Client Access Server]: MSExchangeWS: requests per second|<p>Shows the number of requests processed each second. Determines current user load.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeWS\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
+|MS Exchange: Active agent availability|<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p>|Zabbix internal|zabbix[host,active_agent,available]|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|MS Exchange: Active checks are not available|<p>Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.</p>|`min(/Microsoft Exchange Server 2016 by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2`|High||
 
 ### LLD rule Databases discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Databases discovery|<p>Discovery of Exchange databases.</p>|Zabbix agent (active)|perf_instance.discovery["MSExchange Active Manager"]<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Databases discovery|<p>Discovery of Exchange databases.</p>|Zabbix agent (active)|perf_instance.discovery["MSExchange Active Manager"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Databases discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Active Manager [{#INSTANCE}]: Database copy role|<p>Database copy active or passive role.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Active Manager({#INSTANCE})\Database Copy Role Active"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|Information Store [{#INSTANCE}]: Database state|<p>Database state. Possible values:</p><p>0: Database without any copy and dismounted.</p><p>1: Database is a primary database and mounted.</p><p>2: Database is a passive copy and the state is healthy.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeIS Store({#INSTANCE})\Database State"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `3m`</li></ul>|
+|Active Manager [{#INSTANCE}]: Database copy role|<p>Database copy active or passive role.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Active Manager({#INSTANCE})\Database Copy Role Active"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Information Store [{#INSTANCE}]: Database state|<p>Database state. Possible values:</p><p>0: Database without any copy and dismounted.</p><p>1: Database is a primary database and mounted.</p><p>2: Database is a passive copy and the state is healthy.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeIS Store({#INSTANCE})\Database State"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 |Information Store [{#INSTANCE}]: Active mailboxes count|<p>Number of active mailboxes in this database.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeIS Store({#INSTANCE})\Active mailboxes"]|
 |Information Store [{#INSTANCE}]: Page faults per second|<p>Indicates the rate of page faults that can't be serviced because there are no pages available for allocation from the database cache. If this counter is above 0, it's an indication that the MSExchange Database\I/O Database Writes (Attached) Average Latency is too high.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database({#INF.STORE})\Database Page Fault Stalls/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |Information Store [{#INSTANCE}]: Log records stalled|<p>Indicates the number of log records that can't be added to the log buffers per second because the log buffers are full. The average value should be below 10 per second. Spikes (maximum values) shouldn't be higher than 100 per second.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database({#INF.STORE})\Log Record Stalls/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |Information Store [{#INSTANCE}]: Log threads waiting|<p>Indicates the number of threads waiting to complete an update of the database by writing their data to the log.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database({#INF.STORE})\Log Threads Waiting", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |Information Store [{#INSTANCE}]: RPC requests per second|<p>Shows the number of RPC operations per second for each database instance.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC Operations/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
-|Information Store [{#INSTANCE}]: RPC requests latency|<p>RPC Latency average is the average latency of RPC requests per database. Average is calculated over all RPCs since exrpc32 was loaded. Should be less than 50ms at all times, with spikes less than 100ms.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
+|Information Store [{#INSTANCE}]: RPC requests latency|<p>RPC Latency average is the average latency of RPC requests per database. Average is calculated over all RPCs since exrpc32 was loaded. Should be less than 50ms at all times, with spikes less than 100ms.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |Information Store [{#INSTANCE}]: RPC requests total|<p>Indicates the overall RPC requests currently executing within the information store process. Should be below 70 at all times.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC requests", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |Database Counters [{#INSTANCE}]: Active database read operations per second|<p>Shows the number of database read operations.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached)/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
-|Database Counters [{#INSTANCE}]: Active database read operations latency|<p>Shows the average length of time per database read operation. Should be less than 20 ms on average.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|Database Counters [{#INSTANCE}]: Passive database read operations latency|<p>Shows the average length of time per passive database read operation. Should be less than 200ms on average.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
+|Database Counters [{#INSTANCE}]: Active database read operations latency|<p>Shows the average length of time per database read operation. Should be less than 20 ms on average.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Database Counters [{#INSTANCE}]: Passive database read operations latency|<p>Shows the average length of time per passive database read operation. Should be less than 200ms on average.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |Database Counters [{#INSTANCE}]: Active database write operations per second|<p>Shows the number of database write operations per second for each attached database instance.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached)/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
-|Database Counters [{#INSTANCE}]: Active database write operations latency|<p>Shows the average length of time per database write operation. Should be less than 50ms on average.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|Database Counters [{#INSTANCE}]: Passive database write operations latency|<p>Shows the average length of time, in ms, per passive database write operation. Should be less than the read latency for the same instance, as measured by the MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency counter.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
+|Database Counters [{#INSTANCE}]: Active database write operations latency|<p>Shows the average length of time per database write operation. Should be less than 50ms on average.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Attached) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Database Counters [{#INSTANCE}]: Passive database write operations latency|<p>Shows the average length of time, in ms, per passive database write operation. Should be less than the read latency for the same instance, as measured by the MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Reads (Recovery) Average Latency counter.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange Database ==> Instances({#INF.STORE}/_Total)\I/O Database Writes (Recovery) Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 
 ### Trigger prototypes for Databases discovery
 
@@ -128,8 +136,8 @@ Note that template doesn't provide information about Windows services state. Rec
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Domain Controller [{#INSTANCE}]: Read time|<p>Time that it takes to send an LDAP read request to the domain controller in question and get a response. Should ideally be below 50 ms; spikes below 100 ms are acceptable.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Read Time", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|Domain Controller [{#INSTANCE}]: Search time|<p>Time that it takes to send an LDAP search request and get a response. Should ideally be below 50 ms; spikes below 100 ms are acceptable.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Search Time", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
+|Domain Controller [{#INSTANCE}]: Read time|<p>Time that it takes to send an LDAP read request to the domain controller in question and get a response. Should ideally be below 50 ms; spikes below 100 ms are acceptable.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Read Time", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Domain Controller [{#INSTANCE}]: Search time|<p>Time that it takes to send an LDAP search request and get a response. Should ideally be below 50 ms; spikes below 100 ms are acceptable.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange ADAccess Domain Controllers({#INSTANCE})\LDAP Search Time", {$MS.EXCHANGE.PERF.INTERVAL}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 
 ### Trigger prototypes for LDAP discovery
 
@@ -140,6 +148,7 @@ Note that template doesn't provide information about Windows services state. Rec
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

@@ -2,8 +2,8 @@ zabbix_export:
   version: '6.4'
   template_groups:
     -
-      uuid: 57b7ae836ca64446ba2c296389c009b7
-      name: Templates/Modules
+      uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
   templates:
     -
       uuid: e518b1340ce44d7389d2cc7c304a97b4
@@ -20,7 +20,7 @@ zabbix_export:
         version: 6.4-0
       groups:
         -
-          name: Templates/Modules
+          name: 'Templates/Server hardware'
       discovery_rules:
         -
           uuid: 0a56a348d4a446938beae1eae5ec8993
@@ -1039,7 +1039,7 @@ zabbix_export:
           value: hdd
         -
           tag: target
-          value: sdd
+          value: ssd
       macros:
         -
           macro: '{$SMART.DISK.NAME.MATCHES}'

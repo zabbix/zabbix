@@ -734,7 +734,7 @@ zabbix_export:
           key: 'system.descr[node_exporter]'
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: 'Labeled system information as provided by the uname system call.'
           preprocessing:
@@ -804,7 +804,7 @@ zabbix_export:
           key: 'system.name[node_exporter]'
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: 'The host name of the system.'
           inventory_link: NAME
@@ -981,7 +981,7 @@ zabbix_export:
           key: 'system.uptime[node_exporter]'
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
           preprocessing:
@@ -1342,7 +1342,7 @@ zabbix_export:
               key: 'net.if.speed[node_exporter,"{#IFNAME}"]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               units: bps
               description: 'Sets value to 0 if metric is missing in node_exporter output.'
               preprocessing:
@@ -1458,7 +1458,7 @@ zabbix_export:
               key: 'net.if.type[node_exporter,"{#IFNAME}"]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: 'node_network_protocol_type protocol_type value of /sys/class/net/<iface>.'
               valuemap:
                 name: 'Linux::Interface protocol types'
@@ -1579,7 +1579,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold..'
+              description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -2080,8 +2080,10 @@ zabbix_export:
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
-                    It may become impossible to write to disk if there are no index nodes left.
-                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                    It may become impossible to write to a disk if there are no index nodes left.
+                    The following error messages may be returned as symptoms, even though the free space is available:
+                    - 'No space left on device';
+                    - 'Disk is full'.
                   tags:
                     -
                       tag: scope
@@ -2097,8 +2099,10 @@ zabbix_export:
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: |
-                    It may become impossible to write to disk if there are no index nodes left.
-                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                    It may become impossible to write to a disk if there are no index nodes left.
+                    The following error messages may be returned as symptoms, even though the free space is available:
+                    - 'No space left on device';
+                    - 'Disk is full'.
                   dependencies:
                     -
                       name: '{#FSNAME}: Running out of free inodes'
@@ -2119,7 +2123,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: '(last(//vfs.fs.used[node_exporter,"{#FSNAME}"])/last(//vfs.fs.total[node_exporter,"{#FSNAME}"]))*100'
-              description: 'Space utilization in % for {#FSNAME}'
+              description: 'The space utilization expressed in % for {#FSNAME}.'
               tags:
                 -
                   tag: component

@@ -307,7 +307,7 @@ zabbix_export:
               name: 'PostgreSQL: Failed to get items'
               event_name: 'PostgreSQL: Failed to get items (no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
                 -
                   name: 'PostgreSQL: Service is down'
@@ -827,7 +827,7 @@ zabbix_export:
               name: 'PostgreSQL: Service has been restarted'
               event_name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'PostgreSQL uptime is less than 10 minutes.'''
+              description: 'PostgreSQL uptime is less than 10 minutes.'
               tags:
                 -
                   tag: scope

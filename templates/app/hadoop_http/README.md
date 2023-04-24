@@ -41,42 +41,42 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ResourceManager: Service status|<p>Hadoop ResourceManager API port availability.</p>|Simple check|net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|ResourceManager: Service status|<p>Hadoop ResourceManager API port availability.</p>|Simple check|net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |ResourceManager: Service response time|<p>Hadoop ResourceManager API performance.</p>|Simple check|net.tcp.service.perf["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]|
-|Hadoop: Get ResourceManager stats| |HTTP agent|hadoop.resourcemanager.get|
-|ResourceManager: Uptime| |Dependent item|hadoop.resourcemanager.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</li><li>Custom multiplier: `0.001`</li></ul>|
+|Hadoop: Get ResourceManager stats||HTTP agent|hadoop.resourcemanager.get|
+|ResourceManager: Uptime||Dependent item|hadoop.resourcemanager.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |ResourceManager: Get info||Dependent item|hadoop.resourcemanager.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=~'Hadoop:service=ResourceManager,name=*')]`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li></ul>|
-|ResourceManager: RPC queue & processing time|<p>Average time spent on processing RPC requests.</p>|Dependent item|hadoop.resourcemanager.rpc_processing_time_avg<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|ResourceManager: Active NMs|<p>Number of Active NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_active_nm<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ResourceManager: Decommissioning NMs|<p>Number of Decommissioning NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_decommissioning_nm<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ResourceManager: Decommissioned NMs|<p>Number of Decommissioned NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_decommissioned_nm<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|ResourceManager: Lost NMs|<p>Number of Lost NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_lost_nm<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|ResourceManager: Unhealthy NMs|<p>Number of Unhealthy NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_unhealthy_nm<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|ResourceManager: Rebooted NMs|<p>Number of Rebooted NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_rebooted_nm<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|ResourceManager: Shutdown NMs|<p>Number of Shutdown NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_shutdown_nm<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Service status|<p>Hadoop NameNode API port availability.</p>|Simple check|net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|ResourceManager: RPC queue & processing time|<p>Average time spent on processing RPC requests.</p>|Dependent item|hadoop.resourcemanager.rpc_processing_time_avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|ResourceManager: Active NMs|<p>Number of Active NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_active_nm<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ResourceManager: Decommissioning NMs|<p>Number of Decommissioning NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_decommissioning_nm<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ResourceManager: Decommissioned NMs|<p>Number of Decommissioned NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_decommissioned_nm<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|ResourceManager: Lost NMs|<p>Number of Lost NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_lost_nm<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|ResourceManager: Unhealthy NMs|<p>Number of Unhealthy NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_unhealthy_nm<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|ResourceManager: Rebooted NMs|<p>Number of Rebooted NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_rebooted_nm<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|ResourceManager: Shutdown NMs|<p>Number of Shutdown NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_shutdown_nm<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Service status|<p>Hadoop NameNode API port availability.</p>|Simple check|net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |NameNode: Service response time|<p>Hadoop NameNode API performance.</p>|Simple check|net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]|
-|Hadoop: Get NameNode stats| |HTTP agent|hadoop.namenode.get|
-|NameNode: Uptime| |Dependent item|hadoop.namenode.uptime<p>**Preprocessing**</p><ul><li>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</li><li>Custom multiplier: `0.001`</li></ul>|
+|Hadoop: Get NameNode stats||HTTP agent|hadoop.namenode.get|
+|NameNode: Uptime||Dependent item|hadoop.namenode.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |NameNode: Get info||Dependent item|hadoop.namenode.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=~'Hadoop:service=NameNode,name=*')]`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li></ul>|
-|NameNode: RPC queue & processing time|<p>Average time spent on processing RPC requests.</p>|Dependent item|hadoop.namenode.rpc_processing_time_avg<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Block Pool Renaming| |Dependent item|hadoop.namenode.percent_block_pool_used<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Transactions since last checkpoint|<p>Total number of transactions since last checkpoint.</p>|Dependent item|hadoop.namenode.transactions_since_last_checkpoint<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Percent capacity remaining|<p>Available capacity in percent.</p>|Dependent item|hadoop.namenode.percent_remaining<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|NameNode: Capacity remaining|<p>Available capacity.</p>|Dependent item|hadoop.namenode.capacity_remaining<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Corrupt blocks|<p>Number of corrupt blocks.</p>|Dependent item|hadoop.namenode.corrupt_blocks<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Missing blocks|<p>Number of missing blocks.</p>|Dependent item|hadoop.namenode.missing_blocks<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Failed volumes|<p>Number of failed volumes.</p>|Dependent item|hadoop.namenode.volume_failures_total<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Alive DataNodes|<p>Count of alive DataNodes.</p>|Dependent item|hadoop.namenode.num_live_data_nodes<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|NameNode: Dead DataNodes|<p>Count of dead DataNodes.</p>|Dependent item|hadoop.namenode.num_dead_data_nodes<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|NameNode: Stale DataNodes|<p>DataNodes that do not send a heartbeat within 30 seconds are marked as "stale".</p>|Dependent item|hadoop.namenode.num_stale_data_nodes<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|NameNode: Total files|<p>Total count of files tracked by the NameNode.</p>|Dependent item|hadoop.namenode.files_total<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Total load|<p>The current number of concurrent file accesses (read/write) across all DataNodes.</p>|Dependent item|hadoop.namenode.total_load<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Blocks allocable|<p>Maximum number of blocks allocable.</p>|Dependent item|hadoop.namenode.block_capacity<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Total blocks|<p>Count of blocks tracked by NameNode.</p>|Dependent item|hadoop.namenode.blocks_total<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|NameNode: Under-replicated blocks|<p>The number of blocks with insufficient replication.</p>|Dependent item|hadoop.namenode.under_replicated_blocks<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|Hadoop: Get NodeManagers states| |HTTP agent|hadoop.nodemanagers.get<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
-|Hadoop: Get DataNodes states| |HTTP agent|hadoop.datanodes.get<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|NameNode: RPC queue & processing time|<p>Average time spent on processing RPC requests.</p>|Dependent item|hadoop.namenode.rpc_processing_time_avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Block Pool Renaming||Dependent item|hadoop.namenode.percent_block_pool_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Transactions since last checkpoint|<p>Total number of transactions since last checkpoint.</p>|Dependent item|hadoop.namenode.transactions_since_last_checkpoint<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Percent capacity remaining|<p>Available capacity in percent.</p>|Dependent item|hadoop.namenode.percent_remaining<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|NameNode: Capacity remaining|<p>Available capacity.</p>|Dependent item|hadoop.namenode.capacity_remaining<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Corrupt blocks|<p>Number of corrupt blocks.</p>|Dependent item|hadoop.namenode.corrupt_blocks<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Missing blocks|<p>Number of missing blocks.</p>|Dependent item|hadoop.namenode.missing_blocks<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Failed volumes|<p>Number of failed volumes.</p>|Dependent item|hadoop.namenode.volume_failures_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Alive DataNodes|<p>Count of alive DataNodes.</p>|Dependent item|hadoop.namenode.num_live_data_nodes<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|NameNode: Dead DataNodes|<p>Count of dead DataNodes.</p>|Dependent item|hadoop.namenode.num_dead_data_nodes<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|NameNode: Stale DataNodes|<p>DataNodes that do not send a heartbeat within 30 seconds are marked as "stale".</p>|Dependent item|hadoop.namenode.num_stale_data_nodes<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|NameNode: Total files|<p>Total count of files tracked by the NameNode.</p>|Dependent item|hadoop.namenode.files_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Total load|<p>The current number of concurrent file accesses (read/write) across all DataNodes.</p>|Dependent item|hadoop.namenode.total_load<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Blocks allocable|<p>Maximum number of blocks allocable.</p>|Dependent item|hadoop.namenode.block_capacity<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Total blocks|<p>Count of blocks tracked by NameNode.</p>|Dependent item|hadoop.namenode.blocks_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|NameNode: Under-replicated blocks|<p>The number of blocks with insufficient replication.</p>|Dependent item|hadoop.namenode.under_replicated_blocks<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Hadoop: Get NodeManagers states||HTTP agent|hadoop.nodemanagers.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Hadoop: Get DataNodes states||HTTP agent|hadoop.datanodes.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
@@ -101,25 +101,25 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node manager discovery| |HTTP agent|hadoop.nodemanager.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Node manager discovery||HTTP agent|hadoop.nodemanager.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Node manager discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Hadoop NodeManager {#HOSTNAME}: Get stats| |HTTP agent|hadoop.nodemanager.get[{#HOSTNAME}]|
-|{#HOSTNAME}: RPC queue & processing time|<p>Average time spent on processing RPC requests.</p>|Dependent item|hadoop.nodemanager.rpc_processing_time_avg[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: Container launch avg duration| |Dependent item|hadoop.nodemanager.container_launch_duration_avg[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: JVM Threads|<p>The number of JVM threads.</p>|Dependent item|hadoop.nodemanager.jvm.threads[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: JVM Garbage collection time|<p>The JVM garbage collection time in milliseconds.</p>|Dependent item|hadoop.nodemanager.jvm.gc_time[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: JVM Heap usage|<p>The JVM heap usage in MBytes.</p>|Dependent item|hadoop.nodemanager.jvm.mem_heap_used[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: Uptime| |Dependent item|hadoop.nodemanager.uptime[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</li><li>Custom multiplier: `0.001`</li></ul>|
-|Hadoop NodeManager {#HOSTNAME}: Get raw info| |Dependent item|hadoop.nodemanager.raw_info[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.HostName=='{#HOSTNAME}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|{#HOSTNAME}: State|<p>State of the node - valid values are: NEW, RUNNING, UNHEALTHY, DECOMMISSIONING, DECOMMISSIONED, LOST, REBOOTED, SHUTDOWN.</p>|Dependent item|hadoop.nodemanager.state[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.State`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|{#HOSTNAME}: Version| |Dependent item|hadoop.nodemanager.version[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.NodeManagerVersion`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|{#HOSTNAME}: Number of containers| |Dependent item|hadoop.nodemanager.numcontainers[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.NumContainers`</li></ul>|
-|{#HOSTNAME}: Used memory| |Dependent item|hadoop.nodemanager.usedmemory[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.UsedMemoryMB`</li></ul>|
-|{#HOSTNAME}: Available memory| |Dependent item|hadoop.nodemanager.availablememory[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.AvailableMemoryMB`</li></ul>|
+|Hadoop NodeManager {#HOSTNAME}: Get stats||HTTP agent|hadoop.nodemanager.get[{#HOSTNAME}]|
+|{#HOSTNAME}: RPC queue & processing time|<p>Average time spent on processing RPC requests.</p>|Dependent item|hadoop.nodemanager.rpc_processing_time_avg[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: Container launch avg duration||Dependent item|hadoop.nodemanager.container_launch_duration_avg[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: JVM Threads|<p>The number of JVM threads.</p>|Dependent item|hadoop.nodemanager.jvm.threads[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: JVM Garbage collection time|<p>The JVM garbage collection time in milliseconds.</p>|Dependent item|hadoop.nodemanager.jvm.gc_time[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: JVM Heap usage|<p>The JVM heap usage in MBytes.</p>|Dependent item|hadoop.nodemanager.jvm.mem_heap_used[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: Uptime||Dependent item|hadoop.nodemanager.uptime[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Hadoop NodeManager {#HOSTNAME}: Get raw info||Dependent item|hadoop.nodemanager.raw_info[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.HostName=='{#HOSTNAME}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|{#HOSTNAME}: State|<p>State of the node - valid values are: NEW, RUNNING, UNHEALTHY, DECOMMISSIONING, DECOMMISSIONED, LOST, REBOOTED, SHUTDOWN.</p>|Dependent item|hadoop.nodemanager.state[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#HOSTNAME}: Version||Dependent item|hadoop.nodemanager.version[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NodeManagerVersion`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#HOSTNAME}: Number of containers||Dependent item|hadoop.nodemanager.numcontainers[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NumContainers`</p></li></ul>|
+|{#HOSTNAME}: Used memory||Dependent item|hadoop.nodemanager.usedmemory[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.UsedMemoryMB`</p></li></ul>|
+|{#HOSTNAME}: Available memory||Dependent item|hadoop.nodemanager.availablememory[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.AvailableMemoryMB`</p></li></ul>|
 
 ### Trigger prototypes for Node manager discovery
 
@@ -133,24 +133,24 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Data node discovery| |HTTP agent|hadoop.datanode.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|Data node discovery||HTTP agent|hadoop.datanode.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Data node discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Hadoop DataNode {#HOSTNAME}: Get stats| |HTTP agent|hadoop.datanode.get[{#HOSTNAME}]|
-|{#HOSTNAME}: Remaining|<p>Remaining disk space.</p>|Dependent item|hadoop.datanode.remaining[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: Used|<p>Used disk space.</p>|Dependent item|hadoop.datanode.dfs_used[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: Number of failed volumes|<p>Number of failed storage volumes.</p>|Dependent item|hadoop.datanode.numfailedvolumes[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: JVM Threads|<p>The number of JVM threads.</p>|Dependent item|hadoop.datanode.jvm.threads[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: JVM Garbage collection time|<p>The JVM garbage collection time in milliseconds.</p>|Dependent item|hadoop.datanode.jvm.gc_time[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: JVM Heap usage|<p>The JVM heap usage in MBytes.</p>|Dependent item|hadoop.datanode.jvm.mem_heap_used[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `The text is too long. Please see the template.`</li></ul>|
-|{#HOSTNAME}: Uptime| |Dependent item|hadoop.datanode.uptime[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</li><li>Custom multiplier: `0.001`</li></ul>|
+|Hadoop DataNode {#HOSTNAME}: Get stats||HTTP agent|hadoop.datanode.get[{#HOSTNAME}]|
+|{#HOSTNAME}: Remaining|<p>Remaining disk space.</p>|Dependent item|hadoop.datanode.remaining[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: Used|<p>Used disk space.</p>|Dependent item|hadoop.datanode.dfs_used[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: Number of failed volumes|<p>Number of failed storage volumes.</p>|Dependent item|hadoop.datanode.numfailedvolumes[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: JVM Threads|<p>The number of JVM threads.</p>|Dependent item|hadoop.datanode.jvm.threads[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: JVM Garbage collection time|<p>The JVM garbage collection time in milliseconds.</p>|Dependent item|hadoop.datanode.jvm.gc_time[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: JVM Heap usage|<p>The JVM heap usage in MBytes.</p>|Dependent item|hadoop.datanode.jvm.mem_heap_used[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#HOSTNAME}: Uptime||Dependent item|hadoop.datanode.uptime[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |Hadoop DataNode {#HOSTNAME}: Get raw info||Dependent item|hadoop.datanode.raw_info[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.HostName=='{#HOSTNAME}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|{#HOSTNAME}: Version|<p>DataNode software version.</p>|Dependent item|hadoop.datanode.version[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.version`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|{#HOSTNAME}: Admin state|<p>Administrative state.</p>|Dependent item|hadoop.datanode.admin_state[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.adminState`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|{#HOSTNAME}: Oper state|<p>Operational state.</p>|Dependent item|hadoop.datanode.oper_state[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.operState`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|{#HOSTNAME}: Version|<p>DataNode software version.</p>|Dependent item|hadoop.datanode.version[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#HOSTNAME}: Admin state|<p>Administrative state.</p>|Dependent item|hadoop.datanode.admin_state[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.adminState`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#HOSTNAME}: Oper state|<p>Operational state.</p>|Dependent item|hadoop.datanode.oper_state[{#HOSTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.operState`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Data node discovery
 
@@ -162,6 +162,7 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

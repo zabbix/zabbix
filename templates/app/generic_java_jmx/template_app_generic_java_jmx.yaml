@@ -80,7 +80,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["java.lang:type=Compilation","Name"]'
           history: 7d
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -368,7 +368,7 @@ zabbix_export:
           key: 'jmx["java.lang:type=Runtime","VmName"]'
           delay: 1h
           history: 7d
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -400,7 +400,7 @@ zabbix_export:
           key: 'jmx["java.lang:type=Runtime","VmVersion"]'
           delay: 1h
           history: 7d
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'

@@ -22,12 +22,18 @@ This template has been tested on:
 
 Link this template to the local Zabbix server host.
 
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Zabbix server: Zabbix stats cluster|<p>The master item of Zabbix cluster statistics.</p>|Zabbix internal|zabbix[cluster,discovery,nodes]|
+|Zabbix server: Zabbix proxies stats|<p>The master item of Zabbix proxies' statistics.</p>|Zabbix internal|zabbix[proxy,discovery]|
 |Zabbix server: Queue over 10 minutes|<p>The number of monitored items in the queue, which are delayed at least by 10 minutes.</p>|Zabbix internal|zabbix[queue,10m]|
 |Zabbix server: Queue|<p>The number of monitored items in the queue, which are delayed at least by 6 seconds.</p>|Zabbix internal|zabbix[queue]|
 |Zabbix server: Utilization of alert manager internal processes, in %|<p>The average percentage of the time during which the alert manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,alert manager,avg,busy]|
@@ -48,6 +54,8 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Utilization of java poller data collector processes, in %|<p>The average percentage of the time during which the java poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,java poller,avg,busy]|
 |Zabbix server: Utilization of LLD manager internal processes, in %|<p>The average percentage of the time during which the lld manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,lld manager,avg,busy]|
 |Zabbix server: Utilization of LLD worker internal processes, in %|<p>The average percentage of the time during which the lld worker processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,lld worker,avg,busy]|
+|Zabbix server: Utilization of connector manager internal processes, in %|<p>The average percentage of the time during which the connector manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,connector manager,avg,busy]|
+|Zabbix server: Utilization of connector worker internal processes, in %|<p>The average percentage of the time during which the connector worker processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,connector worker,avg,busy]|
 |Zabbix server: Utilization of poller data collector processes, in %|<p>The average percentage of the time during which the poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,poller,avg,busy]|
 |Zabbix server: Utilization of preprocessing worker internal processes, in %|<p>The average percentage of the time during which the preprocessing worker processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,preprocessing worker,avg,busy]|
 |Zabbix server: Utilization of preprocessing manager internal processes, in %|<p>The average percentage of the time during which the preprocessing manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,preprocessing manager,avg,busy]|
@@ -70,7 +78,7 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Value cache hits|<p>The effectiveness statistics of Zabbix value cache. The number of cache hits (history values taken from the cache).</p>|Zabbix internal|zabbix[vcache,cache,hits]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Zabbix server: Value cache misses|<p>The effectiveness statistics of Zabbix value cache. The number of cache misses (history values taken from the database).</p>|Zabbix internal|zabbix[vcache,cache,misses]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Zabbix server: Value cache operating mode|<p>The operating mode of the value cache.</p>|Zabbix internal|zabbix[vcache,cache,mode]|
-|Zabbix server: Version|<p>A version of Zabbix server.</p>|Zabbix internal|zabbix[version]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `1d`</li></ul>|
+|Zabbix server: Version|<p>A version of Zabbix server.</p>|Zabbix internal|zabbix[version]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Zabbix server: VMware cache, % used|<p>The availability statistics of Zabbix vmware cache. The percentage of used data buffer.</p>|Zabbix internal|zabbix[vmware,buffer,pused]|
 |Zabbix server: History write cache, % used|<p>The statistics and availability of Zabbix write cache. The percentage of used history buffer.</p><p>The history cache is used to store item values. A high number indicates performance problems on the database side.</p>|Zabbix internal|zabbix[wcache,history,pused]|
 |Zabbix server: History index cache, % used|<p>The statistics and availability of Zabbix write cache. The percentage of used history index buffer.</p><p>The history index cache is used to index values stored in the history cache.</p>|Zabbix internal|zabbix[wcache,index,pused]|
@@ -83,6 +91,7 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Number of processed text values per second|<p>The statistics and availability of Zabbix write cache.</p><p>The number of processed text values.</p>|Zabbix internal|zabbix[wcache,values,text]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Zabbix server: LLD queue|<p>The count of values enqueued in the low-level discovery processing queue.</p>|Zabbix internal|zabbix[lld_queue]|
 |Zabbix server: Preprocessing queue|<p>The count of values enqueued in the preprocessing queue.</p>|Zabbix internal|zabbix[preprocessing_queue]|
+|Zabbix server: Connector queue|<p>The count of values enqueued in the connector queue.</p>|Zabbix internal|zabbix[connector_queue]|
 |Zabbix server: Number of processed numeric (unsigned) values per second|<p>The statistics and availability of Zabbix write cache.</p><p>The number of processed numeric (unsigned) values.</p>|Zabbix internal|zabbix[wcache,values,uint]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 
 ### Triggers
@@ -108,6 +117,8 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Utilization of java poller processes is high||`avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of lld manager processes is high||`avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of lld worker processes is high||`avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)>75`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of connector manager processes is high||`avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)>75`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of connector worker processes is high||`avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of poller processes is high||`avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of preprocessing worker processes is high||`avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of preprocessing manager processes is high||`avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)>75`|Average|**Manual close**: Yes|
@@ -132,6 +143,38 @@ Link this template to the local Zabbix server host.
 |Zabbix server: More than 75% used in the history index cache|<p>Consider increasing `HistoryIndexCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[wcache,index,pused],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: More than 75% used in the trends cache|<p>Consider increasing `TrendCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[wcache,trend,pused],10m)>75`|Average|**Manual close**: Yes|
 
+### LLD rule Zabbix proxy discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Zabbix proxy discovery|<p>LLD rule with item and trigger prototypes for the proxy discovery.</p>|Dependent item|zabbix.proxy.discovery|
+
+### Item prototypes for Zabbix proxy discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Proxy [{#PROXY.NAME}]: Stats|<p>The statistics for the discovered proxy.</p>|Dependent item|zabbix.proxy.stats[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.name=="{#PROXY.NAME}")].first()`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Mode|<p>The mode of Zabbix proxy.</p>|Dependent item|zabbix.proxy.mode[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.passive`</p></li><li><p>JavaScript: `return value === 'false' ? 0 : 1`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Unencrypted|<p>The encryption status for connections from a proxy.</p>|Dependent item|zabbix.proxy.unencrypted[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.unencrypted`</p></li><li><p>JavaScript: `return value === 'false' ? 0 : 1`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: PSK|<p>The encryption status for connections from a proxy.</p>|Dependent item|zabbix.proxy.psk[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.psk`</p></li><li><p>JavaScript: `return value === 'false' ? 0 : 1`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Certificate|<p>The encryption status for connections from a proxy.</p>|Dependent item|zabbix.proxy.cert[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cert`</p></li><li><p>JavaScript: `return value === 'false' ? 0 : 1`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Compression|<p>The compression status of a proxy.</p>|Dependent item|zabbix.proxy.compression[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.compression`</p></li><li><p>JavaScript: `return value === 'false' ? 0 : 1`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Item count|<p>The number of enabled items on enabled hosts assigned to a proxy.</p>|Dependent item|zabbix.proxy.items[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Host count|<p>The number of enabled hosts assigned to a proxy.</p>|Dependent item|zabbix.proxy.hosts[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hosts`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Version|<p>A version of Zabbix proxy.</p>|Dependent item|zabbix.proxy.version[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Last seen, in seconds|<p>The time when a proxy was last seen by a server.</p>|Dependent item|zabbix.proxy.last_seen[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.last_seen`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Compatibility|<p>Version of proxy compared to Zabbix server version.</p><p></p><p>Possible values:</p><p>0 - Undefined;</p><p>1 - Current version (proxy and server have the same major version);</p><p>2 - Outdated version (proxy version is older than server version, but is partially supported);</p><p>3 - Unsupported version (proxy version is older than server previous LTS release version or server major version is older than proxy major version).</p>|Dependent item|zabbix.proxy.compatibility[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.compatibility`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy [{#PROXY.NAME}]: Required VPS|<p>The required performance of a proxy (the number of values that need to be collected per second).</p>|Dependent item|zabbix.proxy.requiredperformance[{#PROXY.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.requiredperformance`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+
+### Trigger prototypes for Zabbix proxy discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Proxy [{#PROXY.NAME}]: Proxy last seen|<p>Zabbix proxy is not updating the configuration data.</p>|`last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}`|Warning||
+|Proxy [{#PROXY.NAME}]: Zabbix proxy never seen|<p>Zabbix proxy is not updating the configuration data.</p>|`last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1`|Warning||
+|Proxy [{#PROXY.NAME}]: Zabbix proxy is outdated|<p>Zabbix proxy version is older than server version, but is partially supported. Only data collection and remote execution is available.</p>|`last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=2`|Warning||
+|Proxy [{#PROXY.NAME}]: Zabbix proxy is not supported|<p>Zabbix proxy version is older than server previous LTS release version or server major version is older than proxy major version.</p>|`last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=3`|High||
+
 ### LLD rule High availability cluster node discovery
 
 |Name|Description|Type|Key and additional info|
@@ -142,20 +185,21 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cluster node [{#NODE.NAME}]: Stats|<p>Provides the statistics of a node.</p>|Dependent item|zabbix.nodes.stats[{#NODE.ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.[?(@.id=="{#NODE.ID}")].first()`</li></ul>|
-|Cluster node [{#NODE.NAME}]: Address|<p>The IPv4 address of a node.</p>|Dependent item|zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.address`</li><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|Cluster node [{#NODE.NAME}]: Last access time|<p>Last access time.</p>|Dependent item|zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.lastaccess`</li></ul>|
-|Cluster node [{#NODE.NAME}]: Last access age|<p>The time between the database's `unix_timestamp()` and the last access time.</p>|Dependent item|zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.lastaccess_age`</li></ul>|
-|Cluster node [{#NODE.NAME}]: Status|<p>The status of a node.</p>|Dependent item|zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.status`</li><li>Discard unchanged with heartbeat: `12h`</li></ul>|
+|Cluster node [{#NODE.NAME}]: Stats|<p>Provides the statistics of a node.</p>|Dependent item|zabbix.nodes.stats[{#NODE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.id=="{#NODE.ID}")].first()`</p></li></ul>|
+|Cluster node [{#NODE.NAME}]: Address|<p>The IPv4 address of a node.</p>|Dependent item|zabbix.nodes.address[{#NODE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.address`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Cluster node [{#NODE.NAME}]: Last access time|<p>Last access time.</p>|Dependent item|zabbix.nodes.lastaccess.time[{#NODE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastaccess`</p></li></ul>|
+|Cluster node [{#NODE.NAME}]: Last access age|<p>The time between the database's `unix_timestamp()` and the last access time.</p>|Dependent item|zabbix.nodes.lastaccess.age[{#NODE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastaccess_age`</p></li></ul>|
+|Cluster node [{#NODE.NAME}]: Status|<p>The status of a node.</p>|Dependent item|zabbix.nodes.status[{#NODE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Trigger prototypes for High availability cluster node discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cluster node [{#NODE.NAME}]: Status changed|<p>The state of the node has changed. Confirm to close.</p>|`last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#2)`|Info|**Manual close**: Yes|
+|Cluster node [{#NODE.NAME}]: Status changed|<p>The state of the node has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#2)`|Info|**Manual close**: Yes|
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

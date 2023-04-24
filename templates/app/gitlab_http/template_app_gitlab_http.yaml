@@ -1117,7 +1117,7 @@ zabbix_export:
           type: HTTP_AGENT
           key: gitlab.puma.discovery
           delay: 3h
-          description: 'Discovery Puma specific metrics, when Puma is used.'
+          description: 'Discovery of Puma specific metrics when Puma is used.'
           item_prototypes:
             -
               uuid: 6b6ebfe9326247c8a57fb8c96125bcee

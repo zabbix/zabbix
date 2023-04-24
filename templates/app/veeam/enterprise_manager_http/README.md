@@ -65,14 +65,14 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Veeam Manager: Get metrics|<p>The result of API requests is expressed in the JSON.</p>|Script|veeam.manager.get.metrics|
-|Veeam Manager: Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.manager.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Veeam Manager: Running Jobs|<p>Informs about the running jobs.</p>|Dependent item|veeam.manager.running.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.RunningJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Veeam Manager: Scheduled Jobs|<p>Informs about the scheduled jobs.</p>|Dependent item|veeam.manager.scheduled.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Veeam Manager: Scheduled Backup Jobs|<p>Informs about the scheduled backup jobs.</p>|Dependent item|veeam.manager.scheduled.backup.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledBackupJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Veeam Manager: Scheduled Replica Jobs|<p>Informs about the scheduled replica jobs.</p>|Dependent item|veeam.manager.scheduled.replica.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledReplicaJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Veeam Manager: Total Job Runs|<p>Informs about the total job runs.</p>|Dependent item|veeam.manager.scheduled.total.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.TotalJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Veeam Manager: Warnings Job Runs|<p>Informs about the warning job runs.</p>|Dependent item|veeam.manager.warning.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.WarningsJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|Veeam Manager: Failed Job Runs|<p>Informs about the failed job runs.</p>|Dependent item|veeam.manager.failed.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.FailedJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Veeam Manager: Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.manager.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Veeam Manager: Running Jobs|<p>Informs about the running jobs.</p>|Dependent item|veeam.manager.running.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.RunningJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Veeam Manager: Scheduled Jobs|<p>Informs about the scheduled jobs.</p>|Dependent item|veeam.manager.scheduled.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Veeam Manager: Scheduled Backup Jobs|<p>Informs about the scheduled backup jobs.</p>|Dependent item|veeam.manager.scheduled.backup.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledBackupJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Veeam Manager: Scheduled Replica Jobs|<p>Informs about the scheduled replica jobs.</p>|Dependent item|veeam.manager.scheduled.replica.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledReplicaJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Veeam Manager: Total Job Runs|<p>Informs about the total job runs.</p>|Dependent item|veeam.manager.scheduled.total.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.TotalJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Veeam Manager: Warnings Job Runs|<p>Informs about the warning job runs.</p>|Dependent item|veeam.manager.warning.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.WarningsJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Veeam Manager: Failed Job Runs|<p>Informs about the failed job runs.</p>|Dependent item|veeam.manager.failed.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.FailedJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -86,7 +86,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Backup Files discovery|<p>Discovery of all backup files created on, or imported to the backup servers that are connected to Veeam Backup Enterprise Manager.</p>|Dependent item|veeam.backup.files.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.backupFiles.Refs`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Backup Files discovery|<p>Discovery of all backup files created on, or imported to the backup servers that are connected to Veeam Backup Enterprise Manager.</p>|Dependent item|veeam.backup.files.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.backupFiles.Refs`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Backup Files discovery
 
@@ -99,6 +99,7 @@ This template has been tested on:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

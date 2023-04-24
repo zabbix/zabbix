@@ -173,7 +173,7 @@ zabbix_export:
           key: zyxel.3500_8pd.hw.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -319,7 +319,7 @@ zabbix_export:
           key: zyxel.3500_8pd.net.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: RFC1213-MIB
@@ -448,7 +448,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.3500_8pd.net.if.adminstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The desired state of the interface.  The
@@ -505,7 +504,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -651,7 +649,6 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.3500_8pd.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.3500_8pd.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -684,7 +681,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.24.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3500_8pd.net.if.link_type[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB:  ZYXEL-ES3500-8PD-MIB
                 Physical connection type
@@ -739,7 +735,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
@@ -909,7 +904,6 @@ zabbix_export:
               type: CALCULATED
               key: 'zyxel.3500_8pd.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.3500_8pd.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -942,7 +936,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.24.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.3500_8pd.net.if.speed_duplex[{#SNMPINDEX}]'
               history: 7d
-              trends: '0'
               description: |
                 MIB:  ZYXEL-ES3500-8PD-MIB
                 Transmission mode
@@ -1081,7 +1074,6 @@ zabbix_export:
               key: 'zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               history: 7d
-              trends: '0'
               value_type: FLOAT
               units: '!{#ZYXEL.SFP.UNIT}'
               description: |
@@ -1315,7 +1307,6 @@ zabbix_export:
               key: 'zyxel.3500_8pd.sfp.status[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               history: 7d
-              trends: '0'
               description: |
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Transceiver module status.

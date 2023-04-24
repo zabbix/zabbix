@@ -130,7 +130,7 @@ zabbix_export:
           key: snmptrap.fallback
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -146,7 +146,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -169,7 +169,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -193,7 +193,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -221,7 +221,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -244,7 +244,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -283,7 +283,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -305,7 +305,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -373,7 +373,7 @@ zabbix_export:
               key: 'sensor.fan.status[hwEntityFanState.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: 'MIB: HUAWEI-ENTITY-EXTENT-MIB'
               valuemap:
                 name: 'HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState'
@@ -942,7 +942,7 @@ zabbix_export:
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
               delay: 5m
               history: 7d
-              trends: 0d
+              trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -1024,7 +1024,7 @@ zabbix_export:
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
               delay: 1h
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IF-MIB
                 The type of interface.
@@ -1094,7 +1094,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
                 -

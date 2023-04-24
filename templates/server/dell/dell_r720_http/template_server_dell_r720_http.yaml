@@ -132,7 +132,7 @@ zabbix_export:
           key: dell.server.status
           delay: '0'
           history: 7d
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: 'This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.'
           preprocessing:
@@ -340,7 +340,7 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               authtype: BASIC
               username: '{$API.USER}'
@@ -512,7 +512,7 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}]'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               authtype: BASIC
               username: '{$API.USER}'
@@ -726,7 +726,7 @@ zabbix_export:
               key: 'dell.server.sensor.fan.status[{#SENSOR_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
@@ -1184,7 +1184,7 @@ zabbix_export:
               key: 'dell.server.hw.physicaldisk.media_type[{#DISK_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: 'The type of media contained in this drive. Possible values: HDD, SSD, SMR, null.'
               preprocessing:
@@ -1212,7 +1212,7 @@ zabbix_export:
               key: 'dell.server.hw.physicaldisk.model[{#DISK_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: 'The model number of the drive.'
               preprocessing:
@@ -1240,7 +1240,7 @@ zabbix_export:
               key: 'dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: 'The serial number of this drive.'
               preprocessing:
@@ -1281,7 +1281,7 @@ zabbix_export:
               key: 'dell.server.hw.physicaldisk.size[{#DISK_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               units: B
               description: 'The size, in bytes, of this drive.'
               preprocessing:
@@ -1309,7 +1309,7 @@ zabbix_export:
               key: 'dell.server.hw.physicaldisk.status[{#DISK_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
@@ -1502,7 +1502,7 @@ zabbix_export:
               key: 'dell.server.sensor.psu.status[{#SENSOR_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
@@ -1686,7 +1686,7 @@ zabbix_export:
               key: 'dell.server.sensor.temp.status[{#SENSOR_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
@@ -1947,7 +1947,7 @@ zabbix_export:
               key: 'dell.server.hw.virtualdisk.size[{#DISK_NAME}]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               units: B
               description: 'The size in bytes of this Volume.'
               preprocessing:

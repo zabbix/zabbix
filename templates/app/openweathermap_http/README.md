@@ -57,7 +57,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Openweathermap: Get data|<p>JSON array with result of OpenWeatherMap API requests.</p>|Script|openweathermap.get.data|
-|Openweathermap: Get data collection errors|<p>Errors from get data requests by script item.</p>|Dependent item|openweathermap.get.errors<p>**Preprocessing**</p><ul><li>JSON Path: `$.errors`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Openweathermap: Get data collection errors|<p>Errors from get data requests by script item.</p>|Dependent item|openweathermap.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -69,23 +69,23 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Locations discovery|<p>Weather metrics discovery by location.</p>|Dependent item|openweathermap.locations.discovery<p>**Preprocessing**</p><ul><li>JSON Path: `$.data`</li><li><p>Does not match regular expression: `\[\]`</p><p>⛔️Custom on fail: Set error to: `Failed to receive data about required locations from API`</p></li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|Locations discovery|<p>Weather metrics discovery by location.</p>|Dependent item|openweathermap.locations.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p></li><li><p>Does not match regular expression: `\[\]`</p><p>⛔️Custom on fail: Set error to: `Failed to receive data about required locations from API`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Locations discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#LOCATION}, {#COUNTRY}]: Data|<p>JSON with result of OpenWeatherMap API request by location.</p>|Dependent item|openweathermap.location.data[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.data.[?(@.id=='{#ID}')].first()`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Atmospheric pressure|<p>Atmospheric pressure in Pa.</p>|Dependent item|openweathermap.pressure[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.main.pressure`</li><li>Custom multiplier: `100`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Cloudiness|<p>Cloudiness in %.</p>|Dependent item|openweathermap.clouds[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.clouds.all`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Humidity|<p>Humidity in %.</p>|Dependent item|openweathermap.humidity[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.main.humidity`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Rain volume for the last one hour|<p>Rain volume for the lat one hour in m.</p>|Dependent item|openweathermap.rain[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rain.1h`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Short weather status|<p>Short weather status description.</p>|Dependent item|openweathermap.description[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.weather..description.first()`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Snow volume for the last one hour|<p>Snow volume for the lat one hour in m.</p>|Dependent item|openweathermap.snow[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.snow.1h`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Temperature|<p>Atmospheric temperature value.</p>|Dependent item|openweathermap.temp[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.main.temp`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Visibility|<p>Visibility in m.</p>|Dependent item|openweathermap.visibility[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.visibility`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Wind direction|<p>Wind direction in degrees.</p>|Dependent item|openweathermap.wind.direction[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.wind.deg`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
-|[{#LOCATION}, {#COUNTRY}]: Wind speed|<p>Wind speed value.</p>|Dependent item|openweathermap.wind.speed[{#ID}]<p>**Preprocessing**</p><ul><li>JSON Path: `$.wind.speed`</li><li>Discard unchanged with heartbeat: `1h`</li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Data|<p>JSON with result of OpenWeatherMap API request by location.</p>|Dependent item|openweathermap.location.data[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Atmospheric pressure|<p>Atmospheric pressure in Pa.</p>|Dependent item|openweathermap.pressure[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.main.pressure`</p></li><li><p>Custom multiplier: `100`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Cloudiness|<p>Cloudiness in %.</p>|Dependent item|openweathermap.clouds[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.clouds.all`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Humidity|<p>Humidity in %.</p>|Dependent item|openweathermap.humidity[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.main.humidity`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Rain volume for the last one hour|<p>Rain volume for the lat one hour in m.</p>|Dependent item|openweathermap.rain[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rain.1h`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Short weather status|<p>Short weather status description.</p>|Dependent item|openweathermap.description[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.weather..description.first()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Snow volume for the last one hour|<p>Snow volume for the lat one hour in m.</p>|Dependent item|openweathermap.snow[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.snow.1h`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Temperature|<p>Atmospheric temperature value.</p>|Dependent item|openweathermap.temp[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.main.temp`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Visibility|<p>Visibility in m.</p>|Dependent item|openweathermap.visibility[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.visibility`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Wind direction|<p>Wind direction in degrees.</p>|Dependent item|openweathermap.wind.direction[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.wind.deg`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|[{#LOCATION}, {#COUNTRY}]: Wind speed|<p>Wind speed value.</p>|Dependent item|openweathermap.wind.speed[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.wind.speed`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Locations discovery
 
@@ -96,6 +96,7 @@ This template has been tested on:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

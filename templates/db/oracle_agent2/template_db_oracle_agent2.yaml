@@ -1477,7 +1477,7 @@ zabbix_export:
           key: oracle.uptime
           delay: '0'
           history: 7d
-          trends: 0d
+          trends: '0'
           units: s
           description: 'The Oracle instance uptime expressed in seconds.'
           preprocessing:

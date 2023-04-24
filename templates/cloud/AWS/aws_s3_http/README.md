@@ -80,8 +80,8 @@ Additional information about metrics and used API methods:
 |----|-----------|----|-----------------------|
 |AWS S3: Get metrics data|<p>Get bucket metrics.</p><p>Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html</p>|Script|aws.s3.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS S3: Get alarms data|<p>Get alarms data.</p><p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.s3.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS S3: Get metrics check|<p>Data collection check.</p>|Dependent item|aws.s3.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS S3: Get alarms check|<p>Data collection check.</p>|Dependent item|aws.s3.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|AWS S3: Get metrics check|<p>Data collection check.</p>|Dependent item|aws.s3.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS S3: Get alarms check|<p>Data collection check.</p>|Dependent item|aws.s3.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS S3: Bucket Size|<p>This a daily metric for the bucket.</p><p>The amount of data in bytes stored in a bucket in the STANDARD storage class, INTELLIGENT_TIERING storage class, Standard-Infrequent Access (STANDARD_IA) storage class, OneZone-Infrequent Access (ONEZONE_IA), Reduced Redundancy Storage (RRS) class, S3 Glacier Instant Retrieval storage class, Deep Archive Storage (S3 Glacier Deep Archive) class or, S3 Glacier Flexible Retrieval (GLACIER) storage class. This value is calculated by summing the size of all objects and metadata in the bucket (both current and noncurrent objects), including the size of all parts for all incomplete multipart uploads to the bucket.</p>|Dependent item|aws.s3.bucket_size_bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "BucketSizeBytes")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS S3: Number of objects|<p>This a daily metric for the bucket.</p><p>The total number of objects stored in a bucket for all storage classes. </p><p>This value is calculated by counting all objects in the bucket (both current and noncurrent objects) and the total number of parts for all incomplete multipart uploads to the bucket.</p>|Dependent item|aws.s3.number_of_objects<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NumberOfObjects")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS S3: Requests: All|<p>The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.</p><p>If you're using a metrics configuration with a filter, then this metric only returns the HTTP requests that meet the filter's requirements.</p>|Dependent item|aws.s3.all_requests<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "AllRequests")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -117,14 +117,14 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Bucket Alarms discovery|<p>Discovery bucket alarms.</p>|Dependent item|aws.s3.alarms.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Bucket Alarms discovery|<p>Discovery bucket alarms.</p>|Dependent item|aws.s3.alarms.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Bucket Alarms discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS S3 Alarms: ["{#ALARM_NAME}"]: State reason|<p>An explanation for the alarm state, in text format.</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.s3.alarm.state_reason["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS S3 Alarms: ["{#ALARM_NAME}"]: State|<p>The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.s3.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|AWS S3 Alarms: ["{#ALARM_NAME}"]: State reason|<p>An explanation for the alarm state, in text format.</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.s3.alarm.state_reason["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS S3 Alarms: ["{#ALARM_NAME}"]: State|<p>The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.s3.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Bucket Alarms discovery
 
@@ -135,6 +135,7 @@ Additional information about metrics and used API methods:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

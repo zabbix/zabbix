@@ -7,8 +7,8 @@ zabbix_export:
   templates:
     -
       uuid: eaf36c98b91843b7b79bd5184a23d377
-      template: Solaris
-      name: Solaris
+      template: 'Solaris by Zabbix agent'
+      name: 'Solaris by Zabbix agent'
       description: |
         It is an official Solaris OS template. It requires Zabbix agent 6.4 or newer.
         
@@ -82,7 +82,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2a567bc9d5584dfea986b5b70c89fc65
-              expression: last(/Solaris/kernel.maxproc)<256
+              expression: 'last(/Solaris by Zabbix agent/kernel.maxproc)<256'
               name: 'Solaris: Configured max number of processes is too low'
               priority: INFO
               tags:
@@ -105,7 +105,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6504ba0f7fa445ea9083af008d52c525
-              expression: 'avg(/Solaris/proc.num[,,run],5m)>30'
+              expression: 'avg(/Solaris by Zabbix agent/proc.num[,,run],5m)>30'
               name: 'Solaris: Too many processes running'
               priority: WARNING
               tags:
@@ -128,7 +128,7 @@ zabbix_export:
           triggers:
             -
               uuid: cc2731add899436ca2c12fff13c838fb
-              expression: 'avg(/Solaris/proc.num[],5m)>300'
+              expression: 'avg(/Solaris by Zabbix agent/proc.num[],5m)>300'
               name: 'Solaris: Too many processes'
               priority: WARNING
               tags:
@@ -178,7 +178,7 @@ zabbix_export:
           triggers:
             -
               uuid: e7ef1c2b702440a3a7a20a544446a068
-              expression: 'avg(/Solaris/system.cpu.load[percpu,avg1],5m)>5'
+              expression: 'avg(/Solaris by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
               name: 'Solaris: Processor load is too high'
               priority: WARNING
               tags:
@@ -249,7 +249,7 @@ zabbix_export:
           triggers:
             -
               uuid: 280634a65c9d4702a4913c9c2cd5869c
-              expression: 'avg(/Solaris/system.cpu.util[,iowait],5m)>20'
+              expression: 'avg(/Solaris by Zabbix agent/system.cpu.util[,iowait],5m)>20'
               name: 'Solaris: Disk I/O is overloaded'
               priority: WARNING
               description: 'The OS spends significant time waiting for the I/O (input/output) operations. It could be an indicator of performance issues with the storage system.'
@@ -303,7 +303,7 @@ zabbix_export:
           triggers:
             -
               uuid: cc5a9c97827f4091b83af8be33d58560
-              expression: 'last(/Solaris/system.hostname,#1)<>last(/Solaris/system.hostname,#2)'
+              expression: 'last(/Solaris by Zabbix agent/system.hostname,#1)<>last(/Solaris by Zabbix agent/system.hostname,#2)'
               name: 'Solaris: Hostname was changed'
               priority: INFO
               tags:
@@ -344,7 +344,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7be6856162ca445388b13e524f01a3c2
-              expression: 'last(/Solaris/system.swap.size[,pfree])<50'
+              expression: 'last(/Solaris by Zabbix agent/system.swap.size[,pfree])<50'
               name: 'Solaris: Lack of free swap space'
               priority: WARNING
               description: 'It probably means that the systems requires more physical memory.'
@@ -388,7 +388,7 @@ zabbix_export:
           triggers:
             -
               uuid: dc293e688ac54ac0aee61e398d8bc5c5
-              expression: 'last(/Solaris/system.uname,#1)<>last(/Solaris/system.uname,#2)'
+              expression: 'last(/Solaris by Zabbix agent/system.uname,#1)<>last(/Solaris by Zabbix agent/system.uname,#2)'
               name: 'Solaris: Host information was changed'
               priority: INFO
               tags:
@@ -409,7 +409,7 @@ zabbix_export:
           triggers:
             -
               uuid: 56284beb4a464017b3aa2f4c00bc271f
-              expression: change(/Solaris/system.uptime)<0
+              expression: 'change(/Solaris by Zabbix agent/system.uptime)<0'
               name: 'Solaris: Server has just been restarted'
               priority: INFO
               tags:
@@ -446,13 +446,25 @@ zabbix_export:
           triggers:
             -
               uuid: 50e5be0acabb41658ec82772d9ec234e
-              expression: 'last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#2)'
+              expression: 'last(/Solaris by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
               name: 'Solaris: /etc/passwd has been changed'
               priority: WARNING
               tags:
                 -
                   tag: scope
                   value: security
+        -
+          uuid: 897f991e6f8f433bbd52a958f4f54c08
+          name: 'Solaris: Get filesystems'
+          key: vfs.fs.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 6888f0dd6b2e418f8c28a0ee59648fa3
           name: 'Solaris: Available memory'
@@ -467,7 +479,7 @@ zabbix_export:
           triggers:
             -
               uuid: a0769befcb4e4c649557926824d7dbf3
-              expression: 'last(/Solaris/vm.memory.size[available])<20M'
+              expression: 'last(/Solaris by Zabbix agent/vm.memory.size[available])<20M'
               name: 'Solaris: Lack of available memory on server'
               priority: AVERAGE
               tags:
@@ -504,7 +516,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4ca39fa4a86c45e19e03eff89edd239b
-              expression: 'max(/Solaris/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
+              expression: 'max(/Solaris by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
               name: 'Solaris: Zabbix agent is not available'
               event_name: 'Solaris: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
@@ -582,20 +594,21 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 00AA00
                   item:
-                    host: Solaris
+                    host: 'Solaris by Zabbix agent'
                     key: 'net.if.in[{#IFNAME}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 3333FF
                   item:
-                    host: Solaris
+                    host: 'Solaris by Zabbix agent'
                     key: 'net.if.out[{#IFNAME}]'
         -
           uuid: 3abf31160b404cf095daca79f2a03188
           name: 'Mounted filesystem discovery'
-          key: vfs.fs.discovery
-          delay: 1h
+          type: DEPENDENT
+          key: vfs.fs.dependent.discovery
+          delay: '0'
           filter:
             conditions:
               -
@@ -606,11 +619,20 @@ zabbix_export:
           item_prototypes:
             -
               uuid: aa40b3df2229405193c373b00064e420
-              name: '{#FSNAME}: Free inodes (percentage)'
-              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              name: '{#FSNAME}: Free inodes, %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.inodes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -621,7 +643,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a56d85c866814b5e9273815beafba98c
-                  expression: 'last(/Solaris/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  expression: 'last(/Solaris by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free inodes is less than 20%'
                   priority: WARNING
                   tags:
@@ -634,9 +656,18 @@ zabbix_export:
             -
               uuid: e4c935091c6c49f185ef0e93963388ff
               name: '{#FSNAME}: Free disk space'
-              key: 'vfs.fs.size[{#FSNAME},free]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.free
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -646,11 +677,20 @@ zabbix_export:
                   value: '{#FSNAME}'
             -
               uuid: e2805fb218d64ddd8ea58beae73e1343
-              name: '{#FSNAME}: Free disk space (percentage)'
-              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              name: '{#FSNAME}: Free disk space, %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -661,7 +701,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e93165ebd8d94064836405c8c377bf62
-                  expression: 'last(/Solaris/vfs.fs.size[{#FSNAME},pfree])<20'
+                  expression: 'last(/Solaris by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free disk space is less than 20%'
                   priority: WARNING
                   tags:
@@ -674,10 +714,18 @@ zabbix_export:
             -
               uuid: e15cfb60494944db8e9b2fe929d91fef
               name: '{#FSNAME}: Total disk space'
-              key: 'vfs.fs.size[{#FSNAME},total]'
-              delay: 1h
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},total]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.total
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -688,9 +736,18 @@ zabbix_export:
             -
               uuid: 0da8a65250ec4027b3093772f5c26532
               name: '{#FSNAME}: Used disk space'
-              key: 'vfs.fs.size[{#FSNAME},used]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.used
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -698,29 +755,104 @@ zabbix_export:
                 -
                   tag: filesystem
                   value: '{#FSNAME}'
+            -
+              uuid: 2076c4c4799646d9b42f881369a36f7d
+              name: '{#FSNAME}: Get filesystem data'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},data]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
+              master_item:
+                key: vfs.fs.get
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: de8a43c30de44e83b381b75254735a10
+              name: '{#FSNAME}: Filesystem is read-only'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},readonly]'
+              delay: '0'
+              history: 7d
+              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.options
+                  error_handler: DISCARD_VALUE
+                -
+                  type: REGEX
+                  parameters:
+                    - '(?:^|,)ro\b'
+                    - '1'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: cbbcf1204cf345ceaaf2a9b12996f52f
+                  expression: 'last(/Solaris by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/Solaris by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=1'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Solaris by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0'
+                  name: '{#FSNAME}: Filesystem has become read-only'
+                  priority: AVERAGE
+                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: ba1e86d39b2d4f61892228add27101f2
               name: '{#FSNAME}: Disk space usage'
-              width: '600'
-              height: '340'
-              show_work_period: 'NO'
-              show_triggers: 'NO'
-              type: PIE
-              show_3d: 'YES'
               graph_items:
                 -
-                  color: C80000
-                  type: GRAPH_SUM
+                  color: 199C0D
                   item:
-                    host: Solaris
-                    key: 'vfs.fs.size[{#FSNAME},total]'
+                    host: 'Solaris by Zabbix agent'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
-                  color: 00C800
+                  color: F63100
                   item:
-                    host: Solaris
-                    key: 'vfs.fs.size[{#FSNAME},free]'
+                    host: 'Solaris by Zabbix agent'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+          master_item:
+            key: vfs.fs.get
+          lld_macro_paths:
+            -
+              lld_macro: '{#FSNAME}'
+              path: $.fsname
+            -
+              lld_macro: '{#FSTYPE}'
+              path: $.fstype
           overrides:
             -
               name: 'Skip metadata collection for dynamic FS'
@@ -765,7 +897,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: Solaris
+                        host: 'Solaris by Zabbix agent'
                         name: 'CPU load'
                 -
                   type: graph
@@ -777,7 +909,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: Solaris
+                        host: 'Solaris by Zabbix agent'
                         name: 'CPU utilization'
                 -
                   type: graph
@@ -789,7 +921,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: Solaris
+                        host: 'Solaris by Zabbix agent'
                         name: 'Memory usage'
                 -
                   type: graph
@@ -802,7 +934,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: Solaris
+                        host: 'Solaris by Zabbix agent'
                         name: 'Swap usage'
                 -
                   type: graph
@@ -818,7 +950,7 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        host: Solaris
+                        host: 'Solaris by Zabbix agent'
                         key: 'proc.num[]'
                 -
                   type: graph
@@ -835,7 +967,7 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        host: Solaris
+                        host: 'Solaris by Zabbix agent'
                         key: 'proc.num[,,run]'
       valuemaps:
         -
@@ -866,13 +998,13 @@ zabbix_export:
         -
           color: '009900'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: system.cpu.switches
         -
           sortorder: '1'
           color: '000099'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: system.cpu.intr
     -
       uuid: f66887f0152c484d80b8fe77d5fd2cdd
@@ -882,19 +1014,19 @@ zabbix_export:
         -
           color: '009900'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.cpu.load[percpu,avg1]'
         -
           sortorder: '1'
           color: '000099'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.cpu.load[percpu,avg5]'
         -
           sortorder: '2'
           color: '990000'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.cpu.load[percpu,avg15]'
     -
       uuid: 2b7e4221d79e4db8bf0463e0bb347eb0
@@ -908,28 +1040,28 @@ zabbix_export:
           drawtype: FILLED_REGION
           color: '999900'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.cpu.util[,iowait]'
         -
           sortorder: '1'
           drawtype: FILLED_REGION
           color: '990000'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.cpu.util[,system]'
         -
           sortorder: '2'
           drawtype: FILLED_REGION
           color: '000099'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.cpu.util[,user]'
         -
           sortorder: '3'
           drawtype: FILLED_REGION
           color: '009900'
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.cpu.util[,idle]'
     -
       uuid: 150f0e2062a844a9a8bfcaca92ffbf39
@@ -937,14 +1069,14 @@ zabbix_export:
       ymin_type_1: FIXED
       ymax_type_1: ITEM
       ymax_item_1:
-        host: Solaris
+        host: 'Solaris by Zabbix agent'
         key: 'vm.memory.size[total]'
       graph_items:
         -
           drawtype: GRADIENT_LINE
           color: 00C800
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'vm.memory.size[available]'
     -
       uuid: 061e20f2db6e4a43b35780702b3ebbfa
@@ -960,11 +1092,11 @@ zabbix_export:
           color: AA0000
           type: GRAPH_SUM
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.swap.size[,total]'
         -
           sortorder: '1'
           color: 00AA00
           item:
-            host: Solaris
+            host: 'Solaris by Zabbix agent'
             key: 'system.swap.size[,free]'

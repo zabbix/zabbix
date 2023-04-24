@@ -402,7 +402,7 @@ zabbix_export:
           key: system.hostname
           delay: 1h
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: 'The host name of the system.'
           inventory_link: NAME
@@ -418,7 +418,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3aea75603e584d2f9dc96e7f3cc2b7fa
-              expression: 'last(/Windows by Zabbix agent active/system.hostname,#1)<>last(/Windows by Zabbix agent active/system.hostname,#2) and length(last(/Windows by Zabbix agent active/system.hostname))>0'
+              expression: 'change(/Windows by Zabbix agent active/system.hostname) and length(last(/Windows by Zabbix agent active/system.hostname))>0'
               name: 'Windows: System name has changed'
               event_name: 'Windows: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -444,7 +444,7 @@ zabbix_export:
             -
               uuid: c5c52f75d4214a68b095e8bf55a6a934
               expression: 'fuzzytime(/Windows by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'Windows: System time is out of synс'
+              name: 'Windows: System time is out of sync'
               event_name: 'Windows: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
@@ -472,6 +472,41 @@ zabbix_export:
             -
               tag: component
               value: os
+        -
+          uuid: 5159e7263d7a42e499380b70e9d6490a
+          name: 'Windows: Operating system'
+          type: ZABBIX_ACTIVE
+          key: system.sw.os
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 01bbea22605947dca9638229cf56e4e1
+              expression: 'change(/Windows by Zabbix agent active/system.sw.os) and length(last(/Windows by Zabbix agent active/system.sw.os))>0'
+              name: 'Windows: Operating system description has changed'
+              priority: INFO
+              description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Windows: System name has changed'
+                  expression: 'change(/Windows by Zabbix agent active/system.hostname) and length(last(/Windows by Zabbix agent active/system.hostname))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 9d6f14cc540846ab98052bf741a4247b
           name: 'Windows: Free swap space'
@@ -534,7 +569,7 @@ zabbix_export:
           key: system.uname
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: 'System description of the host.'
           preprocessing:
@@ -553,7 +588,7 @@ zabbix_export:
           key: system.uptime
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
           tags:
@@ -573,6 +608,19 @@ zabbix_export:
                 -
                   tag: scope
                   value: notice
+        -
+          uuid: 60a17a94a9ad4e4192547d0a6a1e1d25
+          name: 'Windows: Get filesystems'
+          type: ZABBIX_ACTIVE
+          key: vfs.fs.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 83185781999742268a7742695c5d3ee3
           name: 'Windows: Total memory'
@@ -655,6 +703,39 @@ zabbix_export:
             -
               tag: component
               value: cpu
+        -
+          uuid: 1ac6ebdb5c98415b94cb44da5feeac7f
+          name: 'Windows: Active agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,active_agent,available]'
+          history: 7d
+          description: |
+            Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - unknown
+            1 - available
+            2 - not available
+          valuemap:
+            name: zabbix.host.active_agent.available
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: bad86dfaf5274927bce35ad314a2d21a
+              expression: 'min(/Windows by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
+              name: 'Windows: Active checks are not available'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: c05c8d1be5614ffab1688cc92db32f12
@@ -849,7 +930,7 @@ zabbix_export:
               key: 'net.if.speed["{#IFGUID}"]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               units: bps
               description: 'Estimated bandwidth of the network interface if any.'
               preprocessing:
@@ -940,7 +1021,7 @@ zabbix_export:
               key: 'net.if.type["{#IFGUID}"]'
               delay: '0'
               history: 7d
-              trends: 0d
+              trends: '0'
               description: 'The type of the network interface.'
               valuemap:
                 name: 'Win32_NetworkAdapter::AdapterTypeId'
@@ -1429,9 +1510,9 @@ zabbix_export:
         -
           uuid: 4fbbdf83609e48e68011f6c394c652f9
           name: 'Mounted filesystem discovery'
-          type: ZABBIX_ACTIVE
-          key: vfs.fs.discovery
-          delay: 1h
+          type: DEPENDENT
+          key: vfs.fs.dependent.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1467,12 +1548,20 @@ zabbix_export:
             -
               uuid: 8949201f93ab46f0a0ad95ca6ce6124c
               name: '{#FSLABEL}({#FSNAME}): Space utilization'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.fs.size[{#FSNAME},pused]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Space utilization in % for {#FSNAME}'
+              description: 'Space utilization expressed in % for `{#FSNAME}`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.pused
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -1483,11 +1572,19 @@ zabbix_export:
             -
               uuid: d45f2c3469dd424486bdee586e4a61eb
               name: '{#FSLABEL}({#FSNAME}): Total space'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.fs.size[{#FSNAME},total]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},total]'
+              delay: '0'
               history: 7d
               units: B
-              description: 'Total space in bytes'
+              description: 'The total space expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.total
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -1498,12 +1595,46 @@ zabbix_export:
             -
               uuid: ddd24d7eaa5742ac9d6cbae42bcfa1ae
               name: '{#FSLABEL}({#FSNAME}): Used space'
-              type: ZABBIX_ACTIVE
-              key: 'vfs.fs.size[{#FSNAME},used]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+              delay: '0'
               history: 7d
               units: B
-              description: 'Used storage in bytes'
+              description: 'Used storage expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.used
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: b9ad1677ea6841309c7dc3a304b61c37
+              name: '{#FSLABEL}({#FSNAME}): Get filesystem data'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},data]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
+              master_item:
+                key: vfs.fs.get
+              tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: storage
@@ -1514,8 +1645,8 @@ zabbix_export:
             -
               uuid: 5bed682545044584852888d96454df86
               expression: |
-                last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
               event_name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1534,8 +1665,8 @@ zabbix_export:
             -
               uuid: 1e5e9718c5a14099b9421ff7956b2f33
               expression: |
-                last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
               name: '{#FSLABEL}({#FSNAME}): Disk space is low'
               event_name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1551,8 +1682,8 @@ zabbix_export:
                 -
                   name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
                   expression: |
-                    last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
+                    last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1572,14 +1703,26 @@ zabbix_export:
                   type: GRAPH_SUM
                   item:
                     host: 'Windows by Zabbix agent active'
-                    key: 'vfs.fs.size[{#FSNAME},total]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
                     host: 'Windows by Zabbix agent active'
-                    key: 'vfs.fs.size[{#FSNAME},used]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+          master_item:
+            key: vfs.fs.get
+          lld_macro_paths:
+            -
+              lld_macro: '{#FSDRIVETYPE}'
+              path: $.fsdrivetype
+            -
+              lld_macro: '{#FSNAME}'
+              path: $.fsname
+            -
+              lld_macro: '{#FSTYPE}'
+              path: $.fstype
       tags:
         -
           tag: class
@@ -1592,6 +1735,10 @@ zabbix_export:
           macro: '{$AGENT.NODATA_TIMEOUT}'
           value: 30m
           description: 'No data timeout for active agents. Consider to keep it relatively high.'
+        -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 5m
+          description: 'Timeout after which agent is considered unavailable.'
         -
           macro: '{$CPU.INTERRUPT.CRIT.MAX}'
           value: '50'
@@ -2023,6 +2170,19 @@ zabbix_export:
             -
               value: '255'
               newvalue: 'No such service'
+        -
+          uuid: 131de6a1016e43019d7cac2ce76901d4
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
         -
           uuid: 0b50ea7e6695421da023ece0a23bed10
           name: 'Zabbix agent ping status'

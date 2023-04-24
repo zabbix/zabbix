@@ -44,25 +44,25 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ClassLoading: Loaded class count|<p>Displays number of classes that are currently loaded in the Java virtual machine.</p>|JMX agent|jmx["java.lang:type=ClassLoading","LoadedClassCount"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|ClassLoading: Total loaded class count|<p>Displays the total number of classes that have been loaded since the Java virtual machine has started execution.</p>|JMX agent|jmx["java.lang:type=ClassLoading","TotalLoadedClassCount"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|ClassLoading: Unloaded class count|<p>Displays the total number of classes that have been loaded since the Java virtual machine has started execution.</p>|JMX agent|jmx["java.lang:type=ClassLoading","UnloadedClassCount"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Compilation: Name of the current JIT compiler|<p>Displays the total number of classes unloaded since the Java virtual machine has started execution.</p>|JMX agent|jmx["java.lang:type=Compilation","Name"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|Compilation: Accumulated time spent|<p>Displays the approximate accumulated elapsed time spent in compilation, in seconds.</p>|JMX agent|jmx["java.lang:type=Compilation","TotalCompilationTime"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|ClassLoading: Loaded class count|<p>Displays number of classes that are currently loaded in the Java virtual machine.</p>|JMX agent|jmx["java.lang:type=ClassLoading","LoadedClassCount"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|ClassLoading: Total loaded class count|<p>Displays the total number of classes that have been loaded since the Java virtual machine has started execution.</p>|JMX agent|jmx["java.lang:type=ClassLoading","TotalLoadedClassCount"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|ClassLoading: Unloaded class count|<p>Displays the total number of classes that have been loaded since the Java virtual machine has started execution.</p>|JMX agent|jmx["java.lang:type=ClassLoading","UnloadedClassCount"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Compilation: Name of the current JIT compiler|<p>Displays the total number of classes unloaded since the Java virtual machine has started execution.</p>|JMX agent|jmx["java.lang:type=Compilation","Name"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Compilation: Accumulated time spent|<p>Displays the approximate accumulated elapsed time spent in compilation, in seconds.</p>|JMX agent|jmx["java.lang:type=Compilation","TotalCompilationTime"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Memory: Heap memory committed|<p>Current heap memory allocated. This amount of memory is guaranteed for the Java virtual machine to use.</p>|JMX agent|jmx["java.lang:type=Memory","HeapMemoryUsage.committed"]|
-|Memory: Heap memory maximum size|<p>Maximum amount of heap that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.</p>|JMX agent|jmx["java.lang:type=Memory","HeapMemoryUsage.max"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Memory: Heap memory used|<p>Current memory usage outside the heap.</p>|JMX agent|jmx["java.lang:type=Memory","HeapMemoryUsage.used"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Memory: Non-Heap memory committed|<p>Current memory allocated outside the heap. This amount of memory is guaranteed for the Java virtual machine to use.</p>|JMX agent|jmx["java.lang:type=Memory","NonHeapMemoryUsage.committed"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Memory: Non-Heap memory maximum size|<p>Maximum amount of non-heap memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.</p>|JMX agent|jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Memory: Non-Heap memory used|<p>Current memory usage outside the heap</p>|JMX agent|jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Memory: Object pending finalization count|<p>The approximate number of objects for which finalization is pending.</p>|JMX agent|jmx["java.lang:type=Memory","ObjectPendingFinalizationCount"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|OperatingSystem: File descriptors maximum count|<p>This is the number of file descriptors we can have opened in the same process, as determined by the operating system. You can never have more file descriptors than this number.</p>|JMX agent|jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|Memory: Heap memory maximum size|<p>Maximum amount of heap that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.</p>|JMX agent|jmx["java.lang:type=Memory","HeapMemoryUsage.max"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Memory: Heap memory used|<p>Current memory usage outside the heap.</p>|JMX agent|jmx["java.lang:type=Memory","HeapMemoryUsage.used"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Memory: Non-Heap memory committed|<p>Current memory allocated outside the heap. This amount of memory is guaranteed for the Java virtual machine to use.</p>|JMX agent|jmx["java.lang:type=Memory","NonHeapMemoryUsage.committed"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Memory: Non-Heap memory maximum size|<p>Maximum amount of non-heap memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.</p>|JMX agent|jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Memory: Non-Heap memory used|<p>Current memory usage outside the heap</p>|JMX agent|jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Memory: Object pending finalization count|<p>The approximate number of objects for which finalization is pending.</p>|JMX agent|jmx["java.lang:type=Memory","ObjectPendingFinalizationCount"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|OperatingSystem: File descriptors maximum count|<p>This is the number of file descriptors we can have opened in the same process, as determined by the operating system. You can never have more file descriptors than this number.</p>|JMX agent|jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |OperatingSystem: File descriptors opened|<p>This is the number of opened file descriptors at the moment, if this reaches the MaxFileDescriptorCount, the application will throw an IOException: Too many open files. This could mean you are opening file descriptors and never closing them.</p>|JMX agent|jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"]|
-|OperatingSystem: Process CPU Load|<p>ProcessCpuLoad represents the CPU load in this process.</p>|JMX agent|jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `100`</li></ul>|
-|Runtime: JVM uptime| |JMX agent|jmx["java.lang:type=Runtime","Uptime"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|Runtime: JVM name| |JMX agent|jmx["java.lang:type=Runtime","VmName"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|Runtime: JVM version| |JMX agent|jmx["java.lang:type=Runtime","VmVersion"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `30m`</li></ul>|
-|Threading: Daemon thread count|<p>Number of daemon threads running.</p>|JMX agent|jmx["java.lang:type=Threading","DaemonThreadCount"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|OperatingSystem: Process CPU Load|<p>ProcessCpuLoad represents the CPU load in this process.</p>|JMX agent|jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `100`</p></li></ul>|
+|Runtime: JVM uptime||JMX agent|jmx["java.lang:type=Runtime","Uptime"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Runtime: JVM name||JMX agent|jmx["java.lang:type=Runtime","VmName"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Runtime: JVM version||JMX agent|jmx["java.lang:type=Runtime","VmVersion"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Threading: Daemon thread count|<p>Number of daemon threads running.</p>|JMX agent|jmx["java.lang:type=Threading","DaemonThreadCount"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Threading: Peak thread count|<p>Maximum number of threads being executed at the same time since the JVM was started or the peak was reset.</p>|JMX agent|jmx["java.lang:type=Threading","PeakThreadCount"]|
 |Threading: Thread count|<p>The number of threads running at the current moment.</p>|JMX agent|jmx["java.lang:type=Threading","ThreadCount"]|
 |Threading: Total started thread count|<p>The number of threads started since the JVM was launched.</p>|JMX agent|jmx["java.lang:type=Threading","TotalStartedThreadCount"]|
@@ -90,7 +90,7 @@ Refer to the vendor documentation.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GarbageCollector: {#JMXNAME} number of collections per second|<p>Displays the total number of collections that have occurred per second.</p>|JMX agent|jmx["java.lang:name={#JMXNAME},type=GarbageCollector","CollectionCount"]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|GarbageCollector: {#JMXNAME} accumulated time spent in collection|<p>Displays the approximate accumulated collection elapsed time, in seconds.</p>|JMX agent|jmx["java.lang:name={#JMXNAME},type=GarbageCollector","CollectionTime"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|GarbageCollector: {#JMXNAME} accumulated time spent in collection|<p>Displays the approximate accumulated collection elapsed time, in seconds.</p>|JMX agent|jmx["java.lang:name={#JMXNAME},type=GarbageCollector","CollectionTime"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 
 ### LLD rule Memory pool discovery
 
@@ -102,8 +102,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Memory pool: {#JMXNAME} committed|<p>Current memory allocated.</p>|JMX agent|jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.committed"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Memory pool: {#JMXNAME} maximum size|<p>Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.</p>|JMX agent|jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.max"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `10m`</li></ul>|
+|Memory pool: {#JMXNAME} committed|<p>Current memory allocated.</p>|JMX agent|jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.committed"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Memory pool: {#JMXNAME} maximum size|<p>Maximum amount of memory that can be used for memory management. This amount of memory is not guaranteed to be available if it is greater than the amount of committed memory. The Java virtual machine may fail to allocate memory even if the amount of used memory does not exceed this maximum size.</p>|JMX agent|jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.max"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Memory pool: {#JMXNAME} used|<p>Current memory usage.</p>|JMX agent|jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.used"]|
 
 ### Trigger prototypes for Memory pool discovery
@@ -114,6 +114,7 @@ Refer to the vendor documentation.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

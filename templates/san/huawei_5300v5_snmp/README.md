@@ -50,22 +50,22 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|OceanStor 5300 V5: Status|<p>System running status.</p>|SNMP agent|huawei.5300.v5[status]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|OceanStor 5300 V5: Version|<p>The device version.</p>|SNMP agent|huawei.5300.v5[version]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|OceanStor 5300 V5: Capacity total|<p>Total capacity of a device.</p>|SNMP agent|huawei.5300.v5[totalCapacity]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|OceanStor 5300 V5: Capacity used|<p>Used capacity of a device.</p>|SNMP agent|huawei.5300.v5[usedCapacity]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
-|OceanStor 5300 V5: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.01`</li></ul>|
-|OceanStor 5300 V5: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Custom multiplier: `0.01`</li></ul>|
+|OceanStor 5300 V5: Status|<p>System running status.</p>|SNMP agent|huawei.5300.v5[status]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|OceanStor 5300 V5: Version|<p>The device version.</p>|SNMP agent|huawei.5300.v5[version]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|OceanStor 5300 V5: Capacity total|<p>Total capacity of a device.</p>|SNMP agent|huawei.5300.v5[totalCapacity]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|OceanStor 5300 V5: Capacity used|<p>Used capacity of a device.</p>|SNMP agent|huawei.5300.v5[usedCapacity]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|OceanStor 5300 V5: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|OceanStor 5300 V5: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |OceanStor 5300 V5: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
-|OceanStor 5300 V5: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|OceanStor 5300 V5: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|OceanStor 5300 V5: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|OceanStor 5300 V5: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
-|OceanStor 5300 V5: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `12h`</li></ul>|
+|OceanStor 5300 V5: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|OceanStor 5300 V5: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|OceanStor 5300 V5: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|OceanStor 5300 V5: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|OceanStor 5300 V5: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |OceanStor 5300 V5: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
-|OceanStor 5300 V5: ICMP ping| |Simple check|icmpping|
-|OceanStor 5300 V5: ICMP loss| |Simple check|icmppingloss|
-|OceanStor 5300 V5: ICMP response time| |Simple check|icmppingsec|
+|OceanStor 5300 V5: ICMP ping||Simple check|icmpping|
+|OceanStor 5300 V5: ICMP loss||Simple check|icmppingloss|
+|OceanStor 5300 V5: ICMP response time||Simple check|icmppingsec|
 
 ### Triggers
 
@@ -91,9 +91,9 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |Controller {#ID}: CPU utilization|<p>CPU usage of a controller {#ID}.</p>|SNMP agent|huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"]|
 |Controller {#ID}: Memory utilization|<p>Memory usage of a controller {#ID}.</p>|SNMP agent|huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"]|
-|Controller {#ID}: Health status|<p>Controller health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|Controller {#ID}: Running status|<p>Controller running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|Controller {#ID}: Role|<p>Controller role..</p>|SNMP agent|huawei.5300.v5[hwInfoControllerRole, "{#ID}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Controller {#ID}: Health status|<p>Controller health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Controller {#ID}: Running status|<p>Controller running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Controller {#ID}: Role|<p>Controller role.</p>|SNMP agent|huawei.5300.v5[hwInfoControllerRole, "{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Controllers discovery
 
@@ -115,8 +115,8 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Enclosure {#NAME}: Health status|<p>Enclosure health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|Enclosure {#NAME}: Running status|<p>Enclosure running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Enclosure {#NAME}: Health status|<p>Enclosure health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Enclosure {#NAME}: Running status|<p>Enclosure running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Enclosure {#NAME}: Temperature|<p>Enclosure temperature.</p>|SNMP agent|huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"]|
 
 ### Trigger prototypes for Enclosure discovery
@@ -137,8 +137,8 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FAN {#ID} on {#LOCATION}: Health status|<p>Health status of a fan. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|FAN {#ID} on {#LOCATION}: Running status|<p>Operating status of a fan. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|FAN {#ID} on {#LOCATION}: Health status|<p>Health status of a fan. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|FAN {#ID} on {#LOCATION}: Running status|<p>Operating status of a fan. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for FANs discovery
 
@@ -157,8 +157,8 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|BBU {#ID} on {#LOCATION}: Health status|<p>Health status of a BBU. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|BBU {#ID} on {#LOCATION}: Running status|<p>Running status of a BBU. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|BBU {#ID} on {#LOCATION}: Health status|<p>Health status of a BBU. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|BBU {#ID} on {#LOCATION}: Running status|<p>Running status of a BBU. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for BBU discovery
 
@@ -177,10 +177,10 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Disk {#MODEL} on {#LOCATION}: Health status|<p>Disk health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|Disk {#MODEL} on {#LOCATION}: Running status|<p>Disk running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Disk {#MODEL} on {#LOCATION}: Health status|<p>Disk health status. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Disk {#MODEL} on {#LOCATION}: Running status|<p>Disk running status. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Disk {#MODEL} on {#LOCATION}: Temperature|<p>Disk temperature.</p>|SNMP agent|huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"]|
-|Disk {#MODEL} on {#LOCATION}: Health score|<p>Health score of a disk. If the value is 255, indicating invalid.</p>|SNMP agent|huawei.5300.v5[hwInfoDiskHealthMark, "{#ID}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Disk {#MODEL} on {#LOCATION}: Health score|<p>Health score of a disk. If the value is 255, indicating invalid.</p>|SNMP agent|huawei.5300.v5[hwInfoDiskHealthMark, "{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Disks discovery
 
@@ -205,9 +205,9 @@ This template has been tested on:
 |Node {#NODE}: Total I/O per second|<p>Total IOPS of the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeTotalIOPS, "{#NODE}"]|
 |Node {#NODE}: Read operations per second|<p>Read IOPS of the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeReadIOPS, "{#NODE}"]|
 |Node {#NODE}: Write operations per second|<p>Write IOPS of the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeWriteIOPS, "{#NODE}"]|
-|Node {#NODE}: Total traffic per second|<p>Total bandwidth for the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeTotalTraffic, "{#NODE}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
-|Node {#NODE}: Read traffic per second|<p>Read bandwidth for the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeReadTraffic, "{#NODE}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
-|Node {#NODE}: Write traffic per second|<p>Write bandwidth for the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeWriteTraffic, "{#NODE}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
+|Node {#NODE}: Total traffic per second|<p>Total bandwidth for the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeTotalTraffic, "{#NODE}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Node {#NODE}: Read traffic per second|<p>Read bandwidth for the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeReadTraffic, "{#NODE}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Node {#NODE}: Write traffic per second|<p>Write bandwidth for the node.</p>|SNMP agent|huawei.5300.v5[hwPerfNodeWriteTraffic, "{#NODE}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
 
 ### Trigger prototypes for Nodes performance discovery
 
@@ -226,17 +226,17 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|LUN {#NAME}: Status|<p>Status of the LUN.</p>|SNMP agent|huawei.5300.v5[hwStorageLunStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|LUN {#NAME}: Average total I/O latency|<p>Average I/O latency of the node in milliseconds.</p>|SNMP agent|huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|LUN {#NAME}: Average read I/O latency|<p>Average read I/O response time in milliseconds.</p>|SNMP agent|huawei.5300.v5[hwPerfLunAverageReadIOLatency, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
-|LUN {#NAME}: Average write I/O latency|<p>Average write I/O response time in milliseconds.</p>|SNMP agent|huawei.5300.v5[hwPerfLunAverageWriteIOLatency, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `0.001`</li></ul>|
+|LUN {#NAME}: Status|<p>Status of the LUN.</p>|SNMP agent|huawei.5300.v5[hwStorageLunStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|LUN {#NAME}: Average total I/O latency|<p>Average I/O latency of the node in milliseconds.</p>|SNMP agent|huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|LUN {#NAME}: Average read I/O latency|<p>Average read I/O response time in milliseconds.</p>|SNMP agent|huawei.5300.v5[hwPerfLunAverageReadIOLatency, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|LUN {#NAME}: Average write I/O latency|<p>Average write I/O response time in milliseconds.</p>|SNMP agent|huawei.5300.v5[hwPerfLunAverageWriteIOLatency, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |LUN {#NAME}: Total I/O per second|<p>Current IOPS of the LUN.</p>|SNMP agent|huawei.5300.v5[hwPerfLunTotalIOPS, "{#NAME}"]|
 |LUN {#NAME}: Read operations per second|<p>Read IOPS of the node.</p>|SNMP agent|huawei.5300.v5[hwPerfLunReadIOPS, "{#NAME}"]|
 |LUN {#NAME}: Write operations per second|<p>Write IOPS of the node.</p>|SNMP agent|huawei.5300.v5[hwPerfLunWriteIOPS, "{#NAME}"]|
-|LUN {#NAME}: Total traffic per second|<p>Current total bandwidth for the LUN.</p>|SNMP agent|huawei.5300.v5[hwPerfLunTotalTraffic, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
-|LUN {#NAME}: Read traffic per second|<p>Current read bandwidth for the LUN.</p>|SNMP agent|huawei.5300.v5[hwPerfLunReadTraffic, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
-|LUN {#NAME}: Write traffic per second|<p>Current write bandwidth for the LUN.</p>|SNMP agent|huawei.5300.v5[hwPerfLunWriteTraffic, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
-|LUN {#NAME}: Capacity|<p>Capacity of the LUN.</p>|SNMP agent|huawei.5300.v5[hwStorageLunCapacity, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1024`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|LUN {#NAME}: Total traffic per second|<p>Current total bandwidth for the LUN.</p>|SNMP agent|huawei.5300.v5[hwPerfLunTotalTraffic, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|LUN {#NAME}: Read traffic per second|<p>Current read bandwidth for the LUN.</p>|SNMP agent|huawei.5300.v5[hwPerfLunReadTraffic, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|LUN {#NAME}: Write traffic per second|<p>Current write bandwidth for the LUN.</p>|SNMP agent|huawei.5300.v5[hwPerfLunWriteTraffic, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|LUN {#NAME}: Capacity|<p>Capacity of the LUN.</p>|SNMP agent|huawei.5300.v5[hwStorageLunCapacity, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for LUNs discovery
 
@@ -255,11 +255,11 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Pool {#NAME}: Health status|<p>Health status of a storage pool. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|Pool {#NAME}: Running status|<p>Operating status of a storage pool. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Discard unchanged with heartbeat: `6h`</li></ul>|
-|Pool {#NAME}: Capacity total|<p>Total capacity of a storage pool.</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li><li>Discard unchanged with heartbeat: `10m`</li></ul>|
-|Pool {#NAME}: Capacity free|<p>Available capacity of a storage pool.</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolFreeCapacity, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
-|Pool {#NAME}: Capacity used|<p>Used capacity of a storage pool.</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"]<p>**Preprocessing**</p><ul><li>Custom multiplier: `1048576`</li></ul>|
+|Pool {#NAME}: Health status|<p>Health status of a storage pool. For details, see definition of Enum Values (HEALTH_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Pool {#NAME}: Running status|<p>Operating status of a storage pool. For details, see definition of Enum Values (RUNNING_STATUS_E).</p><p>https://support.huawei.com/enterprise/en/centralized-storage/oceanstor-5300-v5-pid-22462029?category=reference-guides&subcategory=mib-reference</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Pool {#NAME}: Capacity total|<p>Total capacity of a storage pool.</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Pool {#NAME}: Capacity free|<p>Available capacity of a storage pool.</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolFreeCapacity, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Pool {#NAME}: Capacity used|<p>Used capacity of a storage pool.</p>|SNMP agent|huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
 |Pool {#NAME}: Capacity used percentage|<p>Used capacity of a storage pool in percents.</p>|Calculated|huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"]|
 
 ### Trigger prototypes for Storage pools discovery
@@ -272,6 +272,7 @@ This template has been tested on:
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

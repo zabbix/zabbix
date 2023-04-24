@@ -97,20 +97,20 @@ Additional information about metrics and used API methods:
 |AWS RDS: Get instance info|<p>Get instance info.</p><p>DescribeDBInstances API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeDBInstances.html</p>|Script|aws.rds.get_instance_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS CloudWatch: Get instance alarms data|<p>DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html</p>|Script|aws.rds.get_alarms<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS RDS: Get instance events data|<p>DescribeEvents API method: https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DescribeEvents.html</p>|Script|aws.rds.get_events<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS RDS: Get metrics check|<p>Data collection check.</p>|Dependent item|aws.rds.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Get instance info check|<p>Data collection check.</p>|Dependent item|aws.rds.instance_info.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Get alarms check|<p>Data collection check.</p>|Dependent item|aws.rds.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Get events check|<p>Data collection check.</p>|Dependent item|aws.rds.events.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Class|<p>Contains the name of the compute and memory capacity class of the DB instance.</p>|Dependent item|aws.rds.class<p>**Preprocessing**</p><ul><li>JSON Path: `$[*].DBInstanceClass.first()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Engine|<p>Database engine.</p>|Dependent item|aws.rds.engine<p>**Preprocessing**</p><ul><li>JSON Path: `$..Engine.first()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Engine version|<p>Indicates the database engine version.</p>|Dependent item|aws.rds.engine.version<p>**Preprocessing**</p><ul><li>JSON Path: `$[*].EngineVersion.first()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Status|<p>Specifies the current state of this database.</p><p>All possible status values and their description: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/accessing-monitoring.html#Overview.DBInstance.Status</p>|Dependent item|aws.rds.status<p>**Preprocessing**</p><ul><li>JSON Path: `$..DBInstanceStatus.first()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Storage type|<p>Specifies the storage type associated with DB instance.</p>|Dependent item|aws.rds.storage_type<p>**Preprocessing**</p><ul><li>JSON Path: `$[*].StorageType.first()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Create time|<p>Provides the date and time the DB instance was created.</p>|Dependent item|aws.rds.create_time<p>**Preprocessing**</p><ul><li>JSON Path: `$..InstanceCreateTime.first()`</li></ul>|
-|AWS RDS: Storage: Allocated|<p>Specifies the allocated storage size specified in gibibytes (GiB).</p>|Dependent item|aws.rds.storage.allocated<p>**Preprocessing**</p><ul><li>JSON Path: `$[*].AllocatedStorage.first()`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Storage: Max allocated|<p>The upper limit in gibibytes (GiB) to which Amazon RDS can automatically scale the storage of the DB instance.</p><p>If limit is not specified returns -1.</p>|Dependent item|aws.rds.storage.max_allocated<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Read replica: State|<p>The status of a read replica. If the instance isn't a read replica, this is blank.</p><p>Boolean value that is true if the instance is operating normally, or false if the instance is in an error state.</p>|Dependent item|aws.rds.read_replica_state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..StatusInfos..Normal.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Boolean to decimal</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS: Read replica: Status|<p>The status of a read replica. If the instance isn't a read replica, this is blank.</p><p>Status of the DB instance. For a StatusType of read replica, the values can be replicating, replication stop point set, replication stop point reached, error, stopped, or terminated.</p>|Dependent item|aws.rds.read_replica_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..StatusInfos..Status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|AWS RDS: Get metrics check|<p>Data collection check.</p>|Dependent item|aws.rds.metrics.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Get instance info check|<p>Data collection check.</p>|Dependent item|aws.rds.instance_info.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Get alarms check|<p>Data collection check.</p>|Dependent item|aws.rds.alarms.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Get events check|<p>Data collection check.</p>|Dependent item|aws.rds.events.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Class|<p>Contains the name of the compute and memory capacity class of the DB instance.</p>|Dependent item|aws.rds.class<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].DBInstanceClass.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Engine|<p>Database engine.</p>|Dependent item|aws.rds.engine<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Engine.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Engine version|<p>Indicates the database engine version.</p>|Dependent item|aws.rds.engine.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].EngineVersion.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Status|<p>Specifies the current state of this database.</p><p>All possible status values and their description: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/accessing-monitoring.html#Overview.DBInstance.Status</p>|Dependent item|aws.rds.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..DBInstanceStatus.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Storage type|<p>Specifies the storage type associated with DB instance.</p>|Dependent item|aws.rds.storage_type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].StorageType.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Create time|<p>Provides the date and time the DB instance was created.</p>|Dependent item|aws.rds.create_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..InstanceCreateTime.first()`</p></li></ul>|
+|AWS RDS: Storage: Allocated|<p>Specifies the allocated storage size specified in gibibytes (GiB).</p>|Dependent item|aws.rds.storage.allocated<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].AllocatedStorage.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Storage: Max allocated|<p>The upper limit in gibibytes (GiB) to which Amazon RDS can automatically scale the storage of the DB instance.</p><p>If limit is not specified returns -1.</p>|Dependent item|aws.rds.storage.max_allocated<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Read replica: State|<p>The status of a read replica. If the instance isn't a read replica, this is blank.</p><p>Boolean value that is true if the instance is operating normally, or false if the instance is in an error state.</p>|Dependent item|aws.rds.read_replica_state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..StatusInfos..Normal.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS: Read replica: Status|<p>The status of a read replica. If the instance isn't a read replica, this is blank.</p><p>Status of the DB instance. For a StatusType of read replica, the values can be replicating, replication stop point set, replication stop point reached, error, stopped, or terminated.</p>|Dependent item|aws.rds.read_replica_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..StatusInfos..Status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |AWS RDS: Swap usage|<p>The amount of swap space used. </p><p>This metric is available for the Aurora PostgreSQL DB instance classes db.t3.medium, db.t3.large, db.r4.large, db.r4.xlarge, db.r5.large, db.r5.xlarge, db.r6g.large, and db.r6g.xlarge. </p><p>For Aurora MySQL, this metric applies only to db.t* DB instance classes.</p><p>This metric is not available for SQL Server.</p>|Dependent item|aws.rds.swap_usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "SwapUsage")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS RDS: Disk: Write IOPS|<p>The number of write records generated per second. This is more or less the number of log records generated by the database. These do not correspond to 8K page writes, and do not correspond to network packets sent.</p>|Dependent item|aws.rds.write_iops.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "WriteIOPS")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |AWS RDS: Disk: Write latency|<p>The average amount of time taken per disk I/O operation.</p>|Dependent item|aws.rds.write_latency<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "WriteLatency")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -163,14 +163,14 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Instance Alarms discovery|<p>Discovery instance alarms.</p>|Dependent item|aws.rds.alarms.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Instance Alarms discovery|<p>Discovery instance alarms.</p>|Dependent item|aws.rds.alarms.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Instance Alarms discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS RDS Alarms: ["{#ALARM_NAME}"]: State reason|<p>An explanation for the alarm state, in text format.</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.rds.alarm.state_reason["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS Alarms: ["{#ALARM_NAME}"]: State|<p>The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.rds.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li>JavaScript: `The text is too long. Please see the template.`</li></ul>|
+|AWS RDS Alarms: ["{#ALARM_NAME}"]: State reason|<p>An explanation for the alarm state, in text format.</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.rds.alarm.state_reason["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS Alarms: ["{#ALARM_NAME}"]: State|<p>The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).</p><p>Alarm description:</p><p>{#ALARM_DESCRIPTION}</p>|Dependent item|aws.rds.alarm.state["{#ALARM_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Instance Alarms discovery
 
@@ -183,7 +183,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Aurora metrics discovery|<p>Discovery Amazon Aurora metrics.</p><p>https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances</p>|Dependent item|aws.rds.aurora.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Aurora metrics discovery|<p>Discovery Amazon Aurora metrics.</p><p>https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances</p>|Dependent item|aws.rds.aurora.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Aurora metrics discovery
 
@@ -207,7 +207,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Aurora MySQL metrics discovery|<p>Discovery Aurora MySQL metrics.</p><p>Storage types:</p><p> aurora (for MySQL 5.6-compatible Aurora)</p><p> aurora-mysql (for MySQL 5.7-compatible and MySQL 8.0-compatible Aurora)</p>|Dependent item|aws.rds.postgresql.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `6h`</li></ul>|
+|Aurora MySQL metrics discovery|<p>Discovery Aurora MySQL metrics.</p><p>Storage types:</p><p> aurora (for MySQL 5.6-compatible Aurora)</p><p> aurora-mysql (for MySQL 5.7-compatible and MySQL 8.0-compatible Aurora)</p>|Dependent item|aws.rds.postgresql.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Aurora MySQL metrics discovery
 
@@ -239,17 +239,18 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Instance Events discovery|<p>Discovery instance events.</p>|Dependent item|aws.rds.events.discovery<p>**Preprocessing**</p><ul><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Instance Events discovery|<p>Discovery instance events.</p>|Dependent item|aws.rds.events.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Instance Events discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS RDS Events: [{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}: Message|<p>Provides the text of this event.</p>|Dependent item|aws.rds.event_message["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>JSON Path: `$[-1]`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
-|AWS RDS Events: [{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID} : Date|<p>Provides the text of this event.</p>|Dependent item|aws.rds.event_date["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>JSON Path: `$[-1]`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|AWS RDS Events: [{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}: Message|<p>Provides the text of this event.</p>|Dependent item|aws.rds.event_message["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[-1]`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|AWS RDS Events: [{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID} : Date|<p>Provides the text of this event.</p>|Dependent item|aws.rds.event_date["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$[-1]`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

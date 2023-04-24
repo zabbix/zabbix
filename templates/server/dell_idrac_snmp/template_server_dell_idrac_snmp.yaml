@@ -127,7 +127,7 @@ zabbix_export:
           key: snmptrap.fallback
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -143,7 +143,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -166,7 +166,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -284,7 +284,7 @@ zabbix_export:
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -312,7 +312,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -335,7 +335,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -374,7 +374,7 @@ zabbix_export:
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: |
             MIB: SNMPv2-MIB
@@ -396,7 +396,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           history: 2w
-          trends: 0d
+          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -418,7 +418,7 @@ zabbix_export:
           key: 'system.status[globalSystemStatus.0]'
           delay: 30s
           history: 2w
-          trends: 0d
+          trends: '0'
           description: |
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.
@@ -575,7 +575,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]'
               history: 1w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 Current state of battery.
@@ -696,7 +696,7 @@ zabbix_export:
               key: 'sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0012.0001.0005 This attribute defines the probe status of the cooling device.
@@ -756,7 +756,7 @@ zabbix_export:
               key: 'system.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
               delay: 1d
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -778,7 +778,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
               key: 'system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
               history: 1w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The status of the controller itself without the propagation of any contained component status.
@@ -872,7 +872,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The media type of the physical disk. Possible Values:
@@ -896,7 +896,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -916,7 +916,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.part_number[physicalDiskPartNumber.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -936,7 +936,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
               delay: 1d
               history: 7d
-              trends: 0d
+              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -969,7 +969,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -994,7 +994,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
               delay: 3m
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 Indicates whether the physical disk has received a predictive failure alert.
@@ -1034,7 +1034,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 7d
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The status of the physical disk itself without the propagation of any contained component status.
@@ -1104,7 +1104,7 @@ zabbix_export:
               key: 'sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0600.0012.0001.0005 This attribute defines the status of the power supply.
@@ -1170,7 +1170,7 @@ zabbix_export:
               key: 'sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.
@@ -1297,7 +1297,7 @@ zabbix_export:
               key: 'sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}]'
               delay: 3m
               history: 2w
-              trends: 0d
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 0700.0020.0001.0005 This attribute defines the probe status of the temperature probe.
@@ -1471,7 +1471,7 @@ zabbix_export:
               key: 'system.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
               delay: 1h
               history: 2w
-              trends: 0d
+              trends: '0'
               units: B
               description: |
                 MIB: IDRAC-MIB-SMIv2
