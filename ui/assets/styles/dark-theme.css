@@ -1166,7 +1166,7 @@ a.btn-icon,
   a.btn-icon::before,
   .btn-icon::before,
   .btn-overlay-close::before {
-    color: #505c62; }
+    color: #69808d; }
   a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:active,
   .btn-icon:hover,
   .btn-icon:focus,
@@ -1182,7 +1182,7 @@ a.btn-icon,
     .btn-overlay-close:hover::before,
     .btn-overlay-close:focus::before,
     .btn-overlay-close:active::before {
-      color: #5e737e; }
+      color: #a2b1ba; }
   a.btn-icon[disabled],
   .btn-icon[disabled],
   .btn-overlay-close[disabled] {
@@ -1206,7 +1206,7 @@ a.btn-icon,
       .btn-overlay-close[disabled]:hover::before,
       .btn-overlay-close[disabled]:focus::before,
       .btn-overlay-close[disabled]:active::before {
-        color: #3e4346; }
+        color: #3d4b53; }
 
 button.btn-overlay-close, a.btn-overlay-close.btn-icon, button.zi-remove, a.zi-remove.btn-icon {
   width: 18px;
@@ -2249,7 +2249,7 @@ form.dashboard-widget-svggraph .list-accordion-item {
     form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle::before {
       vertical-align: text-bottom;
       font-size: 24px;
-      color: #768d99; }
+      color: #69808d; }
     form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle.disabled {
       opacity: .35; }
 form.dashboard-widget-svggraph .single-item-table .table-col-handle {
@@ -2451,7 +2451,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   border-collapse: separate;
   border: 1px solid #303030; }
   .list-table .btn-icon::before {
-    color: #768d99; }
+    color: #69808d; }
   .list-table span.zi-calendar-warning {
     display: inline-block;
     width: 18px;
@@ -2713,7 +2713,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     .list-table a.trigger-description::before,
     .list-table button.trigger-description::before,
     .list-table a.trigger-description.btn-icon::before {
-      color: #768d99; }
+      color: #69808d; }
   .list-table .trigger-description::after {
     position: absolute;
     top: 4px;
@@ -4310,7 +4310,7 @@ form.is-loading {
   padding: 5px;
   position: relative; }
   .table-forms-separator [class^="zi-"]::before, .table-forms-separator [class*="zi-"]::before {
-    color: #768d99; }
+    color: #69808d; }
 
 .border-left {
   border-left: 1px solid #383838; }
@@ -4566,7 +4566,7 @@ z-select button.focusable, z-select a.focusable.btn-icon,
   .zi-speaker::before,
   .zi-speaker-off::before,
   .zi-time-period::before {
-    color: #768d99; }
+    color: #69808d; }
   .zi-bell:hover, .zi-bell:active, .zi-bell:focus,
   .zi-bell-off:hover,
   .zi-bell-off:active,
@@ -4820,7 +4820,7 @@ button.icon-help, a.icon-help.btn-icon, button.icon-info, a.icon-info.btn-icon {
   min-height: 16px;
   vertical-align: text-bottom; }
 button.icon-help, a.icon-help.btn-icon {
-  color: #768d99;
+  color: #69808d;
   border: none;
   background: transparent; }
   button.icon-help:focus, a.icon-help.btn-icon:focus {
@@ -5000,7 +5000,7 @@ button.icon-info.status-red:hover, a.icon-info.status-red.btn-icon:hover, .btn-s
       padding-left: 3px; }
       .menu-popup .menu-popup-item[class^="zi-"]::before, .menu-popup .menu-popup-item[class*=" zi-"]::before {
         margin-right: 4px;
-        color: #768d99; }
+        color: #69808d; }
     .menu-popup .menu-popup-item .arrow-right {
       position: absolute;
       right: 10px;
@@ -5192,7 +5192,7 @@ button.icon-info.status-red:hover, a.icon-info.status-red.btn-icon:hover, .btn-s
   .multilineinput-control.multilineinput-disabled button::after, .multilineinput-control.multilineinput-disabled a.btn-icon::after {
     opacity: .5; }
   .multilineinput-control button.zi-pencil::before, .multilineinput-control a.zi-pencil.btn-icon::before {
-    color: #768d99; }
+    color: #69808d; }
 
 .multilineinput-modal {
   min-width: 960px; }
@@ -5421,7 +5421,7 @@ button.icon-info.status-red:hover, a.icon-info.status-red.btn-icon:hover, .btn-s
     margin-top: 20px; }
   .notif-indic .zi-bell-off::before {
     left: -6px;
-    color: #768d99; }
+    color: #69808d; }
 
 .dashed-border td {
   border: 1px dashed #383838; }
@@ -6546,7 +6546,7 @@ a.icon-count {
     display: none; }
   .macro-input-group .btn-undo {
     display: none;
-    color: #768d99;
+    color: #69808d;
     border-width: 1px 0;
     border-color: #4f4f4f; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
@@ -6582,7 +6582,7 @@ a.icon-count {
       .btn-dropdown-container .btn-dropdown-toggle[class^="zi-"]::before, .btn-dropdown-container .btn-dropdown-toggle[class*=" zi-"]::before {
         margin-top: 2px;
         margin-right: 2px;
-        color: #768d99; }
+        color: #69808d; }
       .btn-dropdown-container .btn-dropdown-toggle[class^="zi-"]:hover::before, .btn-dropdown-container .btn-dropdown-toggle[class^="zi-"]:active::before, .btn-dropdown-container .btn-dropdown-toggle[class^="zi-"]:focus::before, .btn-dropdown-container .btn-dropdown-toggle[class*=" zi-"]:hover::before, .btn-dropdown-container .btn-dropdown-toggle[class*=" zi-"]:active::before, .btn-dropdown-container .btn-dropdown-toggle[class*=" zi-"]:focus::before {
         color: #f2f2f2; }
     .btn-dropdown-container .btn-dropdown-toggle::after {
@@ -6805,7 +6805,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .subscriptions-table .zi-user-filled::before {
     top: -1px;
     font-size: 12px;
-    color: #768d99; }
+    color: #69808d; }
 
 .import-compare {
   display: flex;
@@ -6903,7 +6903,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     vertical-align: middle; }
 .leaflet-control .navigate-home-button::before {
   top: -1px;
-  color: #768d99; }
+  color: #69808d; }
 .leaflet-control.disabled {
   background-color: #ffffff;
   opacity: 1; }
@@ -6968,7 +6968,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .list-table.problem-list a.trigger-dependency.btn-icon::before,
   .list-table.problem-list button.suppressions-problem::before,
   .list-table.problem-list a.suppressions-problem.btn-icon::before {
-    color: #768d99; }
+    color: #69808d; }
 .list-table.problem-list .problem-row button.zi-eye-off, .list-table.problem-list .problem-row a.zi-eye-off.btn-icon {
   width: 18px;
   min-height: 18px; }

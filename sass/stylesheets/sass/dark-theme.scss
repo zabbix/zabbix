@@ -138,9 +138,11 @@ $link-main-subnav-active-color: #ffffff;
 $link-main-subnav-visited-color: rgba(#ffffff, .8);
 
 // Icons
-$icon-btn-color: #505c62;
-$icon-btn-hover-color: #5e737e;
-$icon-btn-disabled-color: #3e4346;
+$icon-color: #69808d;
+
+$icon-btn-color: $icon-color;
+$icon-btn-hover-color: lighten($icon-color, 20%);
+$icon-btn-disabled-color: darken($icon-color, 20%);
 
 // Error messages
 $msg-bad-btn-color: $font-color;
