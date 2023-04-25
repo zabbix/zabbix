@@ -29,11 +29,11 @@ import (
 
 const (
 	APPLICATION_NAME        = "Zabbix Agent"
-	ZABBIX_REVDATE          = "27 March 2023"
+	ZABBIX_REVDATE          = "24 April 2023"
 	ZABBIX_VERSION_MAJOR    = 5
 	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 34
-	ZABBIX_VERSION_RC       = "rc1"
+	ZABBIX_VERSION_RC       = ""
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2023 Zabbix SIA\n" +
