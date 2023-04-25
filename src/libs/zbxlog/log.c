@@ -121,6 +121,57 @@ int	zabbix_decrease_log_level(void)
 
 	return SUCCEED;
 }
+
+
+void	zbx_set_log_component(const char *name, zbx_log_component_t *component)
+{
+	int	log_level = *zbx_plog_level;
+
+	zbx_snprintf(log_component_name, sizeof(log_component_name), "[%s] ", name);
+
+	zbx_plog_level = &component->level;
+	component->level = log_level;
+	component->name = log_component_name;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change log level of the specified component                       *
+ *                                                                            *
+ * Comments: This function is used to change log level managed threads.      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_change_component_log_level(zbx_log_component_t *component, int direction)
+{
+	if (0 > direction)
+	{
+		if (LOG_LEVEL_EMPTY == component->level)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot decrease log level:"
+					" minimum level has been already set", component->name);
+		}
+		else
+		{
+			component->level += direction;
+			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been decreased to %s",
+					component->name, zabbix_get_log_level_ref_string(component->level));
+		}
+	}
+	else
+	{
+		if (LOG_LEVEL_TRACE == component->level)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot increase log level:"
+					" maximum level has been already set", component->name);
+		}
+		else
+		{
+			component->level += direction;
+			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been increased to %s",
+					component->name, zabbix_get_log_level_ref_string(component->level));
+		}
+	}
+}
 #endif
 
 int	zbx_redirect_stdio(const char *filename)
@@ -744,56 +795,6 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	}
 
 	zbx_free(buf);
-}
-
-void	zbx_set_log_component(const char *name, zbx_log_component_t *component)
-{
-	int	log_level = *zbx_plog_level;
-
-	zbx_snprintf(log_component_name, sizeof(log_component_name), "[%s] ", name);
-
-	zbx_plog_level = &component->level;
-	component->level = log_level;
-	component->name = log_component_name;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: change log level of the specified component                       *
- *                                                                            *
- * Comments: This function is used to change log level managed threads.      *
- *                                                                            *
- ******************************************************************************/
-void	zbx_change_component_log_level(zbx_log_component_t *component, int direction)
-{
-	if (0 > direction)
-	{
-		if (LOG_LEVEL_EMPTY == component->level)
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot decrease log level:"
-					" minimum level has been already set", component->name);
-		}
-		else
-		{
-			component->level += direction;
-			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been decreased to %s",
-					component->name, zabbix_get_log_level_ref_string(component->level));
-		}
-	}
-	else
-	{
-		if (LOG_LEVEL_TRACE == component->level)
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot increase log level:"
-					" maximum level has been already set", component->name);
-		}
-		else
-		{
-			component->level += direction;
-			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been increased to %s",
-					component->name, zabbix_get_log_level_ref_string(component->level));
-		}
-	}
 }
 
 /******************************************************************************
