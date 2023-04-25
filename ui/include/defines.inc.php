@@ -1647,7 +1647,7 @@ define('ZBX_ACTION_RENAME',		4);
 // Maximum width for popups in Actions column for problems.
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
-// Script modal form label width.
+// Width of the form elements in the script modal window.
 define('ZBX_SCRIPT_POPUP_LABEL_WIDTH',			150);
 define('ZBX_SCRIPT_POPUP_DIV_WIDTH',			575);
 
