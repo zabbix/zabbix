@@ -30,14 +30,14 @@ class CWidgetFieldCheckBoxListView extends CWidgetFieldView {
 	}
 
 	public function getView(): CList {
-		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+		$view = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
 		foreach ($this->classes as $class) {
-			$checkbox_list->addClass($class);
+			$view->addClass($class);
 		}
 
 		foreach ($this->field->getValues() as $key => $label) {
-			$checkbox_list->addItem(
+			$view->addItem(
 				(new CCheckBox($this->field->getName().'[]', $key))
 					->setLabel($label)
 					->setId($this->field->getName().'_'.$key)
@@ -46,7 +46,7 @@ class CWidgetFieldCheckBoxListView extends CWidgetFieldView {
 			);
 		}
 
-		return $checkbox_list;
+		return $view;
 	}
 
 	public function addClass(?string $class): self {

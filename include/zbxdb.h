@@ -75,7 +75,7 @@ zbx_config_dbhigh_t;
 #	define ZBX_FOR_UPDATE	" for update"
 #endif
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, char **error);
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error);
 void	zbx_db_deinit_basic(void);
 
 void	zbx_db_init_autoincrement_options_basic(void);
@@ -241,6 +241,9 @@ struct zbx_db_version_info_t
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
+#ifdef HAVE_ORACLE
+	struct zbx_json		tables_json;
+#endif
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

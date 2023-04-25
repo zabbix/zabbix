@@ -101,7 +101,7 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
 	public function getReadyCondition() {
 		$target = $this;
@@ -109,5 +109,12 @@ class CWidgetElement extends CElement {
 		return function () use ($target) {
 			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false)->isValid() === false);
 		};
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function isReady() {
+		return call_user_func([$this, 'getReadyCondition']);
 	}
 }

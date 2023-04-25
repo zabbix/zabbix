@@ -111,8 +111,6 @@ typedef struct
 }
 zbx_service_manager_t;
 
-/*#define ZBX_AVAILABILITY_MANAGER_DELAY		1*/
-
 static void	event_free(zbx_event_t *event)
 {
 	zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);

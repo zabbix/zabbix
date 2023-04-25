@@ -24,13 +24,9 @@
 #include "log.h"
 #include "../../zabbix_server/ha/ha.h"
 #include "zbxtime.h"
-
-typedef struct
-{
-	zbx_dbpatch_t	*patches;
-	const char	*description;
-}
-zbx_db_version_t;
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -823,67 +819,67 @@ static int	DBset_version(int version, unsigned char mandatory)
 
 zbx_get_program_type_f	DBget_program_type_cb;
 
-extern zbx_dbpatch_t	DBPATCH_VERSION(2010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(2050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(3050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(4050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6040)[];
-extern zbx_dbpatch_t	DBPATCH_VERSION(6050)[];
+DBPATCHES_ARRAY_DECL(2010);
+DBPATCHES_ARRAY_DECL(2020);
+DBPATCHES_ARRAY_DECL(2030);
+DBPATCHES_ARRAY_DECL(2040);
+DBPATCHES_ARRAY_DECL(2050);
+DBPATCHES_ARRAY_DECL(3000);
+DBPATCHES_ARRAY_DECL(3010);
+DBPATCHES_ARRAY_DECL(3020);
+DBPATCHES_ARRAY_DECL(3030);
+DBPATCHES_ARRAY_DECL(3040);
+DBPATCHES_ARRAY_DECL(3050);
+DBPATCHES_ARRAY_DECL(4000);
+DBPATCHES_ARRAY_DECL(4010);
+DBPATCHES_ARRAY_DECL(4020);
+DBPATCHES_ARRAY_DECL(4030);
+DBPATCHES_ARRAY_DECL(4040);
+DBPATCHES_ARRAY_DECL(4050);
+DBPATCHES_ARRAY_DECL(5000);
+DBPATCHES_ARRAY_DECL(5010);
+DBPATCHES_ARRAY_DECL(5020);
+DBPATCHES_ARRAY_DECL(5030);
+DBPATCHES_ARRAY_DECL(5040);
+DBPATCHES_ARRAY_DECL(5050);
+DBPATCHES_ARRAY_DECL(6000);
+DBPATCHES_ARRAY_DECL(6010);
+DBPATCHES_ARRAY_DECL(6020);
+DBPATCHES_ARRAY_DECL(6030);
+DBPATCHES_ARRAY_DECL(6040);
+DBPATCHES_ARRAY_DECL(6050);
 
-static zbx_db_version_t dbversions[] = {
-	{DBPATCH_VERSION(2010), "2.2 development"},
-	{DBPATCH_VERSION(2020), "2.2 maintenance"},
-	{DBPATCH_VERSION(2030), "2.4 development"},
-	{DBPATCH_VERSION(2040), "2.4 maintenance"},
-	{DBPATCH_VERSION(2050), "3.0 development"},
-	{DBPATCH_VERSION(3000), "3.0 maintenance"},
-	{DBPATCH_VERSION(3010), "3.2 development"},
-	{DBPATCH_VERSION(3020), "3.2 maintenance"},
-	{DBPATCH_VERSION(3030), "3.4 development"},
-	{DBPATCH_VERSION(3040), "3.4 maintenance"},
-	{DBPATCH_VERSION(3050), "4.0 development"},
-	{DBPATCH_VERSION(4000), "4.0 maintenance"},
-	{DBPATCH_VERSION(4010), "4.2 development"},
-	{DBPATCH_VERSION(4020), "4.2 maintenance"},
-	{DBPATCH_VERSION(4030), "4.4 development"},
-	{DBPATCH_VERSION(4040), "4.4 maintenance"},
-	{DBPATCH_VERSION(4050), "5.0 development"},
-	{DBPATCH_VERSION(5000), "5.0 maintenance"},
-	{DBPATCH_VERSION(5010), "5.2 development"},
-	{DBPATCH_VERSION(5020), "5.2 maintenance"},
-	{DBPATCH_VERSION(5030), "5.4 development"},
-	{DBPATCH_VERSION(5040), "5.4 maintenance"},
-	{DBPATCH_VERSION(5050), "6.0 development"},
-	{DBPATCH_VERSION(6000), "6.0 maintenance"},
-	{DBPATCH_VERSION(6010), "6.2 development"},
-	{DBPATCH_VERSION(6020), "6.2 maintenance"},
-	{DBPATCH_VERSION(6030), "6.4 development"},
-	{DBPATCH_VERSION(6040), "6.4 maintenance"},
-	{DBPATCH_VERSION(6050), "7.0 development"},
-	{NULL}
+static zbx_dbpatch_t *dbversions[] = {
+	DBPATCH_VERSION(2010), /* 2.2 development */
+	DBPATCH_VERSION(2020), /* 2.2 maintenance */
+	DBPATCH_VERSION(2030), /* 2.4 development */
+	DBPATCH_VERSION(2040), /* 2.4 maintenance */
+	DBPATCH_VERSION(2050), /* 3.0 development */
+	DBPATCH_VERSION(3000), /* 3.0 maintenance */
+	DBPATCH_VERSION(3010), /* 3.2 development */
+	DBPATCH_VERSION(3020), /* 3.2 maintenance */
+	DBPATCH_VERSION(3030), /* 3.4 development */
+	DBPATCH_VERSION(3040), /* 3.4 maintenance */
+	DBPATCH_VERSION(3050), /* 4.0 development */
+	DBPATCH_VERSION(4000), /* 4.0 maintenance */
+	DBPATCH_VERSION(4010), /* 4.2 development */
+	DBPATCH_VERSION(4020), /* 4.2 maintenance */
+	DBPATCH_VERSION(4030), /* 4.4 development */
+	DBPATCH_VERSION(4040), /* 4.4 maintenance */
+	DBPATCH_VERSION(4050), /* 5.0 development */
+	DBPATCH_VERSION(5000), /* 5.0 maintenance */
+	DBPATCH_VERSION(5010), /* 5.2 development */
+	DBPATCH_VERSION(5020), /* 5.2 maintenance */
+	DBPATCH_VERSION(5030), /* 5.4 development */
+	DBPATCH_VERSION(5040), /* 5.4 maintenance */
+	DBPATCH_VERSION(5050), /* 6.0 development */
+	DBPATCH_VERSION(6000), /* 6.0 maintenance */
+	DBPATCH_VERSION(6010), /* 6.2 development */
+	DBPATCH_VERSION(6020), /* 6.2 maintenance */
+	DBPATCH_VERSION(6030), /* 6.4 development */
+	DBPATCH_VERSION(6040), /* 6.4 maintenance */
+	DBPATCH_VERSION(6050), /* 7.0 development */
+	NULL
 };
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -976,12 +972,12 @@ static int	DBcheck_nodes(void)
 }
 #endif
 
-int	DBcheck_version(zbx_ha_mode_t ha_mode)
+int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode)
 {
 #define ZBX_DB_WAIT_UPGRADE	10
 	const char		*dbversion_table_name = "dbversion", *ha_node_table_name = "ha_node";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
-	zbx_db_version_t	*dbversion;
+	zbx_dbpatch_t		**dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
@@ -993,10 +989,10 @@ int	DBcheck_version(zbx_ha_mode_t ha_mode)
 
 	/* find out the required version number by getting the last mandatory version */
 	/* of the last version patch array                                            */
-	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
+	for (dbversion = dbversions; NULL != *dbversion; dbversion++)
 		;
 
-	patches = (--dbversion)->patches;
+	patches = *(--dbversion);
 
 	for (i = 0; 0 != patches[i].version; i++)
 	{
@@ -1035,7 +1031,7 @@ int	DBcheck_version(zbx_ha_mode_t ha_mode)
 	DBget_version(&db_mandatory, &db_optional);
 
 #ifndef HAVE_SQLITE3
-	for (dbversion = dbversions; NULL != (patches = dbversion->patches); dbversion++)
+	for (dbversion = dbversions; NULL != (patches = *dbversion); dbversion++)
 	{
 		for (i = 0; 0 != patches[i].version; i++)
 		{
@@ -1101,9 +1097,9 @@ int	DBcheck_version(zbx_ha_mode_t ha_mode)
 
 	zabbix_log(LOG_LEVEL_WARNING, "starting automatic database upgrade");
 
-	for (dbversion = dbversions; NULL != dbversion->patches; dbversion++)
+	for (dbversion = dbversions; NULL != *dbversion; dbversion++)
 	{
-		patches = dbversion->patches;
+		patches = *dbversion;
 
 		for (i = 0; 0 != patches[i].version; i++)
 		{
@@ -1191,60 +1187,6 @@ out:
 
 	return ret;
 #undef ZBX_DB_WAIT_UPGRADE
-}
-
-int	DBcheck_double_type(zbx_config_dbhigh_t *config_dbhigh)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	char		*sql = NULL;
-	const int	total_dbl_cols = 4;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
-#if defined(HAVE_MYSQL)
-	sql = zbx_db_dyn_escape_string(config_dbhigh->config_dbname);
-	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
-			" where table_schema='%s' and column_type='double'", sql);
-#elif defined(HAVE_POSTGRESQL)
-	sql = zbx_db_dyn_escape_string(NULL == config_dbhigh->config_dbschema ||
-			'\0' == *config_dbhigh->config_dbschema ? "public" : config_dbhigh->config_dbschema);
-	sql = zbx_dsprintf(sql, "select count(*) from information_schema.columns"
-			" where table_schema='%s' and data_type='double precision'", sql);
-#elif defined(HAVE_ORACLE)
-	ZBX_UNUSED(config_dbhigh);
-	sql = zbx_strdup(sql, "select count(*) from user_tab_columns"
-			" where data_type='BINARY_DOUBLE'");
-#elif defined(HAVE_SQLITE3)
-	ZBX_UNUSED(config_dbhigh);
-	/* upgrade patch is not required for sqlite3 */
-	ret = SUCCEED;
-	goto out;
-#endif
-
-	if (NULL == (result = zbx_db_select("%s"
-			" and ((lower(table_name)='trends'"
-					" and (lower(column_name) in ('value_min', 'value_avg', 'value_max')))"
-			" or (lower(table_name)='history' and lower(column_name)='value'))", sql)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot select records with columns information");
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)) && total_dbl_cols == atoi(row[0]))
-		ret = SUCCEED;
-
-	zbx_db_free_result(result);
-out:
-	zbx_db_close();
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return ret;
 }
 
 #ifndef HAVE_SQLITE3

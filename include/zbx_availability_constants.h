@@ -17,29 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlld.h"
+#ifndef ZABBIX_ZBX_AVAILABILITY_CONSTANTS_H
+#define ZABBIX_ZBX_AVAILABILITY_CONSTANTS_H
 
-#include "module.h"
+/* interface availability */
+#define ZBX_INTERFACE_AVAILABLE_UNKNOWN		0
+#define ZBX_INTERFACE_AVAILABLE_TRUE		1
+#define ZBX_INTERFACE_AVAILABLE_FALSE		2
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts,
-		char *error)
-{
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(error);
-}
+#define ZBX_IPC_SERVICE_AVAILABILITY		"availability"
+#define ZBX_IPC_AVAILABILITY_REQUEST		1
+#define ZBX_IPC_AVAILMAN_ACTIVE_HB		2
+#define ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA	3
+#define ZBX_IPC_AVAILMAN_ACTIVE_STATUS		4
+#define ZBX_IPC_AVAILMAN_CONFSYNC_DIFF		5
+#define ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA	6
+#define ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE	7
 
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
-		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
-{
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(meta);
-	ZBX_UNUSED(lastlogsize);
-	ZBX_UNUSED(mtime);
-	ZBX_UNUSED(error);
-}
+#endif
