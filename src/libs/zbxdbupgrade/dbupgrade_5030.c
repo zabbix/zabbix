@@ -5907,26 +5907,24 @@ out:
 
 static int	compose_trigger_expression(DB_ROW row, zbx_uint64_t rules, char **composed_expr)
 {
-	char		*trigger_expr;
-	int		i;
-	DB_ROW		row2;
-	DB_RESULT	result2;
+	char			*trigger_expr;
+	int			i;
+	DB_ROW			row2;
+	DB_RESULT		result2;
+	zbx_eval_context_t	ctx;
 
 	for (i = 0; i < 2; i++)
 	{
-		int			j;
-		char			*error = NULL;
-		zbx_eval_context_t	ctx;
+		int	j;
+		char	*error = NULL;
 
 		trigger_expr = row[i + 2];
 
 		if ('\0' == *trigger_expr)
 		{
 			if (0 == i)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
-						__func__, row[0]);
-			}
+				zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s", __func__, row[0]);
+
 			continue;
 		}
 
@@ -6011,9 +6009,8 @@ static int	DBpatch_5030192(void)
 
 		if (FAIL == compose_trigger_expression(row, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION, composed_expr))
 		{
-			zbx_db_free_result(result);
-
-			return FAIL;
+			ret = FAIL;
+			goto out;
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/", row[1]);
@@ -6392,9 +6389,8 @@ static int	DBpatch_5030199(void)
 
 		if (FAIL == compose_trigger_expression(row, ZBX_EVAL_TRIGGER_EXPRESSION_LLD, composed_expr))
 		{
-			zbx_db_free_result(result);
-
-			return FAIL;
+			ret = FAIL;
+			goto out;
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s/", row[1]);
