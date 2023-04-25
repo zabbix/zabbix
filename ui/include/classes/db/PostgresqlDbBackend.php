@@ -297,7 +297,7 @@ class PostgresqlDbBackend extends DbBackend {
 
 		$result = DBfetch(DBselect($query));
 
-		return (bool) $result['chunks'];
+		return $result && $result['chunks'];
 	}
 
 	/**
