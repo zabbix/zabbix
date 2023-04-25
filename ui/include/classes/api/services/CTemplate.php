@@ -362,7 +362,7 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$templates) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['host'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['host'], ['name']], 'fields' => [
 			'uuid' =>			['type' => API_UUID],
 			'host' =>			['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name'), 'default_source' => 'host'],
@@ -395,36 +395,68 @@ class CTemplate extends CHostGeneral {
 		}
 
 		self::checkVendorFields($templates);
-		self::checkAndAddUuid($templates);
+
+		self::addUuid($templates);
+
+		self::checkUuidDuplicates($templates);
 		$this->checkDuplicates($templates);
 		$this->checkGroups($templates);
 		$this->checkTemplates($templates);
 	}
 
 	/**
-	 * Check that no duplicate UUID is being added. Add UUID to all templates, if it doesn't exist.
+	 * Add the UUID to those of the given templates that don't have the 'uuid' parameter set.
 	 *
-	 * @param array $templates_to_create
-	 *
-	 * @throws APIException
+	 * @param array $templates
 	 */
-	private static function checkAndAddUuid(array &$templates_to_create): void {
-		foreach ($templates_to_create as &$template) {
+	private static function addUuid(array &$templates): void {
+		foreach ($templates as &$template) {
 			if (!array_key_exists('uuid', $template)) {
 				$template['uuid'] = generateUuidV4();
 			}
 		}
 		unset($template);
+	}
 
-		$db_uuid = DB::select('hosts', [
+	/**
+	 * Verify template UUIDs are not repeated.
+	 *
+	 * @param array      $templates
+	 * @param array|null $db_templates
+	 *
+	 * @throws APIException
+	 */
+	private static function checkUuidDuplicates(array $templates, array $db_templates = null): void {
+		$template_indexes = [];
+
+		foreach ($templates as $i => $template) {
+			if (!array_key_exists('uuid', $template)) {
+				continue;
+			}
+
+			if ($db_templates === null || $template['uuid'] !== $db_templates[$template['templateid']]['uuid']) {
+				$template_indexes[$template['uuid']] = $i;
+			}
+		}
+
+		if (!$template_indexes) {
+			return;
+		}
+
+		$duplicates = DB::select('hosts', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($templates_to_create, 'uuid')],
+			'filter' => [
+				'status' => HOST_STATUS_TEMPLATE,
+				'uuid' => array_keys($template_indexes)
+			],
 			'limit' => 1
 		]);
 
-		if ($db_uuid) {
+		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				_s('Invalid parameter "%1$s": %2$s.', '/'.($template_indexes[$duplicates[0]['uuid']] + 1),
+					_('template with the same UUID already exists')
+				)
 			);
 		}
 	}
@@ -471,7 +503,7 @@ class CTemplate extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$templates, array &$db_templates = null) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid'], ['host'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['templateid'], ['host'], ['name']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
@@ -506,7 +538,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$db_templates = $this->get([
-			'output' => ['templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version'],
+			'output' => ['uuid', 'templateid', 'host', 'name', 'description', 'vendor_name', 'vendor_version'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -519,6 +551,7 @@ class CTemplate extends CHostGeneral {
 		$this->addAffectedObjects($templates, $db_templates);
 
 		self::checkVendorFields($templates, $db_templates);
+		self::checkUuidDuplicates($templates, $db_templates);
 		$this->checkDuplicates($templates, $db_templates);
 		$this->checkGroups($templates, $db_templates);
 		$this->checkTemplates($templates, $db_templates);

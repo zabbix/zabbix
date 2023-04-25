@@ -33,13 +33,17 @@ class CWidgetFieldSelectView extends CWidgetFieldView {
 		$label = parent::getLabel();
 
 		if ($label !== null) {
-			$label->setFor($this->getView()->getFocusableElementId());
+			$label->setFor($this->getSelect()->getFocusableElementId());
 		}
 
 		return $label;
 	}
 
 	public function getView(): CSelect {
+		return $this->getSelect();
+	}
+
+	private function getSelect(): CSelect {
 		if ($this->select === null) {
 			$this->select = (new CSelect($this->field->getName()))
 				->setId($this->field->getName())

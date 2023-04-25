@@ -3905,11 +3905,11 @@ static int	lld_if_update_compare(const void *d1, const void *d2)
 	return u1->diff_num - u2->diff_num;
 }
 
-static zbx_uint64_t	popcount64(zbx_uint64_t mask)
+static int	zbx_popcount64(zbx_uint64_t mask)
 {
 	mask -= (mask >> 1) & __UINT64_C(0x5555555555555555);
 	mask = (mask & __UINT64_C(0x3333333333333333)) + (mask >> 2 & __UINT64_C(0x3333333333333333));
-	return ((mask + (mask >> 4)) & __UINT64_C(0xf0f0f0f0f0f0f0f)) * __UINT64_C(0x101010101010101) >> 56;
+	return (int)(((mask + (mask >> 4)) & __UINT64_C(0xf0f0f0f0f0f0f0f)) * __UINT64_C(0x101010101010101) >> 56);
 }
 
 static void	lld_interfaces_link(const zbx_lld_interface_t *ifold, zbx_lld_interface_t *ifnew, zbx_uint64_t flags)
@@ -4008,7 +4008,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
 			update->ifnew = ifnew;
 			update->ifold = interfaces->values[j];
 			update->flags = lld_interface_compare(update->ifold, update->ifnew);
-			update->diff_num = popcount64(update->flags);
+			update->diff_num = zbx_popcount64(update->flags);
 
 			zbx_vector_if_update_append(&updates, update);
 		}

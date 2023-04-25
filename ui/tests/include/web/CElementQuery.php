@@ -372,12 +372,6 @@ class CElementQuery implements IWaitable {
 
 				throw $exception;
 			}
-			// Workaround for communication errors present on Jenkins
-			catch (WebDriverException $exception) {
-				if (strpos($exception->getMessage(), 'START_MAP') === false) {
-					throw $exception;
-				}
-			}
 		}
 
 		return call_user_func([$class, 'createInstance'], $element, array_merge($this->options, [
@@ -394,17 +388,7 @@ class CElementQuery implements IWaitable {
 	public function all() {
 		$class = $this->class;
 
-		try {
-			$elements = $this->context->findElements($this->by);
-		}
-		// Workaround for communication errors present on Jenkins
-		catch (WebDriverException $exception) {
-			if (strpos($exception->getMessage(), 'START_MAP') === false) {
-				throw $exception;
-			}
-
-			$elements = $this->context->findElements($this->by);
-		}
+		$elements = $this->context->findElements($this->by);
 
 		if ($this->reverse_order) {
 			$elements = array_reverse($elements);

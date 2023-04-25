@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -206,7 +206,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
-			//Reset filter
+			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();
 		}
@@ -314,7 +314,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
-			//Reset filter
+			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();
 		}
@@ -417,7 +417,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
-			//Reset filter
+			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();
 		}
