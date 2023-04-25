@@ -367,6 +367,15 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 		goto clean;
 	}
 
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+#endif
+
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err));

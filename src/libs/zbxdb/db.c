@@ -22,6 +22,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "log.h"
+#include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
@@ -39,35 +40,6 @@
 #if defined(HAVE_SQLITE3)
 #	include "zbxmutexs.h"
 #endif
-
-#define ZBX_MYSQL_MIN_VERSION				50728
-#define ZBX_MYSQL_MIN_VERSION_STR			"5.07.28"
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION			80030
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR		"8.00.30"
-#define ZBX_MYSQL_MAX_VERSION				80099
-#define ZBX_MYSQL_MAX_VERSION_STR			"8.00.x"
-
-#define ZBX_MARIA_MIN_VERSION				100200
-#define ZBX_MARIA_MIN_VERSION_STR			"10.02.00"
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION			100500
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION_STR		"10.05.00"
-#define ZBX_MARIA_MAX_VERSION				101099
-#define ZBX_MARIA_MAX_VERSION_STR			"10.10.xx"
-
-#define ZBX_POSTGRESQL_MIN_VERSION			100009
-#define ZBX_POSTGRESQL_MIN_VERSION_STR			"10.9"
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION		130000
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR	"13.0"
-#define ZBX_POSTGRESQL_MAX_VERSION			159999
-#define ZBX_POSTGRESQL_MAX_VERSION_STR			"15.x"
-
-#define ZBX_ORACLE_MIN_VERSION				1201000200
-#define ZBX_ORACLE_MIN_VERSION_STR			"Database 12c Release 12.01.00.02.x"
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR		"Database 19c Release 19.x.x"
-#define ZBX_ORACLE_MAX_VERSION				2199000000
-#define ZBX_ORACLE_MAX_VERSION_STR			"Database 21c Release 21.x.x"
-
 struct zbx_db_result
 {
 #if defined(HAVE_MYSQL)
@@ -2624,6 +2596,15 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	}
 
 	zbx_json_addint64(json, "flag", info->flag);
+#ifdef HAVE_ORACLE
+	if (0 != info->tables_json.buffer_offset)
+	{
+		zbx_json_addobject(json, "schema_diff");
+		if (0 != strcmp(info->tables_json.buffer, "{}"))
+			zbx_json_addraw(json, "tables", info->tables_json.buffer);
+		zbx_json_close(json);
+	}
+#endif
 	zbx_json_close(json);
 
 	if (NULL != info->extension)
@@ -2764,13 +2745,13 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	{
 		version_info->database = "MariaDB";
 
-		version_info->min_version = ZBX_MARIA_MIN_VERSION;
-		version_info->max_version = ZBX_MARIA_MAX_VERSION;
-		version_info->min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION;
+		version_info->min_version = ZBX_MARIADB_MIN_VERSION;
+		version_info->max_version = ZBX_MARIADB_MAX_VERSION;
+		version_info->min_supported_version = ZBX_MARIADB_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_STR;
-		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_STR;
-		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_STR;
+		version_info->friendly_min_version = ZBX_MARIADB_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MARIADB_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MARIADB_MIN_SUPPORTED_VERSION_STR;
 	}
 	else
 	{

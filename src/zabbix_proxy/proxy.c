@@ -395,10 +395,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER];
 	}
-	else if (local_server_num <= (server_count += 1))
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		*local_process_num = local_server_num - server_count + 1;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER];
 	}
 	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER]))
 	{
@@ -1232,7 +1232,7 @@ static void	proxy_db_init(void)
 	zbx_db_check_character_set();
 	zbx_check_db();
 
-	if (SUCCEED != (version_check = DBcheck_version()))
+	if (SUCCEED != (version_check = DBcheck_version(ZBX_HA_MODE_STANDALONE)))
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
@@ -1254,6 +1254,13 @@ static void	proxy_db_init(void)
 		exit(EXIT_FAILURE);
 #endif
 	}
+
+#ifdef HAVE_ORACLE
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_table_prepare("items", NULL);
+	zbx_db_table_prepare("item_preproc", NULL);
+	zbx_db_close();
+#endif
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1274,8 +1281,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout,
-								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&listen_sock, config_startup_time};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
@@ -1462,13 +1468,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		/* skip threaded components */
 		if (ZBX_PROCESS_TYPE_PREPROCESSOR == i)
 			continue;
-
-		/* start single discoverer manager process */
-		if (ZBX_PROCESS_TYPE_DISCOVERER == i)
-		{
-			threads_num++;
-			continue;
-		}
 
 		threads_num += CONFIG_FORKS[i];
 	}

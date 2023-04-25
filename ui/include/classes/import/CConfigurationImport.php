@@ -287,7 +287,7 @@ class CConfigurationImport {
 							if (!array_key_exists($name, $triggers_refs)
 									|| !array_key_exists($expression, $triggers_refs[$name])
 									|| !array_key_exists($recovery_expression, $triggers_refs[$name][$expression])) {
-								$triggers_refs[$name][$expression] = [];
+								$triggers_refs[$name][$expression][$recovery_expression] = [];
 							}
 						}
 					}
@@ -995,6 +995,51 @@ class CConfigurationImport {
 
 		$discovery_rules_to_create = [];
 		$discovery_rules_to_update = [];
+
+		/*
+		 * It's possible that some LLD rules use master items which are web items. They don't reside in item
+		 * references at this point. For items and item prototypes web items are found while processing the order of
+		 * them, but for LLD rules there is no ordering, so this is done independently. So due to the nature of constant
+		 * item refreshing after each entity type is processed, it's safer to collect web items once more here where it
+		 * is necessary. Collect host IDs and master item keys that cannot be resolved and then find web items and add
+		 * references to item list.
+		 */
+		$unresolved_master_items = [];
+		$hostids = [];
+
+		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+			$hostids[$hostid] = true;
+
+			foreach ($discovery_rules as $discovery_rule) {
+				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
+						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
+					// if key cannot be resolved
+					if ($this->referencer->findItemidByKey($hostid,
+							$discovery_rule[$master_item_key]['key']) === null) {
+						$unresolved_master_items[$discovery_rule[$master_item_key]['key']] = true;
+					}
+				}
+			}
+		}
+
+		if ($unresolved_master_items) {
+			$items = API::Item()->get([
+				'output' => ['hostid', 'itemid', 'key_'],
+				'hostids' => array_keys($hostids),
+				'filter' => ['key_' => array_keys($unresolved_master_items)],
+				'webitems' => true
+			]);
+
+			foreach ($items as $item) {
+				$this->referencer->setDbItem($item['itemid'], $item);
+			}
+		}
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);

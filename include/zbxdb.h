@@ -156,22 +156,7 @@ char		*zbx_db_dyn_escape_like_pattern_basic(const char *src);
 
 int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
-#define ZBX_DBVERSION_UNDEFINED				0
-
-#define ZBX_DB_EXTENSION_TIMESCALEDB				"timescaledb"
-
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB_STR		"10.2"
-#define ZBX_TIMESCALE_MIN_VERSION				10500
-#define ZBX_TIMESCALE_MIN_VERSION_STR				"1.5.0"
-#define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
-#define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR 		"2.0.1"
-#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_MAX_VERSION				20999
-#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.9"
-#define ZBX_TIMESCALE_LICENSE_APACHE_STR			"TimescaleDB Apache 2 Edition"
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY_STR			"TimescaleDB Community Edition"
+#define ZBX_DB_EXTENSION_TIMESCALEDB	"timescaledb"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -256,6 +241,9 @@ struct zbx_db_version_info_t
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
+#ifdef HAVE_ORACLE
+	struct zbx_json		tables_json;
+#endif
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

@@ -60,7 +60,7 @@ class CConfiguration extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateExport(array $params, bool $with_unlinked_parent_templates = false): void {
+	private function validateExport(array &$params, bool $with_unlinked_parent_templates = false): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'format' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
 			'prettyprint' =>	['type' => API_BOOLEAN, 'default' => false],
@@ -370,6 +370,7 @@ class CConfiguration extends CApiService {
 			switch ($entity) {
 				case 'host_groups':
 					$imported_ids['host_groups'] = API::HostGroup()->get([
+						'output' => [],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
@@ -383,7 +384,7 @@ class CConfiguration extends CApiService {
 
 				case 'template_groups':
 					$imported_ids['template_groups'] = API::TemplateGroup()->get([
-						'output' => ['groupid'],
+						'output' => [],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
@@ -397,6 +398,7 @@ class CConfiguration extends CApiService {
 
 				case 'templates':
 					$options = [
+						'output' => ['templateid', 'uuid', 'name'],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'host' => $data['template']

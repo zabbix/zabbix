@@ -597,23 +597,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
-						['threshold' => '0.00001']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number has too many fractional digits.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '9999999999999999']
+						['threshold' => '1.79E+400']
 					],
 					'error' => [
 						'Invalid parameter "Thresholds/1/threshold": a number is too large.'
@@ -928,9 +912,9 @@ class testDashboardItemValueWidget extends CWebTest {
 					'thresholds' => [
 						['threshold' => '0.9999'],
 						['color' => 'AABBCC', 'threshold' => '1'],
-						['threshold' => '999999999999999'],
-						['threshold' => '1K'],
-						['color' => 'FFEB3B', 'threshold' => '5G']
+						['threshold' => '5K'],
+						['color' => 'FFEB3B', 'threshold' => '1G'],
+						['threshold' => '999999999999999']
 					]
 				]
 			]
