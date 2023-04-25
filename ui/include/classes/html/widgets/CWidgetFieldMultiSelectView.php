@@ -38,18 +38,24 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 	}
 
 	public function getId(): string {
-		return $this->multiselect->getId();
+		return $this->getMultiselect()->getId();
 	}
 
 	public function getLabel(): ?CLabel {
 		$label = parent::getLabel();
 
-		return $label !== null
-			? $label->setFor($this->getId().'_ms')
-			: null;
+		if ($label !== null) {
+			$label->setFor($this->getId().'_ms');
+		}
+
+		return $label;
 	}
 
 	public function getView(): CMultiSelect {
+		return $this->getMultiselect();
+	}
+
+	private function getMultiselect(): CMultiSelect {
 		if ($this->multiselect === null) {
 			$multiselect_name = $this->field->getName().($this->field->isMultiple() ? '[]' : '');
 

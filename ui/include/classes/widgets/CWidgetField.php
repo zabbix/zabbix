@@ -21,7 +21,8 @@
 
 namespace Zabbix\Widgets;
 
-use CApiInputValidator;
+use CApiInputValidator,
+	DB;
 
 abstract class CWidgetField {
 
@@ -38,6 +39,8 @@ abstract class CWidgetField {
 
 	protected $value;
 	protected $default;
+
+	protected int $max_length;
 
 	protected ?string $action = null;
 
@@ -108,6 +111,18 @@ abstract class CWidgetField {
 	 */
 	public function setAction(string $action): self {
 		$this->action = $action;
+
+		return $this;
+	}
+
+	public function getMaxLength(): int {
+		return $this->max_length;
+	}
+
+	public function setMaxLength(int $max_length): self {
+		$this->max_length = $max_length;
+
+		$this->validation_rules['length'] = $this->max_length;
 
 		return $this;
 	}
@@ -214,7 +229,12 @@ abstract class CWidgetField {
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_STR:
-				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
+				$this->max_length = DB::getFieldLength('widget_field', 'value_str');
+
+				$this->validation_rules = [
+					'type' => API_STRING_UTF8,
+					'length' => $this->max_length
+				];
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_GROUP:

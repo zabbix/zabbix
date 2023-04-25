@@ -6208,7 +6208,6 @@ class CApiInputValidatorTest extends TestCase {
 				['real_hosts' => true],
 				'/',
 				['with_hosts' => true],
-				true,
 				'Parameter "/real_hosts" is deprecated.'
 			],
 			[
@@ -7930,7 +7929,6 @@ class CApiInputValidatorTest extends TestCase {
 				[
 					'medias' => [['status' => true], ['status' => false]]
 				],
-				true,
 				'Parameter "/user_medias" is deprecated.'
 			],
 			[
@@ -7950,14 +7948,8 @@ class CApiInputValidatorTest extends TestCase {
 				[
 					'medias' => [['status' => 'not boolean']]
 				],
-				true,
 				'Parameter "/user_medias" is deprecated.'
-			]
-		];
-	}
-
-	public function dataProviderInputLegacy() {
-		return [
+			],
 			[
 				['type' => API_NUMERIC],
 				'9.99999999999999E+15',
@@ -7968,7 +7960,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_NUMERIC],
 				'1E+16',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
+				'1E+16'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -7980,7 +7972,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_NUMERIC],
 				'-1E+16',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
+				'-1E+16'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -7992,7 +7984,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_NUMERIC],
 				'1.00001',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
+				'1.00001'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -8004,7 +7996,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_NUMERIC],
 				'1E-5',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
+				'1E-5'
 			],
 			[
 				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP, 'length' => 18],
@@ -8071,21 +8063,17 @@ class CApiInputValidatorTest extends TestCase {
 	 * @param mixed       $data
 	 * @param string      $path
 	 * @param mixed       $expected
-	 * @param bool        $float_ieee754
 	 * @param string|null $deprecation_message
 	 */
-	public function testApiInputValidator(array $rule, $data, $path, $expected, $float_ieee754 = true,
-			string $deprecation_message = null) {
-		global $DB;
-
-		$DB['DOUBLE_IEEE754'] = $float_ieee754;
-
-		if ($deprecation_message !== null) {
-//			$this->expectDeprecation();
-//			$this->expectDeprecationMessage($deprecation_message);
-		}
-
+	public function testApiInputValidator(array $rule, $data, $path, $expected, $deprecation_expected = null) {
 		$rc = CApiInputValidator::validate($rule, $data, $path, $error);
+
+		if ($deprecation_expected !== null) {
+			$last_error = error_get_last();
+			$this->assertNotNull($last_error, 'Expected a deprecation error');
+			$this->assertSame(E_USER_DEPRECATED, $last_error['type'], 'Should have received a deprecation error');
+			$this->assertSame($deprecation_expected, $last_error['message'], 'Deprecation error should match');
+		}
 
 		$this->assertTrue(is_bool($rc));
 
@@ -8099,18 +8087,6 @@ class CApiInputValidatorTest extends TestCase {
 			$this->assertSame(gettype($expected), gettype($error));
 			$this->assertSame($expected, $error);
 		}
-	}
-
-	/**
-	 * @dataProvider dataProviderInputLegacy
-	 *
-	 * @param array  $rule
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param mixed  $expected
-	 */
-	public function testApiInputLegacyValidator(array $rule, $data, $path, $expected) {
-		$this->testApiInputValidator($rule, $data, $path, $expected, false);
 	}
 
 	public function dataProviderUniqueness() {

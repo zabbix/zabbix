@@ -134,6 +134,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				? $this->getInput('dashboard_page_unique_id')
 				: null,
 			'captions' => $this->getCaptions($form),
+			'url' => $this->widget->getUrl(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
