@@ -1647,12 +1647,10 @@ div.dashboard-widget-gauge div {
   line-height: 1.2em;
   text-align: center;
   white-space: nowrap; }
-div.dashboard-widget-gauge .arc {
-  fill: none; }
-  div.dashboard-widget-gauge .arc.empty {
-    stroke: #000000; }
-  div.dashboard-widget-gauge .arc.value {
-    stroke: #555555; }
+div.dashboard-widget-gauge .arc.empty {
+  fill: #000000; }
+div.dashboard-widget-gauge .arc.value {
+  fill: #555555; }
 
 div.dashboard-widget-gauge a:link {
   border-bottom: none; }

@@ -238,7 +238,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'data' => $this->thresholds,
 					'show_arc' => ($this->fields_values['th_show_arc'] == 1),
 					'arc_size' => $this->fields_values['th_arc_size'],
-					'show' => ($this->fields_values['th_show_labels'] == 1),
+					'show_labels' => ($this->fields_values['th_show_labels'] == 1),
 					'font_size' => $this->fields_values['minmax_size']
 				]
 			],

@@ -66,29 +66,36 @@ class CWidgetGauge extends CWidget {
 
 	_processUpdateResponse(response) {
 		// If there will a necesity for tooltips due to threshold overhaul, we probably need to stop all widget activity first
-		super._processUpdateResponse(response);
-		this._initial_load = false;
 
 		if (response.gauge_data !== undefined) {
-			const container = this._target.querySelector('.' + ZBX_STYLE_SVG_GAUGE_CONTAINER);
-			const padding = this.#getContainerPadding(container);
-			const width = response.gauge_data.content_width - padding.left - padding.right;
-			const height = response.gauge_data.content_height - padding.top - padding.bottom;
+			if (this._initial_load) {
+				super._processUpdateResponse(response);
 
-			this.gauge = new CSVGGauge({
-				container: container,
-				theme: response.gauge_data.user.theme,
-				bg_color: '#' + response.gauge_data.bg_color,
-				canvas: {
-					width: width,
-					height: height
-				},
-			}, response.gauge_data.data);
+				const container = this._target.querySelector('.' + ZBX_STYLE_SVG_GAUGE_CONTAINER);
+				const padding = this.#getContainerPadding(container);
+				const width = response.gauge_data.content_width - padding.left - padding.right;
+				const height = response.gauge_data.content_height - padding.top - padding.bottom;
+
+				this.gauge = new CSVGGauge({
+					container: container,
+					theme: response.gauge_data.user.theme,
+					bg_color: '#' + response.gauge_data.bg_color,
+					canvas: {
+						width: width,
+						height: height
+					},
+				}, response.gauge_data.data);
+			}
+			else {
+				this.gauge.update(response.gauge_data.data);
+			}
 
 			if (response.gauge_data.error_msg !== undefined) {
 				this._content_body.innerHTML = response.gauge_data.error_msg;
 			}
 		}
+
+		this._initial_load = false;
 	}
 
 	_hasPadding() {

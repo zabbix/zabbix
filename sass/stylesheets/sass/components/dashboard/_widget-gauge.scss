@@ -99,14 +99,12 @@ div.dashboard-widget-gauge {
 	}
 
 	.arc {
-		fill: none;
-
 		&.empty {
-			stroke: $gauge-empty-color;
+			fill: $gauge-empty-color;
 		}
 
 		&.value {
-			stroke: $gauge-fill-color;
+			fill: $gauge-fill-color;
 		}
 	}
 }
