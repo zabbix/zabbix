@@ -1131,8 +1131,9 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
 int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, zbx_variant_t *bytecode,
 		char **errmsg)
 {
-	char	*code, *output = NULL, *error = NULL;
-	int	size;
+	char		*output = NULL, *error = NULL;
+	const char	*code2;
+	int		size;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -1145,6 +1146,8 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 
 	if (ZBX_VARIANT_BIN != bytecode->type)
 	{
+		char	*code;
+
 		if (SUCCEED != zbx_es_compile(es, params, &code, &size, errmsg))
 			goto fail;
 
@@ -1153,9 +1156,9 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 		zbx_free(code);
 	}
 
-	size = (int)zbx_variant_data_bin_get(bytecode->data.bin, (void **)&code);
+	size = (int)zbx_variant_data_bin_get(bytecode->data.bin, (const void ** const)&code2);
 
-	if (SUCCEED == zbx_es_execute(es, params, code, size, value->data.str, &output, errmsg))
+	if (SUCCEED == zbx_es_execute(es, params, code2, size, value->data.str, &output, errmsg))
 	{
 		zbx_variant_clear(value);
 
