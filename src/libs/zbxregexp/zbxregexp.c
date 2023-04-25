@@ -477,10 +477,9 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
  ****************************************************************************************************/
 static const char	*zbx_regexp(const char *string, const char *pattern, int flags, int *len)
 {
-	const char		*c = NULL;
+	const char	*c = NULL, *error = NULL;
 	zbx_regmatch_t	match;
 	zbx_regexp_t	*regexp = NULL;
-	const char*	error = NULL;
 
 	if (NULL != len)
 		*len = FAIL;

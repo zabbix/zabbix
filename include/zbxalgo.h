@@ -243,8 +243,8 @@ void	zbx_hashmap_clear(zbx_hashmap_t *hm);
 
 typedef struct
 {
-	zbx_uint64_t		key;
-	void			*data;
+	zbx_uint64_t	key;
+	void		*data;
 }
 zbx_binary_heap_elem_t;
 
