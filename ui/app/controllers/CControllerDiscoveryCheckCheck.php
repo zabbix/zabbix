@@ -91,7 +91,7 @@ class CControllerDiscoveryCheckCheck extends CController {
 			'ports' => svc_default_port(self::DEFAULT_TYPE)
 		], $this->getInputAll());
 
-		$data['dcheckid'] =$this->getInput('dcheckid');
+		$data['dcheckid'] = $this->getInput('dcheckid');
 
 		if ($data['type'] == SVC_SNMPv1 || $data['type'] == SVC_SNMPv2c || $data['type'] == SVC_SNMPv3) {
 			$data['key_'] = $data['snmp_oid'];

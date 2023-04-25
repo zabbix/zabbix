@@ -75,7 +75,6 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
 				uncheckTableRows('discovery');
-
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {
@@ -131,16 +130,16 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'discovery.delete');
 
-			this._post(target, druleids, curl);
-		}
-
-		_post(target, druleids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
 			);
 
 			target.classList.add('is-loading');
 
+			this._post(target, druleids, curl);
+		}
+
+		_post(target, druleids, url) {
 			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
@@ -154,7 +153,6 @@
 						}
 
 						postMessageDetails('error', response.error.messages);
-
 						uncheckTableRows('discovery');
 					}
 					else if ('success' in response) {

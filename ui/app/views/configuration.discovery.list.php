@@ -26,10 +26,6 @@
 
 $this->includeJsFile('configuration.discovery.list.js.php');
 
-if ($data['uncheck']) {
-	uncheckTableRows('discovery');
-}
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_DISCOVERY_LIST))
@@ -46,9 +42,9 @@ $html_page = (new CHtmlPage())
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
 			(new CFormGrid())
-				->addStyle('margin-top: 5px; margin-bottom: 5px;')
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 				->addItem([
-					new CLabel(_('Name')),
+					new CLabel(_('Name'), 'filter_name'),
 					new CFormField(
 						(new CTextBox('filter_name', $data['filter']['name']))
 							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -56,7 +52,7 @@ $html_page = (new CHtmlPage())
 					)
 				]),
 			(new CFormGrid())
-				->addStyle('margin-top: 5px; margin-bottom: 5px;')
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 				->addItem([
 					new CLabel(_('Status')),
 					new CFormField(

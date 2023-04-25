@@ -66,25 +66,22 @@ window.drule_edit_popup = new class {
 		this._addInputFields(input);
 	}
 
-	_editCheck(btn = null) {
-		row = null;
-
+	_editCheck(row = null) {
 		let params = {
 			dcheckid: this.dcheckid
 		};
 
-		if (btn !== null) {
-			var row = btn.closest('tr');
-
+		if (row !== null) {
 			params = {
 				dcheckid: this.dcheckid,
 				update: 1
 			};
 
-			var hiddenInputs = row.querySelectorAll('input[type="hidden"]');
-			for (var i = 0; i < hiddenInputs.length; i++) {
-				var input = hiddenInputs[i];
-				var name = input.getAttribute('name').match(/\[([^\]]+)]$/);
+			const hidden_inputs = row.querySelectorAll('input[type="hidden"]');
+
+			for (let i = 0; i < hidden_inputs.length; i++) {
+				const input = hidden_inputs[i];
+				const name = input.getAttribute('name').match(/\[([^\]]+)]$/);
 
 				if (name) {
 					params[name[1]] = input.value;
@@ -116,11 +113,9 @@ window.drule_edit_popup = new class {
 		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(drule.name_source)+']')
 			.attr('checked', 'checked');
 
-		const that = this;
-
-		document.querySelectorAll('#host_source, #name_source').forEach(function(element) {
-			element.addEventListener('change', function(e) {
-				that._updateRadioButtonValues(e);
+		document.querySelectorAll('#host_source, #name_source').forEach((element) => {
+			element.addEventListener('change', (e) => {
+				this._updateRadioButtonValues(e);
 			});
 		});
 	}
@@ -129,22 +124,19 @@ window.drule_edit_popup = new class {
 		let target = event.target;
 		let name = target.getAttribute('name');
 
-		if (target.dataset.id) {
-			document.querySelectorAll('[name^=dchecks][name$="[' + name + ']"]')
+		if (target.dataset.id !== undefined) {
+			document.querySelectorAll(`[name^=dchecks][name$="[${name}]"]`)
 				.forEach(function(dcheck) {
 					dcheck.value = (name === 'name_source') ? <?= ZBX_DISCOVERY_UNSPEC ?> : <?= ZBX_DISCOVERY_DNS ?>;
 				});
 
-			document.querySelector(
-				'[name="dchecks[' + target.dataset.id + '][' + name + ']"]'
-			);
+			document.querySelector(`[name="dchecks[${target.dataset.id}][${name}]"]`);
 
-			document.querySelector(
-				'[name="dchecks[' + target.dataset.id + '][' + name + ']"]'
-			).value = <?= ZBX_DISCOVERY_VALUE ?>;
+			document
+				.querySelector(`[name="dchecks[${target.dataset.id}][${name}]"]`).value = <?= ZBX_DISCOVERY_VALUE ?>;
 		}
 		else {
-			document.querySelectorAll('[name^=dchecks][name$="[' + name + ']"]')
+			document.querySelectorAll(`[name^=dchecks][name$="[${name}]"]`)
 				.forEach(function(dcheck) {
 					dcheck.value = target.value;
 				});
@@ -154,15 +146,17 @@ window.drule_edit_popup = new class {
 	_addCheck(input, row = null, update = false) {
 		delete input.dchecks;
 
-		if (update == false) {
-			if (!input.host_source) {
-				const checkedHostSource = document.querySelector('[name="host_source"]:checked:not([data-id])');
-				input.host_source = checkedHostSource ? checkedHostSource.value : '<?= ZBX_DISCOVERY_DNS ?>';
+		if (update === false) {
+			if (input.host_source == undefined) {
+				const checked_host_source = document.querySelector('[name="host_source"]:checked:not([data-id])');
+				input.host_source = checked_host_source === null ? '<?= ZBX_DISCOVERY_DNS ?>' : checked_host_source.value;
 			}
 
-			if (!input.name_source) {
-				const checkedNameSource = document.querySelector('[name="name_source"]:checked:not([data-id])');
-				input.name_source = checkedNameSource ? checkedNameSource.value : '<?= ZBX_DISCOVERY_UNSPEC ?>';
+			if (input.name_source == undefined) {
+				const checked_name_source = document.querySelector('[name="name_source"]:checked:not([data-id])');
+				input.name_source = checked_name_source  === null
+					? '<?= ZBX_DISCOVERY_UNSPEC ?>'
+					: checked_name_source.value;
 			}
 		}
 		else {
@@ -170,10 +164,9 @@ window.drule_edit_popup = new class {
 			input.name_source = row.children[0].querySelector('input[name*="name_source"]').value;
 		}
 
-		let template;
-		template = new Template(document.getElementById('dcheck-row-tmpl').innerHTML);
+		const template = new Template(document.getElementById('dcheck-row-tmpl').innerHTML);
 
-		if (row) {
+		if (row !== null) {
 			row.insertAdjacentHTML('afterend', template.evaluate(input));
 			this._addInputFields(input);
 
@@ -196,19 +189,19 @@ window.drule_edit_popup = new class {
 	_addInputFields(input) {
 		for (let field_name in input) {
 			if (input.hasOwnProperty(field_name)) {
-				const inputElem = document.createElement('input');
-				inputElem.name = `dchecks[${input.dcheckid}][${field_name}]`;
-				inputElem.type = 'hidden';
-				inputElem.value = input[field_name];
+				const input_element = document.createElement('input');
+				input_element.name = `dchecks[${input.dcheckid}][${field_name}]`;
+				input_element.type = 'hidden';
+				input_element.value = input[field_name];
 
-				const dcheckCell = document.getElementById(`dcheckCell_${input.dcheckid}`);
-				dcheckCell.appendChild(inputElem);
+				const dcheck_cell = document.getElementById(`dcheckCell_${input.dcheckid}`);
+				dcheck_cell.appendChild(input_element);
 			}
 		}
 	}
 
 	_addRadioButtonRows(input, update) {
-		if (update == false) {
+		if (update === false) {
 			const templates = {
 				unique_template: ['#unique-row-tmpl', '#device-uniqueness-list'],
 				host_template: ['#host-source-row-tmpl', '#host_source'],
@@ -216,10 +209,10 @@ window.drule_edit_popup = new class {
 			};
 
 			for (const [template, element] of Object.values(templates)) {
-				const templateHtml = document.querySelector(template).innerHTML;
+				const template_html = document.querySelector(template).innerHTML;
 
 				document.querySelector(element)
-					.insertAdjacentHTML('beforeend', new Template(templateHtml).evaluate(input));
+					.insertAdjacentHTML('beforeend', new Template(template_html).evaluate(input));
 			}
 		}
 		else {
@@ -237,7 +230,7 @@ window.drule_edit_popup = new class {
 	}
 
 	_removeDCheckRow(dcheckid) {
-		dcheckid = dcheckid.substring(dcheckid.indexOf("_") + 1);
+		dcheckid = dcheckid.substring(dcheckid.indexOf('_') + 1);
 
 		const elements = {
 			uniqueness_criteria_: 'ip',

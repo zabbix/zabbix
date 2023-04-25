@@ -29,11 +29,10 @@ $csrf_token = CCsrfTokenHelper::get('discovery');
 // Create form.
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
-	->setName('discoveryForm')
 	->setId('discoveryForm')
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if (!empty($this->data['drule']['druleid'])) {
+if ($this->data['drule']['druleid'] !== null) {
 	$form->addVar('druleid', $this->data['drule']['druleid']);
 }
 
@@ -41,7 +40,7 @@ if (!empty($this->data['drule']['druleid'])) {
 $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		new CFormGrid(
+		new CFormField(
 			(new CTextBox('name', $this->data['drule']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -60,45 +59,54 @@ foreach ($this->data['proxies'] as $proxy) {
 }
 
 $form_grid
-	->addItem([new CLabel(_('Discovery by proxy'), $proxy_select->getFocusableElementId()), $proxy_select])
-	->addItem([(new CLabel(_('IP range'), 'iprange'))->setAsteriskMark(),
-		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))->setAriaRequired()
+	->addItem([
+		new CLabel(_('Discovery by proxy'), $proxy_select->getFocusableElementId()),
+		new CFormField($proxy_select)
 	])
-	->addItem([(new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
-		(new CTextBox('delay', $data['drule']['delay']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
+	->addItem([
+		(new CLabel(_('IP range'), 'iprange'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
+				->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Update interval'), 'delay'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('delay', $data['drule']['delay']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		)
 	]);
 
 $form_grid->addItem([
 	(new CLabel(_('Checks'), 'dcheckList'))->setAsteriskMark(),
-	new CFormField(
-		(new CDiv(
-			(new CTable())
-				->setAttribute('style', 'width: 100%;')
-				->setHeader([_('Type'), _('Actions')])
-				->addItem(
-					(new CTag('tfoot', true))
-						->addItem(
-							(new CCol(
-								(new CSimpleButton(_('Add')))
-									->setAttribute('data-action', 'add')
-									->addClass(ZBX_STYLE_BTN_LINK)
-									->addClass('js-check-add')
-							))->setColSpan(2)
-						)
-				)->setId('dcheckListFooter')
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-			->setId('dcheckList')
-	)
+	(new CFormField(
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader([_('Type'), _('Actions')])
+			->addItem(
+				(new CTag('tfoot', true))
+					->addItem(
+						(new CCol(
+							(new CSimpleButton(_('Add')))
+								->setAttribute('data-action', 'add')
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('js-check-add')
+						))->setColSpan(2)
+					)
+			)->setId('dcheckListFooter')
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setId('dcheckList')
 ]);
 
 // Append uniqueness criteria to form list.
 $form_grid->addItem([
 	new CLabel(_('Device uniqueness criteria')),
-	(new CDiv(
+	(new CFormField(
 		(new CRadioButtonList('uniqueness_criteria', (int) $this->data['drule']['uniqueness_criteria']))
 			->setId('device-uniqueness-list')
 			->makeVertical()
@@ -120,7 +128,7 @@ $uniqueness_template = (new CTemplateTag('unique-row-tmpl'))->addItem(
 // Append host source to form list.
 $form_grid->addItem([
 	new CLabel(_('Host name')),
-	(new CDiv(
+	(new CFormField(
 		(new CRadioButtonList('host_source', (int) $this->data['drule']['host_source']))
 			->makeVertical()
 			->addValue(_('DNS name'), ZBX_DISCOVERY_DNS, 'host_source_chk_dns')
@@ -144,7 +152,7 @@ $host_source_template = (new CTemplateTag('host-source-row-tmpl'))->addItem(
 // Append name source to form list.
 $form_grid->addItem([
 	new CLabel(_('Visible name')),
-	(new CDiv(
+	(new CFormField(
 		(new CRadioButtonList('name_source', (int) $this->data['drule']['name_source']))
 			->makeVertical()
 			->addValue(_('Host name'), ZBX_DISCOVERY_UNSPEC, 'name_source_chk_host')

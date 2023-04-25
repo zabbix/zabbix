@@ -34,8 +34,6 @@ class CControllerDiscoveryUpdate extends CController {
 			'delay' =>					'required|db drules.delay|not_empty',
 			'status' =>					'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
 			'uniqueness_criteria' =>	'string',
-			'host_source' =>			'string',
-			'name_source' =>			'string',
 			'dchecks' =>				'required|array'
 		];
 
