@@ -286,7 +286,7 @@ class PostgresqlDbBackend extends DbBackend {
 				' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
 			));
 
-			return (bool) $result['chunks'];
+			return $result && $result['chunks'];
 		}
 
 		$query = implode(' UNION ', array_map(function ($table) {
