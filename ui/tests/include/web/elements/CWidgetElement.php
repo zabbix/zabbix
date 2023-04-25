@@ -47,8 +47,8 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getHeader() {
-		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
-				' contains(@class, "dashboard-grid-iterator-head")]/h4')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
+				' contains(@class, "dashbrd-grid-iterator-head")]/h4')->one();
 	}
 
 	/**
