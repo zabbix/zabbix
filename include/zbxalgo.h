@@ -276,8 +276,7 @@ void			zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t co
 void			zbx_binary_heap_destroy(zbx_binary_heap_t *heap);
 
 int			zbx_binary_heap_empty(const zbx_binary_heap_t *heap);
-zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(zbx_binary_heap_t *heap);
-const zbx_binary_heap_elem_t	*zbx_binary_heap_find_min_const(const zbx_binary_heap_t *heap);
+zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(const zbx_binary_heap_t *heap);
 void			zbx_binary_heap_insert(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *elem);
 void			zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *elem);
 void			zbx_binary_heap_remove_min(zbx_binary_heap_t *heap);

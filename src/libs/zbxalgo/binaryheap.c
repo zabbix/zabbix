@@ -211,18 +211,7 @@ int	zbx_binary_heap_empty(const zbx_binary_heap_t *heap)
 	return (0 == heap->elems_num ? SUCCEED : FAIL);
 }
 
-zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(zbx_binary_heap_t *heap)
-{
-	if (0 == heap->elems_num)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "asking for a minimum in an empty heap");
-		exit(EXIT_FAILURE);
-	}
-
-	return &heap->elems[0];
-}
-
-const zbx_binary_heap_elem_t	*zbx_binary_heap_find_min_const(const zbx_binary_heap_t *heap)
+zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(const zbx_binary_heap_t *heap)
 {
 	if (0 == heap->elems_num)
 	{
