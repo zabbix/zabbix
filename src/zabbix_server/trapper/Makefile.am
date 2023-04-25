@@ -30,8 +30,13 @@ libzbxtrapper_proxy_a_SOURCES = \
 	trapper_request.h
 
 libzbxtrapper_a_CFLAGS = \
-	$(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS)
 	
-libzbxtrapper_server_a_CFLAGS = -I$(top_srcdir)/src/zabbix_server
+libzbxtrapper_server_a_CFLAGS = \
+	-I$(top_srcdir)/src/zabbix_server \
+        $(TLS_CFLAGS)
 	
-libzbxtrapper_proxy_a_CFLAGS = -I$(top_srcdir)/src/zabbix_proxy	
+libzbxtrapper_proxy_a_CFLAGS = \
+	-I$(top_srcdir)/src/zabbix_proxy \
+	$(TLS_CFLAGS)
