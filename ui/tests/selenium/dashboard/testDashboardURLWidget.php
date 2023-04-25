@@ -745,7 +745,6 @@ class testDashboardURLWidget extends CWebTest {
 
 	/**
 	 * Modify the URI scheme validation rules and check the result for the URL type in Widget form.
-	 * TODO: widget name should be changed after ZBX-22192 fix.
 	 */
 	public function testDashboardURLWidget_ValidateUriSchemes() {
 		$invalid_schemes = ['dns://zabbix.com', 'message://zabbix.com'];
@@ -770,9 +769,9 @@ class testDashboardURLWidget extends CWebTest {
 
 		// Check that already created widget became invalid and returns error regarding invalid parameter.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$widget = $dashboard->getWidget('URL')->getContent();
+		$widget = $dashboard->getWidget(self::$default_widget)->getContent();
 		$this->assertEquals('Invalid parameter "URL": unacceptable URL.', $widget->query('class:msg-details')->one()->getText());
-		$broken_form = $dashboard->getWidget('URL')->edit();
+		$broken_form = $dashboard->getWidget(self::$default_widget)->edit();
 
 		// Check that the widget URL field is empty.
 		$broken_form->checkValue(['URL' => '', 'Name' => self::$default_widget]);
@@ -785,7 +784,7 @@ class testDashboardURLWidget extends CWebTest {
 		$message->close();
 
 		// Check updated valid URI schemes.
-		$dashboard->getWidget('URL')->edit();
+		$dashboard->getWidget(self::$default_widget)->edit();
 		$broken_form->fill(['URL' => 'any'])->submit();
 		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
 		$this->assertUriScheme($form, $invalid_schemes);
