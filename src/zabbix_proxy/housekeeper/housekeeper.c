@@ -48,8 +48,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 	DB_ROW		row;
 	int		records = 0;
 	zbx_uint64_t	lastid, maxid;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
+	char		*condition = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);
 
@@ -78,10 +77,7 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 	DBfree_result(result);
 
 	if (0 != CONFIG_PROXY_LOCAL_BUFFER)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock<%d",
-				now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR);
-	}
+		condition = zbx_dsprintf(NULL, " and clock<%d", now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR);
 
 	records = DBexecute(
 			"delete from %s"
@@ -91,8 +87,8 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 			table, maxid,
 			now - CONFIG_PROXY_OFFLINE_BUFFER * SEC_PER_HOUR,
 			lastid,
-			ZBX_NULL2EMPTY_STR(sql));
-	zbx_free(sql);
+			ZBX_NULL2EMPTY_STR(condition));
+	zbx_free(condition);
 
 	DBcommit();
 
