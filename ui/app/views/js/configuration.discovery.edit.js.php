@@ -164,8 +164,9 @@ window.drule_edit_popup = new class {
 			}
 		}
 		else {
-			input.host_source = row.children[0].querySelector('input[name*="host_source"]').value;
-			input.name_source = row.children[0].querySelector('input[name*="name_source"]').value;
+			input.host_source = document.querySelector('input[name=host_source]:checked').value;
+			input.name_source = document.querySelector('input[name=name_source]:checked').value;
+			input.uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked').value;
 		}
 
 		const template = new Template(document.getElementById('dcheck-row-tmpl').innerHTML);
@@ -186,7 +187,7 @@ window.drule_edit_popup = new class {
 		let available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
 		if (available_device_types.includes(parseInt(input.type))) {
-			this._addRadioButtonRows(input, update);
+			this._addRadioButtonRows(input, update, row);
 		}
 	}
 
@@ -204,7 +205,7 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	_addRadioButtonRows(input, update) {
+	_addRadioButtonRows(input, update, row = null) {
 		if (update === false) {
 			const templates = {
 				unique_template: ['#unique-row-tmpl', '#device-uniqueness-list'],
@@ -230,7 +231,16 @@ window.drule_edit_popup = new class {
 				.outerHTML = new Template(document.querySelector('#name-source-row-tmpl').innerHTML).evaluate(input);
 		}
 
-		this._addRadioButtonValues(this.drule);
+		if (update === false) {
+			this._addRadioButtonValues(this.drule);
+		}
+		else {
+			this._addRadioButtonValues(input);
+
+			input.host_source = row.children[0].querySelector('input[name*="host_source"]').value;
+			input.name_source = row.children[0].querySelector('input[name*="name_source"]').value;
+			delete input.uniqueness_criteria;
+		}
 	}
 
 	_removeDCheckRow(dcheckid) {
