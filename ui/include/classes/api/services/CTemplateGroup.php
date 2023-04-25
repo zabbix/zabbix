@@ -409,8 +409,10 @@ class CTemplateGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::addUuid($groups);
+
+		self::checkUuidDuplicates($groups);
 		self::checkDuplicates($groups);
-		self::checkAndAddUuid($groups);
 	}
 
 	/**
@@ -422,7 +424,7 @@ class CTemplateGroup extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['groupid'], ['name']], 'fields' => [
 			'uuid' => 		['type' => API_UUID],
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_TG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
@@ -433,7 +435,7 @@ class CTemplateGroup extends CApiService {
 		}
 
 		$db_groups = $this->get([
-			'output' => ['groupid', 'name'],
+			'output' => ['uuid', 'groupid', 'name'],
 			'groupids' => array_column($groups, 'groupid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -443,6 +445,7 @@ class CTemplateGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		self::checkUuidDuplicates($groups, $db_groups);
 		self::checkDuplicates($groups, $db_groups);
 	}
 
@@ -538,31 +541,58 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * Check that new UUIDs are not already used and generate UUIDs where missing.
+	 * Add the UUID to those of the given template groups that don't have the 'uuid' parameter set.
 	 *
-	 * @static
-	 *
-	 * @param array $groups_to_create  [IN/OUT]
-	 *
-	 * @throws APIException
+	 * @param array $groups
 	 */
-	private static function checkAndAddUuid(array &$groups_to_create): void {
-		foreach ($groups_to_create as &$group) {
+	private static function addUuid(array &$groups): void {
+		foreach ($groups as &$group) {
 			if (!array_key_exists('uuid', $group)) {
 				$group['uuid'] = generateUuidV4();
 			}
 		}
 		unset($group);
+	}
 
-		$db_uuid = DB::select('hstgrp', [
+	/**
+	 * Verify template group UUIDs are not repeated.
+	 *
+	 * @param array      $groups
+	 * @param array|null $db_groups
+	 *
+	 * @throws APIException
+	 */
+	private static function checkUuidDuplicates(array $groups, array $db_groups = null): void {
+		$group_indexes = [];
+
+		foreach ($groups as $i => $group) {
+			if (!array_key_exists('uuid', $group)) {
+				continue;
+			}
+
+			if ($db_groups === null || $group['uuid'] !== $db_groups[$group['groupid']]['uuid']) {
+				$group_indexes[$group['uuid']] = $i;
+			}
+		}
+
+		if (!$group_indexes) {
+			return;
+		}
+
+		$duplicates = DB::select('hstgrp', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($groups_to_create, 'uuid'), 'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP],
+			'filter' => [
+				'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP,
+				'uuid' => array_keys($group_indexes)
+			],
 			'limit' => 1
 		]);
 
-		if ($db_uuid) {
+		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				_s('Invalid parameter "%1$s": %2$s.', '/'.($group_indexes[$duplicates[0]['uuid']] + 1),
+					_('template group with the same UUID already exists')
+				)
 			);
 		}
 	}
