@@ -1560,6 +1560,10 @@ msgstr ""
 msgid "Attribution HTML"
 msgstr ""
 
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -22880,6 +22884,10 @@ msgstr "Zabbix agent"
 msgid "Zabbix agent (active)"
 msgstr "Zabbix agent (active)"
 
+#: app/partials/administration.system.info.php:45
+msgid "Zabbix frontend version"
+msgstr ""
+
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix đã nhận được một yêu cầu không chính xác."
@@ -22932,6 +22940,10 @@ msgstr "Máy chủ Zabbix đang hoạt động"
 #: include/classes/setup/CSetupWizard.php:747
 msgid "Zabbix server name"
 msgstr "Tên máy chủ Zabbix"
+
+#: app/partials/administration.system.info.php:40
+msgid "Zabbix server version"
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"

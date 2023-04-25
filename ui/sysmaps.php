@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'maps' =>					[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'sysmapid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
-		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
+		'isset({form}) && ({form} === "update" || {form} === "clone")'
 	],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'width' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})', _('Width')],
@@ -184,7 +184,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		$messageFailed = _('Cannot update network map');
 	}
 	else {
-		if (getRequest('form') === 'full_clone') {
+		if (getRequest('form') === 'clone') {
 			$maps = API::Map()->get([
 				'output' => [],
 				'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
