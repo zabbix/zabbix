@@ -34,6 +34,7 @@ zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
 zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
 		double *value);
 void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group);
+
 int	__wrap_zbx_db_is_null(const char *field)
 {
 	ZBX_UNUSED(field);

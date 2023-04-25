@@ -618,7 +618,8 @@ int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, time_t start, 
 
 	if (FAIL == zbx_tfc_get_value(itemid, start, end, ZBX_TREND_FUNCTION_COUNT, value, &state))
 	{
-		if (ZBX_TREND_STATE_NORMAL != (state = trends_eval(table, itemid, start, end, "num", "sum(num)", value)))
+		if (ZBX_TREND_STATE_NORMAL != (state = trends_eval(table, itemid, start, end, "num", "sum(num)",
+				value)))
 		{
 			state = ZBX_TREND_STATE_NORMAL;
 			*value = 0;
