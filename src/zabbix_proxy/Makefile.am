@@ -15,8 +15,7 @@ sbin_PROGRAMS = zabbix_proxy
 
 noinst_LIBRARIES = libzbxproxy.a
 
-libzbxproxy_a_SOURCES = \
-	proxy_lld.c
+libzbxproxy_a_SOURCES =
 
 libzbxproxy_a_CFLAGS = \
 	-DZABBIX_DAEMON \
