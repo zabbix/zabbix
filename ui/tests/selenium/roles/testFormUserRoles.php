@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -919,8 +919,9 @@ class testFormUserRoles extends CWebTest {
 					'api_list' => [
 						'action.create', 'action.delete', 'action.get', 'action.update', 'alert.get', 'auditlog.get',
 						'authentication.get', 'authentication.update', 'autoregistration.get', 'autoregistration.update',
-						'configuration.export', 'configuration.import', 'configuration.importcompare', 'correlation.create',
-						'correlation.delete', 'correlation.get', 'correlation.update', 'dashboard.create', 'dashboard.delete',
+						'configuration.export', 'configuration.import', 'configuration.importcompare', 'connector.create',
+						'connector.delete', 'connector.get', 'connector.update', 'correlation.create', 'correlation.delete',
+						'correlation.get', 'correlation.update', 'dashboard.create', 'dashboard.delete',
 						'dashboard.get', 'dashboard.update', 'dcheck.get', 'dhost.get', 'discoveryrule.copy',
 						'discoveryrule.create', 'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update',
 						'drule.create', 'drule.delete', 'drule.get', 'drule.update', 'dservice.get', 'event.acknowledge',
@@ -953,7 +954,7 @@ class testFormUserRoles extends CWebTest {
 						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.create',
 						'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
+						'user.delete', 'user.get', 'user.logout', 'user.provision', 'user.unblock', 'user.update', 'userdirectory.create',
 						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update',
 						'usergroup.create', 'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create',
 						'usermacro.createglobal', 'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get',
@@ -1365,6 +1366,8 @@ class testFormUserRoles extends CWebTest {
 				$this->query('button:Enable')->one()->click();
 				$this->page->acceptAlert();
 				$this->page->waitUntilReady();
+
+				$this->assertMessage(TEST_GOOD, 'Modules enabled');
 			}
 			else {
 				foreach ($modules as $module) {

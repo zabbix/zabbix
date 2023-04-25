@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,13 +35,13 @@
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
-static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
-		char *error, size_t max_error_len)
+static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
+		int config_timeout, char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
 	char		*param = NULL, *port = NULL;
-	DC_ITEM		item;
+	zbx_dc_item_t	item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -49,7 +49,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 	memset(&item, 0, sizeof(item));
 	memcpy(&item.host, host, sizeof(item.host));
 
-	if (SUCCEED != (ret = DCconfig_get_interface_by_type(&item.interface, host->hostid, INTERFACE_TYPE_AGENT)))
+	if (SUCCEED != (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid, INTERFACE_TYPE_AGENT)))
 	{
 		zbx_snprintf(error, max_error_len, "Zabbix agent interface is not defined for host [%s]", host->host);
 		goto fail;
@@ -77,7 +77,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 
 	zbx_init_agent_result(&agent_result);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 
 	if (SUCCEED != (ret = get_value_agent(&item, &agent_result)))
 	{
@@ -102,13 +102,13 @@ fail:
 	return ret;
 }
 
-static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_t *script, char **result,
-		char *error, size_t max_error_len)
+static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
+		int config_timeout, char *error, size_t max_error_len)
 {
 	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
-	DC_ITEM		item;
-	int             (*function)(DC_ITEM *, AGENT_RESULT *);
+	zbx_dc_item_t	item;
+	int             (*function)(zbx_dc_item_t *, AGENT_RESULT *);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -124,7 +124,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 
 	for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 	{
-		if (SUCCEED == (ret = DCconfig_get_interface_by_type(&item.interface, host->hostid,
+		if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid,
 				INTERFACE_TYPE_PRIORITY[i])))
 		{
 			break;
@@ -169,7 +169,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 
 	zbx_init_agent_result(&agent_result);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 
 	if (SUCCEED != (ret = function(&item, &agent_result)))
 	{
@@ -194,7 +194,7 @@ fail:
 
 int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 {
-	DB_RESULT		result;
+	zbx_db_result_t		result;
 	int			ret = SUCCEED;
 	zbx_vector_uint64_t	groupids;
 	char			*sql = NULL;
@@ -215,18 +215,18 @@ int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid)
 				" and",
 			hostid);
 
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values,
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values,
 			groupids.values_num);
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&groupids);
 
-	if (NULL == DBfetch(result))
+	if (NULL == zbx_db_fetch(result))
 		ret = FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -236,12 +236,12 @@ exit:
 int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, zbx_script_t *script)
 {
 	int		ret = SUCCEED;
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
 			__func__, userid, hostid, script->scriptid);
 
-	result = DBselect(
+	result = zbx_db_select(
 		"select null"
 			" from hosts_groups hg,rights r,users_groups ug"
 		" where hg.groupid=r.id"
@@ -256,10 +256,10 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 		PERM_DENY,
 		script->host_access);
 
-	if (NULL == DBfetch(result))
+	if (NULL == zbx_db_fetch(result))
 		ret = FAIL;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -395,13 +395,13 @@ out:
 int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
 {
 	int		ret = SUCCEED;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	zbx_ptr_pair_t	pair;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64, __func__, scriptid);
 
-	result = DBselect("select name,value from script_param where scriptid=" ZBX_FS_UI64, scriptid);
+	result = zbx_db_select("select name,value from script_param where scriptid=" ZBX_FS_UI64, scriptid);
 
 	if (NULL == result)
 	{
@@ -410,14 +410,14 @@ int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params,
 		goto out;
 	}
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		pair.first = zbx_strdup(NULL, row[0]);
 		pair.second = zbx_strdup(NULL, row[1]);
 		zbx_vector_ptr_pair_append(params, pair);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -431,6 +431,7 @@ out:
  * Parameters:  script         - [IN] the script to be executed               *
  *              host           - [IN] the host the script will be executed on *
  *              params         - [IN] parameters for the script               *
+ *              config_timeout - [IN]                                         *
  *              result         - [OUT] the result of a script execution       *
  *              error          - [OUT] the error reported by the script       *
  *              max_error_len  - [IN] the maximum error length                *
@@ -441,8 +442,8 @@ out:
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const char *params, char **result,
-		char *error, size_t max_error_len, char **debug)
+int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params, int config_timeout,
+		char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -460,8 +461,8 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 			switch (script->execute_on)
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
-					ret = zbx_execute_script_on_agent(host, script->command, result, error,
-							max_error_len);
+					ret = zbx_execute_script_on_agent(host, script->command, result, config_timeout,
+							error, max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
@@ -500,7 +501,8 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			ret = zbx_execute_script_on_terminal(host, script, result, error, max_error_len);
+			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, error,
+					max_error_len);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);
@@ -522,7 +524,8 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
  *                error                                                       *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *host, zbx_uint64_t alertid, int now)
+zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_host_t *host, zbx_uint64_t alertid,
+		int now)
 {
 	zbx_tm_task_t	*task;
 	unsigned short	port;
@@ -533,9 +536,9 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 	else
 		port = 0;
 
-	DBbegin();
+	zbx_db_begin();
 
-	taskid = DBget_maxid("task");
+	taskid = zbx_db_get_maxid("task");
 
 	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_STATUS_NEW, now,
 			ZBX_REMOTE_COMMAND_TTL, host->proxy_hostid);
@@ -547,7 +550,7 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const DC_HOST *h
 	if (FAIL == zbx_tm_save_task(task))
 		taskid = 0;
 
-	DBcommit();
+	zbx_db_commit();
 
 	zbx_tm_task_free(task);
 

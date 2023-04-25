@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,34 +28,42 @@
 #include "log.h"
 #include "../../../src/libs/zbxtrends/trends.h"
 
-int	__wrap_DBis_null(const char *field);
-DB_ROW	__wrap_DBfetch(DB_RESULT result);
-DB_RESULT	__wrap_DBselect(const char *fmt, ...);
-zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end,
+int	__wrap_zbx_db_is_null(const char *field);
+zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result);
+zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
+zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
 		double *value);
+void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group);
 
-int	__wrap_DBis_null(const char *field)
+int	__wrap_zbx_db_is_null(const char *field)
 {
 	ZBX_UNUSED(field);
 	return SUCCEED;
 }
 
-DB_ROW	__wrap_DBfetch(DB_RESULT result)
+zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result)
 {
 	ZBX_UNUSED(result);
 	return NULL;
 }
 
-DB_RESULT	__wrap_DBselect(const char *fmt, ...)
+zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...)
 {
 	ZBX_UNUSED(fmt);
 	return NULL;
 }
 
+void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group)
+{
+	ZBX_UNUSED(tm_start);
+	ZBX_UNUSED(table_group);
+}
+
 static	zbx_mock_handle_t	hout;
 static int			iteration;
 
-zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
+		double *value)
 {
 	zbx_mock_handle_t	htime;
 	zbx_timespec_t		start_exp, end_exp, start_ret = {start, 0}, end_ret = {end, 0};

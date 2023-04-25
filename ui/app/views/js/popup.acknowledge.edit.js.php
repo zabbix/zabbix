@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,13 +61,13 @@ window.update_problem_popup = new class {
 
 		this._update_suppress_problem_state(close_problem_checked || unsuppress_checked);
 		this._update_unsuppress_problem_state(close_problem_checked || suppress_checked);
-
 		this._update_suppress_time_options();
 	}
 
 	_update_suppress_problem_state(state) {
 		if (this.problem_suppressible) {
 			document.getElementById('suppress_problem').disabled = state;
+
 			if (state) {
 				document.getElementById('suppress_problem').checked = false;
 			}
@@ -84,7 +84,6 @@ window.update_problem_popup = new class {
 	}
 
 	_update_suppress_time_options() {
-
 		for (const element of document.querySelectorAll('#suppress_time_option input[type="radio"]')) {
 			element.disabled = !document.getElementById('suppress_problem').checked;
 
@@ -93,6 +92,7 @@ window.update_problem_popup = new class {
 		}
 
 		const time_option_checked = document.querySelector('#suppress_time_option input:checked').value;
+
 		if (time_option_checked == <?= ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE ?>) {
 			document.getElementById('suppress_until_problem').disabled = true;
 			document.getElementById('suppress_until_problem_calendar').disabled = true;
@@ -104,7 +104,7 @@ window.update_problem_popup = new class {
 	 */
 	submitAcknowledge(overlay) {
 		var $form = overlay.$dialogue.find('form'),
-			url = new Curl('zabbix.php', false),
+			url = new Curl('zabbix.php'),
 			form_data;
 
 		$form.trimValues(['#message', '#suppress_until_problem']);

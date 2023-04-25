@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
@@ -531,10 +529,43 @@ class testItemTest extends CWebTest {
 		return array_merge($this->getCommonTestItemData(), [
 			[
 				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated0'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated1',
+						'Formula' => '((),9'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "),9".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => 'Calculated',
+						'Key' => 'calculated2',
+						'Formula' => '{{?{{?{{?'
+					],
+					'test_error' => 'Incorrect value for field "Formula": incorrect expression starting from "{{?{{?{{?".'
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Calculated',
-						'Key' => 'test.calculated'
+						'Key' => 'test.calculated',
+						'Formula' => 'avg(/Zabbix Server/zabbix[wcache,values],10m)'
 					]
 				]
 			],
@@ -1028,6 +1059,11 @@ class testItemTest extends CWebTest {
 				}
 				break;
 			case TEST_BAD:
+				if (CTestArrayHelper::get($data, 'test_error')) {
+					$overlay->query('button:Get value and test')->one()->click();
+					$data['error'] = $data['test_error'];
+				}
+
 				$error_message = ($lld) ? $data['lld_error'] : $data['error'];
 				$this->assertMessage(TEST_BAD, null, $error_message);
 				$overlay->close();

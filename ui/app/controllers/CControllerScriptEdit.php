@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 class CControllerScriptEdit extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
@@ -85,7 +85,7 @@ class CControllerScriptEdit extends CController {
 	protected function doAction() {
 		// Default values.
 		$data = [
-			'sid' => $this->getUserSID(),
+			'form_refresh' => $this->getInput('form_refresh', 0),
 			'scriptid' => 0,
 			'name' => '',
 			'scope' => ZBX_SCRIPT_SCOPE_ACTION,

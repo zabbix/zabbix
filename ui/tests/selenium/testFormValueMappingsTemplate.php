@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,16 +146,16 @@ class testFormValueMappingsTemplate extends testFormValueMappings {
 	}
 
 	/**
-	 * Scenario for verifying that value mappings are correctly copied to the clone/ full clone of the template.
+	 * Scenario for verifying that value mappings are correctly copied to the clone of the template.
 	 */
 	public function testFormValueMappingsTemplate_Clone() {
 		$this->checkClone('template');
 	}
 
 	/**
-	 * Scenario for verifying that value mappings are correctly copied to the full clone of the template.
+	 * Scenario for verifying position of draggable element in value mapping of the templates for mass update case.
 	 */
-	public function testFormValueMappingsTemplate_FullClone() {
-		$this->checkClone('template', 'Full clone');
+	public function testFormValueMappingsTemplate_ValuemappingScreenshot() {
+		$this->checkMassValuemappingScreenshot('templates');
 	}
 }

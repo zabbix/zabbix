@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,10 +23,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net"
-	"os"
-	"os/signal"
 	"syscall"
 
 	"git.zabbix.com/ap/plugin-support/log"
@@ -85,15 +84,20 @@ func checkExternalExit(pid int, p *external.Plugin, name string) error {
 }
 
 func listenOnPluginFail(p *external.Plugin, name string) {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGCHLD)
-	defer signal.Stop(sigs)
+	var pid int
+	var err error
 
-	<-sigs
-	var status syscall.WaitStatus
-	pid, err := syscall.Wait4(-1, &status, syscall.WNOHANG, nil)
-	if err != nil {
-		panic(fmt.Errorf("failed to obtain PID of dead child process: %s", err))
+	for {
+		pid, err = syscall.Wait4(-1, nil, 0, nil)
+		if err != nil {
+			if errors.Is(err, syscall.EINTR) {
+				continue
+			}
+
+			panic(fmt.Errorf("failed to obtain PID of dead child process: %w", err))
+		}
+
+		break
 	}
 
 	if err := checkExternalExit(pid, p, name); err != nil {

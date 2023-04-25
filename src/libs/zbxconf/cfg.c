@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,13 +22,18 @@
 #include "zbxstr.h"
 #include "log.h"
 #include "zbxip.h"
+#include "zbxfile.h"
 
-extern unsigned char	program_type;
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	include "zbxwin32.h"
+#endif
 
-int	CONFIG_TIMEOUT		= 3;
+static const char	*program_type_str = NULL;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
 		int noexit);
+
+ZBX_PTR_VECTOR_IMPL(addr_ptr, zbx_addr_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -142,7 +147,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 		goto trim;
 	}
 
-	if (NULL != strchr(p + 1, PATH_SEPARATOR))
+	if (NULL != strchr(p + 1, ZBX_PATH_SEPARATOR))
 	{
 		zbx_error("%s: glob pattern should be the last component of the path", glob);
 		return FAIL;
@@ -158,7 +163,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 
 		p--;
 	}
-	while (PATH_SEPARATOR != *p);
+	while (ZBX_PATH_SEPARATOR != *p);
 
 	*path = zbx_strdup(NULL, glob);
 	(*path)[p - glob] = '\0';
@@ -559,6 +564,11 @@ error:
 	return FAIL;
 }
 
+void	zbx_init_library_cfg(unsigned char program_type)
+{
+	program_type_str = get_program_type_string(program_type);
+}
+
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
 {
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
@@ -569,7 +579,7 @@ int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
 	if (0 != value)
 	{
 		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
-				parameter, get_program_type_string(program_type), feature);
+				parameter, program_type_str, feature);
 		return FAIL;
 	}
 
@@ -581,7 +591,7 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	if (NULL != value)
 	{
 		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
-				parameter, get_program_type_string(program_type), feature);
+				parameter, program_type_str, feature);
 		return FAIL;
 	}
 
@@ -594,21 +604,18 @@ void	zbx_addr_free(zbx_addr_t *addr)
 	zbx_free(addr);
 }
 
-void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from)
+void	zbx_addr_copy(zbx_vector_addr_ptr_t *addr_to, const zbx_vector_addr_ptr_t *addr_from)
 {
 	int	j;
 
 	for (j = 0; j < addr_from->values_num; j++)
 	{
-		const zbx_addr_t	*addr;
-		zbx_addr_t		*addr_ptr;
+		const zbx_addr_t	*addr = addr_from->values[j];
+		zbx_addr_t		*addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 
-		addr = (const zbx_addr_t *)addr_from->values[j];
-
-		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
 		addr_ptr->port = addr->port;
-		zbx_vector_ptr_append(addr_to, addr_ptr);
+		zbx_vector_addr_ptr_append(addr_to, addr_ptr);
 	}
 }
 
@@ -632,11 +639,11 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 		zbx_vector_str_t *hostnames, void *data, char **error)
 {
 	char			*r, *r_node;
-	zbx_vector_ptr_t	addrs, cluster_addrs;
+	zbx_vector_addr_ptr_t	addrs, cluster_addrs;
 	int			ret = SUCCEED;
 
-	zbx_vector_ptr_create(&addrs);
-	zbx_vector_ptr_create(&cluster_addrs);
+	zbx_vector_addr_ptr_create(&addrs);
+	zbx_vector_addr_ptr_create(&cluster_addrs);
 
 	do
 	{
@@ -665,7 +672,7 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 						" is invalid", name, str);
 				ret = FAIL;
 			}
-			else if (SUCCEED == zbx_vector_ptr_search(&addrs, addr, addr_compare_func))
+			else if (SUCCEED == zbx_vector_addr_ptr_search(&addrs, addr, addr_compare_func))
 			{
 				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
 						" specified more than once", name, str);
@@ -678,8 +685,8 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 				str = r_node + 1;
 			}
 
-			zbx_vector_ptr_append(&cluster_addrs, addr);
-			zbx_vector_ptr_append(&addrs, addr);
+			zbx_vector_addr_ptr_append(&cluster_addrs, addr);
+			zbx_vector_addr_ptr_append(&addrs, addr);
 
 			if (FAIL == ret)
 				goto fail;
@@ -698,9 +705,9 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 	}
 	while (NULL != r);
 fail:
-	zbx_vector_ptr_destroy(&cluster_addrs);
-	zbx_vector_ptr_clear_ext(&addrs, (zbx_clean_func_t)zbx_addr_free);
-	zbx_vector_ptr_destroy(&addrs);
+	zbx_vector_addr_ptr_destroy(&cluster_addrs);
+	zbx_vector_addr_ptr_clear_ext(&addrs, zbx_addr_free);
+	zbx_vector_addr_ptr_destroy(&addrs);
 
 	return ret;
 }

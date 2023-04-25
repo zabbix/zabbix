@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ $url = (new CUrl('disc_prototypes.php'))
 	->getUrl();
 
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('disc_prototypes.php')))->removeId())
 	->setId('item-prototype-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -110,7 +112,6 @@ $item_type_options = CSelect::createOptionsFromArray([
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')
-	->addStyle('margin: 5px 0 0 5px;')
 	->addClass(ZBX_STYLE_DISPLAY_NONE);
 
 $item_tab
@@ -120,15 +121,14 @@ $item_tab
 		(new CFormField($key_controls))
 	])
 	->addItem([
-		new CLabel(_('Type of information'), 'label-value-type'),
+		new CLabel([_('Type of information'), $type_mismatch_hint], 'label-value-type'),
 		new CFormField([
 			(new CSelect('value_type'))
 				->setFocusableElementId('label-value-type')
 				->setId('value_type')
 				->setValue($data['value_type'])
 				->addOptions($item_type_options)
-				->setReadonly($readonly),
-			$type_mismatch_hint
+				->setReadonly($readonly)
 		])
 	])
 	// Append ITEM_TYPE_HTTPAGENT URL field to form list.
@@ -453,7 +453,7 @@ $item_tab
 		(new CFormField((new CTextBox('http_proxy', $data['http_proxy'], $readonly,
 				DB::getFieldLength('items', 'http_proxy')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 			->disableAutocomplete()
 		))->setId('js-item-http-proxy-field')
 	])
@@ -493,17 +493,17 @@ $item_tab
 	// Append ITEM_TYPE_HTTPAGENT SSL verify peer to form list.
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
-		(new CFormField((new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
+		(new CFormField((new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
 			->setEnabled(!$readonly)
-			->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON)
+			->setChecked($data['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT SSL verify host to form list.
 	->addItem([
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
-		(new CFormField((new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
+		(new CFormField((new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
 			->setEnabled(!$readonly)
-			->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON)
+			->setChecked($data['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT SSL certificate file to form list.
@@ -824,15 +824,16 @@ $item_tab
 if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$item_tab->addItem([
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
-		(new CFormField((new CMultiSelect([
+		(new CFormField(
+			(new CMultiSelect([
 				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
+				'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 				'disabled' => $readonly,
 				'multiple' => false,
 				'data' => $data['valuemap'],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'valuemapid',
@@ -841,8 +842,7 @@ if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						'editable' => true
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-value-map-field')
 	]);
 }
@@ -901,7 +901,7 @@ $item_tabs = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
 				)
 			])
 			->addItem([
@@ -917,7 +917,7 @@ $item_tabs = (new CTabView())
 		TAB_INDICATOR_PREPROCESSING
 	);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$item_tabs->setSelected(0);
 }
 
@@ -928,7 +928,8 @@ if ($data['itemid'] != 0) {
 			new CSubmit('clone', _('Clone')),
 			(new CSimpleButton(_('Test')))->setId('test_item'),
 			(new CButtonDelete(_('Delete item prototype?'),
-				url_params(['form', 'itemid', 'parent_discoveryid', 'context']), 'context'
+				url_params(['form', 'itemid', 'parent_discoveryid', 'context']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.
+				'='.CCsrfTokenHelper::get('disc_prototypes.php'), 'context'
 			))->setEnabled(!$readonly),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]

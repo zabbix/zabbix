@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1475,7 +1475,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Check that Dashboard has been saved
 			$this->checkDashboardMessage();
 			// Confirm that widget is not present on dashboard.
-			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
+			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header")]/h4[text()='.
 					CXPathHelper::escapeQuotes($name).']')->count());
 			$widget_sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 					' WHERE w.name='.zbx_dbstr($name);
@@ -1640,7 +1640,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				'Time' => '2020-10-23 15:33:48',
 				'Host' => 'ЗАББИКС Сервер',
 				'Problem' => 'Test trigger to check tag filter on problem page',
-				'Ack' => 'No'
+				'Update' => 'Update'
 			],
 			'Tags' => ['Database', 'Service: abc', 'service: abcdef'],
 			'rows' => [

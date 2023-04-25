@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,14 +106,7 @@ class testFormTagsDiscoveredHost extends testFormTags {
 	 * Test cloning of Discovered Host with tags.
 	 */
 	public function testFormTagsDiscoveredHost_Clone() {
-		$this->executeCloning('discovered host', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Discovered Host with tags.
-	 */
-	public function testFormTagsDiscoveredHost_FullClone() {
-		$this->executeCloning('discovered host', 'Full clone');
+		$this->executeCloning('discovered host');
 	}
 
 	/**

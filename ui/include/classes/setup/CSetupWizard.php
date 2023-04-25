@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -260,7 +260,6 @@ class CSetupWizard extends CForm {
 
 				if ($db_connected) {
 					if ($this->checkConnection()) {
-						$this->setConfig('DB_DOUBLE_IEEE754', DB::getDbBackend()->isDoubleIEEE754());
 						$this->doNext();
 					}
 
@@ -333,8 +332,7 @@ class CSetupWizard extends CForm {
 						'KEY_FILE' => $this->getConfig('DB_KEY_FILE'),
 						'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
 						'CA_FILE' => $this->getConfig('DB_CA_FILE'),
-						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
-						'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
+						'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
 					] + $db_creds_config + $vault_config,
 					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
 				];
@@ -987,8 +985,7 @@ class CSetupWizard extends CForm {
 				'CERT_FILE' => $this->getConfig('DB_CERT_FILE'),
 				'CA_FILE' => $this->getConfig('DB_CA_FILE'),
 				'VERIFY_HOST' => $this->getConfig('DB_VERIFY_HOST'),
-				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST'),
-				'DOUBLE_IEEE754' => $this->getConfig('DB_DOUBLE_IEEE754')
+				'CIPHER_LIST' => $this->getConfig('DB_CIPHER_LIST')
 			] + $db_creds_config + $vault_config,
 			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
 		];

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,7 +159,6 @@ class ZBase {
 		require_once 'include/httptest.inc.php';
 		require_once 'include/images.inc.php';
 		require_once 'include/items.inc.php';
-		require_once 'include/maintenances.inc.php';
 		require_once 'include/maps.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
@@ -205,6 +204,18 @@ class ZBase {
 				/** @var CRouter $router */
 				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
+
+				$validator = new CNewValidator(['action' => $action_name], ['action' => 'fatal|required|string']);
+				$errors = $validator->getAllErrors();
+
+				if ($errors) {
+					CCookieHelper::set('system-message-details', base64_encode(json_encode(
+						['type' => 'error', 'messages' => $errors]
+					)));
+
+					redirect('zabbix.php?action=system.warning');
+				}
+
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')
@@ -722,7 +733,7 @@ class ZBase {
 
 	private static function denyPageAccess(CRouter $router): void {
 		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
-			->removeArgument('sid')
+			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME)
 			->toString();
 
 		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
@@ -749,6 +760,7 @@ class ZBase {
 		else {
 			$view['header'] = _('You are not logged in');
 			$view['messages'][] = _('You must login to view this page.');
+			$view['messages'][] = _('Possibly the session has expired or the password was changed.');
 		}
 
 		$view['messages'][] = _('If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
@@ -909,7 +921,9 @@ class ZBase {
 	private function setServerAddress(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
+		if ($ZBX_SERVER !== null) {
+			$ZBX_SERVER_PORT = $ZBX_SERVER_PORT !== null ? (int) $ZBX_SERVER_PORT : ZBX_SERVER_PORT_DEFAULT;
+
 			return;
 		}
 
@@ -936,6 +950,10 @@ class ZBase {
 		if ($active_node !== null) {
 			$ZBX_SERVER = $active_node['address'];
 			$ZBX_SERVER_PORT = $active_node['port'];
+		}
+
+		if ($ZBX_SERVER_PORT !== null) {
+			$ZBX_SERVER_PORT = (int) $ZBX_SERVER_PORT;
 		}
 	}
 }

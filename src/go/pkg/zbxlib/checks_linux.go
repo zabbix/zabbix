@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -82,8 +81,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.system_hw_cpu)
 	case "system.hw.macaddr":
 		cfunc = unsafe.Pointer(C.system_hw_macaddr)
-	case "system.sw.os":
-		cfunc = unsafe.Pointer(C.system_sw_os)
 	case "system.swap.in":
 		cfunc = unsafe.Pointer(C.system_swap_in)
 	case "system.swap.out":

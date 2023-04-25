@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 **/
 
 #include "lld_protocol.h"
-#include "zbxlld.h"
 
 #include "log.h"
 #include "zbxserialize.h"
@@ -99,7 +98,8 @@ zbx_uint32_t	zbx_lld_serialize_diag_stats(unsigned char **data, zbx_uint64_t ite
 	return data_len;
 }
 
-static void	zbx_lld_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *items_num, zbx_uint64_t *values_num)
+static void	zbx_lld_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *items_num,
+		zbx_uint64_t *values_num)
 {
 	data += zbx_deserialize_value(data, items_num);
 	(void)zbx_deserialize_value(data, values_num);
@@ -175,16 +175,19 @@ static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process low level discovery value/error                           *
+ * Purpose: enqueue low level discovery value/error                           *
  *                                                                            *
- * Parameters: itemid - [IN] the LLD rule id                                  *
- *             hostid - [IN] the host id                                      *
- *             value  - [IN] the rule value (can be NULL if error is set)     *
- *             ts     - [IN] the value timestamp                              *
- *             error  - [IN] the error message (can be NULL)                  *
+ * Parameters: itemid      - [IN]                                             *
+ *             hostid      - [IN]                                             *
+ *             value       - [IN] rule value (can be NULL if error is set)    *
+ *             ts          - [IN] value timestamp                             *
+ *             meta        - [IN] flag to include metadata                    *
+ *             lastlogsize - [IN] (metadata)                                  *
+ *             mtime       - [IN] (metadata)                                  *
+ *             error       - [IN] error message (can be NULL)                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
+void	zbx_lld_queue_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
 		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
 {
 	static zbx_ipc_socket_t	socket;
@@ -214,11 +217,11 @@ void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char 
  *                                                                            *
  * Purpose: process low level discovery agent result                          *
  *                                                                            *
- * Parameters: itemid - [IN] the LLD rule id                                  *
- *             hostid - [IN] the host id                                      *
- *             result - [IN] the agent result                                 *
- *             ts     - [IN] the value timestamp                              *
- *             error  - [IN] the error message (can be NULL)                  *
+ * Parameters: itemid - [IN]                                                  *
+ *             hostid - [IN]                                                  *
+ *             result - [IN] agent result                                     *
+ *             ts     - [IN] value timestamp                                  *
+ *             error  - [IN] error message (can be NULL)                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
@@ -243,15 +246,15 @@ void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGEN
 	}
 
 	if (NULL != value || NULL != error || 0 != meta)
-		zbx_lld_process_value(itemid, hostid, value, ts, meta, lastlogsize, mtime, error);
+		zbx_lld_queue_value(itemid, hostid, value, ts, meta, lastlogsize, mtime, error);
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get queue size (enqueued value count) of LLD manager              *
  *                                                                            *
- * Parameters: size  - [OUT] the queue size                                   *
- *             error - [OUT] the error message                                *
+ * Parameters: size  - [OUT] queue size                                       *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the queue size was returned successfully           *
  *               FAIL    - otherwise                                          *
@@ -314,9 +317,9 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
  *                                                                            *
  * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
- * Parameters limit - [IN] the number of top records to retrieve              *
- *            items - [OUT] a vector of top itemid, values_num pairs          *
- *            error - [OUT] the error message                                 *
+ * Parameters limit - [IN] number of top records to retrieve                  *
+ *            items - [OUT] vector of top itemid, values_num pairs            *
+ *            error - [OUT] error message                                     *
  *                                                                            *
  * Return value: SUCCEED - the top n items were returned successfully         *
  *               FAIL - otherwise                                             *

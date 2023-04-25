@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 #include "zbxregexp.h"
 #include "zbxstr.h"
+#include "log.h"
 
 static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 {
@@ -186,6 +187,10 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL != proccomm && '\0' != *proccomm && SUCCEED != check_procargs(&procentry, proccomm))
 			continue;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): selected process with procentry.pi_pid=%d procentry.pi_uid=%d"
+				" procentry.pi_comm=[%s] proccomm=[%s]", __func__, procentry.pi_pid, procentry.pi_uid,
+				procentry.pi_comm, proccomm);
 
 		switch (mem_type_code)
 		{

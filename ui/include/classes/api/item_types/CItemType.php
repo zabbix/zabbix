@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ abstract class CItemType {
 			case 'authtype':
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
-						return ['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => DB::getDefault('items', 'authtype')];
+						return ['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST]), 'default' => DB::getDefault('items', 'authtype')];
 
 					case ITEM_TYPE_SSH:
 						return ['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]), 'default' => DB::getDefault('items', 'authtype')];
@@ -128,7 +128,7 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
+							['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'username')]
 						]];
 
@@ -144,7 +144,7 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+							['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'password')]
 						]];
 
@@ -203,32 +203,15 @@ abstract class CItemType {
 
 		switch ($field_name) {
 			case 'interfaceid':
-				switch (static::TYPE) {
-					case ITEM_TYPE_SIMPLE:
-					case ITEM_TYPE_EXTERNAL:
-					case ITEM_TYPE_SSH:
-					case ITEM_TYPE_TELNET:
-					case ITEM_TYPE_HTTPAGENT:
-						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-							}, 'type' => API_ID],
-							['else' => true, 'type' => API_ID, 'in' => '0']
-						]];
-
-					default:
-						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-							}, 'type' => API_ID],
-							['else' => true, 'type' => API_ID, 'in' => '0']
-						]];
-				}
+				return ['type' => API_MULTIPLE, 'rules' => [
+					['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
+					['else' => true, 'type' => API_ID, 'in' => '0']
+				]];
 
 			case 'authtype':
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
-						return ['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])];
+						return ['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])];
 
 					case ITEM_TYPE_SSH:
 						return ['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY])];
@@ -238,7 +221,7 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
+							['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'username')]
 						]];
 
@@ -254,7 +237,7 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
+							['if' => ['field' => 'authtype', 'in' => implode(',', [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'password')]
 						]];
 
@@ -314,9 +297,7 @@ abstract class CItemType {
 		switch ($field_name) {
 			case 'interfaceid':
 				return ['type' => API_MULTIPLE, 'rules' => [
-					['if' => static function () use ($db_item): bool {
-						return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
-					}, 'type' => API_ID],
+					['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
 					['else' => true, 'type' => API_ID, 'in' => '0']
 				]];
 

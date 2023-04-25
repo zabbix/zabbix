@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,9 +23,7 @@ class CWidgetProblemsBySv extends CWidget {
 	static SHOW_GROUPS = 0;
 	static SHOW_TOTALS = 1;
 
-	_registerEvents() {
-		super._registerEvents();
-
+	onStart() {
 		this._events = {
 			...this._events,
 
@@ -36,15 +34,14 @@ class CWidgetProblemsBySv extends CWidget {
 					if (overlay.type === 'hintbox') {
 						const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
 
-						if (this._content_body.contains(element)) {
+						if (this._body.contains(element)) {
 							hintBox.deleteHint(overlay.element);
 						}
 					}
 				}
 
 				clearMessages();
-
-				addMessage(makeMessageBox('good', [], response.message));
+				addMessage(makeMessageBox('good', [], response.success.title));
 
 				if (this._state === WIDGET_STATE_ACTIVE) {
 					this._startUpdating();
@@ -53,20 +50,16 @@ class CWidgetProblemsBySv extends CWidget {
 		}
 	}
 
-	_activateEvents() {
-		super._activateEvents();
-
+	onActivate() {
 		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	_deactivateEvents() {
-		super._deactivateEvents();
-
+	onDeactivate() {
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	_hasPadding() {
-		return this._view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL
+	hasPadding() {
+		return this._view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL
 			&& this._fields.show_type != CWidgetProblemsBySv.SHOW_TOTALS;
 	}
 }

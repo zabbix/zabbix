@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 	protected function checkInput() {
 		$fields = [
-			'authtype'				=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'authtype'				=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'headers'				=> 'array',
 			'hostid'				=> 'db hosts.hostid',
 			'proxy_hostid'			=> 'id',
-			'http_authtype'			=> 'in '.implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'http_authtype'			=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'http_password'			=> 'string',
 			'http_proxy'			=> 'string',
 			'http_username'			=> 'string',
@@ -113,6 +113,35 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			if (array_key_exists($this->item_type, $this->items_require_interface)) {
 				if (!$this->validateInterface($interface)) {
 					$ret = false;
+				}
+			}
+
+			if ($this->item_type == ITEM_TYPE_CALCULATED) {
+				$expression_parser = new CExpressionParser([
+					'usermacros' => true,
+					'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+					'calculated' => true,
+					'host_macro' => true,
+					'empty_host' => true
+				]);
+
+				if ($expression_parser->parse($this->getInput('params_f')) != CParser::PARSE_SUCCESS) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Formula'),
+						$expression_parser->getError()
+					));
+				}
+				else {
+					$expression_validator = new CExpressionValidator([
+						'usermacros' => true,
+						'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+						'calculated' => true
+					]);
+
+					if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Formula'),
+							$expression_validator->getError()
+						));
+					}
 				}
 			}
 		}

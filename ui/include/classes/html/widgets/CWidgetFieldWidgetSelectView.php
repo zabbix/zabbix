@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,22 +33,14 @@ class CWidgetFieldWidgetSelectView extends CWidgetFieldView {
 		$label = parent::getLabel();
 
 		if ($label !== null) {
-			$label->setFor($this->getView()->getFocusableElementId());
+			$label->setFor($this->getSelect()->getFocusableElementId());
 		}
 
 		return $label;
 	}
 
 	public function getView(): CSelect {
-		if ($this->select === null) {
-			$this->select = (new CSelect($this->field->getName()))
-				->setId($this->field->getName())
-				->setFocusableElementId('label-'.$this->field->getName())
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired($this->isRequired());
-		}
-
-		return $this->select;
+		return $this->getSelect();
 	}
 
 	public function getJavaScript(): string {
@@ -68,5 +60,17 @@ class CWidgetFieldWidgetSelectView extends CWidgetFieldView {
 				}
 			});
 		';
+	}
+
+	private function getSelect(): CSelect {
+		if ($this->select === null) {
+			$this->select = (new CSelect($this->field->getName()))
+				->setId($this->field->getName())
+				->setFocusableElementId('label-'.$this->field->getName())
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired($this->isRequired());
+		}
+
+		return $this->select;
 	}
 }

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,13 +33,17 @@ class CWidgetFieldSelectView extends CWidgetFieldView {
 		$label = parent::getLabel();
 
 		if ($label !== null) {
-			$label->setFor($this->getView()->getFocusableElementId());
+			$label->setFor($this->getSelect()->getFocusableElementId());
 		}
 
 		return $label;
 	}
 
 	public function getView(): CSelect {
+		return $this->getSelect();
+	}
+
+	private function getSelect(): CSelect {
 		if ($this->select === null) {
 			$this->select = (new CSelect($this->field->getName()))
 				->setId($this->field->getName())

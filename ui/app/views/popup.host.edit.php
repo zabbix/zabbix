@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,10 +35,7 @@ if ($data['hostid'] == 0) {
 	elseif ($data['clone_hostid'] !== null) {
 		$popup_url->setArgument('hostid', $data['clone_hostid']);
 
-		if ($data['full_clone'] === 1) {
-			$popup_url->setArgument('full_clone', 1);
-		}
-		else {
+		if ($data['clone'] === 1) {
 			$popup_url->setArgument('clone', 1);
 		}
 	}
@@ -70,13 +67,6 @@ else {
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'host_edit_popup.clone();'
-		],
-		[
-			'title' => _('Full clone'),
-			'class' => 'btn-alt',
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'host_edit_popup.fullClone();'
 		],
 		[
 			'title' => _('Delete'),

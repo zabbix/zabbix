@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,17 +72,7 @@ class testFormHostFromStandalone extends testFormHost {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostFromStandalone_Clone($data) {
-		$this->cloneHost($data, 'Clone');
-
-		// Check that items aren't cloned from original host.
-		$this->assertItemsDBCount($data['fields']['Host name'], 0);
-	}
-
-	/**
-	 * @dataProvider getCloneData
-	 */
-	public function testFormHostFromStandalone_FullClone($data) {
-		$this->cloneHost($data, 'Full clone');
+		$this->cloneHost($data);
 
 		// Check that items cloned from original host.
 		$this->assertItemsDBCount($data['fields']['Host name'], $data['items']);

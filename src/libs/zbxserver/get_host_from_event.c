@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "zbxnum.h"
 #include "log.h"
+#include "zbx_host_constants.h"
 
 #ifdef HAVE_OPENIPMI
 #	define ZBX_IPMI_FIELDS_NUM	4	/* number of selected IPMI-related fields in function */
@@ -29,10 +30,10 @@
 #	define ZBX_IPMI_FIELDS_NUM	0
 #endif
 
-int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len)
+int	get_host_from_event(const zbx_db_event *event, zbx_dc_host_t *host, char *error, size_t max_error_len)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		sql[512];	/* do not forget to adjust size if SQLs change */
 	size_t		offset;
 	int		ret = SUCCEED;
@@ -99,9 +100,9 @@ int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, s
 
 	host->hostid = 0;
 
-	result = DBselect("%s", sql);
+	result = zbx_db_select("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (0 != host->hostid)
 		{
@@ -136,7 +137,7 @@ int	get_host_from_event(const ZBX_DB_EVENT *event, DC_HOST *host, char *error, s
 		zbx_strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (FAIL == ret)
 	{

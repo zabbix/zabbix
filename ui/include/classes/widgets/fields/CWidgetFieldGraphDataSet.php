@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,7 +73,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					['else' => true, 'type' => API_STRING_UTF8, 'in' => GRAPH_AGGREGATE_DEFAULT_INTERVAL]
 				]],
 				'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])],
-				'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])]
+				'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])],
+				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255]
 			]]);
 	}
 
@@ -124,7 +125,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'aggregate_function' => AGGREGATE_NONE,
 			'aggregate_interval' => GRAPH_AGGREGATE_DEFAULT_INTERVAL,
 			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM,
-			'approximation' => APPROXIMATION_AVG
+			'approximation' => APPROXIMATION_AVG,
+			'data_set_label' => ''
 		];
 	}
 
@@ -228,7 +230,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'aggregate_grouping' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'approximation' => ZBX_WIDGET_FIELD_TYPE_INT32
+			'approximation' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR
 		];
 		$dataset_defaults = self::getDefaults();
 

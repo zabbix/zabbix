@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,6 +113,7 @@ class CPage {
 		}
 
 		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
+		$this->driver->setCommandExecutor(new CommandExecutor($this->driver->getCommandExecutor()));
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
@@ -195,11 +196,14 @@ class CPage {
 	 *
 	 * @return $this
 	 */
-	public function login($sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a', $userid = 1) {
+	public function login(string $sessionid = '09e7d4286dfdca4ba7be15e0f3b2b55a', $userid = 1) {
 		$session = CDBHelper::getRow('SELECT status FROM sessions WHERE sessionid='.zbx_dbstr($sessionid));
 
 		if (!$session) {
-			DBexecute('INSERT INTO sessions (sessionid,userid) VALUES ('.zbx_dbstr($sessionid).','.$userid.')');
+			$secret = bin2hex(random_bytes(16));
+			DBexecute('INSERT INTO sessions (sessionid,userid,secret)'.
+				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.zbx_dbstr($secret).')'
+			);
 		}
 		elseif ($session['status'] != 0) {	/* ZBX_SESSION_ACTIVE */
 			DBexecute('UPDATE sessions SET status=0 WHERE sessionid='.zbx_dbstr($sessionid));

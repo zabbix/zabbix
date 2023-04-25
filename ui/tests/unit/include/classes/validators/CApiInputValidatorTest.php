@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1941,6 +1941,32 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
+					'uuid' => ['type' => API_STRING_UTF8, 'in' => '', 'unset' => true],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'uuid' => '',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'name' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'uuid' => ['type' => API_STRING_UTF8, 'in' => '', 'unset' => true],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'uuid' => '56079badd056419383cc26e6a4fcc7e0',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				'Invalid parameter "/uuid": value must be empty.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
 					'host' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 					'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 				]],
@@ -2228,10 +2254,40 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": cannot be empty.'
 			],
 			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[],
+				'/',
+				[]
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				'object',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[[]],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[['field1' => 'value1']],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[[], [], []],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
 				['type' => API_OBJECTS, 'length' => 2, 'fields' => []],
 				[[], [], []],
 				'/',
-				'Invalid parameter "/": value is too long.'
+				'Invalid parameter "/": maximum number of array elements is 2.'
 			],
 			[
 				['type' => API_OBJECTS, 'length' => 3, 'fields' => []],
@@ -6152,7 +6208,6 @@ class CApiInputValidatorTest extends TestCase {
 				['real_hosts' => true],
 				'/',
 				['with_hosts' => true],
-				true,
 				'Parameter "/real_hosts" is deprecated.'
 			],
 			[
@@ -7826,12 +7881,75 @@ class CApiInputValidatorTest extends TestCase {
 				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}{{#LLD_MACRO2}.regsub("(.*)_([0-9]+)", \1)}',
 				'/1/prometheus_label',
 				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
-			]
-		];
-	}
-
-	public function dataProviderInputLegacy() {
-		return [
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'user_medias' => ['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
+						'status' =>	['type' => API_BOOLEAN]
+					]],
+					'medias' => ['type' => API_OBJECTS, 'fields' => [
+						'status' =>	['type' => API_BOOLEAN]
+					]]
+				]],
+				[
+					'user_medias' => [['status' => true], ['status' => false]],
+					'medias' => [['status' => true], ['status' => false]]
+				],
+				'/',
+				'Deprecated parameter "/user_medias" cannot be used with "/medias".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'user_medias' => ['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
+						'status' =>	['type' => API_BOOLEAN]
+					]],
+					'medias' => ['type' => API_OBJECTS, 'fields' => [
+						'status' =>	['type' => API_BOOLEAN]
+					]]
+				]],
+				[
+					'user_medias' => [['status' => true], ['status' => 'string']]
+				],
+				'/',
+				'Invalid parameter "/medias/2/status": a boolean is expected.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'user_medias' => ['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
+						'status' =>	['type' => API_BOOLEAN]
+					]],
+					'medias' => ['type' => API_OBJECTS, 'fields' => [
+						'status' =>	['type' => API_BOOLEAN]
+					]]
+				]],
+				[
+					'user_medias' => [['status' => true], ['status' => false]]
+				],
+				'/',
+				[
+					'medias' => [['status' => true], ['status' => false]]
+				],
+				'Parameter "/user_medias" is deprecated.'
+			],
+			[
+				// API_DEPRECATED rule with 'replacement' SHOULD be defined before rules for field mentioned in 'replacement'
+				['type' => API_OBJECT, 'fields' => [
+					'medias' => ['type' => API_OBJECTS, 'fields' => [
+						'status' =>	['type' => API_BOOLEAN]
+					]],
+					'user_medias' => ['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
+						'status' =>	['type' => API_STRING_UTF8]
+					]]
+				]],
+				[
+					'user_medias' => [['status' => 'not boolean']]
+				],
+				'/',
+				[
+					'medias' => [['status' => 'not boolean']]
+				],
+				'Parameter "/user_medias" is deprecated.'
+			],
 			[
 				['type' => API_NUMERIC],
 				'9.99999999999999E+15',
@@ -7842,7 +7960,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_NUMERIC],
 				'1E+16',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
+				'1E+16'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -7854,7 +7972,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_NUMERIC],
 				'-1E+16',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number is too large.'
+				'-1E+16'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -7866,7 +7984,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_NUMERIC],
 				'1.00001',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
+				'1.00001'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -7878,7 +7996,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_NUMERIC],
 				'1E-5',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
+				'1E-5'
 			],
 			[
 				['type' => API_VAULT_SECRET, 'provider' => ZBX_VAULT_TYPE_HASHICORP, 'length' => 18],
@@ -7945,21 +8063,17 @@ class CApiInputValidatorTest extends TestCase {
 	 * @param mixed       $data
 	 * @param string      $path
 	 * @param mixed       $expected
-	 * @param bool        $float_ieee754
 	 * @param string|null $deprecation_message
 	 */
-	public function testApiInputValidator(array $rule, $data, $path, $expected, $float_ieee754 = true,
-			string $deprecation_message = null) {
-		global $DB;
-
-		$DB['DOUBLE_IEEE754'] = $float_ieee754;
-
-		if ($deprecation_message !== null) {
-//			$this->expectDeprecation();
-//			$this->expectDeprecationMessage($deprecation_message);
-		}
-
+	public function testApiInputValidator(array $rule, $data, $path, $expected, $deprecation_expected = null) {
 		$rc = CApiInputValidator::validate($rule, $data, $path, $error);
+
+		if ($deprecation_expected !== null) {
+			$last_error = error_get_last();
+			$this->assertNotNull($last_error, 'Expected a deprecation error');
+			$this->assertSame(E_USER_DEPRECATED, $last_error['type'], 'Should have received a deprecation error');
+			$this->assertSame($deprecation_expected, $last_error['message'], 'Deprecation error should match');
+		}
 
 		$this->assertTrue(is_bool($rc));
 
@@ -7973,18 +8087,6 @@ class CApiInputValidatorTest extends TestCase {
 			$this->assertSame(gettype($expected), gettype($error));
 			$this->assertSame($expected, $error);
 		}
-	}
-
-	/**
-	 * @dataProvider dataProviderInputLegacy
-	 *
-	 * @param array  $rule
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param mixed  $expected
-	 */
-	public function testApiInputLegacyValidator(array $rule, $data, $path, $expected) {
-		$this->testApiInputValidator($rule, $data, $path, $expected, false);
 	}
 
 	public function dataProviderUniqueness() {

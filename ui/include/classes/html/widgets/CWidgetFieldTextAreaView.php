@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,17 +43,18 @@ class CWidgetFieldTextAreaView extends CWidgetFieldView {
 	}
 
 	public function getView(): CTextArea {
-		$textarea = (new CTextArea($this->field->getName(), $this->field->getValue()))
+		$view = (new CTextArea($this->field->getName(), $this->field->getValue()))
+			->setMaxlength($this->field->getMaxLength())
 			->setEnabled(!$this->isDisabled())
 			->setAriaRequired($this->isRequired());
 
 		if ($this->adaptive_width !== null) {
-			$textarea->setAdaptiveWidth($this->adaptive_width);
+			$view->setAdaptiveWidth($this->adaptive_width);
 		}
 		else {
-			$textarea->setWidth($this->width);
+			$view->setWidth($this->width);
 		}
 
-		return $textarea;
+		return $view;
 	}
 }

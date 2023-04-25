@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,20 +34,20 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 			$tags = [CWidgetFieldTags::DEFAULT_TAG];
 		}
 
-		$tags_table = (new CTable())
+		$view = (new CTable())
 			->setId('tags_table_'.$this->field->getName())
 			->addClass('table-tags')
-			->addClass('table-initial-width');
+			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH);
 
 		$i = 0;
 
 		foreach ($tags as $tag) {
-			$tags_table->addItem($this->getRowTemplate($tag, $i));
+			$view->addItem($this->getRowTemplate($tag, $i));
 
 			$i++;
 		}
 
-		$tags_table->addRow(
+		$view->addRow(
 			(new CCol(
 				(new CButton('tags_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -56,7 +56,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 			))->setColSpan(3)
 		);
 
-		return $tags_table;
+		return $view;
 	}
 
 	public function getJavaScript(): string {

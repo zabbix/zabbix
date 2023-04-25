@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ class CWidgetElement extends CElement {
 	 * @return string
 	 */
 	public function getHeaderText() {
-		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
-				' contains(@class, "dashboard-grid-iterator-head")]/h4')->one()->getText();
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4')->one()->getText();
 	}
 
 	/**
@@ -56,8 +56,8 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-content") or'.
-				' contains(@class, "dashboard-grid-iterator-content")]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-contents") or'.
+				' contains(@class, "dashboard-grid-iterator-contents")]')->one();
 	}
 
 	/**
@@ -91,7 +91,7 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
-	 * @inheritdoc
+	 * @inheritDoc
 	 */
 	public function getReadyCondition() {
 		$target = $this;
@@ -99,5 +99,12 @@ class CWidgetElement extends CElement {
 		return function () use ($target) {
 			return ($target->query('xpath:.//div[contains(@class, "is-loading")]')->one(false)->isValid() === false);
 		};
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function isReady() {
+		return call_user_func([$this, 'getReadyCondition']);
 	}
 }

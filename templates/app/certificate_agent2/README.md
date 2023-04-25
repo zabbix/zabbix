@@ -3,14 +3,14 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 7.0 and higher  
 The template to monitor TLS/SSL certificate on the website by Zabbix agent 2 that works without any external scripts.
 Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns
 JSON with certificate attributes.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1\. Setup and configure zabbix-agent2 with the WebCertificate plugin.
 

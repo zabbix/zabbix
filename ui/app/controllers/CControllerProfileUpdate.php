@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,11 +33,13 @@ class CControllerProfileUpdate extends CController {
 
 		if ($ret) {
 			switch ($this->getInput('idx')) {
-				case 'web.actionconf.filter.active':
+				case 'web.action.list.filter.active':
 				case 'web.actionlog.filter.active':
+				case 'web.auditacts.filter.active':
 				case 'web.auditlog.filter.active':
 				case 'web.avail_report.filter.active':
 				case 'web.charts.filter.active':
+				case 'web.connector.filter.active':
 				case 'web.correlation.filter.active':
 				case 'web.dashboard.filter.active':
 				case 'web.dashboard.hostid':

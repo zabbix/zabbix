@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,11 @@ class CMultiSelect extends CTag {
 	const SEARCH_METHOD = 'multiselect.get';
 
 	/**
+	 * @var array
+	 */
+	protected $params = [];
+
+	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
 	 * @param bool  $options['multiple']       Allows multiple selections.
 	 * @param bool  $options['add_post_js']
@@ -49,8 +54,7 @@ class CMultiSelect extends CTag {
 			->addItem((new CDiv())
 				->setAttribute('aria-live', 'assertive')
 				->setAttribute('aria-atomic', 'true')
-			)
-			->js_event_name = sprintf('multiselect_%s_init', $this->getId());
+			);
 
 		if (array_key_exists('disabled', $options) && $options['disabled']) {
 			$this->setAttribute('aria-disabled', 'true');
@@ -238,7 +242,7 @@ class CMultiSelect extends CTag {
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
-					'enabled_only'
+					'enabled_only', 'group_status'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -397,6 +401,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('enabled_only', $parameters) && $parameters['enabled_only']) {
 					$popup_parameters['enabled_only'] = '1';
 					$autocomplete_parameters['enabled_only'] = true;
+				}
+
+				if (array_key_exists('group_status', $parameters)) {
+					$popup_parameters['group_status'] = $parameters['group_status'];
+					$autocomplete_parameters['group_status'] = $parameters['group_status'];
 				}
 			}
 

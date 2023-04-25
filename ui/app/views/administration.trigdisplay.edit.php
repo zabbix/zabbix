@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,6 +156,7 @@ $form_list = (new CFormList())
 	->addInfo(_('Custom severity names affect all locales and require manual translation!'));
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigdisplay')))->removeId())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.update')

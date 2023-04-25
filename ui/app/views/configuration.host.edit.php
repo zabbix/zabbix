@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,9 +42,6 @@ $data += [
 				->removeAttribute('id'),
 			(new CSimpleButton(_('Clone')))
 				->onClick('view.clone();')
-				->removeAttribute('id'),
-			(new CSimpleButton(_('Full clone')))
-				->onClick('view.fullClone();')
 				->removeAttribute('id'),
 			(new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected host?'))

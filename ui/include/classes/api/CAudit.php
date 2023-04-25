@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ class CAudit {
 	public const RESOURCE_SLA = 48;
 	public const RESOURCE_USERDIRECTORY = 49;
 	public const RESOURCE_TEMPLATE_GROUP = 50;
-
+	public const RESOURCE_CONNECTOR = 51;
 
 	/**
 	 * Audit details actions.
@@ -114,6 +114,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'config',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'config',
+		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOST => 'hosts',
@@ -166,6 +167,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => null,
 		self::RESOURCE_AUTH_TOKEN => 'name',
 		self::RESOURCE_AUTOREGISTRATION => null,
+		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
 		self::RESOURCE_HOST => 'host',
@@ -207,6 +209,7 @@ class CAudit {
 		self::RESOURCE_AUTHENTICATION => 'authentication',
 		self::RESOURCE_AUTH_TOKEN => 'token',
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
+		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
 		self::RESOURCE_HOST => 'host',
@@ -242,10 +245,24 @@ class CAudit {
 	 * @var array
 	 */
 	private const MASKED_PATHS = [
-		self::RESOURCE_AUTHENTICATION => ['paths' => ['authentication.ldap_bind_password']],
 		self::RESOURCE_AUTH_TOKEN => ['paths' => ['token.token']],
 		self::RESOURCE_AUTOREGISTRATION => [
 			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
+		],
+		self::RESOURCE_CONNECTOR => [
+			[
+				'paths' => ['connector.password'],
+				'conditions' => [
+					'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+						ZBX_HTTP_AUTH_DIGEST
+					]
+				]
+			],
+			[
+				'paths' => ['connector.token'],
+				'conditions' => ['authtype' => ZBX_HTTP_AUTH_BEARER]
+			],
+			['paths' => ['connector.ssl_key_password']]
 		],
 		self::RESOURCE_HOST_PROTOTYPE => [
 			'paths' => ['hostprototype.macros.value'],
@@ -262,8 +279,8 @@ class CAudit {
 					],
 					[
 						'type' => ITEM_TYPE_HTTPAGENT,
-						'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-							HTTPTEST_AUTH_DIGEST
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
 						]
 					]
 				]
@@ -281,8 +298,8 @@ class CAudit {
 					],
 					[
 						'type' => ITEM_TYPE_HTTPAGENT,
-						'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-							HTTPTEST_AUTH_DIGEST
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
 						]
 					]
 				]
@@ -301,7 +318,7 @@ class CAudit {
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']],
-		self::RESOURCE_USERDIRECTORY => ['paths' => ['userdirectory.bind_dn', 'userdirectory.bind_password']]
+		self::RESOURCE_USERDIRECTORY => ['paths' => ['userdirectory.bind_password']]
 	];
 
 	/**
@@ -338,6 +355,7 @@ class CAudit {
 		'action.update_operations.opcommand' => 'opcommand',
 		'action.update_operations.opcommand_grp' => 'opcommand_grp',
 		'action.update_operations.opcommand_hst' => 'opcommand_hst',
+		'connector.tags' => 'connector_tag',
 		'correlation.filter' => 'correlation',
 		'correlation.filter.conditions' => 'corr_condition',
 		'correlation.operations' => 'corr_operation',
@@ -392,6 +410,9 @@ class CAudit {
 		'templategroup.templates' => 'hosts_groups',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
+		'userdirectory.provision_media' => 'userdirectory_media',
+		'userdirectory.provision_groups' => 'userdirectory_idpgroup',
+		'userdirectory.provision_groups.user_groups' => 'userdirectory_usrgrp',
 		'usergroup.hostgroup_rights' => 'rights',
 		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
@@ -424,6 +445,7 @@ class CAudit {
 		'action.update_operations.opmessage_usr' => 'opmessage_usrid',
 		'action.update_operations.opcommand_grp' => 'opcommand_grpid',
 		'action.update_operations.opcommand_hst' => 'opcommand_hstid',
+		'connector.tags' => 'connector_tagid',
 		'correlation.filter.conditions' => 'corr_conditionid',
 		'correlation.operations' => 'corr_operationid',
 		'dashboard.users' => 'dashboard_userid',
@@ -475,6 +497,9 @@ class CAudit {
 		'templategroup.templates' => 'hostgroupid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
+		'userdirectory.provision_media' => 'userdirectory_mediaid',
+		'userdirectory.provision_groups' => 'userdirectory_idpgroupid',
+		'userdirectory.provision_groups.user_groups' => 'userdirectory_usrgrpid',
 		'usergroup.hostgroup_rights' => 'rightid',
 		'usergroup.templategroup_rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',

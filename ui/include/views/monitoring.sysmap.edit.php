@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,12 +31,14 @@ $html_page = (new CHtmlPage())
 
 $tabs = new CTabView();
 
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
 // Create sysmap form.
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sysmaps.php')))->removeId())
 	->setId('sysmap-form')
 	->setName('map.edit.php')
 	->addVar('form', getRequest('form', 1))
@@ -286,7 +288,8 @@ foreach ($data['sysmap']['urls'] as $url) {
 	$url_table->addRow(
 		(new CRow([
 			(new CTextBox('urls['.$i.'][name]', $url['name']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			(new CTextBox('urls['.$i.'][url]', $url['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('urls['.$i.'][url]', $url['url'], false, DB::getFieldLength('sysmap_url','url')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CSelect('urls['.$i.'][elementtype]'))
 				->setValue($url['elementtype'])
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
@@ -416,13 +419,14 @@ $sharing_tab = (new CFormList('sharing_form'))
 $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab, TAB_INDICATOR_SHARING);
 
 // Append buttons to form.
-if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'full_clone') {
+if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'clone') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new	CButton('clone', _('Clone')),
-			new CButton('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid'])),
+			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
+				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
+			),
 			new CButtonCancel()
 		]
 	));

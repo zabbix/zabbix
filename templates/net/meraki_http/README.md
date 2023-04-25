@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template to monitor Cisco Meraki dashboard by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
 
@@ -15,7 +15,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 You must set {$MERAKI.TOKEN} and {$MERAKI.API.URL} macros. 
 
@@ -35,7 +35,7 @@ No specific Zabbix configuration is required.
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
 |{$MERAKI.DEVICE.NAME.MATCHES} |<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$MERAKI.DEVICE.NAME.NOT_MATCHES} |<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
-|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.4/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.ORGANIZATION.NAME.MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
@@ -55,7 +55,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Zabbix raw items |Meraki: Get data |<p>Item for gathering all the organizations and devices from Meraki API"</p> |SCRIPT |meraki.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Meraki: Get data |<p>Item for gathering all the organizations and devices from Meraki API.</p> |SCRIPT |meraki.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Meraki: Data item errors |<p>Item for gathering all the data item errors.</p> |DEPENDENT |meraki.get.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
@@ -74,7 +74,7 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 
@@ -89,8 +89,8 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
-|{$MERAKI.CONFIG.CHANGE.TIMESPAN} |<p>Timespan for gathering config change log. Used in metric config and in URL query.</p> |`1200` |
-|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.4/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.CONFIG.CHANGE.TIMESPAN} |<p>Timespan for gathering config change log. Used in the metric config and in the URL query.</p> |`1200` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.LICENSE.EXPIRE} |<p>Time in seconds for license to expire.</p> |`86400` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
 
@@ -157,7 +157,7 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 
 ## Setup
 
@@ -173,8 +173,12 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
 |{$MERAKI.DEVICE.LATENCY} |<p>Devices uplink latency threshold in seconds.</p> |`0.15` |
+|{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES} |<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p> |`^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$` |
+|{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES} |<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p> |`^$` |
 |{$MERAKI.DEVICE.LOSS} |<p>Devices uplink loss threshold in percents.</p> |`15` |
-|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.4/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.DEVICE.UPLINK.MATCHES} |<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p> |`.+` |
+|{$MERAKI.DEVICE.UPLINK.NOT_MATCHES} |<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p> |`^$` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/7.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
 
 ## Template links
@@ -185,7 +189,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Uplinks loss and quality discovery |<p>-</p> |DEPENDENT |meraki.device.uplinks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL`</p> |
+|Uplinks loss and quality discovery |<p>-</p> |DEPENDENT |meraki.device.uplinks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL`</p><p>**Filter**:</p> <p>- {#UPLINK} MATCHES_REGEX `{$MERAKI.DEVICE.UPLINK.MATCHES}`</p><p>- {#UPLINK} NOT_MATCHES_REGEX `{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}`</p><p>- {#IP} MATCHES_REGEX `{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}`</p><p>- {#IP} NOT_MATCHES_REGEX `{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -193,8 +197,8 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Meraki |Meraki: status |<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.device[0].status`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Meraki |Meraki: public ip |<p>Device public ip</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.public.ip<p>**Preprocessing**:</p><p>- JSONPATH: `$.device[0].publicIp`</p> |
-|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Loss, % |<p>Loss percent of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {#SERIAL}.</p> |DEPENDENT |meraki.device.loss.pct[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].lossPercent.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1 : value `</p> |
-|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Latency |<p>Latency of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {#SERIAL}.</p> |DEPENDENT |meraki.device.latency[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].latencyMs.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1000 : value `</p><p>- MULTIPLIER: `0.001`</p> |
+|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Loss, % |<p>Loss percent of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {#SERIAL}.</p> |DEPENDENT |meraki.device.loss.pct[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].lossPercent.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> -1`</p> |
+|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Latency |<p>Latency of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {#SERIAL}.</p> |DEPENDENT |meraki.device.latency[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].latencyMs.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> -1000`</p><p>- MULTIPLIER: `0.001`</p> |
 |Zabbix raw items |Meraki: Get device data |<p>Item for gathering device data from Meraki API.</p> |SCRIPT |meraki.get.device<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Meraki: Device data item errors |<p>Item for gathering errors of the device item.</p> |DEPENDENT |meraki.get.device.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 

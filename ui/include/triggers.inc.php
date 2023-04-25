@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,38 +101,6 @@ function get_triggers_by_hostid($hostid) {
 			' AND f.itemid=i.itemid'.
 			' AND f.triggerid=t.triggerid'
 	);
-}
-
-// unescape Raw URL
-function utf8RawUrlDecode($source) {
-	$decodedStr = '';
-	$pos = 0;
-	$len = strlen($source);
-	while ($pos < $len) {
-		$charAt = substr($source, $pos, 1);
-		if ($charAt == '%') {
-			$pos++;
-			$charAt = substr($source, $pos, 1);
-			if ($charAt == 'u') {
-				// we got a unicode character
-				$pos++;
-				$unicodeHexVal = substr($source, $pos, 4);
-				$unicode = hexdec($unicodeHexVal);
-				$entity = "&#".$unicode.';';
-				$decodedStr .= html_entity_decode(utf8_encode($entity), ENT_COMPAT, 'UTF-8');
-				$pos += 4;
-			}
-			else {
-				$decodedStr .= substr($source, $pos-1, 1);
-			}
-		}
-		else {
-			$decodedStr .= $charAt;
-			$pos++;
-		}
-	}
-
-	return $decodedStr;
 }
 
 /**
@@ -676,6 +644,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity', 'r_eventid'],
 			'objectids' => array_keys($triggers),
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'symptom' => false,
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from'],
@@ -776,13 +745,15 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 
 	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 		$eventid = $trigger['problem']['eventid'];
-		$acknowledge = true;
+		$update_problem = true;
 	}
 	else {
-		$acknowledge = false;
+		$update_problem = false;
 	}
 
-	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
+	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
+		['update_problem' => $update_problem]
+	));
 
 	return $column;
 }
@@ -960,8 +931,8 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 /**
  * Make trigger info block.
  *
- * @param array $trigger  Trigger described in info block.
- * @param array $eventid  Associated eventid.
+ * @param array  $trigger  Trigger described in info block.
+ * @param string $eventid  Associated event ID.
  *
  * @return object
  */
@@ -994,7 +965,9 @@ function make_trigger_details($trigger, $eventid) {
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
 				->addClass(ZBX_STYLE_WORDWRAP)
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
+					['show_rank_change_cause' => true]
+				))
 			)
 		])
 		->addRow([

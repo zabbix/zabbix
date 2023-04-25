@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,8 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
 		zbx_vector_uint64_t *index, char **error)
 {
-	int			i, start, end;
+	int			i;
+	time_t			start, end;
 	double			value_dbl;
 	struct tm		tm, tm_now;
 
@@ -120,8 +121,8 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, time_t now, const char *period,
 		int season_num, int skip, zbx_vector_dbl_t *values, zbx_vector_uint64_t *index, char **error)
 {
-	int		i, start, end, period_num;
-	time_t		time_tmp;
+	int		i, period_num;
+	time_t		start, end, time_tmp;
 	double		value_dbl;
 	struct tm	tm_end, tm_start;
 	size_t		len;

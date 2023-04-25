@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -154,9 +154,9 @@ class testFormValueMappingsHost extends testFormValueMappings {
 	}
 
 	/**
-	 * Scenario for verifying that value mappings are correctly copied to the full clone of the host.
+	 * Scenario for verifying position of draggable element in value mapping of the hosts for mass update case.
 	 */
-	public function testFormValueMappingsHost_FullClone() {
-		$this->checkClone('host', 'Full clone');
+	public function testFormValueMappingsHost_ValuemappingScreenshot() {
+		$this->checkMassValuemappingScreenshot('hosts');
 	}
 }

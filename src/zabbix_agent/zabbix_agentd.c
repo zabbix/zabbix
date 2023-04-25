@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 **/
 
 #include "log.h"
-#include "modbtype.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxconf.h"
 #include "zbxexpr.h"
@@ -26,6 +26,7 @@
 #include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbx_rtc_constants.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -39,9 +40,10 @@ char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
 ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME = NULL;
 
-int	CONFIG_ENABLE_REMOTE_COMMANDS	= 1;
-int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
-int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
+ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 1)
+ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
+ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
+
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -90,10 +92,8 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #else
 #	include "zbxnix.h"
 #endif
-#include "active.h"
+#include "active_checks/active_checks.h"
 #include "listener.h"
-
-#include "zbxsymbols.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -101,7 +101,6 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #	include "zbxnix.h"
 #endif
 
-#include "setproctitle.h"
 #include "zbxcrypto.h"
 
 const char	*progname = NULL;
@@ -250,6 +249,8 @@ static const char	*get_progname(void)
 }
 #endif
 
+ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
+
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
@@ -289,10 +290,11 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_REPORTWRITER */
 	0, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
-	0 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0 /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
 };
 
-static char	*config_file		= NULL;
+static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 
 static zbx_config_log_t	log_file_cfg	= {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
@@ -730,7 +732,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
 }
 
-static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	int	i, forks, new_forks;
 
@@ -745,14 +747,15 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
-		zbx_vector_ptr_create(&config_active_args[forks].addrs);
+		zbx_vector_addr_ptr_create(&config_active_args[forks].addrs);
 		zbx_addr_copy(&config_active_args[forks].addrs, addrs);
 
 		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
-		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].config_timeout = zbx_config_timeout;
 		config_active_args[forks].config_file = config_file;
+		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 	}
 
 	return SUCCEED;
@@ -868,7 +871,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
-		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
+		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
@@ -887,9 +890,9 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	1,			1000},
 		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
 			PARM_OPT,	0,			1},
-		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
+		{"LogRemoteCommands",		&zbx_config_log_remote_commands,	TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"UnsafeUserParameters",	&CONFIG_UNSAFE_USER_PARAMETERS,		TYPE_INT,
+		{"UnsafeUserParameters",	&zbx_config_unsafe_user_parameters,	TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"Alias",			&CONFIG_ALIASES,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
@@ -1079,15 +1082,55 @@ static void	zbx_on_exit(int ret)
 	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
 #endif
 	zbx_config_tls_free(zbx_config_tls);
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
+	zbx_setproctitle_deinit();
 #ifdef _WINDOWS
 	while (0 == WSACleanup())
 		;
 #endif
 	exit(EXIT_SUCCESS);
 }
+
+#ifdef ZABBIX_DAEMON
+static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
+{
+#ifdef HAVE_SIGQUEUE
+	int	scope;
+
+	switch (ZBX_RTC_GET_MSG(flags))
+	{
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+			scope = ZBX_RTC_GET_SCOPE(flags);
+
+			if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == scope)
+			{
+				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags, NULL);
+			}
+			else
+			{
+				if (scope < ZBX_PROCESS_TYPE_EXT_FIRST)
+				{
+					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
+							flags, NULL);
+				}
+			}
+
+			/* call custom sigusr handler to handle log level changes for non worker processes */
+			if (NULL != sigusr_handler)
+				sigusr_handler(flags);
+
+			break;
+		case ZBX_RTC_USER_PARAMETERS_RELOAD:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags, NULL);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags, NULL);
+			break;
+		default:
+			if (NULL != sigusr_handler)
+				sigusr_handler(flags);
+	}
+#endif
+}
+#endif
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
@@ -1149,7 +1192,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #endif
 #ifndef _WINDOWS
-	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		zbx_free_service_resources(FAIL);
@@ -1229,7 +1272,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_thread_args_t		*thread_args;
 		zbx_thread_info_t		*thread_info;
 		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type,
-								config_file};
+								config_file, zbx_config_timeout};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_info = &thread_args->info;
@@ -1240,6 +1283,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			exit(EXIT_FAILURE);
 		}
 
+		thread_info->program_type = program_type;
 		thread_info->server_num = i + 1;
 		thread_args->args = NULL;
 
@@ -1285,8 +1329,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_tcp_close(&listen_sock);
 
 		/* Wait for the service worker thread to terminate us. Listener threads may not exit up to */
-		/* CONFIG_TIMEOUT seconds if they're waiting for external processes to finish / timeout */
-		zbx_sleep(CONFIG_TIMEOUT);
+		/* config_timeout seconds if they're waiting for external processes to finish / timeout */
+		zbx_sleep(zbx_config_timeout);
 
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -1355,6 +1399,9 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
+	zbx_init_library_cfg(program_type);
+	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_progname);
 #endif
@@ -1366,21 +1413,32 @@ int	main(int argc, char **argv)
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
 	zbx_config_tls = zbx_config_tls_new();
-#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	argv = setproctitle_save_env(argc, argv);
-#endif
+	argv = zbx_setproctitle_init(argc, argv);
 	progname = get_program_name(argv[0]);
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
+
+#ifdef _WINDOWS
+	/* if agent is started as windows service then try to log errors */
+	/* into windows event log while zabbix_log is not ready */
+	if (ZBX_TASK_START == t.task && 0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		zbx_config_log_t	log_cfg	= {NULL, NULL, LOG_TYPE_SYSTEM, 1};
+
+		zabbix_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
+	}
+#endif
+
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_import_symbols();
 #endif
+
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
 			SUCCEED != zbx_socket_start(&error))
 	{
-		zbx_error(error);
+		zabbix_log(LOG_LEVEL_CRIT, error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1450,7 +1508,7 @@ int	main(int argc, char **argv)
 			zbx_set_common_signal_handlers(zbx_on_exit);
 #endif
 #ifndef _WINDOWS
-			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))
+			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout, 0))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(EXIT_FAILURE);
@@ -1506,6 +1564,10 @@ int	main(int argc, char **argv)
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 			load_aliases(CONFIG_ALIASES);
+#ifdef _WINDOWS
+			if (0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
+				zabbix_close_log();
+#endif
 			break;
 	}
 
@@ -1513,7 +1575,7 @@ int	main(int argc, char **argv)
 	zbx_service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
-			log_file_cfg.log_type, log_file_cfg.log_file_name);
+			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb);
 #endif
 	exit(EXIT_SUCCESS);
 }

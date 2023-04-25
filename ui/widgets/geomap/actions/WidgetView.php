@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,6 +120,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Get problems.
 		$problems = API::Problem()->get([
 			'output' => ['objectid', 'severity'],
+			'symptom' => false,
 			'selectHosts' => ['hostid'],
 			'objectids' => array_keys($triggers)
 		]);
@@ -233,7 +234,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [
 				'tile_url' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_URL),
 				'max_zoom' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM),
-				'attribution' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION)
+				'attribution' => \CHtml::encode(CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION))
 			];
 		}
 

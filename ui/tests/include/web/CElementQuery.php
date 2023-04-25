@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -357,7 +357,7 @@ class CElementQuery implements IWaitable {
 				else {
 					$elements = $this->context->findElements($this->by);
 					if (!$elements) {
-						throw new NoSuchElementException(null);
+						throw new NoSuchElementException('');
 					}
 
 					$element = end($elements);
@@ -371,12 +371,6 @@ class CElementQuery implements IWaitable {
 				}
 
 				throw $exception;
-			}
-			// Workaround for communication errors present on Jenkins
-			catch (WebDriverException $exception) {
-				if (strpos($exception->getMessage(), 'START_MAP') === false) {
-					throw $exception;
-				}
 			}
 		}
 
@@ -394,17 +388,7 @@ class CElementQuery implements IWaitable {
 	public function all() {
 		$class = $this->class;
 
-		try {
-			$elements = $this->context->findElements($this->by);
-		}
-		// Workaround for communication errors present on Jenkins
-		catch (WebDriverException $exception) {
-			if (strpos($exception->getMessage(), 'START_MAP') === false) {
-				throw $exception;
-			}
-
-			$elements = $this->context->findElements($this->by);
-		}
+		$elements = $this->context->findElements($this->by);
 
 		if ($this->reverse_order) {
 			$elements = array_reverse($elements);
@@ -515,6 +499,17 @@ class CElementQuery implements IWaitable {
 			}
 
 			return true;
+		};
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getClassesPresentCondition($classes) {
+		$target = $this;
+
+		return function () use ($target, $classes) {
+			return $target->one(false)->hasClass($classes);
 		};
 	}
 

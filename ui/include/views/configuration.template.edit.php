@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,17 +29,19 @@ $html_page = (new CHtmlPage())
 	->setTitle(_('Templates'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATES_EDIT));
 
-if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
+if ($data['form'] !== 'clone') {
 	$html_page->setNavigation(getHostNavigation('', $data['templateid']));
 }
 
 $tabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templates.php')))->removeId())
 	->setId('templates-form')
 	->setName('templatesForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -91,7 +93,7 @@ if ($data['linked_templates']) {
 
 		$template_link->addClass(ZBX_STYLE_WORDWRAP);
 
-		$clone_mode = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
+		$clone_mode = $data['form'] === 'clone';
 
 		$linked_templates->addRow([
 			$template_link,
@@ -171,6 +173,13 @@ $template_tab
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
 
+if ($data['vendor']) {
+	$template_tab->addRow(_('Vendor and version'), implode(', ', [
+		$data['vendor']['name'],
+		$data['vendor']['version']
+	]));
+}
+
 $tabs->addTab('tmplTab', _('Templates'), $template_tab, false);
 
 // tags
@@ -211,18 +220,20 @@ $tabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-forml
 );
 
 // footer
-if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
+if ($data['templateid'] != 0 && $data['form'] !== 'clone') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new CSubmit('clone', _('Clone')),
-			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid')),
+			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').'&'.
+				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('templates.php')
+			),
 			new CButtonQMessage(
 				'delete_and_clear',
 				_('Delete and clear'),
 				_('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
-				url_param('form').url_param('templateid')
+				url_param('form').url_param('templateid').'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.
+				CCsrfTokenHelper::get('templates.php')
 			),
 			new CButtonCancel()
 		]

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,9 +54,7 @@ $hintbox_tile_url = makeHelpIcon([
 	]))->addClass(ZBX_STYLE_LIST_DASHED)
 ]);
 
-$hintbox_attribution = makeHelpIcon(
-	_('Tile provider attribution data displayed in a small text box on the map.')
-);
+$warning_attribution = makeWarningIcon(_('Tile provider attribution data displayed in a small text box on the map.'));
 
 $hintbox_max_zoom = makeHelpIcon(_('Maximum zoom level of the map.'));
 
@@ -85,14 +83,14 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel([_('Attribution'), $hintbox_attribution], 'geomaps_attribution'),
-		new CFormField(
+		(new CLabel([_('Attribution text'), $warning_attribution], 'geomaps_attribution'))
+			->addClass($data['geomaps_tile_provider'] !== '' ? ZBX_STYLE_DISPLAY_NONE : null),
+		(new CFormField(
 			(new CTextArea('geomaps_attribution', $data['geomaps_attribution']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->setReadonly($data['geomaps_tile_provider'] !== '')
 				->setMaxLength(DB::getFieldLength('config', 'geomaps_attribution'))
-		)
+		))->addClass($data['geomaps_tile_provider'] !== '' ? ZBX_STYLE_DISPLAY_NONE : null)
 	])
 	->addItem([
 		(new CLabel([_('Max zoom level'), $hintbox_max_zoom], 'geomaps_max_zoom'))->setAsteriskMark(),
@@ -107,6 +105,7 @@ $form_grid = (new CFormGrid())
 	]);
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('geomaps')))->removeId())
 	->setId('geomaps-form')
 	->setName('geomaps-form')
 	->setAction(

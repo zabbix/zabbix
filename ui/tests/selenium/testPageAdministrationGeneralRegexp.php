@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
 		$this->assertEquals(['GUI', 'Autoregistration', 'Images', 'Icon mapping', 'Regular expressions',
-			'Trigger displaying options', 'Geographical maps', 'Modules', 'Other'], $popup_menu->getItems()->asText()
+			'Trigger displaying options', 'Geographical maps', 'Modules', 'Connectors', 'Other'], $popup_menu->getItems()->asText()
 		);
 
 		$this->zbxTestAssertElementPresentXpath('//button[text()="New regular expression"]');

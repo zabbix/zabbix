@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,6 +87,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			'actions_manage_scheduled_reports' => 			'in 0,1',
 			'actions_manage_sla' => 						'in 0,1',
 			'actions_invoke_execute_now' =>					'in 0,1',
+			'actions_change_problem_ranking' =>				'in 0,1',
 			'ui_default_access' => 							'in 0,1',
 			'modules_default_access' => 					'in 0,1',
 			'actions_default_access' => 					'in 0,1',

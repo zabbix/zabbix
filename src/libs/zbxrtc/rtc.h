@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 #include "zbxtypes.h"
 
-int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
-		char **error);
+int	zbx_rtc_parse_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
+		int *scope, char **error);
 
 #endif

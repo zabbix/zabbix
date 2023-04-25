@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,10 +85,17 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 	else
 		msg_output = zbx_strdup(msg_output, "undefined");
 
-	zabbix_log(level, "%s", msg_output);
-
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
+
+	if (ZBX_ES_LOG_MSG_LIMIT <= env->logged_msgs)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,
+				"maximum count of logged messages was reached");
+		goto out;
+	}
+
+	zabbix_log(level, "%s", msg_output);
 
 	if (NULL == env->json)
 		goto out;
@@ -106,6 +113,7 @@ static duk_ret_t	es_log_message(duk_context *ctx, int level)
 	zbx_json_addstring(env->json, "message", msg_output, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(env->json);
 out:
+	env->logged_msgs++;
 	zbx_free(msg_output);
 
 	if (-1 != err_index)

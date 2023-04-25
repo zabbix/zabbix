@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,15 +90,18 @@ typedef void (*zbx_clean_func_t)(void *data);
 	if ((a) > (b))			\
 		return +1
 
-#define ZBX_RETURN_IF_DBL_NOT_EQUAL(a, b)	\
-						\
-	if (FAIL == zbx_double_compare(a, b))	\
-	{					\
-		if ((a) < (b))			\
-			return -1;		\
-		else				\
-			return +1;		\
-	}
+#define ZBX_RETURN_IF_DBL_NOT_EQUAL(a, b)		\
+	do						\
+	{						\
+		if (FAIL == zbx_double_compare(a, b))	\
+		{					\
+			if ((a) < (b))			\
+				return -1;		\
+			else				\
+				return +1;		\
+		}					\
+	}						\
+	while(0)
 
 /* pair */
 
@@ -283,9 +286,9 @@ void			zbx_binary_heap_clear(zbx_binary_heap_t *heap);
 
 /* vector implementation start */
 
-#define ZBX_VECTOR_DECL(__id, __type)										\
+#define ZBX_VECTOR_STRUCT_DECL(__id, __type)									\
 														\
-typedef struct													\
+typedef struct zbx_vector_ ## __id ## _s									\
 {														\
 	__type			*values;									\
 	int			values_num;									\
@@ -294,7 +297,9 @@ typedef struct													\
 	zbx_mem_realloc_func_t	mem_realloc_func;								\
 	zbx_mem_free_func_t	mem_free_func;									\
 }														\
-zbx_vector_ ## __id ## _t;											\
+zbx_vector_ ## __id ## _t;
+
+#define ZBX_VECTOR_FUNC_DECL(__id, __type)									\
 														\
 void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector);					\
 void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
@@ -327,13 +332,19 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size);			\
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
-#define ZBX_PTR_VECTOR_DECL(__id, __type)									\
+#define ZBX_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)					\
+					ZBX_VECTOR_FUNC_DECL(__id, __type)
+
+#define ZBX_PTR_VECTOR_FUNC_DECL(__id, __type)									\
 														\
-ZBX_VECTOR_DECL(__id, __type)											\
+ZBX_VECTOR_FUNC_DECL(__id, __type)										\
 														\
 typedef void (*zbx_ ## __id ## _free_func_t)(__type data);							\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func);
+
+#define ZBX_PTR_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)				\
+						ZBX_PTR_VECTOR_FUNC_DECL(__id, __type)
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
 ZBX_PTR_VECTOR_DECL(str, char *)
@@ -616,10 +627,15 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
 }
 /* vector implementation end */
 
-/* this function is only for use with zbx_vector_XXX_clear_ext() */
+/* these functions are only for use with zbx_vector_XXX_clear_ext() */
 /* and only if the vector does not contain nested allocations */
 void	zbx_ptr_free(void *data);
 void	zbx_str_free(char *data);
+void	zbx_free_tag(zbx_tag_t *tag);
+
+/* these functions are only for use with zbx_vector_XXX_sort() */
+int	zbx_compare_tags(const void *d1, const void *d2);
+int	zbx_compare_tags_and_values(const void *d1, const void *d2);
 
 /* 128 bit unsigned integer handling */
 void	zbx_uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);

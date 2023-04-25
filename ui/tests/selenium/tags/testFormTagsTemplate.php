@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,14 +54,7 @@ class testFormTagsTemplate extends testFormTags {
 	 * Test cloning of Template with tags.
 	 */
 	public function testFormTagsTemplate_Clone() {
-		$this->executeCloning('template', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Template with tags.
-	 */
-	public function testFormTagsTemplate_FullClone() {
-		$this->executeCloning('template', 'Full clone');
+		$this->executeCloning('template');
 	}
 
 	/**

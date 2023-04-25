@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -136,10 +136,6 @@ class CConfigFile {
 
 		if (isset($DB['CIPHER_LIST'])) {
 			$this->config['DB']['CIPHER_LIST'] = $DB['CIPHER_LIST'];
-		}
-
-		if (isset($DB['DOUBLE_IEEE754'])) {
-			$this->config['DB']['DOUBLE_IEEE754'] = $DB['DOUBLE_IEEE754'];
 		}
 
 		if (isset($DB['VAULT'])) {
@@ -282,11 +278,6 @@ $DB[\'VAULT_KEY_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_KEY_FILE']
 // Uncomment to bypass local caching of credentials.
 // $DB[\'VAULT_CACHE\']		= true;
 
-// Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
-// This option is enabled by default for new Zabbix installations.
-// For upgraded installations, please read database upgrade notes before enabling this option.
-$DB[\'DOUBLE_IEEE754\']		= '.($this->config['DB']['DOUBLE_IEEE754'] ? 'true' : 'false').';
-
 // Uncomment and set to desired values to override Zabbix hostname/IP and port.
 // $ZBX_SERVER			= \'\';
 // $ZBX_SERVER_PORT		= \'\';
@@ -328,7 +319,6 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 			'CA_FILE' => '',
 			'VERIFY_HOST' => true,
 			'CIPHER_LIST' => '',
-			'DOUBLE_IEEE754' => false,
 			'VAULT' => '',
 			'VAULT_URL' => '',
 			'VAULT_DB_PATH' => '',

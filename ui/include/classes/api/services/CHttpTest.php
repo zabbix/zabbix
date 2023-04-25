@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -280,9 +280,9 @@ class CHttpTest extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$httptests): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['hostid', 'name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['hostid', 'name']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-			'uuid' =>				['type' => API_UUID],
+			'uuid' =>				['type' => API_ANY],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
 			'retries' =>			['type' => API_INT32, 'in' => '1:10'],
@@ -297,11 +297,11 @@ class CHttpTest extends CApiService {
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED])],
-			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],
+			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])],
 			'http_user' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_user')],
 			'http_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_password')],
-			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_password')],
@@ -344,11 +344,14 @@ class CHttpTest extends CApiService {
 			$names_by_hostid[$httptest['hostid']][] = $httptest['name'];
 		}
 
-		$this->checkAndAddUuid($httptests);
-
 		$this->checkHostsAndTemplates($httptests, $db_hosts, $db_templates);
 		self::addHostStatus($httptests, $db_hosts, $db_templates);
 
+		self::validateUuid($httptests, $db_hosts + $db_templates);
+
+		self::addUuid($httptests, $db_templates);
+
+		self::checkUuidDuplicates($httptests);
 		$this->checkDuplicates($names_by_hostid);
 		$this->validateAuthParameters($httptests, __FUNCTION__);
 		$this->validateSslParameters($httptests, __FUNCTION__);
@@ -356,51 +359,96 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * Check that only httptests on templates have UUID. Add UUID to all httptests on templates, if it does not exists.
-	 *
-	 * @param array $httptests_to_create
+	 * @param array $httptests
+	 * @param array $db_hosts
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$httptests_to_create): void {
-		$db_templateids = API::Template()->get([
-			'output' => [],
-			'templateids' => array_column($httptests_to_create, 'hostid'),
-			'preservekeys' => true
-		]);
+	private static function validateUuid(array $httptests, array $db_hosts): void {
+		foreach ($httptests as &$httptest) {
+			$httptest['host_status'] = array_key_exists('status', $db_hosts[$httptest['hostid']])
+				? $db_hosts[$httptest['hostid']]['status']
+				: HOST_STATUS_TEMPLATE;
+		}
+		unset($httptest);
 
-		foreach ($httptests_to_create as $index => &$httptest) {
-			if (!array_key_exists($httptest['hostid'], $db_templateids) && array_key_exists('uuid', $httptest)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
-			}
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('httptest', 'uuid'), 'unset' => true]
+			]]
+		]];
 
-			if (array_key_exists($httptest['hostid'], $db_templateids) && !array_key_exists('uuid', $httptest)) {
+		if (!CApiInputValidator::validate($api_input_rules, $httptests, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
+	 * Add the UUID to those of the given web scenarios that belong to a template and don't have the 'uuid' parameter
+	 * set.
+	 *
+	 * @param array $httptests
+	 * @param array $db_templates
+	 */
+	private static function addUuid(array &$httptests, array $db_templates): void {
+		foreach ($httptests as &$httptest) {
+			if (array_key_exists($httptest['hostid'], $db_templates) && !array_key_exists('uuid', $httptest)) {
 				$httptest['uuid'] = generateUuidV4();
 			}
 		}
 		unset($httptest);
+	}
 
-		$db_uuid = DB::select('httptest', [
+	/**
+	 * Verify web scenario UUIDs are not repeated.
+	 *
+	 * @param array      $httptests
+	 * @param array|null $db_httptests
+	 *
+	 * @throws APIException
+	 */
+	private static function checkUuidDuplicates(array $httptests, array $db_httptests = null): void {
+		$httptest_indexes = [];
+
+		foreach ($httptests as $i => $httptest) {
+			if (!array_key_exists('uuid', $httptest) || $httptest['uuid'] === '') {
+				continue;
+			}
+
+			if ($db_httptests === null || $httptest['uuid'] !== $db_httptests[$httptest['httptestid']]['uuid']) {
+				$httptest_indexes[$httptest['uuid']] = $i;
+			}
+		}
+
+		if (!$httptest_indexes) {
+			return;
+		}
+
+		$duplicates = DB::select('httptest', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($httptests_to_create, 'uuid')],
+			'filter' => [
+				'uuid' => array_keys($httptest_indexes)
+			],
 			'limit' => 1
 		]);
 
-		if ($db_uuid) {
+		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				_s('Invalid parameter "%1$s": %2$s.', '/'.($httptest_indexes[$duplicates[0]['uuid']] + 1),
+					_('web scenario with the same UUID already exists')
+				)
 			);
 		}
 	}
 
 	/**
-	 * @param $httptests
+	 * @param array $httptests
 	 *
 	 * @return array
 	 */
-	public function update($httptests) {
+	public function update(array $httptests) {
 		$this->validateUpdate($httptests, $db_httptests);
 
 		Manager::HttpTest()->persist($httptests);
@@ -423,6 +471,7 @@ class CHttpTest extends CApiService {
 	 */
 	protected function validateUpdate(array &$httptests, array &$db_httptests = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['httptestid']], 'fields' => [
+			'uuid' => 				['type' => API_ANY],
 			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
@@ -438,11 +487,11 @@ class CHttpTest extends CApiService {
 				'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('httptest_field', 'value')]
 			]],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED])],
-			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])],
+			'authentication' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST])],
 			'http_user' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_user')],
 			'http_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'http_password')],
-			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
-			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
+			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])],
+			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON])],
 			'ssl_cert_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_cert_file')],
 			'ssl_key_file' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_file')],
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest', 'ssl_key_password')],
@@ -475,28 +524,36 @@ class CHttpTest extends CApiService {
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('httptest_tag', 'value'), 'default' => DB::getDefault('httptest_tag', 'value')]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $httptests, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		// permissions
 		$db_httptests = $this->get([
-			'output' => ['httptestid', 'hostid', 'name', 'delay', 'retries', 'agent', 'http_proxy',
+			'output' => ['uuid', 'httptestid', 'hostid', 'name', 'delay', 'retries', 'agent', 'http_proxy',
 				'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
 				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'templateid'
 			],
 			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
 				'status_codes', 'follow_redirects', 'retrieve_mode', 'post_type'
 			],
+			'selectHosts' => ['status'],
 			'httptestids' => zbx_objectValues($httptests, 'httptestid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
+		$db_hosts = [];
+
 		foreach ($db_httptests as &$db_httptest) {
 			$db_httptest['headers'] = [];
 			$db_httptest['variables'] = [];
 			$db_httptest['steps'] = zbx_toHash($db_httptest['steps'], 'httpstepid');
+
+			$db_hosts[$db_httptest['hostid']] = $db_httptest['hosts'][0]['status'] == HOST_STATUS_TEMPLATE
+				? []
+				: $db_httptest['hosts'][0];
 		}
 		unset($db_httptest);
 
@@ -563,6 +620,10 @@ class CHttpTest extends CApiService {
 		if (!CApiInputValidator::validateUniqueness($api_input_rules, $httptests, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		self::validateUuid($httptests, $db_hosts);
+
+		self::checkUuidDuplicates($httptests, $db_httptests);
 
 		// validation
 		if ($names_by_hostid) {
@@ -1060,10 +1121,10 @@ class CHttpTest extends CApiService {
 				$httptest += [
 					'authentication' => ($method === 'validateUpdate')
 						? $db_httptests[$httptest['httptestid']]['authentication']
-						: HTTPTEST_AUTH_NONE
+						: ZBX_HTTP_AUTH_NONE
 				];
 
-				if ($httptest['authentication'] == HTTPTEST_AUTH_NONE) {
+				if ($httptest['authentication'] == ZBX_HTTP_AUTH_NONE) {
 					foreach (['http_user', 'http_password'] as $field_name) {
 						$httptest += [$field_name => ''];
 

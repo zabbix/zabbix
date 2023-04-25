@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,16 +28,16 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 	}
 
 	public function getView(): CList {
-		$list = (new CList())->addClass(ZBX_STYLE_OVERRIDES_LIST);
+		$view = (new CList())->addClass(ZBX_STYLE_OVERRIDES_LIST);
 
 		$i = 0;
 		foreach ($this->field->getValue() as $override) {
-			$list->addItem($this->getItemTemplate($override, $i));
+			$view->addItem($this->getItemTemplate($override, $i));
 
 			$i++;
 		}
 
-		$list->addItem(
+		$view->addItem(
 			(new CDiv(
 				(new CButton('override_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new override')]))
 					->addClass(ZBX_STYLE_BTN_ALT)
@@ -46,7 +46,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			'overrides-foot'
 		);
 
-		return $list;
+		return $view;
 	}
 
 	public function getJavaScript(): string {

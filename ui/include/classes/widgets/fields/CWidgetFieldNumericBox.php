@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ class CWidgetFieldNumericBox extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
-			->setValidationRules(['type' => API_NUMERIC, 'length' => 255]);
+			->setValidationRules(['type' => API_NUMERIC])
+			->setMaxLength(255);
 	}
 }

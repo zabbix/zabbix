@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -204,7 +204,7 @@ class CHostInterface extends CApiService {
 		if ($this->outputIsRequested('details', $options['output'])) {
 			foreach ($result as &$value) {
 				$snmp_fields = ['version', 'bulk', 'community', 'securityname', 'securitylevel', 'authpassphrase',
-					'privpassphrase', 'authprotocol', 'privprotocol', 'contextname'
+					'privpassphrase', 'authprotocol', 'privprotocol', 'contextname', 'max_repetitions'
 				];
 
 				$interface_type = $value['type'];
@@ -220,6 +220,10 @@ class CHostInterface extends CApiService {
 					foreach ($snmp_fields as $field_name) {
 						$details[$field_name] = $value[$field_name];
 						unset($value[$field_name]);
+					}
+
+					if ($details['version'] == SNMP_V1) {
+						unset($details['max_repetitions']);
 					}
 
 					if ($details['version'] == SNMP_V1 || $details['version'] == SNMP_V2C) {
@@ -405,6 +409,8 @@ class CHostInterface extends CApiService {
 
 			$this->checkSnmpCommunity($interface);
 
+			$this->checkSnmpMaxRepetitions($interface);
+
 			$this->checkSnmpBulk($interface);
 
 			$this->checkSnmpSecurityLevel($interface);
@@ -425,6 +431,7 @@ class CHostInterface extends CApiService {
 	protected function sanitizeSnmpFields(array $interfaces): array {
 		$default_fields = [
 			'community' => '',
+			'max_repetitions' =>  DB::getDefault('interface_snmp', 'max_repetitions'),
 			'securityname' => '',
 			'securitylevel' => DB::getDefault('interface_snmp', 'securitylevel'),
 			'authpassphrase' => '',
@@ -435,6 +442,10 @@ class CHostInterface extends CApiService {
 		];
 
 		foreach ($interfaces as &$interface) {
+			if ($interface['version'] == SNMP_V1) {
+				unset($interface['max_repetitions']);
+			}
+
 			if ($interface['version'] == SNMP_V1 || $interface['version'] == SNMP_V2C) {
 				unset($interface['securityname'], $interface['securitylevel'], $interface['authpassphrase'],
 					$interface['privpassphrase'], $interface['authprotocol'], $interface['privprotocol'],
@@ -1078,6 +1089,23 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
+	 * Check SNMP max repetition count.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "max_repetitions" value is incorrect.
+	 */
+	protected function checkSnmpMaxRepetitions(array $interface) {
+		if (($interface['details']['version'] == SNMP_V2C || $interface['details']['version'] == SNMP_V3)
+				&& (array_key_exists('max_repetitions', $interface['details'])
+					&& (!is_numeric($interface['details']['max_repetitions'])
+						|| $interface['details']['max_repetitions'] < 1
+						|| $interface['details']['max_repetitions'] > ZBX_MAX_INT32))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+	}
+
+	/**
 	 * Validates SNMP interface "bulk" field.
 	 *
 	 * @param array $interface
@@ -1157,6 +1185,9 @@ class CHostInterface extends CApiService {
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.version', SNMP_V2C, 'version'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.bulk', SNMP_BULK_ENABLED, 'bulk'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.community', '', 'community'), $sqlParts);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.max_repetitions', '10', 'max_repetitions'),
+				$sqlParts
+			);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.securityname', '', 'securityname'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(
 				dbConditionCoalesce('his.securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'securitylevel'),

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ class testFormTagsTrigger extends testFormTags {
 	public function testFormTagsTrigger_Clone() {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.Host with tags for cloning');
 		$this->link = 'triggers.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$hostid;
-		$this->executeCloning('trigger', 'Clone');
+		$this->executeCloning('trigger');
 	}
 
 	/**
@@ -131,23 +131,23 @@ class testFormTagsTrigger extends testFormTags {
 	}
 
 	/**
-	 * Test host full cloning with Trigger.
+	 * Test host cloning with Trigger.
 	 */
-	public function testFormTagsTrigger_HostFullClone() {
+	public function testFormTagsTrigger_HostClone() {
 		$this->host = 'Host with tags for cloning';
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$this->link = 'triggers.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$hostid;
-		$this->executeFullCloning('trigger', 'Host');
+		$this->executeCloningByParent('trigger', 'Host');
 	}
 
 	/**
-	 * Test template full cloning with Trigger.
+	 * Test template cloning with Trigger.
 	 */
-	public function testFormTagsTrigger_TemplateFullClone() {
+	public function testFormTagsTrigger_TemplateClone() {
 		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
 		$this->link = 'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$templateid.'&context=template';
-		$this->clone_name = 'Template trigger with tags for full cloning';
-		$this->executeFullCloning('trigger', 'Template');
+		$this->clone_name = 'Template trigger with tags for cloning';
+		$this->executeCloningByParent('trigger', 'Template');
 	}
 
 	/**

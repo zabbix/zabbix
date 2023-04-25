@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,14 @@
 
 #include "zbxcommon.h"
 #include "zbxcachevalue.h"
-#include "zbxlld.h"
 #include "zbxcacheconfig.h"
-#include "zbxha.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
+#include "zbxconnector.h"
+#include "../ha/ha.h"
 
 #include "checks_internal.h"
+#include "../lld/lld_protocol.h"
 
 /******************************************************************************
  *                                                                            *
@@ -58,7 +59,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_trigger_count());
+		SET_UI64_RESULT(result, zbx_dc_get_trigger_count());
 	}
 	else if (0 == strcmp(param1, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
 	{							/* zabbix["proxy","discovery"]                        */
@@ -101,7 +102,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 			if (0 == strcmp(param3, "lastaccess"))
 			{
-				res = DCget_proxy_lastaccess_by_name(get_rparam(request, 1), &value, &error);
+				res = zbx_dc_get_proxy_lastaccess_by_name(get_rparam(request, 1), &value, &error);
 			}
 			else if (0 == strcmp(param3, "delay"))
 			{
@@ -109,8 +110,8 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 				param2 = get_rparam(request, 1);
 
-				if (SUCCEED == (res = DCget_proxy_delay_by_name(param2, &value, &error)) &&
-						SUCCEED == (res = DCget_proxy_lastaccess_by_name(param2, &lastaccess,
+				if (SUCCEED == (res = zbx_dc_get_proxy_delay_by_name(param2, &value, &error)) &&
+						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2, &lastaccess,
 						&error)))
 				{
 					value += zbx_time() - lastaccess;
@@ -206,6 +207,25 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 
 		if (FAIL == zbx_lld_get_queue_size(&value, &error))
+		{
+			SET_MSG_RESULT(result, error);
+			goto out;
+		}
+
+		SET_UI64_RESULT(result, value);
+	}
+	else if (0 == strcmp(param1, "connector_queue"))
+	{
+		zbx_uint64_t	value;
+		char		*error = NULL;
+
+		if (1 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		if (FAIL == zbx_connector_get_queue_size(&value, &error))
 		{
 			SET_MSG_RESULT(result, error);
 			goto out;

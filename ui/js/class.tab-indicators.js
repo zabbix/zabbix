@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -448,7 +448,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const element = document.querySelector('#ldap_configured');
+		const element = document.querySelector('#ldap_auth_enabled');
 
 		if (element !== null) {
 			return element.checked;
@@ -458,7 +458,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node = document.querySelector('#ldap_configured');
+		const target_node = document.querySelector('#ldap_auth_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
@@ -859,22 +859,22 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		let count = 0;
 
 		count += document
-			.querySelectorAll('#op-table tbody tr:not(:last-child)')
+			.querySelectorAll('#op-table tbody tr')
 			.length;
 
 		count += document
-			.querySelectorAll('#rec-table tbody tr:not(:last-child)')
+			.querySelectorAll('#rec-table tbody tr')
 			.length;
 
 		count += document
-			.querySelectorAll('#upd-table tbody tr:not(:last-child)')
+			.querySelectorAll('#upd-table tbody tr')
 			.length;
 
 		return count;
 	}
 
 	initObserver() {
-		const target_node_op = document.querySelector('#op-table tbody');
+		const target_node_op = document.querySelector('#operations-container');
 
 		if (target_node_op !== null) {
 			const observer_op = new MutationObserver(() => {
@@ -887,7 +887,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			});
 		}
 
-		const target_node_rec = document.querySelector('#rec-table tbody');
+		const target_node_rec = document.querySelector('#recovery-operations-container');
 
 		if (target_node_rec !== null) {
 			const observer_rec = new MutationObserver(() => {
@@ -900,7 +900,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			});
 		}
 
-		const target_node_upd = document.querySelector('#upd-table tbody');
+		const target_node_upd = document.querySelector('#update-operations-container');
 
 		if (target_node_upd !== null) {
 			const observer_upd = new MutationObserver(() => {

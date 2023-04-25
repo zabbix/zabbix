@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ $form = null;
 $script_inline = '';
 
 // Construct table header.
-$header_form = ($data['popup_type'] === 'help_items') ? (new CForm())->cleanItems() : new CDiv();
+$header_form = ($data['popup_type'] === 'help_items') ? (new CForm()): new CDiv();
 $header_form->setId('generic-popup-form');
 
 // Add host group multiselect control.
@@ -127,7 +127,6 @@ if ($controls) {
 // Create form.
 if ($data['form']) {
 	$form = (new CForm())
-		->cleanItems()
 		->setName($data['form']['name'])
 		->setId($data['form']['id']);
 }
@@ -196,36 +195,46 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$user['userid'].']', $user['userid'])
 				: null;
 
-			$username = (new CLink($user['username']))
-				->setId('spanid'.$user['userid'])
-				->setAttribute('data-reference', $options['reference'])
-				->setAttribute('data-userid', $user['userid'])
-				->setAttribute('data-parentid', $options['parentid'])
-				->onClick('
-					addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid ?? null);
-					popup_generic.closePopup(event);
-				');
+			if (array_key_exists('_disabled', $user)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
 
-			$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
+				$table->addRow([$check_box, $user['username'], $user['name'], $user['surname']]);
+			}
+			else {
+				$username = (new CLink($user['username']))
+					->setId('spanid'.$user['userid'])
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-userid', $user['userid'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
 
-			$entry = [];
-			$srcfld1 = $options['srcfld1'];
-			if ($srcfld1 === 'userid') {
-				$entry['id'] = $user['userid'];
-			}
-			elseif ($srcfld1 === 'username') {
-				$entry['name'] = $user['username'];
-			}
+				$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
 
-			$srcfld2 = $options['srcfld2'];
-			if ($srcfld2 === 'fullname') {
-				$entry['name'] = getUserFullname($user);
-			}
-			elseif (array_key_exists($srcfld2, $user)) {
-				$entry[$srcfld2] = $user[$srcfld2];
-			}
+				$entry = [];
+				$srcfld1 = $options['srcfld1'];
+				if ($srcfld1 === 'userid') {
+					$entry['id'] = $user['userid'];
+				}
+				elseif ($srcfld1 === 'username') {
+					$entry['name'] = $user['username'];
+				}
 
-			$user = $entry;
+				$srcfld2 = $options['srcfld2'];
+				if ($srcfld2 === 'fullname') {
+					$entry['name'] = getUserFullname($user);
+				}
+				elseif (array_key_exists($srcfld2, $user)) {
+					$entry[$srcfld2] = $user[$srcfld2];
+				}
+
+				$user = $entry;
+			}
 		}
 		unset($user);
 		break;
@@ -236,19 +245,29 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$item['usrgrpid'].']', $item['usrgrpid'])
 				: null;
 
-			$name = (new CLink($item['name']))
-				->setId('spanid'.$item['usrgrpid'])
-				->setAttribute('data-reference', $options['reference'])
-				->setAttribute('data-usrgrpid', $item['usrgrpid'])
-				->setAttribute('data-parentid', $options['parentid'])
-				->onClick('
-					addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid ?? null);
-					popup_generic.closePopup(event);
-				');
+			if (array_key_exists('_disabled', $item)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+
+				$name = $item['name'];
+			}
+			else {
+				$name = (new CLink($item['name']))
+					->setId('spanid'.$item['usrgrpid'])
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-usrgrpid', $item['usrgrpid'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
+
+				$item['id'] = $item['usrgrpid'];
+			}
 
 			$table->addRow([$check_box, $name]);
-
-			$item['id'] = $item['usrgrpid'];
 		}
 		unset($item);
 		break;
@@ -266,6 +285,14 @@ switch ($data['popup_type']) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.zbx_jsValue($trigger[$options['srcfld1']]).']', $trigger['triggerid'])
 				: null;
+
+			if (array_key_exists('_disabled', $trigger)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+				$description = new CLabel($trigger['description']);
+			}
 
 			if ($data['multiselect']) {
 				$description
@@ -659,6 +686,7 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'valuemaps':
+	case 'template_valuemaps':
 		foreach ($data['table_records'] as $valuemap) {
 			$name = [];
 			$check_box = $data['multiselect']
@@ -871,7 +899,8 @@ $types = [
 	'users',
 	'usrgrp',
 	'sla',
-	'valuemaps'
+	'valuemaps',
+	'template_valuemaps'
 ];
 
 if (array_key_exists('table_records', $data) && ($data['multiselect'] || in_array($data['popup_type'], $types))) {

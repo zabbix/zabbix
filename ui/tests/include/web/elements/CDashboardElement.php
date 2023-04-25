@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,8 +71,8 @@ class CDashboardElement extends CElement {
 	 * @return CWidgetElement|CNullElement
 	 */
 	public function getWidget($name, $should_exist = true) {
-		$query = $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
-				' contains(@class, "dashboard-grid-iterator-head")]/h4[text()='.
+		$query = $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
 				CXPathHelper::escapeQuotes($name).']/../../..');
 
 		if ($should_exist) {
@@ -191,8 +191,8 @@ class CDashboardElement extends CElement {
 	 */
 	public function deleteWidget($name) {
 		$this->checkIfEditable();
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()
 				->select('Delete')->waitUntilNotVisible();
 
@@ -207,8 +207,8 @@ class CDashboardElement extends CElement {
 	 * @return $this
 	 */
 	public function copyWidget($name) {
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Copy');
 
 		return $this;
@@ -238,8 +238,8 @@ class CDashboardElement extends CElement {
 	public function replaceWidget($name) {
 		$this->checkIfEditable();
 
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Paste');
 
 		return $this;
@@ -293,5 +293,22 @@ class CDashboardElement extends CElement {
 		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
 		$this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one()->click();
 		$this->query('xpath:'.$selection.'/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			foreach ($target->getWidgets() as $widget) {
+				if (!$widget->isReady()) {
+					return false;
+				}
+			}
+
+			return true;
+		};
 	}
 }

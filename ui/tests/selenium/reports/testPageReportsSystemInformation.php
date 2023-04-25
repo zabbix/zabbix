@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,10 @@ class testPageReportsSystemInformation extends testSystemInformation {
 
 	public function testPageReportsSystemInformation_checkDisabledHA() {
 		$this->page->login()->open('zabbix.php?action=report.status')->waitUntilReady();
-		$this->assertScreenshotExcept(null, $this->query('xpath://footer')->one(), 'report_without_ha');
+		$this->assertScreenshotExcept(null,
+				[$this->query('xpath://footer')->one(),
+				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()],
+				'report_without_ha');
 	}
 
 	/**

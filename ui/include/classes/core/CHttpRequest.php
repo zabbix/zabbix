@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,14 @@ class CHttpRequest {
 	/**
 	 * additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal
 	 */
-	public $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH'];
+	private $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH'];
+
+	private $body;
+	private $method;
+	private $protocol;
+	private $request_method;
+	private $headers;
+	private $raw;
 
 	/**
 	 * Retrieve HTTP Body
@@ -96,6 +103,22 @@ class CHttpRequest {
 	 */
 	public function headers() {
 		return $this->headers;
+	}
+
+	/**
+	 * Get authentication header bearer value, return null when no authentication header exists or
+	 * authentication method is not bearer type.
+	 *
+	 * @return string|null
+	 */
+	public function getAuthBearerValue() {
+		$auth = $this->header('AUTHORIZATION');
+
+		if (is_string($auth) && substr($auth, 0, 7) === 'Bearer ') {
+			return substr($auth, 7);
+		}
+
+		return null;
 	}
 
 	/**

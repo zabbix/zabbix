@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ class testHaNode extends CAPITest {
 						'status' => 111
 					]
 				],
-				'expected_error' => 'Invalid parameter "/filter/status/1": value must be one of 0, 1, 2, 3.'
+				'expected_error' => null
 			],
 			'Empty filter' => [
 				'request' => [
@@ -290,7 +290,7 @@ class testHaNode extends CAPITest {
 				],
 				'expected_result' => [
 					'ha_nodeid' => null,
-					'name' => 'node8',
+					'name' => 'z-node',
 					'address' => '192.168.1.12',
 					'port' => null,
 					'status' => null,
@@ -310,7 +310,6 @@ class testHaNode extends CAPITest {
 				],
 				'expected_result' => 3
 			]
-
 		];
 	}
 

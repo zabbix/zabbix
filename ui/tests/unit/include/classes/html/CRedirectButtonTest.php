@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,11 @@ class CRedirectButtonTest extends CTagTest {
 			[
 				['caption', 'http://google.com', 'Are you sure?'],
 				'<button type="button" data-url="http://google.com" data-confirmation="Are you sure?">caption</button>'
+			],
+			// CSRF token argument exists
+			[
+				['caption', (new CUrl('http://localhost'))->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, 'value')],
+				'<button type="button" data-post="1" data-url="http://localhost?_csrf_token=value">caption</button>'
 			],
 			// caption encoding
 			[

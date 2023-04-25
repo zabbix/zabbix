@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -212,10 +212,10 @@ class testScheduledReportPermissions extends CWebTest {
 						'access_userid' => 1
 					],
 					[
-						'userid' => 4
+						'userid' => 40
 					],
 					[
-						'userid' => 5,
+						'userid' => 50,
 						'access_userid' => self::$userids['super-admin report permissions']
 					],
 					[

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ type AgentOptions struct {
 	HostInterface            string   `conf:"optional"`
 	HostInterfaceItem        string   `conf:"optional"`
 	BufferSend               int      `conf:"optional,range=1:3600,default=5"`
-	BufferSize               int      `conf:"optional,range=2:65535,default=100"`
+	BufferSize               int      `conf:"optional,range=2:65535,default=1000"`
 	EnablePersistentBuffer   int      `conf:"optional,range=0:1,default=0"`
 	PersistentBufferPeriod   int      `conf:"optional,range=60:31536000,default=3600"`
 	PersistentBufferFile     string   `conf:"optional"`

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ class testEscalations extends CIntegrationTest {
 		$response = $this->call('action.create', [
 			'esc_period' => '1h',
 			'eventsource' => EVENT_SOURCE_TRIGGERS,
-			'status' => 0,
+			'status' => ACTION_STATUS_ENABLED,
 			'filter' => [
 				'conditions' => [
 					[
@@ -561,9 +561,10 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
+			'esc_period' => '1m',
 			'operations' => [
 				[
-					'esc_period' => '1m',
+					'esc_period' => 0,
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
 					'evaltype' => 0,
@@ -571,8 +572,8 @@ class testEscalations extends CIntegrationTest {
 					'opmessage' => [
 						'default_msg' => 0,
 						'mediatypeid' => 0,
-						'message' => 'Problem',
-						'subject' => 'Problem'
+						'message' => 'Cause problem 1',
+						'subject' => 'Cause problem 1'
 					],
 					'opmessage_grp' => [['usrgrpid' => 7]]
 				],
@@ -585,8 +586,8 @@ class testEscalations extends CIntegrationTest {
 					'opmessage' => [
 						'default_msg' => 0,
 						'mediatypeid' => 0,
-						'message' => 'Problem',
-						'subject' => 'Problem'
+						'message' => 'Cause problem 2',
+						'subject' => 'Cause problem 2'
 					],
 					'opmessage_grp' => [['usrgrpid' => 7]]
 				]
@@ -596,25 +597,179 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
 
+		// create items, triggers, actions for testing symptom events
+		$pause_symptoms = [
+			1 => ACTION_PAUSE_SYMPTOMS_TRUE,
+			2 => ACTION_PAUSE_SYMPTOMS_FALSE
+		];
+		$trapper_keys = [];
+		$symptom_triggerids = [];
+		$symptom_actionids = [];
+
+		foreach ([1, 2] as $i) {
+			// Create trapper item
+			$name = $key = self::TRAPPER_ITEM_NAME."_s".(string)$i;
+			$trapper_keys[$i] = $key;
+			$response = $this->call('item.create', [
+				'hostid' => self::$hostid,
+				'name' => $name,
+				'key_' => $key,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			]);
+			$this->assertArrayHasKey('itemids', $response['result']);
+			$this->assertCount(1, $response['result']['itemids']);
+
+			// Create trigger
+			$response = $this->call('trigger.create', [
+				'description' => 'Mandatory description',
+				'expression' => 'last(/'.self::HOST_NAME.'/'.$key.')>0'
+			]);
+			$this->assertArrayHasKey('triggerids', $response['result']);
+			$this->assertCount(1, $response['result']['triggerids']);
+			$symptom_triggerids[$i] = $response['result']['triggerids'][0];
+
+			// Create action
+			$response = $this->call('action.create', [
+				'esc_period' => '1m',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'status' => ACTION_STATUS_ENABLED,
+				'pause_symptoms' => $pause_symptoms[$i],
+				'filter' => [
+					'conditions' => [
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => $symptom_triggerids[$i]
+						]
+					],
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR
+				],
+				'name' => 'Symptom action '.(string)$i,
+				'operations' => [
+					[
+						'esc_period' => 0,
+						'esc_step_from' => 1,
+						'esc_step_to' => 1,
+						'evaltype' => 0,
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => [
+							'default_msg' => 0,
+							'mediatypeid' => 0,
+							'message' => 'Symptom problem 1',
+							'subject' => 'Symptom problem 1'
+						],
+						'opmessage_grp' => [['usrgrpid' => 7]]
+					],
+					[
+						'esc_period' => 0,
+						'esc_step_from' => 2,
+						'esc_step_to' => 2,
+						'evaltype' => 0,
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => [
+							'default_msg' => 0,
+							'mediatypeid' => 0,
+							'message' => 'Symptom problem 2',
+							'subject' => 'Symptom problem 2'
+						],
+						'opmessage_grp' => [['usrgrpid' => 7]]
+					]
+				]
+			]);
+
+			$this->assertArrayHasKey('actionids', $response['result']);
+			$this->assertCount(1, $response['result']['actionids']);
+			$symptom_actionids[$i] = $response['result']['actionids'][0];
+		}
+
 		$this->reloadConfigurationCache();
 
+		// start all events as causes, because only existing events can be ranked as symptoms
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 7);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
+		$this->sendSenderValue(self::HOST_NAME, $trapper_keys[1], 7);
+		$this->sendSenderValue(self::HOST_NAME, $trapper_keys[2], 7);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
+		$response = $this->callUntilDataIsPresent('problem.get', [
+			'output' => ['eventid'],
+			'objectids' => [self::$triggerid, $symptom_triggerids[1], $symptom_triggerids[2]]
+		]);
 
+		$this->assertCount(3, $response['result']);
+		$this->assertArrayHasKey('eventid', $response['result'][0]);
+		$this->assertArrayHasKey('eventid', $response['result'][1]);
+		$this->assertArrayHasKey('eventid', $response['result'][2]);
+
+		$cause_eventid = $response['result'][0]['eventid'];
+
+		// these events are causes at this point and will be ranked as symptoms later
+		$symptom_eventids[1] = $response['result'][1]['eventid'];
+		$symptom_eventids[2] = $response['result'][2]['eventid'];
+
+		// wait until escalation step 1 is completed for all three events
+		for ($i = 0; $i < 3; $i++) {
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
+		}
+
+		// rank 2 events as symptom events
+		$response = $this->call('event.acknowledge', [
+			'eventids' => $symptom_eventids,
+			'action' => ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
+			'cause_eventid' => $cause_eventid
+		]);
+
+		$this->assertArrayHasKey('result', $response);
+		$this->assertArrayHasKey('eventids', $response['result']);
+		$this->assertCount(2, $response['result']['eventids']);
+
+		// Escalations are expected for 2 events:
+		//    1. the cause event;
+		//    2. one symptom event with ACTION_PAUSE_SYMPTOMS_FALSE.
+		for ($i = 0; $i < 2; $i++) {
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
+		}
+
+		// check alerts for the cause event
 		$response = $this->callUntilDataIsPresent('alert.get', [
 				'output' => 'extend',
 				'actionids' => [self::$trigger_actionid],
 				'sortfield' => 'alertid'
 		], 5, 2);
+
+		// 2 escalations are expected
 		$this->assertCount(2, $response['result']);
 		$this->assertEquals(1, $response['result'][0]['esc_step']);
 		$this->assertEquals(2, $response['result'][1]['esc_step']);
 
+		// check alerts for the symptom event with ACTION_PAUSE_SYMPTOMS_TRUE
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'output' => 'extend',
+			'actionids' => $symptom_actionids[1],
+			'sortfield' => 'alertid'
+		], 5, 2);
+
+		// 1 escalation is expected
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals(1, $response['result'][0]['esc_step']);
+
+		// check alerts for the symptom event with ACTION_PAUSE_SYMPTOMS_FALSE
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'output' => 'extend',
+			'actionids' => $symptom_actionids[2],
+			'sortfield' => 'alertid'
+		], 5, 2);
+
+		// 2 escalations are expected
+		$this->assertCount(2, $response['result']);
+		$this->assertEquals(1, $response['result'][0]['esc_step']);
+		$this->assertEquals(2, $response['result'][1]['esc_step']);
+
+		// stop events
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+		$this->sendSenderValue(self::HOST_NAME, $trapper_keys[1], 0);
+		$this->sendSenderValue(self::HOST_NAME, $trapper_keys[2], 0);
 	}
 
 	/**

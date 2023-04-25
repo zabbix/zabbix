@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ else {
 
 $output = [
 	'header' => $title,
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATE_GROUPS_EDIT),
 	'body' => (new CPartial('configuration.templategroup.edit.html', $data))->getOutput(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

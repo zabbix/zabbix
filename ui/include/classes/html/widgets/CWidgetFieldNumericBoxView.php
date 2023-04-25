@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,15 +44,15 @@ class CWidgetFieldNumericBoxView extends CWidgetFieldView {
 	}
 
 	public function getView(): CTextBox {
-		$textbox = (new CTextBox($this->field->getName(), $this->field->getValue()))
+		$view = (new CTextBox($this->field->getName(), $this->field->getValue(), false, $this->field->getMaxLength()))
 			->setWidth($this->width)
 			->setAriaRequired($this->isRequired())
 			->setEnabled(!$this->isDisabled());
 
 		if ($this->placeholder !== '') {
-			$textbox = $textbox->setAttribute('placeholder', $this->placeholder);
+			$view->setAttribute('placeholder', $this->placeholder);
 		}
 
-		return $textbox;
+		return $view;
 	}
 }

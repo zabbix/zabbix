@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			return false;
 		}
 
-		if ($this->hasInput('clone_hostid') && $this->hasInput('full_clone')) {
+		if ($this->hasInput('clone_hostid') && $this->hasInput('clone')) {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'hostids' => $this->getInput('clone_hostid')
@@ -99,7 +99,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
 
-			$full_clone = $this->hasInput('full_clone');
+			$clone = $this->hasInput('clone');
 			$src_hostid = $this->getInput('clone_hostid', '');
 
 			if ($src_hostid) {
@@ -110,7 +110,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			if ($result === false
 					|| !$this->createValueMaps($result['hostids'][0])
-					|| ($full_clone && !$this->copyFromCloneSourceHost($src_hostid, $result['hostids'][0]))) {
+					|| ($clone && !$this->copyFromCloneSourceHost($src_hostid, $result['hostids'][0]))) {
 				throw new Exception();
 			}
 

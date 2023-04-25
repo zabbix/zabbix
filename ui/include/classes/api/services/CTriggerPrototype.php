@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
+
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';

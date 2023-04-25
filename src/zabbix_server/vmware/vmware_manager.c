@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ extern int				CONFIG_VMWARE_PERF_FREQUENCY;
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 
-extern unsigned char			program_type;
 extern zbx_vmware_t			*vmware;
 
 /******************************************************************************
@@ -195,7 +194,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -211,7 +210,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		zbx_vmware_job_t	*job;
 
 		time_now = zbx_time();
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
