@@ -17,21 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_LLD_H
-#define ZABBIX_LLD_H
+#ifndef ZABBIX_LLD_AUDIT_H
+#define ZABBIX_LLD_AUDIT_H
 
-#include "zbxalgo.h"
-#include "zbxtime.h"
+#include "lld.h"
 
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts, unsigned char meta,
-		zbx_uint64_t lastlogsize, int mtime, const char *error);
+void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
+		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid);
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts, char *error);
-
-int	zbx_lld_get_queue_size(zbx_uint64_t *size, char **error);
-
-int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, char **error);
-
-int	zbx_lld_get_top_items(int limit, zbx_vector_uint64_pair_t *items, char **error);
-
-#endif	/* ZABBIX_LLD_H */
+#endif
