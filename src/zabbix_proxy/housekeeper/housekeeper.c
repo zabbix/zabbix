@@ -30,8 +30,6 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
-static int	hk_period;
-
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS	4
 
@@ -48,8 +46,10 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		minclock, records = 0, minclock_unsent;
+	int		records = 0;
 	zbx_uint64_t	lastid, maxid;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);
 
@@ -68,17 +68,6 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 	ZBX_STR2UINT64(lastid, row[0]);
 	DBfree_result(result);
 
-	minclock_unsent = now - CONFIG_PROXY_OFFLINE_BUFFER * SEC_PER_HOUR;
-	/* skip erroneous clock that can be much older than offline buffer (assume that it is very old) */
-	result = DBselect("select min(clock) from %s where clock>=%d",
-			table, minclock_unsent);
-
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-		minclock = now;
-	else
-		minclock = atoi(row[0]);
-	DBfree_result(result);
-
 	result = DBselect("select max(id) from %s",
 			table);
 
@@ -88,16 +77,22 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 	ZBX_STR2UINT64(maxid, row[0]);
 	DBfree_result(result);
 
+	if (0 != CONFIG_PROXY_LOCAL_BUFFER)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock<%d",
+				now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR);
+	}
+
 	records = DBexecute(
 			"delete from %s"
 			" where id<" ZBX_FS_UI64
 				" and (clock<%d"
-					" or (id<=" ZBX_FS_UI64 " and clock<%d))",
+					" or (id<=" ZBX_FS_UI64 "%s))",
 			table, maxid,
-			minclock_unsent,
+			now - CONFIG_PROXY_OFFLINE_BUFFER * SEC_PER_HOUR,
 			lastid,
-			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR,
-					minclock + HK_MAX_DELETE_PERIODS * hk_period));
+			ZBX_NULL2EMPTY_STR(sql));
+	zbx_free(sql);
 
 	DBcommit();
 
@@ -133,20 +128,10 @@ static int	housekeeping_history(int now)
         return records;
 }
 
-static int	get_housekeeper_period(double time_slept)
-{
-	if (SEC_PER_HOUR > time_slept)
-		return SEC_PER_HOUR;
-	else if (24 * SEC_PER_HOUR < time_slept)
-		return 24 * SEC_PER_HOUR;
-	else
-		return (int)time_slept;
-}
-
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int			records, start, sleeptime;
-	double			sec, time_slept, time_now;
+	double			sec, time_now;
 	char			sleeptext[25];
 	zbx_ipc_async_socket_t	rtc;
 
@@ -215,10 +200,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 
 		time_now = zbx_time();
-		time_slept = time_now - sec;
 		zbx_update_env(get_process_type_string(process_type), time_now);
-
-		hk_period = get_housekeeper_period(time_slept);
 
 		start = time(NULL);
 
