@@ -134,10 +134,21 @@ A......... [ZBX-21238] fixed inability to update status and other fields of disc
 A......... [ZBX-19202] fixed template dashboard availability to users without permissions to the templates (averza)
 
 --------------------------------------------------------------------------------
+Changes for 6.4.2
+
+6.4.2rc2 was released as 6.4.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.4.2rc2
 
 New features:
 .........T [ZBXNEXT-8334] added Event-Driven Ansible media (akotsegubov)
+
+Bug fixes:
+.......PS. [ZBX-22718] fixed memory leak in json objects and identical keys (wiper)
+.......PS. [ZBX-22719] fixed replace() function in expressions (wiper)
+..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
+..F.....S. [ZBX-22727] fixed crash in expression parser (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.2rc1
@@ -3792,7 +3803,7 @@ Bug fixes:
 ...G...... [ZBX-22373] allowed mixing session and key parameter for Zabbix agent 2 items (esneiders)
 ..F....... [ZBX-22241] fixed map link color and drawing style selection when multiple triggers are in problem state (miks)
 ..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
-..F....... [ZBX-21013] hid option "Groups" for unprivileged users in the Import form (Sasha)
+..F....... [ZBX-21013] hide option "Groups" for unprivileged users in the Import form (Sasha)
 ...G...... [ZBX-22219] added validation to the "Server" IP/DNS option in configuration of Zabbix agent 2 (kprutkovs)
 ..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
 ..F....... [ZBX-18527] fixed markup for Type of calculation expression field (dpetra)

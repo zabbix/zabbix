@@ -20,6 +20,7 @@
 #include "zbxalgo.h"
 #include "audit.h"
 #include "audit/zbxaudit_proxy.h"
+#include "audit/zbxaudit.h"
 
 void	zbx_audit_proxy_config_reload(zbx_uint64_t proxy_hostid, const char *name)
 {
