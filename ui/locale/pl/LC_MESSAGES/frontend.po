@@ -1180,9 +1180,17 @@ msgstr "Dopuszczalne metody"
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternatywnie, można zainstalować to ręcznie:"
 
+#: include/classes/data/CItemData.php:1462
+msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1449
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Ilość fizycznej pamięci, która jest zamieniona na przestrzeń pliku wymiany, <url> - URL usługi VMware, <uuid> - nazwa hosta wirtualnej maszyny VMware"
+
+#: include/classes/data/CItemData.php:1482
+msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1469
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -1442,6 +1450,10 @@ msgstr "Atrybucja"
 msgid "Attribution HTML"
 msgstr "Atrybucja HTML"
 
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -1614,9 +1626,17 @@ msgstr "Dostępny"
 msgid "Average"
 msgstr "Średni"
 
+#: include/classes/data/CItemData.php:1542
+msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1529
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Średnia liczba pozostających zapytań odczytu do dysku wirtualnego podczas okresowych danych ,  <url> - URL usługi VMware, <uuid> - nazwa hosta wirtualnej maszyny VMware, <instance> - instancja urządzenia dyskowego"
+
+#: include/classes/data/CItemData.php:1562
+msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1549
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -1812,13 +1832,29 @@ msgstr "Informacje o CPU. Zwraca ciąg znaków lub liczbę"
 msgid "CPU load. Returns float"
 msgstr "Obciążenie CPU. Zwraca liczbę zmiennoprzecinkową"
 
+#: include/classes/data/CItemData.php:1442
+msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1429
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr "Czas oczekiwania CPU na podmianę, <url> - URL usługi VMware, <uuid> - nazwa hosta wirtualnej maszyny VMware, <instance> - instancja CPU"
 
+#: include/classes/data/CItemData.php:1294
+msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1281
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Procentowe zużycie CPU podczas okresu czasu zależnego od zarządzania zasilaniem lub HT, <url> - URL usługi VMware, <uuid> - nazwa hosta hypervisora VMware"
+
+#: include/classes/data/CItemData.php:1286
+msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1446
+msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1273
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -5869,33 +5905,65 @@ msgstr "Lista reguł wykrywania"
 msgid "Discovery object"
 msgstr "Obiekt wykrywania"
 
+#: include/classes/data/CItemData.php:1242
+msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1229
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr "Wykrywanie klastrów VMWare, <url> - URL usługi VMware. Zwraca JSON"
+
+#: include/classes/data/CItemData.php:1250
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1237
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr "Wykrywanie magazynu danych VMWare, <url> - URL usługi VMware. Zwraca JSON"
 
+#: include/classes/data/CItemData.php:1302
+msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1289
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Wykrywanie magazynu danych hypervisora VMWare, <url> - URL usługi VMware, <uuid> - nazwa hosta hypervisora VMware. Zwraca JSON"
+
+#: include/classes/data/CItemData.php:1326
+msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1313
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr "Wykrywanie hypervisorów VMWare, <url> - URL usługi VMware. Zwraca JSON"
 
+#: include/classes/data/CItemData.php:1570
+msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1557
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Wykrywanie urządzeń dyskowych maszyn wirtualnych VMWare, <url> - URL usługi VMware, <uuid> - nazwa hosta hypervisora VMware. Zwraca JSON"
+
+#: include/classes/data/CItemData.php:1582
+msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1569
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Wykrywanie systemów plików maszyn wirtualnych VMWare, <url> - URL usługi VMware, <uuid> - nazwa hosta hypervisora VMware. Zwraca JSON"
 
+#: include/classes/data/CItemData.php:1514
+msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1501
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Wykrywanie interfejsów sieciowych maszyn wirtualnych w Vmware. <url> - adres URL usługi WMware, <uuid> - nazwa hosta maszyny wirtualnej. Zwraca JSON"
+
+#: include/classes/data/CItemData.php:1458
+msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1445
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
@@ -8279,6 +8347,16 @@ msgstr "Prototyp hosta z nazwą hosta \"%1$s\" już istnieje w regule wykrywania
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Istnieje już prototyp hosta z nazwą hosta \"%1$s\" w regule wykrywania \"%2$s\"."
+
+#: include/classes/api/services/CHostPrototype.php:1111
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1108
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
@@ -10734,6 +10812,10 @@ msgstr "Makro LLD"
 msgid "LLD macros"
 msgstr "Makra LLD"
 
+#: include/classes/api/services/CItemGeneral.php:709
+msgid "LLD rule with the same UUID already exists"
+msgstr ""
+
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:57
 #: app/views/popup.lldoverride.php:101 include/maps.inc.php:45
@@ -12333,6 +12415,10 @@ msgstr "Przekroczono czas odpowiedzi dla testu raportu okresowego"
 msgid "Network timeout for script execution"
 msgstr "Upłynął limit czasu w sieci dla wykonywanego skryptu"
 
+#: include/classes/data/CItemData.php:1526
+msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1513
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr "Użycie sieci (łącznie dla wysyłania i odbierania) podczas odstępu, <url> - URL usługi VMware, <uuid> - nazwa hosta wirutalnej maszyny VMware, <instance> - instancja interfejsu sieciowego"
@@ -13077,6 +13163,10 @@ msgstr "Listopad"
 msgid "Number of CPUs. Returns integer"
 msgstr "Liczba CPU. Zwraca liczbę całkowitą"
 
+#: include/classes/data/CItemData.php:1310
+msgid "Number of available DS paths, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - Datastore name, \"partitionid\" - internal id of physical device from vmware.hv.datastore.discovery"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1297
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr "Liczba dostęony ścieżek DS, <url> - URL usługi VMware, <uuid> - nazwa hosta hypervisora VMware, <datastore> - nazwa magazynu danych, <partitionid> - wewnętrzne id fizyczengo urządzenia z vmware.hv.datastore.discovery"
@@ -13134,13 +13224,25 @@ msgstr "Liczba problemów"
 msgid "Number of problems and expand most critical one"
 msgstr "Liczba problemów i powiększone o najbardziej krytyczne"
 
+#: include/classes/data/CItemData.php:1342
+msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1329
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Liczba rdzeni procesora dla hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
+#: include/classes/data/CItemData.php:1346
+msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1333
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Liczba wątków procesora hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1430
+msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1417
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -13218,6 +13320,10 @@ msgstr "Liczba wartości zapisanych w tabeli TRENDS."
 #: include/classes/data/CItemData.php:1713
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Liczba wartości zapisanych w tabeli TRENDS_UINT."
+
+#: include/classes/data/CItemData.php:1414
+msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1401
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -14109,6 +14215,10 @@ msgstr "Zatrzymaj operacje dla wstrzymanych problemów"
 msgid "Peak memory usage: %1$s"
 msgstr "Szczytowe zużycie pamięci: %1$s"
 
+#: include/classes/data/CItemData.php:1426
+msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1413
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Procent czasu wystartowania maszyny wirtualnej ponieważ rywalizuje o dostęp do fizycznych CPU, <url> - URL usługi VMware, <uuid> - nazwa hosta wirtualnej maszyny Vmware"
@@ -14117,9 +14227,17 @@ msgstr "Procent czasu wystartowania maszyny wirtualnej ponieważ rywalizuje o do
 msgid "Percentage"
 msgstr "Procent"
 
+#: include/classes/data/CItemData.php:1510
+msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1497
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Procent zużytej pamięci fizycznej, <url> - URL usługi Vmware, <uuid> - nazwa maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1434
+msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1421
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
@@ -14311,6 +14429,10 @@ msgstr "Typ metody post"
 #: app/views/administration.housekeeping.edit.php:164
 msgid "PostgreSQL database server version is too old."
 msgstr "Wersja serwera bazy danych PostgreSQL jest za stara."
+
+#: include/classes/data/CItemData.php:1390
+msgid "Power usage , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"max\" - Maximum allowed power usage"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -17695,9 +17817,17 @@ msgstr "Szablon URL używany do ładowania i wyświetlania warstwy kafelków w m
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr "Wersja bazy danych Zabbix nie spełnia aktualnych wymagań. Twoja wersja bazy danych: %1$s. Wymagana wersja: %2$s. Proszę skontaktować się z administratorem Twojego systemu."
 
+#: include/classes/data/CItemData.php:1546
+msgid "The average time a read from the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1533
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Średni czas odczytu z dysku wirtualnego, <url> - URL usługi VMware, <uuid> - nazwa maszyny wirtualnej w VMware, <instance> - instancja urządzenia dysku"
+
+#: include/classes/data/CItemData.php:1550
+msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1537
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -18073,6 +18203,10 @@ msgstr "Całkowity czas Elasticsearch: %1$s"
 #, c-format
 msgid "Total SQL time: %1$s"
 msgstr "Czas SQL ogółem: %1$s"
+
+#: include/classes/data/CItemData.php:1466
+msgid "Total time elapsed, in seconds, since last operating system boot-up, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1453
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19467,9 +19601,17 @@ msgstr "Użytkownicy"
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Statystyki cache'a VMware. Poprawne tryby to: total, free, pfree, used i pused."
 
+#: include/classes/data/CItemData.php:1238
+msgid "VMware cluster performance counter, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1225
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Licznik wydajności klastra VMware, <url> - URL usługi VMware, <id> - identyfikator klastra VMware, <path> - ścieżka licznika wydajności, <instance> - instancja licznika wydajności"
+
+#: include/classes/data/CItemData.php:1246
+msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1233
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -19484,217 +19626,433 @@ msgstr "Centra danych VMware i ich ID. Zwraca JSON."
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Statystyki pojemności magazynu danych VMware w bajtach lub procentach ogółem. Zwraca liczbę całkowitą dla bajtów; liczbę zmiennoprzecinkową dla procentów"
 
+#: include/classes/data/CItemData.php:1254
+msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1241
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Lista hipernadzorców magazynu danych VMware, <url> - URL usługi VMware, <datastore> - nazwa magazynu danych"
+
+#: include/classes/data/CItemData.php:1258
+msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - \"latency\"/\"maxlatency\" - average or maximum"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1245
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Statysyki odczytu magazynu danych VMware, <url> - URL usługi VMware, <datastore> - nazwa magazynu danych, <mode> - opóźnienie/maksymalne opóźnienie - średnia albo maksimum"
 
+#: include/classes/data/CItemData.php:1266
+msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - \"latency\"/\"maxlatency\" - average or maximum"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1253
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Statysyki zapisu magazynu danych VMware, <url> - URL usługi VMware, <datastore> - nazwa magazynu danych, <mode> - opóźnienie/maksymalne opóźnienie - średnia albo maksimum"
+
+#: include/classes/data/CItemData.php:1274
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - \"all\" (default), \"skip\" - skip processing of older data"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1261
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "Log zdarzeń VMware, <url> - URL usługi VMware, <mode> - wszystko (domyślnie), pominięcie - pomiń przetwarzanie starszych danych"
 
+#: include/classes/data/CItemData.php:1358
+msgid "VMware hypervisor BIOS UUID, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1345
 msgid "VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "UUID BIOSu hiperwizora VMware, <url> - URL usługi VMware, <uuid> - nazwa hiperwizora VMware"
+
+#: include/classes/data/CItemData.php:1398
+msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1385
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Stan czujników sprzętowych hipernadzorcy Vmware, <url> - adres usługi Vmware, <uuid> - Nazwa hosta hipernadzorcy VMware. Zwraca JSON"
 
+#: include/classes/data/CItemData.php:1370
+msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1357
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Rozmiar pamięci balonowej hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1282
+msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1269
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nazwa klastra hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
+#: include/classes/data/CItemData.php:1298
+msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1285
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr "Nazwa centrum danych hipernadzorcy, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware. Zwraca łańcuch danych"
+
+#: include/classes/data/CItemData.php:1314
+msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1301
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Statystyki odczytu magazynu danych hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware, <datastore> - nazwa magazynu danych, <mode> - opóźnienie"
 
+#: include/classes/data/CItemData.php:1322
+msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1309
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Statystyki zapisu magazynu danych hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware, <datastore> - nazwa magazynu danych, <mode> - opóźnienie"
+
+#: include/classes/data/CItemData.php:1306
+msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1293
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Lista magazynów danych hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
+#: include/classes/data/CItemData.php:1394
+msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1381
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Stan czujnika hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware. Zwraca 0 - szary; 1 - zielony; 2 - żółty; 3 - czerwony"
+
+#: include/classes/data/CItemData.php:1354
+msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1341
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Model hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
+#: include/classes/data/CItemData.php:1330
+msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1317
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nazwa hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1378
+msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - \"bps\""
+msgstr ""
 
 #: include/classes/data/CItemData.php:1365
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Statystyki wejścia sieci hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware, <mode> - bps"
 
+#: include/classes/data/CItemData.php:1382
+msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - \"bps\""
+msgstr ""
+
 #: include/classes/data/CItemData.php:1369
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Statystyki wyjścia sieci hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware, <mode> - bps"
+
+#: include/classes/data/CItemData.php:1386
+msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1373
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Licznik wydajności hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware, <path> - ścieżka licznika wydajności, <instance> - instancja licznika wydajności"
 
+#: include/classes/data/CItemData.php:1334
+msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1321
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Częstotliwość procesora hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1338
+msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1325
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Model procesora hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
+#: include/classes/data/CItemData.php:1290
+msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1277
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Użycie procesora hipernadzorcy VMware w Hz, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1402
+msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1389
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Stan hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
+#: include/classes/data/CItemData.php:1350
+msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1337
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Rozmiar ogółem pamięci hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1406
+msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1393
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Czas działania hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
+#: include/classes/data/CItemData.php:1374
+msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1361
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Rozmiar używanej pamięci hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1362
+msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1349
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Nazwa dostawcy hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
+#: include/classes/data/CItemData.php:1410
+msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1397
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Wersja hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
+
+#: include/classes/data/CItemData.php:1278
+msgid "VMware service full name, \"url\" - VMware service URL"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1265
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Pełna nazwa serwisu VMware, <url> - URL serwisu VMware"
 
+#: include/classes/data/CItemData.php:1418
+msgid "VMware service version, \"url\" - VMware service URL"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1405
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Wersja serwisu VMware, <url> - URL serwisu VMware"
+
+#: include/classes/data/CItemData.php:1474
+msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1461
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci balonowej maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1538
+msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1525
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Używana przestrzeń danych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1478
+msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1465
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar skompresowanej pamięci maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1454
+msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns string"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1441
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr "Nazwa centrum danych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware. Zwraca łańcuch danych"
+
+#: include/classes/data/CItemData.php:1574
+msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1561
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Statystyki odczytu urządzeń dyskowych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <instance> - instancja urządzenia dyskowego, <mode> - bps/ops - bajty/operacje na sekundę"
 
+#: include/classes/data/CItemData.php:1578
+msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1565
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Statystyki zapisu urządzeń dyskowych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <instance> - instancja urządzenia dyskowego, <mode> - bps/ops - bajty/operacje na sekundę"
+
+#: include/classes/data/CItemData.php:1586
+msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\" - total/free/used/pfree/pused"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1573
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Statystyki systemu plików maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <fsname> - nazwa systemu plików, <mode> - total/free/used/pfree/pused"
 
+#: include/classes/data/CItemData.php:1498
+msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1485
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Użycie pamięci gościa maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1502
+msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1489
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Użycie pamięci hosta maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1470
+msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1457
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nazwa hipernadzorcy maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1422
+msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1409
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nazwa maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1518
+msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1505
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Statystyki wejścia interfejsu sieciowego maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <instance> - instancja interfejsu sieciowego, <mode> - bps/pps - bajty/pakiety na sekundę"
+
+#: include/classes/data/CItemData.php:1522
+msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1509
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Statystyki wyjścia interfejsu sieciowego maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <instance> - instancja interfejsu sieciowego, <mode> - bps/pps - bajty/pakiety na sekundę"
 
+#: include/classes/data/CItemData.php:1530
+msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1517
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Licznik wydajności maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <path> - ścieżka licznika wydajności, <instance> - instancja licznika wydajności"
+
+#: include/classes/data/CItemData.php:1534
+msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1521
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Stan zasilania maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1486
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1473
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci prywatnej maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1438
+msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1425
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Czas gotowości procesora maszyny wirtualnej VMware w ms, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1450
+msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1437
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Użycie procesora maszyny wirtualnej VMware w Hz, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1490
+msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1477
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci współdzielonej maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1494
+msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1481
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci swapowanej maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1506
+msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1493
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Rozmiar pamięci ogółem maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1554
+msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1541
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Nieużywana przestrzeń danych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1558
+msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1545
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Niewspółdzielona przestrzeń danych maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:1566
+msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1553
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Czas działania maszyny wirtualnej VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware"
+
+#: include/classes/data/CItemData.php:1366
+msgid "VVMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1353
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
@@ -21434,6 +21792,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globalne ustawienia porządkowania"
 
+#: include/classes/api/services/CGraphGeneral.php:836
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:830
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
 msgid "h"
@@ -21454,11 +21820,19 @@ msgstr "host"
 msgid "host group"
 msgstr "grupa hostów"
 
+#: include/classes/api/services/CHostGroup.php:819
+msgid "host group with the same UUID already exists"
+msgstr ""
+
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
 msgid "host pattern"
 msgstr "wzór hosta"
+
+#: include/classes/api/services/CHostPrototype.php:1174
+msgid "host prototype with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -21673,6 +22047,14 @@ msgstr "pozycja \"%1$s\" będąca na hoście \"%2$s\" nie jest monitorowana"
 msgid "item pattern"
 msgstr "wzór elementu"
 
+#: include/classes/api/services/CItemGeneral.php:715
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:703
+msgid "item with the same UUID already exists"
+msgstr ""
+
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "klucz jest pusty"
@@ -21824,6 +22206,11 @@ msgstr "max() - Maksymalna wartość dla okresu T"
 msgid "maximum dependent items count reached"
 msgstr "osiągnięto maksymlany stopień zależnego elementu"
 
+#: include/classes/validators/CApiInputValidator.php:1556
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -21957,6 +22344,11 @@ msgstr "nowy"
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
 msgstr "brak danych"
+
+#: include/classes/api/services/CHostPrototype.php:1344
+#, c-format
+msgid "no default interface for \"%1$s\" type"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
@@ -22251,6 +22643,10 @@ msgstr "wybrane"
 msgid "service"
 msgstr "usługa"
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr "krótki opis"
@@ -22374,6 +22770,14 @@ msgstr "tan() - Tangens z wartości"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "szablon o ID \"%1$s\" został przekazany %2$s razy"
 
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:449
+msgid "template with the same UUID already exists"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
 msgstr "brakuje ostatniego znaku końca linii"
@@ -22492,9 +22896,17 @@ msgstr "wyrażenie wyzwalacza musi zawierać przynajmniej jedną referencję /ho
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "prototyp wyzwalacza nie może zostać przeniesiony do innego szablonu lub hosta"
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1889
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "wyzwalacz z odsyłaczami nie może być przesuwany do innego szablonu lub hosta"
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -22719,6 +23131,10 @@ msgstr "watość %1$s już istnieje"
 msgid "value is too long"
 msgstr "wartość jest za długa"
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -22823,6 +23239,10 @@ msgstr "przez"
 msgctxt "week short"
 msgid "w"
 msgstr "w"
+
+#: include/classes/api/services/CHttpTest.php:438
+msgid "web scenario with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
