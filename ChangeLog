@@ -3656,7 +3656,7 @@ Bug fixes:
 ...G...... [ZBX-22373] allowed mixing session and key parameter for Zabbix agent 2 items (esneiders)
 ..F....... [ZBX-22241] fixed map link color and drawing style selection when multiple triggers are in problem state (miks)
 ..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
-..F....... [ZBX-21013] hid option "Groups" for unprivileged users in the Import form (Sasha)
+..F....... [ZBX-21013] hide option "Groups" for unprivileged users in the Import form (Sasha)
 ...G...... [ZBX-22219] added validation to the "Server" IP/DNS option in configuration of Zabbix agent 2 (kprutkovs)
 ..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
 ..F....... [ZBX-18527] fixed markup for Type of calculation expression field (dpetra)
