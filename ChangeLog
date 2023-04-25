@@ -1,7 +1,18 @@
+Changes for 6.4.2
+
+6.4.2rc2 was released as 6.4.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.4.2rc2
 
 New features:
 .........T [ZBXNEXT-8334] added Event-Driven Ansible media (akotsegubov)
+
+Bug fixes:
+.......PS. [ZBX-22718] fixed memory leak in json objects and identical keys (wiper)
+.......PS. [ZBX-22719] fixed replace() function in expressions (wiper)
+..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
+..F.....S. [ZBX-22727] fixed crash in expression parser (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.2rc1
