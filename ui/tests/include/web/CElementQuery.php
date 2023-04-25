@@ -158,7 +158,7 @@ class CElementQuery implements IWaitable {
 		if ($locator === null) {
 			if (!is_array($type)) {
 				$parts = explode(':', $type, 2);
-				if ($type !== 'button' && $type !== 'link') {
+				if ($type !== 'button') {
 					$parts = explode(':', $type, 2);
 					if (count($parts) !== 2) {
 						throw new Exception('Element selector "'.$type.'" is not well formatted.');
@@ -186,23 +186,17 @@ class CElementQuery implements IWaitable {
 			$locator = implode('|', $selectors);
 		}
 
-		$text_function = function ($tag) use ($locator) {
-			if ($locator === null) {
-				return WebDriverBy::tagName($tag);
-			}
-
-			return WebDriverBy::xpath('.//'.$tag.'[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
-		};
-
 		$mapping = [
 			'css' => 'cssSelector',
 			'class' => 'className',
 			'tag' => 'tagName',
-			'link' => function () use ($text_function) {
-				return $text_function('a');
-			},
-			'button' => function () use ($text_function) {
-				return $text_function('button');
+			'link' => 'linkText',
+			'button' => function () use ($locator) {
+				if ($locator === null) {
+					return WebDriverBy::tagName('button');
+				}
+
+				return WebDriverBy::xpath('.//button[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
 			}
 		];
 
