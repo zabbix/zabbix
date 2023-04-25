@@ -73,10 +73,11 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))
 			->setAsteriskMark(),
-		new CFormField(
+		(new CFormField(
 			(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired())
+				->setAriaRequired()
+		))->addStyle('width: '.ZBX_SCRIPT_POPUP_DIV_WIDTH.'px')
 	])
 	->addItem(([
 		new CLabel(_('Scope'), 'scope'),

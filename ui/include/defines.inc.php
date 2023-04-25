@@ -1649,6 +1649,7 @@ define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 // Script modal form label width.
 define('ZBX_SCRIPT_POPUP_LABEL_WIDTH',			150);
+define('ZBX_SCRIPT_POPUP_DIV_WIDTH',			575);
 
 define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 

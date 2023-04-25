@@ -52,7 +52,7 @@
 		_edit(parameters = {}) {
 			const overlay = PopUp('script.edit', parameters, {
 				dialogueid: 'script-form',
-				dialogue_class: 'modal-popup-large',
+				dialogue_class: 'modal-popup-medium',
 				prevent_navigation: true
 			});
 
