@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-25T13:15:22Z'
+  date: '2023-04-26T08:03:23Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -220,6 +220,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name == "tikv_coprocessor_rocksdb_perf")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
             -
               type: CHANGE_PER_SECOND
               parameters:
@@ -245,6 +247,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name == "tikv_coprocessor_scan_keys")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
             -
               type: CHANGE_PER_SECOND
               parameters:
@@ -665,6 +669,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - '$[?(@.name == "tikv_raftstore_snapshot_traffic_total" && @.labels.type == "applying")].value.first()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           master_item:
             key: tikv.get_metrics
           tags:
@@ -973,6 +979,8 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$[?(@.name == "tikv_coprocessor_rocksdb_perf")].value.sum()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
