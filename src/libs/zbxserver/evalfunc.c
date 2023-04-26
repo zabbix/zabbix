@@ -458,7 +458,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 					while (NULL != (ptr = strchr(ptr, '-')))
 					{
-						if (ptr > range_str && 'e' != ptr[-1] && 'E' != ptr[-1])
+						if (ptr > range_str && 'e' != *(ptr - 1) && 'E' != *(ptr - 1))
 							break;
 						ptr++;
 					}
