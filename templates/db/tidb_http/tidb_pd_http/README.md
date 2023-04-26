@@ -53,10 +53,10 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |PD: Uptime|<p>The runtime of each PD instance.</p>|Dependent item|pd.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.start_timestamp`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |PD: Get cluster metrics|<p>Get cluster metrics.</p>|Dependent item|pd.cluster_status.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_cluster_status")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |PD: Get region metrics|<p>Get region metrics.</p>|Dependent item|pd.regions.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_scheduler_region_heartbeat")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|PD: Get region label metrics|<p>Get region labels metrics.</p>|Dependent item|pd.region_labels.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_regions_label_level")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|PD: Get region status metrics|<p>Get regions status metrics.</p>|Dependent item|pd.regions_status.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_regions_status")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|PD: Get region label metrics|<p>Get region label metrics.</p>|Dependent item|pd.region_labels.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_regions_label_level")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|PD: Get region status metrics|<p>Get region status metrics.</p>|Dependent item|pd.region_status.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "pd_regions_status")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |PD: Get gRPC command metrics|<p>Get gRPC command metrics.</p>|Dependent item|pd.grpc_commands.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "grpc_server_handling_seconds_count")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|PD: Get scheduler metrics|<p>Get scheduler metrics.</p>|Dependent item|pd.schedulers.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|PD: Get scheduler metrics|<p>Get scheduler metrics.</p>|Dependent item|pd.scheduler.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
@@ -107,8 +107,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB cluster: Get metrics: {#TYPE}||Dependent item|pd.region_labels.get_metrics[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.type == "{#TYPE}")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|TiDB cluster: Regions label: {#TYPE}|<p>The number of Regions in different label levels.</p>|Dependent item|pd.region_labels[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..value.first()`</p></li></ul>|
+|TiDB cluster: Regions label: {#TYPE}|<p>The number of Regions in different label levels.</p>|Dependent item|pd.region_labels[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.type == "{#TYPE}")].value.first()`</p></li></ul>|
 
 ### LLD rule Region status discovery
 
@@ -120,8 +119,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB cluster: Get metrics: {#TYPE}|<p>Get region status metrics for {#TYPE}.</p>|Dependent item|pd.region_status.get_metrics[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.type == "{#TYPE}")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|TiDB cluster: Regions status: {#TYPE}|<p>The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.</p>|Dependent item|pd.region_status[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..value.first()`</p></li></ul>|
+|TiDB cluster: Regions status: {#TYPE}|<p>The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.</p>|Dependent item|pd.region_status[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.type == "{#TYPE}")].value.first()`</p></li></ul>|
 
 ### Trigger prototypes for Region status discovery
 
@@ -140,8 +138,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB cluster: Get metrics: {#KIND}|<p>Get scheduler metrics for {#KIND}.</p>|Dependent item|pd.scheduler.get_metrics[{#KIND}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.kind == "{#KIND}")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|TiDB cluster: Scheduler status: {#KIND}|<p>The current running schedulers.</p>|Dependent item|pd.scheduler[{#KIND}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..value.first()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|TiDB cluster: Scheduler status: {#KIND}|<p>The current running schedulers.</p>|Dependent item|pd.scheduler[{#KIND}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.kind == "{#KIND}")].value.first()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ### LLD rule gRPC commands discovery
 

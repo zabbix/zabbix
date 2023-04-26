@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-24T14:05:48Z'
+  date: '2023-04-26T08:17:13Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -163,28 +163,6 @@ zabbix_export:
               tag: component
               value: raw
         -
-          uuid: 6d97b65149ef4880ae547fb3e82a68c0
-          name: 'PD: Get region status metrics'
-          type: DEPENDENT
-          key: pd.regions_status.get_metrics
-          delay: '0'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          description: 'Get regions status metrics.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$[?(@.name == "pd_regions_status")]'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: pd.get_metrics
-          tags:
-            -
-              tag: component
-              value: raw
-        -
           uuid: 6e6cc3d28b884372a2380b4732af438f
           name: 'PD: Get region label metrics'
           type: DEPENDENT
@@ -193,7 +171,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get region labels metrics.'
+          description: 'Get region label metrics.'
           preprocessing:
             -
               type: JSONPATH
@@ -207,10 +185,32 @@ zabbix_export:
               tag: component
               value: raw
         -
+          uuid: 6d97b65149ef4880ae547fb3e82a68c0
+          name: 'PD: Get region status metrics'
+          type: DEPENDENT
+          key: pd.region_status.get_metrics
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get region status metrics.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name == "pd_regions_status")]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: pd.get_metrics
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 78c65105fd4a4f24b67176331ee685b5
           name: 'PD: Get scheduler metrics'
           type: DEPENDENT
-          key: pd.schedulers.get_metrics
+          key: pd.scheduler.get_metrics
           delay: '0'
           history: '0'
           trends: '0'
@@ -986,33 +986,6 @@ zabbix_export:
           description: 'Discovery region labels specific metrics.'
           item_prototypes:
             -
-              uuid: 8a4c12d407154a1d8b8628ada7c1af73
-              name: 'TiDB cluster: Get metrics: {#TYPE}'
-              type: DEPENDENT
-              key: 'pd.region_labels.get_metrics[{#TYPE}]'
-              delay: '0'
-              history: '0'
-              trends: '0'
-              value_type: TEXT
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.labels.type == "{#TYPE}")]'
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: pd.region_labels.get_metrics
-              tags:
-                -
-                  tag: component
-                  value: raw
-                -
-                  tag: component
-                  value: regions
-                -
-                  tag: type
-                  value: '{#TYPE}'
-            -
               uuid: 117efc3f2fe64c51a18cd3be162185ea
               name: 'TiDB cluster: Regions label: {#TYPE}'
               type: DEPENDENT
@@ -1025,9 +998,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..value.first()
+                    - '$[?(@.labels.type == "{#TYPE}")].value.first()'
               master_item:
-                key: 'pd.region_labels.get_metrics[{#TYPE}]'
+                key: pd.region_labels.get_metrics
               tags:
                 -
                   tag: component
@@ -1060,31 +1033,6 @@ zabbix_export:
           description: 'Discovery region status specific metrics.'
           item_prototypes:
             -
-              uuid: 55d4302962244ea582b31897a40a0559
-              name: 'TiDB cluster: Get metrics: {#TYPE}'
-              type: DEPENDENT
-              key: 'pd.region_status.get_metrics[{#TYPE}]'
-              delay: '0'
-              history: '0'
-              trends: '0'
-              value_type: TEXT
-              description: 'Get region status metrics for {#TYPE}.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.labels.type == "{#TYPE}")]'
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: pd.regions_status.get_metrics
-              tags:
-                -
-                  tag: address
-                  value: '{#TYPE}'
-                -
-                  tag: component
-                  value: raw
-            -
               uuid: 45ef4940b0454492b70116d8958c9b11
               name: 'TiDB cluster: Regions status: {#TYPE}'
               type: DEPENDENT
@@ -1097,9 +1045,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..value.first()
+                    - '$[?(@.labels.type == "{#TYPE}")].value.first()'
               master_item:
-                key: 'pd.region_status.get_metrics[{#TYPE}]'
+                key: pd.region_status.get_metrics
               tags:
                 -
                   tag: component
@@ -1132,7 +1080,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: pd.regions_status.get_metrics
+            key: pd.region_status.get_metrics
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1189,31 +1137,6 @@ zabbix_export:
           description: 'Discovery scheduler specific metrics.'
           item_prototypes:
             -
-              uuid: 03c02eb140564ae0a98a5510669b1c5b
-              name: 'TiDB cluster: Get metrics: {#KIND}'
-              type: DEPENDENT
-              key: 'pd.scheduler.get_metrics[{#KIND}]'
-              delay: '0'
-              history: '0'
-              trends: '0'
-              value_type: TEXT
-              description: 'Get scheduler metrics for {#KIND}.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.labels.kind == "{#KIND}")]'
-                  error_handler: DISCARD_VALUE
-              master_item:
-                key: pd.schedulers.get_metrics
-              tags:
-                -
-                  tag: address
-                  value: '{#KIND}'
-                -
-                  tag: component
-                  value: raw
-            -
               uuid: c6748a20540f49b293795bc72480dda7
               name: 'TiDB cluster: Scheduler status: {#KIND}'
               type: DEPENDENT
@@ -1226,11 +1149,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..value.first()
+                    - '$[?(@.labels.kind == "{#KIND}")].value.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'pd.scheduler.get_metrics[{#KIND}]'
+                key: pd.scheduler.get_metrics
               tags:
                 -
                   tag: component
@@ -1239,7 +1162,7 @@ zabbix_export:
                   tag: scheduler
                   value: '{#KIND}'
           master_item:
-            key: pd.schedulers.get_metrics
+            key: pd.scheduler.get_metrics
           preprocessing:
             -
               type: JAVASCRIPT
