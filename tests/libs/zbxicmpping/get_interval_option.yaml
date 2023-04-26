@@ -1,5 +1,5 @@
 ---
-test case: 'fping 2.4 and 3.0 <= X < 3.14; root; safe limimits: N/A; redirect: NO'
+test case: 'fping 2.4 and 3.0 <= X < 3.14; root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
   fping_out_i0: |+2
@@ -43,7 +43,7 @@ out:
   return: 'SUCCEED'
   value: 1
 ---
-test case: 'fping 2.4 and 3.0 <= X < 3.14; non-root; safe limimits: N/A; redirect: NO 1'
+test case: 'fping 2.4 and 3.0 <= X < 3.14; non-root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
   fping_out_i0: |+2
@@ -115,7 +115,7 @@ out:
   return: 'SUCCEED'
   value: 10
 ---
-test case: 'fping 3.14 <= X < 4.0; root; safe limimits: N/A; redirect: NO'
+test case: 'fping 3.14 <= X < 4.0; root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
   fping_out_i0: |+2
@@ -134,7 +134,7 @@ out:
   return: 'SUCCEED'
   value: 0
 ---
-test case: 'fping 3.14 <= X < 4.0; non-root; safe limimits: N/A; redirect: NO'
+test case: 'fping 3.14 <= X < 4.0; non-root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
   fping_out_i0: |+2
@@ -152,7 +152,7 @@ out:
   return: 'SUCCEED'
   value: 1
 ---
-test case: 'fping 4.0 <= X <= 5.1; root; safe limimits: YES; redirect: NO'
+test case: 'fping 4.0 <= X <= 5.1; root; safe limits: YES; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
   fping_out_i0: |+2
@@ -171,7 +171,7 @@ out:
   return: 'SUCCEED'
   value: 0
 ---
-test case: 'fping 4.0 <= X <= 5.1; non-root; safe limimits: YES; redirect: NO'
+test case: 'fping 4.0 <= X <= 5.1; non-root; safe limits: YES; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
   fping_out_i0: |+2
@@ -189,7 +189,7 @@ out:
   return: 'SUCCEED'
   value: 1
 ---
-test case: 'fping 4.0 <= X <= 5.1; root or non-root; safe limimits: NO; redirect: NO'
+test case: 'fping 4.0 <= X <= 5.1; root or non-root; safe limits: NO; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
   fping_out_i0: |+2
@@ -208,7 +208,7 @@ out:
   return: 'SUCCEED'
   value: 0
 ---
-test case: 'fping 2.4 and 3.0 <= X < 3.11; non-root; safe limimits: N/A; redirect: YES'
+test case: 'fping 2.4 and 3.0 <= X < 3.11; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
   fping_out_i0: |+2
@@ -251,7 +251,7 @@ out:
   return: 'SUCCEED'
   value: 10
 ---
-test case: 'fping 3.11 <= X < 3.14; non-root; safe limimits: N/A; redirect: YES'
+test case: 'fping 3.11 <= X < 3.14; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
   fping_out_i0: |+2
@@ -301,7 +301,7 @@ out:
   return: 'SUCCEED'
   value: 10
 ---
-test case: 'fping 3.14 <= X < 4.0; non-root; safe limimits: N/A; redirect: YES'
+test case: 'fping 3.14 <= X < 4.0; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
   fping_out_i0: |+2
@@ -319,7 +319,7 @@ out:
   return: 'SUCCEED'
   value: 1
 ---
-test case: 'fping 4.0 <= X < 5.1; non-root; safe limimits: NO; redirect: YES'
+test case: 'fping 4.0 <= X <= 5.1; non-root; safe limits: NO; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
   fping_out_i0: |+2
