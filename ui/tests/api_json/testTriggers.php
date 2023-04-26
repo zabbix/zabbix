@@ -148,7 +148,7 @@ class testTriggers extends CAPITest {
 					'description' => 'trigger.error',
 					'expression' => 'last(/API Host/binary.item)=0'
 				],
-				'error' => 'Incorrect value for field "/1/expression": incorrect item value type "Binary" provided for trigger function "last".'
+				'error' => 'Incorrect item value type "Binary" provided for trigger function "last".'
 			],
 			'Prohibit binary items in recovery expression' => [
 				'params' => [
@@ -157,37 +157,7 @@ class testTriggers extends CAPITest {
 					'expression' => 'last(/API Host/master.item)=0',
 					'recovery_expression' => 'last(/API Host/binary.item)=0'
 				],
-				'error' => 'Incorrect value for field "/1/recovery_expression": incorrect item value type "Binary" provided for trigger function "last".'
-			],
-			'Prohibit binary items in expression, multiple triggers' => [
-				'params' => [
-					[
-						'description' => 'trigger.error',
-						'expression' => 'last(/API Host/master.item)=0'
-					],
-					[
-						'description' => 'trigger.error',
-						'expression' => 'last(/API Host/binary.item)=0'
-					]
-				],
-				'error' => 'Incorrect value for field "/2/expression": incorrect item value type "Binary" provided for trigger function "last".'
-			],
-			'Prohibit binary items in recovery expression, multiple triggers' => [
-				'params' => [
-					[
-						'description' => 'trigger.error.1',
-						'recovery_mode' => ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION,
-						'expression' => 'last(/API Host/master.item)=0',
-						'recovery_expression' => 'last(/API Host/master.item)=0'
-					],
-					[
-						'description' => 'trigger.error.2',
-						'recovery_mode' => ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION,
-						'expression' => 'last(/API Host/master.item)=0',
-						'recovery_expression' => 'last(/API Host/binary.item)=0'
-					]
-				],
-				'error' => 'Incorrect value for field "/2/recovery_expression": incorrect item value type "Binary" provided for trigger function "last".'
+				'error' => 'Incorrect item value type "Binary" provided for trigger function "last".'
 			]
 		];
 	}

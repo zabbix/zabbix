@@ -2008,12 +2008,6 @@ abstract class CTriggerGeneral extends CApiService {
 			$hist_functions1 = $expression_parser->getResult()->getTokensOfTypes(
 				[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
 			);
-			$path ='/'.($tnum + 1).'/expression';
-
-			foreach ($hist_functions1 as &$hist_function) {
-				$hist_function['field_path'] = $path;
-			}
-			unset($hist_function);
 
 			$hist_functions2 = [];
 
@@ -2023,12 +2017,6 @@ abstract class CTriggerGeneral extends CApiService {
 				$hist_functions2 = $expression_parser->getResult()->getTokensOfTypes(
 					[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
 				);
-				$path = '/'.($tnum + 1).'/recovery_expression';
-
-				foreach ($hist_functions2 as &$hist_function) {
-					$hist_function['field_path'] = $path;
-				}
-				unset($hist_function);
 			}
 
 			$triggers_functions[$tnum] = [];
@@ -2054,28 +2042,21 @@ abstract class CTriggerGeneral extends CApiService {
 				$key = $host_keys['keys'][$item];
 
 				if ($host_keys['hostid'] === null) {
-					$error = _s('Host "%1$s" does not exist or you have no access to this host.', $host_keys['host']);
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', $hist_function['field_path'], $error)
-					);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _params($error_wrong_host, [$host_keys['host']]));
 				}
 
 				if ($key['itemid'] === null) {
-					$error = _s('incorrect item key "%1$s" provided for trigger expression on "%2$s"', $key['key'],
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect item key "%1$s" provided for trigger expression on "%2$s".', $key['key'],
 						$host_keys['host']
-					);
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', $hist_function['field_path'], $error)
-					);
+					));
 				}
 
 				if (!in_array($key['value_type'], $hist_function_value_types[$hist_function['data']['function']])) {
-					$error = _s('incorrect item value type "%1$s" provided for trigger function "%2$s"',
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect item value type "%1$s" provided for trigger function "%2$s".',
 						itemValueTypeString($key['value_type']), $hist_function['data']['function']
-					);
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', $hist_function['field_path'], $error)
-					);
+					));
 				}
 
 				if (!array_key_exists($hist_function['match'], $triggers_functions[$tnum])) {
