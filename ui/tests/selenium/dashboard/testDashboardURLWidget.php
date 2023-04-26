@@ -811,6 +811,7 @@ class testDashboardURLWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		foreach ($data as $scheme) {
 			$dashboard->getWidget(self::$default_widget)->edit();
+			COverlayDialogElement::find()->one()->waitUntilReady();
 			$form->fill(['URL' => $scheme]);
 			$form->submit();
 
