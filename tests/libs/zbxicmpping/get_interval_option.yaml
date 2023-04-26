@@ -2,6 +2,7 @@
 test case: 'fping 2.4 and 3.0 <= X < 3.14; root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
 
     Usage: /usr/bin/fping [options] [targets...]
@@ -42,10 +43,12 @@ in:
 out:
   return: 'SUCCEED'
   value: 1
+  error_msg: ''
 ---
 test case: 'fping 2.4 and 3.0 <= X < 3.14; non-root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
 
     Usage: /usr/bin/fping [options] [targets...]
@@ -114,10 +117,12 @@ in:
 out:
   return: 'SUCCEED'
   value: 10
+  error_msg: ''
 ---
 test case: 'fping 3.14 <= X < 4.0; root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     127.0.0.1 : [0], 84 bytes, 0.03 ms (0.03 avg, 0% loss)
 
@@ -133,10 +138,12 @@ in:
 out:
   return: 'SUCCEED'
   value: 0
+  error_msg: ''
 ---
 test case: 'fping 3.14 <= X < 4.0; non-root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     /usr/bin/fping: these options are too risky for mere mortals.
     /usr/bin/fping: You need i >= 1, p >= 20, r < 20, and t >= 50
@@ -151,10 +158,12 @@ in:
 out:
   return: 'SUCCEED'
   value: 1
+  error_msg: ''
 ---
 test case: 'fping 4.0 <= X <= 5.1; root; safe limits: YES; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     127.0.0.1 : [0], 84 bytes, 0.02 ms (0.02 avg, 0% loss)
 
@@ -170,10 +179,12 @@ in:
 out:
   return: 'SUCCEED'
   value: 0
+  error_msg: ''
 ---
 test case: 'fping 4.0 <= X <= 5.1; non-root; safe limits: YES; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     /usr/bin/fping: these options are too risky for mere mortals.
     /usr/bin/fping: You need -i >= 1 and -p >= 10
@@ -188,10 +199,12 @@ in:
 out:
   return: 'SUCCEED'
   value: 1
+  error_msg: ''
 ---
 test case: 'fping 4.0 <= X <= 5.1; root or non-root; safe limits: NO; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     127.0.0.1 : [0], 64 bytes, 0.010 ms (0.010 avg, 0% loss)
 
@@ -207,13 +220,15 @@ in:
 out:
   return: 'SUCCEED'
   value: 0
+  error_msg: ''
 ---
 test case: 'fping 2.4 and 3.0 <= X < 3.11; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
 
-  Usage: /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-2.4 [options] [targets...]
+  Usage: /usr/bin/fping  [options] [targets...]
      -a         show targets that are alive
      -A         show targets by address
      -b n       amount of ping data to send, in bytes (default 68)
@@ -224,7 +239,7 @@ in:
      -f file    read list of targets from a file ( - means stdin) (only if no -g specified)
      -g         generate target list (only if no -f specified)
                   (specify the start and end IP in the target list, or supply a IP netmask)
-                  (ex. /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-2.4 -g 192.168.1.0 192.168.1.255 or /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-2.4 -g 192.168.1.0/24)
+                  (ex. /usr/bin/fping  -g 192.168.1.0 192.168.1.255 or /usr/bin/fping  -g 192.168.1.0/24)
      -i n       interval between sending ping packets (in millisec) (default 0)
      -l         loop sending pings forever
      -m         ping multiple interfaces on target host
@@ -241,8 +256,8 @@ in:
      targets    list of targets to check (if no -f specified)
 
   fping_out_i1: |+2
-    /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.9: these options are too risky for mere mortals.
-    /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.9: You need i >= 10, p >= 20, r < 20, and t >= 50
+    /usr/bin/fping : these options are too risky for mere mortals.
+    /usr/bin/fping : You need i >= 10, p >= 20, r < 20, and t >= 50
   fping_out_i10: |+2
     192.168.202.10 : [0], 96 bytes, 0.86 ms (0.86 avg, 0% loss) [<- 192.168.201.10]
 
@@ -250,13 +265,15 @@ in:
 out:
   return: 'SUCCEED'
   value: 10
+  error_msg: ''
 ---
 test case: 'fping 3.11 <= X < 3.14; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
 
-    Usage: /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.11 [options] [targets...]
+    Usage: /usr/bin/fping  [options] [targets...]
        -a         show targets that are alive
        -A         show targets by address
        -b n       amount of ping data to send, in bytes (default 56)
@@ -268,7 +285,7 @@ in:
        -f file    read list of targets from a file ( - means stdin) (only if no -g specified)
        -g         generate target list (only if no -f specified)
                     (specify the start and end IP in the target list, or supply a IP netmask)
-                    (ex. /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.11 -g 192.168.1.0 192.168.1.255 or /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.11 -g 192.168.1.0/24)
+                    (ex. /usr/bin/fping  -g 192.168.1.0 192.168.1.255 or /usr/bin/fping  -g 192.168.1.0/24)
        -H n       Set the IP TTL value (Time To Live hops)
        -i n       interval between sending ping packets (in millisec) (default 0)
        -I if      bind to a particular interface
@@ -291,8 +308,8 @@ in:
        targets    list of targets to check (if no -f specified)
 
   fping_out_i1: |+2
-    /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.11: these options are too risky for mere mortals.
-    /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.11: You need i >= 10, p >= 20, r < 20, and t >= 50
+    /usr/bin/fping : these options are too risky for mere mortals.
+    /usr/bin/fping : You need i >= 10, p >= 20, r < 20, and t >= 50
   fping_out_i10: |+2
      [<- 192.168.201.10]192.168.202.10 : [0], 84 bytes, 0.73 ms (0.73 avg, 0% loss)
 
@@ -300,13 +317,15 @@ in:
 out:
   return: 'SUCCEED'
   value: 10
+  error_msg: ''
 ---
 test case: 'fping 3.14 <= X < 4.0; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
-    /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.14: these options are too risky for mere mortals.
-    /home/mikhail/git/zabbix_tools/fping_tools/bin/fping-3.14: You need i >= 1, p >= 20, r < 20, and t >= 50
+    /usr/bin/fping : these options are too risky for mere mortals.
+    /usr/bin/fping : You need i >= 1, p >= 20, r < 20, and t >= 50
   fping_out_i1: |+2
      [<- 192.168.201.10]192.168.202.10 : [0], 84 bytes, 0.57 ms (0.57 avg, 0% loss)
 
@@ -318,10 +337,12 @@ in:
 out:
   return: 'SUCCEED'
   value: 1
+  error_msg: ''
 ---
 test case: 'fping 4.0 <= X <= 5.1; non-root; safe limits: NO; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
+  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
      [<- 192.168.201.10]192.168.202.10 : [0], 84 bytes, 0.63 ms (0.63 avg, 0% loss)
 
@@ -337,4 +358,32 @@ in:
 out:
   return: 'SUCCEED'
   value: 0
+  error_msg: ''
+---
+test case: 'Timeout error'
+in:
+  target_host_addr: "7.7.7.7"
+  zbx_execute_ret: 'TIMEOUT_ERROR'
+out:
+  return: 'FAIL'
+  value: 0
+  error_msg: 'Timeout while executing "/usr/bin/fping -c1 -t50 -i0 7.7.7.7"'
+---
+test case: 'Signal error'
+in:
+  target_host_addr: "7.7.7.7"
+  zbx_execute_ret: 'SIG_ERROR'
+out:
+  return: 'FAIL'
+  value: 0
+  error_msg: 'Cannot execute "/usr/bin/fping -c1 -t50 -i0 7.7.7.7": Signal received while executing a shell script.'
+---
+test case: 'General failure error'
+in:
+  target_host_addr: "7.7.7.7"
+  zbx_execute_ret: 'FAIL'
+out:
+  return: 'FAIL'
+  value: 0
+  error_msg: 'Cannot execute "/usr/bin/fping -c1 -t50 -i0 7.7.7.7": General failure error.'
 ...

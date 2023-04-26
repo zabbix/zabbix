@@ -44,9 +44,9 @@ char	*__wrap_zbx_fgets(char *buffer, int size, FILE *fp)
 int	__wrap_zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
 		unsigned char flag, const char *dir)
 {
+	int		ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("in.zbx_execute_ret"));
 	const char	*str;
 
-	ZBX_UNUSED(max_error_len);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(flag);
 	ZBX_UNUSED(dir);
@@ -55,20 +55,35 @@ int	__wrap_zbx_execute(const char *command, char **output, char *error, size_t m
 		zbx_free(*output);
 
 	*output = (char *)zbx_malloc(*output, PIPE_BUFFER_SIZE);
-	*error = '\0';
 
-	if (NULL != strstr(command, "-i0"))
-		str = zbx_mock_get_parameter_string("in.fping_out_i0");
-	else if (NULL != strstr(command, "-i1"))
-		str = zbx_mock_get_parameter_string("in.fping_out_i1");
-	else if (NULL != strstr(command, "-i10"))
-		str = zbx_mock_get_parameter_string("in.fping_out_i10");
-	else
-		fail_msg("This should never happen: unknown interval.");
+	switch (ret)
+	{
+		case SUCCEED:
+			*error = '\0';
+			if (NULL != strstr(command, "-i0"))
+				str = zbx_mock_get_parameter_string("in.fping_out_i0");
+			else if (NULL != strstr(command, "-i1"))
+				str = zbx_mock_get_parameter_string("in.fping_out_i1");
+			else if (NULL != strstr(command, "-i10"))
+				str = zbx_mock_get_parameter_string("in.fping_out_i10");
+			else
+				fail_msg("This should never happen: unknown interval.");
+			zbx_strlcpy(*output, str, PIPE_BUFFER_SIZE);
+			break;
+		case FAIL:
+			zbx_snprintf(error, max_error_len, "General failure error.");
+			break;
+		case TIMEOUT_ERROR:
+			zbx_snprintf(error, max_error_len, "Timeout error.");
+			break;
+		case SIG_ERROR:
+			zbx_snprintf(error, max_error_len, "Signal received while executing a shell script.");
+			break;
+		default:
+			fail_msg("This should never happen: unexpected return code in %s().", __func__);
+	}
 
-	zbx_strlcpy(*output, str, PIPE_BUFFER_SIZE);
-
-	return SUCCEED;
+	return ret;
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -97,6 +112,11 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_int_eq("get_interval_option() return value",
 			zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")), ret);
-	zbx_mock_assert_str_eq("error message returned by get_interval_option()", "", error);
-	zbx_mock_assert_int_eq("minimal detected interval", (int)zbx_mock_get_parameter_uint64("out.value"), value);
+	zbx_mock_assert_str_eq("error message returned by get_interval_option()",
+			zbx_mock_get_parameter_string("out.error_msg"), error);
+	if (SUCCEED == ret)
+	{
+		zbx_mock_assert_int_eq("minimal detected interval", (int)zbx_mock_get_parameter_uint64("out.value"),
+				value);
+	}
 }
