@@ -185,7 +185,7 @@ $right_column = (new CFormGrid())
 			->addValue(_('all'), -1, 'state_all#{uniqid}')
 			->addValue(_('Normal'), ITEM_STATE_NORMAL, 'state_'.ITEM_STATE_NORMAL.'#{uniqid}')
 			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED, 'state_'.ITEM_STATE_NOTSUPPORTED.'#{uniqid}')
-			->setModern(true)
+			->setModern()
 			->setId('state_#{uniqid}'),
 	])
 	->addItem([

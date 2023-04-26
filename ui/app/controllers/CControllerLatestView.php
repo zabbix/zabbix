@@ -37,7 +37,7 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
-			'state' =>                  'in -1,'.ITEM_STATE_NORMAL.','.ITEM_STATE_NOTSUPPORTED,
+			'state' =>					'in -1,'.ITEM_STATE_NORMAL.','.ITEM_STATE_NOTSUPPORTED,
 			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
 			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
 			'tag_priority' =>			'string',
@@ -60,7 +60,7 @@ class CControllerLatestView extends CControllerLatest {
 			'subfilter_tags' =>			'array',
 			'subfilter_data' =>			'array',
 			'subfilters_expanded' =>	'array',
-			'subfilter_state' =>        'array'
+			'subfilter_state' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -82,19 +82,19 @@ class CControllerLatestView extends CControllerLatest {
 		// Validate subfilters.
 		if ($ret && $this->hasInput('subfilter_hostids')) {
 			$hostids = $this->getInput('subfilter_hostids', []);
-			$ret = (!$hostids || count($hostids) === count(array_filter($hostids, 'ctype_digit')));
+			$ret = !$hostids || count($hostids) == count(array_filter($hostids, 'ctype_digit'));
 		}
 
 		if ($ret && $this->hasInput('subfilter_tagnames')) {
 			$tagnames = $this->getInput('subfilter_tagnames', []);
-			$ret = (!$tagnames || count($tagnames) === count(array_filter($tagnames, 'is_string')));
+			$ret = !$tagnames || count($tagnames) == count(array_filter($tagnames, 'is_string'));
 		}
 
 		if ($ret && $this->hasInput('subfilter_tags')) {
 			$tags = $this->getInput('subfilter_tags', []);
 			foreach ($tags as $tag => $values) {
 				if (!is_scalar($tag) || !is_array($values)
-						|| count($values) !== count(array_filter($values, 'is_string'))) {
+						|| count($values) != count(array_filter($values, 'is_string'))) {
 					$ret = false;
 					break;
 				}
@@ -104,17 +104,17 @@ class CControllerLatestView extends CControllerLatest {
 		if ($ret && $this->hasInput('subfilter_data')) {
 			$data = $this->getInput('subfilter_data', []);
 			$valid = array_filter($data, function ($val) {
-				return ($val === '0' || $val === '1');
+				return $val === '0' || $val === '1';
 			});
-			$ret = (count($data) === count($valid));
+			$ret = count($data) == count($valid);
 		}
 
 		if ($ret && $this->hasInput('subfilter_state')) {
 			$state = $this->getInput('subfilter_state', []);
 			$valid = array_filter($state, function ($val) {
-				return ($val == ITEM_STATE_NORMAL || $val == ITEM_STATE_NOTSUPPORTED);
+				return $val == ITEM_STATE_NORMAL || $val == ITEM_STATE_NOTSUPPORTED;
 			});
-			$ret = (count($state) === count($valid));
+			$ret = count($state) == count($valid);
 		}
 
 		if (!$ret) {

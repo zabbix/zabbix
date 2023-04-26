@@ -67,7 +67,7 @@ abstract class CControllerLatest extends CController {
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['tags'][]['operator']
-	 * @param int    $filter['state']               Filter state.
+	 * @param int    $filter['state']              Filter state.
 	 * @param string $sort_field                   Sorting field.
 	 * @param string $sort_order                   Sorting order.
 	 *
@@ -401,7 +401,7 @@ abstract class CControllerLatest extends CController {
 			}
 
 			if ($item_matches) {
-				$subfilter_options['state'][$item['state'] == 1 ? 1 : 0]['count']++;
+				$subfilter_options['state'][$item['state']]['count']++;
 			}
 
 			// Data subfilter.
@@ -550,14 +550,14 @@ abstract class CControllerLatest extends CController {
 		];
 
 		$subfilter_options['state'] = [
-			0 => [
+			ITEM_STATE_NORMAL => [
 				'name' => _('Normal'),
-				'selected' => array_key_exists(0, $subfilter['state']),
+				'selected' => array_key_exists(ITEM_STATE_NORMAL, $subfilter['state']),
 				'count' => 0
 			],
-			1 => [
+			ITEM_STATE_NOTSUPPORTED => [
 				'name' => _('Not supported'),
-				'selected' => array_key_exists(1, $subfilter['state']),
+				'selected' => array_key_exists(ITEM_STATE_NOTSUPPORTED, $subfilter['state']),
 				'count' => 0
 			]
 		];
@@ -624,8 +624,10 @@ abstract class CControllerLatest extends CController {
 			}
 
 			if ($subfilter['state']) {
-				$item['matching_subfilters']['state'] = array_key_exists(0, $subfilter['state']) && $item['state'] == 0
-					|| array_key_exists(1, $subfilter['state']) && $item['state'] == 1;
+				$item['matching_subfilters']['state'] = array_key_exists(ITEM_STATE_NORMAL, $subfilter['state'])
+					&& $item['state'] == ITEM_STATE_NORMAL
+					|| array_key_exists(ITEM_STATE_NOTSUPPORTED, $subfilter['state'])
+					&& $item['state'] == ITEM_STATE_NOTSUPPORTED;
 			}
 		}
 		unset($item);
