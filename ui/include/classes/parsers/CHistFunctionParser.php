@@ -332,12 +332,7 @@ class CHistFunctionParser extends CParser {
 					if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
 						$state = self::STATE_END;
 					}
-					elseif ($source[$p] === '\\' && isset($source[$p + 1])
-							&& ($source[$p + 1] === '"' || $source[$p + 1] === '\\')) {
-						$_parameters[$num]['match'] .= $source[$p + 1];
-						$_parameters[$num]['length']++;
-						$p++;
-					}
+
 					break;
 
 				// end of parameters
