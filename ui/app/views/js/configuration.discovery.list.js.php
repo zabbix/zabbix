@@ -130,16 +130,16 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'discovery.delete');
 
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			this._post(target, druleids, curl);
+		}
+
+		_post(target, druleids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
 			);
 
 			target.classList.add('is-loading');
 
-			this._post(target, druleids, curl);
-		}
-
-		_post(target, druleids, url) {
 			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},

@@ -32,7 +32,7 @@ class CControllerDiscoveryUpdate extends CController {
 			'proxy_hostid' =>			'db drules.proxy_hostid',
 			'iprange' =>				'required|db drules.iprange|not_empty|flags '.P_CRLF,
 			'delay' =>					'required|db drules.delay|not_empty',
-			'status' =>					'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
+			'status' =>					'db drules.status|in '.DRULE_STATUS_ACTIVE,
 			'uniqueness_criteria' =>	'string',
 			'dchecks' =>				'required|array'
 		];
@@ -59,8 +59,10 @@ class CControllerDiscoveryUpdate extends CController {
 
 	protected function doAction(): void {
 		$drule = [];
-		$this->getInputs($drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks']);
+		$this->getInputs($drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'dchecks']);
 		$uniq = $this->getInput('uniqueness_criteria', 0);
+
+		$drule['status'] = $this->getInput('status', DRULE_STATUS_DISABLED);
 
 		foreach ($drule['dchecks'] as $dcnum => $check) {
 			if (substr($check['dcheckid'], 0, 3) === 'new') {
