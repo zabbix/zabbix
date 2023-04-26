@@ -543,6 +543,8 @@ function get_next_color($palettetype = 0) {
  * @param string	$string
  */
 function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
+	$string = strtr($string, ['&' => '&#38;']);
+
 	if ((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) || ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 		imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
@@ -583,6 +585,8 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
  * @return array
  */
 function imageTextSize($fontsize, $angle, $string) {
+	$string = strtr($string, ['&' => '&#38;']);
+
 	if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 	}
