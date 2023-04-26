@@ -946,9 +946,10 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		const int *mtime, const unsigned long *timestamp, const char *source,
 		const unsigned short *severity, const unsigned long *logeventid, unsigned char flags)
 {
-	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
-	int				i, ret = FAIL;
-	size_t				sz;
+	ZBX_ACTIVE_BUFFER_ELEMENT		*el = NULL;
+	int					i, ret = FAIL;
+	size_t					sz;
+	static ZBX_THREAD_LOCAL zbx_timespec_t	latest_ts = {0};
 
 	ZBX_UNUSED(agent2_result);
 
@@ -1053,6 +1054,24 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 		el->logeventid = (int)*logeventid;
 
 	zbx_timespec(&el->ts);
+
+	/* temporary debug log and additional protection against duplicate timestamp, should be removed */
+	/* ignores possible host system time shift backwards */
+	if (el->ts.sec < latest_ts.sec ||
+			(el->ts.sec == latest_ts.sec && el->ts.ns <= latest_ts.ns))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "%s(): detected duplicate or old timestamp (%d.%d, latest: %d.%d",
+				__func__, el->ts.sec, el->ts.ns, latest_ts.sec, latest_ts.ns);
+		latest_ts.ns++;
+		el->ts.sec = latest_ts.sec;
+		el->ts.ns = latest_ts.ns;
+	}
+	else
+	{
+		latest_ts.sec = el->ts.sec;
+		latest_ts.ns = el->ts.ns;
+	}
+
 	el->flags = flags;
 	el->id = ++last_valueid;
 
