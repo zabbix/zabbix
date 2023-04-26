@@ -36,7 +36,7 @@ window.drule_edit_popup = new class {
 		this.dcheckid = getUniqueId();
 
 		// Append existing discovery checks to check table.
-		if (typeof(dchecks) === 'object') {
+		if (typeof dchecks === 'object') {
 			dchecks = Object.values(dchecks);
 		}
 		for (const dcheck of dchecks) {
@@ -128,7 +128,7 @@ window.drule_edit_popup = new class {
 		let target = event.target;
 		let name = target.getAttribute('name');
 
-		if (typeof(target.dataset.id) !== 'undefined') {
+		if (typeof target.dataset.id !== 'undefined') {
 			document.querySelectorAll(`[name^=dchecks][name$="[${name}]"]`)
 				.forEach(function (dcheck) {
 					dcheck.value = (name === 'name_source') ? <?= ZBX_DISCOVERY_UNSPEC ?> : <?= ZBX_DISCOVERY_DNS ?>;
@@ -151,12 +151,12 @@ window.drule_edit_popup = new class {
 		delete input.dchecks;
 
 		if (update === false) {
-			if (typeof(input.host_source) === 'undefined') {
+			if (typeof input.host_source === 'undefined') {
 				const checked_host_source = document.querySelector('[name="host_source"]:checked:not([data-id])');
 				input.host_source = checked_host_source === null ? '<?= ZBX_DISCOVERY_DNS ?>' : checked_host_source.value;
 			}
 
-			if (typeof(input.name_source) === 'undefined') {
+			if (typeof input.name_source === 'undefined') {
 				const checked_name_source = document.querySelector('[name="name_source"]:checked:not([data-id])');
 				input.name_source = checked_name_source  === null
 					? '<?= ZBX_DISCOVERY_UNSPEC ?>'
