@@ -41,14 +41,15 @@ class CSVGGauge {
 		this.container = options.container;
 		this.data = data;
 
+		this.initialLoad = true;
+
 		this.angleConfigOld = this.data.angle;
 		this.angleConfigNew = this.data.angle;
 
 		this.valueOld = this.data.minmax.min.raw;
 		this.valueNew = this.data.value.raw;
 
-		this.minMaxShowOld = this.data.minmax.show;
-		this.minMaxShowNew = this.data.minmax.show;
+		this.minMaxFontSize = 0;
 
 		this.minOld = this.data.minmax.min.raw;
 		this.minNew = this.data.minmax.min.raw;
@@ -61,8 +62,6 @@ class CSVGGauge {
 
 		this.angleOld = this.angleStart;
 		this.angleNew = this.#getAngle(this.valueNew, this.minNew, this.maxNew);
-
-		this.initialLoad = true;
 
 		// Width and height of the SVG.
 		this.width = this.options.canvas.width;
@@ -82,8 +81,17 @@ class CSVGGauge {
 		this.x = this.width / 2;
 		this.y = this.height / 2;
 
-		this.radius = 0;
-		this.thickness = 50;
+		this.radiusValueArc = 0;
+		this.radiusThresholdArc = 0;
+		this.thicknessValueArc = 70;
+		this.thicknessThresholdArc = 70;
+
+		this.gapBetweenArcs = 5;
+
+		this.valueArcContainerId = 'value-arc-container';
+		this.thresholdArcContainerId = 'threshold-arc-container';
+
+		this.thresholdsArcParts = [];
 
 		// TO DO: Background color set to parent DIV. But let's leave this in for now to test if saving image will work.
 		// if (this.options.bg_color !== '') {
@@ -103,9 +111,6 @@ class CSVGGauge {
 
 		this.valueOld = this.valueNew;
 		this.valueNew = this.data.value.raw;
-
-		this.minMaxShowOld = this.minMaxShowNew;
-		this.minMaxShowNew = this.data.minmax.show;
 
 		this.minOld = this.minNew;
 		this.minNew = this.data.minmax.min.raw;
@@ -134,150 +139,30 @@ class CSVGGauge {
 	// TO DO: add description and finish function
 	#draw() {
 		if (this.initialLoad) {
-			// Add SVG to DOM.
 			this.container.appendChild(this.svg);
-
-			this.#addDescription(this.data.description);
-
-			if (this.data.description.pos === DESC_V_POSITION_TOP) {
-				this.#reposition(this.elements.description, this.x, 0, 'top center');
-				this.#show(this.elements.description);
-			}
-
-			// TO DO: add other objects and fix all the positions.
-
-			/*
-			* First add invisible element to calculate min and max dimensions. The height will also affect thresholds.
-			* Since there is no separate setting for threshold label size, we will use this as threshold label height.
-			*/
-			// this.#addMinMax({min: this.data.minmax.min, max: this.data.minmax.max}, this.data.minmax.font_size);
-
-			if (this.data.value.show_arc) {
-				this.#addValueArc();
-			}
-
-			// Threshold arc can only be drawn if there are thresholds.
-			if (this.data.thresholds.data.length) {
-				// Reserve space for threshold labels on top if they should be displayed.
-				if (this.data.thresholds.show_labels) {
-					// this.y += this.elements.min.height;
-				}
-
-				// Reserve space for min label or some threshold label. Which shouldn't exceed the min width.
-
-				// TO DO: Check what happens if it is value-mapped and is thresholds exceed the limit of min/max width.
-				// this.x = this.data.minmax.show ? this.x = this.elements.min.width : 0;
-
-				if (this.data.thresholds.show_arc) {
-					this.#addThresholdArc();
-				}
-			}
-
-			// Min/Max max position depends on arc radiuses as well as how wide the min/max blocks are.
-			// TODO: if there is no value arc and no threshold arc, the position of min and max is aligned to center of SVG.
-
-			/*
-			* Can use any height or width. Min and max they are both the same in terms of dimensions. Though they each have
-			* though they each have different coordinates.
-			*/
-
-			this.#addValue(this.data.value, this.data.units);
-			this.#reposition(this.elements.value, this.width / 2, this.y, 'bottom center');
-			this.#show(this.elements.value);
-
-			if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
-				// Same anchor, but this.y will be different as it depends on other objects.
-				this.#reposition(this.elements.description, this.x, this.y, 'top center');
-				this.#show(this.elements.description);
-			}
-
-			if (this.data.minmax.show) {
-				this.#addMinMax();
-
-				let minX = 0;
-				let maxX = 0;
-				let minY = 0;
-				let maxY = 0;
-
-				if (!this.data.thresholds.show_arc) {
-					minX = this.elements.valueArcContainer.coordinates.x1 - 3 * FONT_SIZE_RATIO;
-					maxX = this.elements.valueArcContainer.coordinates.x2 + 3 * FONT_SIZE_RATIO;
-					minY = this.elements.valueArcContainer.coordinates.y4;
-					maxY = this.elements.valueArcContainer.coordinates.y4;
-				}
-				else {
-					minX = this.elements.thresholdArcContainer.coordinates.x1 - 3 * FONT_SIZE_RATIO;
-					maxX = this.elements.thresholdArcContainer.coordinates.x2 + 3 * FONT_SIZE_RATIO;
-					minY = this.elements.thresholdArcContainer.coordinates.y4;
-					maxY = this.elements.thresholdArcContainer.coordinates.y4;
-				}
-
-				this.#reposition(this.elements.min, minX, minY, 'bottom right');
-				this.#show(this.elements.min);
-
-				this.#reposition(this.elements.max, maxX, maxY, 'bottom left');
-				this.#show(this.elements.max);
-			}
 		}
-		else {
-			this.#addDescription(this.data.description);
 
-			if (this.data.description.pos === DESC_V_POSITION_TOP) {
-				this.#reposition(this.elements.description, this.x, 0, 'top center');
-				this.#show(this.elements.description);
-			}
+		this.minMaxFontSize = (this.height * this.data.minmax.font_size / 100) * FONT_SIZE_RATIO;
 
-			if (this.data.value.show_arc) {
-				this.#addValueArc();
-			}
+		this.#addDescription(this.data.description);
 
-			if (this.data.thresholds.data.length) {
-				// Reserve space for min label or some threshold label. Which shouldn't exceed the min width.
-
-				// TO DO: Check what happens if it is value-mapped and is thresholds exceed the limit of min/max width.
-				// this.x = this.data.minmax.show ? this.x = this.elements.min.width : 0;
-
-				if (this.data.thresholds.show_arc) {
-					this.#addThresholdArc();
-				}
-			}
-
-			this.#addValue(this.data.value, this.data.units);
-			this.#reposition(this.elements.value, this.width / 2, this.y, 'bottom center');
-
-			if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
-				// Same anchor, but this.y will be different as it depends on other objects.
-				this.#reposition(this.elements.description, this.x, this.y, 'top center');
-				this.#show(this.elements.description);
-			}
-
-			if (this.data.minmax.show) {
-				this.#addMinMax();
-
-				let minX = 0;
-				let maxX = 0;
-				let minY = 0;
-				let maxY = 0;
-
-				if (!this.data.thresholds.show_arc) {
-					minX = this.elements.valueArcContainer.coordinates.x1 - 3 * FONT_SIZE_RATIO;
-					maxX = this.elements.valueArcContainer.coordinates.x2 + 3 * FONT_SIZE_RATIO;
-					minY = this.elements.valueArcContainer.coordinates.y4;
-					maxY = this.elements.valueArcContainer.coordinates.y4;
-				}
-				else {
-					minX = this.elements.thresholdArcContainer.coordinates.x1 - 3 * FONT_SIZE_RATIO;
-					maxX = this.elements.thresholdArcContainer.coordinates.x2 + 3 * FONT_SIZE_RATIO;
-					minY = this.elements.thresholdArcContainer.coordinates.y4;
-					maxY = this.elements.thresholdArcContainer.coordinates.y4;
-				}
-
-				this.#reposition(this.elements.min, minX, minY, 'bottom right');
-				this.#reposition(this.elements.max, maxX, maxY, 'bottom left');
-				this.#show(this.elements.min);
-				this.#show(this.elements.max);
-			}
+		if (this.data.description.pos === DESC_V_POSITION_TOP) {
+			this.#reposition(this.elements.description, this.x, 0, 'top center');
+			this.#show(this.elements.description);
 		}
+
+		this.#processArc();
+
+		this.#addValue(this.data.value, this.data.units);
+		this.#reposition(this.elements.value, this.width / 2, this.y, 'bottom center');
+		this.#show(this.elements.value);
+
+		if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
+			this.#reposition(this.elements.description, this.x, this.y, 'top center');
+			this.#show(this.elements.description);
+		}
+
+		this.#processMinMax();
 	}
 
 	// TO DO: add description
@@ -309,6 +194,9 @@ class CSVGGauge {
 
 		if (description.is_bold) {
 			this.#addAttributes(div, {style: 'font-weight: bold;'});
+		}
+		else {
+			this.#addAttributes(div, {style: 'font-weight: normal;'});
 		}
 
 		if (description.color !== '') {
@@ -347,6 +235,342 @@ class CSVGGauge {
 			width: width,
 			height: height
 		};
+	}
+
+	#processArc() {
+		if (this.data.description.pos === DESC_V_POSITION_TOP) {
+			this.y = this.height;
+		}
+		else if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
+			this.y = this.height - this.elements.description.height;
+		}
+
+		// Show both arcs
+		if (this.data.value.show_arc && this.data.thresholds.show_arc && this.data.thresholds.data.length) {
+			this.thicknessThresholdArc = 20;
+			this.thicknessValueArc = 50;
+			this.radiusThresholdArc = this.height - this.elements.description.height - this.thicknessThresholdArc;
+			this.radiusValueArc = this.height - this.elements.description.height - this.thicknessValueArc - this.thicknessThresholdArc - this.gapBetweenArcs;
+
+			this.#addThresholdArc();
+			this.#addValueArc();
+		}
+		// Show only value arc
+		else if (this.data.value.show_arc && !this.data.thresholds.show_arc) {
+			this.elements.thresholdArcContainer?.node?.remove();
+			this.elements.thresholdsLabelsContainer?.node?.remove();
+
+			delete this.elements.thresholdArcContainer;
+			delete this.elements.thresholdsLabelsContainer;
+
+			this.thicknessValueArc = 70;
+			this.radiusValueArc = this.height - this.elements.description.height - this.thicknessValueArc;
+
+			this.#addValueArc();
+		}
+		// Show only threshold arc
+		else if (!this.data.value.show_arc && this.data.thresholds.show_arc && this.data.thresholds.data.length) {
+			this.elements.valueArcContainer?.node?.remove();
+
+			delete this.elements.valueArcContainer;
+
+			this.thicknessThresholdArc = 70;
+			this.radiusThresholdArc = this.height - this.elements.description.height - this.thicknessThresholdArc;
+
+			this.#addThresholdArc();
+		}
+		// Don't show any arc
+		else if (!this.data.value.show_arc && !this.data.thresholds.show_arc) {
+			this.elements.thresholdArcContainer?.node?.remove();
+			this.elements.thresholdsLabelsContainer?.node?.remove();
+
+			delete this.elements.thresholdArcContainer;
+			delete this.elements.thresholdsLabelsContainer;
+
+			this.elements.valueArcContainer?.node?.remove();
+
+			delete this.elements.valueArcContainer;
+		}
+	}
+
+	// TO DO: finish the function and write a description. First parameter is for colors, not labels.
+	#addThresholdArc() {
+		// Available max radius depends on which ever side is smaller while also taking min/max block widths into account.
+		// Threshold arc thickness depends on whether there is a value arc or it is independent.
+		// Threshold arc is always on the outer rim.
+
+		// If the thickness would be 1 it would be simply a thin line. But when thickness is added, it extends in both directions.
+		// outer is -offset and inner is +offset;
+		// Find the outer rim starting point depending on angle.
+		// If there is no threshold for min, take the color of the user theme.
+
+		let thresholdArcContainer = this.svg.querySelector(`#${this.thresholdArcContainerId}`);
+
+		if (this.initialLoad || !thresholdArcContainer) {
+			thresholdArcContainer = document.createElementNS(SVGNS, 'g');
+
+			this.#addAttributesNS(thresholdArcContainer, {id: this.thresholdArcContainerId});
+
+			this.svg.appendChild(thresholdArcContainer);
+
+			this.elements.thresholdArcContainer = {
+				node: thresholdArcContainer
+			};
+		}
+
+		// Reserve space for threshold labels on top if they should be displayed.
+		if (this.data.thresholds.show_labels) {
+			this.radiusThresholdArc -= this.minMaxFontSize;
+			this.radiusValueArc -= this.minMaxFontSize;
+		}
+
+		this.#addArcEmpty(this.elements.thresholdArcContainer.node);
+
+		if (!this.initialLoad) {
+			// Remove old threshold parts
+			const parts = this.svg.querySelectorAll('.arc-threshold-part');
+
+			for (let i = 0; i < parts.length; i++) {
+				parts[i].remove();
+			}
+		}
+
+		this.#prepareThresholdsArcParts();
+
+		this.#calculateCoordinatesOfContainer(this.elements.thresholdArcContainer);
+
+		if (this.data.thresholds.show_labels) {
+			this.#addThresholdsLabels();
+		}
+		else {
+			if (this.elements.thresholdsLabelsContainer) {
+				this.elements.thresholdsLabelsContainer.node.innerHTML = '';
+			}
+		}
+	}
+
+	#prepareThresholdsArcParts() {
+		this.thresholdsArcParts = [];
+
+		for (let i = 0; i < this.data.thresholds.data.length; i++) {
+			let valueEnd = 0;
+
+			if (i < this.data.thresholds.data.length - 1) {
+				valueEnd = this.data.thresholds.data[i + 1].threshold_value;
+			}
+			else {
+				valueEnd = this.data.minmax.max.raw;
+			}
+
+			this.thresholdsArcParts[i] = {
+				angleStart: this.#getAngle(this.data.thresholds.data[i].threshold_value, this.data.minmax.min.raw, this.data.minmax.max.raw),
+				angleEnd: this.#getAngle(valueEnd, this.data.minmax.min.raw, this.data.minmax.max.raw),
+				label: this.data.thresholds.data[i].text
+			};
+
+			const path = document.createElementNS(SVGNS, 'path');
+
+			this.#addAttributesNS(path, {class: 'arc-threshold-part'});
+
+			this.elements.thresholdArcContainer.node.appendChild(path);
+
+			const pathDefinition = this.#defineArc(this.x, this.y, this.radiusThresholdArc, this.thresholdsArcParts[i].angleStart, this.thresholdsArcParts[i].angleEnd, this.thicknessThresholdArc);
+
+			this.#addAttributesNS(path, {d: pathDefinition, style: `fill: #${this.data.thresholds.data[i].color}`});
+		}
+	}
+
+	#addThresholdsLabels() {
+		// Depends on whether there is at least one arc. They can be displayed on value arc as well without problems.
+		// Though it doesn't make a lot of sense to do so. But there has to be a threshold to show the label.
+		// If we don't have value arc or threshold arc we can't show labels, even if thresholds are defined.
+
+		// Threshold font size share same height as min/max since there is no separate setting for it.
+		// So we need to reserve space on top of the outter arc. Which ever it is.
+
+		// Each threshold x and y also depends on which ever arc is displayed on the outter rim.
+		// Anchor for each threshold depends on the quadrant in which the circle is drawn.
+
+		// First thing to do is probably translate the values to coordinates.
+
+		// If the area on which threshold should be displayed is taken by another threshold or min/max, it cannot be displayed.
+
+		// To ensure most threholds are displayed, I... I don't know what to do.
+
+		let thresholdsLabelsContainer = this.svg.querySelector('#thresholds-labels-container');
+
+		if (this.initialLoad || !thresholdsLabelsContainer) {
+			thresholdsLabelsContainer = document.createElementNS(SVGNS, 'g');
+
+			this.#addAttributesNS(thresholdsLabelsContainer, {id: 'thresholds-labels-container'});
+
+			this.svg.appendChild(thresholdsLabelsContainer);
+
+			this.elements.thresholdsLabelsContainer = {
+				node: thresholdsLabelsContainer,
+				children: []
+			};
+		}
+
+		thresholdsLabelsContainer.innerHTML = '';
+
+		this.#drawThresholdsLabels();
+	}
+
+	#drawThresholdsLabels() {
+		for (let i = 0; i < this.thresholdsArcParts.length; i++) {
+			// Don't draw label if it is the same as min or max
+			if (this.thresholdsArcParts[i].angleStart === this.angleStart || this.thresholdsArcParts[i].angleStart === this.angleEnd) {
+				continue;
+			}
+
+			let foreign_object = document.createElementNS(SVGNS, 'foreignObject');
+			let div = document.createElement('div');
+
+			this.#addAttributesNS(foreign_object, {x: 0, y: 0, width: '100%', height: '100%', visibility: 'hidden'});
+			this.#addAttributes(div, {xmlns: XMLNS, style: `display: inline-flex; width: fit-content; height: fit-content; font-size: ${this.minMaxFontSize}px;`});
+
+			div.appendChild(document.createTextNode(this.thresholdsArcParts[i].label));
+			foreign_object.appendChild(div);
+			this.elements.thresholdsLabelsContainer.node.appendChild(foreign_object);
+
+			const height = div.offsetHeight;
+			const width = div.offsetWidth;
+
+			this.#addAttributesNS(foreign_object, {height: `${height}px`, width: `${width}px`});
+
+			this.elements.thresholdsLabelsContainer.children[i] = {
+				parent: foreign_object,
+				node: div,
+				width: width,
+				height: height
+			}
+
+			this.#positionThresholdLabel(i);
+		}
+	}
+
+	#positionThresholdLabel(i) {
+		const angle = this.thresholdsArcParts[i].angleStart;
+
+		const radians = ((angle - 90) * Math.PI) / 180;
+
+		const x = (this.x + Math.cos(radians) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+		const y = (this.y + Math.sin(radians) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+
+		const anchor = angle < 0 ? 'bottom right' : 'bottom left';
+
+		this.#reposition(this.elements.thresholdsLabelsContainer.children[i], x, y, anchor);
+		this.#show(this.elements.thresholdsLabelsContainer.children[i]);
+	}
+
+	// TO DO: finish the function
+	#addValueArc() {
+		// Available max radius depends on which ever side is smaller while also taking min/max block widths into account.
+		// But if we have two arcs then value arc is inside the threshold arc, which make the available space even smaller.
+
+		let valueArcContainer = this.svg.querySelector(`#${this.valueArcContainerId}`);
+
+		if (this.initialLoad || !valueArcContainer) {
+			valueArcContainer = document.createElementNS(SVGNS, 'g');
+
+			this.#addAttributesNS(valueArcContainer, {id: this.valueArcContainerId});
+
+			this.svg.appendChild(valueArcContainer);
+
+			this.elements.valueArcContainer = {
+				node: valueArcContainer
+			};
+		}
+
+		this.#addArcEmpty(this.elements.valueArcContainer.node);
+		this.#addArcValue();
+
+		this.#calculateCoordinatesOfContainer(this.elements.valueArcContainer);
+	}
+
+	#addArcValue() {
+		const valueArc = this.svg.querySelector('#arc-value');
+
+		if (this.initialLoad || !valueArc) {
+			const path = document.createElementNS(SVGNS, 'path');
+
+			this.#addAttributesNS(path, {id: 'arc-value', class: 'arc value'});
+
+			this.elements.valueArcContainer.node.appendChild(path);
+		}
+
+		window.requestAnimationFrame(() => {
+			this.#animate(this.angleOld)
+		});
+	}
+
+	#animate(angle) {
+		let currentAngle = angle;
+
+		// A step to move in arc in angles
+		const step = 1;
+
+		if (this.angleOld < this.angleNew) {
+			const angleNext = currentAngle + step;
+			if (angleNext <= this.angleNew) {
+				currentAngle = angleNext;
+			}
+			else {
+				currentAngle += this.angleNew - currentAngle;
+			}
+		}
+		else {
+			const angleNext = currentAngle - step;
+			if (angleNext >= this.angleNew) {
+				currentAngle = angleNext;
+			}
+			else {
+				currentAngle -= currentAngle - this.angleNew;
+			}
+		}
+
+		const path = this.svg.querySelector('#arc-value');
+
+		const pathDefinition = this.#defineArc(this.x, this.y, this.radiusValueArc, this.angleStart, currentAngle, this.thicknessValueArc);
+		this.#addAttributesNS(path, {d: pathDefinition});
+
+		if (currentAngle !== this.angleNew) {
+			window.requestAnimationFrame(() => {
+				this.#animate(currentAngle)
+			});
+		}
+	}
+
+	#addArcEmpty(container) {
+		let arcId = '';
+		let radius = 0;
+		let thickness = 0;
+
+		if (container.id === this.valueArcContainerId) {
+			arcId = 'arc-empty-value';
+			radius = this.radiusValueArc;
+			thickness = this.thicknessValueArc;
+		}
+		else if (container.id === this.thresholdArcContainerId) {
+			arcId = 'arc-empty-threshold';
+			radius = this.radiusThresholdArc;
+			thickness = this.thicknessThresholdArc;
+		}
+
+		let path = this.svg.querySelector(`#${arcId}`);
+
+		if (this.initialLoad || !path) {
+			path = document.createElementNS(SVGNS, 'path');
+
+			this.#addAttributesNS(path, {id: arcId, class: 'arc empty'});
+
+			container.appendChild(path);
+		}
+
+		const pathDefinition = this.#defineArc(this.x, this.y, radius, this.angleStart, this.angleEnd, thickness);
+
+		this.#addAttributesNS(path, {d: pathDefinition});
 	}
 
 	// TO DO: add description
@@ -513,18 +737,52 @@ class CSVGGauge {
 		};
 	}
 
+	#processMinMax() {
+		if (this.data.minmax.show) {
+			this.#addMinMax();
+
+			let minX = 0;
+			let maxX = 0;
+			let minY = 0;
+			let maxY = 0;
+
+			if (this.data.thresholds.show_arc) {
+				minX = this.elements.thresholdArcContainer.coordinates.x1;
+				maxX = this.elements.thresholdArcContainer.coordinates.x2;
+				minY = this.elements.thresholdArcContainer.coordinates.y4;
+				maxY = this.elements.thresholdArcContainer.coordinates.y4;
+			}
+			else {
+				minX = this.elements.valueArcContainer.coordinates.x1;
+				maxX = this.elements.valueArcContainer.coordinates.x2;
+				minY = this.elements.valueArcContainer.coordinates.y4;
+				maxY = this.elements.valueArcContainer.coordinates.y4;
+			}
+
+			this.#reposition(this.elements.min, minX, minY, 'bottom right');
+			this.#reposition(this.elements.max, maxX, maxY, 'bottom left');
+			this.#show(this.elements.min);
+			this.#show(this.elements.max);
+		}
+		else {
+			if (this.elements.min) {
+				this.elements.min.node.innerHTML = '';
+			}
+			if (this.elements.max) {
+				this.elements.max.node.innerHTML = '';
+			}
+		}
+	}
+
 	// TO DO: add description
 	#addMinMax() {
 		const minmax = {min: this.data.minmax.min, max: this.data.minmax.max};
 
 		for (const [key, value] of Object.entries(minmax)) {
-			const line_height = this.height * this.data.minmax.font_size / 100;
-			const font_size = line_height * FONT_SIZE_RATIO;
+			let foreign_object = this.svg.querySelector(`#${key}-container`);
+			let div = this.svg.querySelector(`#${key}-container-div`);
 
-			let foreign_object = null;
-			let div = null;
-
-			if (this.initialLoad || (!this.minMaxShowOld && this.minMaxShowNew)) {
+			if (this.initialLoad || (!foreign_object && !div)) {
 				foreign_object = document.createElementNS(SVGNS, 'foreignObject');
 				div = document.createElement('div');
 
@@ -535,14 +793,12 @@ class CSVGGauge {
 				this.svg.appendChild(foreign_object);
 			}
 			else {
-				foreign_object = this.svg.querySelector(`#${key}-container`);
-				div = this.svg.querySelector(`#${key}-container-div`);
 				div.innerHTML = '';
 
 				this.#addAttributesNS(foreign_object, {height: '100%', width: '100%'});
 			}
 
-			this.#addAttributes(div, {style: `font-size: ${font_size}px;`});
+			this.#addAttributes(div, {style: `font-size: ${this.minMaxFontSize}px;`});
 
 			if (key === 'min') {
 				this.#addAttributes(foreign_object, {style: 'text-align: right;'});
@@ -554,7 +810,7 @@ class CSVGGauge {
 			// This text already contains units inside, because they are always after the min or max.
 			div.appendChild(document.createTextNode(value.text));
 
-			const height = div.offsetHeight + (line_height - div.offsetHeight);
+			const height = div.offsetHeight;
 			const width = div.offsetWidth;
 
 			this.#addAttributesNS(foreign_object, {height: `${height}px`, width: `${width}px`});
@@ -594,13 +850,9 @@ class CSVGGauge {
 		}
 	}
 
-	#polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-		const angleInRadians = (angleInDegrees - 90) * Math.PI / 180;
-
-		return {
-			x: centerX + (radius * Math.cos(angleInRadians)),
-			y: centerY + (radius * Math.sin(angleInRadians))
-		};
+	// TO DO: finish the function
+	#addNeedle() {
+		// Depends on whether there is at least one arc. If both arcs exist, needle takes radius of the smallest arc.
 	}
 
 	#defineArc(x, y, radius, startAngle, endAngle, thickness){
@@ -620,20 +872,13 @@ class CSVGGauge {
 		].join(' ');
 	}
 
-	#addArcEmpty(container) {
-		let path = this.svg.querySelector('#arc-empty');
+	#polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+		const angleInRadians = (angleInDegrees - 90) * Math.PI / 180;
 
-		if (this.initialLoad || !path) {
-			path = document.createElementNS(SVGNS, 'path');
-
-			this.#addAttributesNS(path, {id: 'arc-empty', class: 'arc empty'});
-
-			container.appendChild(path);
-		}
-
-		const pathDefinition = this.#defineArc(this.x, this.y, this.radius, this.angleStart, this.angleEnd, this.thickness);
-
-		this.#addAttributesNS(path, {d: pathDefinition});
+		return {
+			x: centerX + (radius * Math.cos(angleInRadians)),
+			y: centerY + (radius * Math.sin(angleInRadians))
+		};
 	}
 
 	#getAngle(value, min, max) {
@@ -660,314 +905,6 @@ class CSVGGauge {
 
 		return angle;
 	}
-
-	#animate(angle) {
-		let currentAngle = angle;
-
-		// A step to move in arc in angles
-		const step = 1;
-
-		if (this.angleOld < this.angleNew) {
-			const angleNext = currentAngle + step;
-			if (angleNext <= this.angleNew) {
-				currentAngle = angleNext;
-			}
-			else {
-				currentAngle += this.angleNew - currentAngle;
-			}
-		}
-		else {
-			const angleNext = currentAngle - step;
-			if (angleNext >= this.angleNew) {
-				currentAngle = angleNext;
-			}
-			else {
-				currentAngle -= currentAngle - this.angleNew;
-			}
-		}
-
-		const path = this.svg.querySelector('#arc-value');
-
-		const pathDefinition = this.#defineArc(this.x, this.y, this.radius, this.angleStart, currentAngle, this.thickness);
-		this.#addAttributesNS(path, {d: pathDefinition});
-
-		if (currentAngle !== this.angleNew) {
-			window.requestAnimationFrame(() => {
-				this.#animate(currentAngle)
-			});
-		}
-	}
-
-	#addArcValue() {
-		if (this.initialLoad) {
-			const path = document.createElementNS(SVGNS, 'path');
-
-			this.#addAttributesNS(path, {id: 'arc-value', class: 'arc value'});
-
-			this.elements.valueArcContainer.node.appendChild(path);
-		}
-
-		window.requestAnimationFrame(() => {
-			this.#animate(this.angleOld)
-		});
-	}
-
-	// TO DO: finish the function
-	#addValueArc() {
-		// Available max radius depends on which ever side is smaller while also taking min/max block widths into account.
-		// But if we have two arcs then value arc is inside the threshold arc, which make the available space even smaller.
-
-		let valueArcContainer = this.svg.querySelector('#value-arc-container');
-
-		if (this.initialLoad || !valueArcContainer) {
-			valueArcContainer = document.createElementNS(SVGNS, 'g');
-
-			this.#addAttributesNS(valueArcContainer, {id: 'value-arc-container'});
-
-			this.svg.appendChild(valueArcContainer);
-
-			this.elements.valueArcContainer = {
-				node: valueArcContainer
-			};
-		}
-
-		this.radius = this.height - this.elements.description.height - this.thickness;
-
-		if (this.data.description.pos === DESC_V_POSITION_TOP) {
-			this.y = this.height;
-		}
-		else if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
-			this.y = this.height - this.elements.description.height;
-		}
-
-		this.#addArcEmpty(this.elements.valueArcContainer.node);
-		this.#addArcValue();
-
-		const rect = valueArcContainer.getBoundingClientRect();
-
-		this.elements.valueArcContainer.width = rect.width;
-		this.elements.valueArcContainer.height = rect.height;
-
-		this.elements.valueArcContainer.coordinates = this.#calcCoordinates(this.x - rect.width / 2, this.y - rect.height, rect.width, rect.height);
-	}
-
-	// TO DO: finish the function and write a description. First parameter is for colors, not labels.
-	#addThresholdArc() {
-		// Available max radius depends on which ever side is smaller while also taking min/max block widths into account.
-		// Threshold arc thickness depends on whether there is a value arc or it is independent.
-		// Threshold arc is always on the outer rim.
-
-		// If the thickness would be 1 it would be simply a thin line. But when thickness is added, it extends in both directions.
-		// outer is -offset and inner is +offset;
-		// Find the outer rim starting point depending on angle.
-		// If there is no threshold for min, take the color of the user theme.
-
-		this.thresholdsArcParts = [];
-
-		for (let i = 0; i < this.data.thresholds.data.length; i++) {
-			let valueEnd = 0;
-
-			if (i < this.data.thresholds.data.length - 1) {
-				valueEnd = this.data.thresholds.data[i + 1].threshold_value;
-			}
-			else {
-				valueEnd = this.data.minmax.max.raw;
-			}
-
-			this.thresholdsArcParts[i] = {
-				angleStart: this.#getAngle(this.data.thresholds.data[i].threshold_value, this.data.minmax.min.raw, this.data.minmax.max.raw),
-				angleEnd: this.#getAngle(valueEnd, this.data.minmax.min.raw, this.data.minmax.max.raw),
-				label: this.data.thresholds.data[i].text
-			};
-		}
-
-		let thresholdArcContainer = null;
-
-		if (this.initialLoad) {
-			thresholdArcContainer = document.createElementNS(SVGNS, 'g');
-
-			this.#addAttributesNS(thresholdArcContainer, {id: 'threshold-arc-container'});
-
-			this.svg.appendChild(thresholdArcContainer);
-		}
-		else {
-			thresholdArcContainer = this.svg.querySelector('#threshold-arc-container');
-		}
-
-		this.elements.thresholdArcContainer = {
-			node: thresholdArcContainer
-		};
-
-
-		this.radius = this.height - this.elements.description.height - this.thickness;
-
-		if (this.data.description.pos === DESC_V_POSITION_TOP) {
-			this.y = this.height;
-		}
-		else if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
-			this.y = this.height - this.elements.description.height;
-		}
-
-
-		// Reserve space for threshold labels on top if they should be displayed.
-		if (this.data.thresholds.show_labels) {
-			// this.y += this.elements.min.height;
-		}
-
-
-		this.#addArcEmpty(this.elements.thresholdArcContainer.node);
-
-		const rect = thresholdArcContainer.getBoundingClientRect();
-
-		this.elements.thresholdArcContainer.width = rect.width;
-		this.elements.thresholdArcContainer.height = rect.height;
-
-		this.elements.thresholdArcContainer.coordinates = this.#calcCoordinates(this.x - rect.width / 2, this.y - rect.height, rect.width, rect.height);
-
-
-		if (!this.initialLoad) {
-			const parts = this.svg.querySelectorAll('.arc-threshold-part');
-
-			for (let i = 0; i < parts.length; i++) {
-				parts[i].remove();
-			}
-		}
-
-
-		for (let i = 0; i < this.thresholdsArcParts.length; i++) {
-			const path = document.createElementNS(SVGNS, 'path');
-
-			this.#addAttributesNS(path, {class: 'arc-threshold-part'});
-
-			this.elements.thresholdArcContainer.node.appendChild(path);
-
-			const pathDefinition = this.#defineArc(this.x, this.y, this.radius, this.thresholdsArcParts[i].angleStart, this.thresholdsArcParts[i].angleEnd, this.thickness);
-
-			this.#addAttributesNS(path, {d: pathDefinition, style: `fill: #${this.data.thresholds.data[i].color}`});
-		}
-
-
-		if (this.data.thresholds.show_labels) {
-			this.#addThresholdsLabels();
-		}
-		else {
-			if (this.elements.thresholdsLabelsContainer) {
-				this.elements.thresholdsLabelsContainer.node.innerHTML = '';
-			}
-		}
-	}
-
-	#addThresholdsLabels() {
-		// Depends on whether there is at least one arc. They can be displayed on value arc as well without problems.
-		// Though it doesn't make a lot of sense to do so. But there has to be a threshold to show the label.
-		// If we don't have value arc or threshold arc we can't show labels, even if thresholds are defined.
-
-		// Threshold font size share same height as min/max since there is no separate setting for it.
-		// So we need to reserve space on top of the outter arc. Which ever it is.
-
-		// Each threshold x and y also depends on which ever arc is displayed on the outter rim.
-		// Anchor for each threshold depends on the quadrant in which the circle is drawn.
-
-		// First thing to do is probably translate the values to coordinates.
-
-		// If the area on which threshold should be displayed is taken by another threshold or min/max, it cannot be displayed.
-
-		// To ensure most threholds are displayed, I... I don't know what to do.
-
-		let thresholdsLabelsContainer = this.svg.querySelector('#thresholds-labels-container');
-
-		if (this.initialLoad || !thresholdsLabelsContainer) {
-			thresholdsLabelsContainer = document.createElementNS(SVGNS, 'g');
-
-			this.#addAttributesNS(thresholdsLabelsContainer, {id: 'thresholds-labels-container'});
-
-			this.svg.appendChild(thresholdsLabelsContainer);
-
-			this.elements.thresholdsLabelsContainer = {
-				node: thresholdsLabelsContainer,
-				children: []
-			};
-		}
-
-		thresholdsLabelsContainer.innerHTML = '';
-
-		this.#drawThresholdsLabels();
-	}
-
-	#drawThresholdsLabels() {
-		for (let i = 0; i < this.thresholdsArcParts.length; i++) {
-			// Don't draw label if it is the same as min or max
-			if (this.thresholdsArcParts[i].angleStart === this.angleStart || this.thresholdsArcParts[i].angleStart === this.angleEnd) {
-				continue;
-			}
-
-			let foreign_object = document.createElementNS(SVGNS, 'foreignObject');
-			let div = document.createElement('div');
-
-			const line_height = this.height * this.data.minmax.font_size / 100;
-			const font_size = line_height * FONT_SIZE_RATIO;
-
-			this.#addAttributesNS(foreign_object, {x: 0, y: 0, width: '100%', height: '100%', visibility: 'hidden'});
-			this.#addAttributes(div, {xmlns: XMLNS, style: `display: inline-flex; width: fit-content; height: fit-content; font-size: ${font_size}px;`});
-
-			div.appendChild(document.createTextNode(this.thresholdsArcParts[i].label));
-			foreign_object.appendChild(div);
-			this.elements.thresholdsLabelsContainer.node.appendChild(foreign_object);
-
-			const height = div.offsetHeight;
-			const width = div.offsetWidth;
-
-			this.#addAttributesNS(foreign_object, {height: `${height}px`, width: `${width}px`});
-
-			this.elements.thresholdsLabelsContainer.children[i] = {
-				parent: foreign_object,
-				node: div,
-				width: width,
-				height: height
-			}
-
-			this.#positionThresholdsLabels(i);
-		}
-	}
-
-	#positionThresholdsLabels(i) {
-		const angle = this.thresholdsArcParts[i].angleStart;
-
-		const radians = ((angle - 90) * Math.PI) / 180;
-
-		const x = (this.x + Math.cos(radians) * (this.radius + this.thickness));
-		const y = (this.y + Math.sin(radians) * (this.radius + this.thickness));
-
-		const anchor = angle < 0 ? 'bottom right' : 'bottom left';
-
-		this.#reposition(this.elements.thresholdsLabelsContainer.children[i], x, y, anchor);
-		this.#show(this.elements.thresholdsLabelsContainer.children[i]);
-	}
-
-	// TO DO: finish the function
-	#addNeedle() {
-		// Depends on whether there is at least one arc. If both arcs exist, needle takes radius of the smallest arc.
-	}
-
-	#addThresholdLabels(arc, thresholds) {
-		// Depends on whether there is at least one arc. They can be displayed on value arc as well without problems.
-		// Though it doesn't make a lot of sense to do so. But there has to be a threshold to show the label.
-		// If we don't have value arc or threshold arc we can't show labels, even if thresholds are defined.
-
-		// Threshold font size share same height as min/max since there is no separate setting for it.
-		// So we need to reserve space on top of the outter arc. Which ever it is.
-
-		// Each threshold x and y also depends on which ever arc is displayed on the outter rim.
-		// Anchor for each threshold depends on the quadrant in which the circle is drawn.
-
-		// First thing to do is probably translate the values to coordinates.
-
-		// If the area on which threshold should be displayed is taken by another threshold or min/max, it cannot be displayed.
-
-		// To ensure most threholds are displayed, I... I don't know what to do.
-	}
-
-	// TO DO: create functions to add arcs, add needle etc.
 
 	// TO DO: add description and finish writing the function.
 	resize(width, height) {
@@ -1043,6 +980,15 @@ class CSVGGauge {
 		coordinates.y4 = coordinates.y3;
 
 		return coordinates;
+	}
+
+	#calculateCoordinatesOfContainer(container) {
+		const rect = container.node.getBoundingClientRect();
+
+		container.width = rect.width;
+		container.height = rect.height;
+
+		container.coordinates = this.#calcCoordinates(this.x - rect.width / 2, this.y - rect.height, rect.width, rect.height);
 	}
 
 	// TO DO: add description
