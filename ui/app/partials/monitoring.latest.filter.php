@@ -365,8 +365,8 @@ if (array_key_exists('render_html', $data)) {
 
 		// Render subfilter fields.
 		const form = container.querySelector('form');
-		const subfilter_fields = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data',
-			'subfilter_state'
+		const subfilter_fields = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags','subfilter_state',
+			'subfilter_data'
 		];
 
 		subfilter_fields.forEach(key => {
