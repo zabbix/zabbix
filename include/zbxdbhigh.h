@@ -491,7 +491,7 @@ void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 
 #ifdef HAVE_ORACLE
 void	zbx_db_statement_prepare(const char *sql);
-void	zbx_db_table_prepare(const char *tablename, struct zbx_json *j);
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
@@ -871,10 +871,12 @@ typedef struct
 }
 zbx_lld_override_operation_t;
 
+ZBX_PTR_VECTOR_DECL(lld_override_operation, zbx_lld_override_operation_t*)
+
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation);
 
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
-		zbx_vector_ptr_t *ops);
+		zbx_vector_lld_override_operation_t *ops);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 

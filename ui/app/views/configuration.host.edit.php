@@ -43,9 +43,6 @@ $data += [
 			(new CSimpleButton(_('Clone')))
 				->onClick('view.clone();')
 				->removeAttribute('id'),
-			(new CSimpleButton(_('Full clone')))
-				->onClick('view.fullClone();')
-				->removeAttribute('id'),
 			(new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected host?'))
 				->setAttribute('data-hostid', $data['hostid'])

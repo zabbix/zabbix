@@ -294,4 +294,21 @@ class CDashboardElement extends CElement {
 		$this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one()->click();
 		$this->query('xpath:'.$selection.'/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			foreach ($target->getWidgets() as $widget) {
+				if (!$widget->isReady()) {
+					return false;
+				}
+			}
+
+			return true;
+		};
+	}
 }
