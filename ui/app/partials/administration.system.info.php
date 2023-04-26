@@ -37,6 +37,16 @@ $info_table = (new CTableInfo())
 		$data['system_info']['server_details']
 	])
 	->addRow([
+		_('Zabbix server version'),
+		$status['has_status'] ? $status['server_version'] : '',
+		''
+	])
+	->addRow([
+		_('Zabbix frontend version'),
+		ZABBIX_VERSION,
+		''
+	])
+	->addRow([
 		_('Number of hosts (enabled/disabled)'),
 		$status['has_status'] ? $status['hosts_count'] : '',
 		$status['has_status']
@@ -113,17 +123,6 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			))->addClass(ZBX_STYLE_RED)
 		);
 	}
-}
-
-// Warn if database history tables have not been upgraded.
-if (!$data['system_info']['float_double_precision']) {
-	$info_table->addRow([
-		_('Database history tables upgraded'),
-		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
-		(new CCol(
-			_('Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range.')
-		))->addClass(ZBX_STYLE_RED)
-	]);
 }
 
 if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {

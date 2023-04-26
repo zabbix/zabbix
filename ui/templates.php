@@ -56,7 +56,6 @@ $fields = [
 	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'full_clone'		=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
@@ -141,8 +140,8 @@ if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
-elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clone'))) {
-	$_REQUEST['form'] = hasRequest('clone') ? 'clone' : 'full_clone';
+elseif (hasRequest('templateid') && hasRequest('clone')) {
+	$_REQUEST['form'] = 'clone';
 
 	$groups = getRequest('groups', []);
 	$groupids = [];
@@ -185,10 +184,6 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 	$macros = array_map(function($macro) {
 		return array_diff_key($macro, array_flip(['hostmacroid']));
 	}, $macros);
-
-	if (hasRequest('clone')) {
-		unset($_REQUEST['templateid']);
-	}
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	try {
@@ -202,7 +197,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$input_templateid = getRequest('templateid', 0);
 		$cloneTemplateId = 0;
 
-		if (getRequest('form') === 'full_clone') {
+		if (getRequest('form') === 'clone') {
 			$cloneTemplateId = $input_templateid;
 			$input_templateid = 0;
 		}
@@ -295,7 +290,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$upd_valuemaps = [];
 		$del_valuemapids = [];
 
-		if (getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone') {
+		if (getRequest('form', '') === 'clone') {
 			foreach ($valuemaps as &$valuemap) {
 				unset($valuemap['valuemapid']);
 			}
@@ -331,8 +326,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			throw new Exception();
 		}
 
-		// full clone
-		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
+		// clone
+		if ($cloneTemplateId != 0 && getRequest('form') === 'clone') {
 
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
@@ -578,7 +573,7 @@ if (hasRequest('form')) {
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
 
-		if ($data['form'] !== 'full_clone') {
+		if ($data['form'] !== 'clone') {
 			$data['vendor'] = array_filter([
 				'name' => $data['dbTemplate']['vendor_name'],
 				'version' => $data['dbTemplate']['vendor_version']

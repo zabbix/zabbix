@@ -37,6 +37,7 @@ class CElementFilter {
 	const VISIBLE = 'visible';
 	const CLICKABLE = 'clickable';
 	const READY = 'ready';
+	const NOT_READY = 'not ready';
 	const NOT_PRESENT = 'not present';
 	const TEXT_NOT_PRESENT = 'text not present';
 	const ATTRIBUTES_NOT_PRESENT = 'attributes not present';
@@ -107,6 +108,7 @@ class CElementFilter {
 	public static function getConditionCallable($condition) {
 		$conditions = [
 			static::READY => 'getReadyCondition',
+			static::NOT_READY => 'getNotReadyCondition',
 			static::PRESENT => 'getPresentCondition',
 			static::NOT_PRESENT => 'getNotPresentCondition',
 			static::TEXT_PRESENT => 'getTextPresentCondition',

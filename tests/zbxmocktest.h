@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include "zbxtypes.h"
 
 /* hint to a compiler that cmocka _fail returns immediately, so it does not raise 'uninitialized variable' warnings */
 #if defined(__GNUC__) || defined(__clang__)
@@ -35,11 +36,15 @@
 #endif
 
 unsigned char get_program_type(void);
+int	get_config_forks(unsigned char process_type);
+void	set_config_forks(unsigned char process_type, int forks);
 
 int	get_zbx_config_timeout(void);
 int	get_zbx_config_enable_remote_commands(void);
 int	get_zbx_config_log_remote_commands(void);
 int	get_zbx_config_unsafe_user_parameters(void);
+zbx_uint64_t	get_zbx_config_value_cache_size(void);
+void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size);
 
 void	zbx_mock_test_entry(void **state);
 

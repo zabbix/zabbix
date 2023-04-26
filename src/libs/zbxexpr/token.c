@@ -133,11 +133,10 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
  *                                                                            *
  * Purpose: parses expression macro token                                     *
  *                                                                            *
- * Parameters: expression        - [IN] the expression                        *
- *             macro             - [IN] the beginning of the token            *
- *             simple_macro_find - [IN] pass simple macro flag to             *
- *                                      zbx_token_find()                      *
- *             token             - [OUT] the token data                       *
+ * Parameters: expression    - [IN] the expression                            *
+ *             macro         - [IN] the beginning of the token                *
+ *             token_search - [IN] specify if references will be searched     *
+ *             token         - [OUT] the token data                           *
  *                                                                            *
  * Return value: SUCCEED - the expression macro was parsed successfully       *
  *               FAIL    - macro does not point at valid expression macro     *
@@ -150,17 +149,13 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
  *           contain user macro contexts and item keys with string arguments. *
  *                                                                            *
  ******************************************************************************/
-static int	token_parse_expression_macro(const char *expression, const char *macro, int simple_macro_find,
+static int	token_parse_expression_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token)
 {
 	const char			*ptr;
 	size_t				offset;
 	zbx_token_expression_macro_t	*data;
 	int				quoted = 0;
-	zbx_token_search_t		token_search = ZBX_TOKEN_SEARCH_BASIC;
-
-	if (0 != simple_macro_find)
-		token_search |= ZBX_TOKEN_SEARCH_SIMPLE_MACRO;
 
 	for (ptr = macro + 2; '\0' != *ptr ; ptr++)
 	{
@@ -187,6 +182,7 @@ static int	token_parse_expression_macro(const char *expression, const char *macr
 			if ('?' == ptr[1])
 				continue;
 
+			token_search &= ~ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 			if (SUCCEED == zbx_token_find(ptr, 0, &tmp, token_search))
 			{
 				switch (tmp.type)
@@ -751,13 +747,10 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 				break;
 			case '?':
 				if (0 != (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
-					ret = token_parse_expression_macro(expression, ptr,
-							0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) ? 1 : 0,
-							token);
+					ret = token_parse_expression_macro(expression, ptr, token_search, token);
 				break;
 			case '{':
-				ret = zbx_token_parse_nested_macro(expression, ptr,
-						0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) ? 1 : 0, token);
+				ret = zbx_token_parse_nested_macro(expression, ptr, token_search, token);
 				break;
 			case '0':
 			case '1':
@@ -830,11 +823,10 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
  *                                                                            *
  * Purpose: parses token with nested macros                                   *
  *                                                                            *
- * Parameters: expression        - [IN] the expression                        *
- *             macro             - [IN] the beginning of the token            *
- *             simple_macro_find - [IN] pass simple macro flag to             *
- *                                      zbx_token_find()                      *
- *             token             - [OUT] the token data                       *
+ * Parameters: expression   - [IN] the expression                             *
+ *             macro        - [IN] the beginning of the token                 *
+ *             token_search - [IN] specify if references will be searched     *
+ *             token        - [OUT] the token data                            *
  *                                                                            *
  * Return value: SUCCEED - the token was parsed successfully                  *
  *               FAIL    - macro does not point at valid function or simple   *
@@ -852,7 +844,7 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
  *           filled with macro specific data.                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token)
 {
 	const char	*ptr;
@@ -875,22 +867,15 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int 
 	}
 	else if ('?' == macro[2])
 	{
-		zbx_token_t		expr_token;
-		zbx_token_search_t	token_search;
+		zbx_token_t	expr_token;
 
-		token_search = ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
-
-		if (0 != simple_macro_find)
-			token_search |= ZBX_TOKEN_SEARCH_SIMPLE_MACRO;
-
-		if (SUCCEED != zbx_token_find(macro, 1, &expr_token, token_search) ||
-				ZBX_TOKEN_EXPRESSION_MACRO != expr_token.type ||
-				1 != expr_token.loc.l)
-		{
+		if (0 == (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 			return FAIL;
-		}
 
-		ptr = macro + expr_token.loc.r;
+		if (SUCCEED != token_parse_expression_macro(expression, macro + 1, token_search, &expr_token))
+			return FAIL;
+
+		ptr = expression + expr_token.loc.r;
 	}
 	else
 	{
@@ -915,7 +900,7 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int 
 		return token_parse_func_macro(expression, macro, ptr + 2, token, '#' == macro[2] ?
 				ZBX_TOKEN_LLD_FUNC_MACRO : ZBX_TOKEN_FUNC_MACRO);
 	}
-	else if (0 != simple_macro_find && '#' != macro[2] && ':' == ptr[1])
+	else if (0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) && '#' != macro[2] && ':' == ptr[1])
 		return token_parse_simple_macro_key(expression, macro, ptr + 2, token);
 
 	return FAIL;
