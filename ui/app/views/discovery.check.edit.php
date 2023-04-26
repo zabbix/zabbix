@@ -29,7 +29,7 @@ order_result($discovery_check_types);
 
 $inline_js = getPagePostJs().$this->readJsFile('discovery.check.edit.js.php');
 
-$form = (new CForm());
+$form = new CForm();
 
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
@@ -109,7 +109,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CTextBox('snmpv3_securityname', $data['params']['snmpv3_securityname']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAttribute('maxlength', 64)
+				->setAttribute('maxlength', DB::getFieldLength('dchecks', 'snmpv3_securityname'))
 		))->setId('dcheck_snmpv3_securityname')
 	])
 	->addItem([
@@ -132,7 +132,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CTextBox('snmpv3_authpassphrase', $data['params']['snmpv3_authpassphrase']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAttribute('maxlength', 64)
+				->setAttribute('maxlength', DB::getFieldLength('dchecks', 'snmpv3_authpassphrase'))
 				->disableAutocomplete()
 		))->setId('dcheck_snmpv3_authpassphrase')
 	])
@@ -153,7 +153,7 @@ $form_grid = (new CFormGrid())
 			(new CTextBox('snmpv3_privpassphrase', $data['params']['snmpv3_privpassphrase']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired()
-				->setAttribute('maxlength', 64)
+				->setAttribute('maxlength', DB::getFieldLength('dchecks', 'snmpv3_privpassphrase'))
 				->disableAutocomplete()
 		))->setId('dcheck_snmpv3_privpassphrase')
 	]);
