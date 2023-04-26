@@ -101,8 +101,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CTextBox('snmpv3_contextname', $data['params']['snmpv3_contextname']))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		))
-			->setId('dcheck_snmpv3_contextname')
+		))->setId('dcheck_snmpv3_contextname')
 	])
 	->addItem([
 		(new CLabel(_('Security name'), 'snmpv3_securityname'))->setId('dcheck_snmpv3_securityname_label'),
