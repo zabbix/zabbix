@@ -270,8 +270,7 @@ window.drule_edit_popup = new class {
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
-
-		document.getElementById('name').focus();
+		this.overlay.recoverFocus();
 	}
 
 	delete() {
