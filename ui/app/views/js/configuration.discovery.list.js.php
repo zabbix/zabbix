@@ -104,8 +104,8 @@
 		_disable(target, druleids, massdisable = false) {
 			if (massdisable) {
 				const confirmation = druleids.length > 1
-					? <?= json_encode(_('Disable discovery rules?')) ?>
-					: <?= json_encode(_('Disable discovery rule?')) ?>;
+					? <?= json_encode(_('Disable selected discovery rules?')) ?>
+					: <?= json_encode(_('Disable selected discovery rule?')) ?>;
 
 				if (!window.confirm(confirmation)) {
 					return;
