@@ -182,12 +182,11 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 	if (0 != tickPerSecond.QuadPart)
 	{
-		LARGE_INTEGER	tick;
+		static ZBX_THREAD_LOCAL LARGE_INTEGER	last_tick = {0};
+		LARGE_INTEGER				tick;
 
 		if (TRUE == QueryPerformanceCounter(&tick))
 		{
-			static ZBX_THREAD_LOCAL LARGE_INTEGER	last_tick = {0};
-
 			if (0 < last_tick.QuadPart)
 			{
 				LARGE_INTEGER	qpc_tick = {0}, ntp_tick = {0};
@@ -226,6 +225,8 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 			last_tick = tick;
 		}
+		else
+			last_tick.QuadPart = 0;
 	}
 #else	/* not _WINDOWS */
 #ifdef HAVE_TIME_CLOCK_GETTIME
@@ -249,7 +250,12 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	}
 #endif	/* not _WINDOWS */
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
+			(last_ts.ns > ts->ns && 1000000 > (last_ts.ns - ts->ns))))
+#else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
+#endif
 	{
 		ts->ns += ++corr;
 
