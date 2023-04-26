@@ -22,7 +22,7 @@
 /**
  * Class is used to validate and parse a function.
  */
-class C10HistFunctionParser extends CParser {
+class C54HistFunctionParser extends CParser {
 
 	protected const STATE_NEW = 0;
 	protected const STATE_END = 1;

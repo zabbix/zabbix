@@ -36,7 +36,7 @@ class C64ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '7.0';
 
-		class_alias(C10HistFunctionParser::class, 'CHistFunctionParser');
+		class_alias(C54HistFunctionParser::class, 'CHistFunctionParser');
 
 		self::$parser = new CExpressionParser(['usermacros' => true]);
 
