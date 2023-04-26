@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-25T19:12:38Z'
+  date: '2023-04-26T18:21:09Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -57,7 +57,7 @@ zabbix_export:
               name: 'GCP: Authorization has been failed'
               priority: AVERAGE
               description: |
-                GCP: Autorization has been failed. 
+                GCP: Authorization has been failed. 
                 Please, check the authorization parameters carefully
                 and GCP API availability from network segment, where Zabbix-server/proxy is located.
                 
@@ -67,7 +67,7 @@ zabbix_export:
                   value: availability
         -
           uuid: 5cc3faa82f404b38b513958f323f3d7d
-          name: 'GCP: authorization'
+          name: 'GCP: Authorization'
           type: SCRIPT
           key: gcp.authorization
           delay: '{$GCP.AUTH.FREQUENCY}'
@@ -78,10 +78,10 @@ zabbix_export:
             var auth_url = 'https://oauth2.googleapis.com/token',
                 issued = new Date().getTime() / 1000,
                 expires = issued + parseInt('10', 10),
-                scope = "https://www.googleapis.com/auth/cloud-platform.read-only " +
-                    "https://www.googleapis.com/auth/monitoring " +
-                    "https://www.googleapis.com/auth/compute.readonly " +
-                    "https://www.googleapis.com/auth/sqlservice.admin";
+                scope = 'https://www.googleapis.com/auth/cloud-platform.read-only ' +
+                    'https://www.googleapis.com/auth/monitoring ' +
+                    'https://www.googleapis.com/auth/compute.readonly ' +
+                    'https://www.googleapis.com/auth/sqlservice.admin';
             
             function base64url(source) {
                 // Encode in classical base64
@@ -106,8 +106,8 @@ zabbix_export:
             }
             
             function base64EncodeData(data) {
-                var b64u = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
-                    dst = "",
+                var b64u = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',
+                    dst = '',
                     len = data.length;
             
                 for (var i = 0; i <= len - 3; i += 3) {
@@ -132,8 +132,8 @@ zabbix_export:
             }
             
             function encodeJWT(headers, payload, secret) {
-                unsignedToken = base64url(JSON.stringify(headers)) + "." + base64url(JSON.stringify(payload));
-                jwt = unsignedToken + "." + base64EncodeData(fromHex(sign('sha256', secret, unsignedToken)));
+                unsignedToken = base64url(JSON.stringify(headers)) + '.' + base64url(JSON.stringify(payload));
+                jwt = unsignedToken + '.' + base64EncodeData(fromHex(sign('sha256', secret, unsignedToken)));
                 return jwt;
             }
             
@@ -141,11 +141,11 @@ zabbix_export:
                 // This function takes a Signed JWT and exchanges it for a Google OAuth Access Token
                 var request = new HttpRequest();
                 params = {
-                    "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-                    "assertion": signed_jwt
+                    grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                    assertion: signed_jwt
                 };
             
-                response = request.post(auth_url, JSON.stringify(params));
+                var response = request.post(auth_url, JSON.stringify(params));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + auth_url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -186,22 +186,20 @@ zabbix_export:
                 return params;
             }
             
-            var script_params = checkParams(JSON.parse(value));
-            
-            headers = {
-                "alg": "RS256", // Google uses SHA256withRSA
-                'kid': script_params.pkey_id,
-                "typ": "JWT"
-            };
-            
-            payload = {
-                "iss": script_params.email,		// Issuer claim
-                "sub": script_params.email,		// Issuer claim
-                "aud": auth_url,	// Audience claim
-                "iat": ~~issued,	// Issued At claim
-                "exp": ~~expires,	// Expire time
-                "scope": scope		// Permissions
-            };
+            var script_params = checkParams(JSON.parse(value)),
+                headers = {
+                    alg: 'RS256', // Google uses SHA256withRSA
+                    kid: script_params.pkey_id,
+                    typ: 'JWT'
+                },
+                payload = {
+                    iss: script_params.email,		// Issuer claim
+                    sub: script_params.email,		// Issuer claim
+                    aud: auth_url,	// Audience claim
+                    iat: ~~issued,	// Issued At claim
+                    exp: ~~expires,	// Expire time
+                    scope: scope		// Permissions
+                };
             
             try {
                 jwt = encodeJWT(headers, payload, script_params.private_key);
@@ -211,11 +209,10 @@ zabbix_export:
             catch (err) {
                 return JSON.stringify({ error: err });
             }
-            
           description: |
-            Google Cloud Platform REST authorization with wervice account authentication parameters and temporary-generated RSA-based JWT-token usage.
+            Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.
             The necessary scopes are pre-defined on the code level.
-            The result is a signed authorization token with 1 hour livetime, required just once and used for the all dependent script items.
+            The result is a signed authorization token with 1 hour lifetime, required just once and used for the all dependent script items.
             Check the documentation carefully for the details.
             
           timeout: '{$GCP.DATA.TIMEOUT}'
@@ -249,8 +246,7 @@ zabbix_export:
               parameters:
                 - |
                   var token = value,
-                      url = 'https://sqladmin.googleapis.com/sql/v1beta4/projects/{$GCP.PROJECT.ID}/instances',
-                      arr = [];
+                      url = 'https://sqladmin.googleapis.com/sql/v1beta4/projects/{$GCP.PROJECT.ID}/instances';
                   
                   function getHttpData(url, token) {
                       var request = new HttpRequest();
@@ -258,7 +254,7 @@ zabbix_export:
                       request.addHeader('Authorization: Bearer ' + token);
                       request.addHeader('Content-Type: application/json');
                   
-                      response = request.get(url);
+                      var response = request.get(url);
                   
                       Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -283,7 +279,9 @@ zabbix_export:
                   
                   var result = getHttpData(url, token);
                   
-                  if (Object.keys(result).length === 0) return JSON.stringify([]);
+                  if (Object.keys(result).length === 0) {
+                      return JSON.stringify([]);
+                  }
                   
                   var sql_inst_props = result.items.map(function (sql_inst) {
                       obj = {
@@ -314,8 +312,8 @@ zabbix_export:
                   
                       return obj;
                   });
-                  arr = arr.concat(sql_inst_props);
-                  return JSON.stringify(arr);
+                  
+                  return JSON.stringify(sql_inst_props);
           master_item:
             key: gcp.authorization
           tags:
@@ -388,7 +386,7 @@ zabbix_export:
                       request.addHeader('Authorization: Bearer ' + token);
                       request.addHeader('Content-Type: application/json');
                   
-                      response = request.get(url);
+                      var response = request.get(url);
                   
                       Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -410,8 +408,8 @@ zabbix_export:
                       }
                       return response;
                   };
-                  var result = getHttpData(url, token);
-                  var vms_raw = result.items,
+                  var result = getHttpData(url, token),
+                      vms_raw = result.items,
                       keys = Object.keys(vms_raw);
                   
                   for (var i in keys) {
@@ -558,22 +556,21 @@ zabbix_export:
               value: environment
         -
           uuid: c4f17331815345bcb0ac6ea98413b2b5
-          name: 'GCP Compute Engine: Project Quotas Get'
+          name: 'GCP Compute Engine: Project quotas get'
           type: DEPENDENT
           key: gcp.gce.quotas.get
           delay: '0'
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'GCP Compute Engine resource quotas available for the  particular project.'
+          description: 'GCP Compute Engine resource quotas available for the particular project.'
           preprocessing:
             -
               type: JAVASCRIPT
               parameters:
                 - |
                   var token = value,
-                      url = 'https://www.googleapis.com/compute/v1/projects/{$GCP.PROJECT.ID}',
-                      arr = [];
+                      url = 'https://www.googleapis.com/compute/v1/projects/{$GCP.PROJECT.ID}';
                   
                   function getHttpData(url, token) {
                       var request = new HttpRequest();
@@ -581,7 +578,7 @@ zabbix_export:
                       request.addHeader('Authorization: Bearer ' + token);
                       request.addHeader('Content-Type: application/json');
                   
-                      response = request.get(url);
+                      var response = request.get(url);
                   
                       Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
@@ -618,8 +615,8 @@ zabbix_export:
                       };
                       return obj;
                   });
-                  arr = arr.concat(qts_lst);
-                  return JSON.stringify(arr);
+                  
+                  return JSON.stringify(qts_lst);
           master_item:
             key: gcp.authorization
           tags:
@@ -1298,7 +1295,7 @@ zabbix_export:
                   name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit had been changed'
                   opdata: 'Current limit: {ITEM.VALUE}'
                   priority: INFO
-                  description: 'GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota  had been changed'
+                  description: 'GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota had been changed'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1352,7 +1349,7 @@ zabbix_export:
                   name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reach the limit'
                   opdata: 'Usage: {#GCE.QUOTA.USAGE} | Limit: {#GCE.QUOTA.LIMIT} | Percentage {ITEM.VALUE}%'
                   priority: AVERAGE
-                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota  is critically close to reach the limit'
+                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reach the limit'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1493,7 +1490,7 @@ zabbix_export:
         -
           macro: '{$GCP.GCE.QUOTA.PUSED.MIN.WARN}'
           value: '80'
-          description: 'The Warning  quota utilization threshold.'
+          description: 'The Warning quota utilization threshold.'
         -
           macro: '{$GCP.GCE.ZONE.MATCHES}'
           value: '.*'
@@ -1670,7 +1667,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: decimal_places
-                      value: '1'
+                      value: '0'
                     -
                       type: ITEM
                       name: itemid
@@ -1700,7 +1697,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: decimal_places
-                      value: '1'
+                      value: '0'
                     -
                       type: ITEM
                       name: itemid
@@ -1730,7 +1727,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: decimal_places
-                      value: '1'
+                      value: '0'
                     -
                       type: ITEM
                       name: itemid
@@ -1759,7 +1756,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: decimal_places
-                      value: '1'
+                      value: '0'
                     -
                       type: ITEM
                       name: itemid
@@ -1788,7 +1785,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: decimal_places
-                      value: '1'
+                      value: '0'
                     -
                       type: ITEM
                       name: itemid
@@ -1816,7 +1813,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: decimal_places
-                      value: '1'
+                      value: '0'
                     -
                       type: ITEM
                       name: itemid
@@ -1845,7 +1842,7 @@ zabbix_export:
                     -
                       type: INTEGER
                       name: decimal_places
-                      value: '1'
+                      value: '0'
                     -
                       type: ITEM
                       name: itemid
@@ -1918,7 +1915,7 @@ zabbix_export:
               value: security
         -
           uuid: d512c542f5514681acbb11431a0a6f5a
-          name: 'GCP Cloud SQL MSSQL:  Connection resets'
+          name: 'GCP Cloud SQL MSSQL: Connection resets'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.connection_reset_count
           delay: '0'
@@ -1941,7 +1938,7 @@ zabbix_export:
               value: network
         -
           uuid: 300a6cb53fb44176bdf99eba86a976bd
-          name: 'GCP Cloud SQL MSSQL:  Login attempts'
+          name: 'GCP Cloud SQL MSSQL: Login attempts'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.login_attempt_count
           delay: '0'
@@ -1967,7 +1964,7 @@ zabbix_export:
               value: network
         -
           uuid: 622c237ed12e44c7b2415676ec23bd2d
-          name: 'GCP Cloud SQL MSSQL:  Logouts'
+          name: 'GCP Cloud SQL MSSQL: Logouts'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.logout_count
           delay: '0'
@@ -1990,7 +1987,7 @@ zabbix_export:
               value: network
         -
           uuid: 6ba672cbf4c242eb8e6fb80eba4c90d8
-          name: 'GCP Cloud SQL MSSQL:  Processes blocked'
+          name: 'GCP Cloud SQL MSSQL: Processes blocked'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.processes_blocked
           delay: '0'
@@ -2013,7 +2010,7 @@ zabbix_export:
               value: network
         -
           uuid: 38de8ae591854d5fbc4ee4946a2e189a
-          name: 'GCP Cloud SQL MSSQL: CPU: Reserverd cores'
+          name: 'GCP Cloud SQL MSSQL: Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.cpu.reserved_cores
           delay: '0'
@@ -2094,7 +2091,7 @@ zabbix_export:
                   value: performance
         -
           uuid: ecdd1774ef744bcb93e8e4094e29772f
-          name: 'GCP Cloud SQL MSSQL:  Databases get'
+          name: 'GCP Cloud SQL MSSQL: Databases get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.db.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -2126,7 +2123,7 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -2151,23 +2148,23 @@ zabbix_export:
             
             var params = checkParams(JSON.parse(value)),
                 filter = "filter database_id ='" + params.database_id + "'",
-                time_window = " | within {$GCP.TIME.WINDOW} | ",
+                time_window = ' | within {$GCP.TIME.WINDOW} | ',
                 raw = getHttpData(url, params.token, {
                     query:
-                        "{" + base_paths.join(';') + "}" + time_window + filter + " | join"
+                        '{' + base_paths.join(';') + '}' + time_window + filter + ' | join'
                 }),
                 metrics = raw.timeSeriesDescriptor.pointDescriptors,
                 time_series = raw.timeSeriesData;
             
             for (t in time_series) {
                 data = {
-                    'database': time_series[t].labelValues[3].stringValue,
-                    'metrics': {}
+                    database: time_series[t].labelValues[3].stringValue,
+                    metrics: {}
                 };
             
                 for (i in metrics) {
                     re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][metrics[i].key.replace(re, "")] = time_series[t].pointData[0].values[i].int64Value;
+                    data['metrics'][metrics[i].key.replace(re, '')] = time_series[t].pointData[0].values[i].int64Value;
                 }
                 arr.push(data);
             }
@@ -2243,7 +2240,7 @@ zabbix_export:
                   value: availability
         -
           uuid: cd6cf3870a514ff59bd1f40987764642
-          name: 'GCP Cloud SQL MSSQL: Disk: Bytes used'
+          name: 'GCP Cloud SQL MSSQL: Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.bytes_used
           delay: '0'
@@ -2266,7 +2263,7 @@ zabbix_export:
           uuid: 86bdbf20c9b4466c9ea00e26cb0f0652
           name: 'GCP Cloud SQL MSSQL: Disk size'
           type: DEPENDENT
-          key: gcp.cloudsql.mssql.disk.qouta
+          key: gcp.cloudsql.mssql.disk.quota
           delay: '0'
           history: 7d
           trends: 90d
@@ -2285,7 +2282,7 @@ zabbix_export:
               value: storage
         -
           uuid: 400a7318203f40928ebf0b023da65848
-          name: 'GCP Cloud SQL MSSQL: Disk: Read I/O'
+          name: 'GCP Cloud SQL MSSQL: Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.read_ops_count
           delay: '0'
@@ -2361,7 +2358,7 @@ zabbix_export:
                   value: capacity
         -
           uuid: 819078cd99af46368eb33d76dadf4861
-          name: 'GCP Cloud SQL MSSQL: Disk: Write I/O'
+          name: 'GCP Cloud SQL MSSQL: Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.write_ops_count
           delay: '0'
@@ -2503,7 +2500,7 @@ zabbix_export:
                   value: availability
         -
           uuid: a29584de7ab142309f0bb6f57b52af85
-          name: 'GCP Cloud SQL MSSQL: Buffer bache hit ratio'
+          name: 'GCP Cloud SQL MSSQL: Buffer сache hit ratio'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio
           delay: '0'
@@ -2786,7 +2783,7 @@ zabbix_export:
                   value: performance
         -
           uuid: 6de08b07cecc47a88bde22de5d1b4e5a
-          name: 'GCP Cloud SQL MSSQL:  Metrics get'
+          name: 'GCP Cloud SQL MSSQL: Metrics get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -2848,8 +2845,8 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
-                
+                var response = request.post(url, JSON.stringify(body));
+            
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                 if (response !== null) {
@@ -2876,21 +2873,21 @@ zabbix_export:
                 var keys = raw.timeSeriesDescriptor.pointDescriptors,
                     values = raw.timeSeriesData[0].pointData[0].values,
                     re = /(^t_\d+\.value\.)/g;
-                obj = {};
             
                 for (i in keys) {
                     var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
-                                obj[prefix + keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                                obj[prefix + keys[i].key.replace(re, '')] = values[i][value_types[v]];
                             } else {
-                                obj[keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                                obj[keys[i].key.replace(re, '')] = values[i][value_types[v]];
                             }
             
                         }
                     }
-                } return obj;
+                }
+                return obj;
             }
             
             function single_metrics(tsd) {
@@ -2907,36 +2904,40 @@ zabbix_export:
             }
             
             
-                var params = checkParams(JSON.parse(value));
-                if (params.audited.match(/true/)) base_paths.push(mssql_path + 'audits_size');
+            var params = checkParams(JSON.parse(value));
+            if (params.audited.match(/true/)) {
+                base_paths.push(mssql_path + 'audits_size');
+            };
             
-                var filter = "filter database_id ='" + params.database_id + "'",
-                    time_window = " | within {$GCP.TIME.WINDOW} | ",
-                    queries = [
-                        { name: 'base_', data: { query: "{" + base_paths.join(';') + "}" + time_window + filter + " | join" } },
-                        { name: 'mssql_', data: { query: "{" + mssql_paths.join(';') + "}" + time_window + filter + " | join" } }
-                    ];
-            
-                var obj = {};
-                for (q in queries) {
-                    raw = getHttpData(url, params.token, queries[q].data);
-                    obj = Object.assign(obj, rawMap(raw, queries[q].name));
-                }
-            
-                obj.base_ram_pused = (obj.base_usage / obj.base_quota) * 100;
-            
-                single_queries = [
-                    { query: mssql_path + "memory/page_operation_count" + time_window + filter }
+            var filter = "filter database_id ='" + params.database_id + "'",
+                time_window = ' | within {$GCP.TIME.WINDOW} | ',
+                queries = [
+                    { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + time_window + filter + ' | join' } },
+                    { name: 'mssql_', data: { query: '{' + mssql_paths.join(';') + '}' + time_window + filter + ' | join' } }
                 ];
             
-                if (params.audited.match(/true/)) single_queries.push({ query: mssql_path + "audits_upload_count" + time_window + filter });
+            var obj = {};
+            for (q in queries) {
+                raw = getHttpData(url, params.token, queries[q].data);
+                obj = Object.assign(obj, rawMap(raw, queries[q].name));
+            }
             
-                for (q in single_queries) {
-                    raw = getHttpData(url, params.token, single_queries[q]);
-                    Object.assign(obj, single_metrics(raw.timeSeriesData));
-                }
+            obj.base_ram_pused = (obj.base_usage / obj.base_quota) * 100;
             
-                return JSON.stringify(obj);
+            single_queries = [
+                { query: mssql_path + 'memory/page_operation_count' + time_window + filter }
+            ];
+            
+            if (params.audited.match(/true/)) {
+                single_queries.push({ query: mssql_path + 'audits_upload_count' + time_window + filter });
+            }
+            
+            for (q in single_queries) {
+                raw = getHttpData(url, params.token, single_queries[q]);
+                Object.assign(obj, single_metrics(raw.timeSeriesData));
+            }
+            
+            return JSON.stringify(obj);
             
           description: 'MSSQL metrics data in the raw format.'
           preprocessing:
@@ -3032,7 +3033,7 @@ zabbix_export:
               value: traffic
         -
           uuid: 7ee117702e1f40faadd901faa9d333ff
-          name: 'GCP Cloud SQL MSSQL:  Resources get'
+          name: 'GCP Cloud SQL MSSQL: Resources get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.resources.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -3065,7 +3066,7 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -3090,23 +3091,23 @@ zabbix_export:
             
             var params = checkParams(JSON.parse(value)),
                 filter = "filter database_id ='" + params.database_id + "'",
-                time_window = " | within {$GCP.TIME.WINDOW} | ",
+                time_window = ' | within {$GCP.TIME.WINDOW} | ',
                 raw = getHttpData(url, params.token, {
                     query:
-                        "{" + base_paths.join(';') + "}" + time_window + filter + " | join"
+                        '{' + base_paths.join(';') + '}' + time_window + filter + ' | join'
                 }),
                 metrics = raw.timeSeriesDescriptor.pointDescriptors,
                 time_series = raw.timeSeriesData;
             
             for (t in time_series) {
                 data = {
-                    'resource': time_series[t].labelValues[3].stringValue,
-                    'metrics': {}
+                    resource: time_series[t].labelValues[3].stringValue,
+                    metrics: {}
                 };
             
                 for (i in metrics) {
                     re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][metrics[i].key.replace(re, "")] = time_series[t].pointData[0].values[i].int64Value;
+                    data['metrics'][metrics[i].key.replace(re, '')] = time_series[t].pointData[0].values[i].int64Value;
                 }
                 arr.push(data);
             }
@@ -3126,7 +3127,7 @@ zabbix_export:
               value: raw
         -
           uuid: 3c14882329b94b8e88ca5d85e21bb7c8
-          name: 'GCP Cloud SQL MSSQL:  Schedulers get'
+          name: 'GCP Cloud SQL MSSQL: Schedulers get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.schedulers.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -3162,7 +3163,7 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                 
@@ -3187,23 +3188,23 @@ zabbix_export:
             
             var params = checkParams(JSON.parse(value)),
                 filter = "filter database_id ='" + params.database_id + "'",
-                time_window = " | within {$GCP.TIME.WINDOW} | ",
+                time_window = ' | within {$GCP.TIME.WINDOW} | ',
                 raw = getHttpData(url, params.token, {
                     query:
-                        "{" + base_paths.join(';') + "}" + time_window + filter + " | join"
+                        '{' + base_paths.join(';') + '}' + time_window + filter + ' | join'
                 }),
                 metrics = raw.timeSeriesDescriptor.pointDescriptors,
                 time_series = raw.timeSeriesData;
             
             for (t in time_series) {
                 data = {
-                    'scheduler': time_series[t].labelValues[3].stringValue,
-                    'metrics': {}
+                    scheduler: time_series[t].labelValues[3].stringValue,
+                    metrics: {}
                 };
             
                 for (i in metrics) {
                     re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][metrics[i].key.replace(re, "")] = time_series[t].pointData[0].values[i].int64Value;
+                    data['metrics'][metrics[i].key.replace(re, '')] = time_series[t].pointData[0].values[i].int64Value;
                 }
                 arr.push(data);
             }
@@ -3826,7 +3827,7 @@ zabbix_export:
         -
           macro: '{$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}'
           value: '95'
-          description: 'MSSQL instance CPU usage  threshold.'
+          description: 'MSSQL instance CPU usage threshold.'
         -
           macro: '{$CLOUD_SQL.MSSQL.DB.NAME.MATCHES}'
           value: '.*'
@@ -3838,15 +3839,15 @@ zabbix_export:
         -
           macro: '{$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}'
           value: '90'
-          description: 'MSSQL instance critical disk usage  threshold.'
+          description: 'MSSQL instance critical disk usage threshold.'
         -
           macro: '{$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}'
           value: '80'
-          description: 'MSSQL instance warning disk usage  threshold.'
+          description: 'MSSQL instance warning disk usage threshold.'
         -
           macro: '{$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}'
           value: '90'
-          description: 'MSSQL instance RAM usage  threshold.'
+          description: 'MSSQL instance RAM usage threshold.'
         -
           macro: '{$CLOUD_SQL.MSSQL.RES.NAME.MATCHES}'
           value: '.*'
@@ -3869,7 +3870,7 @@ zabbix_export:
           description: 'A response timeout for an API.'
         -
           macro: '{$GCP.TIME.WINDOW}'
-          value: 6m
+          value: 5m
           description: |
             Time interval for the data requests.
             There are following usage types:
@@ -3972,7 +3973,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'GCP Cloud SQL MSSQL by HTTP'
-                        name: 'GCP Cloud SQL MSSQL: Disk read/writeoperations'
+                        name: 'GCP Cloud SQL MSSQL: Disk read/write operations'
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -4100,7 +4101,7 @@ zabbix_export:
       template: 'GCP Cloud SQL MSSQL Replica by HTTP'
       name: 'GCP Cloud SQL MSSQL Replica by HTTP'
       description: |
-        Get GCP Cloud SQL MSSQL monitoring for read-only replicas with script item usage to perform HTTP requestst to Google Cloud Platform Monitoring API.
+        Get GCP Cloud SQL MSSQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
         This template will be connected to discovered entities automatically with the all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
@@ -4214,7 +4215,7 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -4240,10 +4241,10 @@ zabbix_export:
             
             var params = checkParams(JSON.parse(value)),
                 filter = "filter database_id ='" + params.database_id + "'",
-                time_window = " | within {$GCP.TIME.WINDOW} | ";
+                time_window = ' | within {$GCP.TIME.WINDOW} | ';
             
             base_raw = getHttpData(url, params.token, {
-                query: "{" + paths.join(';') + "}" + time_window + filter + " | join"
+                query: '{' + paths.join(';') + '}' + time_window + filter + ' | join'
             });
             
             var keys = base_raw.timeSeriesDescriptor.pointDescriptors,
@@ -4254,7 +4255,7 @@ zabbix_export:
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                 for (v in value_types) {
                     if (typeof values[i][value_types[v]] !== 'undefined') {
-                        obj[keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                        obj[keys[i].key.replace(re, '')] = values[i][value_types[v]];
                     }
                 }
             }
@@ -4594,7 +4595,7 @@ zabbix_export:
               value: mysql
         -
           uuid: 83e36c61e8ce4d06a395ea7b06c5877b
-          name: 'GCP Cloud SQL MySQL: CPU: Reserverd cores'
+          name: 'GCP Cloud SQL MySQL: Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.cpu.reserved_cores
           delay: '0'
@@ -4731,7 +4732,7 @@ zabbix_export:
                   value: availability
         -
           uuid: 76c37760145d43f3927f1a9548dea8a5
-          name: 'GCP Cloud SQL MySQL: Disk: Bytes used'
+          name: 'GCP Cloud SQL MySQL: Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.bytes_used
           delay: '0'
@@ -4754,7 +4755,7 @@ zabbix_export:
           uuid: 464fecbbedd64e988739c93736d2b824
           name: 'GCP Cloud SQL MySQL: Disk size'
           type: DEPENDENT
-          key: gcp.cloudsql.mysql.disk.qouta
+          key: gcp.cloudsql.mysql.disk.quota
           delay: '0'
           history: 7d
           trends: 90d
@@ -4773,7 +4774,7 @@ zabbix_export:
               value: storage
         -
           uuid: d426d282d2ee43fe9c9b64dcb6d0c4c9
-          name: 'GCP Cloud SQL MySQL: Disk: Read I/O'
+          name: 'GCP Cloud SQL MySQL: Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.read_ops_count
           delay: '0'
@@ -4849,7 +4850,7 @@ zabbix_export:
                   value: capacity
         -
           uuid: 7a44187c6a404defb0dc83fa22f89d96
-          name: 'GCP Cloud SQL MySQL: Disk: Write I/O'
+          name: 'GCP Cloud SQL MySQL: Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.write_ops_count
           delay: '0'
@@ -5154,7 +5155,7 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -5181,33 +5182,32 @@ zabbix_export:
                 var keys = raw.timeSeriesDescriptor.pointDescriptors,
                     values = raw.timeSeriesData[0].pointData[0].values,
                     re = /(^t_\d+\.value\.)/g;
-                obj = {};
             
                 for (i in keys) {
                     var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
-                                obj[prefix + keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                                obj[prefix + keys[i].key.replace(re, '')] = values[i][value_types[v]];
                             } else {
-                                obj[keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                                obj[keys[i].key.replace(re, '')] = values[i][value_types[v]];
                             }
             
                         }
                     }
-                } return obj;
+                }
+                return obj;
             }
             
-            var params = checkParams(JSON.parse(value));
-            
-            var filter = "filter database_id ='" + params.database_id + "'",
-                time_window = " | within {$GCP.TIME.WINDOW} | ",
+            var params = checkParams(JSON.parse(value)),
+                filter = "filter database_id ='" + params.database_id + "'",
+                time_window = ' | within {$GCP.TIME.WINDOW} | ',
                 queries = [
-                    { name: 'base_', data: { query: "{" + base_paths.join(';') + "}" + time_window + filter + " | join" } },
-                    { name: 'mysql_', data: { query: "{" + mysql_paths.join(';') + "}" + time_window + filter + " | join" } }
+                    { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + time_window + filter + ' | join' } },
+                    { name: 'mysql_', data: { query: '{' + mysql_paths.join(';') + '}' + time_window + filter + ' | join' } }
                 ];
             
-            var obj = {};
+            
             for (q in queries) {
                 raw = getHttpData(url, params.token, queries[q].data);
                 obj = Object.assign(obj, rawMap(raw, queries[q].name));
@@ -5411,19 +5411,19 @@ zabbix_export:
         -
           macro: '{$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}'
           value: '95'
-          description: 'MySQL instance CPU usage  threshold.'
+          description: 'MySQL instance CPU usage threshold.'
         -
           macro: '{$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}'
           value: '90'
-          description: 'MySQL instance critical disk usage  threshold.'
+          description: 'MySQL instance critical disk usage threshold.'
         -
           macro: '{$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}'
           value: '80'
-          description: 'MySQL instance warning disk usage  threshold.'
+          description: 'MySQL instance warning disk usage threshold.'
         -
           macro: '{$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}'
           value: '90'
-          description: 'MySQL instance RAM usage  threshold.'
+          description: 'MySQL instance RAM usage threshold.'
         -
           macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
@@ -5632,7 +5632,7 @@ zabbix_export:
       template: 'GCP Cloud SQL MySQL Replica by HTTP'
       name: 'GCP Cloud SQL MySQL Replica by HTTP'
       description: |
-        Get GCP Cloud SQL MySQL  monitoring for read-only replicas with script item usage to perform HTTP requestst to Google Cloud Platform Monitoring API.
+        Get GCP Cloud SQL MySQL  monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
         This template will be connected to discovered entities automatically with the all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.     
@@ -5722,10 +5722,10 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-                
+            
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
@@ -5745,17 +5745,17 @@ zabbix_export:
                 return response;
             };
             
-            var params = checkParams(JSON.parse(value));
-            raw_metrics = getHttpData(url, params.token, {
-                query:
-                    "{" + mon_paths.join(';') + "}" + " | within 5m |" +
-                    " filter database_id = '" + params.database_id + "' | join"
-            });
+            var params = checkParams(JSON.parse(value)),
+                filter = "filter database_id ='" + params.database_id + "'",
+                time_window = " | within {$GCP.TIME.WINDOW} | ",
+                raw = getHttpData(url, params.token, {
+                    query:
+                        '{' + mon_paths.join(';') + '}' + time_window + filter + ' | join'
+                });
             
-            var metric_keys = raw_metrics.timeSeriesDescriptor.pointDescriptors,
-                metric_values = raw_metrics.timeSeriesData[0].pointData[0].values,
+            var metric_keys = raw.timeSeriesDescriptor.pointDescriptors,
+                metric_values = raw.timeSeriesData[0].pointData[0].values,
                 re = /(^t_\d+\.value\.)/g;
-            
             
             for (i in metric_keys) {
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
@@ -6045,7 +6045,7 @@ zabbix_export:
       items:
         -
           uuid: 396a555958514890af339f4504a96cc6
-          name: 'GCP Cloud SQL PostgreSQL: CPU: Reserverd cores'
+          name: 'GCP Cloud SQL PostgreSQL: Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.cpu.reserved_cores
           delay: '0'
@@ -6182,7 +6182,7 @@ zabbix_export:
                   value: availability
         -
           uuid: 799cad827e8b44d98b8285b08153842d
-          name: 'GCP Cloud SQL PostgreSQL: Disk: Bytes used'
+          name: 'GCP Cloud SQL PostgreSQL: Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.bytes_used
           delay: '0'
@@ -6205,7 +6205,7 @@ zabbix_export:
           uuid: 470510bf76fb47fbbddfc8c4a711a335
           name: 'GCP Cloud SQL PostgreSQL: Disk size'
           type: DEPENDENT
-          key: gcp.cloudsql.pgsql.disk.qouta
+          key: gcp.cloudsql.pgsql.disk.quota
           delay: '0'
           history: 7d
           trends: 90d
@@ -6224,7 +6224,7 @@ zabbix_export:
               value: storage
         -
           uuid: f12ba5129c2d435389f4fb6964294381
-          name: 'GCP Cloud SQL PostgreSQL: Disk: Read I/O'
+          name: 'GCP Cloud SQL PostgreSQL: Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.read_ops_count
           delay: '0'
@@ -6300,7 +6300,7 @@ zabbix_export:
                   value: capacity
         -
           uuid: 8d8d6c13cdb244cb80c03226b7c14a90
-          name: 'GCP Cloud SQL PostgreSQL: Disk: Write I/O'
+          name: 'GCP Cloud SQL PostgreSQL: Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.write_ops_count
           delay: '0'
@@ -6576,10 +6576,10 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-                
+            
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
@@ -6603,21 +6603,21 @@ zabbix_export:
                 var keys = raw.timeSeriesDescriptor.pointDescriptors,
                     values = raw.timeSeriesData[0].pointData[0].values,
                     re = /(^t_\d+\.value(_|\.)|_sum$)/g;
-                obj = {};
             
                 for (i in keys) {
                     var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
-                                obj[prefix + keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                                obj[prefix + keys[i].key.replace(re, '')] = values[i][value_types[v]];
                             } else {
-                                obj[keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                                obj[keys[i].key.replace(re, '')] = values[i][value_types[v]];
                             }
             
                         }
                     }
-                } return obj;
+                }
+                return obj;
             }
             
             function single_metrics(tsd) {
@@ -6633,10 +6633,9 @@ zabbix_export:
                 return result;
             }
             
-            var params = checkParams(JSON.parse(value));
-            
-            var filter = "filter database_id ='" + params.database_id + "'",
-                time_window = " | within {$GCP.TIME.WINDOW} | ",
+            var params = checkParams(JSON.parse(value)),
+                filter = "filter database_id ='" + params.database_id + "'",
+                time_window = ' | within {$GCP.TIME.WINDOW} | ',
                 base_paths = [
                     base_path + 'cpu/reserved_cores',
                     base_path + 'cpu/usage_time',
@@ -6653,17 +6652,16 @@ zabbix_export:
                     base_path + 'disk/bytes_used',
                     base_path + 'disk/utilization',
                     base_path + 'disk/quota',
-                    pgsql_path + "transaction_id_utilization | " + filter,
-                    pgsql_path + "temp_bytes_written_count | " + filter + " | sum",
-                    pgsql_path + "temp_files_written_count | " + filter + " | sum",
-                    pgsql_path + "num_backends | " + filter + " | sum"
+                    pgsql_path + 'transaction_id_utilization | ' + filter,
+                    pgsql_path + 'temp_bytes_written_count | ' + filter + ' | sum',
+                    pgsql_path + 'temp_files_written_count | ' + filter + ' | sum',
+                    pgsql_path + 'num_backends | ' + filter + ' | sum'
                 ],
                 queries = [
-                    { name: 'base_', data: { query: "{" + base_paths.join(';') + "}" + time_window + filter + " | join" } },
-                    { name: 'pgsql_', data: { query: "{" + pgsql_paths.join(';') + "}" + time_window + "join" } }
+                    { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + time_window + filter + ' | join' } },
+                    { name: 'pgsql_', data: { query: '{' + pgsql_paths.join(';') + '}' + time_window + 'join' } }
                 ];
             
-            var obj = {};
             for (q in queries) {
                 raw = getHttpData(url, params.token, queries[q].data);
                 obj = Object.assign(obj, rawMap(raw, queries[q].name));
@@ -6672,8 +6670,8 @@ zabbix_export:
             obj.base_ram_pused = (obj.base_usage / obj.base_quota) * 100;
             
             single_queries = [
-                { query: pgsql_path + "transaction_id_count" + time_window + filter },
-                { query: pgsql_path + "vacuum/oldest_transaction_age" + time_window + filter }
+                { query: pgsql_path + 'transaction_id_count' + time_window + filter },
+                { query: pgsql_path + 'vacuum/oldest_transaction_age' + time_window + filter }
             ];
             for (q in single_queries) {
                 raw = getHttpData(url, params.token, single_queries[q]);
@@ -6756,7 +6754,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            The  number of the connections to the Cloud SQL PostgreSQL instance. 
+            The number of the connections to the Cloud SQL PostgreSQL instance. 
             Includes connections to the system databases, which aren't visible by default.
             
           preprocessing:
@@ -6996,7 +6994,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           lifetime: 7d
-          description: 'Databases discovery for  the particular PostgreSQL instance'
+          description: 'Databases discovery for the particular PostgreSQL instance'
           item_prototypes:
             -
               uuid: 997bdb03ba0b437ca2705f28dcc651ed
@@ -7049,7 +7047,7 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Metrics raw'
               type: SCRIPT
               key: 'gcp.cloudsql.pgsql.db.metrics.get[{#PGSQL.DB.NAME}]'
-              delay: 6m
+              delay: 5m
               history: '0'
               trends: '0'
               value_type: TEXT
@@ -7073,7 +7071,7 @@ zabbix_export:
                     request.addHeader('Authorization: Bearer ' + token);
                     request.addHeader('Content-Type: application/json');
                 
-                    response = request.post(url, JSON.stringify(body));
+                    var response = request.post(url, JSON.stringify(body));
                 
                     Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                 
@@ -7106,18 +7104,17 @@ zabbix_export:
                 
                 var params = checkParams(JSON.parse(value)),
                     filter = "filter database_id ='" + params.database_id + "'" + " | filter database ='" + params.database_name + "'",
-                    time_window = " | within {$GCP.TIME.WINDOW} | ",
+                    time_window = ' | within {$GCP.TIME.WINDOW} | ',
                     common_paths = [
-                        base_path + "deadlock_count",
-                        base_path + "tuples_returned_count",
-                        base_path + "tuples_fetched_count",
+                        base_path + 'deadlock_count',
+                        base_path + 'tuples_returned_count',
+                        base_path + 'tuples_fetched_count',
                 
                     ];
                 
                 common_raw = getHttpData(url, params.token, {
                     query:
-                        "{" + common_paths.join(';') + "}" + time_window + filter +
-                        "| join"
+                        '{' + common_paths.join(';') + '}' + time_window + filter + '| join'
                 });
                 
                 var keys = common_raw.timeSeriesDescriptor.pointDescriptors,
@@ -7128,16 +7125,16 @@ zabbix_export:
                     var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
-                            obj[keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                            obj[keys[i].key.replace(re, '')] = values[i][value_types[v]];
                         }
                     }
                 }
                 
                 var queries = [
-                    { query: base_path + "transaction_count" + time_window + filter },
-                    { query: base_path + "blocks_read_count" + time_window + filter },
-                    { query: base_path + "tuples_processed_count" + time_window + filter },
-                    { query: base_path + "tuple_size" + time_window + filter }
+                    { query: base_path + 'transaction_count' + time_window + filter },
+                    { query: base_path + 'blocks_read_count' + time_window + filter },
+                    { query: base_path + 'tuples_processed_count' + time_window + filter },
+                    { query: base_path + 'tuple_size' + time_window + filter }
                 ];
                 
                 for (q in queries) {
@@ -7403,7 +7400,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 8ba7dd12152243b4a5a438bd649f96c1
-              name: 'GCP Cloud SQL PostgreSQL:  Database [{#PGSQL.DB.NAME}]: Tuples'
+              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples'
               graph_items:
                 -
                   color: 199C0D
@@ -7476,19 +7473,19 @@ zabbix_export:
         -
           macro: '{$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}'
           value: '95'
-          description: 'PostgreSQL instance CPU usage  threshold.'
+          description: 'PostgreSQL instance CPU usage threshold.'
         -
           macro: '{$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}'
           value: '90'
-          description: 'PostgreSQL instance critical disk usage  threshold.'
+          description: 'PostgreSQL instance critical disk usage threshold.'
         -
           macro: '{$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}'
           value: '80'
-          description: 'PostgreSQL instance warning disk usage  threshold.'
+          description: 'PostgreSQL instance warning disk usage threshold.'
         -
           macro: '{$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}'
           value: '90'
-          description: 'PostgreSQL instance RAM usage  threshold.'
+          description: 'PostgreSQL instance RAM usage threshold.'
         -
           macro: '{$GCP.CLOUD_SQL.DB.NAME.MATCHES}'
           value: '.*'
@@ -7680,7 +7677,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'GCP Cloud SQL PostgreSQL by HTTP'
-                        name: 'GCP Cloud SQL PostgreSQL:  Database [{#PGSQL.DB.NAME}]: Tuples'
+                        name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -7750,7 +7747,7 @@ zabbix_export:
       template: 'GCP Cloud SQL PostgreSQL Replica by HTTP'
       name: 'GCP Cloud SQL PostgreSQL Replica by HTTP'
       description: |
-        Get GCP Cloud SQL PostgreSQL  monitoring for read-only replicas with script item usage to perform HTTP requestst to Google Cloud Platform Monitoring API.
+        Get GCP Cloud SQL PostgreSQL  monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
         This template will be connected to discovered entities automatically with the all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
@@ -7859,7 +7856,7 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
@@ -7879,34 +7876,34 @@ zabbix_export:
                 return response;
             };
             
-            var params = checkParams(JSON.parse(value));
-            common_metrics = getHttpData(url, params.token, {
-                query:
-                    "{" + mon_paths.join(';') + "}" + " | within 5m |" +
-                    " filter database_id = '" + params.database_id + "' | join"
-            });
+            var params = checkParams(JSON.parse(value)),
+                filter = "filter database_id ='" + params.database_id + "'",
+                time_window = ' | within {$GCP.TIME.WINDOW} | ',
+                raw = getHttpData(url, params.token, {
+                    query:
+                        '{' + mon_paths.join(';') + '}' + time_window + filter + ' | join'
+                });
             
-            var common_keys = common_metrics.timeSeriesDescriptor.pointDescriptors,
-                common_values = common_metrics.timeSeriesData[0].pointData[0].values,
+            var common_keys = raw.timeSeriesDescriptor.pointDescriptors,
+                common_values = raw.timeSeriesData[0].pointData[0].values,
                 re = /(^t_\d+\.value\.)/g;
-            
             
             for (i in common_keys) {
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                 for (v in value_types) {
                     if (typeof common_values[i][value_types[v]] !== 'undefined') {
-                        obj[common_keys[i].key.replace(re, "")] = common_values[i][value_types[v]];
+                        obj[common_keys[i].key.replace(re, '')] = common_values[i][value_types[v]];
                     }
                 }
             }
             
             pgsql_metrics = getHttpData(url, params.token, {
                 query:
-                    pgsql_path +  "replica_byte_lag" + " | within 5m |" +
+                    pgsql_path + 'replica_byte_lag' + time_window +
                     " filter replica_name = '" + params.database_id + "'"
             });
             
-            var tsd = pgsql_metrics.timeSeriesData
+            var tsd = pgsql_metrics.timeSeriesData;
             for (t in tsd) {
                 obj[tsd[t].labelValues[3].stringValue] = tsd[t].pointData[0].values[0].int64Value;
             }
@@ -8129,7 +8126,7 @@ zabbix_export:
       items:
         -
           uuid: 3de05ba490644a62ba4a700ffe439c98
-          name: 'GCP Compute Engine: CPU: Guest visible vCPUs'
+          name: 'GCP Compute Engine: Guest visible vCPUs'
           type: DEPENDENT
           key: gcp.gce.cpu.guest_visible_vcpus
           delay: '0'
@@ -8139,7 +8136,7 @@ zabbix_export:
           description: |
             Number of vCPUs visible inside the guest.
             For many GCE machine types, the number of vCPUs visible inside the guest is equal to the `compute.googleapis.com/instance/cpu/reserved_cores` metric.
-            For shared-core machine types, the number of guest-visible vCPUs differs from the number of resereved cores.
+            For shared-core machine types, the number of guest-visible vCPUs differs from the number of reserved cores.
             For example, e2-small instances have two vCPUs visible inside the guest and 0.5 fractional vCPUs reserved.
             Therefore, for an e2-small instance, `compute.googleapis.com/instance/cpu/guest_visible_vcpus` has a value of 2 and `compute.googleapis.com/instance/cpu/reserved_cores` has a value of 0.5.
             
@@ -8177,7 +8174,7 @@ zabbix_export:
               value: cpu
         -
           uuid: f6c9c633f514416189ba85d2015251ba
-          name: 'GCP Compute Engine: CPU: Scheduler wait time'
+          name: 'GCP Compute Engine: Scheduler wait time'
           type: DEPENDENT
           key: gcp.gce.cpu.scheduler_wait_time
           delay: '0'
@@ -8263,7 +8260,7 @@ zabbix_export:
               uuid: fb8e28649b4947e9a11d891e3126a3a1
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}'
               name: 'GCP Compute Engine: High CPU Utilization'
-              event_name: 'GCP Compute Engine: High CPU Utilization  (over {$GCE.CPU.UTIL.MAX}% for 15m)'
+              event_name: 'GCP Compute Engine: High CPU Utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'The CPU utilization is too high. The system might be slow to respond.'
               manual_close: 'YES'
@@ -8283,8 +8280,7 @@ zabbix_export:
           params: |
             var url = 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query',
                 base_path = 'compute.googleapis.com/instance/disk/',
-                params = checkParams(JSON.parse(value)),
-                mon_url = [
+                mon_paths = [
                     base_path + 'read_ops_count',
                     base_path + 'read_bytes_count',
                     base_path + 'write_bytes_count',
@@ -8307,7 +8303,7 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -8330,26 +8326,29 @@ zabbix_export:
                 return response;
             };
             
-            var obj = getHttpData(url, params.token, {
-                query:
-                    "{" + mon_url.join(';') + "}" + " | within 5m | filter instance_id = '" + params.instance_id + "' | join"
-            });
+            var params = checkParams(JSON.parse(value)),
+                filter = "filter instance_id ='" + params.instance_id + "'",
+                time_window = ' | within {$GCP.TIME.WINDOW} | ',
+                raw = getHttpData(url, params.token, {
+                    query:
+                        '{' + mon_paths.join(';') + '}' + time_window + filter + ' | join'
+                });
             
-            var metrics = obj.timeSeriesDescriptor.pointDescriptors,
-                time_series = obj.timeSeriesData,
+            var metrics = raw.timeSeriesDescriptor.pointDescriptors,
+                time_series = raw.timeSeriesData,
                 arr = [];
             
             for (t in time_series) {
                 data = {
-                    'disk_name': time_series[t].labelValues[3].stringValue,
-                    'device_type': time_series[t].labelValues[4].stringValue,
-                    'storage_type': time_series[t].labelValues[6].stringValue,
-                    'metrics': {}
+                    disk_name: time_series[t].labelValues[3].stringValue,
+                    device_type: time_series[t].labelValues[4].stringValue,
+                    storage_type: time_series[t].labelValues[6].stringValue,
+                    metrics: {}
                 };
             
                 for (i in metrics) {
                     re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][metrics[i].key.replace(re, "")] = time_series[t].pointData[0].values[i].int64Value;
+                    data['metrics'][metrics[i].key.replace(re, '')] = time_series[t].pointData[0].values[i].int64Value;
                 }
                 arr.push(data);
             }
@@ -8690,7 +8689,7 @@ zabbix_export:
           units: '%'
           description: |
             Memory usage Percentage. 
-            This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.
+            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
             
           preprocessing:
             -
@@ -8727,7 +8726,7 @@ zabbix_export:
           units: B
           description: |
             The total amount of memory in the VM. 
-            This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.
+            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
             
           preprocessing:
             -
@@ -8752,7 +8751,7 @@ zabbix_export:
           units: B
           description: |
             Memory currently used in the VM. 
-            This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.
+            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
             
           preprocessing:
             -
@@ -8768,7 +8767,7 @@ zabbix_export:
               value: memory
         -
           uuid: b043128882254e9492c7436521bf994a
-          name: 'GCP Compute Engine: Memory: VM swap in'
+          name: 'GCP Compute Engine: VM swap in'
           type: DEPENDENT
           key: gcp.gce.memory.swap_in_bytes_count
           delay: '0'
@@ -8777,7 +8776,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory read into the guest from its own swap space. 
-            This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.
+            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
             
           preprocessing:
             -
@@ -8793,7 +8792,7 @@ zabbix_export:
               value: memory
         -
           uuid: 7166423bbcf0456ab0fcc7c852d89125
-          name: 'GCP Compute Engine: Memory: VM swap out'
+          name: 'GCP Compute Engine: VM swap out'
           type: DEPENDENT
           key: gcp.gce.memory.swap_out_bytes_count
           delay: '0'
@@ -8802,7 +8801,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory written from the guest to its own swap space. 
-            This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.
+            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
             
           preprocessing:
             -
@@ -8875,10 +8874,10 @@ zabbix_export:
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
-                response = request.post(url, JSON.stringify(body));
+                var response = request.post(url, JSON.stringify(body));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-                
+            
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
@@ -8904,13 +8903,13 @@ zabbix_export:
                 result = {};
             
                 for (i in ids) {
-                    result[ids[i].key.replace(re, "")] = {};
+                    result[ids[i].key.replace(re, '')] = {};
                     for (t in ltsd) {
                         for (v in value_types) {
                             if (typeof ltsd[t].pointData[0].values[i][value_types[v]] !== 'undefined') {
                                 ['stringValue', 'boolValue'].forEach(function (type) {
                                     if (typeof ltsd[t].labelValues[4][type] !== 'undefined') {
-                                        result[ids[i].key.replace(re, "")][ltsd[t].labelValues[4][type]] = ltsd[t].pointData[0].values[i][value_types[v]];
+                                        result[ids[i].key.replace(re, '')][ltsd[t].labelValues[4][type]] = ltsd[t].pointData[0].values[i][value_types[v]];
                                     }
                                 });
             
@@ -8922,13 +8921,15 @@ zabbix_export:
             }
             
             var params = checkParams(JSON.parse(value));
-            if (params.machine_type.match(/e2.*/)) base_paths = base_paths.concat(e2_paths);
+            if (params.machine_type.match(/e2.*/)) {
+                base_paths = base_paths.concat(e2_paths);
+            }
             
             var filter = "filter instance_id = '" + params.instance_id + "'",
-                time_window = " | within {$GCP.TIME.WINDOW} | ";
+                time_window = ' | within {$GCP.TIME.WINDOW} | ';
             
             data_raw = getHttpData(url, params.token, {
-                query: "{" + base_paths.join(';') + "}" + time_window + filter + " | join"
+                query: '{' + base_paths.join(';') + '}' + time_window + filter + ' | join'
             });
             
             var keys = data_raw.timeSeriesDescriptor.pointDescriptors,
@@ -8937,15 +8938,17 @@ zabbix_export:
             for (i in keys) {
                 for (v in value_types) {
                     if (typeof values[i][value_types[v]] !== 'undefined') {
-                        obj[keys[i].key.replace(re, "")] = values[i][value_types[v]];
+                        obj[keys[i].key.replace(re, '')] = values[i][value_types[v]];
                     }
                 }
             }
             
-            if (params.machine_type.match(/e2.*/)) obj.ram_pused = (obj.ram_used / obj.ram_size) * 100;
+            if (params.machine_type.match(/e2.*/)) {
+                obj.ram_pused = (obj.ram_used / obj.ram_size) * 100;
+            }
             
             mirr_raw = getHttpData(url, params.token, {
-                query: base_path + "mirroring/dropped_packets_count" + time_window + filter
+                query: base_path + 'mirroring/dropped_packets_count' + time_window + filter
             });
             var tsd = mirr_raw.timeSeriesData;
             
@@ -8958,8 +8961,8 @@ zabbix_export:
             }
             
             single_queries = [
-                { query: "{" + integrity_paths.join(';') + "}" + time_window + filter + " | join" },
-                { query: "{" + net_paths.join(';') + "}" + time_window + filter + " | join" },
+                { query: '{' + integrity_paths.join(';') + '}' + time_window + filter + ' | join' },
+                { query: '{' + net_paths.join(';') + '}' + time_window + filter + ' | join' },
             ];
             
             for (q in single_queries) {
@@ -9371,6 +9374,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
+              description: 'Count of bytes read from disk with the name [{#GCE.DISK.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -9393,12 +9397,13 @@ zabbix_export:
                   value: '{#GCE.DISK.STOR_TYPE}'
             -
               uuid: e166d3dfeb404111bcd143415070a0af
-              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read operations '
+              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read operations'
               type: DEPENDENT
               key: 'gcp.gce.disk.read_ops_count[{#GCE.DISK.NAME}]'
               delay: '0'
               history: 7d
               trends: 90d
+              description: 'Count of read IO operations on disk with the name [{#GCE.DISK.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -9428,6 +9433,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
+              description: 'Count of bytes written to disk with the name [{#GCE.DISK.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -9456,6 +9462,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
+              description: 'Count of write IO operations on disk with the name [{#GCE.DISK.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -9485,6 +9492,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
+              description: 'Data in raw format for the disk with the name [{#GCE.DISK.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -9787,7 +9795,7 @@ zabbix_export:
   graphs:
     -
       uuid: 1ff7d04868284c07829382c44301fe0e
-      name: 'GCP Cloud SQL MSSQL: Disk read/writeoperations'
+      name: 'GCP Cloud SQL MSSQL: Disk read/write operations'
       graph_items:
         -
           color: 199C0D
@@ -9810,7 +9818,7 @@ zabbix_export:
           calc_fnc: MIN
           item:
             host: 'GCP Cloud SQL MSSQL by HTTP'
-            key: gcp.cloudsql.mssql.disk.qouta
+            key: gcp.cloudsql.mssql.disk.quota
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
@@ -9985,7 +9993,7 @@ zabbix_export:
           calc_fnc: MIN
           item:
             host: 'GCP Cloud SQL MySQL by HTTP'
-            key: gcp.cloudsql.mysql.disk.qouta
+            key: gcp.cloudsql.mysql.disk.quota
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
@@ -10115,7 +10123,7 @@ zabbix_export:
           calc_fnc: MIN
           item:
             host: 'GCP Cloud SQL PostgreSQL by HTTP'
-            key: gcp.cloudsql.pgsql.disk.qouta
+            key: gcp.cloudsql.pgsql.disk.quota
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE

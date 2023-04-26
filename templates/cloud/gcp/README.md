@@ -24,12 +24,12 @@ This template has been tested on:
 ## Setup
 
 1. Create the Service Account in Google Cloud Console for the project you have to monitor.
->Refer the [vendor documenataion](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
+>Refer the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
 2. Create and download the Service Account key in JSON format.
->Refer the [vendor documenataion](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
-3. If you want to monitor Cloud SQL services - don't forget to activate  the Cloud SQL Admin API. 
->Refer the [vendor documenataion](https://cloud.google.com/sql/docs/mysql/admin-api) for the details.
-4. Copy  the `project_id`, `private_key_id`, `private_key`, `client_email`, values from the JSON key file, configure {$GCP.PROJECT.ID}, {$GCP.PRIVATE.KEY.ID}, {$GCP.PRIVATE.KEY}, {$GCP.CLIENT.EMAIL} macros accordingly to the template/host.
+>Refer the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+3. If you want to monitor Cloud SQL services - don't forget to activate the Cloud SQL Admin API. 
+>Refer the [vendor documentation](https://cloud.google.com/sql/docs/mysql/admin-api) for the details.
+4. Copy the `project_id`, `private_key_id`, `private_key`, `client_email`, values from the JSON key file, configure {$GCP.PROJECT.ID}, {$GCP.PRIVATE.KEY.ID}, {$GCP.PRIVATE.KEY}, {$GCP.CLIENT.EMAIL} macros accordingly to the template/host.
 **Notes**: 
      >Ensure, that you're creating the Service Account using the credentials with the `Project Owner/Project IAM Admin/Service Account Admin` role.
      >The Service Account JSON key file is able to be downloaded just once. Re-generate it if the previous key has been lost.
@@ -38,7 +38,7 @@ This template has been tested on:
      
      *IMPORTANT!!!*
      >GCP Access Token is available for the 1 hour (3600 seconds) after the generation request.
-     >To avoid the GCP token inconsistency in the Zabbix Database and in the Zabbix-server configuration cache, don't use CacheUpdateFrequency Zabbix server configuration parameter value more, than 40-45 minutes  and don't set the update interval for the GCP Authorization item more, than 1 hour (maximum CacheUpdateFrequency value)
+     >To avoid the GCP token inconsistency in the Zabbix Database and in the Zabbix-server configuration cache, don't use CacheUpdateFrequency Zabbix server configuration parameter value more, than 40-45 minutes and don't set the update interval for the GCP Authorization item more, than 1 hour (maximum CacheUpdateFrequency value)
 
 
 ### Macros used
@@ -75,14 +75,14 @@ This template has been tested on:
 |{$GCP.MSSQL.INST.TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL instances by type (Standalone/Replica).</p><p>To exclude the unnecessary type set 'CLOUD_SQL_INSTANCE' or 'READ_REPLICA_INSTANCE' as a macro value to exclude Standalone Instances or Read-Only Replicas.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.GCE.QUOTA.MATCHES}|<p>The filter to include GCP Compute Engine project quotas by namespace.</p>|`.*`|
 |{$GCP.GCE.QUOTA.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine project quotas by namespace.</p>|`CHANGE_IF_NEEDED`|
-|{$GCP.GCE.QUOTA.PUSED.MIN.WARN}|<p>The Warning  quota utilization threshold.</p>|`80`|
+|{$GCP.GCE.QUOTA.PUSED.MIN.WARN}|<p>The Warning quota utilization threshold.</p>|`80`|
 |{$GCP.GCE.QUOTA.PUSED.MIN.CRIT}|<p>The Critical quota utilization threshold.</p>|`95`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP: authorization|<p>Google Cloud Platform REST authorization with wervice account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined on the code level.</p><p>The result is a signed authorization token with 1 hour livetime, required just once and used for the all dependent script items.</p><p>Check the documentation carefully for the details.</p>|Script|gcp.authorization|
+|GCP: Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined on the code level.</p><p>The result is a signed authorization token with 1 hour lifetime, required just once and used for the all dependent script items.</p><p>Check the documentation carefully for the details.</p>|Script|gcp.authorization|
 |GCP Compute Engine: Instances get|<p>Get GCP Compute Engine instances.</p>|Dependent item|gcp.gce.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP: Authorization errors check|<p>A list of errors from API requests.</p>|Dependent item|gcp.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
 |GCP Cloud SQL: Instances get|<p>GCP Cloud SQL: Instances Get</p>|Dependent item|gcp.cloudsql.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
@@ -93,13 +93,13 @@ This template has been tested on:
 |GCP Compute Engine: Instances total|<p>GCP Compute Engine instances total count.</p>|Dependent item|gcp.gce.instances.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: Regular instances count|<p>GCP Compute Engine: Regular instances count.</p>|Dependent item|gcp.gce.instances.regular_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'regular')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: Container-optimized instances count|<p>GCP Compute Engine: count of instances with Container-optimized OS used.</p>|Dependent item|gcp.gce.instances.cos_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'container-optimized')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Compute Engine: Project Quotas Get|<p>GCP Compute Engine resource quotas available for the  particular project.</p>|Dependent item|gcp.gce.quotas.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|GCP Compute Engine: Project quotas get|<p>GCP Compute Engine resource quotas available for the particular project.</p>|Dependent item|gcp.gce.quotas.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP: Authorization has been failed|<p>GCP: Autorization has been failed. Please, check the authorization parameters carefullyand GCP API availability from network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
+|GCP: Authorization has been failed|<p>GCP: Authorization has been failed. Please, check the authorization parameters carefullyand GCP API availability from network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
 
 ### LLD rule GCP Compute Engine: Instances discovery
 
@@ -144,9 +144,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit had been changed|<p>GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota  had been changed</p>|`change(/GCP by HTTP/gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]) <> 0`|Info|**Manual close**: Yes|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit had been changed|<p>GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota had been changed</p>|`change(/GCP by HTTP/gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]) <> 0`|Info|**Manual close**: Yes|
 |GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is close to reach the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reach the limit</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.WARN:"{#GCE.QUOTA.NAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reach the limit</li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reach the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota  is critically close to reach the limit</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}`|Average|**Manual close**: Yes|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reach the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reach the limit</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}`|Average|**Manual close**: Yes|
 
 # GCP Compute Engine Instance by HTTP
 
@@ -194,16 +194,16 @@ This template will be connected to discovered entities automatically with the al
 |GCP Compute Engine: Metrics get|<p>GCP Compute Engine metrics get in raw format.</p>|Script|gcp.gce.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: Firewall: Dropped packets|<p>Number of outbound packets dropped due to link congestion.</p>|Dependent item|gcp.gce.firewall.dropped_packets_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.dropped_packets_count`</p></li></ul>|
 |GCP Compute Engine: Firewall: Dropped bytes|<p>Count of incoming bytes dropped by the firewall.</p>|Dependent item|gcp.gce.firewall.dropped_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.dropped_bytes_count`</p></li></ul>|
-|GCP Compute Engine: CPU: Guest visible vCPUs|<p>Number of vCPUs visible inside the guest.</p><p>For many GCE machine types, the number of vCPUs visible inside the guest is equal to the `compute.googleapis.com/instance/cpu/reserved_cores` metric.</p><p>For shared-core machine types, the number of guest-visible vCPUs differs from the number of resereved cores.</p><p>For example, e2-small instances have two vCPUs visible inside the guest and 0.5 fractional vCPUs reserved.</p><p>Therefore, for an e2-small instance, `compute.googleapis.com/instance/cpu/guest_visible_vcpus` has a value of 2 and `compute.googleapis.com/instance/cpu/reserved_cores` has a value of 0.5.</p>|Dependent item|gcp.gce.cpu.guest_visible_vcpus<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.guest_visible_vcpus`</p></li></ul>|
+|GCP Compute Engine: Guest visible vCPUs|<p>Number of vCPUs visible inside the guest.</p><p>For many GCE machine types, the number of vCPUs visible inside the guest is equal to the `compute.googleapis.com/instance/cpu/reserved_cores` metric.</p><p>For shared-core machine types, the number of guest-visible vCPUs differs from the number of reserved cores.</p><p>For example, e2-small instances have two vCPUs visible inside the guest and 0.5 fractional vCPUs reserved.</p><p>Therefore, for an e2-small instance, `compute.googleapis.com/instance/cpu/guest_visible_vcpus` has a value of 2 and `compute.googleapis.com/instance/cpu/reserved_cores` has a value of 0.5.</p>|Dependent item|gcp.gce.cpu.guest_visible_vcpus<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.guest_visible_vcpus`</p></li></ul>|
 |GCP Compute Engine: Reserved vCPUs|<p>Number of vCPUs reserved on the host of the instance.</p>|Dependent item|gcp.gce.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.reserved_cores`</p></li></ul>|
-|GCP Compute Engine: CPU: Scheduler wait time|<p>Wait time is the time a vCPU is ready to run, but unexpectedly not scheduled to run. </p><p>The wait time returned here is the accumulated value for all vCPUs. </p><p>The time interval for which the value was measured is returned by Monitoring in whole seconds as start_time and end_time. </p><p>This metric is only available for VMs that belong to the e2 family or to overcommitted VMs on sole-tenant nodes.</p>|Dependent item|gcp.gce.cpu.scheduler_wait_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.scheduler_wait_time`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: Scheduler wait time|<p>Wait time is the time a vCPU is ready to run, but unexpectedly not scheduled to run. </p><p>The wait time returned here is the accumulated value for all vCPUs. </p><p>The time interval for which the value was measured is returned by Monitoring in whole seconds as start_time and end_time. </p><p>This metric is only available for VMs that belong to the e2 family or to overcommitted VMs on sole-tenant nodes.</p>|Dependent item|gcp.gce.cpu.scheduler_wait_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.scheduler_wait_time`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: CPU usage time|<p>Delta vCPU usage for all vCPUs, in vCPU-seconds. </p><p>To compute the per-vCPU utilization fraction, divide this value by (end-start)*N, where end and start define this value's time interval and N is `compute.googleapis.com/instance/cpu/reserved_cores` at the end of the interval. </p><p>This value is reported by the hypervisor for the VM and can differ from `agent.googleapis.com/cpu/usage_time`, which is reported from inside the VM.</p>|Dependent item|gcp.gce.cpu.usage_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage_time`</p></li></ul>|
 |GCP Compute Engine: CPU utilization|<p>Fractional utilization of allocated CPU on this instance. </p><p>This metric is reported by the hypervisor for the VM and can differ from `agent.googleapis.com/cpu/utilization`, which is reported from inside the VM.</p>|Dependent item|gcp.gce.cpu.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
-|GCP Compute Engine: Memory size|<p>The total amount of memory in the VM. </p><p>This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.</p>|Dependent item|gcp.gce.memory.ram_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ram_size`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Compute Engine: Memory used|<p>Memory currently used in the VM. </p><p>This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.</p>|Dependent item|gcp.gce.memory.ram_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ram_used`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Compute Engine: Memory usage percentage|<p>Memory usage Percentage. </p><p>This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.</p>|Dependent item|gcp.gce.memory.ram_pused<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ram_pused`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Compute Engine: Memory: VM swap in|<p>The amount of memory read into the guest from its own swap space. </p><p>This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.</p>|Dependent item|gcp.gce.memory.swap_in_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.swap_in_bytes_count`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Compute Engine: Memory: VM swap out|<p>The amount of memory written from the guest to its own swap space. </p><p>This metric is only available for VMs that belong to the e2 family, empty  value for different instance type.</p>|Dependent item|gcp.gce.memory.swap_out_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.swap_out_bytes_count`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: Memory size|<p>The total amount of memory in the VM. </p><p>This metric is only available for VMs that belong to the e2 family, empty value for different instance type.</p>|Dependent item|gcp.gce.memory.ram_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ram_size`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: Memory used|<p>Memory currently used in the VM. </p><p>This metric is only available for VMs that belong to the e2 family, empty value for different instance type.</p>|Dependent item|gcp.gce.memory.ram_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ram_used`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: Memory usage percentage|<p>Memory usage Percentage. </p><p>This metric is only available for VMs that belong to the e2 family, empty value for different instance type.</p>|Dependent item|gcp.gce.memory.ram_pused<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ram_pused`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: VM swap in|<p>The amount of memory read into the guest from its own swap space. </p><p>This metric is only available for VMs that belong to the e2 family, empty value for different instance type.</p>|Dependent item|gcp.gce.memory.swap_in_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.swap_in_bytes_count`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: VM swap out|<p>The amount of memory written from the guest to its own swap space. </p><p>This metric is only available for VMs that belong to the e2 family, empty value for different instance type.</p>|Dependent item|gcp.gce.memory.swap_out_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.swap_out_bytes_count`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: Network: Received bytes|<p>Count of bytes received from the network without load-balancing.</p>|Dependent item|gcp.gce.network.lb.received_bytes_count.false<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.received_bytes_count.false`</p></li></ul>|
 |GCP Compute Engine: Network: Received bytes: Load-balanced|<p>Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. </p><p>Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.</p><p>The value is empty when load-balancing is not using.</p>|Dependent item|gcp.gce.network.lb.received_bytes_count.true<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.received_bytes_count.true`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: Network: Received packets|<p>Count of packets received from the network without load-balancing.</p>|Dependent item|gcp.gce.network.lb.received_packets_count.false<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.received_packets_count.false`</p></li></ul>|
@@ -248,11 +248,11 @@ This template will be connected to discovered entities automatically with the al
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Raw data||Dependent item|gcp.gce.quota.single.raw[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.disk_name == "{#GCE.DISK.NAME}")].metrics.first()`</p></li></ul>|
-|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read bytes||Dependent item|gcp.gce.disk.read_bytes_count[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.read_bytes_count`</p></li></ul>|
-|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read operations||Dependent item|gcp.gce.disk.read_ops_count[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.read_ops_count`</p></li></ul>|
-|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Write bytes||Dependent item|gcp.gce.disk.write_bytes_count[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write_bytes_count`</p></li></ul>|
-|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Write operations||Dependent item|gcp.gce.disk.write_ops_count[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write_ops_count`</p></li></ul>|
+|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Raw data|<p>Data in raw format for the disk with the name [{#GCE.DISK.NAME}].</p>|Dependent item|gcp.gce.quota.single.raw[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.disk_name == "{#GCE.DISK.NAME}")].metrics.first()`</p></li></ul>|
+|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read bytes|<p>Count of bytes read from disk with the name [{#GCE.DISK.NAME}].</p>|Dependent item|gcp.gce.disk.read_bytes_count[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.read_bytes_count`</p></li></ul>|
+|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read operations|<p>Count of read IO operations on disk with the name [{#GCE.DISK.NAME}].</p>|Dependent item|gcp.gce.disk.read_ops_count[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.read_ops_count`</p></li></ul>|
+|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Write bytes|<p>Count of bytes written to disk with the name [{#GCE.DISK.NAME}].</p>|Dependent item|gcp.gce.disk.write_bytes_count[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write_bytes_count`</p></li></ul>|
+|GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Write operations|<p>Count of write IO operations on disk with the name [{#GCE.DISK.NAME}].</p>|Dependent item|gcp.gce.disk.write_ops_count[{#GCE.DISK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write_ops_count`</p></li></ul>|
 
 # GCP Cloud SQL MySQL by HTTP
 
@@ -284,23 +284,23 @@ This template will be connected to discovered entities automatically with the al
 |----|-----------|-------|
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`5m`|
-|{$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}|<p>MySQL instance warning disk usage  threshold.</p>|`80`|
-|{$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}|<p>MySQL instance critical disk usage  threshold.</p>|`90`|
-|{$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}|<p>MySQL instance CPU usage  threshold.</p>|`95`|
-|{$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}|<p>MySQL instance RAM usage  threshold.</p>|`90`|
+|{$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}|<p>MySQL instance warning disk usage threshold.</p>|`80`|
+|{$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}|<p>MySQL instance critical disk usage threshold.</p>|`90`|
+|{$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}|<p>MySQL instance CPU usage threshold.</p>|`95`|
+|{$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}|<p>MySQL instance RAM usage threshold.</p>|`90`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Cloud SQL MySQL: Metrics get|<p>MySQL Metrics in raw format.</p>|Script|gcp.cloudsql.mysql.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Cloud SQL MySQL: CPU: Reserverd cores|<p>Number of cores reserved for the database.</p>|Dependent item|gcp.cloudsql.mysql.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_reserved_cores`</p></li></ul>|
+|GCP Cloud SQL MySQL: Reserved CPU cores|<p>Number of cores reserved for the database.</p>|Dependent item|gcp.cloudsql.mysql.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_reserved_cores`</p></li></ul>|
 |GCP Cloud SQL MySQL: CPU usage time|<p>Cumulative CPU usage time in seconds.</p>|Dependent item|gcp.cloudsql.mysql.cpu.usage_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_usage_time`</p></li></ul>|
 |GCP Cloud SQL MySQL: CPU utilization|<p>Current CPU utilization represented as a percentage of the reserved CPU that is currently in use.</p>|Dependent item|gcp.cloudsql.mysql.cpu.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
-|GCP Cloud SQL MySQL: Disk size|<p>Maximum data disk size in bytes.</p>|Dependent item|gcp.cloudsql.mysql.disk.qouta<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_quota`</p></li></ul>|
-|GCP Cloud SQL MySQL: Disk: Bytes used|<p>Data utilization in bytes.</p>|Dependent item|gcp.cloudsql.mysql.disk.bytes_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_bytes_used`</p></li></ul>|
-|GCP Cloud SQL MySQL: Disk: Read I/O|<p>Delta count of data disk read I/O operations.</p>|Dependent item|gcp.cloudsql.mysql.disk.read_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_read_ops_count`</p></li></ul>|
-|GCP Cloud SQL MySQL: Disk: Write I/O|<p>Delta count of data disk write I/O operations.</p>|Dependent item|gcp.cloudsql.mysql.disk.write_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_write_ops_count`</p></li></ul>|
+|GCP Cloud SQL MySQL: Disk size|<p>Maximum data disk size in bytes.</p>|Dependent item|gcp.cloudsql.mysql.disk.quota<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_quota`</p></li></ul>|
+|GCP Cloud SQL MySQL: Disk bytes used|<p>Data utilization in bytes.</p>|Dependent item|gcp.cloudsql.mysql.disk.bytes_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_bytes_used`</p></li></ul>|
+|GCP Cloud SQL MySQL: Disk read I/O|<p>Delta count of data disk read I/O operations.</p>|Dependent item|gcp.cloudsql.mysql.disk.read_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_read_ops_count`</p></li></ul>|
+|GCP Cloud SQL MySQL: Disk write I/O|<p>Delta count of data disk write I/O operations.</p>|Dependent item|gcp.cloudsql.mysql.disk.write_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_write_ops_count`</p></li></ul>|
 |GCP Cloud SQL MySQL: Disk utilization|<p>The fraction of the disk quota that is currently in use. </p><p>Shown as percentage.</p>|Dependent item|gcp.cloudsql.mysql.disk.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
 |GCP Cloud SQL MySQL: Memory size|<p>Maximum RAM size in bytes.</p>|Dependent item|gcp.cloudsql.mysql.memory.quota<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_quota`</p></li></ul>|
 |GCP Cloud SQL MySQL: Memory used by DB engine|<p>Total RAM usage in bytes. </p><p>This metric reports the RAM usage of the database process, including the buffer/cache.</p>|Dependent item|gcp.cloudsql.mysql.memory.total_usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_total_usage`</p></li></ul>|
@@ -413,23 +413,23 @@ This template will be connected to discovered entities automatically with the al
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`5m`|
 |{$GCP.CLOUD_SQL.DB.NAME.MATCHES}|<p>This macro is used in PostgreSQL Databases discovery rule.</p>|`.*`|
 |{$GCP.CLOUD_SQL.DB.NAME.NOT_MATCHES}|<p>This macro is used in PostgreSQL Databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}|<p>PostgreSQL instance warning disk usage  threshold.</p>|`80`|
-|{$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}|<p>PostgreSQL instance critical disk usage  threshold.</p>|`90`|
-|{$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}|<p>PostgreSQL instance CPU usage  threshold.</p>|`95`|
-|{$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}|<p>PostgreSQL instance RAM usage  threshold.</p>|`90`|
+|{$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}|<p>PostgreSQL instance warning disk usage threshold.</p>|`80`|
+|{$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}|<p>PostgreSQL instance critical disk usage threshold.</p>|`90`|
+|{$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}|<p>PostgreSQL instance CPU usage threshold.</p>|`95`|
+|{$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}|<p>PostgreSQL instance RAM usage threshold.</p>|`90`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Cloud SQL PostgreSQL: Metrics get|<p>PostgreSQL metrics data in the raw format.</p>|Script|gcp.cloudsql.pgsql.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: CPU: Reserverd cores|<p>Number of cores reserved for the database.</p>|Dependent item|gcp.cloudsql.pgsql.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_reserved_cores`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Reserved CPU cores|<p>Number of cores reserved for the database.</p>|Dependent item|gcp.cloudsql.pgsql.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_reserved_cores`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: CPU usage time|<p>Cumulative CPU usage time in seconds.</p>|Dependent item|gcp.cloudsql.pgsql.cpu.usage_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_usage_time`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: CPU utilization|<p>Current CPU utilization represented as a percentage of the reserved CPU that is currently in use.</p>|Dependent item|gcp.cloudsql.pgsql.cpu.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Disk size|<p>Maximum data disk size in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.disk.qouta<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_quota`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Disk: Bytes used|<p>Data utilization in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.disk.bytes_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_bytes_used`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Disk: Read I/O|<p>Delta count of data disk read I/O operations.</p>|Dependent item|gcp.cloudsql.pgsql.disk.read_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_read_ops_count`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Disk: Write I/O|<p>Delta count of data disk write I/O operations.</p>|Dependent item|gcp.cloudsql.pgsql.disk.write_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_write_ops_count`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Disk size|<p>Maximum data disk size in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.disk.quota<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_quota`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Disk bytes used|<p>Data utilization in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.disk.bytes_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_bytes_used`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Disk read I/O|<p>Delta count of data disk read I/O operations.</p>|Dependent item|gcp.cloudsql.pgsql.disk.read_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_read_ops_count`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Disk write I/O|<p>Delta count of data disk write I/O operations.</p>|Dependent item|gcp.cloudsql.pgsql.disk.write_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_write_ops_count`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Disk utilization|<p>The fraction of the disk quota that is currently in use. </p><p>Shown as percentage.</p>|Dependent item|gcp.cloudsql.pgsql.disk.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Memory size|<p>Maximum RAM size in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.memory.quota<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_quota`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Memory used by DB engine|<p>Total RAM usage in bytes. </p><p>This metric reports the RAM usage of the database process, including the buffer/cache.</p>|Dependent item|gcp.cloudsql.pgsql.memory.total_usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_total_usage`</p></li></ul>|
@@ -448,7 +448,7 @@ This template will be connected to discovered entities automatically with the al
 |GCP Cloud SQL PostgreSQL: Oldest prepared transaction age|<p>Age of the oldest prepared transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. </p><p>Empty value when there is no such transaction type.</p>|Dependent item|gcp.cloudsql.pgsql.oldest_transaction.prepared<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_prepared`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Oldest replication slot transaction age|<p>Age of the oldest replication slot transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. </p><p>Empty value when there is no such transaction type.</p>|Dependent item|gcp.cloudsql.pgsql.oldest_transaction.replication_slot<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_replication_slot`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Oldest replica transaction age|<p>Age of the oldest replica transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. </p><p>Empty value when there is no such transaction type.</p>|Dependent item|gcp.cloudsql.pgsql.oldest_transaction.replica<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_replica`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Connections|<p>The  number of the connections to the Cloud SQL PostgreSQL instance. </p><p>Includes connections to the system databases, which aren't visible by default.</p>|Dependent item|gcp.cloudsql.pgsql.num_backends<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_num_backends`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Connections|<p>The number of the connections to the Cloud SQL PostgreSQL instance. </p><p>Includes connections to the system databases, which aren't visible by default.</p>|Dependent item|gcp.cloudsql.pgsql.num_backends<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_num_backends`</p></li></ul>|
 
 ### Triggers
 
@@ -470,7 +470,7 @@ This template will be connected to discovered entities automatically with the al
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL PostgreSQL: Databases discovery|<p>Databases discovery for  the particular PostgreSQL instance</p>|HTTP agent|gcp.cloudsql.pgsql.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Databases discovery|<p>Databases discovery for the particular PostgreSQL instance</p>|HTTP agent|gcp.cloudsql.pgsql.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Item prototypes for GCP Cloud SQL PostgreSQL: Databases discovery
 
@@ -564,30 +564,30 @@ This template will be connected to discovered entities automatically with the al
 |Name|Description|Default|
 |----|-----------|-------|
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
-|{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`6m`|
+|{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`5m`|
 |{$CLOUD_SQL.MSSQL.RES.NAME.MATCHES}|<p>This macro is used in Resources discovery rule.</p>|`.*`|
 |{$CLOUD_SQL.MSSQL.RES.NAME.NOT_MATCHES}|<p>This macro is used in Resources discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$CLOUD_SQL.MSSQL.DB.NAME.MATCHES}|<p>This macro is used in Databases discovery rule.</p>|`.*`|
 |{$CLOUD_SQL.MSSQL.DB.NAME.NOT_MATCHES}|<p>This macro is used in Schedulers discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$CLOUD_SQL.MSSQL.SCHEDULER.ID.MATCHES}|<p>This macro is used in Schedulers discovery rule.</p>|`.*`|
 |{$CLOUD_SQL.MSSQL.SCHEDULER.ID.NOT_MATCHES}|<p>This macro is used in Schedulers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}|<p>MSSQL instance warning disk usage  threshold.</p>|`80`|
-|{$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}|<p>MSSQL instance critical disk usage  threshold.</p>|`90`|
-|{$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}|<p>MSSQL instance CPU usage  threshold.</p>|`95`|
-|{$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}|<p>MSSQL instance RAM usage  threshold.</p>|`90`|
+|{$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}|<p>MSSQL instance warning disk usage threshold.</p>|`80`|
+|{$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}|<p>MSSQL instance critical disk usage threshold.</p>|`90`|
+|{$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}|<p>MSSQL instance CPU usage threshold.</p>|`95`|
+|{$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}|<p>MSSQL instance RAM usage threshold.</p>|`90`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL MSSQL:  Metrics get|<p>MSSQL metrics data in the raw format.</p>|Script|gcp.cloudsql.mssql.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Cloud SQL MSSQL: CPU: Reserverd cores|<p>Number of cores reserved for the database.</p>|Dependent item|gcp.cloudsql.mssql.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_reserved_cores`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Metrics get|<p>MSSQL metrics data in the raw format.</p>|Script|gcp.cloudsql.mssql.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Cloud SQL MSSQL: Reserved CPU cores|<p>Number of cores reserved for the database.</p>|Dependent item|gcp.cloudsql.mssql.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_reserved_cores`</p></li></ul>|
 |GCP Cloud SQL MSSQL: CPU usage time|<p>Cumulative CPU usage time in seconds.</p>|Dependent item|gcp.cloudsql.mssql.cpu.usage_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_usage_time`</p></li></ul>|
 |GCP Cloud SQL MSSQL: CPU utilization|<p>Current CPU utilization represented as a percentage of the reserved CPU that is currently in use.</p>|Dependent item|gcp.cloudsql.mssql.cpu.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Disk size|<p>Maximum data disk size in bytes.</p>|Dependent item|gcp.cloudsql.mssql.disk.qouta<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_quota`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Disk: Bytes used|<p>Data utilization in bytes.</p>|Dependent item|gcp.cloudsql.mssql.disk.bytes_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_bytes_used`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Disk: Read I/O|<p>Delta count of data disk read I/O operations.</p>|Dependent item|gcp.cloudsql.mssql.disk.read_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_read_ops_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Disk: Write I/O|<p>Delta count of data disk write I/O operations.</p>|Dependent item|gcp.cloudsql.mssql.disk.write_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_write_ops_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Disk size|<p>Maximum data disk size in bytes.</p>|Dependent item|gcp.cloudsql.mssql.disk.quota<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_quota`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Disk bytes used|<p>Data utilization in bytes.</p>|Dependent item|gcp.cloudsql.mssql.disk.bytes_used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_bytes_used`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Disk read I/O|<p>Delta count of data disk read I/O operations.</p>|Dependent item|gcp.cloudsql.mssql.disk.read_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_read_ops_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Disk write I/O|<p>Delta count of data disk write I/O operations.</p>|Dependent item|gcp.cloudsql.mssql.disk.write_ops_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_write_ops_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Disk utilization|<p>The fraction of the disk quota that is currently in use. </p><p>Shown as percentage.</p>|Dependent item|gcp.cloudsql.mssql.disk.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Memory size|<p>Maximum RAM size in bytes.</p>|Dependent item|gcp.cloudsql.mssql.memory.quota<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_quota`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Memory used by DB engine|<p>Total RAM usage in bytes. </p><p>This metric reports the RAM usage of the database process, including the buffer/cache.</p>|Dependent item|gcp.cloudsql.mssql.memory.total_usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_total_usage`</p></li></ul>|
@@ -598,11 +598,11 @@ This template will be connected to discovered entities automatically with the al
 |GCP Cloud SQL MSSQL: Connections|<p>Number of connections to databases on the Cloud SQL instance.</p>|Dependent item|gcp.cloudsql.mssql.network.connections<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_connections`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Instance state|<p>GCP Cloud SQL MSSQL Current instance state.</p>|HTTP agent|gcp.cloudsql.mssql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Cloud SQL MSSQL: DB engine state|<p>GCP Cloud SQL MSSQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.mssql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|GCP Cloud SQL MSSQL:  Connection resets|<p>Total number of logins started from the connection pool since the last restart of SQL Server service.</p>|Dependent item|gcp.cloudsql.mssql.conn.connection_reset_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_connection_reset_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL:  Login attempts|<p>Total number of login attempts since the last restart of SQL Server service. </p><p>This does not include pooled connections.</p>|Dependent item|gcp.cloudsql.mssql.conn.login_attempt_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_login_attempt_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL:  Logouts|<p>Total number of logout operations since the last restart of SQL Server service.</p>|Dependent item|gcp.cloudsql.mssql.conn.logout_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_logout_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL:  Processes blocked|<p>Current number of blocked processes.</p>|Dependent item|gcp.cloudsql.mssql.conn.processes_blocked<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_processes_blocked`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Buffer bache hit ratio|<p>Current percentage of pages found in the buffer cache without having to read from disk. </p><p>The ratio is the total number of cache hits divided by the total number of cache lookups.</p>|Dependent item|gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_buffer_cache_hit_ratio`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Connection resets|<p>Total number of logins started from the connection pool since the last restart of SQL Server service.</p>|Dependent item|gcp.cloudsql.mssql.conn.connection_reset_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_connection_reset_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Login attempts|<p>Total number of login attempts since the last restart of SQL Server service. </p><p>This does not include pooled connections.</p>|Dependent item|gcp.cloudsql.mssql.conn.login_attempt_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_login_attempt_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Logouts|<p>Total number of logout operations since the last restart of SQL Server service.</p>|Dependent item|gcp.cloudsql.mssql.conn.logout_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_logout_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Processes blocked|<p>Current number of blocked processes.</p>|Dependent item|gcp.cloudsql.mssql.conn.processes_blocked<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_processes_blocked`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Buffer сache hit ratio|<p>Current percentage of pages found in the buffer cache without having to read from disk. </p><p>The ratio is the total number of cache hits divided by the total number of cache lookups.</p>|Dependent item|gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_buffer_cache_hit_ratio`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Checkpoint pages|<p>Total number of pages flushed to disk by a checkpoint or other operation that requires all dirty pages to be flushed.</p>|Dependent item|gcp.cloudsql.mssql.memory.checkpoint_page_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_checkpoint_page_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Free list stalls|<p>Total number of requests that had to wait for a free page.</p>|Dependent item|gcp.cloudsql.mssql.memory.free_list_stall_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_free_list_stall_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Lazy writes|<p>Total number of buffers written by the buffer manager's lazy writer. </p><p>The lazy writer is a system process that flushes out batches of dirty, aged buffers </p><p>(buffers that contain changes that must be written back to disk before the buffer can be reused for a different page) </p><p>and makes them available to user processes.</p>|Dependent item|gcp.cloudsql.mssql.memory.lazy_write_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_lazy_write_count`</p></li></ul>|
@@ -619,9 +619,9 @@ This template will be connected to discovered entities automatically with the al
 |GCP Cloud SQL MSSQL: Write age operations|<p>Total number of physical database page writes. </p><p>This statistic counts physical page writes across all databases.</p>|Dependent item|gcp.cloudsql.mssql.memory.page_ops.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_write`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Audits size|<p>Tracks the size in bytes of stored SQLServer audit files on an instance.</p><p>Empty value if there are no audits enabled.</p>|Dependent item|gcp.cloudsql.mssql.audits_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_audits_size`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Audits successfully uploaded|<p>Tracks the size in bytes of stored SQLServer audit files on an instance.</p><p>Empty value if there are no audits enabled.</p>|Dependent item|gcp.cloudsql.mssql.audits_upload_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_success`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Cloud SQL MSSQL:  Resources get|<p>MSSQL resources data in the raw format.</p>|Script|gcp.cloudsql.mssql.resources.get|
-|GCP Cloud SQL MSSQL:  Databases get|<p>MSSQL databases data in the raw format.</p>|Script|gcp.cloudsql.mssql.db.get|
-|GCP Cloud SQL MSSQL:  Schedulers get|<p>MSSQL schedulers data in the raw format.</p>|Script|gcp.cloudsql.mssql.schedulers.get|
+|GCP Cloud SQL MSSQL: Resources get|<p>MSSQL resources data in the raw format.</p>|Script|gcp.cloudsql.mssql.resources.get|
+|GCP Cloud SQL MSSQL: Databases get|<p>MSSQL databases data in the raw format.</p>|Script|gcp.cloudsql.mssql.db.get|
+|GCP Cloud SQL MSSQL: Schedulers get|<p>MSSQL schedulers data in the raw format.</p>|Script|gcp.cloudsql.mssql.schedulers.get|
 
 ### Triggers
 
