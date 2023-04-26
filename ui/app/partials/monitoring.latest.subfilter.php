@@ -29,7 +29,7 @@ $subfilters = $data['subfilters'];
 
 $subfilter_options = [];
 
-foreach (['hostids', 'tagnames', 'data', 'state'] as $key) {
+foreach (['hostids', 'tagnames','state', 'data'] as $key) {
 	if (($key === 'hostids' || $key === 'tagnames' || $key === 'state') && count($subfilters[$key]) == 0) {
 		$subfilter_options[$key] = null;
 

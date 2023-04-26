@@ -40,10 +40,10 @@ abstract class CControllerLatest extends CController {
 		'name' => '',
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
+		'state' => -1,
 		'show_tags' => SHOW_TAGS_3,
 		'tag_name_format' => TAG_NAME_FULL,
 		'tag_priority' => '',
-		'state' => -1,
 		'show_details' => 0,
 		'page' => null,
 		'sort' => 'name',
@@ -51,8 +51,8 @@ abstract class CControllerLatest extends CController {
 		'subfilter_hostids' => [],
 		'subfilter_tagnames' => [],
 		'subfilter_tags' => [],
-		'subfilter_data' => [],
-		'subfilter_state' => []
+		'subfilter_state' => [],
+		'subfilter_data' => []
 	];
 
 	/**
@@ -273,8 +273,8 @@ abstract class CControllerLatest extends CController {
 	 * @param array  $filter['subfilter_hostids']   Selected host subfilter parameters.
 	 * @param array  $filter['subfilter_tagnames']  Selected tagname subfilter parameters.
 	 * @param array  $filter['subfilter_tags']      Selected tags subfilter parameters.
-	 * @param array  $filter['subfilter_data']      Selected data subfilter parameters.
 	 * @param array  $filter['subfilter_state']     Selected state subfilter parameters.
+	 * @param array  $filter['subfilter_data']      Selected data subfilter parameters.
 	 *
 	 * @return array
 	 */
@@ -289,8 +289,8 @@ abstract class CControllerLatest extends CController {
 			'hostids' => array_flip($filter['subfilter_hostids']),
 			'tagnames' => array_flip($filter['subfilter_tagnames']),
 			'tags' => $tags,
-			'data' => array_flip($filter['subfilter_data']),
-			'state' => $filter['state'] == -1 ? array_flip($filter['subfilter_state']) : []
+			'state' => $filter['state'] == -1 ? array_flip($filter['subfilter_state']) : [],
+			'data' => array_flip($filter['subfilter_data'])
 		];
 	}
 
@@ -536,19 +536,6 @@ abstract class CControllerLatest extends CController {
 			}
 		}
 
-		$subfilter_options['data'] = [
-			1 => [
-				'name' => _('With data'),
-				'selected' => array_key_exists(1, $subfilter['data']),
-				'count' => 0
-			],
-			0 => [
-				'name' => _('Without data'),
-				'selected' => array_key_exists(0, $subfilter['data']),
-				'count' => 0
-			]
-		];
-
 		$subfilter_options['state'] = [
 			ITEM_STATE_NORMAL => [
 				'name' => _('Normal'),
@@ -558,6 +545,19 @@ abstract class CControllerLatest extends CController {
 			ITEM_STATE_NOTSUPPORTED => [
 				'name' => _('Not supported'),
 				'selected' => array_key_exists(ITEM_STATE_NOTSUPPORTED, $subfilter['state']),
+				'count' => 0
+			]
+		];
+
+		$subfilter_options['data'] = [
+			1 => [
+				'name' => _('With data'),
+				'selected' => array_key_exists(1, $subfilter['data']),
+				'count' => 0
+			],
+			0 => [
+				'name' => _('Without data'),
+				'selected' => array_key_exists(0, $subfilter['data']),
 				'count' => 0
 			]
 		];
@@ -617,17 +617,17 @@ abstract class CControllerLatest extends CController {
 				'tags' => $match_tags
 			];
 
-			if ($subfilter['data']) {
-				$item['has_data'] = array_key_exists($item['itemid'], $with_data);
-				$item['matching_subfilters']['data'] = array_key_exists(0, $subfilter['data']) && !$item['has_data']
-					|| array_key_exists(1, $subfilter['data']) && $item['has_data'];
-			}
-
 			if ($subfilter['state']) {
 				$item['matching_subfilters']['state'] = array_key_exists(ITEM_STATE_NORMAL, $subfilter['state'])
 					&& $item['state'] == ITEM_STATE_NORMAL
 					|| array_key_exists(ITEM_STATE_NOTSUPPORTED, $subfilter['state'])
 					&& $item['state'] == ITEM_STATE_NOTSUPPORTED;
+			}
+
+			if ($subfilter['data']) {
+				$item['has_data'] = array_key_exists($item['itemid'], $with_data);
+				$item['matching_subfilters']['data'] = array_key_exists(0, $subfilter['data']) && !$item['has_data']
+					|| array_key_exists(1, $subfilter['data']) && $item['has_data'];
 			}
 		}
 		unset($item);
@@ -646,8 +646,8 @@ abstract class CControllerLatest extends CController {
 	 * @param array|bool $items[]['matching_subfilters']['tags']      (optional) TRUE if item matches tagname/value
 	 *                                                                subfilter or array of exactly matching
 	 *                                                                tagname/value pairs.
-	 * @param bool       $items[]['matching_subfilters']['data']      (optional) TRUE if item matches data subfilter.
 	 * @param bool       $items[]['matching_subfilters']['state']     (optional) TRUE if item matches state subfilter.
+	 * @param bool       $items[]['matching_subfilters']['data']      (optional) TRUE if item matches data subfilter.
 	 *
 	 * @return array
 	 */

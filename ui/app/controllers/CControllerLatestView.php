@@ -58,9 +58,9 @@ class CControllerLatestView extends CControllerLatest {
 			'subfilter_hostids' =>		'array',
 			'subfilter_tagnames' =>		'array',
 			'subfilter_tags' =>			'array',
+			'subfilter_state' =>		'array',
 			'subfilter_data' =>			'array',
-			'subfilters_expanded' =>	'array',
-			'subfilter_state' =>		'array'
+			'subfilters_expanded' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -101,20 +101,20 @@ class CControllerLatestView extends CControllerLatest {
 			}
 		}
 
-		if ($ret && $this->hasInput('subfilter_data')) {
-			$data = $this->getInput('subfilter_data', []);
-			$valid = array_filter($data, function ($val) {
-				return $val === '0' || $val === '1';
-			});
-			$ret = count($data) == count($valid);
-		}
-
 		if ($ret && $this->hasInput('subfilter_state')) {
 			$state = $this->getInput('subfilter_state', []);
 			$valid = array_filter($state, function ($val) {
 				return $val == ITEM_STATE_NORMAL || $val == ITEM_STATE_NOTSUPPORTED;
 			});
 			$ret = count($state) == count($valid);
+		}
+
+		if ($ret && $this->hasInput('subfilter_data')) {
+			$data = $this->getInput('subfilter_data', []);
+			$valid = array_filter($data, function ($val) {
+				return $val === '0' || $val === '1';
+			});
+			$ret = count($data) == count($valid);
 		}
 
 		if (!$ret) {
@@ -193,8 +193,8 @@ class CControllerLatestView extends CControllerLatest {
 			'subfilter_hostids' => $filter['subfilter_hostids'],
 			'subfilter_tagnames' => $filter['subfilter_tagnames'],
 			'subfilter_tags' => $filter['tags'],
-			'subfilter_data' => $filter['subfilter_data'],
 			'subfilter_state' => $filter['subfilter_state'],
+			'subfilter_data' => $filter['subfilter_data'],
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'page' => $this->hasInput('page') ? $this->getInput('page') : null
