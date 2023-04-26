@@ -316,18 +316,8 @@ class CTabFilter extends CDiv {
 		$data = $this->options['timeselector'];
 		$selected = $this->options['data'][$this->options['selected']] + ['filter_custom_time' => 0];
 		$enabled = (!$selected['filter_custom_time'] && !$data['disabled']);
-		// Disable navigation by TAB, if timeselector is disabled.
-		$link = (new CLink(relativeDateToText($data['from'], $data['to'])))
-			->addClass('tabfilter-item-link')
-			->setAttribute('tabindex', $enabled ? 0 : -1)
-			->addClass(ZBX_STYLE_BTN_TIME)
-			->addClass($data['disabled'] ? ZBX_STYLE_DISABLED : null);
 
 		return [
-			(new CListItem($link))
-				->setAttribute('data-target', static::CSS_ID_PREFIX.'timeselector')
-				->addClass(self::CSS_TABFILTER_ITEM)
-				->addClass($enabled ? null : ZBX_STYLE_DISABLED),
 			(new CSimpleButton())
 				->setEnabled($enabled)
 				->addClass(ZBX_STYLE_BTN_ICON)
@@ -335,12 +325,23 @@ class CTabFilter extends CDiv {
 				->addClass(ZBX_STYLE_BTN_TIME_LEFT),
 			(new CSimpleButton(_('Zoom out')))
 				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_TIME_OUT),
+				->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT),
 			(new CSimpleButton())
 				->setEnabled($enabled)
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_CHEVRON_RIGHT)
-				->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+				->addClass(ZBX_STYLE_BTN_TIME_RIGHT),
+			(new CListItem(
+				(new CLink(relativeDateToText($data['from'], $data['to'])))
+					->setAttribute('tabindex', $enabled ? 0 : -1)
+					->addClass('tabfilter-item-link')
+					->addClass(ZBX_ICON_CLOCK)
+					->addClass(ZBX_STYLE_BTN_TIME)
+					->addClass($data['disabled'] ? ZBX_STYLE_DISABLED : null)
+			))
+				->setAttribute('data-target', static::CSS_ID_PREFIX.'timeselector')
+				->addClass(self::CSS_TABFILTER_ITEM)
+				->addClass($enabled ? null : ZBX_STYLE_DISABLED)
 		];
 	}
 

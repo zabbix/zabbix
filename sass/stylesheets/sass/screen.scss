@@ -64,6 +64,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/subfilter";
 @import "components/svg-graph";
 @import "components/tabfilter";
+@import "components/tabs";
 @import "components/toc";
 @import "components/z-bar-gauge";
 @import "components/z-select";
@@ -656,6 +657,27 @@ form {
 		td {
 			padding: 0 5px 5px 0;
 			vertical-align: middle;
+		}
+	}
+}
+
+.btn-time-zoomout {
+	vertical-align: top;
+	color: $font-color;
+	background-color: transparent;
+	border-color: transparent;
+
+	&[disabled] {
+		color: $font-color;
+		opacity: .35;
+
+		&,
+		&:hover,
+		&:focus,
+		&:active {
+			color: $font-color;
+			background-color: transparent;
+			border-color: transparent;
 		}
 	}
 }
@@ -1484,6 +1506,7 @@ select {
 	}
 }
 
+// TODO - check
 //.btn-grey {
 //	color: $btn-form-font-color;
 //	background-color: $btn-form-bg-color;
@@ -1509,60 +1532,7 @@ select {
 //	}
 //}
 
-.btn-link {
-	position: relative;
-	background-color: $transparent;
-	border: 0;
-	border-bottom: 1px dotted $link-color;
-	border-radius: 0;
-	color: $link-color;
-	font-size: inherit;
-	padding: 0;
-	min-height: inherit;
-
-	&.red {
-		color: $red;
-		border-color: $red
-	}
-
-	&.green {
-		color: $green;
-		border-color: $green
-	}
-
-	&:hover {
-		@extend .btn-link;
-	}
-
-	&:focus {
-		@extend .btn-link;
-		outline: none;
-		margin-bottom: -2px !important;
-		border-bottom: 2px solid rgba($link-hover-color, .5);
-		box-shadow: 0 0 0 0 !important;
-
-		&.red {
-			border-color: $red
-		}
-
-		&.green {
-			border-color: $green
-		}
-	}
-
-	&:active {
-		@extend .btn-link;
-	}
-
-	&[disabled] {
-		background-color: $transparent;
-
-		&:hover {
-			background-color: $transparent;
-		}
-	}
-}
-
+// TODO - check
 .zi-bell,
 .zi-bell-off,
 .zi-speaker,
@@ -1590,161 +1560,10 @@ select {
 	}
 }
 
-// Time selection.
-.ui-tabs-nav {
-	height: 30px;
-	line-height: 30px;
-	border-bottom: 1px solid $table-border-color;
-
-	li {
-		display: inline-block;
-
-		a {
-			border: 0;
-			padding: 8px 10px;
-			transition: background-color .2s ease-out;
-
-			&:hover,
-			&:focus,
-			&:active {
-				background-color: $ui-hover-color;
-			}
-		}
-
-		&.ui-tabs-active:first-child {
-			border-left: 0;
-		}
-
-		&.ui-tabs-active {
-			a {
-				padding: 8px 10px 6px;
-				background-color: $transparent;
-				color: $font-color;
-				text-decoration: none;
-				cursor: default;
-				border-bottom: 3px solid $ui-tab-bg-selected-color;
-			}
-		}
-
-		&.ui-state-disabled {
-			a {
-				cursor: default;
-				color: $btn-disabled-font-color;
-				background-color: $transparent;
-				border: 0;
-			}
-		}
-	}
-
-	.btn-info, // TODO need to check, not good.
-	.btn-time, // TODO need to check, not good.
-	.filter-trigger {
-		border-radius: 2px;
-		color: $btn-color;
-		background-color: $btn-bg-color;
-		border: 1px solid $btn-bg-color;
-		position: relative;
-		margin: 0 0 0 6px;
-		min-height: 24px;
-		vertical-align: bottom;
-
-		&:focus,
-		&:hover {
-			@include btn-hover-active($btn-color, $btn-bg-color);
-			cursor: pointer;
-		}
-	}
-
-	.btn-info,
-	.btn-time {
-		padding: 0 10px;
-	}
-
-	.filter-trigger {
-		padding: 0 8px 0 10px;
-	}
-
-	.ui-tabs-tab {
-		.btn-info {
-			&::after {
-				@extend %icons-font;
-				margin-left: 8px;
-				content: $zi-circle-info;
-			}
-		}
-
-		.filter-trigger {
-			&::after {
-				vertical-align: middle;
-				padding-left: 8px;
-				@extend %icons-font;
-				content: $zi-filter;
-			}
-		}
-
-		.btn-time {
-			&::after {
-				@extend %icons-font;
-				margin-left: 5px;
-				content: $zi-clock;
-			}
-		}
-	}
-
-	.ui-state-focus {
-		.btn-info,
-		.btn-time,
-		.filter-trigger {
-			box-shadow: 0 0 0 2px $btn-focus-outline-color;
-			@include btn-hover-active($btn-color, $btn-bg-color);
-		}
-
-		&.ui-tabs-active {
-			.btn-info,
-			.btn-time,
-			.filter-trigger {
-				box-shadow: 0 0 0 2px $btn-focus-outline-color;
-			}
-		}
-	}
-
-	.ui-tabs-active {
-		.btn-info,
-		.btn-time,
-		.filter-trigger {
-			color: $font-color;
-			background-color: $ui-bg-color;
-			border: 1px solid $ui-border-color;
-			border-bottom: 0;
-			border-radius: 2px 2px 0 0;
-			margin: -1px 0 0 6px;
-			padding: 1px 10px 7px 10px;
-		}
-
-		.filter-trigger {
-			padding: 1px 8px 7px 10px !important;
-		}
-
-		.btn-time {
-			padding: 1px 6px 7px 10px !important;
-		}
-	}
-
-	.ui-state-hover {
-		&.ui-tabs-active {
-			.btn-info,
-			.btn-time,
-			.filter-trigger {
-				background-color: $action-hover-color;
-			}
-		}
-	}
-}
-
 .filter-space {
 	box-sizing: border-box;
 
-	li a.ui-tabs-anchor {
+	li .ui-tabs-anchor {
 		vertical-align: top;
 	}
 
@@ -1770,23 +1589,6 @@ select {
 		}
 	}
 }
-
-.btn-time-out {
-	margin: 0 5px 0 5px;
-	height: 24px;
-	line-height: 22px;
-	vertical-align: top;
-	background: none;
-	border: 1px solid transparent;
-	color: $font-color;
-
-	&:disabled {
-		background: transparent !important;
-		border-color: transparent !important;
-		opacity: .8;
-	}
-}
-
 
 .time-quick {
 	font-size: 12px;

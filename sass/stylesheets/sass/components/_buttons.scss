@@ -77,6 +77,7 @@ button {
 			color: $btn-disabled-font-color;
 			background-color: $btn-disabled-bg-color;
 			border-color: $btn-disabled-border-color;
+			box-shadow: none;
 		}
 	}
 }
@@ -118,6 +119,7 @@ button {
 	}
 }
 
+a.btn,
 a.btn-icon {
 	@extend button;
 }
@@ -150,10 +152,65 @@ a.btn-icon,
 		&:focus,
 		&:active {
 			background: transparent;
+			box-shadow: none;
 
 			&::before {
 				color: $icon-btn-disabled-color;
 			}
+		}
+	}
+}
+
+.btn-link {
+	position: relative;
+	background-color: $transparent;
+	border: 0;
+	border-bottom: 1px dotted $link-color;
+	border-radius: 0;
+	color: $link-color;
+	font-size: inherit;
+	padding: 0;
+	min-height: inherit;
+
+	&.red {
+		color: $red;
+		border-color: $red
+	}
+
+	&.green {
+		color: $green;
+		border-color: $green
+	}
+
+	&:hover {
+		@extend .btn-link;
+	}
+
+	&:focus {
+		@extend .btn-link;
+		outline: none;
+		margin-bottom: -2px !important;
+		border-bottom: 2px solid rgba($link-hover-color, .5);
+		box-shadow: 0 0 0 0 !important;
+
+		&.red {
+			border-color: $red
+		}
+
+		&.green {
+			border-color: $green
+		}
+	}
+
+	&:active {
+		@extend .btn-link;
+	}
+
+	&[disabled] {
+		background-color: $transparent;
+
+		&:hover {
+			background-color: $transparent;
 		}
 	}
 }

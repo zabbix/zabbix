@@ -16,15 +16,15 @@
 	line-height: 1;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+
+	@if $ui-transitions {
+		transition: color $ui-transition-duration ease-out;
+	}
 }
 
 [class^="{{prefix}}-"], [class*=" {{prefix}}-"] {
 	&::before {
 		@extend %icons-font;
-
-		@if $ui-transitions {
-			transition: color $ui-transition-duration ease-out;
-		}
 	}
 }
 

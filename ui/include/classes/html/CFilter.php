@@ -223,6 +223,8 @@ class CFilter extends CDiv {
 
 		return $this->addTab(
 			(new CLink($header, '#'.$anchor))
+				->addClass(ZBX_STYLE_BTN)
+				->addClass(ZBX_ICON_FILTER)
 				->addClass(ZBX_STYLE_FILTER_TRIGGER),
 			(new CDiv($body))
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
@@ -251,7 +253,7 @@ class CFilter extends CDiv {
 					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_CHEVRON_LEFT)
 					->addClass(ZBX_STYLE_BTN_TIME_LEFT),
-				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
+				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT),
 				(new CSimpleButton())
 					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_CHEVRON_RIGHT)
@@ -282,6 +284,8 @@ class CFilter extends CDiv {
 
 			$this->addTab(
 				(new CLink($header, '#'.$anchor))
+					->addClass(ZBX_STYLE_BTN)
+					->addClass(ZBX_ICON_CLOCK)
 					->addClass(ZBX_STYLE_BTN_TIME),
 				(new CDiv([
 					(new CDiv([

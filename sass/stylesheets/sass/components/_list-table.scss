@@ -4,12 +4,7 @@
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
-	.btn-icon {
-		&::before {
-			color: $icon-color;
-		}
-	}
-
+	// TODO - check
 	span.zi-calendar-warning {
 		display: inline-block;
 		width: 18px;

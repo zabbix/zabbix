@@ -124,15 +124,15 @@ $zi-z: "\ea6c";
 	line-height: 1;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+
+	@if $ui-transitions {
+		transition: color $ui-transition-duration ease-out;
+	}
 }
 
 [class^="zi-"], [class*=" zi-"] {
 	&::before {
 		@extend %icons-font;
-
-		@if $ui-transitions {
-			transition: color $ui-transition-duration ease-out;
-		}
 	}
 }
 

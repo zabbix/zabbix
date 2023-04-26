@@ -31,7 +31,7 @@ jQuery(function($) {
 			apply: $container.find('[name=apply]'),
 			increment: $container.find('.btn-time-right'),
 			decrement: $container.find('.btn-time-left'),
-			zoomout: $container.find('.btn-time-out'),
+			zoomout: $container.find('.btn-time-zoomout'),
 			quickranges: $container.find('.time-quick a'),
 			label: $container.find('.btn-time')
 		},

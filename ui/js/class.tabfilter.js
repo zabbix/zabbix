@@ -206,7 +206,7 @@ class CTabFilter extends CBaseComponent {
 			buttons = {
 				decrement_button: this._target.querySelector('button.btn-time-left'),
 				increment_button: this._target.querySelector('button.btn-time-right'),
-				zoomout_button: this._target.querySelector('button.btn-time-out')
+				zoomout_button: this._target.querySelector('button.btn-time-zoomout')
 			};
 
 		this._timeselector.setDisabled(disabled);
