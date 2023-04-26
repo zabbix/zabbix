@@ -183,7 +183,14 @@ if (count($data['dashboard']['pages']) > 1
 	$widget
 		->addItem($dashboard)
 		->show();
+}
+else {
+	$widget
+		->addItem(new CTableInfo())
+		->show();
+}
 
+if (count($data['dashboard']['pages']) >= 1) {
 	(new CScriptTag('
 		view.init('.json_encode([
 			'host' => $data['host'],
@@ -194,10 +201,5 @@ if (count($data['dashboard']['pages']) > 1
 		]).');
 	'))
 		->setOnDocumentReady()
-		->show();
-}
-else {
-	$widget
-		->addItem(new CTableInfo())
 		->show();
 }
