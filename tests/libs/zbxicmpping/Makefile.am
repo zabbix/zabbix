@@ -1,5 +1,7 @@
 if SERVER
-SERVER_tests = line_process
+SERVER_tests = \
+	line_process \
+	get_interval_option
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -46,4 +48,21 @@ line_process_LDFLAGS = @SERVER_LDFLAGS@
 line_process_CFLAGS = \
 	-I@top_srcdir@/tests \
 	$(line_process_WRAP_FUNCS)
+
+get_interval_option_SOURCES = \
+	get_interval_option.c \
+	../../zbxmocktest.h \
+	../../zbxmockexit.c \
+	../../zbxmockdir.c
+
+get_interval_option_WRAP_FUNCS = \
+	-Wl,--wrap=zbx_fgets \
+	-Wl,--wrap=zbx_execute
+
+get_interval_option_LDADD = $(ICMPPING_LIBS)
+get_interval_option_LDFLAGS = @SERVER_LDFLAGS@
+
+get_interval_option_CFLAGS = \
+	-I@top_srcdir@/tests \
+	$(get_interval_option_WRAP_FUNCS)
 endif

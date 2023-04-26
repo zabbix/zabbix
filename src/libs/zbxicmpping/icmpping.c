@@ -221,8 +221,8 @@ out:
  * Comments: supported minimum interval (in milliseconds) in different fping  *
  *           versions:                                                        *
  *           +------------------+--------------------------+---------+        *
- *           | version X        | as root/non-root/without | Default |        *
- *           |                  | "safe limits"            |         |        *
+ *           | version X        | as root/non-root/non-    | Default |        *
+ *           |                  | root with "safe limits"  |         |        *
  *           +------------------+--------------------------+---------+        *
  *           |         X < 3.14 | 1 / 10 / -               | 25      |        *
  *           | 3.14 <= X <  4.0 | 0 /  1 / -               | 25      |        *
