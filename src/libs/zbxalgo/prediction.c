@@ -23,7 +23,6 @@
 #include "zbxnum.h"
 
 
-#define DB_INFINITY	(1.7976931348623157E+308)
 #define ZBX_MATH_EPSILON	(1e-6)
 
 #define ZBX_IS_NAN(x)	((x) != (x))
@@ -828,7 +827,7 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 	}
 
 	if (no_root)
-		*result = DB_INFINITY;
+		*result = DBL_MAX;
 	else
 		*result -= now;
 
@@ -1135,13 +1134,13 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
 	}
-	else if (DB_INFINITY < result)
+	else if (DBL_MAX < result)
 	{
-		result = DB_INFINITY;
+		result = DBL_MAX;
 	}
-	else if (-DB_INFINITY > result)
+	else if (DBL_MIN > result)
 	{
-		result = -DB_INFINITY;
+		result = DBL_MIN;
 	}
 
 	return result;
@@ -1154,7 +1153,7 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	int		res;
 
 	if (1 == n)
-		return (x[0] == threshold ? 0.0 : DB_INFINITY);
+		return (x[0] == threshold ? 0.0 : DBL_MAX);
 
 	zbx_matrix_struct_alloc(&coefficients);
 
@@ -1210,9 +1209,9 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
 	}
-	else if (0.0 > result || DB_INFINITY < result)
+	else if (0.0 > result || DBL_MAX < result)
 	{
-		result = DB_INFINITY;
+		result = DBL_MAX;
 	}
 
 	zbx_matrix_free(coefficients);
