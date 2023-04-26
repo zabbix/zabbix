@@ -1916,6 +1916,18 @@ static int	jsonpath_regexp_match(const char *text, const char *pattern, double *
 	return SUCCEED;
 }
 
+static int	jsonpath_prepare_numeric_arg(zbx_variant_t *var)
+{
+	if (SUCCEED != zbx_variant_convert(var, ZBX_VARIANT_DBL))
+	{
+		zbx_set_json_strerror("invalid operand '%s' of type '%s'", zbx_variant_value_desc(var),
+				zbx_variant_type_desc(var));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: match json array element/object value against jsonpath expression *
@@ -1962,26 +1974,42 @@ static int	jsonpath_match_expression(zbx_jsonpath_context_t *ctx, const char *na
 			switch (token->type)
 			{
 				case ZBX_JSONPATH_TOKEN_OP_PLUS:
-					zbx_variant_convert(left, ZBX_VARIANT_DBL);
-					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					if (SUCCEED != jsonpath_prepare_numeric_arg(left) ||
+							SUCCEED != jsonpath_prepare_numeric_arg(right))
+					{
+						ret = FAIL;
+						goto out;
+					}
 					left->data.dbl += right->data.dbl;
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_MINUS:
-					zbx_variant_convert(left, ZBX_VARIANT_DBL);
-					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					if (SUCCEED != jsonpath_prepare_numeric_arg(left) ||
+							SUCCEED != jsonpath_prepare_numeric_arg(right))
+					{
+						ret = FAIL;
+						goto out;
+					}
 					left->data.dbl -= right->data.dbl;
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_MULT:
-					zbx_variant_convert(left, ZBX_VARIANT_DBL);
-					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					if (SUCCEED != jsonpath_prepare_numeric_arg(left) ||
+							SUCCEED != jsonpath_prepare_numeric_arg(right))
+					{
+						ret = FAIL;
+						goto out;
+					}
 					left->data.dbl *= right->data.dbl;
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_DIV:
-					zbx_variant_convert(left, ZBX_VARIANT_DBL);
-					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					if (SUCCEED != jsonpath_prepare_numeric_arg(left) ||
+							SUCCEED != jsonpath_prepare_numeric_arg(right))
+					{
+						ret = FAIL;
+						goto out;
+					}
 					left->data.dbl /= right->data.dbl;
 					stack.values_num--;
 					break;
