@@ -177,6 +177,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardURLWidget.php';
 require_once dirname(__FILE__).'/testSID.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -344,6 +345,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardProblemsWidget');
 		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
+		$suite->addTestSuite('testDashboardURLWidget');
 		$suite->addTestSuite('testSID');
 
 		return $suite;
