@@ -58,6 +58,12 @@
 
 		&.is-expanded {
 			& > a {
+				&[class^="zi-"], &[class*=" zi-"] {
+					&::before {
+						color: $menu-main-expanded-icon-color;
+					}
+				}
+
 				&::after {
 					transform: rotate(-180deg);
 				}

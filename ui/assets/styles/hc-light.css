@@ -2815,6 +2815,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   content: "";
   transform: rotate(0deg);
   transition: transform 0.3s; }
+.menu-main .has-submenu.is-expanded > a[class^="zi-"]::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]::before {
+  color: #8cb2ca; }
 .menu-main .has-submenu.is-expanded > a::after {
   transform: rotate(-180deg); }
 .menu-main [class^="zi-"]::before, .menu-main [class*=" zi-"]::before {
