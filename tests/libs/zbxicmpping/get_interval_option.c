@@ -114,6 +114,7 @@ void	zbx_mock_test_entry(void **state)
 			zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")), ret);
 	zbx_mock_assert_str_eq("error message returned by get_interval_option()",
 			zbx_mock_get_parameter_string("out.error_msg"), error);
+
 	if (SUCCEED == ret)
 	{
 		zbx_mock_assert_int_eq("minimal detected interval", (int)zbx_mock_get_parameter_uint64("out.value"),
