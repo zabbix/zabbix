@@ -182,7 +182,6 @@ else {
 		->show();
 }
 
-
 (new CScriptTag('
 	view.init('.json_encode([
 		'host' => $data['host'],
