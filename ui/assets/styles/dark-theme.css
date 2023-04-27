@@ -1664,6 +1664,8 @@ div.dashboard-widget-gauge .arc.empty {
   fill: #383838; }
 div.dashboard-widget-gauge .arc.value {
   fill: #69808d; }
+div.dashboard-widget-gauge #needle {
+  fill: #f2f2f2; }
 
 .dashboard-widget-inaccessible {
   display: grid;

@@ -163,6 +163,8 @@ class CSVGGauge {
 		}
 
 		this.#processMinMax();
+
+		this.#addNeedle();
 	}
 
 	// TO DO: add description
@@ -453,7 +455,7 @@ class CSVGGauge {
 	#positionThresholdLabel(i) {
 		const angle = this.thresholdsArcParts[i].angleStart;
 
-		const radians = ((angle - 90) * Math.PI) / 180;
+		const radians = this.#degreesToRadians(angle);
 
 		const x = (this.x + Math.cos(radians) * (this.radiusThresholdArc + this.thicknessThresholdArc));
 		const y = (this.y + Math.sin(radians) * (this.radiusThresholdArc + this.thicknessThresholdArc));
@@ -498,48 +500,18 @@ class CSVGGauge {
 			this.#addAttributesNS(path, {id: 'arc-value', class: 'arc value'});
 
 			this.elements.valueArcContainer.node.appendChild(path);
+
+			this.elements.valueArc = {
+				node: path
+			};
 		}
 
 		window.requestAnimationFrame(() => {
-			this.#animate(this.angleOld)
+			this.#animate(this.angleOld, (currentAngle) => {
+				const pathDefinition = this.#defineArc(this.x, this.y, this.radiusValueArc, this.angleStart, currentAngle, this.thicknessValueArc);
+				this.#addAttributesNS(this.elements.valueArc.node, {d: pathDefinition});
+			})
 		});
-	}
-
-	#animate(angle) {
-		let currentAngle = angle;
-
-		// A step to move in arc in angles
-		const step = 1;
-
-		if (this.angleOld < this.angleNew) {
-			const angleNext = currentAngle + step;
-			if (angleNext <= this.angleNew) {
-				currentAngle = angleNext;
-			}
-			else {
-				currentAngle += this.angleNew - currentAngle;
-			}
-		}
-		else {
-			const angleNext = currentAngle - step;
-			if (angleNext >= this.angleNew) {
-				currentAngle = angleNext;
-			}
-			else {
-				currentAngle -= currentAngle - this.angleNew;
-			}
-		}
-
-		const path = this.svg.querySelector('#arc-value');
-
-		const pathDefinition = this.#defineArc(this.x, this.y, this.radiusValueArc, this.angleStart, currentAngle, this.thicknessValueArc);
-		this.#addAttributesNS(path, {d: pathDefinition});
-
-		if (currentAngle !== this.angleNew) {
-			window.requestAnimationFrame(() => {
-				this.#animate(currentAngle)
-			});
-		}
 	}
 
 	#addArcEmpty(container) {
@@ -853,9 +825,61 @@ class CSVGGauge {
 	// TO DO: finish the function
 	#addNeedle() {
 		// Depends on whether there is at least one arc. If both arcs exist, needle takes radius of the smallest arc.
+
+		let path = this.svg.querySelector('#needle');
+
+		if (this.data.needle.show && this.data.thresholds.show_arc && !this.data.value.show_arc) {
+			if (this.initialLoad || !path) {
+				path = document.createElementNS(SVGNS, 'path');
+
+				this.#addAttributesNS(path, {id: 'needle'});
+
+				this.svg.appendChild(path);
+			}
+
+			const pathDefinition = this.#defineNeedle();
+
+			this.#addAttributesNS(path, {d: pathDefinition});
+
+			this.elements.needle = {
+				node: path
+			};
+
+			window.requestAnimationFrame(() => {
+				this.#animate(this.angleOld, (currentAngle) => {
+					this.#addAttributesNS(this.elements.needle.node, {transform: `translate(${this.x} ${this.y}) rotate(${currentAngle}) translate(${-this.x} ${-this.y})`});
+				})
+			});
+		}
+		else {
+			path?.remove();
+		}
 	}
 
-	#defineArc(x, y, radius, startAngle, endAngle, thickness){
+	#defineNeedle() {
+		// Radius of needle's round part at the bottom
+		const radius = 10;
+
+		// Length of needle
+		const length = this.radiusThresholdArc + this.thicknessThresholdArc / 2;
+
+		// 0 degrees (needle points to the top) because here is defined only needle's path
+		// Needle will be rotated later to necessary angle
+		const angleInRadians = this.#degreesToRadians(0);
+
+		// Coordinates of needle's tip
+		const tipX = this.x + (length * Math.cos(angleInRadians));
+		const tipY = this.y + (length * Math.sin(angleInRadians));
+
+		return [
+			'M', this.x + radius, this.y,
+			'A', radius, radius, 0, 0, 1, this.x - radius, this.y,
+			'L', tipX, tipY,
+			'Z'
+		].join(' ');
+	}
+
+	#defineArc(x, y, radius, startAngle, endAngle, thickness) {
 		const innerStart = this.#polarToCartesian(x, y, radius, endAngle);
 		const innerEnd = this.#polarToCartesian(x, y, radius, startAngle);
 		const outerStart = this.#polarToCartesian(x, y, radius + thickness, endAngle);
@@ -868,17 +892,57 @@ class CSVGGauge {
 			'A', radius + thickness, radius + thickness, 0, largeArcFlag, 0, outerEnd.x, outerEnd.y,
 			'L', innerEnd.x, innerEnd.y,
 			'A', radius, radius, 0, largeArcFlag, 1, innerStart.x, innerStart.y,
-			'L', outerStart.x, outerStart.y, 'Z'
+			'L', outerStart.x, outerStart.y,
+			'Z'
 		].join(' ');
 	}
 
 	#polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-		const angleInRadians = (angleInDegrees - 90) * Math.PI / 180;
+		const angleInRadians = this.#degreesToRadians(angleInDegrees);
 
 		return {
 			x: centerX + (radius * Math.cos(angleInRadians)),
 			y: centerY + (radius * Math.sin(angleInRadians))
 		};
+	}
+
+	#degreesToRadians(degrees) {
+		return (degrees - 90) * Math.PI / 180;
+	}
+
+	#animate(angle, callback) {
+		let currentAngle = angle;
+
+		// A step to move in arc (in degrees)
+		const step = 1;
+
+		if (this.angleOld < this.angleNew) {
+			const angleNext = currentAngle + step;
+			if (angleNext <= this.angleNew) {
+				currentAngle = angleNext;
+			} else {
+				currentAngle += this.angleNew - currentAngle;
+			}
+		}
+		else {
+			const angleNext = currentAngle - step;
+			if (angleNext >= this.angleNew) {
+				currentAngle = angleNext;
+			}
+			else {
+				currentAngle -= currentAngle - this.angleNew;
+			}
+		}
+
+		if (callback && typeof callback === 'function') {
+			callback(currentAngle);
+
+			if (currentAngle !== this.angleNew) {
+				window.requestAnimationFrame(() => {
+					this.#animate(currentAngle, callback);
+				});
+			}
+		}
 	}
 
 	#getAngle(value, min, max) {

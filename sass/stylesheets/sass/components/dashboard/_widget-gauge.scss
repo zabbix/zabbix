@@ -107,6 +107,10 @@ div.dashboard-widget-gauge {
 			fill: $gauge-fill-color;
 		}
 	}
+
+	#needle {
+		fill: $gauge-needle-color;
+	}
 }
 
 // Modifications by themes.
