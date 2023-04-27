@@ -401,7 +401,7 @@ class CControllerPopupImportCompare extends CController {
 		}
 
 		if ($rows) {
-			$rows[0] = ['id' => $id];
+			$rows[0] += ['id' => $id];
 		}
 
 		return $rows;
