@@ -34,6 +34,21 @@ type Plugin struct {
 
 var impl Plugin
 
+// wmiFmtAdapter returns value adapted to the format of classic C Zabbix agent for compatibility reasons.
+// Boolean values should be converted to "True" and "False" strings starting with capital letter.
+func wmiFmtAdapter(value interface{}) interface{} {
+	switch v := value.(type) {
+	case bool:
+		if v {
+			return "True"
+		} else {
+			return "False"
+		}
+	default:
+		return value
+	}
+}
+
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) != 2 {
@@ -41,11 +56,17 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	switch key {
 	case "wmi.get":
-		return wmi.QueryValue(params[0], params[1])
+		value, err := wmi.QueryValue(params[0], params[1])
+		return wmiFmtAdapter(value), err
 	case "wmi.getall":
 		m, err := wmi.QueryTable(params[0], params[1])
 		if err != nil {
 			return nil, err
+		}
+		for i := range m {
+			for k := range m[i] {
+				m[i][k] = wmiFmtAdapter(m[i][k])
+			}
 		}
 		b, err := json.Marshal(&m)
 		if err != nil {

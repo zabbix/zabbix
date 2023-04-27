@@ -1,1 +1,1 @@
-...G...... [ZBX-22593] fixed representation of boolean item values in Zabbix agent 2 (mprihodko)
+...G...... [ZBX-22593] changed representation of boolean item values in wmi.get, wmi.getall items in Zabbix agent 2 to match the format in classic Zabbix agent (mprihodko)
