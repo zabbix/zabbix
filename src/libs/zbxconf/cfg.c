@@ -312,7 +312,7 @@ static char	*expand_include_path(char *raw_path)
 
 	wraw_path = zbx_utf8_to_unicode(raw_path);
 
-	if (TRUE == PathIsRelativeW(wraw_path) && NULL != CONFIG_FILE)
+	if (TRUE == PathIsRelativeW(wraw_path))
 	{
 		wchar_t	*wconfig_path, dir_buf[_MAX_DIR];
 		char	*dir_utf8, *result = NULL;
@@ -335,7 +335,7 @@ static char	*expand_include_path(char *raw_path)
 
 	zbx_free(wraw_path);
 #else
-	if ('/' != *raw_path && NULL != CONFIG_FILE)
+	if ('/' != *raw_path)
 	{
 		char	*cfg_file, *path;
 
