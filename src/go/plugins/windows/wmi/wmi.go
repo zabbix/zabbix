@@ -57,6 +57,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	switch key {
 	case "wmi.get":
 		value, err := wmi.QueryValue(params[0], params[1])
+
 		return wmiFmtAdapter(value), err
 	case "wmi.getall":
 		m, err := wmi.QueryTable(params[0], params[1])
