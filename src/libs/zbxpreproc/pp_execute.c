@@ -716,6 +716,9 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 
 		ret = zbx_prometheus_pattern_ex(prom_cache, pattern, request, output, &value_out, &err);
 	}
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, value_out);
 out:
 	zbx_free(pattern);
 
@@ -727,9 +730,6 @@ out:
 		zbx_free(err);
 		return FAIL;
 	}
-
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, value_out);
 
 	return SUCCEED;
 }
@@ -761,20 +761,86 @@ static int	pp_execute_prometheus_pattern(zbx_pp_cache_t *cache, zbx_variant_t *v
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: execute 'prometheus to json' conversion                           *
+ *                                                                            *
+ * Parameters: cache  - [IN] preprocessing cache                              *
+ *             value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Result value: SUCCEED - the preprocessing step was executed successfully.  *
+ *               FAIL    - otherwise.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	pp_execute_prometheus_to_json_conversion(zbx_pp_cache_t *cache, zbx_variant_t *value,
+		const char *params, char **errmsg)
+{
+	char	*value_out = NULL, *err = NULL;
+	int	ret = FAIL;
+
+	if (NULL == cache || ZBX_PREPROC_PROMETHEUS_PATTERN != cache->type)
+	{
+		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+			goto out;
+
+		ret = zbx_prometheus_to_json(value->data.str, params, &value_out, &err);
+	}
+	else
+	{
+		zbx_prometheus_t	*prom_cache;
+
+		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
+		{
+			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+				goto out;
+
+			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
+
+			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
+			{
+				zbx_free(prom_cache);
+				cache->type = ZBX_PREPROC_NONE;
+				goto out;
+			}
+
+			cache->data = (void *)prom_cache;
+		}
+
+		ret = zbx_prometheus_to_json_ex(prom_cache, params, &value_out, &err);
+	}
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, value_out);
+out:
+	if (FAIL == ret)
+	{
+		if (NULL == *errmsg)
+			*errmsg = zbx_dsprintf(*errmsg, "cannot convert Prometheus data to JSON: %s", err);
+
+		zbx_free(err);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute 'prometheus to json' step                                 *
  *                                                                            *
- * Parameters: value  - [IN/OUT] value to process                             *
+ * Parameters: cache  - [IN] preprocessing cache                              *
+ *             value  - [IN/OUT] value to process                             *
  *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
-static int	pp_execute_prometheus_to_json(zbx_variant_t *value, const char *params)
+static int	pp_execute_prometheus_to_json(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED == item_preproc_prometheus_to_json(value, params, &errmsg))
+	if (SUCCEED == pp_execute_prometheus_to_json_conversion(cache, value, params, &errmsg))
 		return SUCCEED;
 
 	zbx_variant_clear(value);
@@ -991,7 +1057,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 			ret = pp_execute_prometheus_pattern(cache, value, step->params);
 			goto out;
 		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-			ret = pp_execute_prometheus_to_json(value, step->params);
+			ret = pp_execute_prometheus_to_json(cache, value, step->params);
 			goto out;
 		case ZBX_PREPROC_CSV_TO_JSON:
 			ret = pp_execute_csv_to_json(value, step->params);
