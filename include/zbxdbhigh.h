@@ -492,7 +492,6 @@ void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-DB_RESULT	zbx_db_select_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 DB_RESULT	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 DB_RESULT	zbx_db_select_n(const char *query, int n);
 DB_ROW		zbx_db_fetch(DB_RESULT result);
