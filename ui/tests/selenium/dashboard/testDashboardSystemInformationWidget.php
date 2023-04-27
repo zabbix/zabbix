@@ -278,6 +278,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			$field_values = [
 				'Type' => 'System information',
 				'Name' => '',
+				'Show header' => true,
 				'Refresh interval' => 'Default (15 minutes)',
 				'Show' => 'System stats'
 			];
