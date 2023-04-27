@@ -1060,7 +1060,7 @@ static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_resul
 	if (el->ts.sec < latest_ts.sec ||
 			(el->ts.sec == latest_ts.sec && el->ts.ns <= latest_ts.ns))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "%s(): detected duplicate or old timestamp (%d.%d, latest: %d.%d",
+		zabbix_log(LOG_LEVEL_INFORMATION, "%s(): detected duplicate or old timestamp (%d.%d, latest: %d.%d)",
 				__func__, el->ts.sec, el->ts.ns, latest_ts.sec, latest_ts.ns);
 		latest_ts.ns++;
 		el->ts.sec = latest_ts.sec;
