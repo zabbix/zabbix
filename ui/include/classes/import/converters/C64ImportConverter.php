@@ -36,9 +36,7 @@ class C64ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '7.0';
 
-		class_alias(C54HistFunctionParser::class, 'CHistFunctionParser');
-
-		self::$parser = new CExpressionParser(['usermacros' => true]);
+		self::$parser = new CExpressionParser(['usermacros' => true, 'no_backslash_escaping' => true]);
 
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
@@ -198,7 +196,7 @@ class C64ImportConverter extends CConverter {
 			}
 
 			foreach ($token['data']['parameters'] as $parameter) {
-				if ($parameter['type'] == C10HistFunctionParser::PARAM_TYPE_QUOTED
+				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
 					&& strpos($parameter['match'], '\\') !== false) {
 					$convert_params[] = $parameter;
 				}

@@ -66,7 +66,8 @@ class CExpressionParser extends CParser {
 		'calculated' => false,
 		'host_macro' => false,
 		'host_macro_n' => false,
-		'empty_host' => false
+		'empty_host' => false,
+		'no_backslash_escaping' => false
 	];
 
 	/**
@@ -617,7 +618,8 @@ class CExpressionParser extends CParser {
 			'calculated' => $options['calculated'],
 			'host_macro' => $options['host_macro'],
 			'host_macro_n' => $options['host_macro_n'],
-			'empty_host' => $options['empty_host']
+			'empty_host' => $options['empty_host'],
+			'no_backslash_escaping' => $options['no_backslash_escaping']
 		]);
 
 		if ($hist_function_parser->parse($source, $pos) == CParser::PARSE_FAIL) {
