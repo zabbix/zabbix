@@ -48,7 +48,6 @@ $html_page = (new CHtmlPage())
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
 			(new CFormGrid())
-				->addStyle('margin-top: 5px; margin-bottom: 5px;')
 				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 				->addItem([
 					new CLabel(_('Name'), 'filter_name'),
@@ -59,7 +58,6 @@ $html_page = (new CHtmlPage())
 					)
 				]),
 			(new CFormGrid())
-				->addStyle('margin-top: 5px; margin-bottom: 5px;')
 				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 				->addItem([
 					new CLabel(_('Scope')),

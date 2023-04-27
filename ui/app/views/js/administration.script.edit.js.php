@@ -47,7 +47,7 @@ window.script_edit_popup = new class {
 		document.querySelector('#enable-confirmation').dispatchEvent(new Event('change'));
 
 		document.getElementById('js-add').addEventListener('click', () => {
-			let template = new Template(document.getElementById('script-parameter-template').innerHTML);
+			const template = new Template(document.getElementById('script-parameter-template').innerHTML);
 
 			document
 				.querySelector('#parameters-table tbody')
@@ -61,8 +61,13 @@ window.script_edit_popup = new class {
 		});
 	}
 
+	/**
+	 * Adds a new row to the Parameters table with the given parameter data (name, value).
+	 *
+	 * @param {object} parameter  The parameter object.
+	 */
 	_addParameter(parameter) {
-		let template = new Template(document.getElementById('script-parameter-template').innerHTML);
+		const template = new Template(document.getElementById('script-parameter-template').innerHTML);
 
 		document
 			.querySelector('#parameters-table tbody')
@@ -71,35 +76,34 @@ window.script_edit_popup = new class {
 
 	/**
 	 * Compiles necessary fields for popup based on scope, type, confirmation and host group type fields.
+	 *
+	 * @param {object} script  The script object.
 	 */
 	_loadView(script) {
 		this.scope = parseInt(script.scope);
 		this.type = parseInt(script.type);
 		this.confirmation = script.enable_confirmation;
+		const type = document.querySelector('#type');
 
 		// Load scope fields.
 		document.querySelector('#scope').onchange = (e) => {
 			this._hideFormFields('all');
 			this._loadScopeFields(e);
-			document.querySelector('#type').dispatchEvent(new Event('change'));
+			type.dispatchEvent(new Event('change'));
 		};
 
 		// Load type fields.
-		document.querySelector('#type').onchange = (e) => {
-			this._loadTypeFields(script, e);
-		};
+		type.onchange = (e) => this._loadTypeFields(script, e);
 
-		// Update confirmation fields
-		document.querySelector('#enable-confirmation').onchange = (e) => {
-			this._loadConfirmationFields(e);
-		};
+		// Update confirmation fields.
+		document.querySelector('#enable-confirmation').onchange = (e) => this._loadConfirmationFields(e);
 
-		// test confirmation button
-		document.querySelector('#test-confirmation').addEventListener('click', (e) => {
-			executeScript(null, document.querySelector('#confirmation').value, e.target);
-		});
+		// Test confirmation button.
+		document.querySelector('#test-confirmation').addEventListener('click', (e) =>
+			executeScript(null, document.querySelector('#confirmation').value, e.target)
+		);
 
-		// host group selection
+		// Host group selection.
 		const hgstype = document.querySelector('#hgstype-select');
 		const hostgroup_selection = document.querySelector('#host-group-selection');
 
@@ -114,7 +118,7 @@ window.script_edit_popup = new class {
 
 		hgstype.dispatchEvent(new Event('change'));
 		this.form.removeAttribute('style');
-		document.getElementById('name').focus();
+		this.overlay.recoverFocus();
 	}
 
 	clone({title, buttons}) {
@@ -122,12 +126,12 @@ window.script_edit_popup = new class {
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
-
-		document.getElementById('name').focus();
+		this.overlay.recoverFocus();
 	}
 
 	delete() {
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', 'script.delete');
 		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 			<?= json_encode(CCsrfTokenHelper::get('script'), JSON_THROW_ON_ERROR) ?>
@@ -150,6 +154,7 @@ window.script_edit_popup = new class {
 		}
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', this.scriptid === null ? 'script.create' : 'script.update');
 
 		this._post(curl.getUrl(), fields, (response) => {
@@ -159,6 +164,13 @@ window.script_edit_popup = new class {
 		});
 	}
 
+	/**
+	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
+	 *
+	 * @param {string} url                 The URL to send the POST request to.
+	 * @param {object} data                The data to send with the POST request.
+	 * @param {callback} success_callback  The function to execute when a successful response is received.
+	 */
 	_post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
@@ -181,7 +193,8 @@ window.script_edit_popup = new class {
 					}
 				}
 
-				let title, messages;
+				let title;
+				let messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
@@ -202,16 +215,22 @@ window.script_edit_popup = new class {
 
 	/**
 	 * Displays or hides fields in the popup based on the value of selected scope.
+	 *
+	 * @param {object} event  The event object.
 	 */
 	_loadScopeFields(event) {
 		if (event.target.value) {
 			this.scope = parseInt(event.target.value);
 		}
 
+		const url_radio_button = document.querySelector(
+			`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`
+		);
+
 		switch (this.scope) {
 			case <?= ZBX_SCRIPT_SCOPE_HOST ?>:
 			case <?= ZBX_SCRIPT_SCOPE_EVENT ?>:
-				let show_fields = [
+				const show_fields = [
 					'#menu-path', '#menu-path-label', '#usergroup-label', '#usergroup', '#host-access-label',
 					'#host-access-field', '#enable-confirmation-label', '#enable-confirmation-field',
 					'#confirmation-label', '#confirmation-field'
@@ -221,23 +240,22 @@ window.script_edit_popup = new class {
 					document.querySelector(field).style.display = '';
 				});
 
-				document.querySelector('#type input[type="radio"][value="6"]').closest('li').style.display = '';
-
+				url_radio_button.closest('li').style.display = '';
 				break;
 
 			case <?= ZBX_SCRIPT_SCOPE_ACTION ?>:
-				let hide_fields = ['#menu-path', '#menu-path-label'];
+				const hide_fields = ['#menu-path', '#menu-path-label'];
 
 				hide_fields.forEach((field) => {
 					document.querySelector(field).style.display = 'none';
 				});
 
-				document.querySelector('#type input[type="radio"][value="6"]').closest('li').style.display = 'none';
+				url_radio_button.closest('li').style.display = 'none';
 
 				if (document.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
 					const webhook = document.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`);
-					webhook.checked = true;
 
+					webhook.checked = true;
 					this.type = parseInt(<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>);
 				}
 				break;
@@ -246,6 +264,9 @@ window.script_edit_popup = new class {
 
 	/**
 	 * Displays or hides fields in the popup based on the value of selected type.
+	 *
+	 * @param {object} script  The script object.
+	 * @param {object} event   The event object.
 	 */
 	_loadTypeFields(script, event) {
 		if (event.target.value) {
@@ -253,7 +274,7 @@ window.script_edit_popup = new class {
 		}
 
 		let show_fields = [];
-		let hide_fields = [
+		const hide_fields = [
 			'#command-ipmi-label', '#command-ipmi', '#webhook-parameters', '#webhook-parameters-label',
 			'#js-item-script-field', '#script-label', '#timeout-label', '#timeout-field', '#auth-type-label',
 			'#auth-type', '#username-label', '#username-field', '#password-label', '#password-field',
@@ -301,12 +322,10 @@ window.script_edit_popup = new class {
 
 				// Load authentication fields.
 				this.authtype = parseInt(script.authtype);
+				const authtype = document.querySelector('#authtype');
 
-				document.querySelector('#authtype').onchange = (e) => {
-					this._loadAuthFields(e);
-				};
-
-				document.querySelector('#authtype').dispatchEvent(new Event('change'));
+				authtype.onchange = (e) => this._loadAuthFields(e);
+				authtype.dispatchEvent(new Event('change'));
 				break;
 
 			case <?= ZBX_SCRIPT_TYPE_TELNET ?>:
@@ -342,14 +361,16 @@ window.script_edit_popup = new class {
 	/**
 	 * Displays or hides fields in the popup based on the value of selected authentication method.
 	 * This is relevant only when the script type is SSH.
+	 *
+	 * @param {object} event  The event object.
 	 */
-	_loadAuthFields(e) {
+	_loadAuthFields(event) {
 		this._hideFormFields('auth');
 
 		let show_fields = [];
 
-		if (e.target.value) {
-			this.authtype = parseInt(e.target.value);
+		if (event.target.value) {
+			this.authtype = parseInt(event.target.value);
 		}
 
 		switch (this.authtype) {
@@ -372,33 +393,43 @@ window.script_edit_popup = new class {
 
 	/**
 	 * Displays or hides confirmation fields in the popup based on the value of selected scope.
-	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION
+	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION.
+	 *
+	 * @param {object} event  The event object.
 	 */
-	_loadConfirmationFields(e) {
-		if (e.target.value) {
-			this.confirmation = e.target.checked;
+	_loadConfirmationFields(event) {
+		if (event.target.value) {
+			this.confirmation = event.target.checked;
 		}
 
-		if (this.confirmation) {
-			document.querySelector('#confirmation').removeAttribute('disabled');
+		const confirmation = document.querySelector('#confirmation');
+		const test_confirmation = document.querySelector('#test-confirmation');
 
-			document.querySelector('#confirmation').onkeyup = function () {
-				if (document.querySelector('#confirmation').value != '') {
-					document.querySelector('#test-confirmation').removeAttribute('disabled');
+		if (this.confirmation) {
+			confirmation.removeAttribute('disabled');
+
+			confirmation.onkeyup = function () {
+				if (confirmation.value != '') {
+					test_confirmation.removeAttribute('disabled');
 				}
 				else {
-					document.querySelector('#test-confirmation').setAttribute('disabled', 'disabled');
+					test_confirmation.setAttribute('disabled', 'disabled');
 				}
 			}
 
-			document.querySelector('#confirmation').dispatchEvent(new Event('keyup'));
+			confirmation.dispatchEvent(new Event('keyup'));
 		}
 		else {
-			document.querySelector('#confirmation').setAttribute('disabled', 'disabled');
-			document.querySelector('#test-confirmation').setAttribute('disabled', 'disabled');
+			confirmation.setAttribute('disabled', 'disabled');
+			test_confirmation.setAttribute('disabled', 'disabled');
 		}
 	}
 
+	/**
+	 * Hides the specified fields from the form based on input parameter type.
+	 *
+	 * @param {string} type  A string indicating the type of fields to hide.
+	 */
 	_hideFormFields(type) {
 		let fields = [];
 
@@ -410,28 +441,18 @@ window.script_edit_popup = new class {
 		}
 
 		if (type === 'all') {
-			document.querySelector('#type input[type="radio"][value="6"]').closest('li').style.display = 'none';
+			document.querySelector(`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`)
+				.closest('li').style.display = 'none';
 
 			fields = [
-				'#menu-path', '#menu-path-label',
-				'#url', '#url-label',
-				'#new-window-label', '#new-window',
-				'#webhook-parameters', '#webhook-parameters-label',
-				'#js-item-script-field', '#script-label',
-				'#timeout-label', '#timeout-field',
-				'#commands-label', '#commands',
-				'#command-ipmi-label', '#command-ipmi',
-				'#auth-type-label', '#auth-type',
-				'#username-label', '#username-field',
-				'#password-label', '#password-field',
-				'#port-label', '#port-field',
-				'#publickey-label', '#publickey-field',
-				'#privatekey-label', '#privatekey-field',
-				'#passphrase-label', '#passphrase-field',
-				'#usergroup-label', '#usergroup',
-				'#host-access-label', '#host-access-field',
-				'#enable-confirmation-label', '#enable-confirmation-field',
-				'#confirmation-label', '#confirmation-field'
+				'#menu-path', '#menu-path-label', '#url', '#url-label', '#new-window-label', '#new-window',
+				'#webhook-parameters', '#webhook-parameters-label', '#js-item-script-field', '#script-label',
+				'#timeout-label', '#timeout-field', '#commands-label', '#commands', '#command-ipmi-label',
+				'#command-ipmi', '#auth-type-label', '#auth-type', '#username-label', '#username-field',
+				'#password-label', '#password-field', '#port-label', '#port-field', '#publickey-label',
+				'#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label', '#passphrase-field',
+				'#usergroup-label', '#usergroup', '#host-access-label', '#host-access-field',
+				'#enable-confirmation-label', '#enable-confirmation-field', '#confirmation-label', '#confirmation-field'
 			];
 		}
 
@@ -440,4 +461,3 @@ window.script_edit_popup = new class {
 		});
 	}
 }
-

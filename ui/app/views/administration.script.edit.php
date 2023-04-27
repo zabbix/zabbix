@@ -77,7 +77,7 @@ $form_grid = (new CFormGrid())
 			(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
-		))->addStyle('width: '.ZBX_SCRIPT_POPUP_DIV_WIDTH.'px')
+		))
 	])
 	->addItem(([
 		new CLabel(_('Scope'), 'scope'),
@@ -263,7 +263,7 @@ $form_grid = (new CFormGrid())
 		))->setId('timeout-field')
 	])
 	->addItem([
-		(new CLabel(_('Description'), 'description'))->addStyle('width: '.ZBX_SCRIPT_POPUP_LABEL_WIDTH.'px;'),
+		(new CLabel(_('Description'), 'description')),
 		new CFormField(
 			(new CTextArea('description', $data['description']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
