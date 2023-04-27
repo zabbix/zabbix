@@ -95,7 +95,8 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			'Test existing name' => [
+			// Check existing names in DB.
+			'Test existing name in default menu path' => [
 				'script' => [
 					'name' => 'Ping',
 					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -103,20 +104,137 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Script "Ping" already exists.'
 			],
-			'Test duplicate name' => [
+			'Test existing name in identical menu path' => [
+				'script' => [
+					'name' => 'API script unique name in menu path (host scope)',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'menu_path' => 'home/script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API script unique name in menu path (host scope)" already exists.'
+			],
+			'Test existing name in custom menu path leading slash' => [
+				'script' => [
+					'name' => 'API script unique name in menu path (host scope)',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'menu_path' => '/home/script',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API script unique name in menu path (host scope)" already exists.'
+			],
+			'Test existing name in custom menu path trailing slash' => [
+				'script' => [
+					'name' => 'API script unique name in menu path (host scope)',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'menu_path' => 'home/script/',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API script unique name in menu path (host scope)" already exists.'
+			],
+			'Test existing name in custom menu path both leading and trailing slashes' => [
+				'script' => [
+					'name' => 'API script unique name in menu path (host scope)',
+					'scope' => ZBX_SCRIPT_SCOPE_HOST,
+					'menu_path' => '/home/script/',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'command' => 'reboot server'
+				],
+				'expected_error' => 'Script "API script unique name in menu path (host scope)" already exists.'
+			],
+			// Check duplicate names in input.
+			'Test duplicate name within default menu path' => [
 				'script' => [
 					[
-						'name' => 'Scripts with the same name',
+						'name' => 'Script with same name',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server'
 					],
 					[
-						'name' => 'Scripts with the same name',
+						'name' => 'Script with same name',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, ) already exists.'
+			],
+			'Test duplicate name within identical menu path' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'home/script',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'home/script',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, home/script) already exists.'
+			],
+			'Test duplicate name within same menu path with leading slash' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'home/script',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => '/home/script',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, home/script) already exists.'
+			],
+			'Test duplicate name within same menu path with trailing slash' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'home/script',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'home/script/',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, home/script) already exists.'
+			],
+			'Test duplicate name within same menu path with both leading and trailing slashes' => [
+				'script' => [
+					[
+						'name' => 'Script with same name',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'home/script',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server'
+					],
+					[
+						'name' => 'Script with same name',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => '/home/script/',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, home/script) already exists.'
 			],
 			// Check script scope.
 			'Test invalid scope (empty)' => [
@@ -348,16 +466,6 @@ class testScripts extends CAPITest {
 					'usrgrpid' => 999999
 				],
 				'expected_error' => 'User group with ID "999999" is not available.'
-			],
-			'Test invalid usrgrpid for host scope (empty)' => [
-				'script' => [
-					'name' => 'API create script',
-					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
-					'command' => 'reboot server',
-					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
-					'usrgrpid' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			'Test invalid usrgrpid for event scope (string)' => [
 				'script' => [
@@ -1307,6 +1415,64 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Check unique names and menu paths.
+			'Test successful same menu path different name' => [
+				'script' => [
+					[
+						'name' => 'API create script same path (test1)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					],
+					[
+						'name' => 'API create script same path (test2)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful same name with different menu paths' => [
+				'script' => [
+					[
+						'name' => 'API create script same name (test2)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					],
+					[
+						'name' => 'API create script same name (test2)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path2'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful different name with different menu paths' => [
+				'script' => [
+					[
+						'name' => 'API create script name1',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					],
+					[
+						'name' => 'API create script name2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path2'
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -1969,25 +2135,108 @@ class testScripts extends CAPITest {
 				]],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
-			'Test existing name' => [
+			// Check existing names in DB.
+			'Test existing name in default menu path' => [
 				'script' => [[
 					'scriptid' => 15,
 					'name' => 'Ping'
 				]],
 				'expected_error' => 'Script "Ping" already exists.'
 			],
-			'Test same name' => [
+			'Test existing name in an existing menu path' => [
+				'script' => [
+					'scriptid' => 61,
+					'menu_path' => '/home/script'
+				],
+				'expected_error' => 'Script "API script unique name in menu path (host scope)" already exists.'
+			],
+			'Test existing name in same menu path' => [
+				'script' => [
+					'scriptid' => 58,
+					'name' => 'API script unique name in menu path (host scope)'
+				],
+				'expected_error' => 'Script "API script unique name in menu path (host scope)" already exists.'
+			],
+			'Test existing name in default menu path and change scope to action' => [
+				'script' => [
+					'scriptid' => 65,
+					'scope' => ZBX_SCRIPT_SCOPE_ACTION
+				],
+				'expected_error' => 'Script "API script unique name in default path (host scope)" already exists.'
+			],
+			// Check duplicate names in input.
+			'Test duplicate name within default menu path' => [
 				'script' => [
 					[
 						'scriptid' => 15,
-						'name' => 'Scripts with the same name'
+						'name' => 'Script with same name'
 					],
 					[
 						'scriptid' => 16,
-						'name' => 'Scripts with the same name'
+						'name' => 'Script with same name'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Scripts with the same name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, ) already exists.'
+			],
+			'Test duplicate name within identical menu path' => [
+				'script' => [
+					[
+						'scriptid' => 15,
+						'name' => 'Script with same name',
+						'menu_path' => 'home/script'
+					],
+					[
+						'scriptid' => 16,
+						'name' => 'Script with same name',
+						'menu_path' => 'home/script'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, home/script) already exists.'
+			],
+			'Test duplicate name within same menu path with leading slash' => [
+				'script' => [
+					[
+						'scriptid' => 15,
+						'name' => 'Script with same name',
+						'menu_path' => 'home/script'
+					],
+					[
+						'scriptid' => 16,
+						'name' => 'Script with same name',
+						'menu_path' => '/home/script'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, home/script) already exists.'
+			],
+			'Test duplicate name within same menu path with trailing slash' => [
+				'script' => [
+					[
+						'scriptid' => 15,
+						'name' => 'Script with same name',
+						'menu_path' => 'home/script'
+					],
+					[
+						'scriptid' => 16,
+						'name' => 'Script with same name',
+						'menu_path' => 'home/script/'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, home/script) already exists.'
+			],
+			'Test duplicate name within same menu path with both leading and trailing slashes' => [
+				'script' => [
+					[
+						'scriptid' => 15,
+						'name' => 'Script with same name',
+						'menu_path' => 'home/script'
+					],
+					[
+						'scriptid' => 16,
+						'name' => 'Script with same name',
+						'menu_path' => '/home/script/'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(Script with same name, home/script) already exists.'
 			],
 			// Check script command.
 			'Test empty command' => [
@@ -3501,11 +3750,40 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test successful parameter reset when scope changes to action' => [
+			// Check name and menu path update.
+			'Test successful change of menu path and leaving name the same' => [
 				'script' => [
 					[
 						'scriptid' => 58,
-						'scope' => ZBX_SCRIPT_SCOPE_ACTION
+						'menu_path' => ''
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful change of menu path to custom and leaving name the same' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'menu_path' => 'menu_path_new'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful change of name that exists in another menu path leaving same menu path to this one' => [
+				'script' => [
+					[
+						'scriptid' => 62,
+						'name' => 'API script for update one'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful change of name and menu path that exists in another menu path' => [
+				'script' => [
+					[
+						'scriptid' => 62,
+						'name' => 'API script for update one',
+						'menu_path' => 'new/menu/path'
 					]
 				],
 				'expected_error' => null

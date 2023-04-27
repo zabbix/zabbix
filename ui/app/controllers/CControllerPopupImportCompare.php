@@ -320,27 +320,7 @@ class CControllerPopupImportCompare extends CController {
 		return $yaml_key;
 	}
 
-	private function objectToRows(array $before, array $after, int $depth, string $id): array {
-		if ($before && $after) {
-			$outer_change_type = self::CHANGE_NONE;
-		}
-		else if ($before) {
-			$outer_change_type = self::CHANGE_REMOVED;
-		}
-		else if ($after) {
-			$outer_change_type = self::CHANGE_ADDED;
-		}
-		else {
-			$outer_change_type = self::CHANGE_NONE;
-		}
-
-		$rows = [[
-			'value' => '-',
-			'depth' => $depth,
-			'change_type' => $outer_change_type,
-			'id' => $id
-		]];
-
+	private function objectToRows(array $before, array $after, int $depth): array {
 		$all_keys = [];
 
 		foreach (array_keys($before) as $key) {
@@ -367,6 +347,8 @@ class CControllerPopupImportCompare extends CController {
 		}
 
 		unset($all_keys['uuid']);
+
+		$rows = [];
 
 		foreach ($all_keys as $key => $change_type) {
 			switch ($change_type) {
@@ -440,7 +422,7 @@ class CControllerPopupImportCompare extends CController {
 				foreach ($entities as $entity) {
 					$before = array_key_exists('before', $entity) ? $entity['before'] : [];
 					$after = array_key_exists('after', $entity) ? $entity['after'] : [];
-					$object = $before ? $before : $after;
+					$object = $before ?: $after;
 					unset($entity['before'], $entity['after']);
 
 					$id = $object['uuid'];
@@ -449,7 +431,7 @@ class CControllerPopupImportCompare extends CController {
 						'id' => $id
 					];
 
-					$rows = array_merge($rows, $this->objectToRows($before, $after, $depth + 1, $id));
+					$rows = array_merge($rows, $this->objectToRows($before, $after, $depth + 1));
 
 					// Process any sub-entities.
 					if ($entity) {
