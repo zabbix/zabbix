@@ -320,7 +320,7 @@ class CControllerPopupImportCompare extends CController {
 		return $yaml_key;
 	}
 
-	private function objectToRows(array $before, array $after, int $depth): array {
+	private function objectToRows(array $before, array $after, int $depth, string $id): array {
 		$all_keys = [];
 
 		foreach (array_keys($before) as $key) {
@@ -400,6 +400,10 @@ class CControllerPopupImportCompare extends CController {
 			}
 		}
 
+		if ($rows) {
+			$rows[0] = ['id' => $id];
+		}
+
 		return $rows;
 	}
 
@@ -431,7 +435,7 @@ class CControllerPopupImportCompare extends CController {
 						'id' => $id
 					];
 
-					$rows = array_merge($rows, $this->objectToRows($before, $after, $depth + 1));
+					$rows = array_merge($rows, $this->objectToRows($before, $after, $depth + 1, $id));
 
 					// Process any sub-entities.
 					if ($entity) {
