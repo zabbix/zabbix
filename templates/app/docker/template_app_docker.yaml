@@ -737,7 +737,7 @@ zabbix_export:
               name: 'Docker: Failed to fetch info data'
               event_name: 'Docker: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -2357,10 +2357,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     -
-                      type: INTEGER
-                      name: source_type
-                      value: '0'
-                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -2373,10 +2369,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     -
-                      type: INTEGER
-                      name: source_type
-                      value: '0'
-                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -2388,10 +2380,6 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '0'
                     -
                       type: GRAPH
                       name: graphid
@@ -2406,10 +2394,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     -
-                      type: INTEGER
-                      name: source_type
-                      value: '0'
-                    -
                       type: GRAPH
                       name: graphid
                       value:
@@ -2421,10 +2405,6 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
-                      name: source_type
-                      value: '0'
                     -
                       type: GRAPH
                       name: graphid

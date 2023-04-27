@@ -259,7 +259,7 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 			$config = [
 				'tile_url' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_URL),
 				'max_zoom' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM),
-				'attribution' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION)
+				'attribution' => CHtml::encode(CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION))
 			];
 		}
 		else {
