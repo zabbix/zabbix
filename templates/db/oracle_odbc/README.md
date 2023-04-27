@@ -354,7 +354,7 @@ However, if you wish to monitor only a single PDB or non-CDB instance, a local u
 |ASM '{#DGNAME}': Get ASM stats|<p>It gets the ASM disk group statistics.</p>|Database monitor|db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |ASM '{#DGNAME}': Total size|<p>The total size of the ASM disk group.</p>|Dependent item|oracle.asm_total_size["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.SIZE_BYTE`</p></li></ul>|
 |ASM '{#DGNAME}': Free size|<p>The free size of the ASM disk group.</p>|Dependent item|oracle.asm_free_size["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FREE_SIZE_BYTE`</p></li></ul>|
-|ASM '{#DGNAME}': Free size|<p>Usage of the ASM disk group expressed in %.</p>|Dependent item|oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_PERCENT`</p></li></ul>|
+|ASM '{#DGNAME}': Used size, percent|<p>Usage of the ASM disk group expressed in %.</p>|Dependent item|oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_PERCENT`</p></li></ul>|
 
 ### Trigger prototypes for ASM disk groups discovery
 

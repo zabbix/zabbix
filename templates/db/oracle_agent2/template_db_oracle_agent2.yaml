@@ -2002,7 +2002,7 @@ zabbix_export:
                   value: '{#DGNAME}'
             -
               uuid: e2a0ac73040f401bb05ff88140f6665b
-              name: 'ASM ''{#DGNAME}'': Free size'
+              name: 'ASM ''{#DGNAME}'': Used size, percent'
               type: DEPENDENT
               key: 'oracle.asm_used_pct["{#DGNAME}"]'
               delay: '0'
