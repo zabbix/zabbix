@@ -14,23 +14,21 @@ ICMPPING_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
-	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	-lz -lssl -lcrypto
 
 line_process_SOURCES = \
