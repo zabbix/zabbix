@@ -71,12 +71,13 @@ typedef struct
 	char			*addr;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
+	unsigned char		allow_redirect;
 }
 icmpitem_t;
 
 void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config);
 
 int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout,
-		char *error, size_t max_error_len);
+		unsigned char allow_redirect, char *error, size_t max_error_len);
 
 #endif
