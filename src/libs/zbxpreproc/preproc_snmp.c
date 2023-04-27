@@ -749,7 +749,10 @@ int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, c
 			snmp_value_pair_compare_func);
 
 	if (FAIL == preproc_snmp_walk_to_pairs(&cache->pairs, data, error))
+	{
+		zbx_snmp_value_cache_clear(cache);
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
