@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:18:07Z'
+  date: '2023-04-17T15:33:33Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -506,7 +506,7 @@ zabbix_export:
             -
               type: PROMETHEUS_TO_JSON
               parameters:
-                - 'container_memory_cache{container =~ ".*", namespace =~ ".*", pod =~ "POD"}'
+                - 'container_memory_cache{container !~ "POD", namespace =~ ".*", pod =~ ".*"}'
             -
               type: JAVASCRIPT
               parameters:
