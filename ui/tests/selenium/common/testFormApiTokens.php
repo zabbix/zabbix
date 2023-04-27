@@ -223,7 +223,7 @@ class testFormApiTokens extends CWebTest {
 					$this->assertEquals('The token has expired. Please update the expiry date to use the token.', $hintbox_text);
 
 					// In case if token is expired an empty space (separator) is added to the value in token generate form.
-					$generate_data['Expires at'] = $generate_data['Expires at'].' ';
+					$generate_data['Expires at'] = $generate_data['Expires at'];
 				}
 
 				foreach ($generate_data as $name => $value) {
