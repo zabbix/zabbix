@@ -17,22 +17,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
+AC_DEFUN([CMOCKA_TRY_LINK],
+[
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+		#include <stdint.h>
+		#include <stdarg.h>
+		#include <stddef.h>
+		#include <setjmp.h>
+
+		#include <cmocka.h>
+	]],[[
+		cmocka_run_group_tests(NULL, NULL, NULL);
+	]])],[found_cmocka="yes"],[])
+])dnl
+
 AC_DEFUN([CMOCKA_CHECK_CONFIG],
 [
-	AC_DEFUN([CMOCKA_TRY_LINK],
-	[
-		AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-			#include <stdint.h>
-			#include <stdarg.h>
-			#include <stddef.h>
-			#include <setjmp.h>
-
-			#include <cmocka.h>
-		]],[[
-			cmocka_run_group_tests(NULL, NULL, NULL);
-		]])],[found_cmocka="yes"],[AC_MSG_FAILURE([error])])
-	])dnl
-
 	AC_ARG_WITH([cmocka],[
 If you want to specify cmocka installation directories:
 AS_HELP_STRING([--with-cmocka@<:@=DIR@:>@],[use specific cmocka library @<:@default=yes@:>@, DIR is the cmocka library install directory.])],
