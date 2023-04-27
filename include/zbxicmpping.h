@@ -77,7 +77,7 @@ icmpitem_t;
 
 void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config);
 
-int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout,
+int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count, int period, int size, int timeout,
 		unsigned char allow_redirect, char *error, size_t max_error_len);
 
 #endif
