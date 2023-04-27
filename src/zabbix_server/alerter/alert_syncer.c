@@ -965,7 +965,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 		sec2 = zbx_time();
 
-		nextcheck = sec1 + ZBX_POLL_INTERVAL;
+		nextcheck = (int)sec1 + ZBX_POLL_INTERVAL;
 
 		if (0 > (sleeptime = nextcheck - (int)sec2))
 			sleeptime = 0;

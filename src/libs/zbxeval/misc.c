@@ -49,7 +49,7 @@ static	void	reserve_buffer(unsigned char **buffer, size_t *buffer_size, size_t r
 	if (offset + reserve <= *buffer_size)
 		return;
 
-	new_size = *buffer_size * 1.5;
+	new_size = (size_t)((double)*buffer_size * 1.5);
 
 	if (ZBX_EVAL_STATIC_BUFFER_SIZE == *buffer_size)
 	{

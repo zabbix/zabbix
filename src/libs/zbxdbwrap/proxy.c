@@ -3326,12 +3326,15 @@ int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version)
 	/* warn if another proxy version is used and proceed with compatibility rules*/
 	if (ZBX_PROXY_VERSION_CURRENT != compatibility)
 	{
-		int	now = zbx_time(), print_log = 0;
+		time_t	now;
+		int	print_log = 0;
+
+		now = (time_t)zbx_time();
 
 		if (proxy->last_version_error_time <= now)
 		{
 			print_log = 1;
-			proxy->last_version_error_time = now + 5 * SEC_PER_MIN;
+			proxy->last_version_error_time = (int)now + 5 * SEC_PER_MIN;
 			zbx_update_proxy_lasterror(proxy);
 		}
 

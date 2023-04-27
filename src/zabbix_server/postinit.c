@@ -402,7 +402,7 @@ static int	update_event_names(void)
 
 		processed_num++;
 
-		if (last_completed != (completed = 100.0 * processed_num / triggers_num))
+		if (last_completed != (completed = (int)(100.0 * processed_num / triggers_num)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "completed %d%% of event name update", completed);
 			last_completed = completed;

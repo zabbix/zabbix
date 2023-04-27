@@ -1321,7 +1321,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT,
-							ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
+							ZBX_TM_STATUS_NEW, (int)zbx_time(), 0, 0);
 					task->data = zbx_tm_remote_command_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1368,7 +1368,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-							zbx_time(), 0, 0);
+							(int)zbx_time(), 0, 0);
 					task->data = zbx_tm_data_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1665,7 +1665,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((int)sec1);
-			cleanup_time = sec1;
+			cleanup_time = (int)sec1;
 		}
 
 		sec2 = zbx_time();

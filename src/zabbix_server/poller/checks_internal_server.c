@@ -114,7 +114,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2, &lastaccess,
 						&error)))
 				{
-					value += zbx_time() - lastaccess;
+					value += (int)zbx_time() - lastaccess;
 				}
 			}
 			else

@@ -995,7 +995,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-		now = time_now;
+		now = (int)time_now;
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{

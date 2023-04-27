@@ -1605,7 +1605,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 					goto out;
 				}
 
-				seconds = arg.data.dbl;
+				seconds = (int)arg.data.dbl;
 				zbx_variant_clear(&arg);
 			}
 			count = 0;

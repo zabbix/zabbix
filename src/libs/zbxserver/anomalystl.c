@@ -728,7 +728,7 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 	ZBX_UNUSED(tmp);
 
 	if (L_WINDOW_DEF == l_window)
-		l_window = nextodd(freq);
+		l_window = (int)nextodd(freq);
 
 	if (L_DEGREE_DEF == l_degree)
 		l_degree = t_degree;
@@ -836,8 +836,8 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 		}
 
 		eval_robustness_weights(values_in, values_in_len, &work_0_copy, &weights);
-		step(values_in, values_in_len, freq, s_window, t_window, l_window, s_degree, t_degree, l_degree, nsjump,
-				ntjump, nljump, inner, userw, &weights, seasonal, trend, &work);
+		step(values_in, values_in_len, freq, s_window, (int)t_window, l_window, s_degree, t_degree, l_degree,
+				nsjump, ntjump, nljump, inner, userw, &weights, seasonal, trend, &work);
 
 		zbx_history_record_vector_destroy(&work_0_copy, ITEM_VALUE_TYPE_FLOAT);
 	}

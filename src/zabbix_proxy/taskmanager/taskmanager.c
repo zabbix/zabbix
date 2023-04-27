@@ -78,7 +78,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (int)zbx_time(), 0, 0);
 
 	ZBX_STR2UINT64(parent_taskid, row[9]);
 
@@ -195,7 +195,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_db_free_result(result);
 
 	if (0 != (processed_num = itemids.values_num))
-		zbx_dc_reschedule_items(&itemids, zbx_time(), NULL);
+		zbx_dc_reschedule_items(&itemids, (int)zbx_time(), NULL);
 
 	if (0 != taskids->values_num)
 	{
@@ -275,7 +275,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, (int)zbx_time(), 0, 0);
 	ZBX_STR2UINT64(parent_taskid, row[0]);
 
 	if (0 != ttl && clock + ttl < now)
@@ -499,7 +499,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((int)sec1);
-			cleanup_time = sec1;
+			cleanup_time = (int)sec1;
 		}
 
 		sec2 = zbx_time();
