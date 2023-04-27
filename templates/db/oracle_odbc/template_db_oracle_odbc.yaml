@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-12T12:53:41Z'
+  date: '2023-04-27T10:25:51Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -44,7 +44,6 @@ zabbix_export:
             decode(archiver,'STOPPED',1,'STARTED',2,'FAILED',3, 0) AS  ARCHIVER,
             decode(instance_role,'PRIMARY_INSTANCE',1,'SECONDARY_INSTANCE',2, 0) AS  INSTANCE_ROLE
             FROM v$instance;
-            
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'The item gets its state of the current instance.'
@@ -119,7 +118,6 @@ zabbix_export:
             UNION
              SELECT 'USER::Expire password', ROUND(DECODE(SIGN(NVL(u.expiry_date, SYSDATE + 999) - SYSDATE),-1, 0, NVL(u.expiry_date, SYSDATE + 999) - SYSDATE)) exp_passwd_days_before
             FROM dba_users u WHERE username = UPPER('{$ORACLE.USER}');
-            
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'The item gets the values of the system metrics.'
@@ -631,7 +629,7 @@ zabbix_export:
               name: 'Oracle: Instance hostname has changed'
               event_name: 'Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Oracle DB Instance hostname has changed. Ack to close.'
+              description: 'Oracle DB Instance hostname has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -665,7 +663,7 @@ zabbix_export:
               name: 'Oracle: Instance name has changed'
               event_name: 'Oracle: Instance name has changed (new name received: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Oracle DB instance has changed. Ack to close manually.'
+              description: 'The Oracle DB instance has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1522,7 +1520,7 @@ zabbix_export:
           key: oracle.uptime
           delay: '0'
           history: 7d
-          trends: 0d
+          trends: '0'
           units: s
           description: 'The Oracle instance uptime expressed in seconds.'
           preprocessing:
@@ -1650,7 +1648,7 @@ zabbix_export:
               name: 'Oracle: Version has changed'
               event_name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Oracle DB version has changed. Acknowledge to close manually.'
+              description: 'The Oracle DB version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1692,7 +1690,6 @@ zabbix_export:
           params: |
             SELECT d.dest_name
             FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
-            
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'Destinations of the log archive.'
@@ -1713,7 +1710,6 @@ zabbix_export:
                 d.error
                 FROM v$archive_dest d , v$database db
                 WHERE d.dest_name = '{#DEST_NAME}' AND d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
-                
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
               description: 'It gets the archivelog statistics.'
@@ -1854,7 +1850,6 @@ zabbix_export:
                 ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent
                 FROM v$asm_diskgroup
                 WHERE name = '{#DGNAME}';
-                
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
               description: 'It gets the ASM disk group statistics.'
@@ -1919,7 +1914,7 @@ zabbix_export:
                   value: '{#DGNAME}'
             -
               uuid: 9c87a9089a19468f85eb1d3c28893092
-              name: 'ASM ''{#DGNAME}'': Free size'
+              name: 'ASM ''{#DGNAME}'': Used size, percent'
               type: DEPENDENT
               key: 'oracle.asm_used_pct["{#DGNAME}"]'
               delay: '0'
@@ -1990,9 +1985,7 @@ zabbix_export:
           type: ODBC
           key: 'db.odbc.discovery[db_list,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
-          params: |
-            SELECT name as DBNAME, DECODE(CDB, 'YES', 'CDB', 'No-CDB') AS TYPE  FROM V$DATABASE;
-            
+          params: 'SELECT name as DBNAME, DECODE(CDB, ''YES'', ''CDB'', ''No-CDB'') AS TYPE  FROM V$DATABASE;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           filter:
@@ -2025,7 +2018,6 @@ zabbix_export:
                 DECODE(log_mode, 'MANUAL',2 ,'ARCHIVELOG',1,'NOARCHIVELOG',0,0) AS log_mode
                 FROM v$database
                 WHERE name = '{#DBNAME}';
-                
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
               description: 'It gets the information about the container database (CDB) and non-CDB database on an instance.'
@@ -2150,7 +2142,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB open status has changed. Ack to close manually.'
+                  description: 'The Oracle DB open status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   dependencies:
                     -
@@ -2214,7 +2206,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Role has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Role has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB role has changed. Ack to close manually.'
+                  description: 'The Oracle DB role has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2268,7 +2260,6 @@ zabbix_export:
                 DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode
                 FROM v$pdbs
                 WHERE name = '{#DBNAME}';
-                
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
               description: 'It gets the information about the PDB database on an instance.'
@@ -2327,7 +2318,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB open status has changed. Ack to close manually.'
+                  description: 'The Oracle DB open status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2354,7 +2345,6 @@ zabbix_export:
             TABLESPACE_NAME TABLESPACE,
             CONTENTS
             FROM CDB_TABLESPACES;
-            
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           filter:
@@ -2458,7 +2448,6 @@ zabbix_export:
                         AND ctf.TABLESPACE_NAME = '{#TABLESPACE}'
                         AND ct.CONTENTS = '{#CONTENTS}') Y
                 GROUP BY Y.con_name, Y.name, Y.TYPE, Y.status;
-                
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
               description: 'It gets the statistics of the tablespace.'
@@ -2613,7 +2602,7 @@ zabbix_export:
                   name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace status has changed'
                   event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'Oracle tablespace status has changed. Ack to close.'
+                  description: 'Oracle tablespace status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   dependencies:
                     -

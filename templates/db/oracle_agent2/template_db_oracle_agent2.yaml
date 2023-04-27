@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-23T18:07:34Z'
+  date: '2023-04-27T10:10:19Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1997,7 +1997,7 @@ zabbix_export:
                   value: '{#DGNAME}'
             -
               uuid: e2a0ac73040f401bb05ff88140f6665b
-              name: 'ASM ''{#DGNAME}'': Free size'
+              name: 'ASM ''{#DGNAME}'': Used size, percent'
               type: DEPENDENT
               key: 'oracle.asm_used_pct["{#DGNAME}"]'
               delay: '0'

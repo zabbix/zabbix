@@ -4,6 +4,7 @@
 ## Overview
 
 The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2.
+## Tested versions
 
 This template has been tested on:
 
@@ -20,6 +21,8 @@ For Zabbix version: 6.0 and higher.
 1. Setup and configure Zabbix agent 2 compiled with the Oracle monitoring plugin. See the setup instructions for [Oracle Database plugin](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/oracle/README.md).
 2. Set the {$ORACLE.CONNSTRING} macro value using either <protocol(host:port)> or named session.
 3. If you want to override parameters from Zabbix agent configuration file, set the user name, password and service name in host macros ({$ORACLE.USER}, {$ORACLE.PASSWORD}, and {$ORACLE.SERVICE}).
+
+   User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
 
 Test availability:
  ```zabbix_get -s oracle-host -k  oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]```
@@ -159,7 +162,7 @@ There are no template links in this template.
 |Oracle |Archivelog '{#DEST_NAME}': Status |<p>It identifies the current status of the destination where:</p><p>1 - 'VALID';</p><p>2 - 'DEFERRED';</p><p>3 - 'ERROR';</p><p>0 - 'UNKNOWN'.</p> |DEPENDENT |oracle.archivelog_log_status["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Oracle |ASM '{#DGNAME}': Total size |<p>The total size of the ASM disk group.</p> |DEPENDENT |oracle.asm_total_size["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DGNAME}'].total_bytes.first()`</p> |
 |Oracle |ASM '{#DGNAME}': Free size |<p>The free size of the ASM disk group.</p> |DEPENDENT |oracle.asm_free_size["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DGNAME}'].free_bytes.first()`</p> |
-|Oracle |ASM '{#DGNAME}': Free size |<p>Usage of the ASM disk group expressed in %.</p> |DEPENDENT |oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DGNAME}'].used_pct.first()`</p> |
+|Oracle |ASM '{#DGNAME}': Used size, percent |<p>Usage of the ASM disk group expressed in %.</p> |DEPENDENT |oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DGNAME}'].used_pct.first()`</p> |
 |Zabbix raw items |Oracle: Get instance state |<p>The item gets its state of the current instance.</p> |ZABBIX_PASSIVE |oracle.instance.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get system metrics |<p>The item gets the values of the system metrics.</p> |ZABBIX_PASSIVE |oracle.sys.metrics["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get system parameters |<p>Get a set of system parameter values.</p> |ZABBIX_PASSIVE |oracle.sys.params["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
