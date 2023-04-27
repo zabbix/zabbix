@@ -22,7 +22,6 @@
 #include "log.h"
 #include "zbxnum.h"
 
-
 #define ZBX_MATH_EPSILON	(1e-6)
 
 #define ZBX_IS_NAN(x)	((x) != (x))
@@ -1134,6 +1133,7 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
 	}
+	/* these checks are needed in case of +/- infinity */
 	else if (DBL_MAX < result)
 	{
 		result = DBL_MAX;
