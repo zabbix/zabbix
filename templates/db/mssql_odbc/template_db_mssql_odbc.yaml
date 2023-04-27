@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T06:21:46Z'
+  date: '2023-04-24T08:09:04Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -2017,7 +2017,7 @@ zabbix_export:
           key: mssql.uptime
           delay: '0'
           history: 2w
-          trends: 0d
+          trends: '0'
           units: uptime
           description: 'MS SQL Server uptime in ''N days, hh:mm:ss'' format.'
           preprocessing:
@@ -2038,7 +2038,7 @@ zabbix_export:
               name: 'MSSQL: Failed to fetch info data'
               event_name: 'MSSQL: Failed to fetch info data (or no data for 30m)'
               priority: INFO
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
                 -
                   name: 'MSSQL: Service is unavailable'
@@ -2137,7 +2137,7 @@ zabbix_export:
               name: 'MSSQL: Version has changed'
               event_name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'MSSQL version has changed. Ack to close.'
+              description: 'MSSQL version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
