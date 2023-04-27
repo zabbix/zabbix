@@ -473,25 +473,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
  *                                                                            *
  * Purpose: execute a select statement                                        *
  *                                                                            *
- ******************************************************************************/
-DB_RESULT	zbx_db_select_once(const char *fmt, ...)
-{
-	va_list		args;
-	DB_RESULT	rc;
-
-	va_start(args, fmt);
-
-	rc = zbx_db_vselect(fmt, args);
-
-	va_end(args);
-
-	return rc;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: execute a select statement                                        *
- *                                                                            *
  * Comments: retry until DB is up                                             *
  *                                                                            *
  ******************************************************************************/
