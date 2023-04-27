@@ -190,16 +190,14 @@ else {
 		->show();
 }
 
-if (count($data['dashboard']['pages']) >= 1) {
-	(new CScriptTag('
-		view.init('.json_encode([
-			'host' => $data['host'],
-			'dashboard' => $data['dashboard'],
-			'widget_defaults' => $data['widget_defaults'],
-			'time_period' => $data['time_period'],
-			'web_layout_mode' => $web_layout_mode
-		]).');
-	'))
-		->setOnDocumentReady()
-		->show();
-}
+(new CScriptTag('
+	view.init('.json_encode([
+		'host' => $data['host'],
+		'dashboard' => $data['dashboard'],
+		'widget_defaults' => $data['widget_defaults'],
+		'time_period' => $data['time_period'],
+		'web_layout_mode' => $web_layout_mode
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
