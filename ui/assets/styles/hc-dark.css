@@ -3894,9 +3894,7 @@ z-select,
 .link-alt {
   text-decoration: none;
   cursor: pointer; }
-  .link-alt:link {
-    border-bottom: 1px solid rgba(129, 129, 129, 0.35); }
-  .link-alt:visited {
+  .link-alt:link, .link-alt:visited {
     border-bottom: 1px solid rgba(129, 129, 129, 0.35); }
   .link-alt:hover {
     color: #ffffff;
@@ -7363,8 +7361,7 @@ a.link-action {
   border-bottom: 1px dotted; }
 
 .link-action:hover {
-  color: #ffffff;
-  border-bottom: 1px solid #ffffff; }
+  border-bottom-color: #ffffff; }
 .link-action:active {
   color: #ffffff;
   border-bottom: 1px dotted #ffffff; }
@@ -7372,19 +7369,14 @@ a.link-action {
   color: #ffffff;
   border-bottom: 3px solid #ffffff; }
 
-.link-alt:link {
-  border-bottom: 1px solid #818181; }
-.link-alt:visited {
-  border-bottom: 1px solid #818181; }
+.link-alt:link, .link-alt:visited {
+  border-bottom-color: #818181; }
 .link-alt:hover {
-  color: #ffffff;
-  border-bottom: 1px solid #ffffff; }
+  border-bottom-color: #ffffff; }
 .link-alt:focus {
-  color: #ffffff;
   border-bottom: 3px solid #ffffff; }
 .link-alt:active {
-  color: #f8f8f8;
-  border-bottom: 1px solid #f8f8f8; }
+  border-bottom-color: #f8f8f8; }
 
 .server-name {
   color: rgba(0, 0, 0, 0.8); }

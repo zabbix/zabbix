@@ -647,8 +647,7 @@ a.link-action {
 
 .link-action {
 	&:hover {
-		color: $link-hover-color;
-		border-bottom: 1px solid $link-hover-color;
+		border-bottom-color: $link-hover-color;
 	}
 
 	&:active {
@@ -663,37 +662,31 @@ a.link-action {
 }
 
 .link-alt {
-	&:link {
-		border-bottom: 1px solid $link-alt-underline-color;
-	}
-
+	&:link,
 	&:visited {
-		border-bottom: 1px solid $link-alt-underline-color;
+		border-bottom-color: $link-alt-underline-color;
 	}
 
 	&:hover {
-		color: $link-hover-color;
-		border-bottom: 1px solid $link-hover-color;
+		border-bottom-color: $link-hover-color;
 	}
 
 	&:focus {
-		color: $link-hover-color;
 		border-bottom: 3px solid $link-hover-color;
 	}
 
 	&:active {
-		color: $link-active-color;
-		border-bottom: 1px solid $link-active-color;
+		border-bottom-color: $link-active-color;
 	}
 }
 
 .server-name {
-	color: $link-main-subnav-color;
+	color: $link-main-subnav-color; // TODO check
 }
 
 .status-dark-grey {
-	border: none !important;
-	background-color: #666666 !important;
+	border: none !important; // TODO check important
+	background-color: #666666 !important; // TODO check important
 }
 
 .btn-link {

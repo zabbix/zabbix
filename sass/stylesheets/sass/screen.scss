@@ -103,10 +103,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	text-decoration: none;
 	cursor: pointer;
 
-	&:link {
-		border-bottom: 1px solid rgba($link-alt-underline-color, .35);
-	}
-
+	&:link,
 	&:visited {
 		border-bottom: 1px solid rgba($link-alt-underline-color, .35);
 	}

@@ -3868,9 +3868,7 @@ z-select,
 .link-alt {
   text-decoration: none;
   cursor: pointer; }
-  .link-alt:link {
-    border-bottom: 1px solid rgba(118, 141, 153, 0.35); }
-  .link-alt:visited {
+  .link-alt:link, .link-alt:visited {
     border-bottom: 1px solid rgba(118, 141, 153, 0.35); }
   .link-alt:hover {
     color: #0275b8;
