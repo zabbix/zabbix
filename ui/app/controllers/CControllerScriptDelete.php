@@ -72,6 +72,15 @@ class CControllerScriptDelete extends CController {
 				'title' => _n('Cannot delete script', 'Cannot delete scripts', $deleted),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
+
+			$scripts = API::Script()->get([
+				'output' => [],
+				'scriptids' => $scriptids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($scripts);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

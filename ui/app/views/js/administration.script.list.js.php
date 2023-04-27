@@ -141,6 +141,7 @@
 						if ('title' in response.error) {
 							postMessageError(response.error.title);
 						}
+						uncheckTableRows('script', response.keepids ?? []);
 
 						postMessageDetails('error', response.error.messages);
 					}
