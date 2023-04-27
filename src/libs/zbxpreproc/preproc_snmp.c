@@ -807,6 +807,12 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 	{
 		zbx_snmp_value_cache_t	*snmp_cache;
 
+		if (NULL != cache->error)
+		{
+			*errmsg = zbx_strdup(NULL, cache->error);
+			return FAIL;
+		}
+
 		if (NULL == (snmp_cache = (zbx_snmp_value_cache_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -814,11 +820,11 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 
 			snmp_cache = (zbx_snmp_value_cache_t *)zbx_malloc(NULL, sizeof(zbx_snmp_value_cache_t));
 
-			if (SUCCEED != zbx_snmp_value_cache_init(snmp_cache, value->data.str, &err))
+			if (SUCCEED != zbx_snmp_value_cache_init(snmp_cache, value->data.str, &cache->error))
 			{
 				zbx_free(snmp_cache);
-				cache->type = ZBX_PREPROC_NONE;
-				goto out;
+				*errmsg = zbx_strdup(NULL, cache->error);
+				return FAIL;
 			}
 
 			cache->data = (void *)snmp_cache;
@@ -826,7 +832,7 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 
 		ret = snmp_value_from_cached_walk(snmp_cache, params, &value_out, &err);
 	}
-out:
+
 	if (FAIL == ret)
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "unable to extract value for given OID: %s", err);

@@ -270,6 +270,12 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 	{
 		zbx_jsonobj_t	*obj;
 
+		if (NULL != cache->error)
+		{
+			*errmsg = zbx_strdup(NULL, cache->error);
+			return FAIL;
+		}
+
 		if (NULL == (obj = (zbx_jsonobj_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -279,9 +285,9 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 
 			if (SUCCEED != zbx_jsonobj_open(value->data.str, obj))
 			{
-				*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
+				cache->error = zbx_strdup(NULL, zbx_json_strerror());
+				*errmsg = zbx_strdup(NULL, cache->error);
 				zbx_free(obj);
-				cache->type = ZBX_PREPROC_NONE;
 				return FAIL;
 			}
 
@@ -697,6 +703,12 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 	{
 		zbx_prometheus_t	*prom_cache;
 
+		if (NULL != cache->error)
+		{
+			err = zbx_strdup(NULL, cache->error);
+			goto out;
+		}
+
 		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -704,10 +716,10 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 
 			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
-			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
+			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &cache->error))
 			{
 				zbx_free(prom_cache);
-				cache->type = ZBX_PREPROC_NONE;
+				err = zbx_strdup(NULL, cache->error);
 				goto out;
 			}
 
@@ -789,6 +801,12 @@ static int	pp_execute_prometheus_to_json_conversion(zbx_pp_cache_t *cache, zbx_v
 	{
 		zbx_prometheus_t	*prom_cache;
 
+		if (NULL != cache->error)
+		{
+			err = zbx_strdup(NULL, cache->error);
+			goto out;
+		}
+
 		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -796,10 +814,10 @@ static int	pp_execute_prometheus_to_json_conversion(zbx_pp_cache_t *cache, zbx_v
 
 			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
-			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
+			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &cache->error))
 			{
 				zbx_free(prom_cache);
-				cache->type = ZBX_PREPROC_NONE;
+				err = zbx_strdup(NULL, cache->error);
 				goto out;
 			}
 

@@ -57,6 +57,7 @@ zbx_pp_cache_t	*pp_cache_create(const zbx_pp_item_preproc_t *preproc, const zbx_
 	zbx_variant_copy(&cache->value, value);
 	cache->data = NULL;
 	cache->refcount = 1;
+	cache->error = NULL;
 
 	return cache;
 }
@@ -88,6 +89,7 @@ static void	pp_cache_free(zbx_pp_cache_t *cache)
 		zbx_free(cache->data);
 	}
 
+	zbx_free(cache->error);
 	zbx_free(cache);
 }
 
