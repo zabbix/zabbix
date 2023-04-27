@@ -266,7 +266,7 @@ Test availability:
 |ASM '{#DGNAME}': Get ASM stats|<p>It gets the ASM disk group statistics.</p>|Zabbix agent|oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]|
 |ASM '{#DGNAME}': Total size|<p>The total size of the ASM disk group.</p>|Dependent item|oracle.asm_total_size["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#DGNAME}'].total_bytes.first()`</p></li></ul>|
 |ASM '{#DGNAME}': Free size|<p>The free size of the ASM disk group.</p>|Dependent item|oracle.asm_free_size["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#DGNAME}'].free_bytes.first()`</p></li></ul>|
-|ASM '{#DGNAME}': Free size|<p>Usage of the ASM disk group expressed in %.</p>|Dependent item|oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#DGNAME}'].used_pct.first()`</p></li></ul>|
+|ASM '{#DGNAME}': Used size, percent|<p>Usage of the ASM disk group expressed in %.</p>|Dependent item|oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#DGNAME}'].used_pct.first()`</p></li></ul>|
 
 ### Trigger prototypes for ASM disk groups discovery
 
