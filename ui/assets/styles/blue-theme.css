@@ -1249,19 +1249,19 @@ a.btn-icon,
     .btn-link[disabled]:hover {
       background-color: transparent; }
 
+.btn-alt.zi-plus::before {
+  font-size: 12px; }
+
 button.btn-overlay-close, a.btn-overlay-close.btn,
 a.btn-overlay-close.btn-icon, button.zi-remove, a.zi-remove.btn,
 a.zi-remove.btn-icon {
   width: 18px;
   height: 18px;
   min-height: 18px; }
-  button.btn-overlay-close:before, a.btn-overlay-close.btn:before,
-  a.btn-overlay-close.btn-icon:before, button.zi-remove:before, a.zi-remove.btn:before,
-  a.zi-remove.btn-icon:before {
+  button.btn-overlay-close::before, a.btn-overlay-close.btn::before,
+  a.btn-overlay-close.btn-icon::before, button.zi-remove::before, a.zi-remove.btn::before,
+  a.zi-remove.btn-icon::before {
     font-size: 10.2px; }
-
-.btn-alt.zi-plus::before {
-  font-size: 12px; }
 
 .btn-overlay-close {
   position: absolute;
@@ -1269,7 +1269,8 @@ a.zi-remove.btn-icon {
   right: 1px;
   z-index: 1000; }
   .btn-overlay-close::before {
-    content: ""; }
+    content: "";
+    transition: color .2s ease-out; }
 
 .btn-debug {
   position: fixed;
@@ -1365,7 +1366,7 @@ a.zi-remove.btn-icon {
     left: 2px;
     width: 18px;
     height: 18px; }
-    .color-picker-dialogue .color-picker-input .color-picker-preview:after {
+    .color-picker-dialogue .color-picker-input .color-picker-preview::after {
       line-height: 18px; }
   .color-picker-dialogue .color-picker-input input {
     padding-left: 25px; }
@@ -3776,11 +3777,11 @@ z-select,
     .z-select a.focusable.red.btn,
     .z-select a.focusable.red.btn-icon {
       color: #e33734; }
-      z-select button.focusable.red:after, z-select a.focusable.red.btn:after,
-      z-select a.focusable.red.btn-icon:after,
-      .z-select button.focusable.red:after,
-      .z-select a.focusable.red.btn:after,
-      .z-select a.focusable.red.btn-icon:after {
+      z-select button.focusable.red::after, z-select a.focusable.red.btn::after,
+      z-select a.focusable.red.btn-icon::after,
+      .z-select button.focusable.red::after,
+      .z-select a.focusable.red.btn::after,
+      .z-select a.focusable.red.btn-icon::after {
         color: #1f2c33; }
   z-select .list,
   .z-select .list {

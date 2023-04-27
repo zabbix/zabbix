@@ -215,6 +215,14 @@ a.btn-icon,
 	}
 }
 
+.btn-alt {
+	&.zi-plus {
+		&::before {
+			font-size: $icon-small-size;
+		}
+	}
+}
+
 button {
 	&.btn-overlay-close,
 	&.zi-remove {
@@ -222,16 +230,8 @@ button {
 		height: 18px;
 		min-height: 18px;
 
-		&:before {
-			font-size: $icon-small-size *.85;
-		}
-	}
-}
-
-.btn-alt {
-	&.zi-plus {
 		&::before {
-			font-size: $icon-small-size;
+			font-size: $icon-small-size *.85;
 		}
 	}
 }
@@ -247,6 +247,10 @@ button {
 
 	&::before {
 		content: $zi-remove;
+
+		@if $ui-transitions {
+			transition: color .2s ease-out;
+		}
 	}
 }
 

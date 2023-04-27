@@ -476,18 +476,6 @@ a.btn-icon,
 //	info-clock: url($sprite-path) no-repeat -399px -762px // TODO - AS: should be removed DF: is used
 //);
 
-// Dynamically generated classes:
-//  .btn-alarm-off
-//  .btn-sound-on
-//  .btn-sound-off
-//  .btn-info-clock
-//@each $icon-widget-btn, $bgimage in $icon-widget-btn {
-//	.btn-#{$icon-widget-btn} {
-//		background: $bgimage;
-//		@extend %btn-widget;
-//	}
-//}
-
 .subfilter-enabled {
 	.link-action {
 		color: $link-hover-color;

@@ -50,7 +50,7 @@ z-select,
 		&.red {
 			color: $red;
 
-			&:after {
+			&::after {
 				color: $font-color;
 			}
 		}

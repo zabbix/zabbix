@@ -1146,7 +1146,7 @@ class CWidgetBase {
 			li_button.type = 'button';
 			li_button.setAttribute('data-hintbox', '1');
 			li_button.setAttribute('data-hintbox-static', '1');
-			li_button.classList.add(info[i].icon);
+			li_button.classList.add(ZBX_STYLE_BTN_ICON, info[i].icon);
 			li.appendChild(li_button);
 
 			const li_div = document.createElement('div');
