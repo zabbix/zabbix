@@ -32,7 +32,6 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
@@ -58,8 +57,7 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
+	$(top_srcdir)/tests/libzbxmockdata.a
 
 if SERVER
 SERVER_COMMON_LIB = \
@@ -68,23 +66,6 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
-	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
-	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
-	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
-	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
-	$(top_srcdir)/src/zabbix_server/housekeeper/libzbxhousekeeper.a \
-	$(top_srcdir)/src/zabbix_server/timer/libzbxtimer.a \
-	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
-	$(top_srcdir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
-	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
-	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
-	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
-	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
-	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
-	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
-	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
-	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
@@ -101,7 +82,6 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
-	$(top_srcdir)/src/zabbix_server/service/libservice.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
