@@ -72,9 +72,15 @@ parse_cfg_file_LDADD = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
 
-parse_cfg_file_LDADD += @SERVER_LIBS@
+parse_cfg_file_LDADD += \
+	@SERVER_LIBS@ \
+	$(CMOCKA_LIBS)
 
-parse_cfg_file_LDFLAGS = @SERVER_LDFLAGS@
+parse_cfg_file_LDFLAGS = \
+	@SERVER_LDFLAGS@ \
+	$(CMOCKA_LDFLAGS)
 
-parse_cfg_file_CFLAGS = -I@top_srcdir@/tests
+parse_cfg_file_CFLAGS = \
+	-I@top_srcdir@/tests \
+	$(CMOCKA_CFLAGS)
 endif
