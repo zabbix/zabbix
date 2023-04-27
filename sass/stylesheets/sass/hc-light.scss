@@ -89,29 +89,29 @@ $menu-user-selected-arrow-bg-position: -579px -434px;
 // Sidebar
 $sidebar-server-name-color: #9f9f9f;
 
-$menu-main-icons: (
-	dashboards: -570px -856px,
-	dashboard: -570px -664px,
-	problems: -570px -688px,
-	monitoring: -570px -712px,
-	services: -570px -832px,
-	inventory: -570px -736px,
-	reports: -570px -760px,
-	data-collection: -570px -784px,
-	alerts: -570px -879px,
-	configuration: -570px -784px,
-	users: -570px -904px,
-	administration: -570px -808px
-);
+//$menu-main-icons: (	to be cleaned
+//	dashboards: -570px -856px,
+//	dashboard: -570px -664px,
+//	problems: -570px -688px,
+//	monitoring: -570px -712px,
+//	services: -570px -832px,
+//	inventory: -570px -736px,
+//	reports: -570px -760px,
+//	data-collection: -570px -784px,
+//	alerts: -570px -879px,
+//	configuration: -570px -784px,
+//	users: -570px -904px,
+//	administration: -570px -808px
+//);
 
-$menu-user-expanded-icons: (
-	support: -247px -84px,
-	integrations: -168px -84px,
-	help: -168px -48px,
-	guest: -247px -192px,
-	profile: -168px -120px,
-	signout: -168px -156px
-);
+//$menu-user-expanded-icons: (
+//	support: -247px -84px,
+//	integrations: -168px -84px,
+//	help: -168px -48px,
+//	guest: -247px -192px,
+//	profile: -168px -120px,
+//	signout: -168px -156px
+//);
 
 // UI
 $ui-bg-color: #ffffff;
@@ -257,9 +257,9 @@ $arrow-fill-up-down: #000000;
 						background: $menu-main-expanded-bg-color;
 						border-left-color: $menu-main-expanded-border-color;
 
-						&::before {
-							background-position-x: -600px;
-						}
+						//&::before { // TODO: DF CLEAN
+							//background-position-x: -600px;
+						//}
 					}
 				}
 			}
@@ -267,33 +267,38 @@ $arrow-fill-up-down: #000000;
 	}
 }
 
-// components/menu-main
-.menu-main {
-	li.has-submenu {
-		&.is-expanded > a,
-		.is-selected > a,
-		& > a:hover,
-		& > a:focus {
-			&::before {
-				background-position-x: -600px;
-			}
+// components/menu-main // TODO: DF clean
+// .menu-main {
+// 	li.has-submenu {
+// 		&.is-expanded > a,
+// 		.is-selected > a,
+// 		& > a:hover,
+// 		& > a:focus {
+// 			//&::before {
+// 			//	background-position-x: -600px;
+// 			//}
+// 			//&::after {
+// 			//	background-position-x: -579px;
+// 			//}
+// 		}
+// 	}
+// }
 
-			&::after {
-				background-position-x: -579px;
-			}
-		}
+a.btn-icon,
+.btn-icon {
+	&:link,
+	&:hover,
+	&:focus,
+	&:visited {
+		border-bottom: none;
 	}
 }
 
 // components/menu-user
 .menu-user {
 	a {
-		padding-left: 45px;
+		padding-left: 13px;
 		border-left: 3px solid transparent;
-
-		&::before {
-			left: 15px;
-		}
 
 		&:link,
 		&:visited {
@@ -341,11 +346,11 @@ $arrow-fill-up-down: #000000;
 		background-color: transparent;
 	}
 
-	.dashboard-widget-placeholder-label {
-		&::before {
-			background: url($sprite-path) no-repeat -213px -888px; // TODO - AS: should be removed
-		}
-	}
+	//.dashboard-widget-placeholder-label { // TODO: DF clean
+	//	&::before {
+	//		background: url($sprite-path) no-repeat -213px -888px; // TODO - AS: should be removed
+	//	}
+	//}
 
 	.dashboard-widget-placeholder-resizing {
 		border: 2px dashed $font-color;

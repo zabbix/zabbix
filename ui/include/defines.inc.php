@@ -2063,7 +2063,7 @@ define('ZBX_STYLE_SORTABLE_ITEM', 'sortable-item');
 define('ZBX_STYLE_SORTABLE_DRAG_HANDLE', 'sortable-drag-handle');
 define('ZBX_STYLE_STATUS_AVERAGE_BG', 'status-average-bg');
 define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
-define('ZBX_STYLE_STATUS_DARK_GREY', 'status-dark-grey');
+// define('ZBX_STYLE_STATUS_DARK_GREY', 'status-dark-grey'); // TODO: Clean not used anywhere
 define('ZBX_STYLE_STATUS_DISABLED_BG', 'status-disabled-bg');
 define('ZBX_STYLE_STATUS_DISASTER_BG', 'status-disaster-bg');
 define('ZBX_STYLE_STATUS_GREEN', 'status-green');
