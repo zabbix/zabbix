@@ -9,7 +9,7 @@ zabbix_export:
       uuid: d670c32f007d438c9dcd32db57d2b691
       template: 'Oracle by Zabbix agent 2'
       name: 'Oracle by Zabbix agent 2'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.43'
       vendor:
         name: Zabbix
         version: 6.4-0
@@ -1999,7 +1999,7 @@ zabbix_export:
                   value: '{#DGNAME}'
             -
               uuid: e2a0ac73040f401bb05ff88140f6665b
-              name: 'ASM ''{#DGNAME}'': Free size'
+              name: 'ASM ''{#DGNAME}'': Used size, percent'
               type: DEPENDENT
               key: 'oracle.asm_used_pct["{#DGNAME}"]'
               delay: '0'
