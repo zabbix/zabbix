@@ -44,6 +44,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "version.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -95,7 +96,8 @@ zbx_section_entry_t;
 typedef enum
 {
 	ZBX_SECTION_ENTRY_THE_ONLY,
-	ZBX_SECTION_ENTRY_PER_PROXY
+	ZBX_SECTION_ENTRY_PER_PROXY,
+	ZBX_SECTION_ENTRY_SERVER_STATS
 }
 zbx_entry_type_t;
 
@@ -665,8 +667,20 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
+	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,
+		{
+			{NULL}
+		}
+	},
 	{NULL}
 };
+
+static void	server_stats_entry_export(struct zbx_json *json, const zbx_status_section_t *section)
+{
+	zbx_json_addobject(json, section->name);
+	zbx_json_addstring(json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(json);
+}
 
 static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t *entry,
 		zbx_counter_value_t counter_value, const zbx_uint64_t *proxyid)
@@ -732,6 +746,12 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 		if (NULL != section->res && SUCCEED != *section->res)	/* skip section we have no information for */
 			continue;
+
+		if (ZBX_SECTION_ENTRY_SERVER_STATS == section->entry_type)
+		{
+			server_stats_entry_export(json, section);
+			continue;
+		}
 
 		zbx_json_addarray(json, section->name);
 
@@ -1072,7 +1092,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time, const zbx_events_funcs_t *events_cbs)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
 {
 	int	ret = SUCCEED;
 
@@ -1120,7 +1140,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				zbx_recv_proxy_data(sock, &jp, ts, events_cbs, config_comms->config_timeout);
+			{
+				zbx_recv_proxy_data(sock, &jp, ts, events_cbs, config_comms->config_timeout,
+						proxydata_frequency);
+			}
 			else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 				zbx_send_proxy_data(sock, ts, config_comms);
 		}
@@ -1172,7 +1195,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			ret = process_active_check_heartbeat(&jp);
 		}
 		else if (SUCCEED != trapper_process_request(value, sock, &jp, config_comms->config_tls, config_vault,
-				zbx_get_program_type_cb, config_comms->config_timeout))
+				zbx_get_program_type_cb, config_comms->config_timeout, config_comms->server))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1259,7 +1282,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
-		int config_startup_time, const zbx_events_funcs_t *events_cbs)
+		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
 {
 	ssize_t	bytes_received;
 
@@ -1267,7 +1290,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
-			events_cbs);
+			events_cbs, proxydata_frequency);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1357,7 +1380,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 #endif
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
-					trapper_args_in->config_startup_time, trapper_args_in->events_cbs);
+					trapper_args_in->config_startup_time, trapper_args_in->events_cbs,
+					trapper_args_in->proxydata_frequency);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

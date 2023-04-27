@@ -19,6 +19,7 @@
 **/
 
 
+require_once dirname(__FILE__).'/APITest.php';
 require_once dirname(__FILE__).'/function_DBconnect.php';
 require_once dirname(__FILE__).'/function_DBclose.php';
 require_once dirname(__FILE__).'/function_DBselect.php';
@@ -37,6 +38,7 @@ class GeneralTests {
 	public static function suite() {
 		$suite = new TestSuite('general');
 
+		$suite->addTestSuite('APITest');
 		$suite->addTestSuite('function_DBconnect');
 		$suite->addTestSuite('function_DBclose');
 		$suite->addTestSuite('function_DBselect');
