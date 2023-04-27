@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-13T10:32:52Z'
+  date: '2023-04-27T10:15:32Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -76,7 +76,7 @@ zabbix_export:
           type: SCRIPT
           key: azure.get.resources
           delay: 10m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -260,7 +260,7 @@ zabbix_export:
           type: SCRIPT
           key: azure.get.storage.acc
           delay: 10m
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -994,7 +994,7 @@ zabbix_export:
               name: 'Azure: Storage account [{#NAME}]: Get data'
               type: SCRIPT
               key: 'azure.get.storage.acc[{#NAME}]'
-              history: 0d
+              history: '0'
               trends: '0'
               value_type: TEXT
               params: |
@@ -3711,6 +3711,10 @@ zabbix_export:
                       name: show
                       value: '2'
                     -
+                      type: STRING
+                      name: description
+                      value: adv_conf
+                    -
                       type: ITEM
                       name: itemid
                       value:
@@ -3736,6 +3740,10 @@ zabbix_export:
                       name: adv_conf
                       value: '1'
                     -
+                      type: STRING
+                      name: description
+                      value: adv_conf
+                    -
                       type: ITEM
                       name: itemid
                       value:
@@ -3756,6 +3764,10 @@ zabbix_export:
                       type: INTEGER
                       name: adv_conf
                       value: '1'
+                    -
+                      type: STRING
+                      name: description
+                      value: adv_conf
                     -
                       type: ITEM
                       name: itemid
@@ -3784,6 +3796,10 @@ zabbix_export:
                       type: INTEGER
                       name: decimal_places
                       value: '0'
+                    -
+                      type: STRING
+                      name: description
+                      value: adv_conf
                     -
                       type: STRING
                       name: units
@@ -4100,7 +4116,7 @@ zabbix_export:
           name: 'Azure Microsoft SQL: Get data'
           type: SCRIPT
           key: azure.db.mssql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -5170,7 +5186,7 @@ zabbix_export:
           name: 'Azure Microsoft SQL: Get data'
           type: SCRIPT
           key: azure.db.mssql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -6098,7 +6114,7 @@ zabbix_export:
           name: 'Azure MySQL: Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -6841,7 +6857,7 @@ zabbix_export:
           name: 'Azure MySQL: Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -7694,7 +7710,7 @@ zabbix_export:
           name: 'Azure PostgreSQL: Get data'
           type: SCRIPT
           key: azure.db.pgsql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -8559,7 +8575,7 @@ zabbix_export:
           name: 'Azure PostgreSQL: Get data'
           type: SCRIPT
           key: azure.db.pgsql.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |
@@ -9695,7 +9711,7 @@ zabbix_export:
           name: 'Azure: Get data'
           type: SCRIPT
           key: azure.vm.data.get
-          history: 0d
+          history: '0'
           trends: '0'
           value_type: TEXT
           params: |

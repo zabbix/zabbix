@@ -1829,4 +1829,11 @@ out:
   - {type: ZBX_EVAL_TOKEN_VAR_STR, token: 'x', opt: 0}
   - {type: ZBX_EVAL_TOKEN_FUNCTION, token: 'concat', opt: 2}
   result: SUCCEED
+---
+test case: Fail '((),9'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION]
+  expression: '((),9'
+out:
+  result: FAIL
 ...
