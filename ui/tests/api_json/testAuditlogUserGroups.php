@@ -27,6 +27,11 @@ require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 class testAuditlogUserGroups extends testAuditlogCommon {
 
 	/**
+	 * Existing User ID.
+	 */
+	private const USERID = 2;
+
+	/**
 	 * Existing User group ID.
 	 */
 	private const USRGRPID = 12;
@@ -40,7 +45,7 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 					'id' => 2
 				],
 				'users' => [
-					'userid' => 2
+					'userid' => self::USERID
 				]
 			]
 		]);
@@ -49,18 +54,25 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.zbx_dbstr($resourceid));
 		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.zbx_dbstr($resourceid));
 
+		$this->assertNotFalse($id, 'User group record expected');
+
 		$created = json_encode([
 			'usergroup.name' => ['add', 'Audit user groups'],
 			'usergroup.rights['.$rights['rightid'].']' => ['add'],
 			'usergroup.rights['.$rights['rightid'].'].id' => ['add', '2'],
 			'usergroup.rights['.$rights['rightid'].'].rightid' => ['add', $rights['rightid']],
-			'usergroup.users['.$id['id'].']' => ['add'],
-			'usergroup.users['.$id['id'].'].userid' => ['add', '2'],
-			'usergroup.users['.$id['id'].'].id' => ['add', $id['id']],
 			'usergroup.usrgrpid' => ['add', $resourceid]
 		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+
+		$updated = json_encode([
+			'user.usrgrps['.$id['id'].']' => ['add'],
+			'user.usrgrps['.$id['id'].'].usrgrpid' => ['add', $resourceid],
+			'user.usrgrps['.$id['id'].'].id' => ['add', $id['id']]
+		]);
+
+		$this->getAuditDetails('details', $this->update_actionid, $updated, self::USERID);
 	}
 
 	public function testAuditlogUserGroups_Update() {

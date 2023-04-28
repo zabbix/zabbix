@@ -1,39 +1,22 @@
 
 # SMTP Service
 
-## Overview
 
-For Zabbix version: 6.0 and higher  
+### Items
 
-## Setup
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|SMTP service is running||Simple check|net.tcp.service[smtp]|
 
-Refer to the vendor documentation.
-
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
-
-
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
-
-
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-|Services |SMTP service is running |<p>-</p> |SIMPLE |net.tcp.service[smtp] |
-
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
-|SMTP service is down on {HOST.NAME} |<p>-</p> |`max(/SMTP Service/net.tcp.service[smtp],#3)=0` |AVERAGE | |
+|----|-----------|----------|--------|--------------------------------|
+|SMTP service is down on {HOST.NAME}||`max(/SMTP Service/net.tcp.service[smtp],#3)=0`|Average||
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
+
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
 
