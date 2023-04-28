@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 #include "log.h"
@@ -133,7 +134,6 @@ static int	DBpatch_6050012(void)
 static int	DBpatch_6050013(void)
 {
 	zbx_db_insert_t	db_insert;
-	int	ret = FAIL;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -141,7 +141,7 @@ static int	DBpatch_6050013(void)
 	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
 	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), "gauge", "widgets/gauge", 1, "[]");
 	zbx_db_insert_autoincrement(&db_insert, "moduleid");
-	ret = zbx_db_insert_execute(&db_insert);
+	int	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
