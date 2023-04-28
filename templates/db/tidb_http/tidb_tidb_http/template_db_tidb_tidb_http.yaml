@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-24T08:48:23Z'
+  date: '2023-04-28T11:23:50Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -946,8 +946,8 @@ zabbix_export:
             -
               uuid: 91adc4c6b9364693891faf58c8cced75
               expression: 'last(/TiDB by HTTP/tidb.uptime)<10m'
-              name: 'TiDB: Host has been restarted'
-              event_name: 'TiDB: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'TiDB: has been restarted'
+              event_name: 'TiDB: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
