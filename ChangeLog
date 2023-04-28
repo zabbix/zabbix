@@ -5306,6 +5306,7 @@ Changes for 4.0.46rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45
