@@ -49,12 +49,6 @@ window.widget_tophosts_form = new class {
 					$td.attr('width', $td.width())
 				}
 
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 2) + 'px');
-				}
-
 				return ui;
 			},
 			stop: function(e, ui) {

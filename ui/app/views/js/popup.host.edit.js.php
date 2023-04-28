@@ -29,7 +29,7 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({popup_url, form_name, host_interfaces, host_is_discovered, warning}) {
+	init({popup_url, form_name, host_interfaces, host_is_discovered, warnings}) {
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -38,8 +38,12 @@ window.host_edit_popup = {
 
 		host_edit.init({form_name, host_interfaces, host_is_discovered});
 
-		if (warning !== null) {
-			const message_box = makeMessageBox('warning', [warning], null, true, false)[0];
+		if (warnings.length) {
+			const message_box = warnings.length == 1
+				? makeMessageBox('warning', warnings, null, true, false)[0]
+				: makeMessageBox('warning', warnings,
+						<?= json_encode(_('Cloned host parameter values have been modified.')) ?>, true, false
+					)[0];
 
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}
