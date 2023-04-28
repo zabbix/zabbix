@@ -26,6 +26,12 @@
 		}
 	}
 
+	[class^="zi-"], [class*=" zi-"] {
+		&::before {
+			color: $menu-user-icon-color;
+		}
+	}
+
 	a {
 		color: $menu-user-color;
 

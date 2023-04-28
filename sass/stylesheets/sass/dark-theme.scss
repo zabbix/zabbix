@@ -22,17 +22,13 @@ $disabled-item-bg-color: #383838;
 
 // Layout
 $header-bg-color: #2b2b2b;
+
+$sidebar-color: #9c9c9c;
 $sidebar-bg-color: #454545;
-$sidebar-mode-icon-color:#b1b1b1;
 
 $scrollbar-track-color: rgba(#acbbc2, .55);
 // $scrollbar-thumb-color: rgba(#878787, .85); // TODO: to be cleaned
 $scrollbar-thumb-color-darken: 5%;
-
-$sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
-$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
-
-// $sidebar-toggle-bg-position: -630px -592px; // TODO: clean duplicate
 
 // Main
 $font-color: #f2f2f2;
@@ -43,12 +39,13 @@ $overlay-bg-color: #000000;
 $overlay-border-color: #383838;
 
 // Main menu
-$menu-main-icon-color: #9c9c9c;
 $menu-main-color: #f2f2f2;
-$menu-main-submenu-hover-color: #ffffff;
+
 $menu-main-hover-bg-color: #0e0e0e;
+
 $menu-main-selected-bg-color: #202020;
 $menu-main-selected-border-color: #c5c5c5;
+
 $menu-main-expanded-bg-color: #0d0d0d;
 
 $menu-main-submenu-color: #f2f2f2;

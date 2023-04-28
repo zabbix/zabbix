@@ -904,7 +904,7 @@ footer {
     justify-content: flex-end; }
     .sidebar .sidebar-header-buttons .btn-icon::before {
       font-size: 16px;
-      color: #b1b1b1; }
+      color: #9c9c9c; }
     .sidebar .sidebar-header-buttons .btn-icon:hover::before, .sidebar .sidebar-header-buttons .btn-icon:focus::before {
       color: #ffffff; }
   .sidebar .server-name {
@@ -912,7 +912,7 @@ footer {
     width: 0;
     margin-top: 5px;
     padding: 0 12px;
-    color: rgba(206, 218, 225, 0.5);
+    color: rgba(220, 220, 220, 0.5);
     transition: opacity 0.3s ease-out; }
   .sidebar .form-search {
     margin: 12px; }
@@ -1004,9 +1004,10 @@ footer {
   margin-right: 10px; }
   .sidebar-nav-toggle + div {
     flex-shrink: 1; }
-  .sidebar-nav-toggle .zi-menu::before {
+  .sidebar-nav-toggle .btn-icon::before {
+    font-size: 20px;
     color: #4298ca; }
-  .sidebar-nav-toggle .zi-menu:hover::before, .sidebar-nav-toggle .zi-menu:focus::before {
+  .sidebar-nav-toggle .btn-icon:hover::before, .sidebar-nav-toggle .btn-icon:focus::before {
     color: #0275b8; }
 
 .grid-columns {
@@ -2933,8 +2934,10 @@ div.dashboard-widget-tophosts z-bar-gauge {
     font-size: 12px;
     white-space: nowrap;
     transition: color 0.3s ease-out; }
+  .menu-user [class^="zi-"]::before, .menu-user [class*=" zi-"]::before {
+    color: #9c9c9c; }
   .menu-user a {
-    color: #cedae1; }
+    color: gainsboro; }
     .menu-user a:hover, .menu-user a:focus {
       border-bottom: 0;
       color: #ffffff; }

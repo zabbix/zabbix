@@ -250,15 +250,16 @@ $sidebar-padding: 12px;
 		flex-shrink: 1;
 	}
 
-	.zi-menu {
+	.btn-icon {
 		&::before {
-			color: $main-menu-toggle-color;
+			font-size: 20px;
+			color: $sidebar-toggle-color;
 		}
 
 		&:hover,
 		&:focus {
 			&::before {
-				color: $main-menu-toggle-hover-color;
+				color: $sidebar-toggle-hover-color;
 			}
 		}
 	}
