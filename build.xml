@@ -102,6 +102,9 @@
 	</target>
 
 	<target name="init-integration">
+		<exec executable="src/go/make" failonerror="on">
+			<arg line="-clean"/>
+		</exec>
 		<!-- Copy agent2 configuration file -->
 		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
 	</target>
