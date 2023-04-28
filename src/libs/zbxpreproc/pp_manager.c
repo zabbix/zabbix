@@ -36,7 +36,6 @@
 #include "zbxnix.h"
 #include "zbxvariant.h"
 #include "log.h"
-#include "module.h"
 #include "pp_cache.h"
 #include "zbxcacheconfig.h"
 #include "zbxipcservice.h"

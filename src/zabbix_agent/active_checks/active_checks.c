@@ -25,7 +25,6 @@
 
 #include "cfg.h"
 #include "log.h"
-#include "module.h"
 #include "zbxsysinfo.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
