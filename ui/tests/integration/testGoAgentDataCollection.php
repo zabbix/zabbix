@@ -550,8 +550,14 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				$b = end($values[self::COMPONENT_AGENT2]);
 
 				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
-					$a = substr($a, 0, $item['threshold']);
-					$b = substr($b, 0, $item['threshold']);
+
+		var_dump($a);
+					$x = substr($a, 0, $item['threshold']);
+		var_dump($x);
+
+				$b = substr($b, 0, $item['threshold']);
+				throw new Exception('Failed badher: '.$a.' ; AND '.$x);
+
 				}
 
 				$this->assertEquals($a, $b, 'Strings do not match for '.$item['key']);
