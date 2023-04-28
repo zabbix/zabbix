@@ -1,1 +1,1 @@
-..F....... [ZBX-22369] fixed the suffix base in thresholds for item and top hosts widgets (esekace)
+..F....... [ZBX-22369] fixed suffix interpretation in threshold values for "Top hosts" widget (esekace)
