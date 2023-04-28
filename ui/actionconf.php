@@ -469,6 +469,10 @@ if (hasRequest('form')) {
 		$data['action']['recovery_operations'] = getRequest('recovery_operations', []);
 		$data['action']['ack_operations'] = $ack_operations;
 
+		foreach (['operations', 'recovery_operations', 'ack_operations'] as $operation_key) {
+			$data['action'][$operation_key] = array_values($data['action'][$operation_key]);
+		}
+
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');
 		$data['action']['filter']['conditions'] = getRequest('conditions', []);
