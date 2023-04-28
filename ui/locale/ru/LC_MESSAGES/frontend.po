@@ -3810,6 +3810,15 @@ msgstr "Часы"
 msgid "Clone"
 msgstr "Клонировать"
 
+#: app/views/configuration.host.edit.php:63
+#: app/views/js/popup.host.edit.js.php:47 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:194
+msgid "Cloned template parameter values have been modified."
+msgstr ""
+
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
 #: app/views/popup.import.compare.php:162 include/func.inc.php:1723
@@ -17873,6 +17882,10 @@ msgstr "График более не обнаруживается и будет 
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "График более не обнаруживается и будет удален при следующей обработке правила обнаружения."
 
+#: app/controllers/CControllerHostEdit.php:265 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
+
 #: include/html.inc.php:637
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -17937,6 +17950,10 @@ msgstr "Полученный JSON не является корректным JSO
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Запрашиваемая удаленная процедура не существует / недоступна"
+
+#: templates.php:180
+msgid "The template being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/administration.token.view.php:52
 #: app/views/administration.user.token.view.php:51
