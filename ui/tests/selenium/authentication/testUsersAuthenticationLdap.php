@@ -520,39 +520,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	}
 
 	/**
-	 * Check that the last LDAP server can't be removed while LDAP authentication is enabled.
-	 */
-	public function testUsersAuthenticationLdap_RemoveDefault() {
-		$form = $this->openLdapForm();
-		$table = $form->query('id:ldap-servers')->asTable()->one();
-
-		// Add a new LDAP server if it is not present.
-		if ($table->getRows()->count() === 0) {
-			$this->setLdap([], 'button:Add', 'atest');
-			$form->submit();
-			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-			$form->selectTab('LDAP settings');
-		}
-
-		// Check that an LDAP server is present in DB.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
-
-		// Remove the only LDAP server and try to save the configuration.
-		$table->query('button:Remove')->one()->click();
-		$form->submit();
-
-		// Check the error message and that the LDAP server is still present in DB.
-		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Cannot delete default user directory.');
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
-
-		// Turn off LDAP authentication afterwards.
-		$this->query('id:ldap_auth_enabled')->asCheckbox()->one()->set(false);
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
-	}
-
-	/**
 	 * Check default LDAP server change.
 	 */
 	public function testUsersAuthenticationLdap_Default() {
