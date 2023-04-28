@@ -1,0 +1,1 @@
+...G...PS. [ZBXNEXT-8270] added support of non-blocking sockets and thread safe connect, accept, read, write operation timeouts based on poll (wiper)

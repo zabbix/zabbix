@@ -22,8 +22,9 @@
 
 window.widget_tophosts_form = new class {
 
-	init() {
+	init({templateid}) {
 		this._form = document.getElementById('widget-dialogue-form');
+		this._templateid = templateid;
 
 		this._list_columns = document.getElementById('list_columns');
 		this.initSortable(this._list_columns);
@@ -74,7 +75,7 @@ window.widget_tophosts_form = new class {
 			case 'add':
 				this._column_index = this._list_columns.querySelectorAll('tr').length;
 
-				column_popup = PopUp('widget.tophosts.column.edit', {}).$dialogue[0];
+				column_popup = PopUp('widget.tophosts.column.edit', {templateid: this._templateid}).$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
 				column_popup.addEventListener('overlay.close', this.removeColorpicker);
 				break;
@@ -85,7 +86,7 @@ window.widget_tophosts_form = new class {
 				this._column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 
 				column_popup = PopUp('widget.tophosts.column.edit',
-					{...form_fields.columns[this._column_index], edit: 1}).$dialogue[0];
+					{...form_fields.columns[this._column_index], edit: 1, templateid: this._templateid}).$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
 				column_popup.addEventListener('overlay.close', this.removeColorpicker);
 				break;

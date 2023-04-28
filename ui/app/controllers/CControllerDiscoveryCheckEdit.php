@@ -48,7 +48,8 @@ class CControllerDiscoveryCheckEdit extends CController {
 			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.implode(',', array_keys(getSnmpV3AuthProtocols())),
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
-			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase'
+			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
+			'allow_redirect' =>			'db dchecks.allow_redirect|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);

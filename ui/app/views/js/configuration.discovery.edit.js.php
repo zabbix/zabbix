@@ -169,6 +169,10 @@ window.drule_edit_popup = new class {
 			input.uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked').value;
 		}
 
+		if (input.type == <?= SVC_ICMPPING ?>) {
+			input.allow_redirect = typeof input.allow_redirect === 'undefined' ? 0 : input.allow_redirect;
+		}
+
 		const template = new Template(document.getElementById('dcheck-row-tmpl').innerHTML);
 
 		if (row !== null) {
@@ -334,6 +338,7 @@ window.drule_edit_popup = new class {
 				}
 				else {
 					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];

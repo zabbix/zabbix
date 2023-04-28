@@ -305,6 +305,7 @@
 	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
+	 * @param bool   options['hidden']				hide element (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)

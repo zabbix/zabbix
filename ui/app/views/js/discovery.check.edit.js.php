@@ -59,7 +59,7 @@ window.check_popup = new class {
 				'dcheck_snmp_community', 'dcheck_snmp_community_label',
 				'dcheck_snmp_oid', 'dcheck_snmp_oid_label'
 			],
-			SVC_ICMPPING => [],
+			SVC_ICMPPING => ['allow_redirect_field', 'allow_redirect_label'],
 			SVC_SNMPv3 => [
 				'dcheck_ports', 'dcheck_ports_label',
 				'dcheck_snmp_oid', 'dcheck_snmp_oid_label',
@@ -118,8 +118,14 @@ window.check_popup = new class {
 		let fields = [
 			'dcheckid', 'type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
 			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-			'snmpv3_privpassphrase', 'snmp_oid'
+			'snmpv3_privpassphrase', 'snmp_oid', 'allow_redirect'
 		];
+
+		if (dcheck.type == <?= SVC_ICMPPING ?>) {
+			if (typeof dcheck.allow_redirect === 'undefined') {
+				dcheck.allow_redirect = '0';
+			}
+		}
 
 		[...document.getElementById('dcheckList').getElementsByTagName('tr')].map(element => {
 			let inputs = element.querySelectorAll('input');
@@ -135,13 +141,13 @@ window.check_popup = new class {
 			}
 
 			results.push(result);
-		})
+		});
 
 		const lookup = [
 			{
 				types: [
 					<?= SVC_SSH ?>, <?= SVC_LDAP ?>, <?= SVC_SMTP ?>, <?= SVC_FTP ?>, <?= SVC_HTTP ?>, <?= SVC_POP ?>,
-					<?= SVC_NNTP ?>, <?= SVC_IMAP ?>, <?= SVC_TCP ?>, <?= SVC_ICMPPING ?>, <?= SVC_HTTPS ?>,
+					<?= SVC_NNTP ?>, <?= SVC_IMAP ?>, <?= SVC_TCP ?>, <?= SVC_HTTPS ?>,
 					<?= SVC_TELNET ?>
 				],
 				keys: ['type', 'ports']
@@ -160,6 +166,10 @@ window.check_popup = new class {
 					'type', 'ports', 'snmp_oid', 'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel',
 					'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase'
 				]
+			},
+			{
+				types: [<?= SVC_ICMPPING ?>],
+				keys: ['type', 'allow_redirect']
 			}
 		];
 
@@ -307,6 +317,8 @@ window.check_popup = new class {
 	 * Resets fields of the discovery check form to default values.
 	 */
 	_resetDCheckForm() {
+		document.querySelector('#allow_redirect').checked = false;
+
 		const elements = document.querySelectorAll(
 			`#key_, #snmp_community, #snmp_oid, #snmpv3_contextname, #snmpv3_securityname, #snmpv3_authpassphrase,
 			#snmpv3_privpassphrase`

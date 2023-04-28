@@ -155,6 +155,12 @@ $form_grid = (new CFormGrid())
 				->setAttribute('maxlength', DB::getFieldLength('dchecks', 'snmpv3_privpassphrase'))
 				->disableAutocomplete()
 		))->setId('dcheck_snmpv3_privpassphrase')
+	])
+	->addItem([
+		(new CLabel(_('Allow redirect'), 'allow_redirect'))->setId('allow_redirect_label'),
+		(new CFormField(
+			(new CCheckBox('allow_redirect'))->setChecked($data['params']['allow_redirect'] == 1)
+		))->setId('allow_redirect_field')
 	]);
 
 $form

@@ -47,7 +47,8 @@ class CControllerDiscoveryCheckCheck extends CController {
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
 			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
 			'host_source' =>			'string',
-			'name_source' =>			'string'
+			'name_source' =>			'string',
+			'allow_redirect'=>			'db dchecks.allow_redirect|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -100,7 +101,8 @@ class CControllerDiscoveryCheckCheck extends CController {
 		$data['name'] = discovery_check2str(
 			$data['type'],
 			array_key_exists('key_', $data) ? $data['key_'] : '',
-			array_key_exists('ports',  $data) ? $data['ports'] : ''
+			array_key_exists('ports',  $data) ? $data['ports'] : '',
+			array_key_exists('allow_redirect',  $data) ? $data['allow_redirect'] : ''
 		);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));

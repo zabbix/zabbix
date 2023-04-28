@@ -1,0 +1,88 @@
+---
+test case: Test statistics, all replies received
+in:
+  test_type: "test_process_fping_statistics_line"
+  ipaddr: "8.8.8.8"
+  linebuf: "8.8.8.8 : 0.61 0.67 0.66"
+  hosts_count: 1
+  requests_count: 3
+  allow_redirect: 0
+  fping_existence: 3
+  host_up: 1
+out:
+  min: 0.000610
+  sum: 0.001940
+  max: 0.000670
+  rcv: 3
+---
+test case: Test statistics, no replies received
+in:
+  test_type: "test_process_fping_statistics_line"
+  ipaddr: "7.7.7.7"
+  linebuf: "7.7.7.7        : - - -"
+  hosts_count: 1
+  requests_count: 3
+  allow_redirect: 0
+  fping_existence: 3
+  host_up: 0
+out:
+  min: 0.0
+  sum: 0.0
+  max: 0.0
+  rcv: 0
+---
+test case: "Response was received directly from the ping target host"
+in:
+  test_type: "process_response_to_individual_fping_request"
+  ipaddr: "192.168.1.1"
+  linebuf: "192.168.1.1 : [0], 84 bytes, 0.61 ms (0.61 avg, 0% loss)"
+  requests_count: 1
+  allow_redirect: 0
+  fping_existence: 3
+out:
+  host_up: 1
+---
+test case: "Redirected response fping v2.4 and from v3.0 till 3.10 inclusive (allow_redirect=YES)"
+in:
+  test_type: "process_response_to_individual_fping_request"
+  ipaddr: "192.168.202.10"
+  linebuf: "192.168.202.10 : [0], 1028 bytes, 1.58 ms (1.58 avg, 0% loss) [<- 192.168.201.10]"
+  requests_count: 1
+  allow_redirect: 1
+  fping_existence: 3
+out:
+  host_up: 1
+---
+test case: "Redirected response fping v2.4 and from v3.0 till 3.10 inclusive (allow_redirect=NO)"
+in:
+  test_type: "process_response_to_individual_fping_request"
+  ipaddr: "192.168.202.10"
+  linebuf: "192.168.202.10 : [0], 1028 bytes, 1.58 ms (1.58 avg, 0% loss) [<- 192.168.201.10]"
+  requests_count: 1
+  allow_redirect: 0
+  fping_existence: 3
+out:
+  host_up: 0
+---
+test case: "Redirected response fping from v3.11 till 5.1 inclusive (allow_redirect=YES)"
+in:
+  test_type: "process_response_to_individual_fping_request"
+  ipaddr: "192.168.202.10"
+  linebuf: " [<- 192.168.201.10]192.168.202.10 : [0], 1028 bytes, 0.64 ms (0.64 avg, 0% loss)"
+  requests_count: 1
+  allow_redirect: 1
+  fping_existence: 3
+out:
+  host_up: 1
+---
+test case: "Redirected response fping from v3.11 till 5.1 inclusive (allow_redirect=NO)"
+in:
+  test_type: "process_response_to_individual_fping_request"
+  ipaddr: "192.168.202.10"
+  linebuf: " [<- 192.168.201.10]192.168.202.10 : [0], 1028 bytes, 0.64 ms (0.64 avg, 0% loss)"
+  requests_count: 1
+  allow_redirect: 0
+  fping_existence: 3
+out:
+  host_up: 0
+...

@@ -69,18 +69,21 @@ function discovery_check_type2str($type = null) {
 	return isset($types[$type]) ? $types[$type] : false;
 }
 
-function discovery_check2str($type, $key, $port) {
+function discovery_check2str($type, $key, $port, $allow_redirect) {
 	$externalParam = '';
 
-	if ($key !== '') {
-		switch ($type) {
-			case SVC_SNMPv1:
-			case SVC_SNMPv2c:
-			case SVC_SNMPv3:
-			case SVC_AGENT:
-				$externalParam = ' "'.$key.'"';
-				break;
-		}
+	switch ($type) {
+		case SVC_SNMPv1:
+		case SVC_SNMPv2c:
+		case SVC_SNMPv3:
+		case SVC_AGENT:
+			$externalParam = ' "'.$key.'"';
+			break;
+		case SVC_ICMPPING:
+			if ($allow_redirect == 1) {
+				$externalParam = ' "'._('allow redirect').'"';
+			}
+			break;
 	}
 
 	$result = discovery_check_type2str($type);

@@ -32,7 +32,7 @@ class CWidgetFieldMultiSelectHostView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		return $this->popup_parameters + [
 			'srctbl' => 'hosts',
 			'srcfld1' => 'hostid'
 		];
