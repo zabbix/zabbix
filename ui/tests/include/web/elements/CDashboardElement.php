@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * Dashboard element.
  */
@@ -169,8 +171,20 @@ class CDashboardElement extends CElement {
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
 			$button = $controls->query('id:dashbrd-save')->one()->waitUntilClickable();
-			$button->getLocationOnScreenOnceScrolledIntoView();
 			$button->click();
+
+			try {
+				$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible(2);
+			}
+			catch (TimeoutException $ex) {
+				try {
+					$button->click(true);
+				}
+				catch (\Exception $ex) {
+					// Code is not missing here.
+				}
+			}
+
 			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
 		}
 
@@ -263,5 +277,16 @@ class CDashboardElement extends CElement {
 		if ($this->isEditable($editable) === false) {
 			throw new \Exception('Dashboard is'.($editable ? ' not' : '').' in editing mode.');
 		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return ($target->getWidgets()->filter(CElementFilter::NOT_READY)->count() === 0);
+		};
 	}
 }
