@@ -20,7 +20,6 @@
 #include "pp_queue.h"
 #include "pp_task.h"
 #include "zbxcommon.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 #define PP_TASK_QUEUE_INIT_NONE		0x00

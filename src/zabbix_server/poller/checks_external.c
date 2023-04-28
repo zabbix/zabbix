@@ -19,7 +19,6 @@
 
 #include "checks_external.h"
 
-#include "log.h"
 #include "zbxexec.h"
 #include "zbxsysinfo.h"
 

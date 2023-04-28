@@ -21,7 +21,6 @@
 
 #include "zbxdbhigh.h"
 #include "zbxsysinfo.h"
-#include "log.h"
 
 /*
  * 3.0 development database patches

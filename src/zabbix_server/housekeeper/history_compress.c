@@ -19,8 +19,6 @@
 
 #include "history_compress.h"
 
-#include "log.h"
-
 #if defined(HAVE_POSTGRESQL)
 
 #define ZBX_TS_SEGMENT_BY	"itemid"

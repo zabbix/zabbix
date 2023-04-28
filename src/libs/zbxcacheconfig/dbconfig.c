@@ -19,7 +19,6 @@
 
 #include "dbconfig.h"
 
-#include "log.h"
 #include "zbxtasks.h"
 #include "zbxserver.h"
 #include "zbxshmem.h"

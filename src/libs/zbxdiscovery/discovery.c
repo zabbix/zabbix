@@ -19,7 +19,6 @@
 
 #include "zbxdiscovery.h"
 
-#include "log.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 

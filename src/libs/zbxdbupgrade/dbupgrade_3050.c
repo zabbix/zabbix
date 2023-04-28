@@ -23,7 +23,6 @@
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxalgo.h"

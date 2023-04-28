@@ -23,7 +23,6 @@
 #include "zbxdbhigh.h"
 #include "zbxkvs.h"
 #include "zbxvault.h"
-#include "log.h"
 #include "zbxcommshigh.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"

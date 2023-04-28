@@ -20,7 +20,6 @@
 #include "eval.h"
 
 #include "zbxstr.h"
-#include "log.h"
 #include "zbxalgo.h"
 #include "zbxvariant.h"
 #include "zbxserialize.h"

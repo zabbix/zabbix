@@ -21,7 +21,6 @@
 #include "embed_xml.h"
 #include "embed.h"
 
-#include "log.h"
 #include "httprequest.h"
 #include "zabbix.h"
 #include "global.h"

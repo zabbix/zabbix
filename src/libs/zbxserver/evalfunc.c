@@ -21,7 +21,6 @@
 #include "evalfunc_common.h"
 #include "zbxserver.h"
 
-#include "log.h"
 #include "zbxregexp.h"
 #include "zbxcachevalue.h"
 #include "zbxtrends.h"

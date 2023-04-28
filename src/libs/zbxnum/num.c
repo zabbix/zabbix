@@ -19,8 +19,6 @@
 
 #include "zbxnum.h"
 
-#include "log.h"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: check if the string is unsigned integer within the specified      *

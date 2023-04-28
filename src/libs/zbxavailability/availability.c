@@ -20,7 +20,6 @@
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 
-#include "log.h"
 #include "zbxipcservice.h"
 
 ZBX_PTR_VECTOR_IMPL(proxy_hostdata_ptr, zbx_proxy_hostdata_t *)

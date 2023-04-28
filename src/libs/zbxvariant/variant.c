@@ -21,7 +21,6 @@
 
 #include "zbxstr.h"
 #include "zbxnum.h"
-#include "log.h"
 
 ZBX_VECTOR_IMPL(var, zbx_variant_t)
 

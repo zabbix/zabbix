@@ -20,7 +20,6 @@
 #include "zbxcachehistory.h"
 #include "zbxcachevalue.h"
 
-#include "log.h"
 #include "zbxmutexs.h"
 #include "zbxserver.h"
 #include "zbxmodules.h"

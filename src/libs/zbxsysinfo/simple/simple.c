@@ -29,7 +29,6 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxcomms.h"
-#include "log.h"
 #include "cfg.h"
 
 #ifdef HAVE_LDAP

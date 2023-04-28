@@ -20,7 +20,6 @@
 #include "macrofunc.h"
 
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"

@@ -19,7 +19,6 @@
 
 #include "persistent_state.h"
 
-#include "log.h"
 #include "logfiles.h"
 #include "zbxjson.h"
 #include "zbxcrypto.h"

@@ -20,7 +20,6 @@
 #include "audit.h"
 #include "audit/zbxaudit.h"
 
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxnum.h"

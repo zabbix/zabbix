@@ -20,7 +20,6 @@
 #include "nodecommand.h"
 
 #include "zbxserver.h"
-#include "log.h"
 #include "trapper_auth.h"
 
 #include "../scripts/scripts.h"

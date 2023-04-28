@@ -20,7 +20,6 @@
 #include "cfg.h"
 
 #include "zbxstr.h"
-#include "log.h"
 #include "zbxip.h"
 #include "zbxfile.h"
 

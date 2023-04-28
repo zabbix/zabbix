@@ -18,8 +18,6 @@
 **/
 
 #include "zbxalgo.h"
-
-#include "log.h"
 #include "zbxnum.h"
 
 #define DB_INFINITY	(1e12 - 1e-4)
@@ -27,7 +25,6 @@
 #define ZBX_MATH_EPSILON	(1e-6)
 
 #define ZBX_IS_NAN(x)	((x) != (x))
-
 #define ZBX_VALID_MATRIX(m)		(0 < (m)->rows && 0 < (m)->columns && NULL != (m)->elements)
 #define ZBX_MATRIX_EL(m, row, col)	((m)->elements[(row) * (m)->columns + (col)])
 #define ZBX_MATRIX_ROW(m, row)		((m)->elements + (row) * (m)->columns)

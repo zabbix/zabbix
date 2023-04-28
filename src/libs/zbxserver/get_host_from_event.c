@@ -20,7 +20,6 @@
 #include "get_host_from_event.h"
 
 #include "zbxnum.h"
-#include "log.h"
 #include "zbx_host_constants.h"
 
 #ifdef HAVE_OPENIPMI

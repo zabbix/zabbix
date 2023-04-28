@@ -26,7 +26,6 @@
 #include "../poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
 #include "zbxnum.h"

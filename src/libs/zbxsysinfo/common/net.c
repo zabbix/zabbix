@@ -21,7 +21,6 @@
 #include "net.h"
 
 #include "zbxcomms.h"
-#include "log.h"
 #include "cfg.h"
 #include "zbxstr.h"
 #include "zbxnum.h"

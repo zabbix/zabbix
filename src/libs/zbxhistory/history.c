@@ -19,7 +19,6 @@
 
 #include "history.h"
 
-#include "log.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxprof.h"

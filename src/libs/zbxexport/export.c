@@ -19,7 +19,6 @@
 
 #include "zbxexport.h"
 
-#include "log.h"
 #include "zbxcommon.h"
 #include "zbxstr.h"
 #include "zbxtypes.h"

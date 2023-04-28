@@ -23,7 +23,6 @@
 #include "../actions.h"
 
 #include "zbxserver.h"
-#include "log.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
