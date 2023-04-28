@@ -20,9 +20,6 @@
 
 class CWidgetProblems extends CWidget {
 
-	static ZBX_STYLE_BTN_WIDGET_EXPAND = 'btn-widget-expand';
-	static ZBX_STYLE_BTN_WIDGET_COLLAPSE = 'btn-widget-collapse';
-
 	onInitialize() {
 		this._opened_eventids = [];
 	}
@@ -67,9 +64,8 @@ class CWidgetProblems extends CWidget {
 				const rows = this._body.querySelectorAll("tr[data-cause-eventid='" + button.dataset.eventid + "']");
 
 				if (rows[0].classList.contains('hidden')) {
-					button.classList.replace(CWidgetProblems.ZBX_STYLE_BTN_WIDGET_EXPAND,
-						CWidgetProblems.ZBX_STYLE_BTN_WIDGET_COLLAPSE
-					);
+					button.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
+					button.classList.add(ZBX_ICON_CHEVRON_UP);
 					button.title = t('Collapse');
 
 					this._opened_eventids.push(button.dataset.eventid);
@@ -77,9 +73,8 @@ class CWidgetProblems extends CWidget {
 					[...rows].forEach(row => row.classList.remove('hidden'));
 				}
 				else {
-					button.classList.replace(CWidgetProblems.ZBX_STYLE_BTN_WIDGET_COLLAPSE,
-						CWidgetProblems.ZBX_STYLE_BTN_WIDGET_EXPAND
-					);
+					button.classList.remove(ZBX_ICON_CHEVRON_UP);
+					button.classList.add(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
 					button.title = t('Expand');
 
 					this._opened_eventids = this._opened_eventids.filter((id) => id !== button.dataset.eventid);
@@ -124,9 +119,8 @@ class CWidgetProblems extends CWidget {
 
 				[...rows].forEach(row => row.classList.remove('hidden'));
 
-				button.classList.replace(CWidgetProblems.ZBX_STYLE_BTN_WIDGET_EXPAND,
-					CWidgetProblems.ZBX_STYLE_BTN_WIDGET_COLLAPSE
-				);
+				button.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
+				button.classList.add(ZBX_ICON_CHEVRON_UP);
 				button.title = t('Collapse');
 			}
 		}

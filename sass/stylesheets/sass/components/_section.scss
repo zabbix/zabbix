@@ -29,7 +29,7 @@ section {
 		color: $font-alt-color;
 	}
 
-	&.section-collapsed {
+	&.collapsed {
 		.section-body,
 		.section-foot {
 			display: none;

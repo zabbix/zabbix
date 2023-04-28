@@ -1541,14 +1541,16 @@ function getEventUpdates(array $event) {
 /**
  * Make icons (suppressions, messages, severity changes, actions) for actions column.
  *
- * @param string $eventid                  ID for event, for which icons are created.
- * @param array  $actions                  Array of actions data.
- * @param array  $actions['suppressions']  Suppression icon data.
- * @param array  $actions['messages']      Messages icon data.
- * @param array  $actions['severities']    Severity change icon data.
- * @param array  $actions['actions']       Actions icon data.
- * @param array  $users                    User name, surname and username.
- * @param bool   $is_acknowledged          Is the event currently acknowledged. If true, display icon.
+ * @param string $eventid          ID for event, for which icons are created.
+ * @param array  $actions          Array of actions data.
+ *        array  $actions          ['suppressions']  Suppression icon data.
+ *        array  $actions          ['messages']      Messages icon data.
+ *        array  $actions          ['severities']    Severity change icon data.
+ *        array  $actions          ['actions']       Actions icon data.
+ * @param array  $users            User name, surname and username.
+ * @param bool   $is_acknowledged  Is the event currently acknowledged. If true, display icon.
+ *
+ * @throws Exception
  *
  * @return CCol|string
  */
@@ -1561,9 +1563,8 @@ function makeEventActionsIcons($eventid, $actions, $users, $is_acknowledged) {
 	$action_icons = [];
 
 	if ($is_acknowledged) {
-		$action_icons[] = makeActionIcon(
-			['icon' => ZBX_ICON_CHECK.' '.ZBX_STYLE_EVENT_ACKNOWLEDGED, 'title' => _('Acknowledged')]
-		);
+		$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_CHECK, 'title' => _('Acknowledged')])
+			->addClass(ZBX_STYLE_EVENT_ACKNOWLEDGED);
 	}
 
 	if ($suppression_icon !== null) {
@@ -1590,9 +1591,11 @@ function makeEventActionsIcons($eventid, $actions, $users, $is_acknowledged) {
  * Records must be passed in the order starting from the latest by field 'clock'.
  *
  * @param array $data
- * @param array  $data['suppress_until'][]['suppress_until']  Time until problem is suppressed by user.
- * @param string $data['suppress_until'][]['clock']           Suppression creation time.
+ *        array  $data['suppress_until'][]['suppress_until']  Time until problem is suppressed by user.
+ *        string $data['suppress_until'][]['clock']           Suppression creation time.
  * @param array $users  User name, surname and username.
+ *
+ * @throws Exception
  */
 function makeEventSuppressionsProblemIcon(array $data, array $users): ?CTag {
 	if (!$data['count']) {
@@ -1636,9 +1639,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CTag {
 	}
 
 	return makeActionIcon([
-		'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
-			? ZBX_ICON_EYE_OFF.' '.ZBX_STYLE_SUPPRESSIONS_PROBLEM
-			: ZBX_ICON_EYE.' '.ZBX_STYLE_SUPPRESSIONS_PROBLEM,
+		'icon' => array_key_exists('suppress_until', $data['suppress_until'][0]) ? ZBX_ICON_EYE_OFF : ZBX_ICON_EYE,
 		'button' => true,
 		'hint' => [
 			$table,
@@ -1651,17 +1652,19 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CTag {
 				))->addClass(ZBX_STYLE_TABLE_PAGING)
 				: null
 		]
-	]);
+	])->addClass(ZBX_STYLE_SUPPRESSIONS_PROBLEM);
 }
 
 /**
  * Create icon with hintbox for event messages.
  *
- * @param array  $data
- * @param array  $data['messages']               Array of messages.
- * @param string $data['messages'][]['message']  Message text.
- * @param string $data['messages'][]['clock']    Message creation time.
- * @param array  $users                          User name, surname and username.
+ * @param array $data
+ *        array  $data['messages']               Array of messages.
+ *        string $data['messages'][]['message']  Message text.
+ *        string $data['messages'][]['clock']    Message creation time.
+ * @param array $users  User name, surname and username.
+ *
+ * @throws Exception
  */
 function makeEventMessagesIcon(array $data, array $users): ?CTag {
 	if (!$data['count']) {
@@ -1684,7 +1687,7 @@ function makeEventMessagesIcon(array $data, array $users): ?CTag {
 	}
 
 	return makeActionIcon([
-		'icon' => ZBX_ICON_ALERT.' '.ZBX_STYLE_EVENT_MESSAGES,
+		'icon' => ZBX_ICON_ALERT,
 		'button' => true,
 		'hint' => [
 			$table,
@@ -1698,22 +1701,24 @@ function makeEventMessagesIcon(array $data, array $users): ?CTag {
 				: null
 		],
 		'num' => $data['count'],
-		// 'aria-label' => _xn('%1$s message', '%1$s messages', $data['count'], 'screen reader', $data['count']) // TODO acikuns check
-	]);
+		'aria-label' => _xn('%1$s message', '%1$s messages', $data['count'], 'screen reader', $data['count'])
+	])->addClass(ZBX_STYLE_EVENT_MESSAGES);
 }
 
 /**
  * Create icon with hintbox for event severity changes.
  *
  * @param array  $data
- * @param array  $data['severities']                    Array of severities.
- * @param string $data['severities'][]['old_severity']  Event severity before change.
- * @param string $data['severities'][]['new_severity']  Event severity after change.
- * @param string $data['severities'][]['clock']         Severity change time.
- * @param string $data['original_severity']             Severity before change.
- * @param string $data['current_severity']              Current severity.
- * @param int    $data['count']                         Total number of severity changes.
- * @param array  $users                                 User name, surname and username.
+ *        array  $data   ['severities']                    Array of severities.
+ *        string $data   ['severities'][]['old_severity']  Event severity before change.
+ *        string $data   ['severities'][]['new_severity']  Event severity after change.
+ *        string $data   ['severities'][]['clock']         Severity change time.
+ *        string $data   ['original_severity']             Severity before change.
+ *        string $data   ['current_severity']              Current severity.
+ *        int    $data   ['count']                         Total number of severity changes.
+ * @param array  $users  User name, surname and username.
+ *
+ * @throws Exception
  */
 function makeEventSeverityChangesIcon(array $data, array $users): ?CTag {
 	if (!$data['count']) {
@@ -1741,24 +1746,24 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CTag {
 
 	// select icon
 	if ($data['original_severity'] > $data['current_severity']) {
-		$icon_style = ZBX_ICON_ARROW_DOWN;
-		$type = ZBX_STYLE_EVENT_SEVERITY_DOWN;
-		// $aria_label = _x('Severity decreased', 'screen reader'); // TODO acikuns
+		$icon = ZBX_ICON_ARROW_DOWN;
+		$class = ZBX_STYLE_EVENT_SEVERITY_DOWN;
+		$aria_label = _x('Severity decreased', 'screen reader');
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
-		$icon_style = ZBX_ICON_ARROW_UP;
-		$type = ZBX_STYLE_EVENT_SEVERITY_UP;
-		// $aria_label = _x('Severity increased', 'screen reader'); // TODO acikuns
+		$icon = ZBX_ICON_ARROW_UP;
+		$class = ZBX_STYLE_EVENT_SEVERITY_UP;
+		$aria_label = _x('Severity increased', 'screen reader');
 	}
 	else {
-		$icon_style = ZBX_ICON_ARROWS_TOP_BOTTOM;
-		$type = ZBX_STYLE_EVENT_SEVERITY_CHANGED;
-		// $aria_label = _x('Severity changed', 'screen reader'); // TODO acikuns
+		$icon = ZBX_ICON_ARROWS_TOP_BOTTOM;
+		$class = ZBX_STYLE_EVENT_SEVERITY_CHANGED;
+		$aria_label = _x('Severity changed', 'screen reader');
 	}
 
 	return makeActionIcon([
 		'button' => true,
-		'icon' => $icon_style.' '.$type,
+		'icon' => $icon,
 		'hint' => [
 			$table,
 			($data['count'] > ZBX_WIDGET_ROWS)
@@ -1770,8 +1775,8 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CTag {
 				))->addClass(ZBX_STYLE_TABLE_PAGING)
 				: null
 		],
-		// 'aria-label' => $aria_label // TODO acikuns
-	]);
+		'aria-label' => $aria_label
+	])->addClass($class);
 }
 
 /**
@@ -1833,9 +1838,9 @@ function makeEventActionsTable(array $actions, array $users, array $mediatypes):
  * Create icon with hintbox for event actions.
  *
  * @param array  $data
- * @param int    $data['count']                     Number of actions.
- * @param bool   $data['has_uncomplete_action']     Does the event have at least one uncompleted alert action.
- * @param bool   $data['has_failed_action']         Does the event have at least one failed alert action.
+ *        int    $data['count']                     Number of actions.
+ *        bool   $data['has_uncomplete_action']     Does the event have at least one uncompleted alert action.
+ *        bool   $data['has_failed_action']         Does the event have at least one failed alert action.
  * @param string $eventid
  */
 function makeEventActionsIcon(array $data, $eventid): ?CTag {
@@ -1844,24 +1849,26 @@ function makeEventActionsIcon(array $data, $eventid): ?CTag {
 	}
 
 	if ($data['has_failed_action']) {
-		$type = ZBX_STYLE_EVENT_ACTION_RED;
+		$class = ZBX_STYLE_EVENT_ACTION_RED;
 	}
 	elseif ($data['has_uncomplete_action']) {
-		$type = ZBX_STYLE_EVENT_ACTION_YELLOW;
+		$class = ZBX_STYLE_EVENT_ACTION_YELLOW;
 	}
 	else {
-		$type = ZBX_STYLE_EVENT_ACTION_GRAY;
+		$class = ZBX_STYLE_EVENT_ACTION_GRAY;
 	}
 
 	return makeActionIcon([
-		'icon' => ZBX_ICON_BULLET_RIGHT.' '.$type,
+		'icon' => ZBX_ICON_BULLET_RIGHT,
 		'button' => true,
 		'num' => $data['count'],
-		// 'aria-label' => _xn('%1$s action', '%1$s actions', $data['count'], 'screen reader', $data['count']) // TODO relocate this to title acikuns
-	])->setAjaxHint([
-		'type' => 'eventactions',
-		'data' => ['eventid' => $eventid]
-	]);
+		'aria-label' => _xn('%1$s action', '%1$s actions', $data['count'], 'screen reader', $data['count'])
+	])
+		->addClass($class)
+		->setAjaxHint([
+			'type' => 'eventactions',
+			'data' => ['eventid' => $eventid]
+		]);
 }
 
 /**
@@ -2039,14 +2046,15 @@ function makeActionTableIcon(array $action): ?CTag {
 				$action_icons[] = makeActionIcon([ 'icon' => ZBX_ICON_CHECKBOX, 'title' => _('Manually closed')]);
 			}
 
-			if (($action['action']
-					& ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
+			if (($action['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
 				$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_ARROW_RIGHT_TOP, 'title' => _('Cause')]);
 			}
 
-			if (($action['action']
-					& ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_ICON_ARROW_TOP_RIGHT, 'title' => _('Symptom')]);
+			if (($action['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
+				$action_icons[] = makeActionIcon([
+					'icon' => ZBX_STYLE_SYMPTOM.' '.ZBX_ICON_ARROW_TOP_RIGHT,
+					'title' => _('Symptom')
+				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {

@@ -21,7 +21,6 @@
 
 class CSectionCollapsible extends CSection {
 
-	private const ZBX_STYLE_COLLAPSED = 'section-collapsed';
 	private const ZBX_STYLE_TOGGLE = 'section-toggle';
 
 	private bool $is_expanded = true;
@@ -40,7 +39,7 @@ class CSectionCollapsible extends CSection {
 	}
 
 	public function toString($destroy = true): string {
-		$this->addClass($this->is_expanded ? null : self::ZBX_STYLE_COLLAPSED);
+		$this->addClass($this->is_expanded ? null : ZBX_STYLE_COLLAPSED);
 
 		$toggle = (new CSimpleButton())
 			->addClass(ZBX_STYLE_BTN_ICON)

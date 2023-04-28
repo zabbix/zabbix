@@ -370,8 +370,7 @@ class CTabFilter extends CDiv {
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
 				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_DOWN)
-				->addClass('btn-select-filter-tab'),
+				->addClass(ZBX_ICON_CHEVRON_DOWN),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass(ZBX_STYLE_BTN_ICON)
@@ -379,7 +378,9 @@ class CTabFilter extends CDiv {
 		]);
 
 		if (array_key_exists('timeselector', $this->options)) {
-			array_map([$nav_list, 'addItem'], $this->getTimeselectorNavigation());
+			foreach ($this->getTimeselectorNavigation() as $button) {
+				$nav_list->addItem($button);
+			}
 		}
 
 		return new CTag('nav', true , new CList([
@@ -388,7 +389,7 @@ class CTabFilter extends CDiv {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_CHEVRON_LEFT),
 			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
-			$static ? $static : null,
+			$static ?: null,
 			$nav_list
 		]));
 	}

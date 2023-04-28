@@ -1497,6 +1497,7 @@ class CScreenProblem extends CScreenBase {
 			$empty_col = new CCol();
 			$symptom_col = (new CCol(
 				makeActionIcon(['icon' => ZBX_ICON_ARROW_TOP_RIGHT, 'title' => _('Symptom')])
+					->addClass(ZBX_STYLE_SYMPTOM)
 			));
 
 			if ($data['show_timeline']) {
@@ -1513,8 +1514,8 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
 					$symptom_count_span = (new CSpan($problem['symptom_count']))
-						->addClass(ZBX_STYLE_TAG)
-						->addStyle('max-width: 22px;');
+						->addClass(ZBX_STYLE_SYMPTOMS_COUNT)
+						->addStyle('max-width: 22px;'); // TODO - check & clean
 
 					if ($problem['symptom_count'] >= 1000) {
 						$symptom_count_span->setHint($problem['symptom_count']);
@@ -1523,12 +1524,12 @@ class CScreenProblem extends CScreenBase {
 					$symptom_count_col = (new CCol($symptom_count_span))->addClass(ZBX_STYLE_SECOND_COL);
 
 					$collapse_expand_col = (new CCol(
-						(new CButton(null))
+						(new CSimpleButton())
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
 							->addClass(ZBX_STYLE_BTN_ICON)
 							->addClass(ZBX_ICON_CHEVRON_DOWN)
-							->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
+							->addClass(ZBX_STYLE_COLLAPSED)
 							->setTitle(_('Expand'))
 					))->addClass(ZBX_STYLE_THIRD_COL);
 
@@ -1617,8 +1618,8 @@ class CScreenProblem extends CScreenBase {
 				$row->addItem([
 					$cell_clock->addClass(ZBX_STYLE_TIMELINE_DATE),
 					(new CCol())
-							->addClass(ZBX_STYLE_TIMELINE_AXIS)
-							->addClass(ZBX_STYLE_TIMELINE_DOT),
+						->addClass(ZBX_STYLE_TIMELINE_AXIS)
+						->addClass(ZBX_STYLE_TIMELINE_DOT),
 					(new CCol())->addClass(ZBX_STYLE_TIMELINE_TD)
 				]);
 			}

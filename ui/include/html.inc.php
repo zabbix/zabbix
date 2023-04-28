@@ -997,8 +997,8 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
  */
 function makeActionIcon(array $icon_data): CTag {
 	$icon = array_key_exists('button', $icon_data) && $icon_data['button']
-		? (new CButton(null))->addClass(ZBX_STYLE_BTN_ICON)
-		: new CSpan();
+		? (new CSimpleButton())->addClass(ZBX_STYLE_BTN_ICON)
+		: (new CSpan())->addClass(ZBX_STYLE_ICON);
 
 	$icon->addClass($icon_data['icon']);
 
@@ -1021,9 +1021,7 @@ function makeActionIcon(array $icon_data): CTag {
 	}
 
 	if (array_key_exists('aria-label', $icon_data)) {
-		$icon
-			->addItem($icon_data['aria-label'])
-			->addClass(ZBX_STYLE_INLINE_SR_ONLY);
+		$icon->setAttribute('aria-label', $icon_data['aria-label']);
 	}
 
 	return $icon;
@@ -1034,8 +1032,8 @@ function makeActionIcon(array $icon_data): CTag {
  *
  * @param string $description
  */
-function makeDescriptionIcon($description): CLink { // FIXME
-	return (new CLink())
+function makeDescriptionIcon($description): CSimpleButton {
+	return (new CSimpleButton())
 		->addClass(ZBX_STYLE_BTN_ICON)
 		->addClass(ZBX_ICON_ALERT)
 		->addClass(ZBX_STYLE_TRIGGER_DESCRIPTION)

@@ -130,6 +130,20 @@ $zi-z: "\ea6c";
 	}
 }
 
+%icon-position {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: top;
+
+	&:empty {
+		justify-content: center;
+	}
+}
+
+.icon {
+	@extend %icon-position;
+}
+
 [class^="zi-"], [class*=" zi-"] {
 	&::before {
 		@extend %icons-font;

@@ -689,9 +689,9 @@ function toggleSection(id, profile_idx) {
 	const section = document.getElementById(id);
 	const toggle = section.querySelector('.section-toggle');
 
-	let is_collapsed = section.classList.contains('section-collapsed');
+	let is_collapsed = section.classList.contains(ZBX_STYLE_COLLAPSED);
 
-	section.classList.toggle('section-collapsed', !is_collapsed);
+	section.classList.toggle(ZBX_STYLE_COLLAPSED, !is_collapsed);
 	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
 	if (profile_idx !== '') {

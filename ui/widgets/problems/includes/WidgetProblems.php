@@ -375,11 +375,8 @@ class WidgetProblems extends CTableInfo {
 			}
 
 			$symptom_col = (new CCol(
-				makeActionIcon([
-					'icon' => ZBX_ICON_ARROW_TOP_RIGHT,
-					'title' => _('Symptom'),
-					'style' => 'margin-right: 0'
-				])
+				makeActionIcon(['icon' => ZBX_ICON_ARROW_TOP_RIGHT, 'title' => _('Symptom')])
+					->addClass(ZBX_STYLE_SYMPTOM)
 			))->addClass(ZBX_STYLE_RIGHT);
 
 			$empty_col = new CCol();
@@ -396,14 +393,16 @@ class WidgetProblems extends CTableInfo {
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
 					$symptom_count_col = (new CCol(
-						(new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_TAG)
+						(new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_SYMPTOMS_COUNT)
 					))->addClass(ZBX_STYLE_RIGHT);
 
 					$collapse_expand_col = (new CCol(
-						(new CButton(null))
+						(new CSimpleButton())
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
-							->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
+							->addClass(ZBX_STYLE_BTN_ICON)
+							->addClass(ZBX_ICON_CHEVRON_DOWN)
+							->addClass(ZBX_STYLE_COLLAPSED)
 							->setTitle(_('Expand'))
 					))
 						->addClass(ZBX_STYLE_RIGHT)

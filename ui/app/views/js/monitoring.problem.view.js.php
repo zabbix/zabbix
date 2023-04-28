@@ -189,7 +189,8 @@
 
 					[...rows].forEach((row) => row.classList.remove('hidden'));
 
-					btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+					btn.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
+					btn.classList.add(ZBX_ICON_CHEVRON_UP);
 					btn.title = '<?= _('Collapse') ?>';
 				}
 			});
@@ -200,7 +201,7 @@
 			if (rows.length > 0) {
 				const row = [...rows].pop();
 				const btn = row.querySelector('button[data-action="show_symptoms"]');
-				const is_collapsed = btn !== null && btn.classList.contains('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				const is_collapsed = btn !== null && btn.classList.contains(ZBX_STYLE_COLLAPSED);
 
 				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
 			}
@@ -215,7 +216,8 @@
 
 			// Show symptom rows for current cause. Sliding animations are not supported on table rows.
 			if (rows[0].classList.contains('hidden')) {
-				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+				btn.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
+				btn.classList.add(ZBX_ICON_CHEVRON_UP);
 				btn.title = '<?= _('Collapse') ?>';
 
 				this.opened_eventids.push(btn.dataset.eventid);
@@ -223,7 +225,8 @@
 				[...rows].forEach((row) => row.classList.remove('hidden'));
 			}
 			else {
-				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>', '<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				btn.classList.remove(ZBX_ICON_CHEVRON_UP);
+				btn.classList.add(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
 				btn.title = '<?= _('Expand') ?>';
 
 				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
@@ -236,7 +239,7 @@
 
 			if (rows.length > 0) {
 				const row = [...rows].pop();
-				const is_collapsed = btn !== null && btn.classList.contains('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				const is_collapsed = btn.classList.contains(ZBX_STYLE_COLLAPSED);
 
 				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
 			}
