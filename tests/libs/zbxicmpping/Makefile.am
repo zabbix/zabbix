@@ -11,7 +11,6 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 ICMPPING_LIBS = \
-	-lz -lssl -lcrypto \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
@@ -37,7 +36,8 @@ ICMPPING_LIBS = \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	-lz -lssl -lcrypto
 
 
 line_process_SOURCES = \
