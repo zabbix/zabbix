@@ -25,7 +25,7 @@ class CHtmlUrlValidator {
 	 * URL is validated if schema validation is enabled (see VALIDATE_URI_SCHEMES).
 	 *
 	 * Relative URL should start with .php file name.
-	 * Absolute URL schema must match schemes mentioned in ZBX_URL_VALID_SCHEMES comma separated list.
+	 * Absolute URL schema must match schemes mentioned in ZBX_URI_VALID_SCHEMES comma separated list.
 	 *
 	 * @static
 	 *
@@ -95,20 +95,24 @@ class CHtmlUrlValidator {
 			return false;
 		}
 
-		if (array_key_exists('scheme', $url_parts)) {
-			if (!in_array(strtolower($url_parts['scheme']), explode(',', strtolower(ZBX_URI_VALID_SCHEMES)))) {
+		$scheme = array_key_exists('scheme', $url_parts) ? $url_parts['scheme'] : null;
+
+		if ($scheme === null && preg_match('/^(.*):\D+[^?#]/', $url, $matches) === 1) {
+			$scheme = $matches[1];
+		}
+
+		if ($scheme !== null) {
+			if (stripos(ZBX_URI_VALID_SCHEMES, $scheme) === false) {
 				return false;
 			}
 
 			if (array_key_exists('host', $url_parts)) {
 				return true;
 			}
-			else {
-				return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '/');
-			}
+
+			return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '/');
 		}
-		else {
-			return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '');
-		}
+
+		return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '');
 	}
 }
