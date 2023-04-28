@@ -95,13 +95,19 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 }
 check_fields($fields);
 
+$color_validator = new CColorValidator();
 $gitems = [];
+
 foreach (getRequest('items', []) as $item) {
 	$gitem = json_decode($item, true);
 
-	if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
-			&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
-			&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+	if ($gitem
+			&& array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid'])
+			&& array_key_exists('type', $gitem) && ctype_digit($gitem['type'])
+			&& array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype'])
+			&& array_key_exists('calc_fnc', $gitem) && ctype_digit($gitem['calc_fnc'])
+			&& array_key_exists('yaxisside', $gitem) && ctype_digit($gitem['yaxisside'])
+			&& array_key_exists('color', $gitem) && $color_validator->validate($gitem['color'])) {
 		$gitems[] = $gitem;
 	}
 }
