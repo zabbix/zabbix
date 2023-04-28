@@ -41,7 +41,7 @@ extern unsigned char	program_type;
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result)
+int	get_value_agent(const zbx_dc_item_t *item, int timeout, AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
@@ -82,7 +82,7 @@ int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result)
 			goto out;
 	}
 
-	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, timeout,
 			item->host.tls_connect, tls_arg1, tls_arg2))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
@@ -91,7 +91,7 @@ int	get_value_agent(const zbx_dc_item_t *item, AGENT_RESULT *result)
 			ret = NETWORK_ERROR;
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
 			ret = SUCCEED;
-		else if (SUCCEED == zbx_alarm_timed_out())
+		else if (SUCCEED != zbx_socket_check_deadline(&s))
 			ret = TIMEOUT_ERROR;
 		else
 			ret = NETWORK_ERROR;

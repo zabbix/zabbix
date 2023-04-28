@@ -67,7 +67,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 void	zbx_log_impl(int level, const char *fmt, va_list args);
 void	zabbix_close_log(void);
 
-char		*strerror_from_system(unsigned long error);
+char	*strerror_from_system(zbx_syserror_t error);
 
 #ifdef _WINDOWS
 char		*strerror_from_module(unsigned long error, const wchar_t *module);

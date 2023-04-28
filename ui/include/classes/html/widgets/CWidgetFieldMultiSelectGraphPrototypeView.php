@@ -32,11 +32,21 @@ class CWidgetFieldMultiSelectGraphPrototypeView extends CWidgetFieldMultiSelectV
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		$parameters = $this->popup_parameters + [
 			'srctbl' => 'graph_prototypes',
 			'srcfld1' => 'graphid',
 			'srcfld2' => 'name',
 			'with_graph_prototypes' => true
 		];
+
+		return $parameters + ($this->field->isTemplateDashboard()
+			? [
+				'hostid' => $this->field->getTemplateId(),
+				'hide_host_filter' => false
+			]
+			: [
+				'real_hosts' => true
+			]
+		);
 	}
 }

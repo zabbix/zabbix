@@ -26,7 +26,6 @@
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"
 #include "zbxcrypto.h"
-#include "zbxlld.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 #include "zbxcommshigh.h"
@@ -122,6 +121,13 @@ static zbx_history_table_t	areg = {
 		{NULL}
 		}
 };
+
+static zbx_lld_process_agent_result_func_t	lld_process_agent_result_cb = NULL;
+
+void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func)
+{
+	lld_process_agent_result_cb = lld_process_agent_result_func;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1155,8 +1161,11 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j)
  *                                                                            *
  * Purpose: processes item value depending on proxy/flags settings            *
  *                                                                            *
- * Parameters: item    - [IN] the item to process                             *
- *             result  - [IN] the item result                                 *
+ * Parameters: item    - [IN] item to process                                 *
+ *             result  - [IN] item result                                     *
+ *             ts      - [IN] value timestamp                                 *
+ *             h_num   - [OUT] number of history entries                      *
+ *             error   - [OUT]                                                *
  *                                                                            *
  * Comments: Values gathered by server are sent to the preprocessing manager, *
  *           while values received from proxy are already preprocessed and    *
@@ -1177,7 +1186,8 @@ static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 		{
-			zbx_lld_process_agent_result(item->itemid, item->host.hostid, result, ts, error);
+			if (NULL != lld_process_agent_result_cb)
+				lld_process_agent_result_cb(item->itemid, item->host.hostid, result, ts, error);
 			*h_num = 0;
 		}
 		else

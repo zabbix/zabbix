@@ -76,9 +76,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 
 	zbx_init_agent_result(&agent_result);
 
-	zbx_alarm_on(config_timeout);
-
-	if (SUCCEED != (ret = get_value_agent(&item, &agent_result)))
+	if (SUCCEED != (ret = get_value_agent(&item, config_timeout, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -86,8 +84,6 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 	}
 	else if (NULL != result && ZBX_ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
-
-	zbx_alarm_off();
 
 	zbx_free_agent_result(&agent_result);
 
@@ -107,7 +103,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
-	int             (*function)(zbx_dc_item_t *, AGENT_RESULT *);
+	int             (*function)(zbx_dc_item_t *, int timeout, AGENT_RESULT *);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -168,9 +164,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 
 	zbx_init_agent_result(&agent_result);
 
-	zbx_alarm_on(config_timeout);
-
-	if (SUCCEED != (ret = function(&item, &agent_result)))
+	if (SUCCEED != (ret = function(&item, config_timeout, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -178,8 +172,6 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	}
 	else if (NULL != result && ZBX_ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
-
-	zbx_alarm_off();
 
 	zbx_free_agent_result(&agent_result);
 

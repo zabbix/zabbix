@@ -166,7 +166,8 @@ WRAP_EXIT = \
 
 WRAP_COMM_FUNCS = \
 	-Wl,--wrap=read \
-	-Wl,--wrap=connect
+	-Wl,--wrap=connect \
+	-Wl,--wrap=poll
 
 COMMON_WRAP_FUNCS = \
 	$(WRAP_DB_FUNCS) \

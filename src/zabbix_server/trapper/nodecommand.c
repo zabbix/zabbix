@@ -614,12 +614,10 @@ finish:
 		send = j.buffer;
 	}
 
-	zbx_alarm_on(config_timeout);
-	if (SUCCEED != zbx_tcp_send(sock, send))
+	if (SUCCEED != zbx_tcp_send_to(sock, send, config_timeout))
 		zabbix_log(LOG_LEVEL_WARNING, "Error sending result of command");
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending back command '%s' result '%s'", data, send);
-	zbx_alarm_off();
 
 	zbx_json_free(&j);
 	zbx_free(result);

@@ -21,7 +21,7 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxcachevalue.h"
-#include "zbxlld.h"
+#include "../lld/lld_protocol.h"
 #include "zbxtrends.h"
 #include "zbxconnector.h"
 #include "../ha/ha.h"

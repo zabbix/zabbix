@@ -2224,7 +2224,9 @@ int	zbx_db_table_exists(const char *table_name)
 
 int	zbx_db_field_exists(const char *table_name, const char *field_name)
 {
+#if (defined(HAVE_MYSQL) || defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3))
 	zbx_db_result_t	result;
+#endif
 #if defined(HAVE_MYSQL)
 	char		*field_name_esc;
 	int		ret;

@@ -32,7 +32,7 @@ class CWidgetFieldMultiSelectSlaView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		return $this->popup_parameters + [
 			'srctbl' => 'sla',
 			'srcfld1' => 'slaid'
 		];

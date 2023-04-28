@@ -4,6 +4,7 @@ SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxhistory \
+	zbxicmpping \
 	zbxjson \
 	zbxpreproc \
 	zbxsysinfo \

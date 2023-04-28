@@ -19,11 +19,12 @@
 
 #include "lld.h"
 #include "zbxserver.h"
-#include "zbxdbwrap.h"
 
+#include "zbxdbwrap.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_graph.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 
 typedef struct
 {
@@ -34,19 +35,19 @@ typedef struct
 	zbx_uint64_t		ymin_itemid;
 	zbx_uint64_t		ymax_itemid_orig;
 	zbx_uint64_t		ymax_itemid;
-	int 			width_orig;
-	int 			height_orig;
-	double 			yaxismin_orig;
-	double 			yaxismax_orig;
-	unsigned char 		show_work_period_orig;
-	unsigned char 		show_triggers_orig;
-	unsigned char 		graphtype_orig;
-	unsigned char 		show_legend_orig;
-	unsigned char 		show_3d_orig;
-	double 			percent_left_orig;
-	double 			percent_right_orig;
-	unsigned char 		ymin_type_orig;
-	unsigned char 		ymax_type_orig;
+	int			width_orig;
+	int			height_orig;
+	double			yaxismin_orig;
+	double			yaxismax_orig;
+	unsigned char		show_work_period_orig;
+	unsigned char		show_triggers_orig;
+	unsigned char		graphtype_orig;
+	unsigned char		show_legend_orig;
+	unsigned char		show_3d_orig;
+	double			percent_left_orig;
+	double			percent_right_orig;
+	unsigned char		ymin_type_orig;
+	unsigned char		ymax_type_orig;
 	zbx_vector_ptr_t	gitems;
 #define ZBX_FLAG_LLD_GRAPH_UNSET			__UINT64_C(0x00000000)
 #define ZBX_FLAG_LLD_GRAPH_DISCOVERED			__UINT64_C(0x00000001)
@@ -171,6 +172,8 @@ static void	lld_graphs_free(zbx_vector_ptr_t *graphs)
  *                                                                            *
  * Parameters: parent_graphid - [IN] graph prototype identifier               *
  *             graphs         - [OUT] sorted list of graphs                   *
+ *             ...            - [IN] new values which should be updated if    *
+ *                                   different from original                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs, int width, int height,
@@ -491,14 +494,14 @@ static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_ptr_t *graphs, zbx_uint64_t
  * Return value: upon successful completion return pointer to the graph       *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_get(zbx_vector_ptr_t *graphs, const zbx_vector_ptr_t *item_links)
+static zbx_lld_graph_t	*lld_graph_get(zbx_vector_ptr_t *graphs, const zbx_vector_lld_item_link_t *item_links)
 {
 	int		i;
 	zbx_lld_graph_t	*graph;
 
 	for (i = 0; i < item_links->values_num; i++)
 	{
-		const zbx_lld_item_link_t	*item_link = (const zbx_lld_item_link_t *)item_links->values[i];
+		const zbx_lld_item_link_t	*item_link = item_links->values[i];
 
 		if (NULL != (graph = lld_graph_by_item(graphs, item_link->itemid)))
 			return graph;
@@ -516,7 +519,7 @@ static zbx_lld_graph_t	*lld_graph_get(zbx_vector_ptr_t *graphs, const zbx_vector
  *                                                                            *
  ******************************************************************************/
 static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_ptr_t *items,
-		const zbx_vector_ptr_t *item_links, zbx_uint64_t *itemid)
+		const zbx_vector_lld_item_link_t *item_links, zbx_uint64_t *itemid)
 {
 	int			index;
 	zbx_lld_item_t		*item_proto;
@@ -529,7 +532,8 @@ static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_ptr_t *items
 
 	if (0 != (item_proto->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
-		index = zbx_vector_ptr_bsearch(item_links, &item_proto->itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)item_links, (const void *)&item_proto->itemid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		if (FAIL == index)
 			return FAIL;
@@ -545,7 +549,7 @@ static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_ptr_t *items
 }
 
 static int	lld_gitems_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *gitems,
-		const zbx_vector_ptr_t *items, const zbx_vector_ptr_t *item_links, uint64_t grpahid)
+		const zbx_vector_ptr_t *items, const zbx_vector_lld_item_link_t *item_links, uint64_t grpahid)
 {
 	int			i, ret = FAIL;
 	zbx_lld_gitem_t		*gitem;
@@ -661,7 +665,7 @@ out:
  * Purpose: create a graph based on lld rule and add it to the list           *
  *                                                                            *
  ******************************************************************************/
-static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
+static void	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
 		unsigned char discover_proto, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
 {
@@ -759,13 +763,14 @@ out:
 
 static void	lld_graphs_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
-		unsigned char discover_proto, const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths)
+		unsigned char discover_proto, const zbx_vector_lld_row_t *lld_rows,
+		const zbx_vector_ptr_t *lld_macro_paths)
 {
 	int	i;
 
 	for (i = 0; i < lld_rows->values_num; i++)
 	{
-		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
+		zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
 		lld_graph_make(gitems_proto, graphs, items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
 				discover_proto, lld_row, lld_macro_paths);
@@ -811,7 +816,11 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
 
 /******************************************************************************
  *                                                                            *
- * Parameters: graphs - [IN] sorted list of graphs                            *
+ * Purpose: validate sorted graph                                             *
+ *                                                                            *
+ * Parameters: hostid - [IN]                                                  *
+ *             graphs - [IN] sorted list of graphs                            *
+ *             error  - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
 static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, char **error)
@@ -977,7 +986,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
 	int			ret = SUCCEED, i, j, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
-	zbx_vector_ptr_t	upd_gitems; 	/* the ordered list of graphs_items which will be updated */
+	zbx_vector_ptr_t	upd_gitems;	/* the ordered list of graphs_items which will be updated */
 	zbx_vector_uint64_t	del_gitemids;
 
 	zbx_uint64_t		graphid = 0, gitemid = 0;
@@ -1004,8 +1013,9 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		if (0 != graph->graphid)
 		{
-			zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_UPDATE, graph->graphid, (NULL == graph->name_orig) ?
-					graph->name : graph->name_orig, ZBX_FLAG_DISCOVERY_CREATED);
+			zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_UPDATE, graph->graphid,
+					(NULL == graph->name_orig) ? graph->name : graph->name_orig,
+					ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
 		for (j = 0; j < graph->gitems.values_num; j++)
@@ -1450,16 +1460,12 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
  *                                                                            *
  * Purpose: add or update graphs for discovery item                           *
  *                                                                            *
- * Parameters: hostid  - [IN] host identifier from database                   *
- *             agent   - [IN] discovery item identifier from database         *
- *             jp_data - [IN] received data                                   *
- *                                                                            *
  * Return value: SUCCEED - if graphs were successfully added/updated or       *
  *                         adding/updating was not necessary                  *
  *               FAIL    - graphs cannot be added/updated                     *
  *                                                                            *
  ******************************************************************************/
-int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
+int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	int			ret = SUCCEED;
@@ -1530,8 +1536,8 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
 				percent_right, ymin_type, ymax_type);
 
-		lld_remove_lost_objects("graph_discovery", "graphid", &graphs, lifetime, lastcheck, zbx_db_delete_graphs,
-				get_graph_info);
+		lld_remove_lost_objects("graph_discovery", "graphid", (const zbx_vector_ptr_t *)&graphs, lifetime,
+				lastcheck, zbx_db_delete_graphs, get_graph_info);
 
 		lld_items_free(&items);
 		lld_gitems_free(&gitems_proto);

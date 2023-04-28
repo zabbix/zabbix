@@ -204,6 +204,7 @@ var metrics = metric.MetricSet{
 			paramURI, paramUsername, paramPassword, paramService,
 			metric.NewParam("Tablespace", "Table-space name."),
 			metric.NewParam("Type", "table-space type."),
+			metric.NewParam("Conname", "Container name."),
 		}, false),
 	keyTablespacesDiscovery: metric.New("Returns list of tablespaces in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService}, false),

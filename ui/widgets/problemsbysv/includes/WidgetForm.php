@@ -44,15 +44,21 @@ use Widgets\ProblemsBySv\Widget;
 class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
+		$is_show_type_totals = array_key_exists('show_type', $this->values)
+			&& $this->values['show_type'] == Widget::SHOW_TOTALS;
+
 		return $this
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
-			->addField(
-				new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
 			)
-			->addField(
-				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
 				new CWidgetFieldTextBox('problem', _('Problem'))
@@ -61,7 +67,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldSeverities('severities', _('Severity'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
@@ -69,8 +75,9 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldTags('tags')
 			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('show_type', _('Show'), [
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldRadioButtonList('show_type', _('Show'), [
 					Widget::SHOW_GROUPS => _('Host groups'),
 					Widget::SHOW_TOTALS => _('Totals')
 				]))->setDefault(Widget::SHOW_GROUPS)
@@ -81,11 +88,9 @@ class WidgetForm extends CWidgetForm {
 					STYLE_VERTICAL => _('Vertical')
 				]))
 					->setDefault(STYLE_HORIZONTAL)
-					->setFlags(
-						!array_key_exists('show_type', $this->values)
-							|| !$this->values['show_type'] == Widget::SHOW_TOTALS
-						? CWidgetField::FLAG_DISABLED
-						: 0x00
+					->setFlags($this->isTemplateDashboard() || $is_show_type_totals
+						? 0x00
+						: CWidgetField::FLAG_DISABLED
 					)
 			)
 			->addField(
@@ -98,14 +103,10 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
-			->addField(
-				(new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems')))
-					->setFlags(
-						array_key_exists('show_type', $this->values)
-							&& $this->values['show_type'] == Widget::SHOW_TOTALS
-						? CWidgetField::FLAG_DISABLED
-						: 0x00
-					)
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems')))
+					->setFlags($is_show_type_totals ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [
