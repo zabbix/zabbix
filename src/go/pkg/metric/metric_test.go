@@ -32,8 +32,9 @@ var (
 	paramRequiredUsername = NewConnParam("User", "Description.").SetRequired()
 	paramUserValidation   = NewConnParam("User", "Description.").WithDefault("").WithValidator(
 		SetValidator{Set: []string{"", "supervisor", "admin", "guest"}})
-	paramPassword = NewConnParam("Password", "Description.").WithDefault("")
-	paramGeneral  = NewParam("GeneralParam", "Description.")
+	paramPassword               = NewConnParam("Password", "Description.").WithDefault("")
+	paramPasswordWithSetDefault = NewConnParam("Password", "Description.").WithDefault("Password")
+	paramGeneral                = NewParam("GeneralParam", "Description.")
 )
 
 var metricSet = MetricSet{
@@ -57,6 +58,7 @@ var metricSet = MetricSet{
 		[]*Param{paramURI, paramUsername}, false),
 	"metric.userValidation": New("UserValidation description.",
 		[]*Param{paramURI, paramUserValidation, paramPassword}, false),
+	"metric.conn": New("Conn description.", []*Param{paramURI, paramUsername, paramPasswordWithSetDefault}, false),
 }
 
 func TestMetric_EvalParams(t *testing.T) {
@@ -320,6 +322,22 @@ func TestMetric_EvalParams(t *testing.T) {
 				"URI": "localhost", "User": "user", "Password": "password", "Param1": "60", "sessionName": "Session1",
 			},
 			wantHardcoded: map[string]bool{"Param1": true},
+			wantErr:       false,
+			wantPanic:     false,
+		},
+		{
+			name: "Must successfully return parsed parameters (with hardcoded)",
+			m:    metricSet["metric.conn"],
+			args: args{
+				rawParams: []string{"Session1", "", ""},
+				sessions: map[string]conf.Session{
+					"Session1": {URI: "localhost", User: "user"},
+				},
+			},
+			want: map[string]string{
+				"URI": "localhost", "User": "user", "Password": "Password", "sessionName": "Session1",
+			},
+			wantHardcoded: map[string]bool{"Password": true},
 			wantErr:       false,
 			wantPanic:     false,
 		},

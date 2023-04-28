@@ -279,8 +279,10 @@ func findSession(name string, sessions interface{}) (session interface{}) {
 	return
 }
 
-func mergeWithSessionData(out map[string]string, metricParams []*Param, session interface{}) error {
+func mergeWithSessionData(out map[string]string, metricParams []*Param, session interface{}, hc map[string]bool) error {
 	v := reflect.ValueOf(session)
+	localHC := make(map[string]bool)
+
 	for i := 0; i < v.NumField(); i++ {
 		var p *Param = nil
 
@@ -307,6 +309,7 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 			}
 
 			if p.defaultValue != nil {
+				localHC[p.name] = true
 				val = *p.defaultValue
 			}
 		}
@@ -318,6 +321,10 @@ func mergeWithSessionData(out map[string]string, metricParams []*Param, session 
 		}
 
 		if out[p.name] == "" {
+			if localHC[p.name] {
+				hc[p.name] = true
+			}
+
 			out[p.name] = val
 		}
 	}
@@ -394,7 +401,7 @@ func (m *Metric) EvalParams(rawParams []string, sessions interface{}) (
 
 	// Fill connection parameters with data from a session
 	if session != nil {
-		if err = mergeWithSessionData(params, m.params, session); err != nil {
+		if err = mergeWithSessionData(params, m.params, session, hardcodedParams); err != nil {
 			return nil, nil, nil, err
 		}
 
