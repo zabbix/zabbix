@@ -26,8 +26,8 @@ class COverlayDialogElement extends CElement {
 	/**
 	 * @inheritdoc
 	 */
-	public function waitUntilReady() {
-		$this->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+	public function waitUntilReady($timeout = null) {
+		$this->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent($timeout);
 
 		return $this;
 	}
