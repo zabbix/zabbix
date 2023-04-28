@@ -1138,9 +1138,9 @@ out:
 	{
 		result = DBL_MAX;
 	}
-	else if (DBL_MIN > result)
+	else if (-DBL_MAX > result)
 	{
-		result = DBL_MIN;
+		result = -DBL_MAX;
 	}
 
 	return result;
