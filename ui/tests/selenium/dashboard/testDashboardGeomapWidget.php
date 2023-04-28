@@ -145,7 +145,7 @@ class testDashboardGeomapWidget extends CWebTest {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => 'Geomap']);
 		$dialog->waitUntilReady();
-		$this->assertEquals(["Type", "Name", "Refresh interval", "Host groups", "Hosts", "Tags", "Initial view"],
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Host groups', 'Hosts', 'Tags', 'Initial view'],
 				$form->getLabels()->asText()
 		);
 		$form->checkValue(['id:show_header' => true, 'Refresh interval' => 'Default (1 minute)']);

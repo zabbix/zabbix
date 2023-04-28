@@ -170,7 +170,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$items = [];
 		$clock = ['is_enabled' => true];
 
-		if ($this->hasInput('templateid')) {
+		if ($this->isTemplateDashboard()) {
 			if ($this->hasInput('dynamic_hostid')) {
 				$template_items = API::Item()->get([
 					'output' => ['key_'],

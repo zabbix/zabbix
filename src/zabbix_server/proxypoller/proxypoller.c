@@ -226,7 +226,7 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 				else
 				{
 					ret = zbx_send_proxy_data_response(proxy, &s, NULL, SUCCEED,
-							ZBX_PROXY_UPLOAD_UNDEFINED);
+							ZBX_PROXY_UPLOAD_UNDEFINED, 0);
 
 					if (SUCCEED == ret)
 						*data = zbx_strdup(*data, s.buffer);

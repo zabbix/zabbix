@@ -11125,6 +11125,7 @@ void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclo
 	UNLOCK_CACHE;
 }
 
+#ifdef HAVE_OPENIPMI
 /******************************************************************************
  *                                                                            *
  * Purpose: requeue unreachable items                                         *
@@ -11173,6 +11174,7 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 
 	UNLOCK_CACHE;
 }
+#endif /* HAVE_OPENIPMI */
 
 /******************************************************************************
  *                                                                            *
@@ -15746,7 +15748,7 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 #	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
 #endif
 
-void	zbx_recalc_time_period(int *ts_from, int table_group)
+void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
 	time_t			least_ts = 0, now;
@@ -15780,6 +15782,6 @@ void	zbx_recalc_time_period(int *ts_from, int table_group)
 	}
 
 	if (least_ts > *ts_from)
-		*ts_from = (int)least_ts;
+		*ts_from = least_ts;
 #undef HK_CFG_UPDATE_INTERVAL
 }

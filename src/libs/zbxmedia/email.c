@@ -499,7 +499,7 @@ static int	send_smtp_helo_plain(const char *addr, const char *helo, zbx_socket_t
 		zbx_snprintf(cmd, sizeof(cmd), "HELO %s\r\n", helo_parsed);
 	}
 
-	if (-1 == write(s->socket, cmd, strlen(cmd)))
+	if (-1 == zbx_tcp_send_raw(s, cmd))
 	{
 		zbx_snprintf(*error, max_error_len, "error sending HELO to mailserver: %s",
 				zbx_strerror(errno));
@@ -529,6 +529,14 @@ out:
 	return ret;
 }
 
+static const char	*socket_error(zbx_socket_t *s, int socket_errno)
+{
+	if (SUCCEED != zbx_socket_check_deadline(s))
+		return "timeout error";
+
+	return zbx_strerror(socket_errno);
+}
+
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout,
@@ -543,12 +551,9 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	const char	*response;
 
-	zbx_alarm_on(timeout);
-
 	/* connect to and receive an initial greeting from SMTP server */
-
-	if (FAIL == zbx_tcp_connect(&s, config_source_ip, smtp_server, smtp_port, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL,
-			NULL))
+	if (FAIL == zbx_tcp_connect(&s, config_source_ip, smtp_server, smtp_port, timeout, ZBX_TCP_SEC_UNENCRYPTED,
+			NULL, NULL))
 	{
 		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
 				smtp_server, zbx_socket_strerror());
@@ -558,7 +563,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	if (FAIL == smtp_readln(&s, &response))
 	{
 		zbx_snprintf(error, max_error_len, "error receiving initial string from SMTP server: %s",
-				zbx_strerror(errno));
+				socket_error(&s, errno));
 		goto close;
 	}
 
@@ -581,15 +586,17 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	{
 		zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", ((zbx_mailaddr_t *)from_mails->values[i])->addr);
 
-		if (-1 == write(s.socket, cmd, strlen(cmd)))
+		if (-1 == zbx_tcp_send_raw(&s, cmd))
 		{
-			zbx_snprintf(error, max_error_len, "error sending MAIL FROM to mailserver: %s", zbx_strerror(errno));
+			zbx_snprintf(error, max_error_len, "error sending MAIL FROM to mailserver: %s",
+					socket_error(&s, errno));
 			goto close;
 		}
 
 		if (FAIL == smtp_readln(&s, &response))
 		{
-			zbx_snprintf(error, max_error_len, "error receiving answer on MAIL FROM request: %s", zbx_strerror(errno));
+			zbx_snprintf(error, max_error_len, "error receiving answer on MAIL FROM request: %s",
+					socket_error(&s, errno));
 			goto close;
 		}
 
@@ -606,15 +613,17 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	{
 		zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", ((zbx_mailaddr_t *)to_mails->values[i])->addr);
 
-		if (-1 == write(s.socket, cmd, strlen(cmd)))
+		if (-1 == zbx_tcp_send_raw(&s, cmd))
 		{
-			zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
+			zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s",
+					socket_error(&s, errno));
 			goto close;
 		}
 
 		if (FAIL == smtp_readln(&s, &response))
 		{
-			zbx_snprintf(error, max_error_len, "error receiving answer on RCPT TO request: %s", zbx_strerror(errno));
+			zbx_snprintf(error, max_error_len, "error receiving answer on RCPT TO request: %s",
+					socket_error(&s, errno));
 			goto close;
 		}
 
@@ -631,15 +640,17 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	zbx_snprintf(cmd, sizeof(cmd), "DATA\r\n");
 
-	if (-1 == write(s.socket, cmd, strlen(cmd)))
+	if (-1 == zbx_tcp_send_raw(&s, cmd))
 	{
-		zbx_snprintf(error, max_error_len, "error sending DATA to mailserver: %s", zbx_strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending DATA to mailserver: %s",
+				socket_error(&s, errno));
 		goto close;
 	}
 
 	if (FAIL == smtp_readln(&s, &response))
 	{
-		zbx_snprintf(error, max_error_len, "error receiving answer on DATA request: %s", zbx_strerror(errno));
+		zbx_snprintf(error, max_error_len, "error receiving answer on DATA request: %s",
+				socket_error(&s, errno));
 		goto close;
 	}
 
@@ -650,13 +661,13 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	}
 
 	cmdp = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody, content_type);
-	err = write(s.socket, cmdp, strlen(cmdp));
+	err = zbx_tcp_send_raw(&s, cmdp);
 	zbx_free(cmdp);
 
 	if (-1 == err)
 	{
 		zbx_snprintf(error, max_error_len, "error sending headers and mail body to mailserver: %s",
-				zbx_strerror(errno));
+				socket_error(&s, errno));
 		goto close;
 	}
 
@@ -664,15 +675,17 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	zbx_snprintf(cmd, sizeof(cmd), "\r\n.\r\n");
 
-	if (-1 == write(s.socket, cmd, strlen(cmd)))
+	if (-1 == zbx_tcp_send_raw(&s, cmd))
 	{
-		zbx_snprintf(error, max_error_len, "error sending . to mailserver: %s", zbx_strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending . to mailserver: %s",
+				socket_error(&s, errno));
 		goto close;
 	}
 
 	if (FAIL == smtp_readln(&s, &response))
 	{
-		zbx_snprintf(error, max_error_len, "error receiving answer on . request: %s", zbx_strerror(errno));
+		zbx_snprintf(error, max_error_len, "error receiving answer on . request: %s",
+				socket_error(&s, errno));
 		goto close;
 	}
 
@@ -686,9 +699,10 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 
 	zbx_snprintf(cmd, sizeof(cmd), "QUIT\r\n");
 
-	if (-1 == write(s.socket, cmd, strlen(cmd)))
+	if (-1 == zbx_tcp_send_raw(&s, cmd))
 	{
-		zbx_snprintf(error, max_error_len, "error sending QUIT to mailserver: %s", zbx_strerror(errno));
+		zbx_snprintf(error, max_error_len, "error sending QUIT to mailserver: %s",
+				socket_error(&s, errno));
 		goto close;
 	}
 
@@ -696,8 +710,6 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 close:
 	zbx_tcp_close(&s);
 out:
-	zbx_alarm_off();
-
 	return ret;
 #undef OK_220
 #undef OK_251

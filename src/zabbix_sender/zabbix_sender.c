@@ -1019,7 +1019,6 @@ static void	parse_commandline(int argc, char **argv)
 			case 'h':
 				zbx_help();
 				exit(EXIT_SUCCESS);
-				break;
 			case 'V':
 				zbx_version();
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1027,7 +1026,6 @@ static void	parse_commandline(int argc, char **argv)
 				zbx_tls_version();
 #endif
 				exit(EXIT_SUCCESS);
-				break;
 			case 'I':
 				if (NULL == config_source_ip)
 					config_source_ip = zbx_strdup(config_source_ip, zbx_optarg);
@@ -1143,7 +1141,6 @@ static void	parse_commandline(int argc, char **argv)
 			default:
 				zbx_usage();
 				exit(EXIT_FAILURE);
-				break;
 		}
 	}
 
@@ -1869,9 +1866,7 @@ exit:
 	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 	{
 		zbx_tls_free();
-#if defined(_WINDOWS)
-		zbx_tls_library_deinit();
-#endif
+		zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);
 	}
 #endif
 	zbx_config_tls_free(zbx_config_tls);
