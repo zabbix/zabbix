@@ -35,13 +35,15 @@ else {
 	$operations_table->setHeader([_('Details'), _('Action')]);
 }
 
-if (array_key_exists('operation', $data['descriptions'])) {
-	$data['descriptions'] = $data['descriptions']['operation'];
-}
+if (array_key_exists('descriptions', $data)) {
+	if (array_key_exists('operation', $data['descriptions'])) {
+		$data['descriptions'] = $data['descriptions']['operation'];
+	}
 
-$details_column = getActionOperationDescriptions(
-	$data['action']['operations'], $data['eventsource'], $data['descriptions']
-);
+	$details_column = getActionOperationDescriptions(
+		$data['action']['operations'], $data['eventsource'], $data['descriptions']
+	);
+}
 
 foreach ($data['action']['operations'] as $i => $operation) {
 	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
