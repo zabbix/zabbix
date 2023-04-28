@@ -97,7 +97,7 @@ class CHtmlUrlValidator {
 
 		$scheme = array_key_exists('scheme', $url_parts) ? $url_parts['scheme'] : null;
 
-		if ($scheme === null && preg_match('/^(.*):\D+[^?#]/', $url, $matches) === 1) {
+		if ($scheme === null && preg_match('/^(.*):\D+[^?#]/s', $url, $matches) === 1) {
 			$scheme = $matches[1];
 		}
 
