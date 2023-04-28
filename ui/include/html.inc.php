@@ -59,9 +59,9 @@ function make_decoration($haystack, $needle, $class = null) {
 	$pos = mb_strpos($tmpHaystack, $tmpNeedle);
 
 	if ($pos !== false) {
-		$start = CHtml::encode(mb_substr($haystack, 0, $pos));
-		$end = CHtml::encode(mb_substr($haystack, $pos + mb_strlen($needle)));
-		$found = CHtml::encode(mb_substr($haystack, $pos, mb_strlen($needle)));
+		$start = mb_substr($haystack, 0, $pos);
+		$end = mb_substr($haystack, $pos + mb_strlen($needle));
+		$found = mb_substr($haystack, $pos, mb_strlen($needle));
 
 		if (is_null($class)) {
 			$result = [$start, bold($found), $end];
@@ -138,17 +138,45 @@ function BR() {
 	return new CTag('br');
 }
 
+function BULLET() {
+	return new CHtmlEntity('&bullet;');
+}
+
+function COPYR() {
+	return new CHtmlEntity('&copy;');
+}
+
+function HELLIP() {
+	return new CHtmlEntity('&hellip;');
+}
+
+function LARR() {
+	return new CHtmlEntity('&lArr;');
+}
+
+function NBSP() {
+	return new CHtmlEntity('&nbsp;');
+}
+
+function NDASH() {
+	return new CHtmlEntity('&ndash;');
+}
+
+function RARR() {
+	return new CHtmlEntity('&rArr;');
+}
+
 function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favourite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
-				$icon = (new CRedirectButton(SPACE, null))
+				$icon = (new CRedirectButton(NBSP(), null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
 					->setTitle(_('Remove from favourites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
-				$icon = (new CRedirectButton(SPACE, null))
+				$icon = (new CRedirectButton(NBSP(), null))
 					->addClass(ZBX_STYLE_BTN_ADD_FAV)
 					->setTitle(_('Add to favourites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
@@ -159,7 +187,7 @@ function get_icon($type, $params = []) {
 
 		case 'kioskmode':
 			if ($params['mode'] == ZBX_LAYOUT_KIOSKMODE) {
-				$icon = (new CButton(null, '&nbsp;'))
+				$icon = (new CButton(null, NBSP()))
 					->setTitle(_('Normal view'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 					->addClass(ZBX_LAYOUT_MODE)
@@ -167,7 +195,7 @@ function get_icon($type, $params = []) {
 					->addClass(ZBX_STYLE_BTN_MIN);
 			}
 			else {
-				$icon = (new CButton(null, '&nbsp;'))
+				$icon = (new CButton(null, NBSP()))
 					->setTitle(_('Kiosk mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
 					->addClass(ZBX_LAYOUT_MODE)
@@ -177,12 +205,12 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'screenconf':
-			return (new CRedirectButton(SPACE, null))
+			return (new CRedirectButton(NBSP(), null))
 				->addClass(ZBX_STYLE_BTN_CONF)
 				->setTitle(_('Refresh interval'));
 
 		case 'overviewhelp':
-			return (new CRedirectButton(SPACE, null))
+			return (new CRedirectButton(NBSP(), null))
 				->addClass(ZBX_STYLE_BTN_INFO);
 	}
 }
@@ -310,7 +338,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = new CSpan(new CLink(CHtml::encode($db_host['name']),
+		$host = new CSpan(new CLink($db_host['name'],
 			'hosts.php?form=update&hostid='.$db_host['hostid']
 		));
 
@@ -438,7 +466,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	else {
 		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
-				CHtml::encode($db_discovery_rule['name']),
+				$db_discovery_rule['name'],
 				'host_discovery.php?form=update&itemid='.$db_discovery_rule['itemid']
 			)
 		);

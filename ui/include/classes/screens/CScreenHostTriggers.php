@@ -64,7 +64,7 @@ class CScreenHostTriggers extends CScreenBase {
 
 			$header = (new CDiv([
 				new CTag('h4', true, _('Host issues')),
-				(new CList())->addItem([_('Host'), ':', SPACE, $hosts[0]['name']])
+				(new CList())->addItem([_('Host'), ':', NBSP(), $hosts[0]['name']])
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
 			$params['hostids'] = $this->screenitem['resourceid'];
@@ -140,11 +140,11 @@ class CScreenHostTriggers extends CScreenBase {
 					->cleanItems()
 					->addItem(
 						(new CList())
-							->addItem([new CLabel(_('Group'), $groups_select->getFocusableElementId()), '&nbsp;',
+							->addItem([new CLabel(_('Group'), $groups_select->getFocusableElementId()), NBSP(),
 								$groups_select
 							])
-							->addItem('&nbsp;')
-							->addItem([new CLabel(_('Host'), $hosts_select->getFocusableElementId()), '&nbsp;',
+							->addItem(NBSP())
+							->addItem([new CLabel(_('Host'), $hosts_select->getFocusableElementId()), NBSP(),
 								$hosts_select
 							])
 					)
