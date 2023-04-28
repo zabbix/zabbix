@@ -268,10 +268,11 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	preproc_init_snmp();
 	read_step("in.step", &step);
 
 #ifdef HAVE_NETSNMP
+	preproc_init_snmp();
+
 	/* MIB translation test cases will fail if system lacks MIBs - in this case test case should be skipped */
 	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
 	{
