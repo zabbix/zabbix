@@ -79,6 +79,11 @@ class CElementQuery implements IWaitable {
 	const WAIT_ITERATION = 50;
 
 	/**
+	 * Timeout in seconds.
+	 */
+	const WAIT_TIMEOUT = 20;
+
+	/**
 	 * Element selector.
 	 *
 	 * @var WebDriverBy
@@ -158,11 +163,14 @@ class CElementQuery implements IWaitable {
 		if ($locator === null) {
 			if (!is_array($type)) {
 				$parts = explode(':', $type, 2);
-				if (count($parts) !== 2) {
-					throw new Exception('Element selector "'.$type.'" is not well formatted.');
-				}
+				if ($type !== 'button') {
+					$parts = explode(':', $type, 2);
+					if (count($parts) !== 2) {
+						throw new Exception('Element selector "'.$type.'" is not well formatted.');
+					}
 
-				list($type, $locator) = $parts;
+					list($type, $locator) = $parts;
+				}
 			}
 			else {
 				$selectors = [];
@@ -189,6 +197,10 @@ class CElementQuery implements IWaitable {
 			'tag' => 'tagName',
 			'link' => 'linkText',
 			'button' => function () use ($locator) {
+				if ($locator === null) {
+					return WebDriverBy::tagName('button');
+				}
+
 				return WebDriverBy::xpath('.//button[normalize-space(text())='.CXPathHelper::escapeQuotes($locator).']');
 			}
 		];
@@ -313,12 +325,15 @@ class CElementQuery implements IWaitable {
 	 *
 	 * @return WebDriverWait
 	 */
-	public static function wait($timeout = 20, $iteration = null) {
+	public static function wait($timeout = null, $iteration = null) {
 		if ($iteration === null) {
 			$iteration = self::WAIT_ITERATION;
 		}
+		if ($timeout === null) {
+			$timeout = self::WAIT_TIMEOUT;
+		}
 
-		return static::getDriver()->wait($timeout, self::WAIT_ITERATION);
+		return static::getDriver()->wait($timeout, $iteration);
 	}
 
 	/**
@@ -327,15 +342,16 @@ class CElementQuery implements IWaitable {
 	 * @param IWaitable $target       target for wait operation
 	 * @param string    $condition    condition to be waited for
 	 * @param array     $params       condition params
+	 * @param integer   $timeout	  timeout in seconds
 	 */
-	public static function waitUntil($target, $condition, $params = []) {
+	public static function waitUntil($target, $condition, $params = [], $timeout = null) {
 		$selector = $target->getSelectorAsText();
 		if ($selector !== null) {
 			$selector = ' located by '.$selector;
 		}
 
 		$callable = call_user_func_array([$target, CElementFilter::getConditionCallable($condition)], $params);
-		self::wait()->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
+		self::wait($timeout)->until($callable, 'Failed to wait for element'.$selector.' to be '.$condition.'.');
 	}
 
 	/**
