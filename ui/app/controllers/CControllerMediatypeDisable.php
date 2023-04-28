@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,7 +21,11 @@
 
 class CControllerMediatypeDisable extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeids' =>	'required|array_db media_type.mediatypeid'
 		];
@@ -29,27 +33,23 @@ class CControllerMediatypeDisable extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)) {
-			return false;
-		}
-
-		$mediatypes = API::Mediatype()->get([
-			'mediatypeids' => $this->getInput('mediatypeids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($mediatypes == count($this->getInput('mediatypeids')));
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$mediatypes = [];
 
 		foreach ($this->getInput('mediatypeids') as $mediatypeid) {
@@ -62,18 +62,20 @@ class CControllerMediatypeDisable extends CController {
 
 		$updated = count($mediatypes);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'mediatype.list')
-			->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
-		);
-
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_n('Media type disabled', 'Media types disabled', $updated));
+			$output['success']['title'] = _n('Media type disabled', 'Media types disabled', $updated);
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			CMessageHelper::setErrorTitle(_n('Cannot disable media type', 'Cannot disable media types', $updated));
+			$output['error'] = [
+				'title' => _n('Cannot disable media type', 'Cannot disable media types', $updated),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
-		$this->setResponse($response);
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

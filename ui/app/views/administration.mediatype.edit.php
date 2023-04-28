@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -24,19 +24,7 @@
  * @var array $data
  */
 
-$this->addJsFile('multilineinput.js');
-
-$this->includeJsFile('administration.mediatype.edit.js.php');
-
-$html_page = (new CHtmlPage())
-	->setTitle(_('Media types'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT));
-
 $tabs = new CTabView();
-
-if ($data['form_refresh'] == 0) {
-	$tabs->setSelected(0);
-}
 
 $csrf_token = CCsrfTokenHelper::get('mediatype');
 
@@ -51,64 +39,121 @@ $mediaTypeForm = (new CForm())
 	->disablePasswordAutofill()
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
-// Create form list.
-$mediatype_formlist = (new CFormList())
-	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], false, 100))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-	)
-	->addRow(new CLabel(_('Type'), 'label-type'), (new CSelect('type'))
-		->setId('type')
-		->setFocusableElementId('label-type')
-		->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::getMediaTypes()))
-		->setValue($data['type'])
-	)
-	->addRow(new CLabel(_('Email provider'), 'label-provider'), (new CSelect('provider'))
-		->setId('provider')
-		->setFocusableElementId('label-provider')
-		->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::getAllEmailProvidersNames()))
-		->setValue($data['provider'])
-	)
-	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
-		(new CTextBox('smtp_server', $data['smtp_server']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(_('SMTP server port'),
-		(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-	)
-	->addRow((new CLabel(_('Email'), 'smtp_email'))->setAsteriskMark(),
-		(new CTextBox('smtp_email', $data['smtp_email']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('SMTP helo'), 'smtp_helo')),
-		(new CTextBox('smtp_helo', $data['smtp_helo']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(new CLabel(_('Connection security'), 'smtp_security'),
-		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
-			->addValue(_('None'), SMTP_CONNECTION_SECURITY_NONE)
-			->addValue(_('STARTTLS'), SMTP_CONNECTION_SECURITY_STARTTLS)
-			->addValue(_('SSL/TLS'), SMTP_CONNECTION_SECURITY_SSL_TLS)
-			->setModern(true)
-	)
-	->addRow(_('SSL verify peer'), (new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer']))
-	->addRow(_('SSL verify host'), (new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host']))
-	->addRow(new CLabel(_('Authentication'), 'smtp_authentication'),
-		(new CRadioButtonList('smtp_authentication', (int) $data['smtp_authentication']))
-			->addValue(_('None'), SMTP_AUTHENTICATION_NONE)
-			->addValue(_('Username and password'), SMTP_AUTHENTICATION_NORMAL)
-			->setModern(true)
-	)
-	->addRow(_('Username'), (new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
-	->addRow((new CLabel(_('Script name'), 'exec_path'))->setAsteriskMark(),
-		(new CTextBox('exec_path', $data['exec_path']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	);
+// Create form grid.
+$mediatype_form_grid = (new CFormGrid())
+	->addItem([
+		(new CLabel(_('Name'), 'name'))
+			->setId('name-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('name', $data['name'], false, 100))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
+		))->setId('name-field')
+	])
+	->addItem([
+		(new CLabel(_('Type'), 'label-type'))->setId('type-label'),
+		(new CFormField(
+			(new CSelect('type'))
+				->setId('type')
+				->setFocusableElementId('label-type')
+				->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::getMediaTypes()))
+				->setValue($data['type'])
+		))->setId('type-field')
+	])
+	->addItem([
+		(new CLabel(_('Email provider'), 'label-provider'))->setId('email-provider-label'),
+		(new CFormField(
+			(new CSelect('provider'))
+				->setId('provider')
+				->setFocusableElementId('label-provider')
+				->addOptions(CSelect::createOptionsFromArray(CMediatypeHelper::getAllEmailProvidersNames()))
+				->setValue($data['provider'])
+		))->setId('email-provider-field')
+	])
+	->addItem([
+		(new CLabel(_('SMTP server'), 'smtp_server'))
+			->setId('smtp-server-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('smtp_server', $data['smtp_server']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('smtp-server-field')
+	])
+	->addItem([
+		(new CLabel(_('SMTP server port')))->setId('smtp-port-label'),
+		(new CFormField(
+			(new CNumericBox(
+				'smtp_port', $data['smtp_port'], 5, false, false, false)
+			)->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		))->setId('smtp-port-field')
+	])
+	->addItem([
+		(new CLabel(_('Email'), 'smtp_email'))
+			->setId('smtp-email-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('smtp_email', $data['smtp_email']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('smtp-email-field')
+	])
+	->addItem([
+		(new CLabel(_('SMTP helo'), 'smtp_helo'))->setId('smtp-helo-label'),
+		(new CFormField(
+			(new CTextBox('smtp_helo', $data['smtp_helo']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->setId('smtp-helo-field')
+	])
+	->addItem([
+		(new CLabel(_('Connection security'), 'smtp_security'))->setId('smtp-security-label'),
+		(new CFormField(
+			(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
+				->addValue(_('None'), SMTP_CONNECTION_SECURITY_NONE)
+				->addValue(_('STARTTLS'), SMTP_CONNECTION_SECURITY_STARTTLS)
+				->addValue(_('SSL/TLS'), SMTP_CONNECTION_SECURITY_SSL_TLS)
+				->setModern()
+		))->setId('smtp-security-field')
+	])
+	->addItem([
+		(new CLabel(_('SSL verify peer')))->setId('verify-peer-label'),
+		(new CFormField(
+			(new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer'])
+		))->setId('verify-peer-field')
+	])
+	->addItem([
+		(new CLabel(_('SSL verify host')))->setId('verify-host-label'),
+		(new CFormField(
+			(new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host'])
+		))->setId('verify-host-field')
+	])
+	->addItem([
+		(new CLabel(_('Authentication'), 'smtp_authentication'))->setId('smtp-authentication-label'),
+		(new CFormField(
+			(new CRadioButtonList('smtp_authentication', (int) $data['smtp_authentication']))
+				->addValue(_('None'), SMTP_AUTHENTICATION_NONE)
+				->addValue(_('Username and password'), SMTP_AUTHENTICATION_NORMAL)
+				->setModern()
+		))->setId('smtp-authentication-field')
+	])
+	->addItem([
+		(new CLabel(_('Username')))->setId('smtp-username-label'),
+		(new CFormField(
+			(new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
+		)->setId('smtp-username-field')
+	])
+	->addItem([
+		(new CLabel(_('Script name'), 'exec_path'))
+			->setId('exec-path-label')
+			->setAsteriskMark(),
+		(new CFormField([
+			(new CTextBox('exec_path', $data['exec_path']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		]))->setId('exec-path-field')
+	]);
 
 // MEDIA_TYPE_EXEC
 $parameters_exec_table = (new CTable())
@@ -133,22 +178,27 @@ $parameters_exec_table->addRow([(new CButton('exec_param_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-$mediatype_formlist->addRow(
-	new CLabel([
-		_('Script parameters'),
-		makeHelpIcon(_('These parameters will be passed to the script as command-line arguments in the specified order.'))
-	]),
-	(new CDiv($parameters_exec_table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-	'row_exec_params'
-);
-
-$mediatype_formlist->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteriskMark(),
-	(new CTextBox('gsm_modem', $data['gsm_modem']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired()
-);
+$mediatype_form_grid
+	->addItem([
+		(new CLabel([
+			_('Script parameters'),
+			makeHelpIcon(_('These parameters will be passed to the script as command-line arguments in the specified order.'))
+		]))->setId('row_exec_params_label'),
+		(new CFormField($parameters_exec_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->setId('row_exec_params_field')
+	])
+	->addItem([
+		(new CLabel(_('GSM modem'), 'gsm_modem'))
+			->setId('gsm_modem_label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('gsm_modem', $data['gsm_modem']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('gsm_modem_field')
+	]);
 
 // Create password field.
 if ($data['passwd'] !== '' && !$data['change_passwd']) {
@@ -213,86 +263,123 @@ $row_template = (new CTag('script', true))
 		]))->addClass('form_row')
 	);
 
-$html_page->addItem($row_template);
+//$html_page->addItem($row_template);
+$mediaTypeForm->addItem($row_template);
 
 $parameters_table->addRow([(new CButton('parameter_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-// append password field to form list
-$mediatype_formlist
-	->addRow(new CLabel(_('Password'), 'passwd'), $passwd_field)
-	->addRow(new CLabel(_('Message format'), 'content_type'),
-		(new CRadioButtonList('content_type', (int) $data['content_type']))
-			->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
-			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
-			->setModern(true)
-	)
-	->addRow(new CLabel(_('Parameters'), $parameters_table->getId()),
-		(new CDiv($parameters_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-		'row_webhook_parameters'
-	)
-	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
-		(new CMultilineInput('script', $data['script'], [
-			'title' => _('JavaScript'),
-			'placeholder' => _('script'),
-			'placeholder_textarea' => 'return value',
-			'grow' => 'auto',
-			'rows' => 0,
-			'maxlength' => DB::getFieldLength('media_type', 'script')
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		'row_webhook_script'
-	)
-	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
-		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		'row_webhook_timeout'
-	)
-	->addRow(new CLabel(_('Process tags'), 'process_tags'),
-		(new CCheckBox('process_tags', ZBX_MEDIA_TYPE_TAGS_ENABLED))
-			->setChecked($data['process_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED)
-			->setUncheckedValue(ZBX_MEDIA_TYPE_TAGS_DISABLED),
-		'row_webhook_tags'
-	)
-	->addRow(new CLabel(_('Include event menu entry'), 'show_event_menu'),
-		(new CCheckBox('show_event_menu', ZBX_EVENT_MENU_SHOW))
-			->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
-			->setUncheckedValue(ZBX_EVENT_MENU_HIDE),
-		'row_webhook_show_event_menu'
-	)
-	->addRow((new CLabel(_('Menu entry name'), 'event_menu_name'))->setAsteriskMark(),
-		(new CTextBox('event_menu_name', $data['event_menu_name'], false,
-			DB::getFieldLength('media_type', 'event_menu_name')
-		))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
-			->setAriaRequired(),
-		'row_webhook_url_name'
-	)
-	->addRow((new CLabel(_('Menu entry URL'), 'event_menu_url'))->setAsteriskMark(),
-		(new CTextBox('event_menu_url', $data['event_menu_url'], false,
-			DB::getFieldLength('media_type', 'event_menu_url')
-		))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
-			->setAriaRequired(),
-		'row_webhook_event_menu_url'
-	)
-	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Enabled'),
-		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
-	);
-$tabs->addTab('mediaTab', _('Media type'), $mediatype_formlist);
+// Append password field to form grid.
+$mediatype_form_grid
+	->addItem([
+		(new CLabel(_('Password'), 'passwd'))->setId('passwd_label'),
+		(new CFormField($passwd_field))->setId('passwd_field')
+	])
+	->addItem([
+		(new CLabel(_('Message format'), 'content_type'))->setId('content_type_label'),
+		(new CFormField(
+			(new CRadioButtonList('content_type', (int) $data['content_type']))
+				->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
+				->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
+				->setModern()
+		))->setId('content_type_field')
+	])
+	->addItem([
+		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('webhook_parameters_label'),
+		(new CFormField(
+			(new CDiv($parameters_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		))->setId('webhook_parameters_field')
+	])
+	->addItem([
+		(new CLabel(_('Script'), 'script'))
+			->setId('webhook_script_label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CMultilineInput('script', $data['script'], [
+				'title' => _('JavaScript'),
+				'placeholder' => _('script'),
+				'placeholder_textarea' => 'return value',
+				'grow' => 'auto',
+				'rows' => 0,
+				'maxlength' => DB::getFieldLength('media_type', 'script')
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('webhook_script_field')
+	])
+	->addItem([
+		(new CLabel(_('Timeout'), 'timeout'))
+			->setId('webhook_timeout_label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		))->setId('webhook_timeout_field')
+	])
+	->addItem([
+		(new CLabel(_('Process tags'), 'process_tags'))->setId('webhook_tags_label'),
+		(new CFormField(
+			(new CCheckBox('process_tags', ZBX_MEDIA_TYPE_TAGS_ENABLED))
+				->setChecked($data['process_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED)
+				->setUncheckedValue(ZBX_MEDIA_TYPE_TAGS_DISABLED)
+		))->setId('webhook_tags_field')
+	])
+	->addItem([
+		(new CLabel(_('Include event menu entry'), 'show_event_menu'))->setId('webhook_event_menu_label'),
+		(new CFormField(
+			(new CCheckBox('show_event_menu', ZBX_EVENT_MENU_SHOW))
+				->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+				->setUncheckedValue(ZBX_EVENT_MENU_HIDE)
+		))->setId('webhook_event_menu_field')
+	])
+	->addItem([
+		(new CLabel(_('Menu entry name'), 'event_menu_name'))
+			->setId('webhook_url_name_label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('event_menu_name', $data['event_menu_name'], false,
+				DB::getFieldLength('media_type', 'event_menu_name')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+				->setAriaRequired()
+		))->setId('webhook_url_name_field')
+	])
+	->addItem([
+		(new CLabel(_('Menu entry URL'), 'event_menu_url'))
+			->setId('webhook_event_menu_url_label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('event_menu_url', $data['event_menu_url'], false,
+				DB::getFieldLength('media_type', 'event_menu_url')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+				->setAriaRequired()
+		))->setId('webhook_event_menu_url_field')
+	])
+	->addItem([
+		(new CLabel(_('Description'))),
+		new CFormField(
+			(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	])
+	->addItem([
+		new CLabel(_('Enabled')),
+		new CFormField(
+			(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
+		)
+	]);
+
+$tabs->addTab('mediaTab', _('Media type'), $mediatype_form_grid);
 
 // Message templates tab.
-$message_templates_formlist = (new CFormList('messageTemplatesFormlist'))
-	->addRow(null,
-		(new CDiv(
+$message_templates_form_grid = (new CFormGrid())
+	->setId('messageTemplatesFormlist')
+	->addItem(
+		(new CFormField(
 			(new CTable())
 				->addStyle('width: 100%;')
 				->setHeader([
@@ -314,7 +401,8 @@ $message_templates_formlist = (new CFormList('messageTemplatesFormlist'))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
-$tabs->addTab('messageTemplatesTab', _('Message templates'), $message_templates_formlist,
+
+$tabs->addTab('messageTemplatesTab', _('Message templates'), $message_templates_form_grid,
 	TAB_INDICATOR_MESSAGE_TEMPLATE
 );
 
@@ -335,73 +423,120 @@ switch ($data['maxsessions']) {
 		$data['maxsessions_type'] = 'custom';
 }
 
-$mediaOptionsForm = (new CFormList('options'))
-	->addRow(new CLabel(_('Concurrent sessions'), 'maxsessions_type'),
-		(new CDiv())
-			->addClass(ZBX_STYLE_NOWRAP)
-			->addItem([
-				(new CDiv(
-					(new CRadioButtonList('maxsessions_type', $data['maxsessions_type']))
-						->addValue(_('One'), 'one')
-						->addValue(_('Unlimited'), 'unlimited')
-						->addValue(_('Custom'), 'custom')
-						->setModern(true)
-				))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CNumericBox('maxsessions', $max_sessions, 3, false, false, false))
-					->setAriaRequired()
-					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			])
-	)
-	->addRow((new CLabel(_('Attempts'), 'maxattempts'))->setAsteriskMark(),
-		(new CNumericBox('maxattempts', $data['maxattempts'], 3, false, false, false))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Attempt interval'), 'attempt_interval'))->setAsteriskMark(),
-		(new CTextBox('attempt_interval', $data['attempt_interval'], false, 12))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAriaRequired()
-	);
+$mediaOptionsForm = (new CFormGrid())
+	->setId('options')
+	->addItem([
+		new CLabel(_('Concurrent sessions'), 'maxsessions_type'),
+		(new CFormField([
+			(new CDiv(
+				(new CRadioButtonList('maxsessions_type', $data['maxsessions_type']))
+					->addValue(_('One'), 'one')
+					->addValue(_('Unlimited'), 'unlimited')
+					->addValue(_('Custom'), 'custom')
+					->setModern(true)
+			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CNumericBox('maxsessions', $max_sessions, 3, false, false, false))
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		]))->addClass(ZBX_STYLE_NOWRAP)
+	])
+	->addItem([
+		(new CLabel(_('Attempts'), 'maxattempts'))->setAsteriskMark(),
+		new CFormField(
+			(new CNumericBox('maxattempts', $data['maxattempts'], 3, false, false, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Attempt interval'), 'attempt_interval'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('attempt_interval', $data['attempt_interval'], false, 12))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		)
+	]);
 
 $tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS);
-
-// append buttons to form
-$cancelButton = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-	->setArgument('action', 'mediatype.list')
-	->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
-))->setId('cancel');
-
-if ($data['mediatypeid'] == 0) {
-	$addButton = (new CSubmitButton(_('Add'), 'action', 'mediatype.create'))->setId('add');
-
-	$tabs->setFooter(makeFormFooter(
-		$addButton,
-		[$cancelButton]
-	));
-}
-else {
-	$updateButton = (new CSubmitButton(_('Update'), 'action', 'mediatype.update'))->setId('update');
-	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
-	$deleteButton = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'mediatype.delete')
-			->setArgument('mediatypeids', [$data['mediatypeid']])
-			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
-		_('Delete media type?')
-	))
-		->setId('delete');
-
-	$tabs->setFooter(makeFormFooter(
-		$updateButton,
-		[
-			$cloneButton,
-			$deleteButton,
-			$cancelButton
-		]
-	));
-}
 
 // append tab to form
 $mediaTypeForm->addItem($tabs);
 
-// append form to widget
-$html_page->addItem($mediaTypeForm)->show();
+$form = $mediaTypeForm;
+
+$form
+	->addItem(
+		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
+				'mediatype' => $data
+			]).');'))->setOnDocumentReady()
+	);
+
+if ($data['mediatypeid'] === null) {
+	$buttons = [
+		[
+			'title' => _('Add'),
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'script_edit_popup.submit();'
+		]
+	];
+}
+else {
+	$buttons = [
+		[
+			'title' => _('Update'),
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'script_edit_popup.submit();'
+		],
+		[
+			'title' => _('Clone'),
+			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'script_edit_popup.clone(' . json_encode([
+					'title' => _('New script'),
+					'buttons' => [
+						[
+							'title' => _('Add'),
+							'class' => 'js-add',
+							'keepOpen' => true,
+							'isSubmit' => true,
+							'action' => 'script_edit_popup.submit();'
+						],
+						[
+							'title' => _('Cancel'),
+							'class' => ZBX_STYLE_BTN_ALT,
+							'cancel' => true,
+							'action' => ''
+						]
+					]
+				]) . ');'
+		],
+		[
+			'title' => _('Delete'),
+			'confirmation' => _('Delete script?'),
+			'class' => ZBX_STYLE_BTN_ALT,
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'script_edit_popup.delete();'
+		]
+	];
+}
+
+
+$output = [
+	'header' => $data['mediatypeid'] === null ? _('New media type') : _('Media type'),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT),
+	'body' => $form->toString(),
+	'buttons' => $buttons,
+	'script_inline' => getPagePostJs().$this->readJsFile('administration.mediatype.edit.js.php')
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);
+

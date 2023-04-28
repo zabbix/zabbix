@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,11 +21,11 @@
 
 class CControllerMediatypeList extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'sort' =>			'in name,type',
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
@@ -45,11 +45,11 @@ class CControllerMediatypeList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$sortField = $this->getInput('sort', CProfile::get('web.media_types.php.sort', 'name'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.media_types.php.sortorder', ZBX_SORT_UP));
 		CProfile::update('web.media_types.php.sort', $sortField, PROFILE_TYPE_STR);

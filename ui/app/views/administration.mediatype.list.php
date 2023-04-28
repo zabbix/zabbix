@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,10 +21,13 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.mediatype.list.js.php');
+$this->addJsFile('multilineinput.js');
 
+// todo - remove this?
 if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
 }
@@ -34,7 +37,7 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
-			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
+			->addItem((new CSimpleButton(_('Create media type')))->setId('js-create'))
 			->addItem(
 				(new CButton('', _('Import')))
 					->onClick(
@@ -152,14 +155,14 @@ foreach ($data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? (new CLink(_('Enabled'), (new CUrl($statusLink))->getUrl()))
-			->addCsrfToken($csrf_token)
-			->addClass(ZBX_STYLE_LINK_ACTION)
+		? (new CLink(_('Enabled')))
 			->addClass(ZBX_STYLE_GREEN)
-		: (new CLink(_('Disabled'), (new CUrl($statusLink))->getUrl()))
-			->addCsrfToken($csrf_token)
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_RED);
+			->addClass('js-disable')
+			->setAttribute('data-mediatypeid', (int) $mediaType['mediatypeid'])
+		: (new CLink(_('Disabled')))
+			->addClass(ZBX_STYLE_RED)
+			->addClass('js-enable')
+			->setAttribute('data-mediatypeid', (int) $mediaType['mediatypeid']);
 
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
@@ -173,7 +176,9 @@ foreach ($data['mediatypes'] as $mediaType) {
 			});
 		');
 
-	$name = new CLink($mediaType['name'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
+	$name = (new CLink($mediaType['name']))
+		->addClass('js-edit')
+		->setAttribute('data-mediatypeid', $mediaType['mediatypeid']);
 
 	// append row
 	$mediaTypeTable->addRow([
@@ -192,12 +197,19 @@ $mediaTypeForm->addItem([
 	$mediaTypeTable,
 	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
-		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?'),
-			'csrf_token' => $csrf_token
+		'mediatype.enable' => [
+			'content' => (new CSimpleButton(_('Enable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massenable')
+				->addClass('no-chkbxrange')
 		],
-		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?'),
-			'csrf_token' => $csrf_token
+		'mediatype.disable' => [
+			'content' => (new CSimpleButton(_('Disable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdisable')
+				->addClass('no-chkbxrange')
 		],
+
 		'mediatype.export' => [
 			'content' => new CButtonExport('export.mediatypes',
 				(new CUrl('zabbix.php'))
@@ -206,8 +218,11 @@ $mediaTypeForm->addItem([
 					->getUrl()
 			)
 		],
-		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?'),
-			'csrf_token' => $csrf_token
+		'mediatype.delete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdelete')
+				->addClass('no-chkbxrange')
 		]
 	], 'mediatype')
 ]);

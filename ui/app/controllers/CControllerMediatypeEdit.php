@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -23,11 +23,11 @@ class CControllerMediatypeEdit extends CController {
 
 	private $mediatype = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>			'db media_type.mediatypeid',
 			'type' =>					'db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
@@ -72,7 +72,7 @@ class CControllerMediatypeEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)) {
 			return false;
 		}
@@ -100,13 +100,13 @@ class CControllerMediatypeEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		// default values
 		$db_defaults = DB::getDefaults('media_type');
 		$email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_SMTP);
 
 		$data = [
-			'mediatypeid' => 0,
+			'mediatypeid' => null,
 			'type' => MEDIA_TYPE_EMAIL,
 			'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
 			'name' => '',
@@ -245,6 +245,7 @@ class CControllerMediatypeEdit extends CController {
 				}
 			}
 		}
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));
