@@ -593,7 +593,7 @@ static int	expression_item_check_tag(zbx_expression_item_t *item, const char *ta
  *           calls that are evaluated by this callback.                       *
  *                                                                            *
  ******************************************************************************/
-static int	expression_eval_filter(const char *name, size_t len, int args_num, const zbx_variant_t *args,
+static int	expression_eval_filter(const char *name, size_t len, int args_num, zbx_variant_t *args,
 		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	zbx_expression_eval_many_t	*many = (zbx_expression_eval_many_t *)data;
@@ -928,7 +928,7 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
  *                                                                            *
  ******************************************************************************/
 static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query_t *query, const char *name,
-		size_t len, int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+		size_t len, int args_num, zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	char				func_name[MAX_STRING_LEN], *params = NULL;
 	size_t				params_alloc = 0, params_offset = 0;
@@ -1359,7 +1359,7 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
  *                                                                            *
  ******************************************************************************/
 static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expression_query_t *query,
-		int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, int item_func, zbx_variant_t *value,
+		int args_num, zbx_variant_t *args, const zbx_timespec_t *ts, int item_func, zbx_variant_t *value,
 		char **error)
 {
 	zbx_expression_query_many_t	*data;
@@ -1519,6 +1519,42 @@ err:
 	return ret;
 }
 
+static int	evaluate_count_many(char *operator, char *pattern, zbx_dc_item_t *dcitem, zbx_vector_history_record_t *values, int seconds,
+		int count, const zbx_timespec_t *ts, zbx_vector_dbl_t *results_vector, char **error)
+{
+	int				ret = SUCCEED;
+	zbx_eval_count_pattern_data_t	pdata;
+
+	zbx_vector_expression_create(&pdata.regexps);
+
+	if (FAIL == zbx_validate_count_pattern(operator, pattern, dcitem->value_type, &pdata, error))
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+	if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, values, seconds, count, ts) &&
+			0 < values->values_num)
+	{
+		int	result_tmp = 0;
+		double	result;
+
+		zbx_execute_count_with_pattern(pattern, dcitem->value_type, ZBX_MAX_UINT31_1, &pdata, values, &result_tmp);
+
+		if (0 != result_tmp)
+		{
+			result = (double)result_tmp;
+			zbx_vector_dbl_append(results_vector, result);
+		}
+	}
+
+out:
+	zbx_regexp_clean_expressions(&pdata.regexps);
+	zbx_vector_expression_destroy(&pdata.regexps);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate historical function for multiple items (aggregate checks)*
@@ -1528,7 +1564,7 @@ err:
  *             name     - [IN] the function name (not zero terminated)        *
  *             len      - [IN] the function name length                       *
  *             args_num - [IN] the number of function arguments               *
- *             args     - [IN] an array of the function arguments.            *
+ *             args     - [IN/OUT] an array of the function arguments.        *
  *             data     - [IN] the caller data used for function evaluation   *
  *             ts       - [IN] the function execution time                    *
  *             value    - [OUT] the function return value                     *
@@ -1539,7 +1575,7 @@ err:
  *                                                                            *
  ******************************************************************************/
 static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_query_t *query, const char *name,
-		size_t len, int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value,
+		size_t len, int args_num, zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error)
 {
 	zbx_expression_query_many_t	*data;
@@ -1547,7 +1583,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 	zbx_vector_history_record_t	values;
 	zbx_vector_dbl_t		*results_vector;
 	double				result;
-	zbx_variant_t			arg;
+	char				*operator = NULL, *pattern = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int)len, name,
 			ZBX_NULL2EMPTY_STR(query->ref.host), ZBX_NULL2EMPTY_STR(query->ref.key),
@@ -1573,14 +1609,31 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			goto out;
 		case ZBX_VALUE_FUNC_LAST:
 			count = 1;
-			seconds = 0;
+
+			if (1 == args_num && ZBX_VARIANT_STR == args[0].type)
+			{
+				if (FAIL == zbx_is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+				{
+					*error = zbx_strdup(NULL, "invalid second parameter");
+					goto out;
+				}
+			}
+			else
+				seconds = 0;
+
 			break;
 		case ZBX_VALUE_FUNC_MIN:
 		case ZBX_VALUE_FUNC_AVG:
 		case ZBX_VALUE_FUNC_MAX:
 		case ZBX_VALUE_FUNC_SUM:
+			if (args_num >= 2)
+			{
+				*error = zbx_strdup(NULL, "invalid number of function parameters");
+				goto out;
+			}
+			ZBX_FALLTHROUGH;
 		case ZBX_VALUE_FUNC_COUNT:
-			if (1 != args_num)
+			if (1 > args_num)
 			{
 				*error = zbx_strdup(NULL, "invalid number of function parameters");
 				goto out;
@@ -1596,19 +1649,40 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			}
 			else
 			{
-				zbx_variant_copy(&arg, &args[0]);
-
-				if (SUCCEED != zbx_variant_convert(&arg, ZBX_VARIANT_DBL))
+				if (SUCCEED != zbx_variant_convert(&args[0], ZBX_VARIANT_DBL))
 				{
-					zbx_variant_clear(&arg);
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
 				}
 
-				seconds = arg.data.dbl;
-				zbx_variant_clear(&arg);
+				seconds = args[0].data.dbl;
 			}
 			count = 0;
+
+			if (2 <= args_num)
+			{
+				if (ZBX_VARIANT_NONE != args[1].type)
+				{
+					if (SUCCEED != zbx_variant_convert(&args[1], ZBX_VARIANT_STR))
+					{
+						*error = zbx_strdup(NULL, "invalid third parameter");
+						goto out;
+					}
+
+					operator = args[1].data.str;
+				}
+
+				if (args_num == 3 && ZBX_VARIANT_NONE != args[2].type)
+				{
+					if (SUCCEED != zbx_variant_convert(&args[2], ZBX_VARIANT_STR))
+					{
+						*error = zbx_strdup(NULL, "invalid fourth parameter");
+						goto out;
+					}
+
+					pattern = args[2].data.str;
+				}
+			}
 
 			break;
 		case ZBX_ITEM_FUNC_BPERCENTL:
@@ -1625,7 +1699,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 	for (i = 0; i < data->itemids.values_num; i++)
 	{
-		zbx_dc_item_t	*dcitem;
+		zbx_dc_item_t			*dcitem;
 
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
 			continue;
@@ -1636,15 +1710,29 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		if (HOST_STATUS_MONITORED != dcitem->host.status)
 			continue;
 
+		if (ITEM_STATE_NOTSUPPORTED == dcitem->state)
+			continue;
+
 		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
 			continue;
 
 		zbx_history_record_vector_create(&values);
 
-		if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts) &&
-				0 < values.values_num)
+		if (ZBX_VALUE_FUNC_COUNT == item_func)
+		{
+			if (FAIL == (ret = evaluate_count_many(operator, pattern, dcitem, &values, seconds, count, ts,
+					results_vector, error)))
+			{
+				zbx_vector_dbl_destroy(results_vector);
+				zbx_free(results_vector);
+				goto out;
+			}
+		}
+		else if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts)
+				&& 0 < values.values_num)
 		{
 			evaluate_history_func(&values, dcitem->value_type, item_func, &result);
+
 			zbx_vector_dbl_append(results_vector, result);
 		}
 
@@ -1678,7 +1766,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	expression_eval_history(const char *name, size_t len, int args_num, const zbx_variant_t *args,
+static int	expression_eval_history(const char *name, size_t len, int args_num, zbx_variant_t *args,
 		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	int			ret = FAIL;
@@ -1759,7 +1847,7 @@ out:
  *           it's used to check for /host/key query quoting errors instead.   *
  *                                                                            *
  ******************************************************************************/
-static int	expression_eval_common(const char *name, size_t len, int args_num, const zbx_variant_t *args,
+static int	expression_eval_common(const char *name, size_t len, int args_num, zbx_variant_t *args,
 		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	ZBX_UNUSED(data);
