@@ -128,14 +128,10 @@ static int	snmp_hex_to_utf8_dyn(char *value, char **out)
 
 static int	snmp_hex_to_mac(char *out)
 {
-	int	hex_num = 0;
-
 	while ('\0' != *out)
 	{
 		if (0 == isxdigit((unsigned char)out[0]) || 0 == isxdigit((unsigned char)out[1]))
 			return FAIL;
-
-		hex_num++;
 
 		if ('\0' == out[2])
 			break;
