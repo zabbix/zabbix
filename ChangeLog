@@ -3,6 +3,8 @@ Changes for 5.0.35rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.34
