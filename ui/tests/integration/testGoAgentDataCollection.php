@@ -551,12 +551,10 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
 
-		var_dump($a);
 					$x = substr($a, 0, $item['threshold']);
-		var_dump($x);
 
 				$b = substr($b, 0, $item['threshold']);
-				throw new Exception('Failed badher: '.$a.' ; AND '.$x);
+				throw new Exception('Failed badher: '.$a['uptime'].' ; AND '.$x['uptime']);
 
 				}
 
