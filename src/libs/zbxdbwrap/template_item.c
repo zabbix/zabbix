@@ -117,15 +117,15 @@ zbx_lld_rule_map_t;
 
 typedef struct
 {
-	zbx_uint64_t		overrideid;
-	zbx_uint64_t		itemid;
-	char			*name;
-	char			*formula;
-	zbx_vector_ptr_t	override_conditions;
-	zbx_vector_ptr_t	override_operations;
-	unsigned char		step;
-	unsigned char		evaltype;
-	unsigned char		stop;
+	zbx_uint64_t				overrideid;
+	zbx_uint64_t				itemid;
+	char					*name;
+	char					*formula;
+	zbx_vector_ptr_t			override_conditions;
+	zbx_vector_lld_override_operation_t	override_operations;
+	unsigned char				step;
+	unsigned char				evaltype;
+	unsigned char				stop;
 }
 lld_override_t;
 
@@ -141,8 +141,8 @@ lld_override_codition_t;
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	unsigned char	type;
 
 	result = zbx_db_select(
@@ -179,8 +179,8 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  ******************************************************************************/
 static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *items)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0, i;
 	unsigned char		interface_type;
@@ -409,19 +409,20 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	}				\
 }
 
-#define SET_FLAG_UINT64(r, i, f)			\
-							\
-{							\
-	if (SUCCEED == zbx_db_is_null(r))		\
-		uint64_orig = 0;			\
-	else						\
-		ZBX_STR2UINT64(uint64_orig, (r));	\
-	if (uint64_orig != (i))				\
-	{						\
-		item->upd_flags |= f;			\
-		i##_orig = uint64_orig;			\
-	}						\
-}
+#define SET_FLAG_UINT64(r, i, f)				\
+	do							\
+	{							\
+		if (SUCCEED == zbx_db_is_null(r))		\
+			uint64_orig = 0;			\
+		else						\
+			ZBX_STR2UINT64(uint64_orig, (r));	\
+		if (uint64_orig != (i))				\
+		{						\
+			item->upd_flags |= f;			\
+			i##_orig = uint64_orig;			\
+		}						\
+	}							\
+	while(0)
 			item->key = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
 
@@ -513,8 +514,8 @@ static void	get_template_lld_rule_map(const zbx_vector_ptr_t *items, zbx_vector_
 	zbx_lld_rule_condition_t	*condition;
 	int				i, index;
 	zbx_vector_uint64_t		itemids;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid, item_conditionid;
@@ -1232,8 +1233,8 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 	}
 	zbx_proto_t;
 
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
@@ -2133,8 +2134,8 @@ static void	lld_override_free(lld_override_t *override)
 {
 	zbx_vector_ptr_clear_ext(&override->override_conditions, (zbx_clean_func_t)lld_override_condition_free);
 	zbx_vector_ptr_destroy(&override->override_conditions);
-	zbx_vector_ptr_clear_ext(&override->override_operations, (zbx_clean_func_t)zbx_lld_override_operation_free);
-	zbx_vector_ptr_destroy(&override->override_operations);
+	zbx_vector_lld_override_operation_clear_ext(&override->override_operations, zbx_lld_override_operation_free);
+	zbx_vector_lld_override_operation_destroy(&override->override_operations);
 	zbx_free(override->name);
 	zbx_free(override->formula);
 	zbx_free(override);
@@ -2144,8 +2145,8 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 		char **sql, size_t *sql_alloc)
 {
 	size_t			sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_uint64_t		overrideid;
 	int			i;
 	lld_override_t		*override;
@@ -2185,20 +2186,20 @@ static void	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_
 static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_vector_uint64_t *overrideids,
 		char **sql, size_t *sql_alloc)
 {
-	lld_override_t			*override;
-	zbx_lld_override_operation_t	*op;
-	zbx_vector_ptr_t		ops;
-	int				i, index;
+	zbx_vector_lld_override_operation_t	ops;
+	int					i, index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&ops);
+	zbx_vector_lld_override_operation_create(&ops);
 
 	zbx_load_lld_override_operations(overrideids, sql, sql_alloc, &ops);
 
 	for (i = 0; i < ops.values_num; i++)
 	{
-		op = (zbx_lld_override_operation_t *)ops.values[i];
+		lld_override_t			*override;
+		zbx_lld_override_operation_t	*op = ops.values[i];
+
 		if (FAIL == (index = zbx_vector_ptr_bsearch(overrides, &op->overrideid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -2206,11 +2207,11 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
-		override = (lld_override_t *)overrides->values[index];
-		zbx_vector_ptr_append(&override->override_operations, op);
+		override = overrides->values[index];
+		zbx_vector_lld_override_operation_append(&override->override_operations, op);
 	}
 
-	zbx_vector_ptr_destroy(&ops);
+	zbx_vector_lld_override_operation_destroy(&ops);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2489,8 +2490,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	lld_override_t		*override;
 	zbx_vector_ptr_t	overrides;
 	zbx_vector_uint64_t	overrideids;
@@ -2549,7 +2550,7 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 		override->formula = zbx_strdup(NULL, row[5]);
 		ZBX_STR2UCHAR(override->stop, row[6]);
 		zbx_vector_ptr_create(&override->override_conditions);
-		zbx_vector_ptr_create(&override->override_operations);
+		zbx_vector_lld_override_operation_create(&override->override_operations);
 
 		zbx_vector_uint64_append(&overrideids, override->overrideid);
 		zbx_vector_ptr_append(&overrides, override);
@@ -2672,8 +2673,8 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2850,8 +2851,8 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2957,8 +2958,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3065,8 +3066,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 	zbx_uint64_t			itemid;
 	zbx_template_lld_macro_t	*plmpsrc, *plmpdst;
 	zbx_template_item_t		*item;
-	DB_ROW				row;
-	DB_RESULT			result;
+	zbx_db_row_t			row;
+	zbx_db_result_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

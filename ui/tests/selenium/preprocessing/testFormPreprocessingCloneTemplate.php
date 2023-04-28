@@ -35,7 +35,7 @@ class testFormPreprocessingCloneTemplate extends testFormPreprocessingClone {
 	/**
 	 * @onBefore prepareLLDPreprocessing, prepareItemPreprocessing, prepareItemPrototypePreprocessing
 	 */
-	public function testFormPreprocessingCloneTemplate_FullCloneTemplate() {
+	public function testFormPreprocessingCloneTemplate_CloneTemplate() {
 		$this->executeCloning(true);
 	}
 }

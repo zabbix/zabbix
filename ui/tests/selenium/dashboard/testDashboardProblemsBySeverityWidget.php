@@ -68,7 +68,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Four Or tags in filter',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'Service', 'operator' => 'Contains', 'value' => ''],
@@ -322,7 +322,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Four Or tags in filter',
 						'Show' => 'Totals',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
@@ -911,7 +911,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Two Or tags in filter',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'check' => [
 						'pop-up' => true
@@ -956,7 +956,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'HG: Two Or tags in filter 2',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
@@ -977,7 +977,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Problems by severity',
 						'Name' => 'Two Or tags in filter 3',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'Alpha', 'operator' => 'Equals', 'value' => 'a'],
@@ -1072,7 +1072,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter',
 						'Show' => 'Totals',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'check' => [
 						'pop-up' => true,
@@ -1113,7 +1113,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter 2',
 						'Show' => 'Totals',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc'],
@@ -1133,7 +1133,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 						'Type' => 'Problems by severity',
 						'Name' => 'Totals: Two Or tags in filter 3',
 						'Show' => 'Totals',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'Alpha', 'operator' => 'Equals', 'value' => 'a'],
@@ -1475,7 +1475,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			// Check that Dashboard has been saved
 			$this->checkDashboardMessage();
 			// Confirm that widget is not present on dashboard.
-			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
+			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header")]/h4[text()='.
 					CXPathHelper::escapeQuotes($name).']')->count());
 			$widget_sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 					' WHERE w.name='.zbx_dbstr($name);

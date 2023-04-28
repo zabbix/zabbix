@@ -33,15 +33,15 @@
 #include "../../../src/libs/zbxserver/evalfunc_common.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item,
 		zbx_db_alert *alert, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
 		const zbx_db_service *service, const char *tz, char **data, int macro_type, char *error,
 		int maxerrlen);
 
-int	__wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
+int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item,
 		zbx_db_alert *alert, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
 		const zbx_db_service *service, const char *tz, char **data, int macro_type, char *error,
 		int maxerrlen)
@@ -66,7 +66,7 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *
 	return SUCCEED;
 }
 
-int	__wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
+int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
 	ZBX_UNUSED(itemid);
 	*seconds = zbx_vcmock_get_ts().sec - 600;
@@ -76,13 +76,14 @@ int	__wrap_DCget_data_expected_from(zbx_uint64_t itemid, int *seconds)
 
 void	zbx_mock_test_entry(void **state)
 {
+	time_t				start_evaluate_period, end_evaluate_period;
 	int				start_detect_period, end_detect_period, detect_period_season_shift, err,
-					detect_period, start_evaluate_period, end_evaluate_period, evaluate_seconds = 0,
+					detect_period, evaluate_seconds = 0,
 					evaluate_nvalues = 0;
 	double				deviations_count, result;
 	char				*error = NULL, *evaluate_period = NULL;
 	const char			*params, *dev_alg = NULL;
-	DC_ITEM				item;
+	zbx_dc_item_t			item;
 	zbx_vcmock_ds_item_t		*ds_item;
 	zbx_timespec_t			ts, ts_evaluate_end;
 	zbx_mock_handle_t		handle;
@@ -94,11 +95,11 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_history_record_vector_create(&values_in);
 
-	err = zbx_vc_init(&error);
+	err = zbx_vc_init(get_zbx_config_value_cache_size(), &error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
 	zbx_vc_enable();
 	zbx_vcmock_ds_init();
-	memset(&item, 0, sizeof(DC_ITEM));
+	memset(&item, 0, sizeof(zbx_dc_item_t));
 	ds_item = zbx_vcmock_ds_first_item();
 	item.itemid = ds_item->itemid;
 	item.value_type = ds_item->value_type;

@@ -109,12 +109,6 @@
 					td.width(td.width());
 				});
 
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 4) + 'px');
-				}
-
 				return ui;
 			},
 			start: function(e, ui) {

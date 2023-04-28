@@ -129,10 +129,6 @@ while (0)
 
 void	*get_result_value_by_type(AGENT_RESULT *result, int require_type);
 
-extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
-extern int	CONFIG_LOG_REMOTE_COMMANDS;
-extern int	CONFIG_UNSAFE_USER_PARAMETERS;
-
 /* collector */
 #define ZBX_MAX_COLLECTOR_HISTORY	(15 * SEC_PER_MIN + 1)
 #define ZBX_AVG1		0
@@ -185,7 +181,9 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
-void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f);
+void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
+		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
+		zbx_get_config_int_f get_config_unsafe_user_parameters_cb);
 
 void	zbx_init_metrics(void);
 int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
@@ -244,5 +242,8 @@ zbx_uint32_t	zbx_get_thread_global_mutex_flag(void);
 void		zbx_add_alias(const char *name, const char *value);
 void		zbx_alias_list_free(void);
 const char	*zbx_alias_get(const char *orig);
+
+int		zbx_init_modbus(char **error);
+void		zbx_deinit_modbus(void);
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

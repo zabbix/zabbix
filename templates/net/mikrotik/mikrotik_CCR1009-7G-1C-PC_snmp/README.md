@@ -3,14 +3,14 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 7.0 and higher.
 The template for monitoring Ethernet router MikroTik CCR1009-7G-1C-PC.
 
 7x Gigabit Ethernet, 1x Combo port (SFP or Gigabit Ethernet), 9 cores x 1GHz CPU, 1GB RAM, passive cooling case, RouterOS L6
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 

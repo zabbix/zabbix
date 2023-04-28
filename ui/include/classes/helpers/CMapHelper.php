@@ -256,7 +256,7 @@ class CMapHelper {
 		$labels = getMapLabels($sysmap, $map_info);
 		$highlights = getMapHighligts($sysmap, $map_info);
 		$actions = getActionsBySysmap($sysmap, $options);
-		$linktrigger_info = getMapLinkTriggerInfo($sysmap, $options);
+		$link_triggers_info = getMapLinkTriggerInfo($sysmap, $options);
 
 		$problems_total = 0;
 		$status_problems = [];
@@ -328,36 +328,35 @@ class CMapHelper {
 		}
 
 		foreach ($sysmap['links'] as &$link) {
-			if ($link['permission'] >= PERM_READ) {
-				if (empty($link['linktriggers'])) {
-					continue;
-				}
-
-				$drawtype = $link['drawtype'];
-				$color = $link['color'];
-				$linktriggers = $link['linktriggers'];
-				order_result($linktriggers, 'triggerid');
-				$max_severity = $options['severity_min'];
-
-				foreach ($linktriggers as $link_trigger) {
-					if ($link_trigger['triggerid'] == 0
-							|| !array_key_exists($link_trigger['triggerid'], $linktrigger_info)) {
-						continue;
+			if ($link['permission'] >= PERM_READ && $link['linktriggers']) {
+				$link_triggers = array_filter($link['linktriggers'],
+					function ($link_trigger) use ($link_triggers_info, $options) {
+						return (array_key_exists($link_trigger['triggerid'], $link_triggers_info)
+							&& $link_triggers_info[$link_trigger['triggerid']]['status'] == TRIGGER_STATUS_ENABLED
+							&& $link_triggers_info[$link_trigger['triggerid']]['value'] == TRIGGER_VALUE_TRUE
+							&& $link_triggers_info[$link_trigger['triggerid']]['priority'] >= $options['severity_min']
+						);
 					}
+				);
 
-					$trigger = zbx_array_merge($link_trigger, $linktrigger_info[$link_trigger['triggerid']]);
+				// Link-trigger with highest severity or lower triggerid defines link color and drawtype.
+				if ($link_triggers) {
+					$link_triggers = array_map(function ($link_trigger) use ($link_triggers_info) {
+						return [
+							'priority' => $link_triggers_info[$link_trigger['triggerid']]['priority']
+						] + $link_trigger;
+					}, $link_triggers);
 
-					if ($trigger['status'] == TRIGGER_STATUS_ENABLED
-							&& $trigger['value'] == TRIGGER_VALUE_TRUE
-							&& $trigger['priority'] >= $max_severity) {
-						$drawtype = $trigger['drawtype'];
-						$color = $trigger['color'];
-						$max_severity = $trigger['priority'];
-					}
+					CArrayHelper::sort($link_triggers, [
+						['field' => 'priority', 'order' => ZBX_SORT_DOWN],
+						['field' => 'triggerid', 'order' => ZBX_SORT_UP]
+					]);
+
+					$styling_link_triggers = reset($link_triggers);
+
+					$link['color'] = $styling_link_triggers['color'];
+					$link['drawtype'] = $styling_link_triggers['drawtype'];
 				}
-
-				$link['color'] = $color;
-				$link['drawtype'] = $drawtype;
 			}
 		}
 		unset($link);

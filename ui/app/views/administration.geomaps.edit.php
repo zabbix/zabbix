@@ -54,9 +54,7 @@ $hintbox_tile_url = makeHelpIcon([
 	]))->addClass(ZBX_STYLE_LIST_DASHED)
 ]);
 
-$hintbox_attribution = makeHelpIcon(
-	_('Tile provider attribution data displayed in a small text box on the map.')
-);
+$warning_attribution = makeWarningIcon(_('Tile provider attribution data displayed in a small text box on the map.'));
 
 $hintbox_max_zoom = makeHelpIcon(_('Maximum zoom level of the map.'));
 
@@ -85,14 +83,14 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel([_('Attribution'), $hintbox_attribution], 'geomaps_attribution'),
-		new CFormField(
+		(new CLabel([_('Attribution text'), $warning_attribution], 'geomaps_attribution'))
+			->addClass($data['geomaps_tile_provider'] !== '' ? ZBX_STYLE_DISPLAY_NONE : null),
+		(new CFormField(
 			(new CTextArea('geomaps_attribution', $data['geomaps_attribution']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-				->setReadonly($data['geomaps_tile_provider'] !== '')
 				->setMaxLength(DB::getFieldLength('config', 'geomaps_attribution'))
-		)
+		))->addClass($data['geomaps_tile_provider'] !== '' ? ZBX_STYLE_DISPLAY_NONE : null)
 	])
 	->addItem([
 		(new CLabel([_('Max zoom level'), $hintbox_max_zoom], 'geomaps_max_zoom'))->setAsteriskMark(),

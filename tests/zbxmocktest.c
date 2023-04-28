@@ -25,9 +25,14 @@
 
 /* unresolved symbols needed for linking */
 
-unsigned char	program_type	= 0;
+static unsigned char	program_type	= 0;
 
-int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+unsigned char	get_program_type(void)
+{
+	return program_type;
+}
+
+static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
 	1, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
@@ -68,6 +73,16 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 };
 
+int	get_config_forks(unsigned char process_type)
+{
+	return CONFIG_FORKS[process_type];
+}
+
+void	set_config_forks(unsigned char process_type, int forks)
+{
+	CONFIG_FORKS[process_type] = forks;
+}
+
 int	CONFIG_LISTEN_PORT		= 0;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
@@ -75,7 +90,6 @@ int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
-int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
 int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
@@ -83,21 +97,23 @@ int	CONFIG_VMWARE_FREQUENCY		= 60;
 int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 int	CONFIG_VMWARE_TIMEOUT		= 10;
 
-zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * 0;
-zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * 0;
-zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * 0;
-zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * 0;
-zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * 0;
+static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
+
+zbx_uint64_t	get_zbx_config_value_cache_size(void)
+{
+	return zbx_config_value_cache_size;
+}
+
+void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
+{
+	zbx_config_value_cache_size = cache_size;
+}
+
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * 0;
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
-int	CONFIG_UNREACHABLE_PERIOD	= 45;
-int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_LOG_LEVEL		= 0;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
-int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
-int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
@@ -105,12 +121,6 @@ char	*CONFIG_JAVA_GATEWAY		= NULL;
 int	CONFIG_JAVA_GATEWAY_PORT	= 0;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
-
-int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-/* how often Zabbix server sends configuration data to proxy, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;
-int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
@@ -153,8 +163,6 @@ int	CONFIG_BUFFER_SEND		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND	= 20;
 
-int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
-
 char	**CONFIG_ALIASES		= NULL;
 char	**CONFIG_USER_PARAMETERS	= NULL;
 #if defined(_WINDOWS)
@@ -162,10 +170,28 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
-static int	config_timeout = 3;
-int		get_config_timeout(void)
+static int	zbx_config_timeout = 3;
+int	get_zbx_config_timeout(void)
 {
-	return config_timeout;
+	return zbx_config_timeout;
+}
+
+static int	zbx_config_enable_remote_commands = 0;
+int	get_zbx_config_enable_remote_commands(void)
+{
+	return zbx_config_enable_remote_commands;
+}
+
+static int	zbx_config_log_remote_commands = 0;
+int	get_zbx_config_log_remote_commands(void)
+{
+	return zbx_config_log_remote_commands;
+}
+
+static int	zbx_config_unsafe_user_parameters = 0;
+int	get_zbx_config_unsafe_user_parameters(void)
+{
+	return zbx_config_unsafe_user_parameters;
 }
 
 /* test itself */

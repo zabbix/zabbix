@@ -427,6 +427,10 @@ switch ($data['method']) {
 					'limit' => $limit
 				]);
 
+				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {
+					$users[] = ['userid' => '0', 'username' => 'System', 'name' => '', 'surname' => ''];
+				}
+
 				if ($users) {
 					CArrayHelper::sort($users, [
 						['field' => 'username', 'order' => ZBX_SORT_UP]
@@ -734,6 +738,10 @@ switch ($data['method']) {
 					]);
 
 					$hostids = array_keys($hosts);
+				}
+
+				if (array_key_exists('hostid', $data)) {
+					$hostids = $data['hostid'];
 				}
 
 				$options = [

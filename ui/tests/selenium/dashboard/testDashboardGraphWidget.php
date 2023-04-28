@@ -1483,7 +1483,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Problem hosts' => ['Simple form test host'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
-							'Tags' => 'Or'
+							'Problem tags' => 'Or'
 						],
 						'tags' => [
 							['name' => 'server', 'value' => 'selenium', 'operator' => 'Equals'],
@@ -1775,7 +1775,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
-							'Tags' => 'Or'
+							'Problem tags' => 'Or'
 						],
 						'tags' => [
 							['name' => 'server', 'value' => 'selenium', 'operator' => 'Equals'],
@@ -2214,7 +2214,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
-		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
+		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header")]/h4[text()='.
 				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 
@@ -2313,7 +2313,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Problems');
 
-		$fields = ['Selected items only', 'Severity', 'Problem', 'Tags', 'Problem hosts'];
+		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
 		$tag_elements = [
 			'id:evaltype',				// Tag type.
 			'id:tags_0_tag',			// Tag name.

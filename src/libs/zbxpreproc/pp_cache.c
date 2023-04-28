@@ -28,8 +28,8 @@
  *                                                                            *
  * Purpose: create preprocessing cache                                        *
  *                                                                            *
- * Parameters: preproc  - [IN] the preprocessing data                         *
- *             value    - [IN/OUT] the input value - it will copied to cache  *
+ * Parameters: preproc  - [IN] preprocessing data                             *
+ *             value    - [IN/OUT] input value - it will copied to cache      *
  *                                 and cleared                                *
  *                                                                            *
  * Return value: The created preprocessing cache                              *
@@ -50,8 +50,6 @@ zbx_pp_cache_t	*pp_cache_create(const zbx_pp_item_preproc_t *preproc, const zbx_
 /******************************************************************************
  *                                                                            *
  * Purpose: free preprocessing cache                                          *
- *                                                                            *
- * Parameters: cache - [IN] the preprocessing cache                           *
  *                                                                            *
  ******************************************************************************/
 static void	pp_cache_free(zbx_pp_cache_t *cache)
@@ -83,8 +81,6 @@ static void	pp_cache_free(zbx_pp_cache_t *cache)
  *                                                                            *
  * Purpose: release preprocessing cache                                       *
  *                                                                            *
- * Parameters: cache - [IN] the preprocessing cache                           *
- *                                                                            *
  ******************************************************************************/
 void	pp_cache_release(zbx_pp_cache_t *cache)
 {
@@ -97,8 +93,6 @@ void	pp_cache_release(zbx_pp_cache_t *cache)
 /******************************************************************************
  *                                                                            *
  * Purpose: copy preprocessing cache                                          *
- *                                                                            *
- * Parameters: cache - [IN] the preprocessing cache                           *
  *                                                                            *
  * Return value: The copied preprocessing cache.                              *
  *                                                                            *
@@ -117,22 +111,19 @@ zbx_pp_cache_t	*pp_cache_copy(zbx_pp_cache_t *cache)
  *                                                                            *
  * Purpose: copy original value from cache if needed                          *
  *                                                                            *
- * Parameters: cache     - [IN] the preprocessing cache                       *
- *             step_type - [IN] the preprocessing step type                   *
- *             value     - [OUT] the output value                             *
+ * Parameters: cache     - [IN] preprocessing cache                           *
+ *             step_type - [IN] preprocessing step type                       *
+ *             value     - [OUT] output value                                 *
  *                                                                            *
  * Comments: The value is copied from preprocessing cache if cache exists and *
  *           cache is not initialized or wrong preprocessing step type is     *
  *           cached. Otherwise the cache will be used to execute the step.    *
  *                                                                            *
  ******************************************************************************/
-void	pp_cache_copy_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *value)
+void	pp_cache_prepare_output_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *value)
 {
-	if (NULL != cache && (NULL == cache->data || step_type != cache->type))
-	{
-		zbx_variant_clear(value);
+	if (NULL == cache->data || step_type != cache->type)
 		zbx_variant_copy(value, &cache->value);
-	}
 }
 
 /******************************************************************************
@@ -140,7 +131,7 @@ void	pp_cache_copy_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *va
  * Purpose: check if caching can be done for the specified preprocessing      *
  *          data                                                              *
  *                                                                            *
- * Parameters: preproc  - [IN] the preprocessing data                         *
+ * Parameters: preproc  - [IN] preprocessing data                             *
  *                                                                            *
  * Return value: SUCCEED - the preprocessing caching is possible              *
  *               FAIL    - otherwise                                          *

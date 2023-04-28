@@ -1,0 +1,171 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2023 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+#include "dbupgrade.h"
+#include "zbxdbschema.h"
+#include "log.h"
+
+/*
+ * 7.0 development database patches
+ */
+
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_6050000(void)
+{
+	const zbx_db_field_t	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("config", &field, NULL);
+}
+
+static int	DBpatch_6050001(void)
+{
+	const zbx_db_field_t	field = {"geomaps_tile_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("config", &field, NULL);
+}
+
+static int	DBpatch_6050002(void)
+{
+	const zbx_db_field_t	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmap_url", &field, NULL);
+}
+
+static int	DBpatch_6050003(void)
+{
+	const zbx_db_field_t	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("sysmap_element_url", &field, NULL);
+}
+
+static int	DBpatch_6050004(void)
+{
+	const zbx_db_field_t	field = {"url_a", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_6050005(void)
+{
+	const zbx_db_field_t	field = {"url_b", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_6050006(void)
+{
+	const zbx_db_field_t	field = {"url_c", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_6050007(void)
+{
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget_field", &field, NULL);
+}
+
+static int	DBpatch_6050008(void)
+{
+	const zbx_db_field_t	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("history", &field, &field);
+}
+
+static int	DBpatch_6050009(void)
+{
+	const zbx_db_field_t	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050010(void)
+{
+	const zbx_db_field_t	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050011(void)
+{
+	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050012(void)
+{
+	const zbx_db_field_t	field = {"allow_redirect", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_6050013(void)
+{
+	zbx_db_insert_t	db_insert;
+	int	ret = FAIL;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), "gauge", "widgets/gauge", 1, "[]");
+	zbx_db_insert_autoincrement(&db_insert, "moduleid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+#endif
+
+DBPATCH_START(6050)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(6050000, 0, 1)
+DBPATCH_ADD(6050001, 0, 1)
+DBPATCH_ADD(6050002, 0, 1)
+DBPATCH_ADD(6050003, 0, 1)
+DBPATCH_ADD(6050004, 0, 1)
+DBPATCH_ADD(6050005, 0, 1)
+DBPATCH_ADD(6050006, 0, 1)
+DBPATCH_ADD(6050007, 0, 1)
+DBPATCH_ADD(6050008, 0, 1)
+DBPATCH_ADD(6050009, 0, 1)
+DBPATCH_ADD(6050010, 0, 1)
+DBPATCH_ADD(6050011, 0, 1)
+DBPATCH_ADD(6050012, 0, 1)
+DBPATCH_ADD(6050013, 0, 1)
+
+DBPATCH_END()

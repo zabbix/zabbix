@@ -22,6 +22,8 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "log.h"
+#include "zbxdb.h"
+#include "zbxcacheconfig.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 		"unknown error",
@@ -34,9 +36,9 @@ static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
  *                                                                            *
  * Purpose: parse largest period base from function parameters                *
  *                                                                            *
- * Parameters: shift  - [IN] the period shift parameter                       *
- *             base   - [OUT] the period shift base (now/?)                   *
- *             error  - [OUT] the error message if parsing failed             *
+ * Parameters: shift  - [IN] period shift parameter                           *
+ *             base   - [OUT] period shift base (now/?)                       *
+ *             error  - [OUT] error message if parsing failed                 *
  *                                                                            *
  * Return value: SUCCEED - period was parsed successfully                     *
  *               FAIL    - invalid time period was specified                  *
@@ -76,9 +78,9 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
  *                                                                            *
  * Purpose: parse largest period base from function parameters                *
  *                                                                            *
- * Parameters: params - [IN] the function parameters                          *
- *             base   - [OUT] the period shift base (now/?)                   *
- *             error  - [OUT] the error message if parsing failed             *
+ * Parameters: params - [IN] function parameters                              *
+ *             base   - [OUT] period shift base (now/?)                       *
+ *             error  - [OUT] error message if parsing failed                 *
  *                                                                            *
  * Return value: SUCCEED - period was parsed successfully                     *
  *               FAIL    - invalid time period was specified                  *
@@ -101,11 +103,11 @@ int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **erro
  *                                                                            *
  * Purpose: parse timeshift                                                   *
  *                                                                            *
- * Parameters: from          - [IN] the start time                            *
- *             timeshift     - [IN] the timeshift string                      *
+ * Parameters: from          - [IN] start time                                *
+ *             timeshift     - [IN] timeshift string                          *
  *             min_time_unit - [IN] minimum time unit that can be used        *
- *             tm            - [IN] the shifted time                          *
- *             error         - [OUT] the error message if parsing failed      *
+ *             tm            - [IN] shifted time                              *
+ *             error         - [OUT] error message if parsing failed          *
  *                                                                            *
  * Return value: SUCCEED - time shift was parsed successfully                 *
  *               FAIL    - otherwise                                          *
@@ -194,10 +196,10 @@ static int	trends_parse_timeshift(time_t from, const char *timeshift, zbx_time_u
  *                                                                            *
  * Purpose: parse timeshift                                                   *
  *                                                                            *
- * Parameters: from          - [IN] the start time                            *
- *             timeshift     - [IN] the timeshift string                      *
- *             tm            - [IN] the shifted time                          *
- *             error         - [OUT] the error message if parsing failed      *
+ * Parameters: from          - [IN] start time                                *
+ *             timeshift     - [IN] timeshift string                          *
+ *             tm            - [IN] shifted time                              *
+ *             error         - [OUT] error message if parsing failed          *
  *                                                                            *
  * Return value: SUCCEED - time shift was parsed successfully                 *
  *               FAIL    - otherwise                                          *
@@ -212,15 +214,12 @@ int	zbx_trends_parse_timeshift(time_t from, const char *timeshift, struct tm *tm
  *                                                                            *
  * Purpose: parse trend function period arguments into time range             *
  *                                                                            *
- * Parameters: from         - [IN] the time the period shift is calculated    *
- *                                 from                                       *
- *             param        - [IN] the history period parameter:              *
+ * Parameters: from         - [IN] time the period shift is calculated from   *
+ *             param        - [IN] history period parameter:                  *
  *                                     <period>:<period_shift>                *
- *             start        - [OUT] the period start time in seconds since    *
- *                                  Epoch                                     *
- *             end          - [OUT] the period end time in seconds since      *
- *                                  Epoch                                     *
- *             error        - [OUT] the error message if parsing failed       *
+ *             start        - [OUT] period start time in seconds since Epoch  *
+ *             end          - [OUT] period end time in seconds since Epoch    *
+ *             error        - [OUT] error message if parsing failed           *
  *                                                                            *
  * Return value: SUCCEED - period was parsed successfully                     *
  *               FAIL    - invalid time period was specified                  *
@@ -237,7 +236,7 @@ int	zbx_trends_parse_timeshift(time_t from, const char *timeshift, struct tm *tm
  *             now-1d/h                                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end, char **error)
+int	zbx_trends_parse_range(time_t from, const char *param, time_t *start, time_t *end, char **error)
 {
 	int		period_num;
 	int		period_hours[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, 1, 24, 24 * 7, 24 * 30, 24 * 365, 24 * 7 * 53};
@@ -287,7 +286,7 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 		return FAIL;
 	}
 
-	if (abs((int)from - *end) > SEC_PER_YEAR * 26)
+	if (abs((int)(from - *end)) > SEC_PER_YEAR * 26)
 	{
 		*error = zbx_strdup(*error, "period shift is too large");
 		return FAIL;
@@ -300,7 +299,7 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 		return FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:%d end:%d", __func__, *start, *end);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() start:" ZBX_FS_I64 " end:" ZBX_FS_I64, __func__, *start, *end);
 
 	return SUCCEED;
 }
@@ -309,12 +308,11 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
  *                                                                            *
  * Purpose: calculate possible nextcheck based on trend function parameters   *
  *                                                                            *
- * Parameters: from         - [IN] the time the period shift is calculated    *
- *                                 from                                       *
- *             p            - [IN] the history period shift                   *
- *             nextcheck    - [OUT] the time starting from which the period   *
- *                                  will end in future                        *
- *             error        - [OUT] the error message if parsing failed       *
+ * Parameters: from         - [IN] time the period shift is calculated from   *
+ *             p            - [IN] history period shift                       *
+ *             nextcheck    - [OUT] time starting from which the period will  *
+ *                                  end in future                             *
+ *             error        - [OUT] error message if parsing failed           *
  *                                                                            *
  * Return value: SUCCEED - period was parsed successfully                     *
  *               FAIL    - invalid time period was specified                  *
@@ -410,37 +408,40 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
  *                                                                            *
  * Purpose: evaluate expression with trends data                              *
  *                                                                            *
- * Parameters: table       - [IN] the trends table name                       *
- *             itemid      - [IN] the itemid                                  *
- *             start       - [OUT] the period start time in seconds since     *
- *                                  Epoch                                     *
- *             end         - [OUT] the period end time in seconds since       *
- *                                  Epoch                                     *
+ * Parameters: table       - [IN] trends table name                           *
+ *             itemid      - [IN]                                             *
+ *             start       - [OUT] period start time in seconds since Epoch   *
+ *             end         - [OUT] period end time in seconds since Epoch     *
  *             eval_single - [IN] sql expression to evaluate for single       *
  *                                 record                                     *
  *             eval_multi  - [IN] sql expression to evaluate for multiple     *
  *                                 records                                    *
- *             value       - [OUT] the evaluation result                      *
+ *             value       - [OUT] evaluation result                          *
  *                                                                            *
  * Return value: Trend value state of the specified period and function.      *
  *                                                                            *
  ******************************************************************************/
-static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int start, int end,
+static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
 		const char *eval_single, const char *eval_multi, double *value)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_trend_state_t	state;
+
+	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS);
+
+	if (start > end)
+		return ZBX_TREND_STATE_NODATA;
 
 	if (start != end)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select %s from %s"
 				" where itemid=" ZBX_FS_UI64
-					" and clock>=%d"
-					" and clock<=%d",
+					" and clock>=" ZBX_FS_I64
+					" and clock<=" ZBX_FS_I64,
 				eval_multi, table, itemid, start, end);
 	}
 	else
@@ -448,7 +449,7 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select %s from %s"
 				" where itemid=" ZBX_FS_UI64
-					" and clock=%d",
+					" and clock=" ZBX_FS_I64,
 				eval_single, table, itemid, start);
 	}
 
@@ -472,33 +473,40 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int
  *                                                                            *
  * Purpose: evaluate avg function with trends data                            *
  *                                                                            *
- * Parameters: table       - [IN] the trends table name                       *
- *             itemid      - [IN] the itemid                                  *
- *             start       - [OUT] the period start time in seconds since     *
- *                                  Epoch                                     *
- *             end         - [OUT] the period end time in seconds since       *
- *                                  Epoch                                     *
- *             value       - [OUT] the evaluation result                      *
+ * Parameters: table       - [IN] trends table name                           *
+ *             itemid      - [IN]                                             *
+ *             start       - [OUT] period start time in seconds since Epoch   *
+ *             end         - [OUT] period end time in seconds since Epoch     *
+ *             value       - [OUT] evaluation result                          *
  *                                                                            *
  * Return value: Trend value state of the specified period and function.      *
  *                                                                            *
  ******************************************************************************/
-static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end,
+static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
 		double *value)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_trend_state_t	state;
 	double			avg, num, num2, avg2;
 
+	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS);
+
+	if (start > end)
+		return ZBX_TREND_STATE_NODATA;
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select value_avg,num from %s where itemid=" ZBX_FS_UI64,
 			table, itemid);
+
 	if (start != end)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=%d and clock<=%d", start, end);
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=" ZBX_FS_I64 " and clock<=" ZBX_FS_I64,
+				start, end);
+	}
 	else
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", start);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=" ZBX_FS_I64, start);
 
 	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
@@ -531,32 +539,39 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
  *                                                                            *
  * Purpose: evaluate sum function with trends data                            *
  *                                                                            *
- * Parameters: table       - [IN] the trends table name                       *
- *             itemid      - [IN] the itemid                                  *
- *             start       - [OUT] the period start time in seconds since     *
- *                                  Epoch                                     *
- *             end         - [OUT] the period end time in seconds since       *
- *                                  Epoch                                     *
- *             value       - [OUT] the evaluation result                      *
+ * Parameters: table       - [IN] trends table name                           *
+ *             itemid      - [IN]                                             *
+ *             start       - [OUT] period start time in seconds since Epoch   *
+ *             end         - [OUT] period end time in seconds since Epoch     *
+ *             value       - [OUT] evaluation result                          *
  *                                                                            *
  * Return value: Trend value state of the specified period and function.      *
  *                                                                            *
  ******************************************************************************/
-static zbx_trend_state_t	trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end,
+static zbx_trend_state_t	trends_eval_sum(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
 		double *value)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 	double		sum = 0;
 
+	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS);
+
+	if (start > end)
+		return ZBX_TREND_STATE_NODATA;
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select value_avg,num from %s where itemid=" ZBX_FS_UI64,
 			table, itemid);
+
 	if (start != end)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=%d and clock<=%d", start, end);
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>=" ZBX_FS_I64 " and clock<=" ZBX_FS_I64,
+				start, end);
+	}
 	else
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=%d", start);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock=" ZBX_FS_I64, start);
 
 	result = zbx_db_select("%s", sql);
 	zbx_free(sql);
@@ -574,7 +589,8 @@ static zbx_trend_state_t	trends_eval_sum(const char *table, zbx_uint64_t itemid,
 	return ZBX_TREND_STATE_NORMAL;
 }
 
-int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
+int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error)
 {
 	zbx_trend_state_t	state;
 
@@ -593,7 +609,8 @@ int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int e
 	return FAIL;
 }
 
-int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
+int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error)
 {
 	zbx_trend_state_t	state;
 
@@ -601,7 +618,8 @@ int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int
 
 	if (FAIL == zbx_tfc_get_value(itemid, start, end, ZBX_TREND_FUNCTION_COUNT, value, &state))
 	{
-		if (ZBX_TREND_STATE_NORMAL != (state = trends_eval(table, itemid, start, end, "num", "sum(num)", value)))
+		if (ZBX_TREND_STATE_NORMAL != (state = trends_eval(table, itemid, start, end, "num", "sum(num)",
+				value)))
 		{
 			state = ZBX_TREND_STATE_NORMAL;
 			*value = 0;
@@ -613,7 +631,8 @@ int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int
 	return SUCCEED;
 }
 
-int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
+int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error)
 {
 	zbx_trend_state_t	state;
 
@@ -632,7 +651,8 @@ int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int e
 	return FAIL;
 }
 
-int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
+int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error)
 {
 	zbx_trend_state_t	state;
 
@@ -651,7 +671,8 @@ int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, int start, int e
 	return FAIL;
 }
 
-int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
+int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error)
 {
 	zbx_trend_state_t	state;
 
@@ -670,7 +691,8 @@ int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int e
 	return FAIL;
 }
 
-zbx_trend_state_t	zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+zbx_trend_state_t	zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
+		double *value)
 {
 	zbx_trend_state_t	state;
 

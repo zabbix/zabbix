@@ -79,8 +79,8 @@ out:
  ******************************************************************************/
 static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			ret = FAIL, errcode;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], *sendto = NULL, *subject = NULL,
 				*message = NULL, *error = NULL, *params = NULL, *value = NULL, *debug = NULL;
@@ -218,10 +218,11 @@ fail:
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
-		zbx_get_program_type_f get_program_type_cb, int config_timeout)
+		zbx_get_program_type_f get_program_type_cb, int config_timeout, const char *server)
 {
 	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(get_program_type_cb);
+	ZBX_UNUSED(server);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{

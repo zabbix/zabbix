@@ -1770,8 +1770,6 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
 {
 	int		ret;
 	zbx_variant_t	*arg, *pattern, *replacement, value;
-	char		*strval, *p;
-	size_t		pattern_len, replacement_len;
 
 	if (3 != token->opt)
 	{
@@ -1794,24 +1792,11 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
 		return FAIL;
 	}
 
-	strval = zbx_strdup(NULL, arg->data.str);
-	pattern_len = strlen(pattern->data.str);
+	if ('\0' != *pattern->data.str)
+		zbx_variant_set_str(&value, zbx_string_replace(arg->data.str, pattern->data.str, replacement->data.str));
+	else
+		zbx_variant_copy(&value, arg);
 
-	if (0 < pattern_len)
-	{
-		replacement_len = strlen(replacement->data.str);
-
-		while (NULL != (p = strstr(strval, pattern->data.str)))
-		{
-			size_t	str_alloc, str_len;
-
-			str_alloc = str_len = strlen(strval) + 1;
-			zbx_replace_mem_dyn(&strval, &str_alloc, &str_len, (size_t)(p - strval), pattern_len,
-					replacement->data.str, replacement_len);
-		}
-	}
-
-	zbx_variant_set_str(&value, strval);
 	eval_function_return(3, &value, output);
 
 	return SUCCEED;
@@ -2632,6 +2617,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 	{
 		*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
 				ctx->expression + token->loc.l);
+		return FAIL;
 	}
 
 	zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)arg->data.dbl_vector->values_num);
