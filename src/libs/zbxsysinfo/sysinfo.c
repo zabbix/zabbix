@@ -835,33 +835,6 @@ static void	zbx_log_init(zbx_log_t *log)
 	log->logeventid = 0;
 }
 
-void	zbx_init_agent_result(AGENT_RESULT *result)
-{
-	memset(result, 0, sizeof(AGENT_RESULT));
-}
-
-static void	zbx_log_clean(zbx_log_t *log)
-{
-	zbx_free(log->source);
-	zbx_free(log->value);
-}
-
-void	zbx_log_free(zbx_log_t *log)
-{
-	zbx_log_clean(log);
-	zbx_free(log);
-}
-
-void	zbx_free_agent_result(AGENT_RESULT *result)
-{
-	ZBX_UNSET_UI64_RESULT(result);
-	ZBX_UNSET_DBL_RESULT(result);
-	ZBX_UNSET_STR_RESULT(result);
-	ZBX_UNSET_TEXT_RESULT(result);
-	ZBX_UNSET_LOG_RESULT(result);
-	ZBX_UNSET_MSG_RESULT(result);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize the request structure                                  *

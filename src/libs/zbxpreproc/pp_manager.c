@@ -32,7 +32,6 @@
 #include "zbxcachehistory.h"
 #include "zbxprof.h"
 #include "pp_protocol.h"
-#include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxnix.h"
 #include "zbxvariant.h"

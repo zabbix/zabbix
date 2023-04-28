@@ -22,7 +22,6 @@
 
 #include "log.h"
 #include "zbxserialize.h"
-#include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
