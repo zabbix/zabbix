@@ -484,7 +484,7 @@ func TestSetDefaults(t *testing.T) {
 					B string
 				}{"A", "B"},
 			},
-			map[string]string{"foo": "bar", "abc": "def"},
+			map[string]string{"foo": "bar", "abc": "def", "A": "A", "B": "B"},
 			false,
 		},
 		{
@@ -496,7 +496,7 @@ func TestSetDefaults(t *testing.T) {
 					Bar string
 				}{"A"},
 			},
-			map[string]string{"foo": "bar"},
+			map[string]string{"foo": "bar", "Bar": "A"},
 			false,
 		},
 		{
@@ -519,7 +519,7 @@ func TestSetDefaults(t *testing.T) {
 					Bar string
 				}{"A", "B"},
 			},
-			map[string]string{},
+			map[string]string{"Foo": "A", "Bar": "B"},
 			false,
 		},
 		{
@@ -679,7 +679,7 @@ func Test_setDefaults(t *testing.T) {
 				map[string]string{"bar": "foo"},
 				nil,
 			},
-			map[string]string{"foo": "bar", "abc": "def"},
+			map[string]string{"foo": "bar", "bar": "foo", "abc": "def"},
 		},
 		{
 			"set_default_not_in_param",
@@ -688,7 +688,7 @@ func Test_setDefaults(t *testing.T) {
 				map[string]string{"foo": "bar", "bar": "foo"},
 				nil,
 			},
-			map[string]string{"foo": "bar"},
+			map[string]string{"foo": "bar", "bar": "foo"},
 		},
 		{
 			"empty_default",
@@ -706,7 +706,7 @@ func Test_setDefaults(t *testing.T) {
 				map[string]string{"foo": "bar"},
 				nil,
 			},
-			map[string]string{},
+			map[string]string{"foo": "bar"},
 		},
 		{
 			"hardcoded",
