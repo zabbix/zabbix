@@ -181,7 +181,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 	}
 
 	if (count($usergroup['users']) != $usergroup['user_cnt']) {
-		$users[] = ' &hellip;';
+		$users[] = [' ', HELLIP()];
 	}
 
 	$name = new CLink($usergroup['name'], (new CUrl('zabbix.php'))
