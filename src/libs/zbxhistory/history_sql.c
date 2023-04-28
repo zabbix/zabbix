@@ -332,7 +332,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
-	int			time_from;
+	time_t			time_from;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select clock,ns,%s"
@@ -346,7 +346,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 
 	if (ZBX_JAN_2038 == end_timestamp)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", time_from);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_I64, time_from);
 	}
 	else if (1 == seconds)
 	{
@@ -360,7 +360,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 	}
 	else
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_I64 " and clock<=%d",
 				time_from, end_timestamp);
 	}
 
@@ -412,9 +412,10 @@ out:
 static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values,
 		int count, int end_timestamp)
 {
+	time_t			clock_from;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	int			clock_to, clock_from, step = 0, ret = FAIL;
+	int			clock_to, step = 0, ret = FAIL;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
@@ -443,7 +444,7 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 		if (clock_from != clock_to)
 		{
 			zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d", clock_from);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_I64, clock_from);
 		}
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by clock desc");

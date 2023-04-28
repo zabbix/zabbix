@@ -92,11 +92,15 @@ class CActionButtonList extends CObject {
 
 				if (array_key_exists('redirect', $button_data)) {
 					$on_click_action = 'const form = this.closest("form");' .
-						// Save the original form action
+						/*
+						 * Save the original form action
+						 * Function getAttribute()/setAttribute() is used instead of .action, because there are many
+						 * buttons with name 'action' and .action selects these buttons.
+						 */
 						'if (!form.dataset.action) {
-							form.dataset.action = form.action;
+							form.dataset.action = form.getAttribute("action");
 						}
-						form.action = this.dataset.redirect;';
+						form.setAttribute("action", this.dataset.redirect);';
 
 					$button
 						// Removing parameters not to conflict with the redirecting URL.
@@ -108,7 +112,7 @@ class CActionButtonList extends CObject {
 					$on_click_action = 'const form = this.closest("form");'.
 						// Restore the original form action, if previously saved.
 						'if (form.dataset.action) {
-							form.action = form.dataset.action;
+							form.setAttribute("action", form.dataset.action);
 						}';
 
 					$button

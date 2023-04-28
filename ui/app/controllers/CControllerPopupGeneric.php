@@ -1591,7 +1591,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'dchecks':
 				$records = API::DRule()->get([
-					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports'],
+					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports', 'allow_redirect'],
 					'output' => ['druleid', 'name']
 				]);
 
