@@ -458,7 +458,20 @@ zbx_int64_t	json_parse_object(const char *start, zbx_jsonobj_t *obj, char **erro
 			}
 
 			if (NULL != obj)
-				zbx_hashset_insert(&obj->data.object, &el, sizeof(el));
+			{
+				zbx_jsonobj_el_t	*pel;
+
+				pel = (zbx_jsonobj_el_t *)zbx_hashset_insert(&obj->data.object, &el, sizeof(el));
+
+				/* check if they element was inserted, if not solve the conflict */
+				/* by overwriting old data                                       */
+				if (pel->name != el.name)
+				{
+					zbx_free(pel->name);
+					zbx_jsonobj_clear(&pel->value);
+					*pel = el;
+				}
+			}
 
 			ptr += len;
 

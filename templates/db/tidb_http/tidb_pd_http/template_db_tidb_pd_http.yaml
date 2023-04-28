@@ -298,8 +298,8 @@ zabbix_export:
             -
               uuid: 9f47a19f6f424df598e74c5a653ebf27
               expression: 'last(/TiDB PD by HTTP/pd.uptime)<10m'
-              name: 'PD: has been restarted'
-              event_name: 'PD: has been restarted (uptime < 10m)'
+              name: 'PD: Host has been restarted'
+              event_name: 'PD: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'

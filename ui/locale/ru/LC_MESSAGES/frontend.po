@@ -1450,6 +1450,10 @@ msgstr "Атрибуция"
 msgid "Attribution HTML"
 msgstr "HTML код авторства"
 
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -10807,6 +10811,10 @@ msgstr "LLD макрос"
 #: include/views/configuration.host.discovery.edit.php:977
 msgid "LLD macros"
 msgstr "LLD макросы"
+
+#: include/classes/api/services/CItemGeneral.php:709
+msgid "LLD rule with the same UUID already exists"
+msgstr ""
 
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:57
@@ -21784,6 +21792,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "глобальные настройки очистки истории"
 
+#: include/classes/api/services/CGraphGeneral.php:836
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:830
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
 msgid "h"
@@ -21803,6 +21819,10 @@ msgstr "узел сети"
 #: include/classes/api/services/CMap.php:1317
 msgid "host group"
 msgstr "группа узла сети"
+
+#: include/classes/api/services/CHostGroup.php:819
+msgid "host group with the same UUID already exists"
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
@@ -22026,6 +22046,14 @@ msgstr "элемент данных \"%1$s\" на узле сети \"%2$s\" н�
 #: include/classes/widgets/CWidgetHelper.php:1175
 msgid "item pattern"
 msgstr "шаблон элемента данных"
+
+#: include/classes/api/services/CItemGeneral.php:715
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:703
+msgid "item with the same UUID already exists"
+msgstr ""
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -22615,6 +22643,10 @@ msgstr "выбрано"
 msgid "service"
 msgstr "услуга"
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr "краткое описание"
@@ -22738,6 +22770,14 @@ msgstr "tan() - Тангенс значения"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:449
+msgid "template with the same UUID already exists"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
 msgstr "последний перевод на новую строку отсутствует"
@@ -22856,9 +22896,17 @@ msgstr "выражение триггера должно содержать по
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "прототип триггера нельзя переместить в другой шаблон или узел сети"
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1889
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "триггер со связями нельзя переместить в другой шаблон или узел сети"
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -23083,6 +23131,10 @@ msgstr "значение %1$s уже существует"
 msgid "value is too long"
 msgstr "значение слишком длинное"
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -23187,6 +23239,10 @@ msgstr "через"
 msgctxt "week short"
 msgid "w"
 msgstr "н"
+
+#: include/classes/api/services/CHttpTest.php:438
+msgid "web scenario with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

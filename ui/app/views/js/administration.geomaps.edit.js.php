@@ -40,7 +40,6 @@
 			this.tile_providers = tile_providers;
 			this.defaults = {
 				geomaps_tile_url: '',
-				geomaps_attribution: '',
 				geomaps_max_zoom: ''
 			};
 
@@ -52,27 +51,34 @@
 
 		events: {
 			tileProviderChange(e) {
+				const attribution_field = view.attribution.parentNode;
+				const attribution_label = view.attribution.parentNode.previousElementSibling;
+
 				if (e.target.value !== '') {
 					view.tile_url.readOnly = true;
-					view.attribution.readOnly = true;
 					view.max_zoom.readOnly = true;
 					view.tile_url.tabIndex = -1;
-					view.attribution.tabIndex = -1;
 					view.max_zoom.tabIndex = -1;
+
+					attribution_field.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+					attribution_label.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+
+					hintBox.deleteHint(attribution_label.querySelector('[data-hintbox]'));
 				}
 				else {
 					view.tile_url.readOnly = false;
-					view.attribution.readOnly = false;
 					view.max_zoom.readOnly = false;
 					view.tile_url.removeAttribute('tabIndex');
-					view.attribution.removeAttribute('tabIndex');
 					view.max_zoom.removeAttribute('tabIndex');
+
+					attribution_field.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+					attribution_label.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 
 				const data = view.tile_providers[e.target.value] || view.defaults;
 				view.tile_url.value = data.geomaps_tile_url;
-				view.attribution.value = data.geomaps_attribution;
 				view.max_zoom.value = data.geomaps_max_zoom;
+				view.attribution.value = '';
 			},
 
 			submit() {
