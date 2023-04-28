@@ -1,8 +1,25 @@
 Changes for 6.0.18rc1
 
 New features:
+.........T [ZBXNEXT-8209] added azure cosmosdb for mongodb template (egordymov)
+..F....... [ZBXNEXT-8078] removed unnecessary new line for each element in array for export .yaml templates (rdetlavs)
+...G...PS. [ZBXNEXT-8273] implemented reading of relative Include paths in config based on current directory of the config (dgoloscapov)
+.........T [ZBXNEXT-8391] added healthcheck metric for container in Docker by Zabbix agent 2 template (egordymov)
+...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+..F....... [ZBX-22714] fixed signature for mqtt.get key in Standard items popup (dpetra)
+.........T [ZBX-21397] fixed preprocessing step in discovery for k8s kubelet template (egordymov)
+.........T [ZBX-20202] improved tablespace handling to support Oracle multitenant architecture in Oracle by ODBC template (knaglis)
+........S. [ZBX-22713] fixed Zabbix server compilation problem for NetBSD (kprutkovs, wiper)
+...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
+..F....... [ZBX-21801] fixed helper positioning when sorting Header and Query fields in item configuration form (miks)
+..F....... [ZBX-22238] fixed non-writable hostgroup appearance in template, host and host prototype clone forms (miks)
+..F....... [ZBX-22192] fixed valid widget name being reset when other widget fields are invalid (miks)
+A......... [ZBX-21871] switched for the changes in users of user group API object to be audit logged as updates in groups of user API objects (jfreibergs, vmaksimovs)
+..F....... [ZBX-22461] fixed incorrect sortable item positioning in Safari (miks)
+A......... [ZBX-22469] fixed SLI calculation for services having multiple alarms per second (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.17
