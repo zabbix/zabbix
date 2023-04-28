@@ -26,13 +26,13 @@ $sidebar-bg-color: #454545;
 $sidebar-mode-icon-color:#b1b1b1;
 
 $scrollbar-track-color: rgba(#acbbc2, .55);
-$scrollbar-thumb-color: rgba(#878787, .85);
+// $scrollbar-thumb-color: rgba(#878787, .85); // TODO: to be cleaned
 $scrollbar-thumb-color-darken: 5%;
 
 $sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
 $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
 
-$sidebar-toggle-bg-position: -630px -592px;
+// $sidebar-toggle-bg-position: -630px -592px; // TODO: clean duplicate
 
 // Main
 $font-color: #f2f2f2;
@@ -68,8 +68,6 @@ $ui-hover-color: #383838;
 $ui-border-color: #303030;
 $ui-placeholder-background-color: darken($ui-hover-color, 15%);
 $ui-highlighted-parent-background-color: darken($ui-hover-color, 10%);
-$ui-sortable-helper-background-color: $ui-bg-color;
-$ui-sortable-helper-border-color: $ui-border-color;
 
 $action-hover-color: #454545;
 $action-border-color: #383838;
@@ -98,7 +96,7 @@ $scrollbar-thumb-color: #383838;
 // Search form
 $form-search-bg-color: #191919;
 $form-search-focused-border-color: $form-border-focus-color;
-$form-search-icon-bg-position: -570px -616px;
+// $form-search-icon-bg-position: -570px -616px; // TODO: to be cleaned not used
 
 // Buttons
 $btn-color: #f2f2f2;
@@ -127,15 +125,15 @@ $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
 $link-visited-color: #4796c4;
 
-$link-main-nav-color: rgba(#ffffff, .8);
-$link-main-nav-hover-color: #ffffff;
-$link-main-nav-active-color: #ffffff;
-$link-main-nav-visited-color: rgba(#ffffff, .8);
+// $link-main-nav-color: rgba(#ffffff, .8); // TODO: to be cleaned not used
+// $link-main-nav-hover-color: #ffffff;
+// $link-main-nav-active-color: #ffffff;
+// $link-main-nav-visited-color: rgba(#ffffff, .8);
 
 $link-main-subnav-color: rgba(#ffffff, .8);
-$link-main-subnav-hover-color: #ffffff;
-$link-main-subnav-active-color: #ffffff;
-$link-main-subnav-visited-color: rgba(#ffffff, .8);
+// $link-main-subnav-hover-color: #ffffff; // TODO: to be cleaned not used
+// $link-main-subnav-active-color: #ffffff;
+// $link-main-subnav-visited-color: rgba(#ffffff, .8);
 
 // Icons
 $icon-color: #69808d;

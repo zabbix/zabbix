@@ -136,8 +136,6 @@ $ui-hover-color: #222222;
 $ui-border-color: #444444;
 $ui-placeholder-background-color: lighten($ui-hover-color, 10%);
 $ui-highlighted-parent-background-color: lighten($ui-hover-color, 20%);
-$ui-sortable-helper-background-color: $ui-bg-color;
-$ui-sortable-helper-border-color: $ui-border-color;
 
 $action-hover-color: #454545;
 $action-border-color: #666666;
@@ -638,14 +636,14 @@ a.link-action {
 	border-bottom: 1px dotted; // FIXME: needs to be checked if because link-action class has this value
 }
 
-.link-action {
+.link-action { // TODO: DF deleted duplicates
 	&:hover {
 		border-bottom-color: $link-hover-color;
 	}
 
 	&:active {
 		color: $link-hover-color;
-		border-bottom: 1px dotted $link-hover-color;
+		border-bottom-color: $link-hover-color;
 	}
 
 	&:focus {
@@ -1126,7 +1124,7 @@ td.inactive-bg {
 }
 
 // Multiline input control.
-// TODO: DF: Class overwriten need to ask AS
+// TODO: DF: to be cleaned
 //.multilineinput-control {
 //	button {
 //		&::after {
@@ -1465,9 +1463,10 @@ td.inactive-bg {
 		min-width: 65px;
 		padding-left: 42px;
 
-		&::after {
-			top: 50%;
-			transform: translateY(-50%);
+		&::before {
+			display: flex;
+			flex-direction: column; // TODO: SHOULD BE checked to AS
+			justify-content: center;
 		}
 	}
 }

@@ -7360,7 +7360,7 @@ a.link-action {
   border-bottom-color: #ffffff; }
 .link-action:active {
   color: #ffffff;
-  border-bottom: 1px dotted #ffffff; }
+  border-bottom-color: #ffffff; }
 .link-action:focus {
   color: #ffffff;
   border-bottom: 3px solid #ffffff; }
@@ -7741,9 +7741,10 @@ td.inactive-bg {
 .by-severity-widget > div {
   min-width: 65px;
   padding-left: 42px; }
-  .by-severity-widget > div::after {
-    top: 50%;
-    transform: translateY(-50%); }
+  .by-severity-widget > div::before {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; }
 
 .btn-undo.is-focused {
   box-shadow: 0 1px 0 #ffffff, 0 -1px 0 #ffffff; }

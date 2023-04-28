@@ -203,9 +203,9 @@ $link-visited-color: $link-color !default;
 $link-alt-underline-color: #768d99 !default;
 
 $link-main-subnav-color: rgba(#ffffff, .8) !default;
-$link-main-subnav-hover-color: rgba(#ffffff, 1) !default;
-$link-main-subnav-active-color: rgba(#ffffff, 1) !default;
-$link-main-subnav-visited-color: rgba(#ffffff, .8) !default;
+// $link-main-subnav-hover-color: rgba(#ffffff, 1) !default; // TODO: to be cleaned not used
+// $link-main-subnav-active-color: rgba(#ffffff, 1) !default;
+// $link-main-subnav-visited-color: rgba(#ffffff, .8) !default;
 
 // Icons
 $icon-color: #768d99 !default;
