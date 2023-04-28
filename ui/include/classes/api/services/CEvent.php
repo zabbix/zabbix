@@ -457,16 +457,7 @@ class CEvent extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
-			$this->dbFilter('events e', $options, $sqlParts);
-
-			// Filter symptom events for given cause.
-			if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
-				zbx_value2array($options['filter']['cause_eventid']);
-
-				$sqlParts['from']['event_symptom'] = 'event_symptom es';
-				$sqlParts['where']['ese'] = 'es.eventid=e.eventid';
-				$sqlParts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
-			}
+			$this->applyFilters($options, $sqlParts);
 		}
 
 		// limit
@@ -529,6 +520,48 @@ class CEvent extends CApiService {
 		if (!$evaltype_validator->validate($options['evaltype'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
 		}
+	}
+
+	/**
+	 * Apply filter conditions to sql built query.
+	 *
+	 * @param array  $options
+	 * @param array  $sqlParts
+	 */
+	protected function applyFilters($options, &$sqlParts): void {
+		// Acknowledge action filter properties.
+		$acknowledge_actions = [
+			'ack.eventid=e.eventid'
+		];
+
+		if (array_key_exists('action', $options['filter']) && ctype_xdigit((string) $options['filter']['action'])
+				&& $options['filter']['action'] != ZBX_PROBLEM_UPDATE_NONE) {
+			$acknowledge_actions[] = 'ack.action & '.sprintf('0x%02X', $options['filter']['action']);
+		}
+
+		if (array_key_exists('action_userid', $options['filter']) && ctype_digit($options['filter']['action_userid'])) {
+			$acknowledge_actions[] = dbConditionId('ack.userid', [$options['filter']['action_userid']]);
+		}
+
+		if (count($acknowledge_actions) > 1) {
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM acknowledges ack'.
+				' WHERE '.implode(' AND ', $acknowledge_actions).
+			')';
+		}
+
+		// Filter symptom events for given cause.
+		if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
+			zbx_value2array($options['filter']['cause_eventid']);
+
+			$sqlParts['from']['event_symptom'] = 'event_symptom es';
+			$sqlParts['where']['ese'] = 'es.eventid=e.eventid';
+			$sqlParts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
+		}
+
+		// Apply standard filter properties.
+		$this->dbFilter('events e', $options, $sqlParts);
 	}
 
 	/**

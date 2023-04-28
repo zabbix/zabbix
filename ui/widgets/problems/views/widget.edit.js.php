@@ -34,6 +34,9 @@ window.widget_problems_form = new class {
 		this._show_timeline = document.getElementById('show_timeline');
 		this._show_timeline_value = this._show_timeline.checked;
 
+		this._acknowledge_status = document.getElementById('unacknowledged');
+		this._acknowledge_status.addEventListener('change', () => this.updateForm());
+
 		this.updateForm();
 	}
 
@@ -44,6 +47,14 @@ window.widget_problems_form = new class {
 
 		for (const radio of document.querySelectorAll('#tag_name_format input')) {
 			radio.disabled = !show_tags;
+		}
+
+		if (this._acknowledge_status.querySelector('input:checked').value != 2) {
+			document.getElementById('acknowledged_by_me').disabled = true;
+			document.getElementById('acknowledged_by_me').checked = false;
+		}
+		else {
+			document.getElementById('acknowledged_by_me').disabled = false;
 		}
 
 		if (this._sort_with_enabled_show_timeline[this._sort_triggers.value]) {

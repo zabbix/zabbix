@@ -49,6 +49,7 @@ $options = [
 			'show_symptoms' => $data['filter']['show_symptoms'],
 			'show_suppressed' => $data['filter']['show_suppressed'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
+			'acknowledged_by_me' => $data['filter']['acknowledged_by_me'],
 			'compact_view' => $data['filter']['compact_view'],
 			'show_timeline' => $data['filter']['show_timeline'],
 			'details' => $data['filter']['details'],

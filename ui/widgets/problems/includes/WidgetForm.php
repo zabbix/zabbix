@@ -125,9 +125,23 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
+			// ->addField(
+			// 	(new CWidgetFieldCheckBox('unacknowledged', _('Show unacknowledged only')))
+			// 		->setFlags(CWidgetField::FLAG_ACKNOWLEDGES)
+			// )
 			->addField(
-				(new CWidgetFieldCheckBox('unacknowledged', _('Show unacknowledged only')))
-					->setFlags(CWidgetField::FLAG_ACKNOWLEDGES)
+				(new CWidgetFieldRadioButtonList('unacknowledged', _('Acknowledgement status'), [
+					0 => _('all'),
+					1 => _('Unacknowledged'),
+					2 => _('Acknowledged')
+				]))->setDefault(0)
+			)
+			->addField(
+				(new CWidgetFieldCheckBox('acknowledged_by_me', _('By me')))
+					->setFlags(array_key_exists('unacknowledged', $this->values) && $this->values['unacknowledged'] != 2
+						? CWidgetField::FLAG_DISABLED
+						: 0x00
+					)
 			)
 			->addField(
 				(new CWidgetFieldSelect('sort_triggers', _('Sort entries by'), $this->getSortTriggersValues()))

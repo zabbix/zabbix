@@ -66,6 +66,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'show_symptoms' => $this->fields_values['show_symptoms'],
 				'show_suppressed' => $this->fields_values['show_suppressed'],
 				'unacknowledged' => $this->fields_values['unacknowledged'],
+				'acknowledged_by_me' => $this->fields_values['unacknowledged'] == 2
+					? $this->fields_values['acknowledged_by_me']
+					: 0,
 				'show_opdata' => $this->fields_values['show_opdata']
 			], $search_limit);
 

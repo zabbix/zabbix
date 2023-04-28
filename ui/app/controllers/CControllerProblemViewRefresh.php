@@ -48,7 +48,8 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			'show_tags' =>			'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
 			'show_symptoms' =>		'in 0,1',
 			'show_suppressed' =>	'in 0,1',
-			'unacknowledged' =>		'in 0,1',
+			'unacknowledged' =>		'in 0,1,2',
+			'acknowledged_by_me' =>	'in 0,1',
 			'compact_view' =>		'in 0,1',
 			'show_timeline' =>		'in '.ZBX_TIMELINE_OFF.','.ZBX_TIMELINE_ON,
 			'details' =>			'in 0,1',
@@ -133,6 +134,9 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 					'show_suppressed' => $this->getInput('show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
 					'show_symptoms' => $this->getInput('show_symptoms', 0),
 					'unacknowledged' => $this->getInput('unacknowledged', 0),
+					'acknowledged_by_me' => $this->getInput('unacknowledged', 0) == 2
+						? $this->getInput('acknowledged_by_me', 0)
+						: 0,
 					'compact_view' => $this->getInput('compact_view', 0),
 					'show_timeline' => $this->getInput('show_timeline', ZBX_TIMELINE_OFF),
 					'details' => $this->getInput('details', 0),

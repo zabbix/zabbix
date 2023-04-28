@@ -251,9 +251,6 @@ class CScreenProblem extends CScreenBase {
 					$options['severities'] = $filter['severities'];
 				}
 			}
-			if (array_key_exists('unacknowledged', $filter) && $filter['unacknowledged']) {
-				$options['acknowledged'] = false;
-			}
 			if (array_key_exists('evaltype', $filter)) {
 				$options['evaltype'] = $filter['evaltype'];
 			}
@@ -269,8 +266,32 @@ class CScreenProblem extends CScreenBase {
 				unset($options['symptom']);
 			}
 
+			$filter_options = [];
+
 			if (array_key_exists('cause_eventid', $filter) && $filter['cause_eventid']) {
-				$options['filter'] = ['cause_eventid' => $filter['cause_eventid']];
+				$filter_options['cause_eventid'] = $filter['cause_eventid'];
+			}
+			if (array_key_exists('unacknowledged', $filter)) {
+				switch ($filter['unacknowledged']) {
+					case 1:
+						$options['acknowledged'] = false;
+						break;
+
+					case 2:
+						$options['acknowledged'] = true;
+
+						if (array_key_exists('acknowledged_by_me', $filter) && $filter['acknowledged_by_me'] == 1) {
+							$filter_options += [
+								'action' => ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+								'action_userid' => CUser::$userData['userid']
+							];
+						}
+						break;
+				}
+			}
+
+			if ($filter_options) {
+				$options['filter'] = $filter_options;
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
