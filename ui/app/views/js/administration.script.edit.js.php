@@ -47,7 +47,7 @@ window.script_edit_popup = new class {
 		this.form.querySelector('#enable-confirmation').dispatchEvent(new Event('change'));
 
 		this.form.querySelector('.js-parameter-add').addEventListener('click', () => {
-			const template = new Template(document.getElementById('script-parameter-template').innerHTML);
+			const template = new Template(this.form.querySelector('#script-parameter-template').innerHTML);
 
 			this.form
 				.querySelector('#parameters-table tbody')
@@ -67,7 +67,7 @@ window.script_edit_popup = new class {
 	 * @param {object} parameter  The parameter object.
 	 */
 	#addParameter(parameter) {
-		const template = new Template(document.getElementById('script-parameter-template').innerHTML);
+		const template = new Template(this.form.querySelector('#script-parameter-template').innerHTML);
 
 		this.form
 			.querySelector('#parameters-table tbody')
