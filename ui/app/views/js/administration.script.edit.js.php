@@ -83,6 +83,7 @@ window.script_edit_popup = new class {
 		this.scope = parseInt(script.scope);
 		this.type = parseInt(script.type);
 		this.confirmation = script.enable_confirmation;
+
 		const type = this.form.querySelector('#type');
 
 		// Load scope fields.
@@ -107,14 +108,7 @@ window.script_edit_popup = new class {
 		const hgstype = this.form.querySelector('#hgstype-select');
 		const hostgroup_selection = this.form.querySelector('#host-group-selection');
 
-		hgstype.onchange = function () {
-			if (hgstype.value === '1') {
-				hostgroup_selection.style.display = '';
-			}
-			else {
-				hostgroup_selection.style.display = 'none';
-			}
-		}
+		hgstype.onchange = () => hostgroup_selection.style.display = hgstype.value === '1' ? '' : 'none';
 
 		hgstype.dispatchEvent(new Event('change'));
 		this.form.removeAttribute('style');
@@ -167,8 +161,8 @@ window.script_edit_popup = new class {
 	/**
 	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
 	 *
-	 * @param {string} url                 The URL to send the POST request to.
-	 * @param {object} data                The data to send with the POST request.
+	 * @param {string}   url               The URL to send the POST request to.
+	 * @param {object}   data              The data to send with the POST request.
 	 * @param {callback} success_callback  The function to execute when a successful response is received.
 	 */
 	#post(url, data, success_callback) {
@@ -208,9 +202,7 @@ window.script_edit_popup = new class {
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.finally(() => this.overlay.unsetLoading());
 	}
 
 	/**
@@ -322,6 +314,7 @@ window.script_edit_popup = new class {
 
 				// Load authentication fields.
 				this.authtype = parseInt(script.authtype);
+
 				const authtype = this.form.querySelector('#authtype');
 
 				authtype.onchange = (e) => this.#loadAuthFields(e);
@@ -353,9 +346,7 @@ window.script_edit_popup = new class {
 				break;
 		}
 
-		show_fields.forEach((field) => {
-			this.form.querySelector(field).style.display = '';
-		})
+		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
 	}
 
 	/**
@@ -386,9 +377,7 @@ window.script_edit_popup = new class {
 				break;
 		}
 
-		show_fields.forEach((field) => {
-			this.form.querySelector(field).style.display = '';
-		});
+		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
 	}
 
 	/**
@@ -408,14 +397,9 @@ window.script_edit_popup = new class {
 		if (this.confirmation) {
 			confirmation.removeAttribute('disabled');
 
-			confirmation.onkeyup = function () {
-				if (confirmation.value != '') {
-					test_confirmation.removeAttribute('disabled');
-				}
-				else {
-					test_confirmation.setAttribute('disabled', 'disabled');
-				}
-			}
+			confirmation.onkeyup = () => confirmation.value !== ''
+				? test_confirmation.removeAttribute('disabled')
+				: test_confirmation.setAttribute('disabled', 'disabled');
 
 			confirmation.dispatchEvent(new Event('keyup'));
 		}
@@ -456,8 +440,6 @@ window.script_edit_popup = new class {
 			];
 		}
 
-		fields.forEach((field) => {
-			this.form.querySelector(field).style.display = 'none';
-		});
+		fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
 	}
 }
