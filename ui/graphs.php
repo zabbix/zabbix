@@ -93,7 +93,7 @@ if (isset($_REQUEST['yaxismin']) && zbx_empty($_REQUEST['yaxismin'])) {
 if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
-check_fields($fields);
+check_fields($fields, false);
 
 $color_validator = new CColorValidator();
 $gitems = [];
