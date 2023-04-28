@@ -77,7 +77,7 @@ out:
  *              jp    - [IN] the request data                                 *
  *                                                                            *
  ******************************************************************************/
-static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -200,7 +200,7 @@ fail:
 	if (NULL != debug)
 		zbx_json_addraw(&json, "debug", debug);
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_free(params);
 	zbx_free(message);
@@ -231,7 +231,7 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
 	{
-		trapper_process_alert_send(sock, jp);
+		trapper_process_alert_send(sock, jp, config_timeout);
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))

@@ -38,20 +38,24 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
-			->addField(
-				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
 			)
-			->addField(
-				new CWidgetFieldTags('tags')
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldTags('tags')
 			)
 			->addField(
 				new CWidgetFieldLatLng('default_view', _('Initial view'))

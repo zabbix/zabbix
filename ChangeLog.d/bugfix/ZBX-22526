@@ -1,0 +1,1 @@
+..F....... [ZBX-22526] refactored jQuery onclick CButtonExport code, changed usage of form.action to form.getAttribute/setAttribute('action') in CActionButtonList. (epulke)
