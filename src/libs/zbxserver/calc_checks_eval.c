@@ -1564,7 +1564,7 @@ out:
  *             name     - [IN] the function name (not zero terminated)        *
  *             len      - [IN] the function name length                       *
  *             args_num - [IN] the number of function arguments               *
- *             args     - [IN] an array of the function arguments.            *
+ *             args     - [IN/OUT] an array of the function arguments.        *
  *             data     - [IN] the caller data used for function evaluation   *
  *             ts       - [IN] the function execution time                    *
  *             value    - [OUT] the function return value                     *
@@ -1659,7 +1659,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			}
 			count = 0;
 
-			if (args_num >= 2)
+			if (2 <= args_num)
 			{
 				if (ZBX_VARIANT_NONE != args[1].type)
 				{
