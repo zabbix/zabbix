@@ -376,12 +376,13 @@ out:
  *                                                                            *
  * Purpose: processes proxy data request                                      *
  *                                                                            *
- * Parameters: proxy      - [IN/OUT] proxy data                               *
- *             answer     - [IN] data received from proxy                     *
- *             ts         - [IN] timestamp when the proxy connection was      *
- *                           established                                      *
- *             events_cbs - [IN]                                              *
- *             more       - [OUT] available data flag                         *
+ * Parameters: proxy               - [IN/OUT] proxy data                      *
+ *             answer              - [IN] data received from proxy            *
+ *             ts                  - [IN] timestamp when the proxy connection *
+ *                                        was established                     *
+ *             events_cbs          - [IN]                                     *
+ *             proxydata_frequency - [IN]                                     *
+ *             more                - [OUT] available data flag                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               FAIL - otherwise                                             *
@@ -391,7 +392,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	proxy_process_proxy_data(zbx_dc_proxy_t *proxy, const char *answer, zbx_timespec_t *ts,
-		const zbx_events_funcs_t *events_cbs, int *more)
+		const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more)
 {
 	struct zbx_json_parse	jp;
 	char			*error = NULL, *version_str = NULL;
@@ -426,8 +427,8 @@ static int	proxy_process_proxy_data(zbx_dc_proxy_t *proxy, const char *answer, z
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, events_cbs, more,
-			&error)))
+	if (SUCCEED != (ret = zbx_process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, events_cbs,
+			proxydata_frequency, more, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->host, proxy->addr, error);
@@ -446,10 +447,11 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy          - [IN/OUT] proxy data                           *
- *             config_timeout - [IN]                                          *
- *             events_cbs     - [IN]                                          *
- *             more           - [OUT] available data flag                     *
+ * Parameters: proxy               - [IN/OUT] proxy data                      *
+ *             config_timeout      - [IN]                                     *
+ *             events_cbs          - [IN]                                     *
+ *             proxydata_frequency - [IN]                                     *
+ *             more                - [OUT] available data flag                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               other code - an error occurred                               *
@@ -459,7 +461,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	proxy_get_data(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_events_funcs_t *events_cbs,
-		int *more)
+		int proxydata_frequency, int *more)
 {
 	char		*answer = NULL;
 	int		ret;
@@ -481,7 +483,7 @@ static int	proxy_get_data(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_e
 	}
 
 	proxy->lastaccess = time(NULL);
-	ret = proxy_process_proxy_data(proxy, answer, &ts, events_cbs, more);
+	ret = proxy_process_proxy_data(proxy, answer, &ts, events_cbs, proxydata_frequency, more);
 	zbx_free(answer);
 out:
 	if (SUCCEED == ret)
@@ -496,9 +498,10 @@ out:
  *                                                                            *
  * Purpose: gets data from proxy ('proxy data' request)                       *
  *                                                                            *
- * Parameters: proxy          - [IN/OUT] proxy data                           *
- *             config_timeout - [IN]                                          *
- *             events_cbs     - [IN]                                          *
+ * Parameters: proxy               - [IN/OUT] proxy data                      *
+ *             config_timeout      - [IN]                                     *
+ *             events_cbs          - [IN]                                     *
+ *             proxydata_frequency - [IN]                                     *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
  *               other code - an error occurred                               *
@@ -507,7 +510,8 @@ out:
  *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_tasks(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_events_funcs_t *events_cbs)
+static int	proxy_get_tasks(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_events_funcs_t *events_cbs,
+		int proxydata_frequency)
 {
 	char		*answer = NULL;
 	int		ret = FAIL, more;
@@ -530,7 +534,7 @@ static int	proxy_get_tasks(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_
 
 	proxy->lastaccess = time(NULL);
 
-	ret = proxy_process_proxy_data(proxy, answer, &ts, events_cbs, &more);
+	ret = proxy_process_proxy_data(proxy, answer, &ts, events_cbs, proxydata_frequency, &more);
 
 	zbx_free(answer);
 out:
@@ -545,7 +549,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	process_proxy(const zbx_config_vault_t *config_vault, int config_timeout,
-		const zbx_events_funcs_t *events_cbs)
+		const zbx_events_funcs_t *events_cbs, int proxyconfig_frequency, int proxydata_frequency)
 {
 	zbx_dc_proxy_t		proxy, proxy_old;
 	int			num, i;
@@ -617,7 +621,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 						break;
 
 					if (SUCCEED != (ret = proxy_get_data(&proxy, config_timeout, events_cbs,
-							&more)))
+							proxydata_frequency, &more)))
 					{
 						goto error;
 					}
@@ -629,8 +633,11 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 			if (1 == check_tasks)
 			{
-				if (SUCCEED != (ret = proxy_get_tasks(&proxy, config_timeout, events_cbs)))
+				if (SUCCEED != (ret = proxy_get_tasks(&proxy, config_timeout, events_cbs,
+						proxydata_frequency)))
+				{
 					goto error;
+				}
 			}
 		}
 error:
@@ -642,7 +649,7 @@ error:
 					proxy.auto_compress, 0);
 		}
 
-		zbx_dc_requeue_proxy(proxy.hostid, update_nextcheck, ret);
+		zbx_dc_requeue_proxy(proxy.hostid, update_nextcheck, ret, proxyconfig_frequency, proxydata_frequency);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
@@ -701,7 +708,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		}
 
 		processed += process_proxy(proxy_poller_args_in->config_vault, proxy_poller_args_in->config_timeout,
-				proxy_poller_args_in->events_cbs);
+				proxy_poller_args_in->events_cbs, proxy_poller_args_in->proxyconfig_frequency,
+				proxy_poller_args_in->proxydata_frequency);
 		total_sec += zbx_time() - sec;
 
 		nextcheck = zbx_dc_config_get_proxypoller_nextcheck();

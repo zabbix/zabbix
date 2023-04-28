@@ -23,12 +23,13 @@
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxcomms.h"
+#include "cfg.h"
 
 #define HOST_INTERFACE_LEN	255	/* UTF-8 characters, not bytes */
 
 typedef struct
 {
-	zbx_vector_ptr_t	addrs;
+	zbx_vector_addr_ptr_t	addrs;
 	char			*hostname;
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;

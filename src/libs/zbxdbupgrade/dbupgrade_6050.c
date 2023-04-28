@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
+#include "log.h"
 
 /*
  * 7.0 development database patches
@@ -83,6 +83,53 @@ static int	DBpatch_6050007(void)
 	return DBmodify_field_type("widget_field", &field, NULL);
 }
 
+static int	DBpatch_6050008(void)
+{
+	const zbx_db_field_t	field = {"value", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("history", &field, &field);
+}
+
+static int	DBpatch_6050009(void)
+{
+	const zbx_db_field_t	field = {"value_min", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050010(void)
+{
+	const zbx_db_field_t	field = {"value_avg", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050011(void)
+{
+	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBmodify_field_type("trends", &field, &field);
+}
+
+static int	DBpatch_6050012(void)
+{
+	const zbx_db_field_t	field = {"allow_redirect", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -97,5 +144,10 @@ DBPATCH_ADD(6050004, 0, 1)
 DBPATCH_ADD(6050005, 0, 1)
 DBPATCH_ADD(6050006, 0, 1)
 DBPATCH_ADD(6050007, 0, 1)
+DBPATCH_ADD(6050008, 0, 1)
+DBPATCH_ADD(6050009, 0, 1)
+DBPATCH_ADD(6050010, 0, 1)
+DBPATCH_ADD(6050011, 0, 1)
+DBPATCH_ADD(6050012, 0, 1)
 
 DBPATCH_END()

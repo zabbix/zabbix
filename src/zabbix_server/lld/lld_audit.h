@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AVAIL_MANAGER_H
-#define ZABBIX_AVAIL_MANAGER_H
+#ifndef ZABBIX_LLD_AUDIT_H
+#define ZABBIX_LLD_AUDIT_H
 
-#include "zbxthreads.h"
+#include "lld.h"
 
-ZBX_THREAD_ENTRY(availability_manager_thread, args);
+void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
+		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid);
 
 #endif

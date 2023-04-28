@@ -580,7 +580,8 @@ class CControllerPopupGeneric extends CController {
 			'hostids' =>							'array',
 			'host_pattern' =>						'array|not_empty',
 			'host_pattern_wildcard_allowed' =>		'in 1',
-			'host_pattern_multiple' =>				'in 1'
+			'host_pattern_multiple' =>				'in 1',
+			'hide_host_filter' =>					'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -876,7 +877,8 @@ class CControllerPopupGeneric extends CController {
 
 		// Host dropdown.
 		if (in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER)
-				&& ($this->source_table !== 'item_prototypes' || !$this->page_options['parent_discoveryid'])) {
+				&& ($this->source_table !== 'item_prototypes' || !$this->page_options['parent_discoveryid'])
+				&& !$this->hasInput('hide_host_filter')) {
 
 			$src_name = 'hosts';
 			if (!array_key_exists('monitored_hosts', $host_options)
@@ -1589,7 +1591,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'dchecks':
 				$records = API::DRule()->get([
-					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports'],
+					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports', 'allow_redirect'],
 					'output' => ['druleid', 'name']
 				]);
 

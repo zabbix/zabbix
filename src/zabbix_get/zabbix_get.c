@@ -361,7 +361,6 @@ int	main(int argc, char **argv)
 			case 'h':
 				zbx_help();
 				exit(EXIT_SUCCESS);
-				break;
 			case 'V':
 				zbx_version();
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -369,7 +368,6 @@ int	main(int argc, char **argv)
 				zbx_tls_version();
 #endif
 				exit(EXIT_SUCCESS);
-				break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			case '1':
 				zbx_config_tls->connect = zbx_strdup(zbx_config_tls->connect,
@@ -441,7 +439,6 @@ int	main(int argc, char **argv)
 			default:
 				zbx_usage();
 				exit(EXIT_FAILURE);
-				break;
 		}
 	}
 

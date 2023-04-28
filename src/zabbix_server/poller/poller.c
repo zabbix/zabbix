@@ -41,6 +41,7 @@
 #include "zbxhttp.h"
 #include "log.h"
 #include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -191,7 +192,7 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item,  unsig
 
 	interface_set_availability(&item->interface, &out);
 
-	if (INTERFACE_AVAILABLE_TRUE == in.agent.available)
+	if (ZBX_INTERFACE_AVAILABLE_TRUE == in.agent.available)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
 				item_type_agent_string(item->type), item->host.host);
@@ -212,18 +213,21 @@ out:
  *                                                                                 *
  * Purpose: deactivate item interface                                              *
  *                                                                                 *
- * Parameters: ts                - [IN] timestamp                                  *
- *             item              - [IN/OUT] item                                   *
- *             data              - [IN/OUT] serialized availability data           *
- *             data_alloc        - [IN/OUT] serialized availability data size      *
- *             data_alloc        - [IN/OUT] serialized availability data offset    *
- *             ts                - [IN] timestamp                                  *
- *             unavailable_delay - [IN]                                            *
- *             error             - [IN/OUT]                                        *
+ * Parameters: ts                 - [IN] timestamp                                 *
+ *             item               - [IN/OUT] item                                  *
+ *             data               - [IN/OUT] serialized availability data          *
+ *             data_alloc         - [IN/OUT] serialized availability data size     *
+ *             data_alloc         - [IN/OUT] serialized availability data offset   *
+ *             ts                 - [IN] timestamp                                 *
+ *             unavailable_delay  - [IN]                                           *
+ *             unreachable_period - [IN]                                           *
+ *             unreachable_delay  - [IN]                                           *
+ *             error              - [IN/OUT]                                       *
  *                                                                                 *
  ***********************************************************************************/
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsigned char **data, size_t *data_alloc,
-		size_t *data_offset, int unavailable_delay, const char *error)
+		size_t *data_offset, int unavailable_delay, int unreachable_period, int unreachable_delay,
+		const char *error)
 {
 	zbx_interface_availability_t	in, out;
 
@@ -238,8 +242,8 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsi
 
 	interface_get_availability(&item->interface, &in);
 
-	if (FAIL == zbx_dc_interface_deactivate(item->interface.interfaceid, ts, unavailable_delay, &in.agent, &out.agent,
-			error))
+	if (FAIL == zbx_dc_interface_deactivate(item->interface.interfaceid, ts, unavailable_delay, unreachable_period,
+			unreachable_delay, &in.agent, &out.agent, error))
 	{
 		goto out;
 	}
@@ -256,9 +260,9 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsi
 				item_type_agent_string(item->type), item->key_orig, item->host.host,
 				out.agent.disable_until - ts->sec);
 	}
-	else if (INTERFACE_AVAILABLE_FALSE != in.agent.available)
+	else if (ZBX_INTERFACE_AVAILABLE_FALSE != in.agent.available)
 	{
-		if (INTERFACE_AVAILABLE_FALSE != out.agent.available)
+		if (ZBX_INTERFACE_AVAILABLE_FALSE != out.agent.available)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s item \"%s\" on host \"%s\" failed:"
 					" another network error, wait for %d seconds",
@@ -792,30 +796,34 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve values of metrics from monitored hosts                   *
- *                                                                            *
- * Parameters: poller_type         - [IN] poller type (ZBX_POLLER_TYPE_...)   *
- *             nextcheck           - [OUT] item nextcheck                     *
- *             config_comms        - [IN] server/proxy configuration for      *
- *                                      communication                         *
- *             config_startup_time - [IN] program startup time                *
- *                                                                            *
- * Return value: number of items processed                                    *
- *                                                                            *
- * Comments: processes single item at a time except for Java, SNMP items,     *
- *           see zbx_dc_config_get_poller_items()                             *
- *                                                                            *
- ******************************************************************************/
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: retrieve values of metrics from monitored hosts                        *
+ *                                                                                 *
+ * Parameters: poller_type                - [IN] poller type (ZBX_POLLER_TYPE_...) *
+ *             nextcheck                  - [OUT] item nextcheck                   *
+ *             config_comms               - [IN] server/proxy configuration for    *
+ *                                               communication                     *
+ *             config_startup_time        - [IN] program startup time              *
+ *             config_unavailable_delay   - [IN]                                   *
+ *             config_unreachable_period  - [IN]                                   *
+ *             config_unreachable_delay   - [IN]                                   *
+ *                                                                                 *
+ * Return value: number of items processed                                         *
+ *                                                                                 *
+ * Comments: processes single item at a time except for Java, SNMP items,          *
+ *           see zbx_dc_config_get_poller_items()                                  *
+ *                                                                                 *
+ **********************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, int config_unavailable_delay)
+		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
+		int config_unreachable_delay)
 {
 	zbx_dc_item_t		item, *items;
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
 	int			errcodes[ZBX_MAX_POLLER_ITEMS];
 	zbx_timespec_t		timespec;
-	int			i, num, last_available = INTERFACE_AVAILABLE_UNKNOWN;
+	int			i, num, last_available = ZBX_INTERFACE_AVAILABLE_UNKNOWN;
 	zbx_vector_ptr_t	add_results;
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
@@ -846,21 +854,23 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-				if (INTERFACE_AVAILABLE_TRUE != last_available)
+				if (ZBX_INTERFACE_AVAILABLE_TRUE != last_available)
 				{
 					zbx_activate_item_interface(&timespec, &items[i], &data, &data_alloc,
 							&data_offset);
-					last_available = INTERFACE_AVAILABLE_TRUE;
+					last_available = ZBX_INTERFACE_AVAILABLE_TRUE;
 				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
-				if (INTERFACE_AVAILABLE_FALSE != last_available)
+				if (ZBX_INTERFACE_AVAILABLE_FALSE != last_available)
 				{
 					zbx_deactivate_item_interface(&timespec, &items[i], &data, &data_alloc,
-							&data_offset, config_unavailable_delay, results[i].msg);
-					last_available = INTERFACE_AVAILABLE_FALSE;
+							&data_offset, config_unavailable_delay,
+							config_unreachable_period, config_unreachable_delay,
+							results[i].msg);
+					last_available = ZBX_INTERFACE_AVAILABLE_FALSE;
 				}
 				break;
 			case CONFIG_ERROR:
@@ -1006,7 +1016,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		}
 
 		processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
-				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay);
+				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
+				poller_args_in->config_unreachable_period, poller_args_in->config_unreachable_delay);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

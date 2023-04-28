@@ -70,6 +70,7 @@ else {
 
 $output = [
 	'header' => $title,
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATE_GROUPS_EDIT),
 	'body' => (new CPartial('configuration.templategroup.edit.html', $data))->getOutput(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

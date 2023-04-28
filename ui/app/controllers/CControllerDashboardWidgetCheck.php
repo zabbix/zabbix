@@ -56,12 +56,6 @@ class CControllerDashboardWidgetCheck extends CController {
 			}
 		}
 
-		if ($ret && $this->hasInput('templateid') && !$this->widget->hasTemplateSupport()) {
-			error(_('Widget type is not supported in this context.'));
-
-			$ret = false;
-		}
-
 		if (!$ret) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
