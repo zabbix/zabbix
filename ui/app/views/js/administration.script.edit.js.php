@@ -33,23 +33,23 @@ window.script_edit_popup = new class {
 		this.script = script;
 		this.scriptid = script.scriptid;
 
-		this._loadView(script);
-		this._initActions();
+		this.#loadView(script);
+		this.#initActions();
 
 		for (const parameter of script.parameters) {
-			this._addParameter(parameter);
+			this.#addParameter(parameter);
 		}
 	}
 
-	_initActions() {
-		document.querySelector('#scope').dispatchEvent(new Event('change'));
-		document.querySelector('#type').dispatchEvent(new Event('change'));
-		document.querySelector('#enable-confirmation').dispatchEvent(new Event('change'));
+	#initActions() {
+		this.form.querySelector('#scope').dispatchEvent(new Event('change'));
+		this.form.querySelector('#type').dispatchEvent(new Event('change'));
+		this.form.querySelector('#enable-confirmation').dispatchEvent(new Event('change'));
 
-		document.getElementById('js-add').addEventListener('click', () => {
+		this.form.querySelector('.js-parameter-add').addEventListener('click', () => {
 			const template = new Template(document.getElementById('script-parameter-template').innerHTML);
 
-			document
+			this.form
 				.querySelector('#parameters-table tbody')
 				.insertAdjacentHTML('beforeend', template.evaluate({}));
 		});
@@ -66,10 +66,10 @@ window.script_edit_popup = new class {
 	 *
 	 * @param {object} parameter  The parameter object.
 	 */
-	_addParameter(parameter) {
+	#addParameter(parameter) {
 		const template = new Template(document.getElementById('script-parameter-template').innerHTML);
 
-		document
+		this.form
 			.querySelector('#parameters-table tbody')
 			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
 	}
@@ -79,33 +79,33 @@ window.script_edit_popup = new class {
 	 *
 	 * @param {object} script  The script object.
 	 */
-	_loadView(script) {
+	#loadView(script) {
 		this.scope = parseInt(script.scope);
 		this.type = parseInt(script.type);
 		this.confirmation = script.enable_confirmation;
-		const type = document.querySelector('#type');
+		const type = this.form.querySelector('#type');
 
 		// Load scope fields.
-		document.querySelector('#scope').onchange = (e) => {
-			this._hideFormFields('all');
-			this._loadScopeFields(e);
+		this.form.querySelector('#scope').onchange = (e) => {
+			this.#hideFormFields('all');
+			this.#loadScopeFields(e);
 			type.dispatchEvent(new Event('change'));
 		};
 
 		// Load type fields.
-		type.onchange = (e) => this._loadTypeFields(script, e);
+		type.onchange = (e) => this.#loadTypeFields(script, e);
 
 		// Update confirmation fields.
-		document.querySelector('#enable-confirmation').onchange = (e) => this._loadConfirmationFields(e);
+		this.form.querySelector('#enable-confirmation').onchange = (e) => this.#loadConfirmationFields(e);
 
 		// Test confirmation button.
-		document.querySelector('#test-confirmation').addEventListener('click', (e) =>
-			executeScript(null, document.querySelector('#confirmation').value, e.target)
+		this.form.querySelector('#test-confirmation').addEventListener('click', (e) =>
+			executeScript(null, this.form.querySelector('#confirmation').value, e.target)
 		);
 
 		// Host group selection.
-		const hgstype = document.querySelector('#hgstype-select');
-		const hostgroup_selection = document.querySelector('#host-group-selection');
+		const hgstype = this.form.querySelector('#hgstype-select');
+		const hostgroup_selection = this.form.querySelector('#host-group-selection');
 
 		hgstype.onchange = function () {
 			if (hgstype.value === '1') {
@@ -137,7 +137,7 @@ window.script_edit_popup = new class {
 			<?= json_encode(CCsrfTokenHelper::get('script'), JSON_THROW_ON_ERROR) ?>
 		);
 
-		this._post(curl.getUrl(), {scriptids: [this.scriptid]}, (response) => {
+		this.#post(curl.getUrl(), {scriptids: [this.scriptid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
@@ -157,7 +157,7 @@ window.script_edit_popup = new class {
 
 		curl.setArgument('action', this.scriptid === null ? 'script.create' : 'script.update');
 
-		this._post(curl.getUrl(), fields, (response) => {
+		this.#post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
@@ -171,7 +171,7 @@ window.script_edit_popup = new class {
 	 * @param {object} data                The data to send with the POST request.
 	 * @param {callback} success_callback  The function to execute when a successful response is received.
 	 */
-	_post(url, data, success_callback) {
+	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -218,12 +218,12 @@ window.script_edit_popup = new class {
 	 *
 	 * @param {object} event  The event object.
 	 */
-	_loadScopeFields(event) {
+	#loadScopeFields(event) {
 		if (event.target.value) {
 			this.scope = parseInt(event.target.value);
 		}
 
-		const url_radio_button = document.querySelector(
+		const url_radio_button = this.form.querySelector(
 			`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`
 		);
 
@@ -237,7 +237,7 @@ window.script_edit_popup = new class {
 				];
 
 				show_fields.forEach((field) => {
-					document.querySelector(field).style.display = '';
+					this.form.querySelector(field).style.display = '';
 				});
 
 				url_radio_button.closest('li').style.display = '';
@@ -247,13 +247,13 @@ window.script_edit_popup = new class {
 				const hide_fields = ['#menu-path', '#menu-path-label'];
 
 				hide_fields.forEach((field) => {
-					document.querySelector(field).style.display = 'none';
+					this.form.querySelector(field).style.display = 'none';
 				});
 
 				url_radio_button.closest('li').style.display = 'none';
 
-				if (document.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
-					const webhook = document.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`);
+				if (this.form.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
+					const webhook = this.form.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`);
 
 					webhook.checked = true;
 					this.type = parseInt(<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>);
@@ -268,7 +268,7 @@ window.script_edit_popup = new class {
 	 * @param {object} script  The script object.
 	 * @param {object} event   The event object.
 	 */
-	_loadTypeFields(script, event) {
+	#loadTypeFields(script, event) {
 		if (event.target.value) {
 			this.type = parseInt(event.target.value);
 		}
@@ -284,11 +284,11 @@ window.script_edit_popup = new class {
 		];
 
 		hide_fields.forEach((field) => {
-			document.querySelector(field).style.display = 'none';
+			this.form.querySelector(field).style.display = 'none';
 		})
 
-		const command_ipmi = document.querySelector('#commandipmi');
-		const command = document.querySelector('#command');
+		const command_ipmi = this.form.querySelector('#commandipmi');
+		const command = this.form.querySelector('#command');
 
 		switch (this.type) {
 			case <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>:
@@ -322,9 +322,9 @@ window.script_edit_popup = new class {
 
 				// Load authentication fields.
 				this.authtype = parseInt(script.authtype);
-				const authtype = document.querySelector('#authtype');
+				const authtype = this.form.querySelector('#authtype');
 
-				authtype.onchange = (e) => this._loadAuthFields(e);
+				authtype.onchange = (e) => this.#loadAuthFields(e);
 				authtype.dispatchEvent(new Event('change'));
 				break;
 
@@ -354,7 +354,7 @@ window.script_edit_popup = new class {
 		}
 
 		show_fields.forEach((field) => {
-			document.querySelector(field).style.display = '';
+			this.form.querySelector(field).style.display = '';
 		})
 	}
 
@@ -364,8 +364,8 @@ window.script_edit_popup = new class {
 	 *
 	 * @param {object} event  The event object.
 	 */
-	_loadAuthFields(event) {
-		this._hideFormFields('auth');
+	#loadAuthFields(event) {
+		this.#hideFormFields('auth');
 
 		let show_fields = [];
 
@@ -387,7 +387,7 @@ window.script_edit_popup = new class {
 		}
 
 		show_fields.forEach((field) => {
-			document.querySelector(field).style.display = '';
+			this.form.querySelector(field).style.display = '';
 		});
 	}
 
@@ -397,13 +397,13 @@ window.script_edit_popup = new class {
 	 *
 	 * @param {object} event  The event object.
 	 */
-	_loadConfirmationFields(event) {
+	#loadConfirmationFields(event) {
 		if (event.target.value) {
 			this.confirmation = event.target.checked;
 		}
 
-		const confirmation = document.querySelector('#confirmation');
-		const test_confirmation = document.querySelector('#test-confirmation');
+		const confirmation = this.form.querySelector('#confirmation');
+		const test_confirmation = this.form.querySelector('#test-confirmation');
 
 		if (this.confirmation) {
 			confirmation.removeAttribute('disabled');
@@ -430,7 +430,7 @@ window.script_edit_popup = new class {
 	 *
 	 * @param {string} type  A string indicating the type of fields to hide.
 	 */
-	_hideFormFields(type) {
+	#hideFormFields(type) {
 		let fields = [];
 
 		if (type === 'auth') {
@@ -441,7 +441,7 @@ window.script_edit_popup = new class {
 		}
 
 		if (type === 'all') {
-			document.querySelector(`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`)
+			this.form.querySelector(`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`)
 				.closest('li').style.display = 'none';
 
 			fields = [
@@ -457,7 +457,7 @@ window.script_edit_popup = new class {
 		}
 
 		fields.forEach((field) => {
-			document.querySelector(field).style.display = 'none';
+			this.form.querySelector(field).style.display = 'none';
 		});
 	}
 }

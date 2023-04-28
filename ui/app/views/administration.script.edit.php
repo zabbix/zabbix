@@ -46,7 +46,7 @@ $parameters_table = (new CTable())
 				(new CCol(
 					(new CSimpleButton(_('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK)
-						->setId('js-add')
+						->addClass('js-parameter-add')
 				))->setColSpan(2)
 			)
 	);

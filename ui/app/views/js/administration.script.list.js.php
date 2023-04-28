@@ -28,31 +28,31 @@
 	const view = new class {
 
 		init() {
-			this._initActions();
+			this.#initActions();
 		}
 
-		_initActions() {
-			document.getElementById('js-create').addEventListener('click', () => this._edit());
+		#initActions() {
+			document.getElementById('js-create').addEventListener('click', () => this.#edit());
 
 			document.getElementById('js-massdelete').addEventListener('click', (e) => {
-				this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
 			});
 
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-edit')) {
-					this._editAction({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
+					this.#editAction({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
 				}
 
 				if (e.target.classList.contains('js-edit')) {
-					this._edit({scriptid: e.target.dataset.scriptid});
+					this.#edit({scriptid: e.target.dataset.scriptid});
 				}
 			})
 		}
 
-		_edit(parameters = {}) {
+		#edit(parameters = {}) {
 			const overlay = PopUp('script.edit', parameters, {
 				dialogueid: 'script-form',
-				dialogue_class: 'modal-popup-medium',
+				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
@@ -80,7 +80,7 @@
 			});
 		}
 
-		_editAction(parameters = {}) {
+		#editAction(parameters = {}) {
 			const overlay = PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
 				dialogue_class: 'modal-popup-large',
@@ -108,7 +108,7 @@
 			});
 		}
 
-		_delete(target, scriptids) {
+		#delete(target, scriptids) {
 			const confirmation = scriptids.length > 1
 				? <?= json_encode(_('Delete selected scripts?')) ?>
 				: <?= json_encode(_('Delete selected script?')) ?>;
@@ -120,10 +120,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'script.delete');
 
-			this._post(target, scriptids, curl);
+			this.#post(target, scriptids, curl);
 		}
 
-		_post(target, scriptids, url) {
+		#post(target, scriptids, url) {
 			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('script')) ?>
 			);
