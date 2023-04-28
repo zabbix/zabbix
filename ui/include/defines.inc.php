@@ -1330,11 +1330,6 @@ define('ZBX_TIMELINE_OFF',	0);
 define('ZBX_TIMELINE_ON',	1);
 
 /**
- * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
- */
-define('SPACE',	'&nbsp;');
-
-/**
  * Symbol used to separate name pairs such as "host: item" or "proxy: host".
  *
  * Should not be used as just a colon.

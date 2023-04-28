@@ -58,7 +58,7 @@ foreach($data['regexs'] as $regexid => $regex) {
 	foreach($regex['expressions'] as $expression) {
 		$expressions[] = (new CTable())->addRow([
 			new CCol($numb++),
-			new CCol(' &raquo; '),
+			new CCol([' ', RARR(), ' ']),
 			new CCol($expression['expression']),
 			new CCol(' ['.CRegexHelper::expression_type2str($expression['expression_type']).']')
 		]);
