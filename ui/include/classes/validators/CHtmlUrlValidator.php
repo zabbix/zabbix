@@ -25,9 +25,7 @@ class CHtmlUrlValidator {
 	 * URL is validated if schema validation is enabled by CSettingsHelper::VALIDATE_URI_SCHEMES parameter.
 	 *
 	 * Relative URL should start with .php file name.
-	 * Absolute URL schema must match schemes mentioned in ZBX_URL_VALID_SCHEMES comma separated list.
-	 *
-	 * @static
+	 * Absolute URL schema must match the URI schemes comma separated list stored in the DB.
 	 *
 	 * @param string $url                              URL string to validate.
 	 * @param array  $options
@@ -45,7 +43,7 @@ class CHtmlUrlValidator {
 	 *
 	 * @return bool
 	 */
-	public static function validate($url, array $options = []) {
+	public static function validate(string $url, array $options = []): bool {
 		$options += [
 			'allow_user_macro' => true,
 			'allow_event_tags_macro' => false,
@@ -99,23 +97,25 @@ class CHtmlUrlValidator {
 			return false;
 		}
 
-		if (array_key_exists('scheme', $url_parts)) {
-			if (!in_array(strtolower($url_parts['scheme']), explode(',', strtolower(CSettingsHelper::get(
-					CSettingsHelper::URI_VALID_SCHEMES
-			))))) {
+		$scheme = array_key_exists('scheme', $url_parts) ? $url_parts['scheme'] : null;
+
+		if ($scheme === null && preg_match('/^(.*):\D+[^?#]/', $url, $matches) === 1) {
+			$scheme = $matches[1];
+		}
+
+		if ($scheme !== null) {
+			if (stripos(CSettingsHelper::get(CSettingsHelper::URI_VALID_SCHEMES), $scheme) === false) {
 				return false;
 			}
 
 			if (array_key_exists('host', $url_parts)) {
 				return true;
 			}
-			else {
-				return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '/');
-			}
+
+			return array_key_exists('path', $url_parts) && $url_parts['path'] !== '/';
 		}
-		else {
-			return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '');
-		}
+
+		return array_key_exists('path', $url_parts) && $url_parts['path'] !== '';
 	}
 
 	/**
