@@ -99,28 +99,48 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		];
 
 		if ($dataset_type == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
-			$host_pattern_field = (new CPatternSelect([
-				'name' => $field_name.'['.$row_num.'][hosts][]',
-				'object_name' => 'hosts',
-				'data' => $value['hosts'],
-				'placeholder' => _('host pattern'),
-				'wildcard_allowed' => 1,
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'hosts',
-						'srcfld1' => 'host',
-						'dstfrm' => $this->form_name,
-						'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
-					]
-				],
-				'add_post_js' => false
-			]))->addClass('js-hosts-multiselect');
+			if ($this->field->isTemplateDashboard()) {
+				$host_pattern_field = null;
 
-			$dataset_head = array_merge($dataset_head, [
-				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
-					->appendColorPickerJs(false),
-				$host_pattern_field,
-				(new CPatternSelect([
+				$item_pattern_field = (new CPatternSelect([
+					'name' => $field_name.'['.$row_num.'][items][]',
+					'object_name' => 'items',
+					'data' => $value['items'],
+					'placeholder' => _('item pattern'),
+					'wildcard_allowed' => 1,
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'items',
+							'srcfld1' => 'name',
+							'hostid' => $this->field->getTemplateId(),
+							'hide_host_filter' => true,
+							'numeric' => 1,
+							'dstfrm' => $this->form_name,
+							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
+						]
+					],
+					'add_post_js' => false
+				]))->addClass('js-items-multiselect');
+			}
+			else {
+				$host_pattern_field = (new CPatternSelect([
+					'name' => $field_name.'['.$row_num.'][hosts][]',
+					'object_name' => 'hosts',
+					'data' => $value['hosts'],
+					'placeholder' => _('host pattern'),
+					'wildcard_allowed' => 1,
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'hosts',
+							'srcfld1' => 'host',
+							'dstfrm' => $this->form_name,
+							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
+						]
+					],
+					'add_post_js' => false
+				]))->addClass('js-hosts-multiselect');
+
+				$item_pattern_field = (new CPatternSelect([
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
 					'data' => $value['items'],
@@ -157,7 +177,14 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 						]
 					],
 					'add_post_js' => false
-				]))->addClass('js-items-multiselect')
+				]))->addClass('js-items-multiselect');
+			}
+
+			$dataset_head = array_merge($dataset_head, [
+				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
+					->appendColorPickerJs(false),
+				$host_pattern_field,
+				$item_pattern_field
 			]);
 		}
 		else {
@@ -208,7 +235,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 				->setAttribute('title', _('Delete'))
 				->addClass(ZBX_STYLE_BTN_REMOVE)
 				->removeId()
-		))->addClass('dataset-actions');
+		))->addClass('list-item-actions');
 
 		return (new CListItem([
 			(new CLabel(''))

@@ -1483,7 +1483,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Problem hosts' => ['Simple form test host'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
-							'Tags' => 'Or'
+							'Problem tags' => 'Or'
 						],
 						'tags' => [
 							['name' => 'server', 'value' => 'selenium', 'operator' => 'Equals'],
@@ -1775,7 +1775,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
-							'Tags' => 'Or'
+							'Problem tags' => 'Or'
 						],
 						'tags' => [
 							['name' => 'server', 'value' => 'selenium', 'operator' => 'Equals'],
@@ -2313,7 +2313,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Problems');
 
-		$fields = ['Selected items only', 'Severity', 'Problem', 'Tags', 'Problem hosts'];
+		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
 		$tag_elements = [
 			'id:evaltype',				// Tag type.
 			'id:tags_0_tag',			// Tag name.

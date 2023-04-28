@@ -257,7 +257,7 @@ function actionConditionValueToString(array $actions) {
 
 	if ($dCheckIds) {
 		$dChecks = API::DCheck()->get([
-			'output' => ['type', 'key_', 'ports'],
+			'output' => ['type', 'key_', 'ports', 'allow_redirect'],
 			'dcheckids' => $dCheckIds,
 			'selectDRules' => ['name'],
 			'preservekeys' => true
@@ -321,8 +321,9 @@ function actionConditionValueToString(array $actions) {
 							$type = $dChecks[$id]['type'];
 							$key_ = $dChecks[$id]['key_'];
 							$ports = $dChecks[$id]['ports'];
+							$allow_redirect = $dChecks[$id]['allow_redirect'];
 
-							$dCheck = discovery_check2str($type, $key_, $ports);
+							$dCheck = discovery_check2str($type, $key_, $ports, $allow_redirect);
 
 							$result[$i][$j] = $drule['name'].NAME_DELIMITER.$dCheck;
 						}
