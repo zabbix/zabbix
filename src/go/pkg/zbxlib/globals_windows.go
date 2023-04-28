@@ -93,7 +93,7 @@ ZBX_METRIC	parameters_common_local[] = {NULL};
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
-char	*strerror_from_system(unsigned long error)
+char	*strerror_from_system(zbx_syserror_t error)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];

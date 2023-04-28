@@ -80,10 +80,10 @@ int		zabbix_decrease_log_level(void);
 const char	*zabbix_get_log_level_string(void);
 #endif
 
-char		*strerror_from_system(unsigned long error);
+char		*strerror_from_system(zbx_syserror_t error);
 
 #ifdef _WINDOWS
-char		*strerror_from_module(unsigned long error, const wchar_t *module);
+char		*strerror_from_module(zbx_syserror_t error, const wchar_t *module);
 #endif
 
 int		zbx_redirect_stdio(const char *filename);
