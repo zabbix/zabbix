@@ -21,7 +21,6 @@
 #define ZABBIX_MODULE_H
 
 #include "zbxtypes.h"
-#include <string.h>	/* memset() */
 
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1

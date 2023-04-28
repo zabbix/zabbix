@@ -26,7 +26,6 @@
 #include "zbxhttp.h"
 #include "httpmacro.h"
 #include "zbxnum.h"
-#include "module.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"

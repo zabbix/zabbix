@@ -45,7 +45,6 @@
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "module.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
 

@@ -34,7 +34,6 @@
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 #include "zbxtime.h"
-#include "module.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 

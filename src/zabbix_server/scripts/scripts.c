@@ -31,7 +31,6 @@
 #include "zbxembed.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
-#include "module.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
