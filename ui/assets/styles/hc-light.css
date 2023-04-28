@@ -7232,6 +7232,8 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
   .menu-user a:hover, .menu-user a:focus {
     border-color: #ffffff; }
 
+.dashboard-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) > div {
+  box-shadow: 0 0 0 2px #111111; }
 .dashboard-navigation-tabs .csortable > .csortable-item > div, .dashboard-navigation-tabs .csortable-list > .csortable-item > div:hover {
   border: 1px solid #8e8e8e; }
 .dashboard-navigation-tabs .csortable > .csortable-item > div.selected-tab span, .dashboard-navigation-tabs .csortable-list > .csortable-item > div.selected-tab span {
@@ -7545,7 +7547,7 @@ td.log-disaster-bg {
 .notif-body p {
   margin-bottom: 2px; }
 .notif-body li {
-  padding-bottom: 42px; }
+  padding-left: 42px; }
 
 .notif-indic {
   width: 34px;

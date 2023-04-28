@@ -2,17 +2,17 @@ $theme-name: 'hc-dark';
 
 // Notification & Alert
 $red: #ff5050;
-$light-red: #ff3a3a;
+// $light-red: #ff3a3a; // TODO: clean not used
 
 $orange: #ff7800;
 
 $dark-yellow: #ffa20d;
 $yellow: #a78820;
-$light-yellow: #2f280a;
+// $light-yellow: #2f280a; // TODO: clean no usage
 $lighter-yellow: #222222;
 
 $green: #23d545;
-$light-green: #23d545;
+// $light-green: #23d545;
 $lighter-green: #44e763;
 
 $blue: #ffffff;
@@ -30,17 +30,17 @@ $sidebar-bg-color: #ffffff;
 $sidebar-mode-icon-color: #404040;
 $sidebar-mode-icon-hover-color: #000000;
 
-$scrollbar-track-color: rgba(#acbbc2, .55);
-$scrollbar-thumb-color: rgba(#878787, .85);
+// $scrollbar-track-color: rgba(#acbbc2, .55);
+// $scrollbar-thumb-color: rgba(#878787, .85); TODO: DF delete
 
-$sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
-$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
+// $sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
+// $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
 
 // $sidebar-toggle-bg-position: -630px -592px; // TODO: DF delete
 
 // Main
 $font-color: #ffffff;
-$font-selected-color: #ffffff;
+// $font-selected-color: #ffffff; default
 $font-alt-color: #cacaca;
 $body-bg-color: #111111;
 $overlay-bg-color: #222222;
@@ -66,7 +66,7 @@ $menu-main-submenu-color: #0c0c0c;
 $menu-main-submenu-bg-color: #cccccc;
 $menu-main-submenu-border-color: #f3f3f3;
 
-$menu-main-submenu-hover-color: #ffffff;
+// $menu-main-submenu-hover-color: #ffffff; TODO: DF delete
 $menu-main-submenu-hover-bg-color: #1a1a1a;
 $menu-main-submenu-hover-border-color: transparent;
 
@@ -186,7 +186,7 @@ $btn-focus-outline-color: #ffffff;
 $btn-alt-color: $font-color;
 
 $btn-form-font-color: #f2f2f2;
-$btn-form-bg-color: $form-bg-color;
+// $btn-form-bg-color: $form-bg-color; // TODO: Clean DF
 $btn-form-hover-color: #414141;
 $btn-form-border-color: $form-border-color;
 
@@ -211,7 +211,7 @@ $link-alt-underline-color: #818181;
 //$link-main-nav-active-color: #ffffff;
 //$link-main-nav-visited-color: rgba(#ffffff, .8);
 
-$link-main-subnav-color: rgba(#000000, .8);
+//$link-main-subnav-color: rgba(#000000, .8);
 //$link-main-subnav-hover-color: #000000; // TODO: DF to be cleaned
 //$link-main-subnav-active-color: #000000;
 //$link-main-subnav-visited-color: rgba(#000000, .8);
@@ -351,13 +351,13 @@ a.btn-icon,
 }
 
 .dashboard-navigation-tabs {
-	//.csortable-list { // FIXME: DF class is not found in code
-	//	& > .csortable-item:focus:not(:active) {
-	//		& > div {
-	//			box-shadow: 0 0 0 2px $blue;
-	//		}
-	//	}
-	//}
+	.csortable-list {
+		& > .csortable-item:focus:not(:active) {
+			& > div {
+				box-shadow: 0 0 0 2px $blue;
+			}
+		}
+	}
 
 	& .csortable > .csortable-item > div,
 	& .csortable-list > .csortable-item > div:hover {

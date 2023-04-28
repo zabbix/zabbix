@@ -25,12 +25,12 @@ $disabled-item-bg-color: #9f9f9f;
 $header-bg-color: #f3f3f3;
 $sidebar-bg-color: #000000;
 
-$scrollbar-track-color: rgba(#acbbc2, .55);
+// $scrollbar-track-color: rgba(#acbbc2, .55);
 // $scrollbar-thumb-color: rgba(#878787, .85); // TODO: to be cleaned
 // $scrollbar-thumb-color-darken: 5% !default; // TODO: CLean duplicate
 
-$sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
-$sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
+// $sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
+// $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
 
 // $sidebar-toggle-bg-position: -600px -592px; // TODO: clean duplicate
 
@@ -168,7 +168,7 @@ $btn-focus-outline-color: #111111;
 $btn-alt-color: $font-color;
 
 $btn-form-font-color: #333333;
-$btn-form-bg-color: $form-bg-color;
+//$btn-form-bg-color: $form-bg-color; // TODO: clean DF
 $btn-form-hover-color: #f4f4f4;
 $btn-form-border-color: $form-border-color;
 
@@ -193,7 +193,7 @@ $link-alt-underline-color: #808080;
 // $link-main-nav-active-color: #000000;
 // $link-main-nav-visited-color: rgba(0, 0, 0, .8);
 
-$link-main-subnav-color: rgba(255, 255, 255, .8);
+// $link-main-subnav-color: rgba(255, 255, 255, .8);
 // $link-main-subnav-hover-color: #ffffff; // TODO: to be cleaned not used
 // $link-main-subnav-active-color: #ffffff;
 // $link-main-subnav-visited-color: rgba(255, 255, 255, .8);
@@ -205,10 +205,10 @@ $clock-hand-sec-color: #555555;
 $clock-lines-color: #555555;
 
 // Statuses
-$problem-unack-fg-color: #cc0000;
-$problem-ack-fg-color: #cc0000;
-$ok-unack-fg-color: #009900;
-$ok-ack-fg-color: #009900;
+// $problem-unack-fg-color: #cc0000; // TODO: clean already this color by default
+// $problem-ack-fg-color: #cc0000;
+// $ok-unack-fg-color: #009900; // TODO: clean default
+// $ok-ack-fg-color: #009900;
 
 // Multiselect
 $multiselect-selected-bg-color: #777777;
@@ -218,7 +218,7 @@ $dashboard-shared-bg-color: #555555;
 $dashboard-my-bg-color: #555555;
 
 // Import compare.
-$toc-title-color: #ffffff;
+// $toc-title-color: #ffffff; // TODO: clean default color
 $toc-title-bg-color: #333333;
 $diff-added-bg-color: transparent;
 $diff-removed-bg-color: transparent;
@@ -311,13 +311,13 @@ a.btn-icon,
 }
 
 .dashboard-navigation-tabs {
-	// .csortable-list {
-	// 	& > .csortable-item:focus:not(:active) { FIXME: DF class is not found in code
-	// 		& > div {
-	// 			box-shadow: 0 0 0 2px $blue;
-	// 		}
-	// 	}
-	// }
+	.csortable-list {
+		& > .csortable-item:focus:not(:active) {
+			& > div {
+				box-shadow: 0 0 0 2px $blue;
+			}
+		}
+	}
 
 	& .csortable > .csortable-item > div,
 	& .csortable-list > .csortable-item > div:hover {

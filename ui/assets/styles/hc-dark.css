@@ -7252,6 +7252,8 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
   .menu-user a:link, .menu-user a:visited {
     border-bottom: 0; }
 
+.dashboard-navigation-tabs .csortable-list > .csortable-item:focus:not(:active) > div {
+  box-shadow: 0 0 0 2px #ffffff; }
 .dashboard-navigation-tabs .csortable > .csortable-item > div, .dashboard-navigation-tabs .csortable-list > .csortable-item > div:hover {
   border: 1px solid transparent; }
 .dashboard-navigation-tabs .csortable > .csortable-item > div.selected-tab span, .dashboard-navigation-tabs .csortable-list > .csortable-item > div.selected-tab span {
@@ -7378,7 +7380,7 @@ a.link-action {
   border-bottom-color: #f8f8f8; }
 
 .server-name {
-  color: rgba(0, 0, 0, 0.8); }
+  color: rgba(255, 255, 255, 0.8); }
 
 .btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
   font-weight: bold !important;
