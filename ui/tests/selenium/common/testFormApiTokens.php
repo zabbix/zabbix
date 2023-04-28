@@ -221,9 +221,6 @@ class testFormApiTokens extends CWebTest {
 					$form->getField('Expires at:')->query('xpath:./a[@data-hintbox]')->one()->click();
 					$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText();
 					$this->assertEquals('The token has expired. Please update the expiry date to use the token.', $hintbox_text);
-
-					// In case if token is expired an empty space (separator) is added to the value in token generate form.
-					$generate_data['Expires at'] = $generate_data['Expires at'];
 				}
 
 				foreach ($generate_data as $name => $value) {
