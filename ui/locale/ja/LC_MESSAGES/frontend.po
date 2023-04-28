@@ -4261,6 +4261,15 @@ msgstr "時計のタイプ"
 msgid "Clone"
 msgstr "複製"
 
+#: app/views/configuration.host.edit.php:64
+#: app/views/js/popup.host.edit.js.php:45 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:196
+msgid "Cloned template parameter values have been modified."
+msgstr ""
+
 #: app/views/popup.import.compare.php:162 app/views/popup.token.view.php:86
 #: include/func.inc.php:1723 include/views/js/monitoring.sysmaps.js.php:339
 #: include/views/js/monitoring.sysmaps.js.php:498
@@ -19394,6 +19403,10 @@ msgstr "グラフがディスカバリされなくなったため%1$sに削除�
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "グラフはディスカバリされなかったので次のディスカバリルールの処理後に削除されます。"
 
+#: app/controllers/CControllerHostEdit.php:284 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
+
 #: include/html.inc.php:637
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -19454,6 +19467,10 @@ msgstr "受信したJSONは有効なJSON-RPCリクエストではありません
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "受信したリモートプロシージャーは存在しないか利用することができません。"
+
+#: templates.php:182
+msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
