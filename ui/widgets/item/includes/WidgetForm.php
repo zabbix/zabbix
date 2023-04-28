@@ -59,7 +59,6 @@ class WidgetForm extends CWidgetForm {
 
 	private bool $is_binary_units = false;
 
-
 	public function __construct(array $values, ?string $templateid) {
 		parent::__construct($values, $templateid);
 
