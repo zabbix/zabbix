@@ -43,9 +43,9 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(CMOCKA_LIBS)
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
-COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS)
+COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 if IPV6
 zbx_tcp_check_allowed_peers_SOURCES = \
@@ -57,7 +57,7 @@ zbx_tcp_check_allowed_peers_LDADD = \
 
 zbx_tcp_check_allowed_peers_LDADD += @AGENT_LIBS@
 
-zbx_tcp_check_allowed_peers_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS)
+zbx_tcp_check_allowed_peers_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_tcp_check_allowed_peers_CFLAGS = $(COMMON_COMPILER_FLAGS)
 else
@@ -70,7 +70,7 @@ zbx_tcp_check_allowed_peers_ipv4_LDADD = \
 
 zbx_tcp_check_allowed_peers_ipv4_LDADD += @AGENT_LIBS@
 
-zbx_tcp_check_allowed_peers_ipv4_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS)
+zbx_tcp_check_allowed_peers_ipv4_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_tcp_check_allowed_peers_ipv4_CFLAGS = $(COMMON_COMPILER_FLAGS)
 endif

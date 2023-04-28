@@ -29,11 +29,11 @@ wildcard_match_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(CMOCKA_LIBS)
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
 wildcard_match_LDADD += @SERVER_LIBS@
 
-wildcard_match_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+wildcard_match_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
-wildcard_match_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS)
+wildcard_match_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 endif

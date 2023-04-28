@@ -76,7 +76,7 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(CMOCKA_LIBS)
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
 zbx_pinger_test_SOURCES = \
 	zbx_pinger_test.c \
@@ -88,8 +88,8 @@ zbx_pinger_test_SOURCES = \
 
 zbx_pinger_test_LDADD = $(PINGER_LIBS)
 zbx_pinger_test_LDADD += @SERVER_LIBS@
-zbx_pinger_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+zbx_pinger_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_pinger_test_CFLAGS = \
-	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS)
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 endif
