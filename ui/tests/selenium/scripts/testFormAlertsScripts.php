@@ -1114,8 +1114,10 @@ class testFormAlertsScripts extends CWebTest {
 	public function testFormAlertsScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
-		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('link:Script for Update')->waitUntilClickable()->one()->click();
+		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill([
 			'Name' => 'Cancelled script',
 			'Type' => 'Script',
@@ -1128,7 +1130,7 @@ class testFormAlertsScripts extends CWebTest {
 			'Required host permissions' => 'Write',
 			'Enable confirmation' => true
 		]);
-		$form->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$modal->query('button:Cancel')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Scripts');
 		$this->assertTrue($this->query('button:Create script')->waitUntilVisible()->one()->isReady());
