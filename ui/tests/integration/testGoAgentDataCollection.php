@@ -561,9 +561,10 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 					$aa = substr($a, $item['threshold_before']);
 					$bb = substr($b, $item['threshold_before']);
-				}
 
 				throw new Exception('Failed a and aa: '.$a.' \n\n\n; AND '.$aa.' \n\n\nand ;Failed b and bb: '.$b.' \n\n\n; AND '.$bb);
+				}
+
 				$this->assertEquals($a, $b, 'Strings do not match for '.$item['key']);
 				break;
 
