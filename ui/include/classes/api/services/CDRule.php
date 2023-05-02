@@ -595,6 +595,14 @@ class CDRule extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
 					}
 					break;
+				case SVC_ICMPPING:
+					if (array_key_exists('allow_redirect', $dcheck)
+							&& $dcheck['allow_redirect'] != 1 && $dcheck['allow_redirect'] != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value "%1$s" for "%2$s" field.', $dcheck['allow_redirect'], 'allow_redirect')
+						);
+					}
+					break;
 			}
 
 			// validate snmpv3 fields
@@ -657,7 +665,7 @@ class CDRule extends CApiService {
 			}
 
 			$dcheck += $default_values;
-			unset($dcheck['uniq']);
+			unset($dcheck['dcheckid'], $dcheck['uniq']);
 		}
 		unset($dcheck);
 
@@ -698,6 +706,7 @@ class CDRule extends CApiService {
 	 *  		snmpv3_authpassphrase => string,
 	 *  		snmpv3_privpassphrase => string,
 	 *  		uniq => int,
+	 * 			allow_redirect => int,
 	 *  	), ...
 	 *  )
 	 * ) $drules
@@ -752,6 +761,7 @@ class CDRule extends CApiService {
 	 *  		snmpv3_authpassphrase => string,
 	 *  		snmpv3_privpassphrase => string,
 	 *  		uniq => int,
+	 * 			allow_redirect => int,
 	 *  	), ...
 	 *  )
 	 * ) $drules
@@ -768,7 +778,7 @@ class CDRule extends CApiService {
 			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status', 'concurrency_max'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source'
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source', 'allow_redirect'
 			],
 			'druleids' => $druleids,
 			'editable' => true,

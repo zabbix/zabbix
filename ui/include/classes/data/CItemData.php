@@ -138,7 +138,7 @@ final class CItemData {
 			'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>,<persistent_dir>]',
 			'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>,<persistent_dir>]',
 			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
-			'mqtt.get[<broker_url>,topic]',
+			'mqtt.get[<broker_url>,topic,<username>,<password>]',
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
@@ -227,9 +227,9 @@ final class CItemData {
 			'zabbix.stats[<ip>,<port>]'
 		],
 		ITEM_TYPE_SIMPLE => [
-			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]',
-			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>]',
-			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>]',
+			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>,<options>]',
+			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>,<options>]',
+			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>,<options>]',
 			'net.tcp.service.perf[service,<ip>,<port>]',
 			'net.tcp.service[service,<ip>,<port>]',
 			'net.udp.service.perf[service,<ip>,<port>]',
@@ -900,15 +900,15 @@ final class CItemData {
 				'description' => _('Event log monitoring. Returns log'),
 				'value_type' => ITEM_VALUE_TYPE_LOG
 			],
-			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]' => [
+			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>,<options>]' => [
 				'description' => _('Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
-			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>]' => [
+			'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>,<options>]' => [
 				'description' => _('Returns percentage of lost ICMP ping packets.'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
-			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>]' => [
+			'icmppingsec[<target>,<packets>,<interval>,<size>,<timeout>,<mode>,<options>]' => [
 				'description' => _('Returns ICMP ping response time in seconds. Example: 0.02'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
@@ -960,7 +960,7 @@ final class CItemData {
 				'description' => _('Reads modbus data. Returns various types'),
 				'value_type' => null
 			],
-			'mqtt.get[<broker_url>,topic]' => [
+			'mqtt.get[<broker_url>,topic,<username>,<password>]' => [
 				'description' => _('Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],

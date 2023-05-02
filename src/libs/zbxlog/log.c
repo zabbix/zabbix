@@ -632,13 +632,13 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_f
 	return SUCCEED;
 }
 
-char	*strerror_from_system(unsigned long error)
+char	*strerror_from_system(zbx_syserror_t error)
 {
 #ifdef _WINDOWS
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
 	/* !!! Attention: static !!! Not thread-safe for Win32 */
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
+	static ZBX_THREAD_LOCAL char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	offset += zbx_snprintf(utf8_string, sizeof(utf8_string), "[0x%08lX] ", error);
 
@@ -665,13 +665,13 @@ char	*strerror_from_system(unsigned long error)
 }
 
 #ifdef _WINDOWS
-char	*strerror_from_module(unsigned long error, const wchar_t *module)
+char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
 	HMODULE		hmodule;
 	/* !!! Attention: static !!! not thread-safe for Win32 */
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
+	static ZBX_THREAD_LOCAL char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
 	*utf8_string = '\0';
 	hmodule = GetModuleHandle(module);

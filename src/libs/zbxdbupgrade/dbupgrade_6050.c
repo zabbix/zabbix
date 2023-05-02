@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 #include "log.h"
@@ -126,12 +125,19 @@ static int	DBpatch_6050011(void)
 
 static int	DBpatch_6050012(void)
 {
+	const zbx_db_field_t	field = {"allow_redirect", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_6050013(void)
+{
 	const zbx_db_field_t	field = {"concurrency_max", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("drules", &field);
 }
 
-static int	DBpatch_6050013(void)
+static int	DBpatch_6050014(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update drules set concurrency_max=1"))
 		return FAIL;
@@ -159,5 +165,6 @@ DBPATCH_ADD(6050010, 0, 1)
 DBPATCH_ADD(6050011, 0, 1)
 DBPATCH_ADD(6050012, 0, 1)
 DBPATCH_ADD(6050013, 0, 1)
+DBPATCH_ADD(6050014, 0, 1)
 
 DBPATCH_END()

@@ -268,29 +268,52 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			}
 		}
 
-		$host_pattern_field = (new CPatternSelect([
-			'name' => $this->field->getName().'['.$row_num.'][hosts][]',
-			'object_name' => 'hosts',
-			'data' => $value['hosts'],
-			'placeholder' => _('host pattern'),
-			'wildcard_allowed' => 1,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
-					'dstfrm' => $this->form_name,
-					'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][hosts][]')
-				]
-			],
-			'add_post_js' => false
-		]))
-			->setEnabled(!$this->isDisabled())
-			->setAriaRequired($this->isRequired());
+		if ($this->field->isTemplateDashboard()) {
+			$host_pattern_field = null;
 
-		return (new CListItem([
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-			$host_pattern_field,
-			(new CPatternSelect([
+			$item_pattern_field = (new CPatternSelect([
+				'name' => $this->field->getName().'['.$row_num.'][items][]',
+				'object_name' => 'items',
+				'data' => $value['items'],
+				'placeholder' => _('item pattern'),
+				'wildcard_allowed' => 1,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'hostid' => $this->field->getTemplateId(),
+						'hide_host_filter' => true,
+						'numeric' => 1,
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][items][]')
+					]
+				],
+				'add_post_js' => false
+			]))
+				->setEnabled(!$this->isDisabled())
+				->setAriaRequired($this->isRequired());
+		}
+		else {
+			$host_pattern_field = (new CPatternSelect([
+				'name' => $this->field->getName().'['.$row_num.'][hosts][]',
+				'object_name' => 'hosts',
+				'data' => $value['hosts'],
+				'placeholder' => _('host pattern'),
+				'wildcard_allowed' => 1,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'hosts',
+						'srcfld1' => 'hostid',
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][hosts][]')
+					]
+				],
+				'add_post_js' => false
+			]))
+				->setEnabled(!$this->isDisabled())
+				->setAriaRequired($this->isRequired());
+
+			$item_pattern_field = (new CPatternSelect([
 				'name' => $this->field->getName().'['.$row_num.'][items][]',
 				'object_name' => 'items',
 				'data' => $value['items'],
@@ -329,13 +352,19 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				'add_post_js' => false
 			]))
 				->setEnabled(!$this->isDisabled())
-				->setAriaRequired($this->isRequired()),
+				->setAriaRequired($this->isRequired());
+		}
+
+		return (new CListItem([
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+			$host_pattern_field,
+			$item_pattern_field,
 			(new CDiv(
 				(new CButton())
 					->setAttribute('title', _('Delete'))
 					->addClass(ZBX_STYLE_BTN_REMOVE)
 					->removeId()
-			))->addClass('dataset-actions'),
+			))->addClass('list-item-actions'),
 			(new CList($inputs))
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
 				->addItem(

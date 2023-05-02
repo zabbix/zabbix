@@ -20,6 +20,7 @@
 #include "discoverer.h"
 
 #include "log.h"
+#include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
 #include "zbxserver.h"
@@ -369,7 +370,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, &result) &&
+					if (SUCCEED == get_value_agent(&item, config_timeout, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -431,6 +432,7 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 	dst->ports = NULL;
 	dst->uniq = src->uniq;
 	dst->type = src->type;
+	dst->allow_redirect = src->allow_redirect;
 
 	if (SVC_SNMPv1 == src->type || SVC_SNMPv2c == src->type || SVC_SNMPv3 == src->type)
 	{

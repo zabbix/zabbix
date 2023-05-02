@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0alpha1');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050013);
+define('ZABBIX_DB_VERSION',		6050014);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1333,11 +1333,6 @@ define('ZBX_FUNCTION_TYPE_STRING',		7);
 
 define('ZBX_TIMELINE_OFF',	0);
 define('ZBX_TIMELINE_ON',	1);
-
-/**
- * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
- */
-define('SPACE',	'&nbsp;');
 
 /**
  * Symbol used to separate name pairs such as "host: item" or "proxy: host".
