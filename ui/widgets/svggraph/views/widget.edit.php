@@ -302,10 +302,13 @@ function getProblemsTab(CWidgetFormView $form, array $fields): CFormGrid {
 			$graph_item_problems->getLabel(),
 			new CFormField($graph_item_problems->getView())
 		])
-		->addItem($problemhosts === null ?: [
-			$problemhosts->getLabel(),
-			new CFormField($problemhosts->getView())
-		])
+		->addItem($problemhosts !== null
+			? [
+				$problemhosts->getLabel(),
+				new CFormField($problemhosts->getView())
+			]
+			: null
+		)
 		->addItem([
 			$severities->getLabel(),
 			new CFormField($severities->getView())
