@@ -1668,19 +1668,19 @@ form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show {
   form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show label[for='minmax_size'] {
     width: 100%; }
 
-div.dashboard-widget-gauge > div {
+div.dashboard-widget-gauge .dashboard-grid-widget-body > div {
   box-sizing: border-box;
   height: 100%;
   padding: 10px; }
-div.dashboard-widget-gauge div {
+div.dashboard-widget-gauge .dashboard-grid-widget-body div {
   line-height: 1.2em;
   text-align: center;
   white-space: nowrap; }
-div.dashboard-widget-gauge .arc.empty {
+div.dashboard-widget-gauge .dashboard-grid-widget-body .arc.empty {
   fill: #383838; }
-div.dashboard-widget-gauge .arc.value {
+div.dashboard-widget-gauge .dashboard-grid-widget-body .arc.value {
   fill: #69808d; }
-div.dashboard-widget-gauge #needle {
+div.dashboard-widget-gauge .dashboard-grid-widget-body #needle {
   fill: #f2f2f2; }
 
 .dashboard-widget-inaccessible {

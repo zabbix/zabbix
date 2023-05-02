@@ -114,8 +114,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->addValidationRules([
 			'dynamic_hostid' => 'db hosts.hostid',
-			'content_width' => 'int32|ge '.self::GAUGE_WIDTH_MIN.'|le '.self::GAUGE_WIDTH_MAX,
-			'content_height' => 'int32|ge '.self::GAUGE_HEIGHT_MIN.'|le '.self::GAUGE_HEIGHT_MAX
+			'contents_width' => 'int32|ge '.self::GAUGE_WIDTH_MIN.'|le '.self::GAUGE_WIDTH_MAX,
+			'contents_height' => 'int32|ge '.self::GAUGE_HEIGHT_MIN.'|le '.self::GAUGE_HEIGHT_MAX
 		]);
 	}
 
@@ -185,8 +185,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'error' => $error,
 			'url' => $url,
 			'bg_color' => $this->fields_values['bg_color'],
-			'content_width' => (int) $this->getInput('content_width', self::GAUGE_WIDTH_MIN),
-			'content_height' => (int) $this->getInput('content_height', self::GAUGE_HEIGHT_MIN),
+			'contents_width' => (int) $this->getInput('contents_width', self::GAUGE_WIDTH_MIN),
+			'contents_height' => (int) $this->getInput('contents_height', self::GAUGE_HEIGHT_MIN),
 			'data' => [
 				'angle' => $this->fields_values['angle'],
 				'description' => [

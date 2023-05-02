@@ -35,9 +35,9 @@ class CWidgetGauge extends CWidget {
 		const container = this._target.querySelector('.' + ZBX_STYLE_SVG_GAUGE_CONTAINER);
 	}
 
-	_getUpdateRequestData() {
+	getUpdateRequestData() {
 		return {
-			...super._getUpdateRequestData(),
+			...super.getUpdateRequestData(),
 			initial_load: this._initial_load ? 1 : 0
 		};
 	}
@@ -64,17 +64,17 @@ class CWidgetGauge extends CWidget {
 		return {top, right, left, bottom}
 	}
 
-	_processUpdateResponse(response) {
+	processUpdateResponse(response) {
 		// If there will a necesity for tooltips due to threshold overhaul, we probably need to stop all widget activity first
 
 		if (response.gauge_data !== undefined) {
 			if (this._initial_load) {
-				super._processUpdateResponse(response);
+				super.processUpdateResponse(response);
 
 				const container = this._target.querySelector('.' + ZBX_STYLE_SVG_GAUGE_CONTAINER);
 				const padding = this.#getContainerPadding(container);
-				const width = response.gauge_data.content_width - padding.left - padding.right;
-				const height = response.gauge_data.content_height - padding.top - padding.bottom;
+				const width = response.gauge_data.contents_width - padding.left - padding.right;
+				const height = response.gauge_data.contents_height - padding.top - padding.bottom;
 
 				this.gauge = new CSVGGauge({
 					container: container,
@@ -98,7 +98,7 @@ class CWidgetGauge extends CWidget {
 		this._initial_load = false;
 	}
 
-	_hasPadding() {
+	hasPadding() {
 		return false;
 	}
 }
