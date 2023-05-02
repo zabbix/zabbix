@@ -3,10 +3,10 @@
 
 ## Overview
 
-The template to monitor Kubernetes Controller manager by Zabbix that works without any external scripts.
+The template to monitor Kubernetes Kubelet by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Kubernetes Controller manager by HTTP` - collects metrics by HTTP agent from Controller manager /metrics endpoint.
+Template `Kubernetes Kubelet by HTTP` - collects metrics by HTTP agent from Kubelet /metrics endpoint.
 
 Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 
@@ -88,9 +88,10 @@ Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s|<p>Pods cpu load average over the last 10 seconds.</p>|Dependent item|kube.pod.container_cpu_load_average_10s[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total|<p>The number of cores used for system time.</p>|Dependent item|kube.pod.container_cpu_system_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total|<p>The number of cores used for user time.</p>|Dependent item|kube.pod.container_cpu_user_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s|<p>Pods cpu load average over the last 10 seconds.</p>|Dependent item|kube.pod.container_cpu_load_average_10s[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total|<p>Cumulative system cpu time consumed.</p>|Dependent item|kube.pod.container_cpu_system_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Usage seconds, total|<p>Cumulative cpu time consumed.</p>|Dependent item|kube.pod.container_cpu_usage_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total|<p>Cumulative user cpu time consumed.</p>|Dependent item|kube.pod.container_cpu_user_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 
 ### LLD rule REST client requests discovery
 
