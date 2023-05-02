@@ -15793,14 +15793,17 @@ int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx
  ******************************************************************************/
 void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle)
 {
-	if (0 == --handle->refcount)
+	if (NULL != handle)
 	{
-		WRLOCK_CACHE;
+		if (0 == --handle->refcount)
+		{
+			WRLOCK_CACHE;
 
-		um_cache_release(handle->um_cache);
-		zbx_free(handle);
+			um_cache_release(handle->um_cache);
+			zbx_free(handle);
 
-		UNLOCK_CACHE;
+			UNLOCK_CACHE;
+		}
 	}
 }
 
