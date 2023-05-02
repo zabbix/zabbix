@@ -322,7 +322,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'threshold' => 500,
 			// Removing initial block ->
 			// {"response":"success","data":{"boottime":1683011633,"uptime":113,<- ,
-			// since uptime is flaky (116 and 117 on agent 1 and 2 can appear)
+			// since uptime is flaky (e.g. values "113" and "114" on agent 1 and 2 can appear)
 			'threshold_before' => 65
 		]
 	];
