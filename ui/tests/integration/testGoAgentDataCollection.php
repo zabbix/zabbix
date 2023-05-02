@@ -319,7 +319,9 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'zabbix.stats[127.0.0.1,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'threshold' => 500
+			'threshold' => 500,
+			// Removing initial block ->{"boottime":1682692815,"uptime":116<- , as uptime is flaky
+			'threshold_before' => 35
 		]
 	];
 
@@ -551,13 +553,17 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
 
-					$x = substr($a, 0, $item['threshold']);
-
-				$b = substr($b, 0, $item['threshold']);
-				throw new Exception('Failed badher: '.$a['uptime'].' ; AND '.$x['uptime']);
-
+					$a = substr($a, 0, $item['threshold']);
+					$b = substr($b, 0, $item['threshold']);
 				}
 
+				if (array_key_exists('threshold_before', $item) && $item['threshold_before'] !== 0) {
+
+					$aa = substr($a, $item['threshold_before']);
+					$bb = substr($b, $item['threshold_before']);
+				}
+
+				throw new Exception('Failed a and aa: '.$a.' \n\n\n; AND '.$aa.' \n\n\nand ;Failed b and bb: '.$b.' \n\n\n; AND '.$bb);
 				$this->assertEquals($a, $b, 'Strings do not match for '.$item['key']);
 				break;
 
