@@ -172,10 +172,10 @@ class CSVGGauge {
 		const line_height = this.height * description.font_size / 100;
 		const font_size = line_height * FONT_SIZE_RATIO;
 
-		let foreign_object = null;
-		let div = null;
+		let foreign_object = this.svg.querySelector('#description-container');
+		let div = this.svg.querySelector('#description-container-div');
 
-		if (this.initialLoad) {
+		if (this.initialLoad || (!foreign_object || !div)) {
 			foreign_object = document.createElementNS(SVGNS, 'foreignObject');
 			div = document.createElement('div');
 
@@ -186,9 +186,6 @@ class CSVGGauge {
 			this.svg.appendChild(foreign_object);
 		}
 		else {
-			foreign_object = this.svg.querySelector('#description-container');
-			div = this.svg.querySelector('#description-container-div');
-
 			div.innerHTML = '';
 
 			this.#addAttributesNS(foreign_object, {width: '100%', height: '100%'});
@@ -547,10 +544,10 @@ class CSVGGauge {
 
 	// TO DO: add description
 	#addValue(value, units) {
-		let foreign_object = null;
-		let div = null;
+		let foreign_object = this.svg.querySelector('#value-container');
+		let div = this.svg.querySelector('#value-container-div');
 
-		if (this.initialLoad) {
+		if (this.initialLoad || (!foreign_object && !div)) {
 			foreign_object = document.createElementNS(SVGNS, 'foreignObject');
 			div = document.createElement('div');
 
@@ -561,8 +558,7 @@ class CSVGGauge {
 			this.svg.appendChild(foreign_object);
 		}
 		else {
-			foreign_object = this.svg.querySelector('#value-container');
-			div = this.svg.querySelector('#value-container-div');
+			div.innerHTML = '';
 		}
 
 		const value_line_height = this.height * value.font_size / 100;
@@ -572,10 +568,10 @@ class CSVGGauge {
 
 		// Create two div blocks inside, otherwise add text element to parent.
 		if (units.show && units.text !== '') {
-			let value_div = null;
-			let units_div = null;
+			let value_div = this.svg.querySelector('#value');
+			let units_div = this.svg.querySelector('#units');
 
-			if (this.initialLoad) {
+			if (this.initialLoad || (!value_div && !units_div)) {
 				value_div = document.createElement('div');
 				this.#addAttributesNS(value_div, {id: 'value'});
 
@@ -583,11 +579,6 @@ class CSVGGauge {
 				this.#addAttributesNS(units_div, {id: 'units'});
 			}
 			else {
-				value_div = this.svg.querySelector('#value');
-				units_div = this.svg.querySelector('#units');
-
-				// Clear contents of containers
-				div.innerHTML = '';
 				units_div.innerHTML = '';
 				value_div.innerHTML = '';
 			}
@@ -628,21 +619,6 @@ class CSVGGauge {
 				}
 
 				this.#addAttributes(div, {'style': 'align-items: baseline;'});
-
-				div.appendChild(units_div);
-				div.appendChild(value_div);
-			}
-			else if (units.pos === UNITS_POSITION_ABOVE) {
-				// Total height is both units and value combined.
-				block_height = units_line_height + value_line_height;
-
-				units_div.appendChild(document.createTextNode(units.text));
-				value_div.appendChild(document.createTextNode(value.text));
-
-				this.#addAttributes(div, {'style': 'align-items: center; flex-direction: column;'});
-
-				div.appendChild(units_div);
-				div.appendChild(value_div);
 			}
 			else if (units.pos === UNITS_POSITION_AFTER) {
 				// Take the largest height from both.
@@ -659,11 +635,8 @@ class CSVGGauge {
 				}
 
 				this.#addAttributes(div, {'style': 'align-items: baseline;'});
-
-				div.appendChild(value_div);
-				div.appendChild(units_div);
 			}
-			else if (units.pos === UNITS_POSITION_BELOW) {
+			else if (units.pos === UNITS_POSITION_ABOVE || units.pos === UNITS_POSITION_BELOW) {
 				// Total height is both units and value combined.
 				block_height = units_line_height + value_line_height;
 
@@ -671,10 +644,10 @@ class CSVGGauge {
 				value_div.appendChild(document.createTextNode(value.text));
 
 				this.#addAttributes(div, {'style': 'align-items: center; flex-direction: column;'});
-
-				div.appendChild(value_div);
-				div.appendChild(units_div);
 			}
+
+			div.appendChild(value_div);
+			div.appendChild(units_div);
 		}
 		else {
 			// No units.
