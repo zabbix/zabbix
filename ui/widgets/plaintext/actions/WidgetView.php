@@ -51,12 +51,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$histories = [];
 
 		// Editing template dashboard?
-		if ($this->hasInput('templateid') && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$error = _('No data.');
 		}
 		else {
-			$is_template_dashboard = $this->hasInput('templateid');
-			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
+			$is_dynamic_item = $this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM;
 
 			if ($this->fields_values['itemids']) {
 				$items = API::Item()->get([
@@ -130,12 +129,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($items_count == 1) {
 					$item = reset($items);
-					$dynamic_widget_name = $is_template_dashboard
+					$dynamic_widget_name = $this->isTemplateDashboard()
 						? $item['name']
 						: $host_name.NAME_DELIMITER.$item['name'];
 				}
 				elseif ($same_host && $items_count > 1) {
-					$dynamic_widget_name = $is_template_dashboard
+					$dynamic_widget_name = $this->isTemplateDashboard()
 						? _n('%1$s item', '%1$s items', $items_count)
 						: $host_name.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
 				}

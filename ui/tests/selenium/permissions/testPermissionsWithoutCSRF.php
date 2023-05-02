@@ -608,8 +608,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM module',
-					'link' => 'zabbix.php?action=module.edit&moduleid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=module.list',
+					'overlay' => 'update'
 				]
 			],
 			// #69 Audit log administration update.

@@ -241,14 +241,10 @@ class CControllerNotificationsGet extends CController {
 						->getUrl();
 
 					$notification += [
-						'title' => sprintf('[url=%s]%s[/url]', $url_problems,
-							CHtml::encode($trigger['hosts'][0]['name'])
-						),
+						'title' => (new CLink($trigger['hosts'][0]['name'], $url_problems))->toString(),
 						'body' => [
-							'[url='.$url_events.']'.CHtml::encode($notification['name']).'[/url]',
-							'[url='.$url_trigger_events.']'.
-								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']).
-							'[/url]'
+							(new CLink($notification['name'], $url_events))->toString(),
+							(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']), $url_trigger_events))->toString()
 						]
 					];
 				}

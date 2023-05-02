@@ -64,14 +64,17 @@ class WidgetForm extends CWidgetForm {
 					TRIGGERS_OPTION_ALL => _('History')
 				]))->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
 			)
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
-			->addField(
-				new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
 			)
-			->addField(
-				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
 				new CWidgetFieldTextBox('problem', _('Problem'))
@@ -80,7 +83,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldSeverities('severities', _('Severity'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
@@ -127,16 +130,8 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_ACKNOWLEDGES)
 			)
 			->addField(
-				(new CWidgetFieldSelect('sort_triggers', _('Sort entries by'), [
-					SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
-					SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
-					SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity').' ('._('descending').')',
-					SCREEN_SORT_TRIGGERS_SEVERITY_ASC => _('Severity').' ('._('ascending').')',
-					SCREEN_SORT_TRIGGERS_NAME_DESC => _('Problem').' ('._('descending').')',
-					SCREEN_SORT_TRIGGERS_NAME_ASC => _('Problem').' ('._('ascending').')',
-					SCREEN_SORT_TRIGGERS_HOST_NAME_DESC => _('Host').' ('._('descending').')',
-					SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host').' ('._('ascending').')'
-				]))->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC)
+				(new CWidgetFieldSelect('sort_triggers', _('Sort entries by'), $this->getSortTriggersValues()))
+					->setDefault(SCREEN_SORT_TRIGGERS_TIME_DESC)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('show_timeline', _('Show timeline')))
@@ -158,5 +153,25 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(ZBX_DEFAULT_WIDGET_LINES)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			);
+	}
+
+	protected function getSortTriggersValues(): array {
+		$sort_triggers_values = [
+			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_SEVERITY_ASC => _('Severity').' ('._('ascending').')',
+			SCREEN_SORT_TRIGGERS_NAME_DESC => _('Problem').' ('._('descending').')',
+			SCREEN_SORT_TRIGGERS_NAME_ASC => _('Problem').' ('._('ascending').')'
+		];
+
+		if (!$this->isTemplateDashboard()) {
+			$sort_triggers_values += [
+				SCREEN_SORT_TRIGGERS_HOST_NAME_DESC => _('Host').' ('._('descending').')',
+				SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host').' ('._('ascending').')'
+			];
+		}
+
+		return $sort_triggers_values;
 	}
 }
