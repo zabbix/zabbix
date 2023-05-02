@@ -99,7 +99,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP: Authorization has been failed|<p>GCP: Authorization has been failed. Please, check the authorization parameters carefullyand GCP API availability from network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
+|GCP: Authorization has failed|<p>GCP: Authorization has failed. Please, check the authorization parameters carefully and GCP API availability from network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
 
 ### LLD rule GCP Compute Engine: Instances discovery
 
@@ -135,10 +135,10 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Raw data|<p>GCP Compute Engine: Get metrics for the quota with the name {#GCE.QUOTA.NAME}.</p>|Dependent item|gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "{#GCE.QUOTA.NAME}")].first()`</p></li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Usage|<p>GCP Compute Engine: The current usage value for the quota with the name {#GCE.QUOTA.NAME}.</p>|Dependent item|gcp.gce.quota.usage[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage`</p></li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Limit|<p>GCP Compute Engine: The current limit value for the quota with the name {#GCE.QUOTA.NAME}.</p>|Dependent item|gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.limit`</p></li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percent used|<p>GCP Compute Engine Percentage usage for the quota with the name {#GCE.QUOTA.NAME}.</p>|Dependent item|gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.p_used`</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Raw data|<p>GCP Compute Engine: Get metrics for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "{#GCE.QUOTA.NAME}")].first()`</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Usage|<p>GCP Compute Engine: The current usage value for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.usage[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage`</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Limit|<p>GCP Compute Engine: The current limit value for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.limit`</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percent used|<p>GCP Compute Engine Percentage usage for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.p_used`</p></li></ul>|
 
 ### Trigger prototypes for GCP Compute Engine: Project quotas discovery
 
@@ -170,7 +170,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with the all required parameters pre-defined
+This template will be connected to discovered entities automatically with all required parameters pre-defined
 
 ### Macros used
 
@@ -192,7 +192,7 @@ This template will be connected to discovered entities automatically with the al
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Compute Engine: Metrics get|<p>GCP Compute Engine metrics get in raw format.</p>|Script|gcp.gce.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Compute Engine: Firewall: Dropped packets|<p>Number of outbound packets dropped due to link congestion.</p>|Dependent item|gcp.gce.firewall.dropped_packets_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.dropped_packets_count`</p></li></ul>|
+|GCP Compute Engine: Firewall: Dropped packets|<p>Count of incoming packets dropped by the firewall.</p>|Dependent item|gcp.gce.firewall.dropped_packets_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.dropped_packets_count`</p></li></ul>|
 |GCP Compute Engine: Firewall: Dropped bytes|<p>Count of incoming bytes dropped by the firewall.</p>|Dependent item|gcp.gce.firewall.dropped_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.dropped_bytes_count`</p></li></ul>|
 |GCP Compute Engine: Guest visible vCPUs|<p>Number of vCPUs visible inside the guest.</p><p>For many GCE machine types, the number of vCPUs visible inside the guest is equal to the `compute.googleapis.com/instance/cpu/reserved_cores` metric.</p><p>For shared-core machine types, the number of guest-visible vCPUs differs from the number of reserved cores.</p><p>For example, e2-small instances have two vCPUs visible inside the guest and 0.5 fractional vCPUs reserved.</p><p>Therefore, for an e2-small instance, `compute.googleapis.com/instance/cpu/guest_visible_vcpus` has a value of 2 and `compute.googleapis.com/instance/cpu/reserved_cores` has a value of 0.5.</p>|Dependent item|gcp.gce.cpu.guest_visible_vcpus<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.guest_visible_vcpus`</p></li></ul>|
 |GCP Compute Engine: Reserved vCPUs|<p>Number of vCPUs reserved on the host of the instance.</p>|Dependent item|gcp.gce.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.reserved_cores`</p></li></ul>|
@@ -217,12 +217,8 @@ This template will be connected to discovered entities automatically with the al
 |GCP Compute Engine: Network: Mirrored packets dropped: Out of quota|<p>The count of mirrored packets dropped. </p><p>Reason - out of quota.</p>|Dependent item|gcp.gce.network.mirr_dropped_packets.out_of_quota<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.out_of_quota`</p></li></ul>|
 |GCP Compute Engine: Network: Mirrored packets dropped: Unknown|<p>The count of mirrored packets dropped. </p><p>Reason - unknown.</p>|Dependent item|gcp.gce.network.mirr_dropped_packets.unknown<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.unknown`</p></li></ul>|
 |GCP Compute Engine: Network: Mirrored packets dropped: Invalid|<p>The count of mirrored packets dropped. </p><p>Reason - invalid.</p>|Dependent item|gcp.gce.network.mirr_dropped_packets.invalid<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.invalid`</p></li></ul>|
-|GCP Compute Engine: Integrity: Early boot validation: Passed|<p>The validation status of early boot integrity policy - is passed or not.</p>|Dependent item|gcp.gce.integrity.early_boot_validation_status.passed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.early_boot_validation_status.passed`</p></li></ul>|
-|GCP Compute Engine: Integrity: Early boot validation: Unknown|<p>The validation status of early boot integrity policy - unknown or not.</p>|Dependent item|gcp.gce.integrity.early_boot_validation_status.unknown<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.early_boot_validation_status.unknown`</p></li></ul>|
-|GCP Compute Engine: Integrity: Early boot validation: Failed|<p>The validation status of early boot integrity policy - failed or not.</p>|Dependent item|gcp.gce.integrity.early_boot_validation_status.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.early_boot_validation_status.failed`</p></li></ul>|
-|GCP Compute Engine: Integrity: Late boot validation: Passed|<p>The validation status of late boot integrity policy - is passed or not.</p>|Dependent item|gcp.gce.integrity.late_boot_validation_status.passed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.late_boot_validation_status.passed`</p></li></ul>|
-|GCP Compute Engine: Integrity: Late boot validation: Unknown|<p>The validation status of late boot integrity policy - unknown or not.</p>|Dependent item|gcp.gce.integrity.late_boot_validation_status.unknown<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.late_boot_validation_status.unknown`</p></li></ul>|
-|GCP Compute Engine: Integrity: Late boot validation: Failed|<p>The validation status of late boot integrity policy - failed or not.</p>|Dependent item|gcp.gce.integrity.late_boot_validation_status.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.late_boot_validation_status.failed`</p></li></ul>|
+|GCP Compute Engine: Integrity: Early boot validation status|<p>The validation status of early boot integrity policy. </p><p>Empty value if integrity monitoring isn't enabled.</p>|Dependent item|gcp.gce.integrity.early_boot_validation_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.early_boot_validation_status`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|GCP Compute Engine: Integrity: Late boot validation status|<p>The validation status of late boot integrity policy. </p><p>Empty value if integrity monitoring isn't enabled.</p>|Dependent item|gcp.gce.integrity.late_boot_validation_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.late_boot_validation_status`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Compute Engine: Instance uptime|<p>Elapsed time since the VM was started, in seconds.</p>|Dependent item|gcp.gce.instance.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime_total`</p></li></ul>|
 |GCP Compute Engine: Instance state|<p>GCP Compute Engine instance state.</p>|HTTP agent|gcp.gce.instance.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |GCP Compute Engine: Disks get|<p>Disk entities and metrics related to particular instance.</p>|Script|gcp.gce.disks.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -268,7 +264,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- GCP Cloud SQL MySQL
+- GCP Cloud SQL MySQL versions: 8.0, 5.7
 
 ## Configuration
 
@@ -276,7 +272,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+This template will be connected to discovered entities automatically with all required parameters pre-defined.
 
 ### Macros used
 
@@ -307,17 +303,19 @@ This template will be connected to discovered entities automatically with the al
 |GCP Cloud SQL MySQL: Memory usage|<p>The RAM usage in bytes. </p><p>This metric reports the RAM usage of the server, excluding the buffer/cache.</p>|Dependent item|gcp.cloudsql.mysql.memory.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_usage`</p></li></ul>|
 |GCP Cloud SQL MySQL: Memory utilization|<p>The fraction of the memory quota that is currently in use.</p><p>Shown as percentage.</p>|Dependent item|gcp.cloudsql.mysql.memory.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_ram_pused`</p></li></ul>|
 |GCP Cloud SQL MySQL: Network: Received bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.mysql.network.received_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_received_bytes_count`</p></li></ul>|
-|GCP Cloud SQL MySQL: Network: Sent bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.mysql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
-|GCP Cloud SQL MySQL: Connections|<p>Number of connections to databases on the Cloud SQL instance.</p>|Dependent item|gcp.cloudsql.mysql.network.connections<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_connections`</p></li></ul>|
+|GCP Cloud SQL MySQL: Network: Sent bytes|<p>Delta count of bytes sent through the network.</p>|Dependent item|gcp.cloudsql.mysql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
+|GCP Cloud SQL MySQL: Connections|<p>Number of connections to the databases on the Cloud SQL instance.</p>|Dependent item|gcp.cloudsql.mysql.network.connections<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_connections`</p></li></ul>|
 |GCP Cloud SQL MySQL: Instance state|<p>GCP Cloud SQL MySQL Current instance state.</p>|HTTP agent|gcp.cloudsql.mysql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Cloud SQL MySQL: DB engine state|<p>GCP Cloud SQL MySQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.mysql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|GCP Cloud SQL MySQL: InnoDB dirty pages|<p>Number of unflushed pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.innodb_buffer_pool_pages_dirty<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_dirty`</p></li></ul>|
-|GCP Cloud SQL MySQL: InnoDB free pages|<p>Number of unused pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.innodb_buffer_pool_pages_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_free`</p></li></ul>|
-|GCP Cloud SQL MySQL: InnoDB total pages|<p>Total number of pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.innodb_buffer_pool_pages_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_total`</p></li></ul>|
-|GCP Cloud SQL MySQL: InnoDB fsync calls|<p>Delta count of InnoDB fsync() calls.</p>|Dependent item|gcp.cloudsql.innodb_data_fsyncs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_data_fsyncs`</p></li></ul>|
-|GCP Cloud SQL MySQL: InnoDB log fsync calls|<p>Delta count of InnoDB fsync() calls to the log file.</p>|Dependent item|gcp.cloudsql.innodb_os_log_fsyncs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_os_log_fsyncs`</p></li></ul>|
-|GCP Cloud SQL MySQL: InnoDB pages read|<p>Delta count of InnoDB pages read.</p>|Dependent item|gcp.cloudsql.innodb_pages_read<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_pages_read`</p></li></ul>|
-|GCP Cloud SQL MySQL: InnoDB pages written|<p>Delta count of InnoDB pages written.</p>|Dependent item|gcp.cloudsql.innodb_pages_written<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_pages_written`</p></li></ul>|
+|GCP Cloud SQL MySQL: InnoDB dirty pages|<p>Number of unflushed pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.mysql.innodb_buffer_pool_pages_dirty<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_dirty`</p></li></ul>|
+|GCP Cloud SQL MySQL: InnoDB free pages|<p>Number of unused pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.mysql.innodb_buffer_pool_pages_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_free`</p></li></ul>|
+|GCP Cloud SQL MySQL: InnoDB total pages|<p>Total number of pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.mysql.innodb_buffer_pool_pages_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_total`</p></li></ul>|
+|GCP Cloud SQL MySQL: InnoDB fsync calls|<p>Delta count of InnoDB fsync() calls.</p>|Dependent item|gcp.cloudsql.mysql.innodb_data_fsyncs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_data_fsyncs`</p></li></ul>|
+|GCP Cloud SQL MySQL: InnoDB log fsync calls|<p>Delta count of InnoDB fsync() calls to the log file.</p>|Dependent item|gcp.cloudsql.mysql.innodb_os_log_fsyncs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_os_log_fsyncs`</p></li></ul>|
+|GCP Cloud SQL MySQL: InnoDB pages read|<p>Delta count of InnoDB pages read.</p>|Dependent item|gcp.cloudsql.mysql.innodb_pages_read<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_pages_read`</p></li></ul>|
+|GCP Cloud SQL MySQL: InnoDB pages written|<p>Delta count of InnoDB pages written.</p>|Dependent item|gcp.cloudsql.mysql.innodb_pages_written<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_pages_written`</p></li></ul>|
+|GCP Cloud SQL MySQL: Open tables|<p>The number of tables that are currently open.</p>|Dependent item|gcp.cloudsql.mysql.open_tables<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_open_tables`</p></li></ul>|
+|GCP Cloud SQL MySQL: Open table definitions|<p>The number of table definitions that are currently cached.</p>|Dependent item|gcp.cloudsql.mysql.open_table_definitions<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_open_table_definitions`</p></li></ul>|
 |GCP Cloud SQL MySQL: Queries|<p>Delta count of statements executed by the server.</p>|Dependent item|gcp.cloudsql.queries<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_queries`</p></li></ul>|
 |GCP Cloud SQL MySQL: Questions|<p>Delta count of statements executed by the server sent by the client.</p>|Dependent item|gcp.cloudsql.questions<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_questions`</p></li></ul>|
 |GCP Cloud SQL MySQL: Network: Bytes received by MySQL|<p>Delta count of bytes received by MySQL process.</p>|Dependent item|gcp.cloudsql.mysql_received_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_received_bytes_count`</p></li></ul>|
@@ -353,7 +351,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- GCP Cloud SQL MySQL Read-Replicas
+- GCP Cloud SQL MySQL Read-replica versions: 8.0, 5.7
 
 ## Configuration
 
@@ -361,25 +359,27 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+This template will be connected to discovered entities automatically with all required parameters pre-defined.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
+|{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`5m`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Cloud SQL MySQL: Replication metrics get|<p>MySQL replication metrics data in the raw format.</p>|Script|gcp.cloudsql.mysql.repl.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Cloud SQL MySQL: Replication: Last I/O thread error number.|<p>The error number of the most recent error that caused the I/O thread to stop.</p>|Dependent item|gcp.cloudsql.mysql.repl.last_io_errno<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.last_io_errno`</p></li></ul>|
-|GCP Cloud SQL MySQL: Replication: Last SQL thread error number.|<p>The error number of the most recent error that caused the SQL thread to stop.</p>|Dependent item|gcp.cloudsql.mysql.repl.last_sql_errno<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.last_sql_errno`</p></li></ul>|
+|GCP Cloud SQL MySQL: Last I/O thread error number|<p>The error number of the most recent error that caused the I/O thread to stop.</p>|Dependent item|gcp.cloudsql.mysql.repl.last_io_errno<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.last_io_errno`</p></li></ul>|
+|GCP Cloud SQL MySQL: Last SQL thread error number|<p>The error number of the most recent error that caused the SQL thread to stop.</p>|Dependent item|gcp.cloudsql.mysql.repl.last_sql_errno<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.last_sql_errno`</p></li></ul>|
 |GCP Cloud SQL MySQL: Replication lag|<p>Number of seconds the read replica is behind its primary (approximation).</p>|Dependent item|gcp.cloudsql.mysql.repl.replica_lag<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.replica_lag`</p></li></ul>|
 |GCP Cloud SQL MySQL: Network lag|<p>Indicates time taken from primary binary log to IO thread on replica.</p>|Dependent item|gcp.cloudsql.mysql.repl.network_lag<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.network_lag`</p></li></ul>|
-|GCP Cloud SQL MySQL: Replication: Slave I/O thread running|<p>Indicates whether the I/O thread for reading the primary's binary log is running. </p><p>Possible values are Yes, No and Connecting.</p>|Dependent item|gcp.cloudsql.mysql.repl.slave_io_running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.slave_io_running`</p></li></ul>|
-|GCP Cloud SQL MySQL: Replication: Slave SQL thread running|<p>Indicates whether the SQL thread for executing events in the relay log is running.</p>|Dependent item|gcp.cloudsql.mysql.repl.slave_sql_running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.slave_sql_running`</p></li><li>Boolean to decimal</li></ul>|
+|GCP Cloud SQL MySQL: Replication state|<p>The current serving state of replication.</p><p>This metric is only available for the MySQL/PostgreSQL instances.</p>|Dependent item|gcp.cloudsql.mysql.repl.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|GCP Cloud SQL MySQL: Slave I/O thread running|<p>Indicates whether the I/O thread for reading the primary's binary log is running. </p><p>Possible values are Yes, No and Connecting.</p>|Dependent item|gcp.cloudsql.mysql.repl.slave_io_running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.slave_io_running`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|GCP Cloud SQL MySQL: Slave SQL thread running|<p>Indicates whether the SQL thread for executing events in the relay log is running.</p>|Dependent item|gcp.cloudsql.mysql.repl.slave_sql_running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.slave_sql_running`</p></li><li>Boolean to decimal</li></ul>|
 
 # GCP Cloud SQL PostgreSQL by HTTP
 
@@ -395,7 +395,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- GCP Cloud SQL PostgreSQL
+- GCP Cloud SQL PostgreSQL versions: 14, 13, 12
 
 ## Configuration
 
@@ -403,7 +403,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+This template will be connected to discovered entities automatically with all required parameters pre-defined.
 
 ### Macros used
 
@@ -436,13 +436,13 @@ This template will be connected to discovered entities automatically with the al
 |GCP Cloud SQL PostgreSQL: Memory usage|<p>The RAM usage in bytes. </p><p>This metric reports the RAM usage of the server, excluding the buffer/cache.</p>|Dependent item|gcp.cloudsql.pgsql.memory.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_usage`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Memory utilization|<p>The fraction of the memory quota that is currently in use.</p><p>Shown as percentage.</p>|Dependent item|gcp.cloudsql.pgsql.memory.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_ram_pused`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Network: Received bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.pgsql.network.received_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_received_bytes_count`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Network: Sent bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.pgsql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Network: Sent bytes|<p>Delta count of bytes sent through the network.</p>|Dependent item|gcp.cloudsql.pgsql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Instance state|<p>GCP Cloud SQL PostgreSQL Current instance state.</p>|HTTP agent|gcp.cloudsql.pgsql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: DB engine state|<p>GCP Cloud SQL PostgreSQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.pgsql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Transaction id utilization|<p>Current utilization represented as a percentage of transaction IDs consumed by the Cloud SQL PostgreSQL instance.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_id_utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_transaction_id_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Assigned transactions|<p>Delta count of transaction ID assigned.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_id_count_assigned<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_assigned`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Frozen transactions|<p>Delta count of transaction ID frozen.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_id_count_frozen<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_frozen`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Data written to temporary|<p>Total amount of data (in bytes) written to temporary files by the queries per database.</p>|Dependent item|gcp.cloudsql.pgsql.temp_bytes_written_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_temp_bytes_written_count`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Data written to temporary|<p>Total amount of data (in bytes) written to temporary files by the queries.</p>|Dependent item|gcp.cloudsql.pgsql.temp_bytes_written_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_temp_bytes_written_count`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Temporary files used for writing data|<p>Total number of temporary files used for writing data while performing algorithms such as join and sort.</p>|Dependent item|gcp.cloudsql.pgsql.temp_files_written_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_temp_files_written_count`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Oldest running transaction age|<p>Age of the oldest running transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. </p><p>Empty value when there is no such transaction type.</p>|Dependent item|gcp.cloudsql.pgsql.oldest_transaction.running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_running`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Oldest prepared transaction age|<p>Age of the oldest prepared transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. </p><p>Empty value when there is no such transaction type.</p>|Dependent item|gcp.cloudsql.pgsql.oldest_transaction.prepared<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_prepared`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -476,19 +476,19 @@ This template will be connected to discovered entities automatically with the al
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Metrics raw|<p>PostgreSQl metrics in raw format.</p>|Script|gcp.cloudsql.pgsql.db.metrics.get[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Deadlocks count|<p>Number of deadlocks detected for this database.</p>|Dependent item|gcp.cloudsql.pgsql.deadlock_count[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deadlock_count`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples returned|<p>Total number of rows scanned while processing the queries per database in the PostgreSQL instance.</p>|Dependent item|gcp.cloudsql.pgsql.tuples_returned_count[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tuples_returned_count`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples fetched|<p>Total number of rows fetched as a result of queries per database in the PostgreSQL instance.</p>|Dependent item|gcp.cloudsql.pgsql.tuples_fetched_count[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tuples_fetched_count`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Committed transactions|<p>Delta count of number of committed transactions.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_count_commit[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.commit`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled back transactions|<p>Delta count of number of rolled back transactions.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_count_rollback[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rollback`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Buffer cache blocks read.|<p>Number of buffer cache blocks read by this database.</p>|Dependent item|gcp.cloudsql.pgsql.blocks_read_count_buffer_cache[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffer_cache`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Disk blocks read.|<p>Number of disk blocks read by this database.</p>|Dependent item|gcp.cloudsql.pgsql.blocks_read_count_disk[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disk`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Inserted rows processed.|<p>Number of tuples(rows) processed for a given database for insert operations.</p>|Dependent item|gcp.cloudsql.pgsql.tuples_processed_count_insert[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.insert`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Updated rows processed|<p>Number of tuples(rows) processed for a given database for delete operations.</p>|Dependent item|gcp.cloudsql.pgsql.tuples_processed_count_delete[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.delete`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Updated rows processed|<p>Number of tuples(rows) processed for a given database for update operations.</p>|Dependent item|gcp.cloudsql.pgsql.tuples_processed_count_update[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.update`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Live tuples|<p>Number of live tuples(rows) in the database.</p>|Dependent item|gcp.cloudsql.pgsql.tuple_size_live[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.live`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Dead tuples|<p>Number of live tuples(rows) in the database.</p>|Dependent item|gcp.cloudsql.pgsql.tuple_size_dead[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.dead`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Metrics raw|<p>PostgreSQL metrics in raw format.</p>|Script|gcp.cloudsql.pgsql.db.metrics.get[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Deadlocks count|<p>Number of deadlocks detected in the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.deadlock_count[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deadlock_count`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples returned|<p>Total number of rows scanned while processing the queries of the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.tuples_returned_count[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tuples_returned_count`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples fetched|<p>Total number of rows fetched as a result of queries of the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.tuples_fetched_count[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tuples_fetched_count`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Committed transactions|<p>Delta count of number of committed transactions in the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.transaction_count_commit[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.commit`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled back transactions|<p>Delta count of number of rolled back transactions in the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.transaction_count_rollback[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rollback`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Buffer cache blocks read.|<p>Number of buffer cache blocks read by the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.blocks_read_count_buffer_cache[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffer_cache`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Disk blocks read.|<p>Number of disk blocks read by the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.blocks_read_count_disk[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disk`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Inserted rows processed.|<p>Number of tuples(rows) processed for insert operations for the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.tuples_processed_count_insert[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.insert`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Deleted rows processed|<p>Number of tuples(rows) processed for delete operations for the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.tuples_processed_count_delete[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.delete`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Updated rows processed|<p>Number of tuples(rows) processed for update operations for the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.tuples_processed_count_update[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.update`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Live tuples|<p>Number of live tuples(rows) in the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.tuple_size_live[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.live`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Dead tuples|<p>Number of live tuples(rows) in the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.tuple_size_dead[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.dead`</p></li></ul>|
 
 # GCP Cloud SQL PostgreSQL Replica by HTTP
 
@@ -504,7 +504,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- GCP Cloud SQL PostgreSQL Read-Replicas
+- GCP Cloud SQL PostgreSQL Read-Replicas versions: 14, 13, 12
 
 ## Configuration
 
@@ -512,7 +512,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+This template will be connected to discovered entities automatically with all required parameters pre-defined.
 
 ### Macros used
 
@@ -528,7 +528,8 @@ This template will be connected to discovered entities automatically with the al
 |GCP Cloud SQL PostgreSQL: Replica metrics get|<p>PostgreSQL replica metrics data in the raw format.</p>|Script|gcp.cloudsql.pgsql.repl.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Network lag|<p>Indicates time taken from primary binary log to IO thread on replica.</p>|Dependent item|gcp.cloudsql.pgsql.repl.network_lag<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.network_lag`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Replication lag|<p>Number of seconds the read replica is behind its primary (approximation).</p>|Dependent item|gcp.cloudsql.pgsql.repl.replica_lag<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.replica_lag`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Replay location lag|<p>Replay Location replication lag in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.repl.replay_location<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.replay_location`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Replication state|<p>The current serving state of replication.</p><p>This metric is only available for the MySQL/PostgreSQL instances.</p>|Dependent item|gcp.cloudsql.pgsql.repl.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Replay location lag|<p>Replay location replication lag in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.repl.replay_location<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.replay_location`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Write location lag|<p>Write location replication lag in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.repl.write_location<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write_location`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Flush location lag|<p>Flush location replication lag in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.repl.flush_location<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.flush_location`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Sent location lag|<p>Sent location replication lag in bytes.</p>|Dependent item|gcp.cloudsql.pgsql.repl.sent_location<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sent_location`</p></li></ul>|
@@ -549,7 +550,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- GCP Cloud SQL MSSQL
+- GCP Cloud SQL MSSQL versions: 2019 Standard/Enterprise, 2017 Standard/Enterprise
 
 ## Configuration
 
@@ -557,7 +558,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+This template will be connected to discovered entities automatically with all required parameters pre-defined.
 
 ### Macros used
 
@@ -594,15 +595,15 @@ This template will be connected to discovered entities automatically with the al
 |GCP Cloud SQL MSSQL: Memory usage|<p>The RAM usage in bytes. </p><p>This metric reports the RAM usage of the server, excluding the buffer/cache.</p>|Dependent item|gcp.cloudsql.mssql.memory.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_usage`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Memory utilization|<p>The fraction of the memory quota that is currently in use.</p><p>Shown as percentage.</p>|Dependent item|gcp.cloudsql.mssql.memory.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_ram_pused`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Network: Received bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.mssql.network.received_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_received_bytes_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Network: Sent bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.mssql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Connections|<p>Number of connections to databases on the Cloud SQL instance.</p>|Dependent item|gcp.cloudsql.mssql.network.connections<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_connections`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Network: Sent bytes|<p>Delta count of bytes sent through the network.</p>|Dependent item|gcp.cloudsql.mssql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Connections|<p>Number of connections to the databases on the Cloud SQL instance.</p>|Dependent item|gcp.cloudsql.mssql.network.connections<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_connections`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Instance state|<p>GCP Cloud SQL MSSQL Current instance state.</p>|HTTP agent|gcp.cloudsql.mssql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Cloud SQL MSSQL: DB engine state|<p>GCP Cloud SQL MSSQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.mssql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Connection resets|<p>Total number of logins started from the connection pool since the last restart of SQL Server service.</p>|Dependent item|gcp.cloudsql.mssql.conn.connection_reset_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_connection_reset_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Login attempts|<p>Total number of login attempts since the last restart of SQL Server service. </p><p>This does not include pooled connections.</p>|Dependent item|gcp.cloudsql.mssql.conn.login_attempt_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_login_attempt_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Logouts|<p>Total number of logout operations since the last restart of SQL Server service.</p>|Dependent item|gcp.cloudsql.mssql.conn.logout_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_logout_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Processes blocked|<p>Current number of blocked processes.</p>|Dependent item|gcp.cloudsql.mssql.conn.processes_blocked<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_processes_blocked`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Buffer сache hit ratio|<p>Current percentage of pages found in the buffer cache without having to read from disk. </p><p>The ratio is the total number of cache hits divided by the total number of cache lookups.</p>|Dependent item|gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_buffer_cache_hit_ratio`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Buffer cache hit ratio|<p>Current percentage of pages found in the buffer cache without having to read from disk. </p><p>The ratio is the total number of cache hits divided by the total number of cache lookups.</p>|Dependent item|gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_buffer_cache_hit_ratio`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Checkpoint pages|<p>Total number of pages flushed to disk by a checkpoint or other operation that requires all dirty pages to be flushed.</p>|Dependent item|gcp.cloudsql.mssql.memory.checkpoint_page_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_checkpoint_page_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Free list stalls|<p>Total number of requests that had to wait for a free page.</p>|Dependent item|gcp.cloudsql.mssql.memory.free_list_stall_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_free_list_stall_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Lazy writes|<p>Total number of buffers written by the buffer manager's lazy writer. </p><p>The lazy writer is a system process that flushes out batches of dirty, aged buffers </p><p>(buffers that contain changes that must be written back to disk before the buffer can be reused for a different page) </p><p>and makes them available to user processes.</p>|Dependent item|gcp.cloudsql.mssql.memory.lazy_write_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_lazy_write_count`</p></li></ul>|
@@ -649,10 +650,10 @@ This template will be connected to discovered entities automatically with the al
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Raw data|<p>Data in raw format for the resource with the name {#RESOURCE.NAME}.</p>|Dependent item|gcp.cloudsql.mssql.resource.raw[{#RESOURCE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.resource == "{#RESOURCE.NAME}")].metrics.first()`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Raw data|<p>Data in raw format for the resource with the name [{#RESOURCE.NAME}].</p>|Dependent item|gcp.cloudsql.mssql.resource.raw[{#RESOURCE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.resource == "{#RESOURCE.NAME}")].metrics.first()`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Deadlocks|<p>Total number of lock requests that resulted in a deadlock for the resource with the name {#RESOURCE.NAME}.</p>|Dependent item|gcp.cloudsql.mssql.resource.deadlock_count[{#RESOURCE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deadlock_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Lock waits|<p>Total number of lock requests that required the caller to wait for the resource with the name {#RESOURCE.NAME}.</p>|Dependent item|gcp.cloudsql.mssql.resource.lock_wait_count[{#RESOURCE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lock_wait_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Lock wait time|<p>Total time lock requests were waiting for locks for the resource with the name {#RESOURCE.NAME}.</p>|Dependent item|gcp.cloudsql.mssql.resource.lock_wait_time[{#RESOURCE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lock_wait_time`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Lock waits|<p>Total number of lock requests that required the caller to wait for the resource with the name [{#RESOURCE.NAME}].</p>|Dependent item|gcp.cloudsql.mssql.resource.lock_wait_count[{#RESOURCE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lock_wait_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Lock wait time|<p>Total time lock requests were waiting for locks for the resource with the name [{#RESOURCE.NAME}].</p>|Dependent item|gcp.cloudsql.mssql.resource.lock_wait_time[{#RESOURCE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lock_wait_time`</p></li></ul>|
 
 ### LLD rule Databases discovery
 
@@ -665,8 +666,8 @@ This template will be connected to discovered entities automatically with the al
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Raw data|<p>Data in raw format for the database with the name {#DB.NAME}.</p>|Dependent item|gcp.cloudsql.mssql.db.raw[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.database == "{#DB.NAME}")].metrics.first()`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Log bytes flushed|<p>Total number of log bytes flushed for the database with the name {#DB.NAME}.</p>|Dependent item|gcp.cloudsql.mssql.db.log_bytes_flushed_count[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.log_bytes_flushed_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Transactions started|<p>Total number of transactions started for the database with the name {#DB.NAME}.</p>|Dependent item|gcp.cloudsql.mssql.db.transaction_count[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.transaction_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Log bytes flushed|<p>Total number of log bytes flushed for the database with the name [{#DB.NAME}].</p>|Dependent item|gcp.cloudsql.mssql.db.log_bytes_flushed_count[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.log_bytes_flushed_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Transactions started|<p>Total number of transactions started for the database with the name [{#DB.NAME}].</p>|Dependent item|gcp.cloudsql.mssql.db.transaction_count[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.transaction_count`</p></li></ul>|
 
 ### LLD rule Schedulers discovery
 
@@ -678,13 +679,13 @@ This template will be connected to discovered entities automatically with the al
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Raw data|<p>Data in raw format associated with a scheduler with id {#SCHEDULER.ID}.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scheduler == "{#SCHEDULER.ID}")].metrics.first()`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers|<p>Current number of workers that are active associated with a scheduler with id {#SCHEDULER.ID}.</p><p>An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.active_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_workers`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current tasks|<p>Current number of current tasks associated with a scheduler with id {#SCHEDULER.ID}.</p><p>This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_tasks`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current workers|<p>Current number of workers associated with a scheduler with id {#SCHEDULER.ID}.</p><p>It includes workers that are not assigned any task.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_workers`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Pending I/O operations|<p>Current number of pending I/Os that are waiting to be completed associated with a scheduler with id {#SCHEDULER.ID}.</p><p>Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. </p><p>The count is incremented when the request is inserted. </p><p>This count is decremented when the request is completed. </p><p>This number does not indicate the state of the I/Os.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.pending_disk_io[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pending_disk_io`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Runnable tasks|<p>Current number of workers, with tasks assigned to them, that are waiting to be scheduled on the runnable queue associated with a scheduler with id {#SCHEDULER.ID}.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.runnable_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.runnable_tasks`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Work queue|<p>Current number of tasks in the pending queue associated with a scheduler with id {#SCHEDULER.ID}.</p><p>These tasks are waiting for a worker to pick them up.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.work_queue[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.work_queue`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Raw data|<p>Data in raw format associated with a scheduler with id [{#SCHEDULER.ID}].</p>|Dependent item|gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scheduler == "{#SCHEDULER.ID}")].metrics.first()`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers|<p>Current number of workers that are active associated with a scheduler with id [{#SCHEDULER.ID}].</p><p>An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.active_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_workers`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current tasks|<p>Current number of current tasks associated with a scheduler with id [{#SCHEDULER.ID}].</p><p>This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_tasks`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current workers|<p>Current number of workers associated with a scheduler with id [{#SCHEDULER.ID}].</p><p>It includes workers that are not assigned any task.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_workers`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Pending I/O operations|<p>Current number of pending I/Os that are waiting to be completed associated with a scheduler with id [{#SCHEDULER.ID}].</p><p>Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. </p><p>The count is incremented when the request is inserted. </p><p>This count is decremented when the request is completed. </p><p>This number does not indicate the state of the I/Os.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.pending_disk_io[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pending_disk_io`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Runnable tasks|<p>Current number of workers, with tasks assigned to them, that are waiting to be scheduled on the runnable queue associated with a scheduler with id [{#SCHEDULER.ID}].</p>|Dependent item|gcp.cloudsql.mssql.scheduler.runnable_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.runnable_tasks`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Work queue|<p>Current number of tasks in the pending queue associated with a scheduler with id [{#SCHEDULER.ID}].</p><p>These tasks are waiting for a worker to pick them up.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.work_queue[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.work_queue`</p></li></ul>|
 
 # GCP Cloud SQL MSSQL Replica by HTTP
 
@@ -708,7 +709,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+This template will be connected to discovered entities automatically with all required parameters pre-defined.
 
 ### Macros used
 
@@ -726,7 +727,7 @@ This template will be connected to discovered entities automatically with the al
 |GCP Cloud SQL MSSQL: Resent messages|<p>Total number of Always On messages resent. </p><p>A resent message is a message that was attempted to be sent but was unable to complete and must be attempted to be sent again.</p>|Dependent item|gcp.cloudsql.mssql.repl.resent_message_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resent_message_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Log apply pending queue|<p>Current number of log blocks that are waiting to be applied to replica.</p>|Dependent item|gcp.cloudsql.mssql.repl.log_apply_pending_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.log_apply_pending_queue`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Log bytes received|<p>Total amount of log records received by the replica.</p>|Dependent item|gcp.cloudsql.mssql.repl.log_bytes_received_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.log_bytes_received_count`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Recovery queue|<p>Current amount of log records in kilobytes in the log files of the replica that have not been redone.</p>|Dependent item|gcp.cloudsql.mssql.repl.recovery_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.recovery_queue`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Recovery queue|<p>Current amount of log records in ytes in the log files of the replica that have not been redone.</p>|Dependent item|gcp.cloudsql.mssql.repl.recovery_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.recovery_queue`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Redone bytes|<p>Total amount of log records redone.</p>|Dependent item|gcp.cloudsql.mssql.repl.redone_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.redone_bytes_count`</p></li></ul>|
 
 ## Feedback

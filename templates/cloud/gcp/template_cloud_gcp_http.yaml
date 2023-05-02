@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-04-26T18:21:09Z'
+  date: '2023-04-28T16:55:57Z'
   groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -54,11 +54,11 @@ zabbix_export:
             -
               uuid: 74c0e16244314ab4a920e32faca50444
               expression: 'length(last(/GCP by HTTP/gcp.auth.err.check)) > 0'
-              name: 'GCP: Authorization has been failed'
+              name: 'GCP: Authorization has failed'
               priority: AVERAGE
               description: |
-                GCP: Authorization has been failed. 
-                Please, check the authorization parameters carefully
+                GCP: Authorization has failed. 
+                Please, check the authorization parameters carefully 
                 and GCP API availability from network segment, where Zabbix-server/proxy is located.
                 
               tags:
@@ -77,7 +77,7 @@ zabbix_export:
           params: |
             var auth_url = 'https://oauth2.googleapis.com/token',
                 issued = new Date().getTime() / 1000,
-                expires = issued + parseInt('10', 10),
+                expires = issued + 3600, // 1h - default acc token lifetime
                 scope = 'https://www.googleapis.com/auth/cloud-platform.read-only ' +
                     'https://www.googleapis.com/auth/monitoring ' +
                     'https://www.googleapis.com/auth/compute.readonly ' +
@@ -159,7 +159,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -170,11 +170,11 @@ zabbix_export:
                     throw 'Cannot process response data: received data is not an object.';
                 }
             
-                if (!('access_token' in response)) {
+                if (response.access_token !== 'undefined') {
+                    return response.access_token;
+                } else {
                     throw 'No access token in the JWT exchange request.';
                 }
-            
-                return response.access_token;
             }
             
             function checkParams(params) {
@@ -268,7 +268,7 @@ zabbix_export:
                       }
                   
                       if (request.getStatus() !== 200) {
-                          if (response.error && response.error.message) {
+                          if (typeof (response.error && response.error.message) !== 'undefined') {
                               throw response.error.message;
                           } else {
                               throw 'Failed to receive data: invalid response status code.';
@@ -280,7 +280,7 @@ zabbix_export:
                   var result = getHttpData(url, token);
                   
                   if (Object.keys(result).length === 0) {
-                      return JSON.stringify([]);
+                      return '[]';
                   }
                   
                   var sql_inst_props = result.items.map(function (sql_inst) {
@@ -400,7 +400,7 @@ zabbix_export:
                       }
                   
                       if (request.getStatus() !== 200) {
-                          if (response.error && response.error.message) {
+                          if (typeof (response.error && response.error.message) !== 'undefined') {
                               throw response.error.message;
                           } else {
                               throw 'Failed to receive data: invalid response status code.';
@@ -423,7 +423,8 @@ zabbix_export:
                                   m_type: inst.machineType.replace(/.*machineTypes\//g, ''),
                                   state: inst.status,
                                   project_id: '{$GCP.PROJECT.ID}',
-                                  ip: inst.networkInterfaces[0].networkIP ? inst.networkInterfaces[0].networkIP : '0.0.0.0'
+                                  ip: inst.networkInterfaces[0].networkIP ? inst.networkInterfaces[0].networkIP : '0.0.0.0',
+                                  integrity: inst.shieldedInstanceConfig.enableIntegrityMonitoring.toString()
                               };
                   
                               if (inst.networkInterfaces[0].accessConfigs[0]) {
@@ -592,17 +593,18 @@ zabbix_export:
                       }
                   
                       if (request.getStatus() !== 200) {
-                          if (response.error && response.error.message) {
+                          if (typeof (response.error && response.error.message) !== 'undefined') {
                               throw response.error.message;
                           } else {
                               throw 'Failed to receive data: invalid response status code.';
                           }
                       }
                   
-                      if (!('quotas' in response)) {
+                      if (typeof response.quotas !== 'undefined') {
+                          return response;
+                      } else {
                           throw 'No quotas array in API response';
                       }
-                      return response;
                   };
                   var qts_raw = getHttpData(url, token);
                   
@@ -1170,6 +1172,10 @@ zabbix_export:
                   value: '{#GCE.INSTANCE.ZONE}'
                   description: 'Instance zone (location)'
                 -
+                  macro: '{$GCE.INTEGRITY.STATE}'
+                  value: '{#GCE.INTEGRITY.STATE}'
+                  description: 'Instance integrity metrics status.'
+                -
                   macro: '{$GCE.MACHINE.TYPE}'
                   value: '{#GCE.MACHINE.TYPE}'
                   description: 'Instance machine type.'
@@ -1231,6 +1237,9 @@ zabbix_export:
               lld_macro: '{#GCE.INSTANCE.ZONE}'
               path: $.zone
             -
+              lld_macro: '{#GCE.INTEGRITY.STATE}'
+              path: $.integrity
+            -
               lld_macro: '{#GCE.MACHINE.TYPE}'
               path: $.m_type
             -
@@ -1273,7 +1282,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'GCP Compute Engine: The current limit value for the quota with the name {#GCE.QUOTA.NAME}.'
+              description: 'GCP Compute Engine: The current limit value for the quota with the name [{#GCE.QUOTA.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1311,7 +1320,7 @@ zabbix_export:
               trends: 90d
               value_type: FLOAT
               units: '%'
-              description: 'GCP Compute Engine Percentage usage for the quota with the name {#GCE.QUOTA.NAME}.'
+              description: 'GCP Compute Engine Percentage usage for the quota with the name [{#GCE.QUOTA.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1367,7 +1376,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'GCP Compute Engine: Get metrics for the quota with the name {#GCE.QUOTA.NAME}.'
+              description: 'GCP Compute Engine: Get metrics for the quota with the name [{#GCE.QUOTA.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1390,7 +1399,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'GCP Compute Engine: The current usage value for the quota with the name {#GCE.QUOTA.NAME}.'
+              description: 'GCP Compute Engine: The current usage value for the quota with the name [{#GCE.QUOTA.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1855,7 +1864,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MSSQL by HTTP'
       description: |
         Get GCP Cloud SQL MSSQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+        This template will be connected to discovered entities automatically with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -2137,7 +2146,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -2188,8 +2197,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: gcp.cloudsql.mssql.db.state
           history: 7d
-          trends: '0'
-          value_type: TEXT
           description: 'GCP Cloud SQL MSSQL DB Engine State.'
           valuemap:
             name: 'Database availability'
@@ -2382,8 +2389,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: gcp.cloudsql.mssql.inst.state
           history: 7d
-          trends: '0'
-          value_type: TEXT
           description: 'GCP Cloud SQL MSSQL Current instance state.'
           valuemap:
             name: 'Instance state'
@@ -2500,7 +2505,7 @@ zabbix_export:
                   value: availability
         -
           uuid: a29584de7ab142309f0bb6f57b52af85
-          name: 'GCP Cloud SQL MSSQL: Buffer сache hit ratio'
+          name: 'GCP Cloud SQL MSSQL: Buffer cache hit ratio'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio
           delay: '0'
@@ -2859,7 +2864,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -2968,7 +2973,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Number of connections to databases on the Cloud SQL instance.'
+          description: 'Number of connections to the databases on the Cloud SQL instance.'
           preprocessing:
             -
               type: JSONPATH
@@ -3016,7 +3021,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Delta count of bytes received through the network.'
+          description: 'Delta count of bytes sent through the network.'
           preprocessing:
             -
               type: JSONPATH
@@ -3080,7 +3085,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -3177,7 +3182,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -3396,7 +3401,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'Total number of log bytes flushed for the database with the name {#DB.NAME}.'
+              description: 'Total number of log bytes flushed for the database with the name [{#DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3443,7 +3448,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of transactions started for the database with the name {#DB.NAME}.'
+              description: 'Total number of transactions started for the database with the name [{#DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3521,7 +3526,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of lock requests that required the caller to wait for the resource with the name {#RESOURCE.NAME}.'
+              description: 'Total number of lock requests that required the caller to wait for the resource with the name [{#RESOURCE.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3545,7 +3550,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: s
-              description: 'Total time lock requests were waiting for locks for the resource with the name {#RESOURCE.NAME}.'
+              description: 'Total time lock requests were waiting for locks for the resource with the name [{#RESOURCE.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3569,7 +3574,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Data in raw format for the resource with the name {#RESOURCE.NAME}.'
+              description: 'Data in raw format for the resource with the name [{#RESOURCE.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3625,7 +3630,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of workers that are active associated with a scheduler with id {#SCHEDULER.ID}.
+                Current number of workers that are active associated with a scheduler with id [{#SCHEDULER.ID}].
                 An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.
                 
               preprocessing:
@@ -3651,7 +3656,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of current tasks associated with a scheduler with id {#SCHEDULER.ID}.
+                Current number of current tasks associated with a scheduler with id [{#SCHEDULER.ID}].
                 This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).
                 
               preprocessing:
@@ -3677,7 +3682,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of workers associated with a scheduler with id {#SCHEDULER.ID}.
+                Current number of workers associated with a scheduler with id [{#SCHEDULER.ID}].
                 It includes workers that are not assigned any task.
                 
               preprocessing:
@@ -3703,7 +3708,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of pending I/Os that are waiting to be completed associated with a scheduler with id {#SCHEDULER.ID}.
+                Current number of pending I/Os that are waiting to be completed associated with a scheduler with id [{#SCHEDULER.ID}].
                 Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. 
                 The count is incremented when the request is inserted. 
                 This count is decremented when the request is completed. 
@@ -3732,7 +3737,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Data in raw format associated with a scheduler with id {#SCHEDULER.ID}.'
+              description: 'Data in raw format associated with a scheduler with id [{#SCHEDULER.ID}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3755,7 +3760,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Current number of workers, with tasks assigned to them, that are waiting to be scheduled on the runnable queue associated with a scheduler with id {#SCHEDULER.ID}.'
+              description: 'Current number of workers, with tasks assigned to them, that are waiting to be scheduled on the runnable queue associated with a scheduler with id [{#SCHEDULER.ID}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3779,7 +3784,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of tasks in the pending queue associated with a scheduler with id {#SCHEDULER.ID}.
+                Current number of tasks in the pending queue associated with a scheduler with id [{#SCHEDULER.ID}].
                 These tasks are waiting for a worker to pick them up.
                 
               preprocessing:
@@ -4102,7 +4107,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MSSQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL MSSQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+        This template will be connected to discovered entities automatically with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -4229,7 +4234,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -4288,7 +4293,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Current amount of log records in kilobytes in the log files of the replica that have not been redone.'
+          description: 'Current amount of log records in ytes in the log files of the replica that have not been redone.'
           preprocessing:
             -
               type: JSONPATH
@@ -4422,7 +4427,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MySQL by HTTP'
       description: |
         Get GCP Cloud SQL MySQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+        This template will be connected to discovered entities automatically with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -4432,167 +4437,6 @@ zabbix_export:
         -
           name: Templates/Cloud
       items:
-        -
-          uuid: 5e5b9cdfa7f2455b881cceface136e65
-          name: 'GCP Cloud SQL MySQL: InnoDB dirty pages'
-          type: DEPENDENT
-          key: gcp.cloudsql.innodb_buffer_pool_pages_dirty
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'Number of unflushed pages in the InnoDB buffer pool.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.mysql_innodb_buffer_pool_pages_dirty
-          master_item:
-            key: gcp.cloudsql.mysql.metrics.get
-          tags:
-            -
-              tag: component
-              value: innodb
-            -
-              tag: component
-              value: memory
-        -
-          uuid: 75835c8326e6461d8f25fb7d55271f16
-          name: 'GCP Cloud SQL MySQL: InnoDB free pages'
-          type: DEPENDENT
-          key: gcp.cloudsql.innodb_buffer_pool_pages_free
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'Number of unused pages in the InnoDB buffer pool.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.mysql_innodb_buffer_pool_pages_free
-          master_item:
-            key: gcp.cloudsql.mysql.metrics.get
-          tags:
-            -
-              tag: component
-              value: innodb
-            -
-              tag: component
-              value: memory
-        -
-          uuid: 080d5304c0e346808bd70b125a27be4b
-          name: 'GCP Cloud SQL MySQL: InnoDB total pages'
-          type: DEPENDENT
-          key: gcp.cloudsql.innodb_buffer_pool_pages_total
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'Total number of pages in the InnoDB buffer pool.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.mysql_innodb_buffer_pool_pages_total
-          master_item:
-            key: gcp.cloudsql.mysql.metrics.get
-          tags:
-            -
-              tag: component
-              value: innodb
-            -
-              tag: component
-              value: memory
-        -
-          uuid: 19e259f61fc24e29a189c35121878eb3
-          name: 'GCP Cloud SQL MySQL: InnoDB fsync calls'
-          type: DEPENDENT
-          key: gcp.cloudsql.innodb_data_fsyncs
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'Delta count of InnoDB fsync() calls.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.mysql_innodb_data_fsyncs
-          master_item:
-            key: gcp.cloudsql.mysql.metrics.get
-          tags:
-            -
-              tag: component
-              value: innodb
-            -
-              tag: component
-              value: storage
-        -
-          uuid: c4a4ffa274974041bccbd25643ff9f70
-          name: 'GCP Cloud SQL MySQL: InnoDB log fsync calls'
-          type: DEPENDENT
-          key: gcp.cloudsql.innodb_os_log_fsyncs
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'Delta count of InnoDB fsync() calls to the log file.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.mysql_innodb_os_log_fsyncs
-          master_item:
-            key: gcp.cloudsql.mysql.metrics.get
-          tags:
-            -
-              tag: component
-              value: innodb
-            -
-              tag: component
-              value: storage
-        -
-          uuid: 4a9154e235e84c0d9dbf0abf44479f49
-          name: 'GCP Cloud SQL MySQL: InnoDB pages read'
-          type: DEPENDENT
-          key: gcp.cloudsql.innodb_pages_read
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'Delta count of InnoDB pages read.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.mysql_innodb_pages_read
-          master_item:
-            key: gcp.cloudsql.mysql.metrics.get
-          tags:
-            -
-              tag: component
-              value: innodb
-            -
-              tag: component
-              value: memory
-        -
-          uuid: 584714b219034bbebbc24edad36704c9
-          name: 'GCP Cloud SQL MySQL: InnoDB pages written'
-          type: DEPENDENT
-          key: gcp.cloudsql.innodb_pages_written
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'Delta count of InnoDB pages written.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.mysql_innodb_pages_written
-          master_item:
-            key: gcp.cloudsql.mysql.metrics.get
-          tags:
-            -
-              tag: component
-              value: innodb
-            -
-              tag: component
-              value: mysql
         -
           uuid: 83e36c61e8ce4d06a395ea7b06c5877b
           name: 'GCP Cloud SQL MySQL: Reserved CPU cores'
@@ -4680,8 +4524,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: gcp.cloudsql.mysql.db.state
           history: 7d
-          trends: '0'
-          value_type: TEXT
           description: 'GCP Cloud SQL MySQL DB Engine State.'
           valuemap:
             name: 'Database availability'
@@ -4869,13 +4711,172 @@ zabbix_export:
               tag: component
               value: storage
         -
+          uuid: 5e5b9cdfa7f2455b881cceface136e65
+          name: 'GCP Cloud SQL MySQL: InnoDB dirty pages'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_dirty
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'Number of unflushed pages in the InnoDB buffer pool.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_innodb_buffer_pool_pages_dirty
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 75835c8326e6461d8f25fb7d55271f16
+          name: 'GCP Cloud SQL MySQL: InnoDB free pages'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_free
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'Number of unused pages in the InnoDB buffer pool.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_innodb_buffer_pool_pages_free
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 080d5304c0e346808bd70b125a27be4b
+          name: 'GCP Cloud SQL MySQL: InnoDB total pages'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_total
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'Total number of pages in the InnoDB buffer pool.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_innodb_buffer_pool_pages_total
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 19e259f61fc24e29a189c35121878eb3
+          name: 'GCP Cloud SQL MySQL: InnoDB fsync calls'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.innodb_data_fsyncs
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'Delta count of InnoDB fsync() calls.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_innodb_data_fsyncs
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: storage
+        -
+          uuid: c4a4ffa274974041bccbd25643ff9f70
+          name: 'GCP Cloud SQL MySQL: InnoDB log fsync calls'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.innodb_os_log_fsyncs
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'Delta count of InnoDB fsync() calls to the log file.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_innodb_os_log_fsyncs
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 4a9154e235e84c0d9dbf0abf44479f49
+          name: 'GCP Cloud SQL MySQL: InnoDB pages read'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.innodb_pages_read
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'Delta count of InnoDB pages read.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_innodb_pages_read
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 584714b219034bbebbc24edad36704c9
+          name: 'GCP Cloud SQL MySQL: InnoDB pages written'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.innodb_pages_written
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'Delta count of InnoDB pages written.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_innodb_pages_written
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: innodb
+            -
+              tag: component
+              value: memory
+        -
           uuid: 71559008ad444772b0b1212f715980ed
           name: 'GCP Cloud SQL MySQL: Instance state'
           type: HTTP_AGENT
           key: gcp.cloudsql.mysql.inst.state
           history: 7d
-          trends: '0'
-          value_type: TEXT
           description: 'GCP Cloud SQL MySQL Current instance state.'
           valuemap:
             name: 'Instance state'
@@ -5137,7 +5138,9 @@ zabbix_export:
                     mysql_path + 'queries',
                     mysql_path + 'questions',
                     mysql_path + 'received_bytes_count',
-                    mysql_path + 'sent_bytes_count'
+                    mysql_path + 'sent_bytes_count',
+                    mysql_path + 'open_tables',
+                    mysql_path + 'open_table_definitions'
                 ];
             
             function checkParams(params) {
@@ -5169,7 +5172,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -5242,7 +5245,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Number of connections to databases on the Cloud SQL instance.'
+          description: 'Number of connections to the databases on the Cloud SQL instance.'
           preprocessing:
             -
               type: JSONPATH
@@ -5290,7 +5293,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Delta count of bytes received through the network.'
+          description: 'Delta count of bytes sent through the network.'
           preprocessing:
             -
               type: JSONPATH
@@ -5306,6 +5309,46 @@ zabbix_export:
               tag: component
               value: traffic
         -
+          uuid: 1d651976f70944acb31cd0430e70d422
+          name: 'GCP Cloud SQL MySQL: Open tables'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.open_tables
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'The number of tables that are currently open.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_open_tables
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: tables
+        -
+          uuid: 1606766c63bf4aa1ade24a34650eef05
+          name: 'GCP Cloud SQL MySQL: Open table definitions'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.open_table_definitions
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'The number of table definitions that are currently cached.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.mysql_open_table_definitions
+          master_item:
+            key: gcp.cloudsql.mysql.metrics.get
+          tags:
+            -
+              tag: component
+              value: tables
+        -
           uuid: 3d3ec2e37bf94fb68c40967b56dfd95c
           name: 'GCP Cloud SQL MySQL: Network: Bytes received by MySQL'
           type: DEPENDENT
@@ -5313,6 +5356,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
+          units: B
           description: 'Delta count of bytes received by MySQL process.'
           preprocessing:
             -
@@ -5336,6 +5380,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
+          units: B
           description: 'Delta count of bytes sent by MySQL process.'
           preprocessing:
             -
@@ -5632,8 +5677,8 @@ zabbix_export:
       template: 'GCP Cloud SQL MySQL Replica by HTTP'
       name: 'GCP Cloud SQL MySQL Replica by HTTP'
       description: |
-        Get GCP Cloud SQL MySQL  monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+        Get GCP Cloud SQL MySQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
+        This template will be connected to discovered entities automatically with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.     
         
@@ -5645,7 +5690,7 @@ zabbix_export:
       items:
         -
           uuid: 17aa9eb4749e46be9b0b0f93ef011fca
-          name: 'GCP Cloud SQL MySQL: Replication: Last I/O thread error number.'
+          name: 'GCP Cloud SQL MySQL: Last I/O thread error number'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.last_io_errno
           delay: '0'
@@ -5665,7 +5710,7 @@ zabbix_export:
               value: replication
         -
           uuid: 52c11965a2fc4d37a97ebccc04ee7b80
-          name: 'GCP Cloud SQL MySQL: Replication: Last SQL thread error number.'
+          name: 'GCP Cloud SQL MySQL: Last SQL thread error number'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.last_sql_errno
           delay: '0'
@@ -5688,7 +5733,7 @@ zabbix_export:
           name: 'GCP Cloud SQL MySQL: Replication metrics get'
           type: SCRIPT
           key: gcp.cloudsql.mysql.repl.metrics.get
-          delay: 5m
+          delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -5736,7 +5781,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -5762,6 +5807,25 @@ zabbix_export:
                 for (v in value_types) {
                     if (typeof metric_values[i][value_types[v]] !== 'undefined') {
                         obj[metric_keys[i].key.replace(re, "")] = metric_values[i][value_types[v]];
+                    }
+                }
+            }
+            
+            state_raw = getHttpData(url, params.token, {
+                query:
+                    common_path + 'state' + time_window + filter
+            });
+            
+            var state_keys = state_raw.timeSeriesDescriptor.pointDescriptors,
+                state_tsd = state_raw.timeSeriesData;
+            
+            for (i in state_keys) {
+                var state_key = state_keys[i].key.replace(/value\./g, '');
+                obj[state_key] = 'undefined';
+                for (t in state_tsd) {
+                    if (state_tsd[t].pointData[0].values[i].boolValue == true) {
+                        obj[state_key] = state_tsd[t].labelValues[3].stringValue;
+                        break;
                     }
                 }
             }
@@ -5805,12 +5869,6 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: cloudsql
-            -
-              tag: component
-              value: mysql
-            -
-              tag: component
               value: replication
         -
           uuid: b5f9960de9414975ac48357844a15860
@@ -5832,31 +5890,36 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: cloudsql
-            -
-              tag: component
-              value: mysql
-            -
-              tag: component
               value: replication
         -
           uuid: 0c093a0416f24afb96fc28a7abb283d4
-          name: 'GCP Cloud SQL MySQL: Replication: Slave I/O thread running'
+          name: 'GCP Cloud SQL MySQL: Slave I/O thread running'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.slave_io_running
           delay: '0'
           history: 7d
-          trends: '0'
-          value_type: CHAR
+          trends: 90d
           description: |
             Indicates whether the I/O thread for reading the primary's binary log is running. 
             Possible values are Yes, No and Connecting.
             
+          valuemap:
+            name: 'Thread state'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.slave_io_running
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const idx = [           // 10 - (default)
+                      'No',         // 0 — Thread is not running 
+                      'Yes',     // 1 — Thread is running
+                      'Connecting',        // 2 — The iis connecting
+                  ].indexOf(value);
+                  return idx !== -1 ? idx : 10;
           master_item:
             key: gcp.cloudsql.mysql.repl.metrics.get
           tags:
@@ -5865,15 +5928,13 @@ zabbix_export:
               value: replication
         -
           uuid: 994d92340dd146a381f2e6bbebd1c3f2
-          name: 'GCP Cloud SQL MySQL: Replication: Slave SQL thread running'
+          name: 'GCP Cloud SQL MySQL: Slave SQL thread running'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.slave_sql_running
           delay: '0'
           history: 7d
           trends: 90d
-          description: |
-            Indicates whether the SQL thread for executing events in the relay log is running.
-            
+          description: 'Indicates whether the SQL thread for executing events in the relay log is running.'
           preprocessing:
             -
               type: JSONPATH
@@ -5889,6 +5950,46 @@ zabbix_export:
             -
               tag: component
               value: replication
+        -
+          uuid: 90a9154072164b5c89d715fa77e7e2b0
+          name: 'GCP Cloud SQL MySQL: Replication state'
+          type: DEPENDENT
+          key: gcp.cloudsql.mysql.repl.state
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: |
+            The current serving state of replication.
+            This metric is only available for the MySQL/PostgreSQL instances.
+            
+          valuemap:
+            name: 'Replication state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.state
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const idx = [           // 10 - (default)
+                      'Running',         // 0
+                      'Syncing',     // 1
+                      'Unsynced',        // 2
+                      'Stopped',    // 3
+                      'Error',    // 4
+                  ].indexOf(value);
+                  return idx !== -1 ? idx : 10;
+          master_item:
+            key: gcp.cloudsql.mysql.repl.metrics.get
+          tags:
+            -
+              tag: component
+              value: replication
+            -
+              tag: component
+              value: status
       tags:
         -
           tag: class
@@ -5913,6 +6014,15 @@ zabbix_export:
           macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        -
+          macro: '{$GCP.TIME.WINDOW}'
+          value: 5m
+          description: |
+            Time interval for the data requests.
+            There are following usage types:
+            1. The default update interval for the most of the items.
+            2. The minimal time window for the data requested inside Monitoring Query Language REST API request.
+            
       dashboards:
         -
           uuid: 76eda12212f045388bef22cb382eff6b
@@ -6027,13 +6137,52 @@ zabbix_export:
                       value:
                         host: 'GCP Cloud SQL MySQL Replica by HTTP'
                         key: gcp.cloudsql.mysql.repl.slave_sql_running
+      valuemaps:
+        -
+          uuid: ea83090a16d94eb3bb643009c784d820
+          name: 'Replication state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Running
+            -
+              value: '1'
+              newvalue: Syncing
+            -
+              value: '2'
+              newvalue: Unsynced
+            -
+              value: '3'
+              newvalue: Stopped
+            -
+              value: '4'
+              newvalue: Error
+            -
+              value: '10'
+              newvalue: Unknown
+        -
+          uuid: b1acfa66a401499cae56777db6c7750b
+          name: 'Thread state'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'No'
+            -
+              value: '1'
+              newvalue: 'Yes'
+            -
+              value: '2'
+              newvalue: Connecting
+            -
+              value: '10'
+              newvalue: Unknown
     -
       uuid: e74c1e12f82e4d9880a368b53f5e65a4
       template: 'GCP Cloud SQL PostgreSQL by HTTP'
       name: 'GCP Cloud SQL PostgreSQL by HTTP'
       description: |
         Get GCP Cloud SQL PostgreSQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+        This template will be connected to discovered entities automatically with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -6130,8 +6279,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: gcp.cloudsql.pgsql.db.state
           history: 7d
-          trends: '0'
-          value_type: TEXT
           description: 'GCP Cloud SQL PostgreSQL DB Engine State.'
           valuemap:
             name: 'Database availability'
@@ -6324,8 +6471,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: gcp.cloudsql.pgsql.inst.state
           history: 7d
-          trends: '0'
-          value_type: TEXT
           description: 'GCP Cloud SQL PostgreSQL Current instance state.'
           valuemap:
             name: 'Instance state'
@@ -6590,7 +6735,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -6730,7 +6875,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Delta count of bytes received through the network.'
+          description: 'Delta count of bytes sent through the network.'
           preprocessing:
             -
               type: JSONPATH
@@ -6876,7 +7021,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Total amount of data (in bytes) written to temporary files by the queries per database.'
+          description: 'Total amount of data (in bytes) written to temporary files by the queries.'
           preprocessing:
             -
               type: JSONPATH
@@ -7004,7 +7149,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of buffer cache blocks read by this database.'
+              description: 'Number of buffer cache blocks read by the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7027,7 +7172,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of disk blocks read by this database.'
+              description: 'Number of disk blocks read by the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7085,7 +7230,7 @@ zabbix_export:
                     }
                 
                     if (request.getStatus() !== 200) {
-                        if (response.error && response.error.message) {
+                        if (typeof (response.error && response.error.message) !== 'undefined') {
                             throw response.error.message;
                         } else {
                             throw 'Failed to receive data: invalid response status code.';
@@ -7143,7 +7288,7 @@ zabbix_export:
                 }
                 
                 return JSON.stringify(obj);
-              description: 'PostgreSQl metrics in raw format.'
+              description: 'PostgreSQL metrics in raw format.'
               preprocessing:
                 -
                   type: CHECK_NOT_SUPPORTED
@@ -7175,7 +7320,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of deadlocks detected for this database.'
+              description: 'Number of deadlocks detected in the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7198,7 +7343,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Delta count of number of committed transactions.'
+              description: 'Delta count of number of committed transactions in the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7221,7 +7366,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Delta count of number of rolled back transactions.'
+              description: 'Delta count of number of rolled back transactions in the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7244,7 +7389,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of rows fetched as a result of queries per database in the PostgreSQL instance.'
+              description: 'Total number of rows fetched as a result of queries of the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7261,13 +7406,13 @@ zabbix_export:
                   value: '{#PGSQL.DB.NAME}'
             -
               uuid: 7daca0b14f5843669bc5b0823cd4d44f
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Updated rows processed'
+              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Deleted rows processed'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_processed_count_delete[{#PGSQL.DB.NAME}]'
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of tuples(rows) processed for a given database for delete operations.'
+              description: 'Number of tuples(rows) processed for delete operations for the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7290,7 +7435,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of tuples(rows) processed for a given database for insert operations.'
+              description: 'Number of tuples(rows) processed for insert operations for the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7313,7 +7458,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of tuples(rows) processed for a given database for update operations.'
+              description: 'Number of tuples(rows) processed for update operations for the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7336,7 +7481,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of rows scanned while processing the queries per database in the PostgreSQL instance.'
+              description: 'Total number of rows scanned while processing the queries of the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7359,7 +7504,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of live tuples(rows) in the database.'
+              description: 'Number of live tuples(rows) in the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7382,7 +7527,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of live tuples(rows) in the database.'
+              description: 'Number of live tuples(rows) in the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7748,7 +7893,7 @@ zabbix_export:
       name: 'GCP Cloud SQL PostgreSQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL PostgreSQL  monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+        This template will be connected to discovered entities automatically with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -7832,7 +7977,6 @@ zabbix_export:
             var url = 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query',
                 common_path = 'cloudsql.googleapis.com/database/replication/',
                 pgsql_path = 'cloudsql.googleapis.com/database/postgresql/replication/',
-                raw_metrics,
                 obj = {},
                 mon_paths = [
                     common_path + 'network_lag',
@@ -7867,7 +8011,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -7879,13 +8023,13 @@ zabbix_export:
             var params = checkParams(JSON.parse(value)),
                 filter = "filter database_id ='" + params.database_id + "'",
                 time_window = ' | within {$GCP.TIME.WINDOW} | ',
-                raw = getHttpData(url, params.token, {
+                common_raw = getHttpData(url, params.token, {
                     query:
                         '{' + mon_paths.join(';') + '}' + time_window + filter + ' | join'
                 });
             
-            var common_keys = raw.timeSeriesDescriptor.pointDescriptors,
-                common_values = raw.timeSeriesData[0].pointData[0].values,
+            var common_keys = common_raw.timeSeriesDescriptor.pointDescriptors,
+                common_values = common_raw.timeSeriesData[0].pointData[0].values,
                 re = /(^t_\d+\.value\.)/g;
             
             for (i in common_keys) {
@@ -7897,15 +8041,34 @@ zabbix_export:
                 }
             }
             
-            pgsql_metrics = getHttpData(url, params.token, {
+            state_raw = getHttpData(url, params.token, {
+                query:
+                    common_path + 'state' + time_window + filter
+            });
+            
+            var state_keys = state_raw.timeSeriesDescriptor.pointDescriptors,
+                state_tsd = state_raw.timeSeriesData;
+            
+            for (i in state_keys) {
+                var state_key = state_keys[i].key.replace(/value\./g, '');
+                obj[state_key] = 'undefined';
+                for (t in state_tsd) {
+                    if (state_tsd[t].pointData[0].values[i].boolValue == true) {
+                        obj[state_key] = state_tsd[t].labelValues[3].stringValue;
+                        break;
+                    }
+                }
+            }
+            
+            lag_raw = getHttpData(url, params.token, {
                 query:
                     pgsql_path + 'replica_byte_lag' + time_window +
                     " filter replica_name = '" + params.database_id + "'"
             });
             
-            var tsd = pgsql_metrics.timeSeriesData;
-            for (t in tsd) {
-                obj[tsd[t].labelValues[3].stringValue] = tsd[t].pointData[0].values[0].int64Value;
+            var lag_tsd = lag_raw.timeSeriesData;
+            for (t in lag_tsd) {
+                obj[lag_tsd[t].labelValues[3].stringValue] = lag_tsd[t].pointData[0].values[0].int64Value;
             }
             
             return JSON.stringify(obj);
@@ -7947,12 +8110,6 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: cloudsql
-            -
-              tag: component
-              value: mysql
-            -
-              tag: component
               value: replication
         -
           uuid: 7d74736aa2804c899de35634bc072edf
@@ -7963,7 +8120,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Replay Location replication lag in bytes.'
+          description: 'Replay location replication lag in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7995,12 +8152,6 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: cloudsql
-            -
-              tag: component
-              value: mysql
-            -
-              tag: component
               value: replication
         -
           uuid: 379c8bc0cfe847d1819ab96aceee5efe
@@ -8023,6 +8174,46 @@ zabbix_export:
             -
               tag: component
               value: replication
+        -
+          uuid: a7f785dbe4954d77a82e6384620b5d6e
+          name: 'GCP Cloud SQL PostgreSQL: Replication state'
+          type: DEPENDENT
+          key: gcp.cloudsql.pgsql.repl.state
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: |
+            The current serving state of replication.
+            This metric is only available for the MySQL/PostgreSQL instances.
+            
+          valuemap:
+            name: 'Replication state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.state
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const idx = [           // 10 - (default)
+                      'Running',         // 0
+                      'Syncing',     // 1
+                      'Unsynced',        // 2
+                      'Stopped',    // 3
+                      'Error',    // 4
+                  ].indexOf(value);
+                  return idx !== -1 ? idx : 10;
+          master_item:
+            key: gcp.cloudsql.pgsql.repl.metrics.get
+          tags:
+            -
+              tag: component
+              value: replication
+            -
+              tag: component
+              value: status
         -
           uuid: 10af15bc71ed446eb4e614c2cb6029d5
           name: 'GCP Cloud SQL PostgreSQL: Write location lag'
@@ -8108,13 +8299,36 @@ zabbix_export:
                       value:
                         host: 'GCP Cloud SQL PostgreSQL Replica by HTTP'
                         name: 'GCP Cloud SQL PostgreSQL: Lags'
+      valuemaps:
+        -
+          uuid: af111e6b9e5a47cd9c3933b8ce35076c
+          name: 'Replication state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Running
+            -
+              value: '1'
+              newvalue: Syncing
+            -
+              value: '2'
+              newvalue: Unsynced
+            -
+              value: '3'
+              newvalue: Stopped
+            -
+              value: '4'
+              newvalue: Error
+            -
+              value: '10'
+              newvalue: Unknown
     -
       uuid: 6d2443db49e54d59a82b9b525f2424ef
       template: 'GCP Compute Engine Instance by HTTP'
       name: 'GCP Compute Engine Instance by HTTP'
       description: |
         Discover GCP Compute Engine instances by HTTP with script item usage.
-        This template will be connected to discovered entities automatically with the all required parameters pre-defined.
+        This template will be connected to discovered entities automatically with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -8317,7 +8531,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -8403,7 +8617,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Number of outbound packets dropped due to link congestion.'
+          description: 'Count of incoming packets dropped by the firewall.'
           preprocessing:
             -
               type: JSONPATH
@@ -8424,8 +8638,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: gcp.gce.instance.state
           history: 7d
-          trends: '0'
-          value_type: CHAR
           description: 'GCP Compute Engine instance state.'
           valuemap:
             name: 'Instance state'
@@ -8544,45 +8756,37 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: status
-        -
-          uuid: 792b421375d14c89b6018421032cb1b6
-          name: 'GCP Compute Engine: Integrity: Early boot validation: Failed'
-          type: DEPENDENT
-          key: gcp.gce.integrity.early_boot_validation_status.failed
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'The validation status of early boot integrity policy - failed or not.'
-          valuemap:
-            name: 'Integrity validation status'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.early_boot_validation_status.failed
-          master_item:
-            key: gcp.gce.metrics.get
-          tags:
-            -
-              tag: component
-              value: security
+              value: uptime
         -
           uuid: 744f3f821847473d9cef1236580bda38
-          name: 'GCP Compute Engine: Integrity: Early boot validation: Passed'
+          name: 'GCP Compute Engine: Integrity: Early boot validation status'
           type: DEPENDENT
-          key: gcp.gce.integrity.early_boot_validation_status.passed
+          key: gcp.gce.integrity.early_boot_validation_status
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'The validation status of early boot integrity policy - is passed or not.'
+          description: |
+            The validation status of early boot integrity policy. 
+            Empty value if integrity monitoring isn't enabled.
+            
           valuemap:
             name: 'Integrity validation status'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.early_boot_validation_status.passed
+                - $.early_boot_validation_status
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  const idx = [           // "" - (default) to avoid data processing when integrity monitoring is not enabled
+                      'passed',         // 0 — Early boot validation status is passed.
+                      'failed',     // 1 — Early boot validation status is failed.
+                      'unknown',        // 2 — Early boot validation status is unknown.
+                  ].indexOf(value);
+                  return idx !== -1 ? idx : "";
           master_item:
             key: gcp.gce.metrics.get
           tags:
@@ -8590,87 +8794,35 @@ zabbix_export:
               tag: component
               value: security
         -
-          uuid: d4263a9b98c14923a66d49b843d2ddbc
-          name: 'GCP Compute Engine: Integrity: Early boot validation: Unknown'
+          uuid: aa334c3a0faf4f36bcbbf51d87ef9186
+          name: 'GCP Compute Engine: Integrity: Late boot validation status'
           type: DEPENDENT
-          key: gcp.gce.integrity.early_boot_validation_status.unknown
+          key: gcp.gce.integrity.late_boot_validation_status
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'The validation status of early boot integrity policy - unknown or not.'
+          description: |
+            The validation status of late boot integrity policy. 
+            Empty value if integrity monitoring isn't enabled.
+            
           valuemap:
             name: 'Integrity validation status'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.early_boot_validation_status.unknown
-          master_item:
-            key: gcp.gce.metrics.get
-          tags:
+                - $.late_boot_validation_status
+              error_handler: DISCARD_VALUE
             -
-              tag: component
-              value: security
-        -
-          uuid: 58634fcb79dc43c0a66d0a0cb882a264
-          name: 'GCP Compute Engine: Integrity: Late boot validation: Failed'
-          type: DEPENDENT
-          key: gcp.gce.integrity.late_boot_validation_status.failed
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'The validation status of late boot integrity policy - failed or not.'
-          valuemap:
-            name: 'Integrity validation status'
-          preprocessing:
-            -
-              type: JSONPATH
+              type: JAVASCRIPT
               parameters:
-                - $.late_boot_validation_status.failed
-          master_item:
-            key: gcp.gce.metrics.get
-          tags:
-            -
-              tag: component
-              value: security
-        -
-          uuid: 5f850446c72a447f9b4ca8dc611f91d5
-          name: 'GCP Compute Engine: Integrity: Late boot validation: Passed'
-          type: DEPENDENT
-          key: gcp.gce.integrity.late_boot_validation_status.passed
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'The validation status of late boot integrity policy - is passed or not.'
-          valuemap:
-            name: 'Integrity validation status'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.late_boot_validation_status.passed
-          master_item:
-            key: gcp.gce.metrics.get
-          tags:
-            -
-              tag: component
-              value: security
-        -
-          uuid: 9a95c4aaca864997b1cc5bf9be5f9d11
-          name: 'GCP Compute Engine: Integrity: Late boot validation: Unknown'
-          type: DEPENDENT
-          key: gcp.gce.integrity.late_boot_validation_status.unknown
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'The validation status of late boot integrity policy - unknown or not.'
-          valuemap:
-            name: 'Integrity validation status'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.late_boot_validation_status.unknown
+                - |
+                  const idx = [           // "" - (default) to avoid data processing when integrity monitoring is not enabled
+                      'passed',         // 0 — Early boot validation status is passed.
+                      'failed',     // 1 — Early boot validation status is failed.
+                      'unknown',        // 2 — Early boot validation status is unknown.
+                  ].indexOf(value);
+                  return idx !== -1 ? idx : "";
           master_item:
             key: gcp.gce.metrics.get
           tags:
@@ -8860,7 +9012,7 @@ zabbix_export:
                 ];
             
             function checkParams(params) {
-                ['instance_id', 'token', 'machine_type'].forEach(function (field) {
+                ['instance_id', 'token', 'machine_type','integrity'].forEach(function (field) {
                     if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                         throw 'Required param is not set: ' + field + '.';
                     }
@@ -8888,7 +9040,7 @@ zabbix_export:
                 }
             
                 if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
@@ -8903,13 +9055,14 @@ zabbix_export:
                 result = {};
             
                 for (i in ids) {
-                    result[ids[i].key.replace(re, '')] = {};
+                    var id = ids[i].key.replace(re, '');
+                    result[id] = {};
                     for (t in ltsd) {
                         for (v in value_types) {
                             if (typeof ltsd[t].pointData[0].values[i][value_types[v]] !== 'undefined') {
                                 ['stringValue', 'boolValue'].forEach(function (type) {
                                     if (typeof ltsd[t].labelValues[4][type] !== 'undefined') {
-                                        result[ids[i].key.replace(re, '')][ltsd[t].labelValues[4][type]] = ltsd[t].pointData[0].values[i][value_types[v]];
+                                        result[id][ltsd[t].labelValues[4][type]] = ltsd[t].pointData[0].values[i][value_types[v]];
                                     }
                                 });
             
@@ -8960,14 +9113,27 @@ zabbix_export:
                 }
             }
             
-            single_queries = [
-                { query: '{' + integrity_paths.join(';') + '}' + time_window + filter + ' | join' },
-                { query: '{' + net_paths.join(';') + '}' + time_window + filter + ' | join' },
-            ];
+            net_metrics = getHttpData(url, params.token, {
+                query: '{' + net_paths.join(';') + '}' + time_window + filter + ' | join'
+            });
+            Object.assign(obj, nestedMap(net_metrics));
             
-            for (q in single_queries) {
-                raw = getHttpData(url, params.token, single_queries[q]);
-                Object.assign(obj, nestedMap(raw));
+            if (params.integrity.match(/true/)) {
+                integrity_metrics = getHttpData(url, params.token, {
+                    query: '{' + integrity_paths.join(';') + '}' + time_window + filter + ' | join'
+                });
+                var keys = integrity_metrics.timeSeriesDescriptor.pointDescriptors,
+                    tsd = integrity_metrics.timeSeriesData;
+                for (i in keys) {
+                    var key = keys[i].key.replace(re, '');
+                    obj[key] = 'undefined';
+                    for (t in tsd) {
+                        if (tsd[t].pointData[0].values[i].int64Value == 1) {
+                            obj[key] = tsd[t].labelValues[4].stringValue;
+                            break;
+                        }
+                    }
+                }
             }
             
             return JSON.stringify(obj);
@@ -8988,6 +9154,9 @@ zabbix_export:
             -
               name: machine_type
               value: '{$GCE.MACHINE.TYPE}'
+            -
+              name: integrity
+              value: '{$GCE.INTEGRITY.STATE}'
           tags:
             -
               tag: component
@@ -9456,7 +9625,7 @@ zabbix_export:
                   value: '{#GCE.DISK.STOR_TYPE}'
             -
               uuid: 602255b7df004129b5a3e0e1d2fba920
-              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Write operations '
+              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Write operations'
               type: DEPENDENT
               key: 'gcp.gce.disk.write_ops_count[{#GCE.DISK.NAME}]'
               delay: '0'
@@ -9788,10 +9957,13 @@ zabbix_export:
           mappings:
             -
               value: '0'
-              newvalue: 'No'
+              newvalue: Passed
             -
               value: '1'
-              newvalue: 'Yes'
+              newvalue: Failed
+            -
+              value: '2'
+              newvalue: Unknown
   graphs:
     -
       uuid: 1ff7d04868284c07829382c44301fe0e
@@ -10058,31 +10230,31 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'GCP Cloud SQL MySQL by HTTP'
-            key: gcp.cloudsql.innodb_buffer_pool_pages_free
+            key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_free
         -
           sortorder: '1'
           color: F63100
           item:
             host: 'GCP Cloud SQL MySQL by HTTP'
-            key: gcp.cloudsql.innodb_buffer_pool_pages_dirty
+            key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_dirty
         -
           sortorder: '2'
           color: 00611C
           item:
             host: 'GCP Cloud SQL MySQL by HTTP'
-            key: gcp.cloudsql.innodb_buffer_pool_pages_total
+            key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_total
         -
           sortorder: '3'
           color: F7941D
           item:
             host: 'GCP Cloud SQL MySQL by HTTP'
-            key: gcp.cloudsql.innodb_pages_read
+            key: gcp.cloudsql.mysql.innodb_pages_read
         -
           sortorder: '4'
           color: FC6EA3
           item:
             host: 'GCP Cloud SQL MySQL by HTTP'
-            key: gcp.cloudsql.innodb_pages_written
+            key: gcp.cloudsql.mysql.innodb_pages_written
     -
       uuid: e447dd13336446b1a965e92d7ddeaf96
       name: 'GCP Cloud SQL MySQL: Queries'
