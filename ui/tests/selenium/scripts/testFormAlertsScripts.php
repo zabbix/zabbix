@@ -1154,9 +1154,11 @@ class testFormAlertsScripts extends CWebTest {
 	 * Function for checking script cloning with only changed name.
 	 */
 	public function testFormAlertsScripts_Clone() {
+		$this->page->login()->open('zabbix.php?action=script.list');
 		foreach (self::$clone_scriptids as $scriptid) {
-			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
-			$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+			$this->query('xpath://a[@data-scriptid="'.$scriptid.'"]')->waitUntilClickable()->one()->click();
+			$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+			$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 			$values = $form->getFields()->asValues();
 			$script_name = $values['Name'];
 			$this->query('button:Clone')->waitUntilClickable()->one()->click();
@@ -1171,7 +1173,8 @@ class testFormAlertsScripts extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name)));
 
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name));
-			$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
+			$this->page->open('zabbix.php?action=script.list');
+			$this->query('xpath://a[@data-scriptid="'.$id.'"]')->waitUntilClickable()->one()->click();
 			$cloned_values = $form->getFields()->asValues();
 			$this->assertEquals('Cloned_'.$script_name, $cloned_values['Name']);
 
@@ -1179,6 +1182,7 @@ class testFormAlertsScripts extends CWebTest {
 			unset($cloned_values['Name']);
 			unset($values['Name']);
 			$this->assertEquals($values, $cloned_values);
+			$modal->close();
 		}
 	}
 
