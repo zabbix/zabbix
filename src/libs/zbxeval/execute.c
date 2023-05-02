@@ -290,7 +290,7 @@ static int	eval_execute_op_binary(const zbx_eval_context_t *ctx, const zbx_eval_
 
 	if (ZBX_EVAL_TOKEN_OP_EQ == token->type || ZBX_EVAL_TOKEN_OP_NE == token->type)
 	{
-		if (ZBX_VARIANT_DBL_VECTOR == left->type || ZBX_VARIANT_DBL_VECTOR == right->type)
+		if (ZBX_VARIANT_VECTOR == left->type || ZBX_VARIANT_VECTOR == right->type)
 		{
 			*error = zbx_dsprintf(*error, "vector cannot be used with comparison operator at \"%s\"",
 					ctx->expression + token->loc.l);
@@ -715,7 +715,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 
 	i = output->values_num - token->opt;
 
-	if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+	if (ZBX_VARIANT_VECTOR != output->values[i].type)
 	{
 		for (; i < output->values_num; i++)
 		{
@@ -732,7 +732,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 			return FAIL;
 		}
 
-		if (0 == output->values[i].data.dbl_vector->values_num)
+		if (0 == output->values[i].data.vector->values_num)
 		{
 			*error = zbx_dsprintf(*error, "no input data for function at \"%s\"",
 					ctx->expression + token->loc.l);
@@ -768,7 +768,7 @@ static int	eval_execute_function_min(const zbx_eval_context_t *ctx, const zbx_ev
 
 	i = output->values_num - token->opt;
 
-	if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+	if (ZBX_VARIANT_VECTOR != output->values[i].type)
 	{
 		min = output->values[i++].data.dbl;
 
@@ -780,14 +780,17 @@ static int	eval_execute_function_min(const zbx_eval_context_t *ctx, const zbx_ev
 	}
 	else
 	{
-		zbx_vector_dbl_t	*dbl_vector = output->values[i].data.dbl_vector;
+		zbx_vector_var_t	*value_vector = output->values[i].data.vector;
 
-		min = dbl_vector->values[0];
+		if (FAIL == zbx_vector_var_to_dbl(value_vector, error))
+			return FAIL;
 
-		for (i = 1; i < dbl_vector->values_num; i++)
+		min = value_vector->values[0].data.dbl;
+
+		for (i = 1; i < value_vector->values_num; i++)
 		{
-			if (min > dbl_vector->values[i])
-				min = dbl_vector->values[i];
+			if (min > value_vector->values[i].data.dbl)
+				min = value_vector->values[i].data.dbl;
 		}
 	}
 
@@ -822,7 +825,7 @@ static int	eval_execute_function_max(const zbx_eval_context_t *ctx, const zbx_ev
 
 	i = output->values_num - token->opt;
 
-	if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+	if (ZBX_VARIANT_VECTOR != output->values[i].type)
 	{
 		max = output->values[i++].data.dbl;
 
@@ -834,14 +837,17 @@ static int	eval_execute_function_max(const zbx_eval_context_t *ctx, const zbx_ev
 	}
 	else
 	{
-		zbx_vector_dbl_t	*dbl_vector = output->values[i].data.dbl_vector;
+		if (FAIL == zbx_vector_var_to_dbl(output->values[i].data.vector, error))
+			return FAIL;
 
-		max = dbl_vector->values[0];
+		zbx_vector_var_t	*var_vector = output->values[i].data.vector;
 
-		for (i = 1; i < dbl_vector->values_num; i++)
+		max = var_vector->values[0].data.dbl;
+
+		for (i = 1; i < var_vector->values_num; i++)
 		{
-			if (max < dbl_vector->values[i])
-				max = dbl_vector->values[i];
+			if (max < var_vector->values[i].data.dbl)
+				max = var_vector->values[i].data.dbl;
 		}
 	}
 
@@ -876,17 +882,20 @@ static int	eval_execute_function_sum(const zbx_eval_context_t *ctx, const zbx_ev
 
 	i = output->values_num - token->opt;
 
-	if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+	if (ZBX_VARIANT_VECTOR != output->values[i].type)
 	{
 		for (; i < output->values_num; i++)
 			sum += output->values[i].data.dbl;
 	}
 	else
 	{
-		zbx_vector_dbl_t	*dbl_vector = output->values[i].data.dbl_vector;
+		if (FAIL == zbx_vector_var_to_dbl(output->values[i].data.vector, error))
+			return FAIL;
 
-		for (i = 0; i < dbl_vector->values_num; i++)
-			sum += dbl_vector->values[i];
+		zbx_vector_var_t	*var_vector = output->values[i].data.vector;
+
+		for (i = 0; i < var_vector->values_num; i++)
+			sum += var_vector->values[i].data.dbl;
 	}
 
 	zbx_variant_set_dbl(&value, sum);
@@ -920,7 +929,7 @@ static int	eval_execute_function_avg(const zbx_eval_context_t *ctx, const zbx_ev
 
 	i = output->values_num - token->opt;
 
-	if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+	if (ZBX_VARIANT_VECTOR != output->values[i].type)
 	{
 		for (; i < output->values_num; i++)
 			avg += output->values[i].data.dbl;
@@ -929,12 +938,15 @@ static int	eval_execute_function_avg(const zbx_eval_context_t *ctx, const zbx_ev
 	}
 	else
 	{
-		zbx_vector_dbl_t	*dbl_vector = output->values[i].data.dbl_vector;
+		if (FAIL == zbx_vector_var_to_dbl(output->values[i].data.vector, error))
+			return FAIL;
 
-		for (i = 0; i < dbl_vector->values_num; i++)
-			avg += dbl_vector->values[i];
+		zbx_vector_var_t	*var_vector = output->values[i].data.vector;
 
-		avg /= dbl_vector->values_num;
+		for (i = 0; i < var_vector->values_num; i++)
+			avg += var_vector->values[i].data.dbl;
+
+		avg /= var_vector->values_num;
 	}
 
 	zbx_variant_set_dbl(&value, avg);
@@ -1378,14 +1390,14 @@ static int	eval_validate_statistical_function_args(const zbx_eval_context_t *ctx
 
 	i = output->values_num - 1;
 
-	if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+	if (ZBX_VARIANT_VECTOR != output->values[i].type)
 	{
 		*error = zbx_dsprintf(*error, "invalid argument type \"%s\" for function at \"%s\"",
 				zbx_variant_type_desc(&output->values[i]), ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
-	if (0 == output->values[i].data.dbl_vector->values_num)
+	if (0 == output->values[i].data.vector->values_num)
 	{
 		*error = zbx_dsprintf(*error, "empty vector argument for function at \"%s\"",
 				ctx->expression + token->loc.l);
@@ -1415,19 +1427,25 @@ static int	eval_execute_statistical_function(const zbx_eval_context_t *ctx, cons
 	int			ret;
 	double			result;
 	zbx_variant_t		value;
-	zbx_vector_dbl_t	*dbl_vector;
+	zbx_vector_var_t	*var_vector;
+	zbx_vector_dbl_t	dbl_vector;
 
 	if (UNKNOWN != (ret = eval_validate_statistical_function_args(ctx, token, output, error)))
 		return ret;
 
-	dbl_vector = output->values[output->values_num - (int)token->opt].data.dbl_vector;
+	var_vector = output->values[output->values_num - (int)token->opt].data.vector;
+	zbx_vector_dbl_create(&dbl_vector);
 
-	if (FAIL == stat_func(dbl_vector, &result, error))
-		return FAIL;
+	if (FAIL == stat_func(&dbl_vector, &result, error))
+	{
+		ret = FAIL;
+		goto out;
+	}
 
 	zbx_variant_set_dbl(&value, result);
 	eval_function_return((int)token->opt, &value, output);
-
+out:
+	zbx_vector_dbl_destroy(&dbl_vector);
 	return SUCCEED;
 }
 
@@ -2240,13 +2258,13 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 	if (2 == token->opt)
 	{
-		if (ZBX_VARIANT_DBL_VECTOR != output->values[i].type)
+		if (ZBX_VARIANT_VECTOR != output->values[i].type)
 		{
 			*error = zbx_dsprintf(*error, "invalid type of second argument for function at \"%s\"", err_fn);
 			return FAIL;
 		}
 
-		if (output->values[i].data.dbl_vector->values_num % 2 != 0)
+		if (output->values[i].data.vector->values_num % 2 != 0)
 		{
 			*error = zbx_dsprintf(*error, "invalid values number of second argument for function at \"%s\"",
 					err_fn);
@@ -2309,7 +2327,10 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 	if (2 == token->opt)
 	{
-		v = output->values[i].data.dbl_vector;
+		v = (zbx_vector_dbl_t*)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
+
+		if (FAIL == zbx_vector_dbl_from_vector_var(output->values[i].data.vector, v, error))
+			return FAIL;
 	}
 	else
 	{
@@ -2327,7 +2348,12 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 		eval_function_return(token->opt, &value, output);
 	}
 
-	if (NULL == v)
+	if (NULL != v)
+	{
+		zbx_vector_dbl_destroy(v);
+		zbx_free(v);
+	}
+	else
 		zbx_vector_dbl_destroy(&values);
 
 	return ret;
@@ -2616,14 +2642,11 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 	arg_vector = &output->values[output->values_num - token->opt];
 
-	if (arg_vector->type != ZBX_VARIANT_DBL_VECTOR)
+	if (arg_vector->type != ZBX_VARIANT_VECTOR)
 	{
-		if (arg_vector->type != ZBX_VARIANT_VAR_VECTOR)
-		{
-			*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
-					ctx->expression + token->loc.l);
-			return FAIL;
-		}
+		*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
+				ctx->expression + token->loc.l);
+		return FAIL;
 	}
 
 	if (1 < token->opt)
@@ -2660,7 +2683,8 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 		zbx_vector_expression_create(&pdata.regexps);
 
-		value_type = (ZBX_VARIANT_VAR_VECTOR == arg_vector->type ? ITEM_VALUE_TYPE_STR : ITEM_VALUE_TYPE_FLOAT);
+		value_type = (SUCCEED != zbx_vector_var_is_double(arg_vector->data.vector) ?
+				ITEM_VALUE_TYPE_STR : ITEM_VALUE_TYPE_FLOAT);
 
 		if (FAIL == zbx_validate_count_pattern(operator, pattern, value_type, &pdata, error))
 		{
@@ -2670,10 +2694,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 		{
 			int	result = 0;
 
-			if (ZBX_VARIANT_VAR_VECTOR == arg_vector->type)
-				zbx_count_var_vector_with_pattern(&pdata, pattern, arg_vector->data.var_vector, &result);
-			else
-				zbx_count_dbl_vector_with_pattern(&pdata, pattern, arg_vector->data.dbl_vector, &result);
+			zbx_count_var_vector_with_pattern(&pdata, pattern, arg_vector->data.vector, &result);
 
 			zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)result);
 		}
@@ -2685,10 +2706,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 	{
 		int value_count;
 
-		if (ZBX_VARIANT_VAR_VECTOR == arg_vector->type)
-			value_count = (zbx_uint64_t)arg_vector->data.var_vector->values_num;
-		else
-			value_count = (zbx_uint64_t)arg_vector->data.dbl_vector->values_num;
+		value_count = (zbx_uint64_t)arg_vector->data.vector->values_num;
 
 		zbx_variant_set_ui64(&ret_value, value_count);
 	}
