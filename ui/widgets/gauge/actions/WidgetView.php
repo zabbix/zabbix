@@ -363,8 +363,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	/**
-	 * Set the data to items array and item ID depending on options and wheter there were previously temporary items set
-	 * in case of dynamic host selection.
+	 * Set the data to items array and item ID depending on options and whether there were previously temporary items
+	 * set in case of dynamic host selection.
 	 */
 	private function setItems(): void {
 		$options = $this->getItemOptions();

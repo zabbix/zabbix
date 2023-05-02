@@ -46,6 +46,7 @@ $this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
+$this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.dashboard.print.js.php');
