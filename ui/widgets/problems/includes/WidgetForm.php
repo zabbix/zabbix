@@ -125,10 +125,6 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
-			// ->addField(
-			// 	(new CWidgetFieldCheckBox('unacknowledged', _('Show unacknowledged only')))
-			// 		->setFlags(CWidgetField::FLAG_ACKNOWLEDGES)
-			// )
 			->addField(
 				(new CWidgetFieldRadioButtonList('unacknowledged', _('Acknowledgement status'), [
 					0 => _('all'),
