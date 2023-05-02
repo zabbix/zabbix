@@ -1178,7 +1178,8 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 		if (hosts.values_num - i < worker_max)
 			worker_max = hosts.values_num - i;
 
-		if (SUCCEED != zbx_ping(&hosts.values[i], worker_max, 3, 0, 0, 0, 1, error, sizeof(error)))
+		if (SUCCEED != zbx_ping(&hosts.values[i], worker_max, 3, 0, 0, 0, dcheck->allow_redirect, 1, error,
+				sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() %d icmp checks failed with error:%s", __func__,
 					worker_max, error);

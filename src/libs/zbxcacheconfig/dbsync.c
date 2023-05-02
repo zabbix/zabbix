@@ -3833,10 +3833,10 @@ int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select dcheckid,druleid,type,key_,snmp_community,ports,snmpv3_securityname,"
 				"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq,"
-				"snmpv3_authprotocol,snmpv3_privprotocol,snmpv3_contextname"
+				"snmpv3_authprotocol,snmpv3_privprotocol,snmpv3_contextname,allow_redirect"
 			" from dchecks");
 
-	dbsync_prepare(sync, 14, NULL);
+	dbsync_prepare(sync, 15, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

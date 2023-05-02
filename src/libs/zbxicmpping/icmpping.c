@@ -494,24 +494,24 @@ static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int ho
  *                                                                            *
  * Purpose: get ICMP pinged host by host address in fping output line         *
  *                                                                            *
- * Parameters: resp - [IN] fping output                                       *
- *             args - [IN] host data and fping settings                       *
- *             host - [OUT]                                                   *
+ * Parameters: resp        - [IN] fping output                                *
+ *             args        - [IN] host data and fping settings                *
+ *             dnsname_len - [IN]                                             *
+ *             host        - [OUT]                                            *
  *                                                                            *
  * Return value: SUCCEED - host was found                                     *
  *               FAIL    - fping returned response for and unknown host       *
  *                                                                            *
  ******************************************************************************/
-static int	host_get(zbx_fping_resp *resp, zbx_fping_args *args, ZBX_FPING_HOST **host)
+static int	host_get(zbx_fping_resp *resp, zbx_fping_args *args, size_t *dnsname_len, ZBX_FPING_HOST **host)
 {
-	int	i, ret;
-	char	*p_end;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*host = NULL;
 
-	ret = check_hostip_response(resp->linebuf, args->hosts, args->hosts_count, args->rdns, &dnsname_len, &host))
+	ret = check_hostip_response(resp->linebuf, args->hosts, args->hosts_count, args->rdns, dnsname_len, host);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -624,6 +624,7 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 {
 	ZBX_FPING_HOST	*host;
 	char		*linebuf_p;
+	size_t		dnsname_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() linebuf: \"%s\"", __func__, resp->linebuf);
 
@@ -633,7 +634,7 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 	if (SUCCEED != redirect_remove(resp->linebuf))
 		return;
 
-	if (SUCCEED != host_get(resp, args, &host))
+	if (SUCCEED != host_get(resp, args, &dnsname_len, &host))
 		return;
 
 	if (NULL == (linebuf_p = strstr(resp->linebuf, " : ")))
@@ -660,6 +661,11 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
 		/* Fping statistics may look like:                                                        */
 		/* 8.8.8.8 : 91.7 37.0 29.2 − 36.8                                                        */
 		stats_calc(linebuf_p, host, args);
+	}
+
+	if (0 != args->rdns)
+	{
+		host->dnsname = zbx_dsprintf(NULL, "%.*s", (int)dnsname_len, resp->linebuf);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -712,7 +718,7 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 }
 
 static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count, int interval, int size,
-		int timeout, int rdns, unsigned char allow_redirect, char *error, size_t max_error_len)
+		int timeout, unsigned char allow_redirect, int rdns, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
 	FILE		*f;
@@ -1054,6 +1060,7 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 	fping_args.hosts_count = hosts_count;
 	fping_args.requests_count = requests_count;
 	fping_args.allow_redirect = allow_redirect;
+	fping_args.rdns = rdns;
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = fping_existence;
 #endif
@@ -1126,7 +1133,7 @@ void	zbx_init_icmpping_env(const char *prefix, long int id)
  *             allow_redirect - [IN]  treat redirected response as host up:   *
  *                                    0 - no, 1 - yes                         *
  *             rdns          - [IN]  flag required rdns option                *
- *                                   (fping option -dA)  
+ *                                   (fping option -dA)                       *
  *             error          - [OUT] error string if function fails          *
  *             max_error_len  - [IN]  length of error buffer                  *
  *                                                                            *

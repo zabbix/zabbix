@@ -5804,6 +5804,7 @@ static void	dc_sync_dchecks(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UCHAR(dcheck->snmpv3_authprotocol, row[11]);
 		ZBX_STR2UCHAR(dcheck->snmpv3_privprotocol, row[12]);
 		dc_strpool_replace(found, (const char **)&dcheck->snmpv3_contextname, row[13]);
+		ZBX_STR2UCHAR(dcheck->allow_redirect, row[14]);
 
 		if (drule->revision == revision)
 			continue;
@@ -15506,6 +15507,7 @@ zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
 				dheck_out->ports = zbx_strdup(NULL, dcheck->ports);
 				dheck_out->uniq = dcheck->uniq;
 				dheck_out->type = dcheck->type;
+				dheck_out->allow_redirect = dcheck->allow_redirect;
 
 				if (SVC_SNMPv1 == dheck_out->type || SVC_SNMPv2c == dheck_out->type ||
 						SVC_SNMPv3 == dheck_out->type)

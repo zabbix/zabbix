@@ -638,6 +638,7 @@ typedef struct
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
 	char		*snmpv3_contextname;
+	unsigned char	allow_redirect;
 }
 zbx_dc_dcheck_t;
 
