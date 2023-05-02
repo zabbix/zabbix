@@ -82,7 +82,8 @@ form.dashboard-widget-gauge {
 	}
 }
 
-// Widget view.
+// Widget view only.
+
 div.dashboard-widget-gauge {
 	.dashboard-grid-widget-body {
 		$line-height: 1.2em;
@@ -98,20 +99,37 @@ div.dashboard-widget-gauge {
 			text-align: center;
 			white-space: nowrap;
 		}
+	}
+}
 
-		.arc {
-			&.empty {
-				fill: $gauge-empty-color;
-			}
+// Widget view and downloaded image.
 
-			&.value {
-				fill: $gauge-fill-color;
-			}
+.svg-gauge {
+	$line-height: 1.2em;
+
+	div {
+		line-height: $line-height;
+		text-align: center;
+		white-space: nowrap;
+	}
+
+	#value,
+	#units {
+		white-space: pre;
+	}
+
+	.arc {
+		&.empty {
+			fill: $gauge-empty-color;
 		}
 
-		#needle {
-			fill: $gauge-needle-color;
+		&.value {
+			fill: $gauge-fill-color;
 		}
+	}
+
+	#needle {
+		fill: $gauge-needle-color;
 	}
 }
 

@@ -38,4 +38,13 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Gauge');
 	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.widget.js' => [
+				'Actions' => _s('Actions'),
+				'Download image' => _s('Download image')
+			]
+		];
+	}
 }

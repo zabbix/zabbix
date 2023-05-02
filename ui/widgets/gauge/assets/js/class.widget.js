@@ -26,6 +26,8 @@ class CWidgetGauge extends CWidget {
 		super._init();
 
 		this._initial_load = true;
+		this._has_contents = false;
+		this._svg = false;
 		this.gauge = null;
 	}
 
@@ -68,6 +70,8 @@ class CWidgetGauge extends CWidget {
 		// If there will a necesity for tooltips due to threshold overhaul, we probably need to stop all widget activity first
 
 		if (response.gauge_data !== undefined) {
+			this._has_contents = true;
+
 			if (this._initial_load) {
 				super.processUpdateResponse(response);
 
@@ -85,6 +89,8 @@ class CWidgetGauge extends CWidget {
 						height: height
 					},
 				}, response.gauge_data.data);
+
+				this._svg = this._body.querySelector('svg');
 			}
 			else {
 				this.gauge.update(response.gauge_data.data);
@@ -94,8 +100,48 @@ class CWidgetGauge extends CWidget {
 				this._content_body.innerHTML = response.gauge_data.error_msg;
 			}
 		}
+		else {
+			this._has_contents = false;
+		}
 
 		this._initial_load = false;
+	}
+
+	getActionsContextMenu({can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_paste_widget});
+
+		if (this._is_edit_mode) {
+			return menu;
+		}
+
+		let menu_actions = null;
+
+		for (const search_menu_actions of menu) {
+			if ('label' in search_menu_actions && search_menu_actions.label === t('Actions')) {
+				menu_actions = search_menu_actions;
+
+				break;
+			}
+		}
+
+		if (menu_actions === null) {
+			menu_actions = {
+				label: t('Actions'),
+				items: []
+			};
+
+			menu.unshift(menu_actions);
+		}
+
+		menu_actions.items.push({
+			label: t('Download image'),
+			disabled: !this._has_contents,
+			clickCallback: () => {
+				downloadSvgImage(this._svg, 'gauge.png');
+			}
+		});
+
+		return menu;
 	}
 
 	hasPadding() {

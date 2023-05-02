@@ -1663,11 +1663,19 @@ div.dashboard-widget-gauge .dashboard-grid-widget-body div {
   line-height: 1.2em;
   text-align: center;
   white-space: nowrap; }
-div.dashboard-widget-gauge .dashboard-grid-widget-body .arc.empty {
+
+.svg-gauge div {
+  line-height: 1.2em;
+  text-align: center;
+  white-space: nowrap; }
+.svg-gauge #value,
+.svg-gauge #units {
+  white-space: pre; }
+.svg-gauge .arc.empty {
   fill: #ffffff; }
-div.dashboard-widget-gauge .dashboard-grid-widget-body .arc.value {
+.svg-gauge .arc.value {
   fill: #555555; }
-div.dashboard-widget-gauge .dashboard-grid-widget-body #needle {
+.svg-gauge #needle {
   fill: #000000; }
 
 div.dashboard-widget-gauge a:link {

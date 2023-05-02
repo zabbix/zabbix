@@ -74,7 +74,7 @@ class CSVGGauge {
 		this.svg = document.createElementNS(SVGNS, 'svg');
 
 		// TO DO: the preserveAspectRatio: 'xMidYMid' doesn't seem to do anything. At least for now. So probably delete this comment later.
-		this.#addAttributesNS(this.svg, {width: this.width, height: this.height});
+		this.#addAttributesNS(this.svg, {width: this.width, height: this.height, class: 'svg-gauge'});
 		this.#addAttributes(this.svg, {xmlns: SVGNS});
 
 		// Set starting point - center coordinates of arc.
@@ -610,15 +610,18 @@ class CSVGGauge {
 
 				// If units are larger, add space after units. If value is larger add space before value.
 				if (units_line_height > value_line_height) {
-					units_div.appendChild(document.createTextNode(units.text + '\xa0'));
+					units_div.appendChild(document.createTextNode(units.text + ' '));
 					value_div.appendChild(document.createTextNode(value.text));
 				}
 				else {
 					units_div.appendChild(document.createTextNode(units.text));
-					value_div.appendChild(document.createTextNode('\xa0' + value.text));
+					value_div.appendChild(document.createTextNode(' ' + value.text));
 				}
 
 				this.#addAttributes(div, {'style': 'align-items: baseline;'});
+
+				div.appendChild(units_div);
+				div.appendChild(value_div);
 			}
 			else if (units.pos === UNITS_POSITION_AFTER) {
 				// Take the largest height from both.
@@ -626,17 +629,20 @@ class CSVGGauge {
 
 				// If units are larger, add space before units. If value is larger add space after value.
 				if (units_line_height > value_line_height) {
-					units_div.appendChild(document.createTextNode('\xa0' + units.text));
+					units_div.appendChild(document.createTextNode(' ' + units.text));
 					value_div.appendChild(document.createTextNode(value.text));
 				}
 				else {
 					units_div.appendChild(document.createTextNode(units.text));
-					value_div.appendChild(document.createTextNode(value.text + '\xa0'));
+					value_div.appendChild(document.createTextNode(value.text + ''));
 				}
 
 				this.#addAttributes(div, {'style': 'align-items: baseline;'});
+
+				div.appendChild(value_div);
+				div.appendChild(units_div);
 			}
-			else if (units.pos === UNITS_POSITION_ABOVE || units.pos === UNITS_POSITION_BELOW) {
+			else if (units.pos === UNITS_POSITION_ABOVE) {
 				// Total height is both units and value combined.
 				block_height = units_line_height + value_line_height;
 
@@ -644,10 +650,22 @@ class CSVGGauge {
 				value_div.appendChild(document.createTextNode(value.text));
 
 				this.#addAttributes(div, {'style': 'align-items: center; flex-direction: column;'});
-			}
 
-			div.appendChild(value_div);
-			div.appendChild(units_div);
+				div.appendChild(units_div);
+				div.appendChild(value_div);
+			}
+			else if (units.pos === UNITS_POSITION_BELOW) {
+				// Total height is both units and value combined.
+				block_height = units_line_height + value_line_height;
+
+				units_div.appendChild(document.createTextNode(units.text));
+				value_div.appendChild(document.createTextNode(value.text));
+
+				this.#addAttributes(div, {'style': 'align-items: center; flex-direction: column;'});
+
+				div.appendChild(value_div);
+				div.appendChild(units_div);
+			}
 		}
 		else {
 			// No units.
