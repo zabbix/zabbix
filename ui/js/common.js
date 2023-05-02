@@ -406,6 +406,20 @@ function PopUp(action, parameters, {
 					script_inline: resp.script_inline,
 					data: resp.data || null
 				});
+
+				for (const grid of overlay.$dialogue.$body[0].querySelectorAll('form .form-grid')) {
+					new ResizeObserver(() => {
+						const label = grid.querySelector(':scope > label:first-of-type');
+
+						if (label !== null) {
+							const rect = label.getBoundingClientRect();
+
+							if (rect.width > 0) {
+								grid.style.setProperty('--label-width', Math.ceil(rect.width) + 'px');
+							}
+						}
+					}).observe(grid);
+				}
 			}
 
 			overlay.recoverFocus();

@@ -5323,7 +5323,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     z-index: 4;
     margin: 0 0 10px; }
   .overlay-dialogue .form-grid {
-    grid-template-columns: minmax(100px, max-content) auto; }
+    grid-template-columns: minmax(var(--label-width, 100px), max-content) auto; }
     .overlay-dialogue .form-grid.form-grid-1-1 {
       grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
     .overlay-dialogue .form-grid.form-grid-3-1 {
