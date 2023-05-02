@@ -78,10 +78,7 @@ $form
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
-	->addFieldsGroup(
-		$data['fields']['unacknowledged']->getLabel(),
-		getAcknowledgementStatusFieldsGroupViews($form, $data['fields'])
-	)
+	->addItem(getAcknowledgementStatusFieldsGroupViews($form, $data['fields']))
 	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
 	)
@@ -100,18 +97,32 @@ $form
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
+// function getAcknowledgementStatusFieldsGroupViews(CWidgetFormView $form, array $fields): array {
+// 	$acknowledgement_status_field = new CWidgetFieldRadioButtonListView($fields['unacknowledged']);
+// 	$acknowledged_by_me_field = new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']);
+
+// 	return $form->makeCustomField($acknowledgement_status_field, [
+// 		$acknowledgement_status_field->getLabel(),
+// 		[
+// 			$acknowledgement_status_field->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+// 			[
+// 				$acknowledged_by_me_field->getLabel()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+// 				$acknowledged_by_me_field->getView()
+// 			]
+// 		]
+// 	]);
+// }
+
 function getAcknowledgementStatusFieldsGroupViews(CWidgetFormView $form, array $fields): array {
 	$acknowledgement_status_field = new CWidgetFieldRadioButtonListView($fields['unacknowledged']);
 	$acknowledged_by_me_field = new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']);
 
 	return $form->makeCustomField($acknowledgement_status_field, [
-		null,
-		[
+		$acknowledgement_status_field->getLabel(),
+		new CFormField([
 			$acknowledgement_status_field->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			[
-				$acknowledged_by_me_field->getLabel()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				$acknowledged_by_me_field->getView()
-			]
-		]
+			$acknowledged_by_me_field->getLabel()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$acknowledged_by_me_field->getView()
+		])
 	]);
 }
