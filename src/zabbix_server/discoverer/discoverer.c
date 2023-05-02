@@ -1678,7 +1678,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		goto out;
 	}
 
-	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DISCOVERER, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, rtc_msgs, ARRSIZE(rtc_msgs),
 			discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
 
 #ifdef HAVE_NETSNMP

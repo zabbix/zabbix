@@ -929,7 +929,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 		SET_UI64_RESULT(result, zbx_preprocessor_get_queue_size());
 	}
-	else if (0 == strcmp(tmp, "discoverer_queue"))			/* zabbix[discoverer_queue] */
+	else if (0 == strcmp(tmp, "discovery_queue"))			/* zabbix[discovery_queue] */
 	{
 		zbx_uint64_t size;
 
