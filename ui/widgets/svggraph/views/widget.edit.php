@@ -65,7 +65,8 @@ $form
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_svggraph_form.init('.json_encode([
 		'form_tabs_id' => $form_tabs->getId(),
-		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE
+		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE,
+		'templateid' => $data['templateid']
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
@@ -280,9 +281,11 @@ function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 function getProblemsTab(CWidgetFormView $form, array $fields): CFormGrid {
 	$show_problems = $form->registerField(new CWidgetFieldCheckBoxView($fields['show_problems']));
 	$graph_item_problems = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_item_problems']));
-	$problemhosts = $form->registerField(
-		(new CWidgetFieldHostPatternSelectView($fields['problemhosts']))->setPlaceholder(_('host pattern'))
-	);
+	$problemhosts = array_key_exists('problemhosts', $fields)
+		? $form->registerField(
+			(new CWidgetFieldHostPatternSelectView($fields['problemhosts']))->setPlaceholder(_('host pattern'))
+		)
+		: null;
 	$severities = $form->registerField(new CWidgetFieldSeveritiesView($fields['severities']));
 	$problem_name = $form->registerField(
 		(new CWidgetFieldTextBoxView($fields['problem_name']))->setPlaceholder(_('problem pattern'))
@@ -299,7 +302,7 @@ function getProblemsTab(CWidgetFormView $form, array $fields): CFormGrid {
 			$graph_item_problems->getLabel(),
 			new CFormField($graph_item_problems->getView())
 		])
-		->addItem([
+		->addItem($problemhosts === null ?: [
 			$problemhosts->getLabel(),
 			new CFormField($problemhosts->getView())
 		])

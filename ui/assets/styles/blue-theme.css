@@ -1855,9 +1855,10 @@ form.dashboard-widget-svggraph .td-drag-icon .drag-icon {
   top: 0;
   left: 9px;
   margin-right: 5px; }
-form.dashboard-widget-svggraph .dataset-actions {
+form.dashboard-widget-svggraph .list-item-actions {
+  grid-column: span 1 / -1;
   text-align: right; }
-  form.dashboard-widget-svggraph .dataset-actions .btn-remove {
+  form.dashboard-widget-svggraph .list-item-actions .btn-remove {
     top: 0;
     right: 0;
     vertical-align: baseline; }
@@ -1936,10 +1937,6 @@ form.dashboard-widget-svggraph .overrides-list-item {
     margin-bottom: -5px; }
   form.dashboard-widget-svggraph .overrides-list-item .multiselect {
     width: 100%; }
-  form.dashboard-widget-svggraph .overrides-list-item .btn-remove {
-    right: 0;
-    top: 0;
-    vertical-align: baseline; }
 form.dashboard-widget-svggraph .overrides-foot {
   padding: 5px 0; }
 form.dashboard-widget-svggraph .overrides-options-list {

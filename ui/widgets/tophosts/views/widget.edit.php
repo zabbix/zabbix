@@ -30,21 +30,24 @@ use Zabbix\Widgets\Fields\CWidgetFieldSelect;
 
 $form = (new CWidgetFormView($data));
 
-$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
-	$data['captions']['ms']['groups']['groupids']
-);
+$groupids = array_key_exists('groupids', $data['fields'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],	$data['captions']['ms']['groups']['groupids'])
+	: null;
 
 $form
 	->addField($groupids)
-	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+	->addField(array_key_exists('hostids', $data['fields'])
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+		: null
 	)
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+	->addField(array_key_exists('evaltype', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+		: null
 	)
-	->addField(
-		new CWidgetFieldTagsView($data['fields']['tags'])
+	->addField(array_key_exists('tags', $data['fields'])
+		? new CWidgetFieldTagsView($data['fields']['tags'])
+		: null
 	)
 	->addField(
 		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -55,11 +58,14 @@ $form
 	->addItem(
 		getColumnField($form, $data['fields']['column'])
 	)
-	->addField(
-		new CWidgetFieldIntegerBoxView($data['fields']['count'])
+	->addField(array_key_exists('count', $data['fields'])
+		? new CWidgetFieldIntegerBoxView($data['fields']['count'])
+		: null
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_tophosts_form.init();')
+	->addJavaScript('widget_tophosts_form.init('.json_encode([
+		'templateid' => $data['templateid']
+	], JSON_THROW_ON_ERROR).');')
 	->show();
 
 function getColumnField(CWidgetFormView $form, CWidgetFieldSelect $field): array {
