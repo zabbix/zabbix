@@ -27,6 +27,7 @@ class CFormFieldsetCollapsible {
 	constructor(target) {
 		this._target = target;
 		this._toggle = this._target.querySelector(`.${CFormFieldsetCollapsible.ZBX_STYLE_TOGGLE}`);
+		this._observed_fields = this._target.querySelectorAll(':scope > .form-field, :scope > .fields-group');
 
 		this._init();
 	}
@@ -39,24 +40,20 @@ class CFormFieldsetCollapsible {
 			this._toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 		});
 
-		for (const element of this._target.querySelectorAll('.form-field')) {
+		for (const element of this._observed_fields) {
 			new ResizeObserver(() => this._update()).observe(element);
 		}
 	}
 
 	_update() {
-		const fields = this._target.children;
-
 		let height = 0;
 
-		if (fields !== null) {
-			for (const element of Array.from(fields).reverse()) {
-				const rect = element.getBoundingClientRect();
+		for (const element of [...this._observed_fields].reverse()) {
+			const rect = element.getBoundingClientRect();
 
-				if (rect.height > 0) {
-					height = rect.bottom - this._toggle.getBoundingClientRect().bottom + 4;
-					break;
-				}
+			if (rect.height > 0) {
+				height = rect.bottom - this._toggle.getBoundingClientRect().bottom + 4;
+				break;
 			}
 		}
 
