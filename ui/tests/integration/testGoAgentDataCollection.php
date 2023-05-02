@@ -320,8 +320,10 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'threshold' => 500,
-			// Removing initial block ->{"boottime":1682692815,"uptime":116<- , as uptime is flaky
-			'threshold_before' => 35
+			// Removing initial block ->
+			// {"response":"success","data":{"boottime":1683011633,"uptime":113,<- ,
+			// since uptime is flaky (116 and 117 on agent 1 and 2 can appear)
+			'threshold_before' => 65
 		]
 	];
 
@@ -331,7 +333,8 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	public function prepareData() {
 		// Create host "agentd" and "agent2".
 		$hosts = [];
-		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => self::AGENT2_PORT_SUFFIX] as $component => $port) {
+		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 =>
+			self::AGENT2_PORT_SUFFIX] as $component => $port) {
 			$hosts[] = [
 				'host' => $component,
 				'interfaces' => [
