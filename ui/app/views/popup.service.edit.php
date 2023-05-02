@@ -192,7 +192,7 @@ $service_tab->addItem(
 			new CFormField(
 				(new CDiv($additional_rules))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-					->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+					->addStyle('min-width: '.(ZBX_TEXTAREA_BIG_WIDTH - 27).'px;')
 			)
 		])
 		->addItem([
