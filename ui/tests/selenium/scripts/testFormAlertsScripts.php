@@ -1556,8 +1556,11 @@ class testFormAlertsScripts extends CWebTest {
 	 * @dataProvider getContextMenuData
 	 */
 	public function testFormAlertsScripts_ContextMenu($data) {
-		$this->page->login()->open('zabbix.php?action=script.edit');
-		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('button:Create script')->waitUntilClickable()->one()->click();
+		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
+
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Script added');
