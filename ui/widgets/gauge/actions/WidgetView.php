@@ -52,13 +52,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private $itemid = null;
 
 	/**
-	 * If user is in template dashboards or not.
-	 *
-	 * @var bool
-	 */
-	private $is_template_dashboard = false;
-
-	/**
 	 * If host is currently dynamically selected.
 	 *
 	 * @var bool
@@ -133,9 +126,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Set default text in case there is no data for item.
 		$this->value['text'] = _('No data.');
 
-		$this->is_template_dashboard = $this->hasInput('templateid');
 		$this->is_dynamic = ($this->hasInput('dynamic_hostid')
-			&& ($this->is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
+			&& ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
 		);
 
 		$this->setItems();
@@ -261,11 +253,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$name = $this->widget->getDefaultName();
 
 		if ($this->getInput('name', '') === '' && $item !== null) {
-			if (!$this->hasInput('templateid') || $this->hasInput('dynamic_hostid')) {
+			if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
 				$name = $item['name'];
 			}
 
-			if (!$this->hasInput('templateid')) {
+			if (!$this->isTemplateDashboard()) {
 				$name = $item['hosts'][0]['name'].NAME_DELIMITER.$name;
 			}
 		}
@@ -295,7 +287,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$items[$this->itemid]['name'] = $description;
 
 			// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
-			if (!$this->hasInput('templateid') || $this->hasInput('dynamic_hostid')) {
+			if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
 				$items = CMacrosResolverHelper::resolveWidgetItemNames($items);
 			}
 
@@ -347,11 +339,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
 		 */
 		if ($this->getInput('name', '') === '') {
-			if (!$this->is_template_dashboard || ($this->hasInput('dynamic_hostid') && $this->tmp_items)) {
+			if (!$this->isTemplateDashboard() || ($this->hasInput('dynamic_hostid') && $this->tmp_items)) {
 				$options['output'] = array_merge($options['output'], ['name']);
 			}
 
-			if (!$this->is_template_dashboard) {
+			if (!$this->isTemplateDashboard()) {
 				$options['selectHosts'] = ['name'];
 			}
 		}

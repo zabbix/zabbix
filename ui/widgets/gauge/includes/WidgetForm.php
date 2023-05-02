@@ -150,10 +150,9 @@ class WidgetForm extends CWidgetForm {
 	public function addFields(): self {
 		return $this
 			->addField(
-				(new CWidgetFieldMultiSelectItem('itemid', _('Item'), $this->templateid))
+				(new CWidgetFieldMultiSelectItem('itemid', _('Item')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
-					->setFilterParameter('numeric', true)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('angle', _('Angle'),
@@ -281,9 +280,9 @@ class WidgetForm extends CWidgetForm {
 					self::SIZE_PERCENT_MAX
 				))->setDefault(self::DEFAULT_TH_ARC_SIZE_PERCENT)
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 			);
 	}
 }
