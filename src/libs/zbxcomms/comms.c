@@ -2488,7 +2488,7 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 {
 	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */
 
-	ssize_t		n = 0;
+	ssize_t		n;
 	zbx_pollfd_t	pd;
 
 	zbx_socket_set_deadline(s, timeout);
@@ -2498,9 +2498,9 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 
 	zbx_socket_free(s);
 
-	while (0 >= n)
+	while (0 >= (n = recvfrom(s->socket, buffer, sizeof(buffer) - 1, 0, NULL, NULL)))
 	{
-		if (0 == (n = recvfrom(s->socket, buffer, sizeof(buffer) - 1, 0, NULL, NULL)))
+		if (0 == n)
 		{
 			zbx_set_socket_strerror("connection shutdown");
 			return FAIL;
