@@ -23,6 +23,7 @@
  * @var CView $this
  */
 ?>
+// todo - rewrite to vanilla js. send data to check controller.
 
 /**
  * Returns a default message template with message subject and body.
@@ -32,6 +33,8 @@
  * @return {object}
  */
 function getDefaultMessageTemplate(message_type) {
+	let message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>;
+
 	var media_type = jQuery('#type').val(),
 		message_format = jQuery('input[name="content_type"]:checked').val();
 

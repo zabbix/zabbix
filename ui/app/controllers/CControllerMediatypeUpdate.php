@@ -21,6 +21,10 @@
 
 class CControllerMediatypeUpdate extends CController {
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>			'fatal|required|db media_type.mediatypeid',
@@ -58,31 +62,25 @@ class CControllerMediatypeUpdate extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
 
 		if ($ret && $this->getInput('type') == MEDIA_TYPE_EMAIL) {
 			$email_validator = new CEmailValidator();
 
 			if (!$email_validator->validate($this->getInput('smtp_email'))) {
 				error($email_validator->getError());
-				$error = self::VALIDATION_ERROR;
 				$ret = false;
 			}
 		}
 
 		if (!$ret) {
-			switch ($error) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update media type'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update media type'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)])
+			);
 		}
 
 		return $ret;
@@ -185,20 +183,19 @@ class CControllerMediatypeUpdate extends CController {
 		$result = API::Mediatype()->update($mediatype);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'mediatype.list')
-				->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Media type updated'));
+			$output['success']['title'] = _('Media type updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'mediatype.edit')
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update media type'));
+			$output['error'] = [
+				'title' => ('Cannot update media type'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
-		$this->setResponse($response);
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

@@ -28,8 +28,8 @@ $tabs = new CTabView();
 
 $csrf_token = CCsrfTokenHelper::get('mediatype');
 
-// create form
-$mediaTypeForm = (new CForm())
+// Create form.
+$form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('media-type-form')
@@ -162,21 +162,33 @@ $parameters_exec_table = (new CTable())
 		(new CColHeader(_('Value')))->setWidth('100%'),
 		_('Action')
 	])
-	->setAttribute('style', 'width: 100%;');
+	->setAttribute('style', 'width: 100%;')
+	->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol(
+					(new CSimpleButton(_('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-add')
+				))->setColSpan(2)
+			)
+	);
 
-foreach ($data['parameters_exec'] as $sortorder => $parameter) {
-	$parameters_exec_table->addRow([
-		(new CTextBox('parameters_exec['.$parameter['sortorder'].'][value]', $parameter['value'], false, 255))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CButton('parameters_exec['.$parameter['sortorder'].'][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-	], 'form_row');
-}
-
-$parameters_exec_table->addRow([(new CButton('exec_param_add', _('Add')))
-	->addClass(ZBX_STYLE_BTN_LINK)
-	->addClass('element-table-add')]);
+$parameters_exec_template = (new CTemplateTag('exec_params_template'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('parameters_exec[#{row_num}][value]', '', false, DB::getFieldLength('script_param', 'name')))
+				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->setAttribute('maxlength', 255)
+				->setAttribute('value', '#{value}')
+				->setId('parameters_exec_#{rowNum}_value')
+				->removeId(),
+			(new CSimpleButton(_('Remove')))
+				->removeId()
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('js-remove')
+		]))->addClass('form_row')
+	);
 
 $mediatype_form_grid
 	->addItem([
@@ -184,10 +196,12 @@ $mediatype_form_grid
 			_('Script parameters'),
 			makeHelpIcon(_('These parameters will be passed to the script as command-line arguments in the specified order.'))
 		]))->setId('row_exec_params_label'),
-		(new CFormField($parameters_exec_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-			->setId('row_exec_params_field')
+		(new CFormField(
+			(new CFormField($parameters_exec_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+
+		))->setId('row_exec_params_field')
 	])
 	->addItem([
 		(new CLabel(_('GSM modem'), 'gsm_modem'))
@@ -224,51 +238,37 @@ $parameters_table = (new CTable())
 		(new CColHeader(_('Value')))->setWidth('50%'),
 		_('Action')
 	])
-	->setAttribute('style', 'width: 100%;');
+	->setAttribute('style', 'width: 100%;')
+	->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol(
+					(new CSimpleButton(_('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('webhook-param-add')
+				))->setColSpan(2)
+			)
+	);
 
-foreach ($data['parameters_webhook'] as $parameter) {
-	$parameters_table->addRow([
-		(new CTextBox('parameters_webhook[name][]', $parameter['name'], false, DB::getFieldLength('media_type_param', 'name')))
-			->setAttribute('style', 'width: 100%;')
-			->removeId(),
-		(new CTextBox('parameters_webhook[value][]', $parameter['value'], false,
-			DB::getFieldLength('media_type_param', 'value')
-		))
-			->setAttribute('style', 'width: 100%;')
-			->removeId(),
-		(new CButton('', _('Remove')))
-			->removeId()
-			->onClick('jQuery(this).closest("tr").remove()')
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-	], 'form_row');
-}
-
-$row_template = (new CTag('script', true))
-	->setId('parameters_row')
-	->setAttribute('type', 'text/x-jquery-tmpl')
+$webhook_params_template = (new CTemplateTag('webhook_params_template'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('parameters_webhook[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
 				->setAttribute('style', 'width: 100%;')
+				->setAttribute('value', '#{name}')
 				->removeId(),
 			(new CTextBox('parameters_webhook[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
 				->setAttribute('style', 'width: 100%;')
+				->setAttribute('value', '#{value}')
 				->removeId(),
-			(new CButton('', _('Remove')))
+			(new CSimpleButton(_('Remove')))
 				->removeId()
-				->onClick('jQuery(this).closest("tr").remove()')
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+				->addClass('js-remove')
 		]))->addClass('form_row')
 	);
 
-//$html_page->addItem($row_template);
-$mediaTypeForm->addItem($row_template);
-
-$parameters_table->addRow([(new CButton('parameter_add', _('Add')))
-	->addClass(ZBX_STYLE_BTN_LINK)
-	->addClass('element-table-add')]);
+$form->addItem($webhook_params_template);
 
 // Append password field to form grid.
 $mediatype_form_grid
@@ -329,9 +329,8 @@ $mediatype_form_grid
 	->addItem([
 		(new CLabel(_('Include event menu entry'), 'show_event_menu'))->setId('webhook_event_menu_label'),
 		(new CFormField(
-			(new CCheckBox('show_event_menu', ZBX_EVENT_MENU_SHOW))
+			(new CCheckBox('show_event_menu', $data['show_event_menu']))
 				->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
-				->setUncheckedValue(ZBX_EVENT_MENU_HIDE)
 		))->setId('webhook_event_menu_field')
 	])
 	->addItem([
@@ -373,8 +372,6 @@ $mediatype_form_grid
 		)
 	]);
 
-$tabs->addTab('mediaTab', _('Media type'), $mediatype_form_grid);
-
 // Message templates tab.
 $message_templates_form_grid = (new CFormGrid())
 	->setId('messageTemplatesFormlist')
@@ -391,6 +388,7 @@ $message_templates_form_grid = (new CFormGrid())
 					(new CRow(
 						(new CCol(
 							(new CSimpleButton(_('Add')))
+								->addClass('msg-template-add')
 								->setAttribute('data-action', 'add')
 								->addClass(ZBX_STYLE_BTN_LINK)
 						))->setColSpan(3)
@@ -402,11 +400,7 @@ $message_templates_form_grid = (new CFormGrid())
 			->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
-$tabs->addTab('messageTemplatesTab', _('Message templates'), $message_templates_form_grid,
-	TAB_INDICATOR_MESSAGE_TEMPLATE
-);
-
-// media options tab
+// Media options tab.
 $max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;
 if ($data['type'] == MEDIA_TYPE_SMS) {
 	$max_sessions = 1;
@@ -457,14 +451,16 @@ $mediaOptionsForm = (new CFormGrid())
 		)
 	]);
 
-$tabs->addTab('optionsTab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS);
+$tabs
+	->addTab('media_tab', _('Media type'), $mediatype_form_grid)
+	->addTab('msg_templates_tab', _('Message templates'), $message_templates_form_grid, TAB_INDICATOR_MESSAGE_TEMPLATE)
+	->addTab('options_tab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS)
+	->setSelected(0);
 
-// append tab to form
-$mediaTypeForm->addItem($tabs);
-
-$form = $mediaTypeForm;
-
+// Append tabs to form.
 $form
+	->addItem($tabs)
+	->addItem($parameters_exec_template)
 	->addItem(
 		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
 				'mediatype' => $data
@@ -477,7 +473,7 @@ if ($data['mediatypeid'] === null) {
 			'title' => _('Add'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'script_edit_popup.submit();'
+			'action' => 'mediatype_edit_popup.submit();'
 		]
 	];
 }
@@ -487,14 +483,14 @@ else {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'script_edit_popup.submit();'
+			'action' => 'mediatype_edit_popup.submit();'
 		],
 		[
 			'title' => _('Clone'),
 			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'script_edit_popup.clone(' . json_encode([
+			'action' => 'mediatype_edit_popup.clone(' . json_encode([
 					'title' => _('New script'),
 					'buttons' => [
 						[
@@ -502,7 +498,7 @@ else {
 							'class' => 'js-add',
 							'keepOpen' => true,
 							'isSubmit' => true,
-							'action' => 'script_edit_popup.submit();'
+							'action' => 'mediatype_edit_popup.submit();'
 						],
 						[
 							'title' => _('Cancel'),
@@ -519,7 +515,7 @@ else {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'script_edit_popup.delete();'
+			'action' => 'mediatype_edit_popup.delete();'
 		]
 	];
 }

@@ -67,6 +67,29 @@
 				dialogue_class: 'modal-popup-static',
 				prevent_navigation: true
 			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('mediatype');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('mediatype');
+
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
 		}
 
 		_enable(target, mediatypeids, massenable = false) {
