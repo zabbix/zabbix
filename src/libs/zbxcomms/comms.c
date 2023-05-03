@@ -383,10 +383,7 @@ char 	*socket_poll_error(short revents)
 	}
 
 	if (0 != (revents & POLLNVAL))
-	{
 		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%c%s", delim, "POLLNVAL");
-		delim = ',';
-	}
 
 	zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, ')');
 
