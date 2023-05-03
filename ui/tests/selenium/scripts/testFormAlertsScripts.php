@@ -1339,8 +1339,10 @@ class testFormAlertsScripts extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open('zabbix.php?action=script.edit');
-		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('button:Create script')->waitUntilClickable()->one()->click();
+		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->checkValue(['Scope' => 'Action operation', 'Type' => 'Webhook']);
 
 		foreach (['Action operation', 'Manual host action', 'Manual event action'] as $scope) {
