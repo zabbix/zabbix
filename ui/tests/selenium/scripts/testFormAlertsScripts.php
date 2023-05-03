@@ -1415,31 +1415,37 @@ class testFormAlertsScripts extends CWebTest {
 			'mailto://zabbix.com', 'tel://zabbix.com', 'ssh://zabbix.com'
 		];
 
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes']);
-		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('xpath://a[@data-scriptid="'.self::$ids['URI schemes'].'"]')->waitUntilClickable()->one()->click();
+		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 
 		// Check default URI scheme rules: http, https, ftp, file, mailto, tel, ssh.
 		$this->assertUriScheme($form, $default_valid_schemes);
 		$this->assertUriScheme($form, $invalid_schemes, TEST_BAD);
 
 		// Change valid URI schemes on "Other configuration parameters" page.
+		$modal->close();
 		$this->page->open('zabbix.php?action=miscconfig.edit');
 		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
 		$config_form->fill(['Valid URI schemes' => 'dns,message']);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-		$this->page->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('xpath://a[@data-scriptid="'.self::$ids['URI schemes'].'"]')->waitUntilClickable()->one()->click();
 		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
 		$this->assertUriScheme($form, $invalid_schemes);
 
 		// Disable URI scheme validation.
+		$modal->close();
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$config_form->fill(['Validate URI schemes' => false]);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-		$this->page->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('xpath://a[@data-scriptid="'.self::$ids['URI schemes'].'"]')->waitUntilClickable()->one()->click();
 		$this->assertUriScheme($form, array_merge($default_valid_schemes, $invalid_schemes));
 	}
 
@@ -1457,7 +1463,8 @@ class testFormAlertsScripts extends CWebTest {
 
 			if ($expected === TEST_GOOD) {
 				$this->assertMessage(TEST_GOOD, 'Script updated');
-				$this->page->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes'])->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=script.list');
+				$this->query('xpath://a[@data-scriptid="'.self::$ids['URI schemes'].'"]')->waitUntilClickable()->one()->click();
 			}
 			else {
 				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL.');
