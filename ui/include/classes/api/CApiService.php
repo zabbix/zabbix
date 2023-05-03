@@ -1121,7 +1121,7 @@ class CApiService {
 	 */
 	protected function customFetch($query, array $options) {
 		if ($this->requiresPostSqlFiltering($options)) {
-			$offset = $options["offset"] ?? null;
+			$offset = $options["offset"] ?? 0;
 
 			// we think that taking twice as necessary elements in first query is fair guess, this cast to int as well
 			$limit = $options['limit'] ? 2 * $options['limit'] : null;

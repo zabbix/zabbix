@@ -506,6 +506,11 @@ class CHost extends CHostGeneral {
 			$options['limit'] = null;
 		}
 
+		// offset
+		if (!zbx_ctype_digit($options['offset']) || !$options['offset']) {
+			$options['offset'] = null;
+		}
+
 		/*
 		 * Cleaning the output from write-only properties.
 		 */
