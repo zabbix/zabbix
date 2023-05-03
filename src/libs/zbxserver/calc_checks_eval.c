@@ -1513,7 +1513,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		if (HOST_STATUS_MONITORED != dcitem->host.status)
 			continue;
 
-		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
+		if (ITEM_VALUE_TYPE_NONE == dcitem->value_type)
 			continue;
 
 		if (0 != zbx_get_key_param(dcitem->key_orig, pos, bucket, sizeof(bucket)))
@@ -1587,16 +1587,15 @@ static int	evaluate_count_many(char *operator, char *pattern, zbx_dc_item_t *dci
 	if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, values, seconds, count, ts) &&
 			0 < values->values_num)
 	{
-		int	result_tmp = 0;
-		double	result;
+		int	result = 0;
 
-		zbx_execute_count_with_pattern(pattern, dcitem->value_type, ZBX_MAX_UINT31_1, &pdata, values, &result_tmp);
+		zbx_execute_count_with_pattern(pattern, dcitem->value_type, ZBX_MAX_UINT31_1, &pdata, values, &result);
 
-		if (0 != result_tmp)
+		if (0 != result)
 		{
 			zbx_variant_t	v;
 
-			zbx_variant_set_dbl(&v, (double)result_tmp);
+			zbx_variant_set_dbl(&v, (double)result);
 			zbx_vector_var_append(results_vector, v);
 		}
 	}
@@ -1766,11 +1765,8 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		if (ITEM_STATE_NOTSUPPORTED == dcitem->state)
 			continue;
 
-		if (ITEM_VALUE_TYPE_FLOAT != dcitem->value_type && ITEM_VALUE_TYPE_UINT64 != dcitem->value_type)
-		{
-			if (item_func != ZBX_VALUE_FUNC_LAST && item_func != ZBX_VALUE_FUNC_COUNT)
-				continue;
-		}
+		if (ITEM_VALUE_TYPE_NONE == dcitem->value_type)
+			continue;
 
 		zbx_history_record_vector_create(&values);
 

@@ -1427,13 +1427,11 @@ static int	eval_execute_statistical_function(const zbx_eval_context_t *ctx, cons
 	int			ret;
 	double			result;
 	zbx_variant_t		value;
-	zbx_vector_var_t	*var_vector;
 	zbx_vector_dbl_t	dbl_vector;
 
 	if (UNKNOWN != (ret = eval_validate_statistical_function_args(ctx, token, output, error)))
 		return ret;
 
-	var_vector = output->values[output->values_num - (int)token->opt].data.vector;
 	zbx_vector_dbl_create(&dbl_vector);
 
 	if (FAIL == stat_func(&dbl_vector, &result, error))
