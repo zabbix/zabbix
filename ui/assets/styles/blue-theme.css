@@ -2560,6 +2560,13 @@ z-select[disabled] button,
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
 
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+@supports (-webkit-backdrop-filter: blur(1px)) {
+  z-select[disabled] button,
+  .z-select[disabled] button, z-select[readonly] button,
+  .z-select[readonly] button, .multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
+  .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .input-group button.btn-dropdown-toggle:disabled {
+    -webkit-text-fill-color: #acbbc2; } }
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
 
