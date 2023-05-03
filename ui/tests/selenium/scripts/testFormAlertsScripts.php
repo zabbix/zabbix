@@ -1216,8 +1216,10 @@ class testFormAlertsScripts extends CWebTest {
 	 * Check all fields default values, lengths, placeholders, element options and table headers.
 	 */
 	public function testFormAlertsScripts_Layout() {
-		$this->page->login()->open('zabbix.php?action=script.edit');
-		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('button:Create script')->waitUntilClickable()->one()->click();
+		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 
 		$default_values = ['Scope' => 'Action operation', 'Type' => 'Webhook', 'Host group' => 'All',
 			'User group' => 'All', 'Required host permissions' => 'Read', 'Enable confirmation' => false, 'Timeout' => '30s',
@@ -1272,17 +1274,17 @@ class testFormAlertsScripts extends CWebTest {
 		$script_dialog->query('tag:textarea')->one()->type('aaa');
 		$this->assertEquals('65532 characters remaining', $script_dialog->query('class:multilineinput-char-count')->one()->getText());
 		$script_dialog->query('button:Cancel')->one()->click();
-		$script_dialog->ensureNotPresent();
+		$this->assertEquals(0, $this->query('class:multilineinput-modal')->count());
 		$form->checkValue(['Script' => '']);
 
 		// Check "Confirmation" dialog window.
 		$form->fill(['Scope' => 'Manual host action', 'Enable confirmation' => true, 'Confirmation text' => 'test']);
 		$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = $this->query('class:modal-popup-small')->asOverlayDialog()->one();
 		$this->assertEquals('Execution confirmation', $dialog->getTitle());
 		$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
 		$dialog->query('button:Cancel')->one()->click();
-		$dialog->ensureNotPresent();
+		$this->assertEquals(0, $this->query('class:modal-popup-small')->count());
 	}
 
 	/**
