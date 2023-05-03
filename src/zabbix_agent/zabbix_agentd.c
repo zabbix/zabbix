@@ -1420,6 +1420,7 @@ int	main(int argc, char **argv)
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
 
+
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
 	/* into windows event log while zabbix_log is not ready */
@@ -1444,6 +1445,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
+
+	zbx_init_library_cfg(program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	zbx_init_metrics();
