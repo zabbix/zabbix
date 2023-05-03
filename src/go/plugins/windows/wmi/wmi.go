@@ -57,6 +57,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	switch key {
 	case "wmi.get":
 		value, err := wmi.QueryValue(params[0], params[1])
+		if err != nil {
+			return nil, err
+		}
 
 		return wmiFmtAdapter(value), err
 	case "wmi.getall":
@@ -73,6 +76,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if err != nil {
 			return nil, err
 		}
+
 		return string(b), nil
 	default:
 		return nil, plugin.UnsupportedMetricError
