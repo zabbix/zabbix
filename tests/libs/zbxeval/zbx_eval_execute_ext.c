@@ -94,7 +94,7 @@ static void	mock_read_callbacks(const char *path)
 					zbx_vector_var_append(values, tmp);
 				}
 
-				zbx_variant_copy(&cb->retval, &var_vector);
+				zbx_variant_set_var_vector(&cb->retval, &var_vector);
 			}
 		}
 		else if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hcb, "error", &hdata))
