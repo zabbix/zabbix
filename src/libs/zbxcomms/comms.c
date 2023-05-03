@@ -2500,55 +2500,52 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 
 	while (0 >= (n = recvfrom(s->socket, buffer, sizeof(buffer) - 1, 0, NULL, NULL)))
 	{
+		int	rc;
+
 		if (0 == n)
 		{
 			zbx_set_socket_strerror("connection shutdown");
 			return FAIL;
 		}
 
-		if (ZBX_PROTO_ERROR == n)
+		if (SUCCEED != zbx_socket_had_nonblocking_error())
 		{
-			int	rc;
+			zbx_set_socket_strerror("recvfrom() failed: %s",
+					strerror_from_system(zbx_socket_last_error()));
+			return FAIL;
+		}
 
+		if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+		{
 			if (SUCCEED != zbx_socket_had_nonblocking_error())
 			{
-				zbx_set_socket_strerror("recvfrom() failed: %s",
+				zbx_set_socket_strerror("cannot wait for socket: %s",
 						strerror_from_system(zbx_socket_last_error()));
 				return FAIL;
 			}
+		}
 
-			if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
-			{
-				if (SUCCEED != zbx_socket_had_nonblocking_error())
-				{
-					zbx_set_socket_strerror("cannot wait for socket: %s",
-							strerror_from_system(zbx_socket_last_error()));
-					return FAIL;
-				}
-			}
+		if (SUCCEED != zbx_socket_check_deadline(s))
+		{
+			zbx_set_socket_strerror("recv timeout");
+			return FAIL;
+		}
 
-			if (SUCCEED != zbx_socket_check_deadline(s))
-			{
-				zbx_set_socket_strerror("recv timeout");
-				return FAIL;
-			}
+		if (0 >= rc)
+			continue;
 
-			if (0 >= rc)
-				continue;
+		if (0 == (pd.revents & POLLIN))
+		{
+			char	*errmsg;
 
-			if (0 == (pd.revents & POLLIN))
-			{
-				char	*errmsg;
+			errmsg = socket_poll_error(pd.revents);
+			zbx_set_socket_strerror("%s", errmsg);
+			zbx_free(errmsg);
 
-				errmsg = socket_poll_error(pd.revents);
-				zbx_set_socket_strerror("%s", errmsg);
-				zbx_free(errmsg);
+			zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLIN) failed with revents 0x%x",
+					(unsigned)pd.revents);
 
-				zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLIN) failed with revents 0x%x",
-						(unsigned)pd.revents);
-
-				return FAIL;
-			}
+			return FAIL;
 		}
 	}
 
