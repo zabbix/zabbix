@@ -91,8 +91,8 @@ $filter_tags_table->setId('tags_#{uniqid}');
 $filter_tags_table->addRow(
 	(new CCol(
 		(new CRadioButtonList('evaltype', (int) $data['evaltype']))
-			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_0#{uniqid}')
-			->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_2#{uniqid}')
+			->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR, 'evaltype_'.TAG_EVAL_TYPE_AND_OR.'#{uniqid}')
+			->addValue(_('Or'), TAG_EVAL_TYPE_OR, 'evaltype_'.TAG_EVAL_TYPE_OR.'#{uniqid}')
 			->setModern(true)
 			->setId('evaltype_#{uniqid}')
 	))->setColSpan(4)
@@ -141,19 +141,19 @@ $filter_tags_table->addRow(
 
 $tag_format_line = (new CHorList())
 	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
-		->addValue(_('None'), SHOW_TAGS_NONE, 'show_tags_0#{uniqid}')
-		->addValue(SHOW_TAGS_1, SHOW_TAGS_1, 'show_tags_1#{uniqid}')
-		->addValue(SHOW_TAGS_2, SHOW_TAGS_2, 'show_tags_2#{uniqid}')
-		->addValue(SHOW_TAGS_3, SHOW_TAGS_3, 'show_tags_3#{uniqid}')
+		->addValue(_('None'), SHOW_TAGS_NONE, 'show_tags_'.SHOW_TAGS_NONE.'#{uniqid}')
+		->addValue(SHOW_TAGS_1, SHOW_TAGS_1, 'show_tags_'.SHOW_TAGS_1.'#{uniqid}')
+		->addValue(SHOW_TAGS_2, SHOW_TAGS_2, 'show_tags_'.SHOW_TAGS_2.'#{uniqid}')
+		->addValue(SHOW_TAGS_3, SHOW_TAGS_3, 'show_tags_'.SHOW_TAGS_3.'#{uniqid}')
 		->setModern(true)
 		->setId('show_tags_#{uniqid}')
 	)
 	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
 	->addItem(new CLabel(_('Tag name')))
 	->addItem((new CRadioButtonList('tag_name_format', (int) $data['tag_name_format']))
-		->addValue(_('Full'), TAG_NAME_FULL, 'tag_name_format_0#{uniqid}')
-		->addValue(_('Shortened'), TAG_NAME_SHORTENED, 'tag_name_format_1#{uniqid}')
-		->addValue(_('None'), TAG_NAME_NONE, 'tag_name_format_2#{uniqid}')
+		->addValue(_('Full'), TAG_NAME_FULL, 'tag_name_format_'.TAG_NAME_FULL.'#{uniqid}')
+		->addValue(_('Shortened'), TAG_NAME_SHORTENED, 'tag_name_format_'.TAG_NAME_SHORTENED.'#{uniqid}')
+		->addValue(_('None'), TAG_NAME_NONE, 'tag_name_format_'.TAG_NAME_NONE.'#{uniqid}')
 		->setModern(true)
 		->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
 		->setId('tag_name_format_#{uniqid}')
@@ -178,6 +178,15 @@ $right_column = (new CFormGrid())
 				->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
 				->setId('tag_priority_#{uniqid}')
 		)
+	])
+	->addItem([
+		new CLabel(_('State'), 'state_#{uniqid}'),
+		(new CRadioButtonList('state', (int) $data['state']))
+			->addValue(_('all'), -1, 'state_all#{uniqid}')
+			->addValue(_('Normal'), ITEM_STATE_NORMAL, 'state_'.ITEM_STATE_NORMAL.'#{uniqid}')
+			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED, 'state_'.ITEM_STATE_NOTSUPPORTED.'#{uniqid}')
+			->setModern()
+			->setId('state_#{uniqid}'),
 	])
 	->addItem([
 		new CLabel(_('Show details'), 'show_details'),
@@ -338,7 +347,7 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Input, radio and single checkboxes.
-		const fields = ['name', 'evaltype', 'show_details', 'show_tags', 'tag_name_format', 'tag_priority'];
+		const fields = ['name', 'evaltype', 'show_details', 'show_tags', 'state', 'tag_name_format', 'tag_priority'];
 
 		fields.forEach(key => {
 			const elm = $('[name="' + key + '"]', container);
@@ -356,7 +365,9 @@ if (array_key_exists('render_html', $data)) {
 
 		// Render subfilter fields.
 		const form = container.querySelector('form');
-		const subfilter_fields = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags', 'subfilter_data'];
+		const subfilter_fields = ['subfilter_hostids', 'subfilter_tagnames', 'subfilter_tags','subfilter_state',
+			'subfilter_data'
+		];
 
 		subfilter_fields.forEach(key => {
 			if ((key in data) && data[key].length != 0) {
