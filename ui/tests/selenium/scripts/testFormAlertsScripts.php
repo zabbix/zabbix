@@ -1108,7 +1108,7 @@ class testFormAlertsScripts extends CWebTest {
 
 		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
 			$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
-			$dialog = $this->query('class:modal-popup-small')->asOverlayDialog()->one();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 			$this->assertEquals($data['fields']['Confirmation text'],
 					$dialog->query('xpath:.//span[@class="confirmation-msg"]')->waitUntilVisible()->one()->getText()
 			);
@@ -1270,17 +1270,17 @@ class testFormAlertsScripts extends CWebTest {
 		$script_dialog->query('tag:textarea')->one()->type('aaa');
 		$this->assertEquals('65532 characters remaining', $script_dialog->query('class:multilineinput-char-count')->one()->getText());
 		$script_dialog->query('button:Cancel')->one()->click();
-		$this->assertEquals(0, $this->query('class:multilineinput-modal')->count());
+		$script_dialog->waitUntilNotVisible();
 		$form->checkValue(['Script' => '']);
 
 		// Check "Confirmation" dialog window.
 		$form->fill(['Scope' => 'Manual host action', 'Enable confirmation' => true, 'Confirmation text' => 'test']);
 		$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
-		$dialog = $this->query('class:modal-popup-small')->asOverlayDialog()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals('Execution confirmation', $dialog->getTitle());
 		$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
 		$dialog->query('button:Cancel')->one()->click();
-		$this->assertEquals(0, $this->query('class:modal-popup-small')->count());
+		$dialog->waitUntilNotVisible();
 	}
 
 	/**
