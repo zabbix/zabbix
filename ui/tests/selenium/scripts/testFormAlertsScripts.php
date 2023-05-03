@@ -1200,8 +1200,10 @@ class testFormAlertsScripts extends CWebTest {
 	 * Function for testing script delete from configuration form.
 	 */
 	public function testFormAlertsScripts_Delete() {
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
-		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('xpath://a[@data-scriptid="'.self::$ids['Script for Delete'].'"]')->waitUntilClickable()->one()->click();
+		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+		$modal->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script deleted');
