@@ -1153,8 +1153,10 @@ class testFormAlertsScripts extends CWebTest {
 	public function testFormAlertsScripts_SimpleUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
-		$this->query('id:script-form')->asForm()->waitUntilVisible()->one()->submit();
+		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->query('xpath://a[@data-scriptid="'.self::$ids['Script for Update'].'"]')->waitUntilClickable()->one()->click();
+		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+		$modal->query('id:script-form')->asForm()->waitUntilVisible()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
