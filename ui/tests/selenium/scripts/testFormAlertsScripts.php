@@ -1013,11 +1013,10 @@ class testFormAlertsScripts extends CWebTest {
 		}
 
 		// Open the correct form - either edit existing script, or add new.
-		$this->page->login()->open('zabbix.php?action=script.list');
 		if ($update){
-			$this->query('xpath://a[@data-scriptid="'.$id.'"]')->waitUntilClickable()->one()->click();
+			$this->openScriptForEditing($id);
 		}else{
-			$this->query('button:Create script')->waitUntilClickable()->one()->click();
+			$this->openCreateScriptForm();
 		}
 
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -1057,8 +1056,7 @@ class testFormAlertsScripts extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name'])));
 			// Check the results in form.
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name']));
-			//$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
-			$this->query('xpath://a[@data-scriptid="'.$id.'"]')->waitUntilClickable()->one()->click();
+			$this->openScriptForEditing($id, false);
 
 			$form->invalidate();
 			$form->checkValue($data['fields']);
@@ -1153,8 +1151,7 @@ class testFormAlertsScripts extends CWebTest {
 	public function testFormAlertsScripts_SimpleUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('xpath://a[@data-scriptid="'.self::$ids['Script for Update'].'"]')->waitUntilClickable()->one()->click();
+		$this->openScriptForEditing(self::$ids['Script for Update']);
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 		$modal->query('id:script-form')->asForm()->waitUntilVisible()->one()->submit();
 		$this->page->waitUntilReady();
@@ -1166,9 +1163,9 @@ class testFormAlertsScripts extends CWebTest {
 	 * Function for checking script cloning with only changed name.
 	 */
 	public function testFormAlertsScripts_Clone() {
-		$this->page->login()->open('zabbix.php?action=script.list');
+		$this->page->login();
 		foreach (self::$clone_scriptids as $scriptid) {
-			$this->query('xpath://a[@data-scriptid="'.$scriptid.'"]')->waitUntilClickable()->one()->click();
+			$this->openScriptForEditing($scriptid, false);
 			$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 			$values = $form->getFields()->asValues();
@@ -1185,8 +1182,7 @@ class testFormAlertsScripts extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name)));
 
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr('Cloned_'.$script_name));
-			$this->page->open('zabbix.php?action=script.list');
-			$this->query('xpath://a[@data-scriptid="'.$id.'"]')->waitUntilClickable()->one()->click();
+			$this->openScriptForEditing($id, false);
 			$cloned_values = $form->getFields()->asValues();
 			$this->assertEquals('Cloned_'.$script_name, $cloned_values['Name']);
 
@@ -1202,8 +1198,7 @@ class testFormAlertsScripts extends CWebTest {
 	 * Function for testing script delete from configuration form.
 	 */
 	public function testFormAlertsScripts_Delete() {
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('xpath://a[@data-scriptid="'.self::$ids['Script for Delete'].'"]')->waitUntilClickable()->one()->click();
+		$this->openScriptForEditing(self::$ids['Script for Delete']);
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 		$modal->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
@@ -1218,8 +1213,7 @@ class testFormAlertsScripts extends CWebTest {
 	 * Check all fields default values, lengths, placeholders, element options and table headers.
 	 */
 	public function testFormAlertsScripts_Layout() {
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('button:Create script')->waitUntilClickable()->one()->click();
+		$this->openCreateScriptForm();
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 
@@ -1339,8 +1333,7 @@ class testFormAlertsScripts extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('button:Create script')->waitUntilClickable()->one()->click();
+		$this->openCreateScriptForm();
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->checkValue(['Scope' => 'Action operation', 'Type' => 'Webhook']);
@@ -1417,8 +1410,7 @@ class testFormAlertsScripts extends CWebTest {
 			'mailto://zabbix.com', 'tel://zabbix.com', 'ssh://zabbix.com'
 		];
 
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('xpath://a[@data-scriptid="'.self::$ids['URI schemes'].'"]')->waitUntilClickable()->one()->click();
+		$this->openScriptForEditing(self::$ids['URI schemes']);
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 
@@ -1434,8 +1426,7 @@ class testFormAlertsScripts extends CWebTest {
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('xpath://a[@data-scriptid="'.self::$ids['URI schemes'].'"]')->waitUntilClickable()->one()->click();
+		$this->openScriptForEditing(self::$ids['URI schemes']);
 		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
 		$this->assertUriScheme($form, $invalid_schemes);
 
@@ -1446,8 +1437,7 @@ class testFormAlertsScripts extends CWebTest {
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('xpath://a[@data-scriptid="'.self::$ids['URI schemes'].'"]')->waitUntilClickable()->one()->click();
+		$this->openScriptForEditing(self::$ids['URI schemes'], false);
 		$this->assertUriScheme($form, array_merge($default_valid_schemes, $invalid_schemes));
 	}
 
@@ -1465,8 +1455,7 @@ class testFormAlertsScripts extends CWebTest {
 
 			if ($expected === TEST_GOOD) {
 				$this->assertMessage(TEST_GOOD, 'Script updated');
-				$this->page->login()->open('zabbix.php?action=script.list');
-				$this->query('xpath://a[@data-scriptid="'.self::$ids['URI schemes'].'"]')->waitUntilClickable()->one()->click();
+				$this->openScriptForEditing(self::$ids['URI schemes'], false);
 			}
 			else {
 				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL.');
@@ -1581,8 +1570,7 @@ class testFormAlertsScripts extends CWebTest {
 	 * @dataProvider getContextMenuData
 	 */
 	public function testFormAlertsScripts_ContextMenu($data) {
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('button:Create script')->waitUntilClickable()->one()->click();
+		$this->openCreateScriptForm();
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 
@@ -1612,5 +1600,32 @@ class testFormAlertsScripts extends CWebTest {
 		$this->assertEquals(0, CPopupMenuElement::find()->waitUntilVisible()->one()->getItems()
 				->filter(CElementFilter::TEXT_PRESENT, $data['fields']['Name'])->count()
 		);
+	}
+
+	/**
+	 * Logs in, opens Script list and opens a Script for editing.
+	 *
+	 * @param int	$id		ID of the script to open.
+	 * @param bool	$login	Is a login needed?
+	 */
+	private function openScriptForEditing($id, $login=true) {
+		if($login){
+			$this->page->login();
+		}
+		$this->page->open('zabbix.php?action=script.list');
+		$this->query('xpath://a[@data-scriptid="'.$id.'"]')->waitUntilClickable()->one()->click();
+	}
+
+	/**
+	 * Logs in, opens Script list and presses the Create script button.
+	 *
+	 * @param bool	$login	Is a login needed?
+	 */
+	private function openCreateScriptForm($login=true) {
+		if($login){
+			$this->page->login();
+		}
+		$this->page->open('zabbix.php?action=script.list');
+		$this->query('button:Create script')->waitUntilClickable()->one()->click();
 	}
 }
