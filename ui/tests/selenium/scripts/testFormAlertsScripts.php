@@ -989,14 +989,14 @@ class testFormAlertsScripts extends CWebTest {
 	 * @backupOnce scripts
 	 */
 	public function testFormAlertsScripts_Create($data) {
-		$this->checkScripts($data, false, 'zabbix.php?action=script.edit');
+		$this->checkScripts($data, false);
 	}
 
 	/**
 	 * @dataProvider getScriptsData
 	 */
 	public function testFormAlertsScripts_Update($data) {
-		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
+		$this->checkScripts($data, true, self::$ids['Script for Update']);
 	}
 
 	/**
@@ -1004,16 +1004,24 @@ class testFormAlertsScripts extends CWebTest {
 	 *
 	 * @param array     $data     data provider
 	 * @param boolean   $update   is it update case, or not
-	 * @param string    $link     link to script form
+	 * @param int		$id       id of the script in case of updating
 	 */
-	private function checkScripts($data, $update, $link) {
+	private function checkScripts($data, $update, $id = null) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
-		$this->page->login()->open($link);
-		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
+		// Open the correct form - either edit existing script, or add new.
+		$this->page->login()->open('zabbix.php?action=script.list');
+		if ($update){
+			$this->query('xpath://a[@data-scriptid="'.$id.'"]')->waitUntilClickable()->one()->click();
+		}else{
+			$this->query('button:Create script')->waitUntilClickable()->one()->click();
+		}
+
+		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Parameters')) {
@@ -1026,7 +1034,7 @@ class testFormAlertsScripts extends CWebTest {
 				unset($parameter);
 			}
 
-			$this->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['Parameters']);
+			$modal->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['Parameters']);
 		}
 
 		// Check testing confirmation while configuring.
@@ -1049,7 +1057,8 @@ class testFormAlertsScripts extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name'])));
 			// Check the results in form.
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name']));
-			$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
+			//$this->page->open('zabbix.php?action=script.edit&scriptid='.$id);
+			$this->query('xpath://a[@data-scriptid="'.$id.'"]')->waitUntilClickable()->one()->click();
 
 			$form->invalidate();
 			$form->checkValue($data['fields']);
@@ -1081,9 +1090,10 @@ class testFormAlertsScripts extends CWebTest {
 					unset($parameter);
 				}
 
-				$this->query('id:parameters-table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
+				$modal->query('id:parameters-table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
 			}
 		}
+		$modal->close();
 	}
 
 	/**
@@ -1100,11 +1110,11 @@ class testFormAlertsScripts extends CWebTest {
 
 		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
 			$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->one();
+			$dialog = $this->query('class:modal-popup-small')->asOverlayDialog()->one();
 			$this->assertEquals($data['fields']['Confirmation text'],
 					$dialog->query('xpath:.//span[@class="confirmation-msg"]')->waitUntilVisible()->one()->getText()
 			);
-			$dialog->close();
+			$dialog->query('class:overlay-close-btn')->waitUntilClickable()->one()->click();
 		}
 	}
 
