@@ -196,8 +196,12 @@ if ($data['change_password']) {
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$change_password_enabled = !$data['readonly']
-		&& ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER);
+	if ($data['action'] === 'userprofile.edit') {
+		$change_password_enabled = !$data['readonly'] && $data['internal_authentication'];
+	}
+	else {
+		$change_password_enabled = !$data['readonly'] && $data['db_user']['username'] !== ZBX_GUEST_USER;
+	}
 
 	$hint = !$change_password_enabled
 		? $hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))
