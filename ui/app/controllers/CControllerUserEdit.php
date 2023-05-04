@@ -288,8 +288,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'preservekeys' => true
 		]);
 
-		$data['internal_authentication'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));
 		$this->setResponse($response);

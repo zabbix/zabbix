@@ -196,7 +196,7 @@ if ($data['change_password']) {
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$change_password_enabled = $data['internal_authentication'] && !$data['readonly']
+	$change_password_enabled = !$data['readonly']
 		&& ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER);
 
 	$hint = !$change_password_enabled
