@@ -125,13 +125,13 @@ See documentation for details:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node discovery||Dependent item|kube.node.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes`</p></li></ul>|
+|Node discovery||Dependent item|kube.node.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes..filternode`</p></li></ul>|
 
 ### Item prototypes for Node discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node [{#NAME}]: Get data|<p>Collecting and processing cluster by node [{#NAME}] data via Kubernetes API.</p>|Dependent item|kube.node.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes[?(@.metadata.name == "{#NAME}")].first()`</p></li></ul>|
+|Node [{#NAME}]: Get data|<p>Collecting and processing cluster by node [{#NAME}] data via Kubernetes API.</p>|Dependent item|kube.node.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes..[?(@.metadata.name == "{#NAME}")].first()`</p></li></ul>|
 |Node [{#NAME}] Addresses: External IP|<p>Typically the IP address of the node that is externally routable (available from outside the cluster).</p>|Dependent item|kube.node.addresses.external_ip[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Node [{#NAME}] Addresses: Internal IP|<p>Typically the IP address of the node that is routable only within the cluster.</p>|Dependent item|kube.node.addresses.internal_ip[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Node [{#NAME}] Allocatable: CPU|<p>Allocatable CPU.</p><p></p><p>'Allocatable' on a Kubernetes node is defined as the amount of compute resources that are available for pods. The scheduler does not over-subscribe 'Allocatable'. 'CPU', 'memory' and 'ephemeral-storage' are supported as of now.</p>|Dependent item|kube.node.allocatable.cpu[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status.allocatable.cpu`</p></li></ul>|
@@ -184,13 +184,13 @@ See documentation for details:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Pod discovery||Dependent item|kube.pod.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pods`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Pod discovery||Dependent item|kube.pod.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Pods`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Pod discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node [{#NODE}] Pod [{#POD}]: Get data|<p>Collecting and processing cluster by node [{#NODE}] data via Kubernetes API.</p>|Dependent item|kube.pod.get[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pods[?(@.name == "{#POD}")].first()`</p></li></ul>|
+|Node [{#NODE}] Pod [{#POD}]: Get data|<p>Collecting and processing cluster by node [{#NODE}] data via Kubernetes API.</p>|Dependent item|kube.pod.get[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Pods[?(@.name == "{#POD}")].first()`</p></li></ul>|
 |Node [{#NODE}] Pod [{#POD}] Conditions: Containers ready|<p>All containers in the Pod are ready.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.containers_ready[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "ContainersReady")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Node [{#NODE}] Pod [{#POD}] Conditions: Initialized|<p>All init containers have started successfully.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.initialized[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "Initialized")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Node [{#NODE}] Pod [{#POD}] Conditions: Ready|<p>The Pod is able to serve requests and should be added to the load balancing pools of all matching Services.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.ready[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "Ready")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
