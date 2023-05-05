@@ -23249,6 +23249,10 @@ msgstr ""
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr ""
