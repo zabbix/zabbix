@@ -1,6 +1,8 @@
 Changes for 7.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-8390] added state filter for items in monitoring latest data (dfofanovs)
+...G...PS. [ZBXNEXT-8273] fixed failures to read relative paths based on current working directory from Include directives in Zabbix Agent config (dgoloscapov)
 ..F.....S. [ZBXNEXT-8355] added various improvements for aggregation functions (dfofanovs, dgoloscapov)
 ...G...PS. [ZBXNEXT-8270] added support of non-blocking sockets and thread safe connect, accept, read, write operation timeouts based on poll (wiper)
 ..F....... [ZBXNEXT-8086] implemented ability to use all widgets in dashboard templates (ashubin, dpetra, esekace)
@@ -30,6 +32,12 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+..F....... [ZBX-22732] fixed description of ATAN2 mathematical function (dpetra)
+.......PS. [ZBX-22664] fixed user macros with regex context being resynced without any changes (wiper)
+..F....... [ZBX-22661] fixed templated dashboard display in Monitoring Hosts Dashboards (dpetra)
+.........T [ZBX-21599] optimised preprocessing steps and added dashboard in the TiDB TiKV by HTTP template (aiantsen)
+.........T [ZBX-21598] optimised preprocessing steps and added dashboard in the TiDB PD by HTTP template (aiantsen)
+.........T [ZBX-21600] optimised preprocessing steps and added dashboard in the TiDB by HTTP template (aiantsen)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 ..F....... [ZBX-22714] fixed signature for mqtt.get key in Standard items popup (dpetra)
 .........T [ZBX-21397] fixed preprocessing step in discovery for k8s kubelet template (egordymov)
