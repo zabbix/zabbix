@@ -28,10 +28,6 @@ $page['title'] = _('Configuration of maintenance periods');
 $page['file'] = 'maintenance.php';
 $page['scripts'] = ['class.calendar.js'];
 
-ob_start();
-
-require_once dirname(__FILE__).'/include/page_header.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'hostids' =>							[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
@@ -100,10 +96,15 @@ if (hasRequest('action') && (!hasRequest('maintenanceids') || !is_array(getReque
 
 $allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 
-if (!$allowed_edit && hasRequest('form') && getRequest('form') !== 'update') {
-	ob_end_clean();
+if (!$allowed_edit && array_filter([
+	hasRequest('form') && getRequest('form') !== 'update',
+	hasRequest('add') || hasRequest('update'),
+	hasRequest('delete') || getRequest('action', '') == 'maintenance.massdelete'
+])) {
 	access_deny(ACCESS_DENY_PAGE);
 }
+
+require_once dirname(__FILE__).'/include/page_header.php';
 
 /*
  * Actions
@@ -113,11 +114,6 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	if (!$allowed_edit) {
-		ob_end_clean();
-		access_deny(ACCESS_DENY_PAGE);
-	}
-
 	if (hasRequest('update')) {
 		$messageSuccess = _('Maintenance updated');
 		$messageFailed = _('Cannot update maintenance');
@@ -200,11 +196,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdelete') {
-	if (!$allowed_edit) {
-		ob_end_clean();
-		access_deny(ACCESS_DENY_PAGE);
-	}
-
 	$maintenanceids = getRequest('maintenanceid', []);
 	if (hasRequest('maintenanceids')) {
 		$maintenanceids = getRequest('maintenanceids');
@@ -228,8 +219,6 @@ elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdel
 
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));
 }
-
-ob_end_flush();
 
 /*
  * Display
