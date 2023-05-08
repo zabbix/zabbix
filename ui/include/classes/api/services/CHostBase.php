@@ -545,28 +545,6 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Recursively collects the roots of the given templates based on the given template map.
-	 *
-	 * @param array $templateids
-	 * @param array $tpl_map
-	 *
-	 * @return array
-	 */
-	protected static function getRootTemplateIds(array $templateids, array $tpl_map): array {
-		$root_templateids = $templateids;
-
-		foreach ($templateids as $templateid => $foo) {
-			if (array_key_exists($templateid, $tpl_map)) {
-				unset($root_templateids[$templateid]);
-
-				$root_templateids += self::getRootTemplateIds($tpl_map[$templateid], $tpl_map);
-			}
-		}
-
-		return $root_templateids;
-	}
-
-	/**
 	 * Check whether double linkage occurs as a result of the given changes in templates links.
 	 *
 	 * @param array  $ins_templates
@@ -581,6 +559,32 @@ abstract class CHostBase extends CApiService {
 		foreach ($ins_templates as $templateid => $_ins_hosts) {
 			foreach ($_ins_hosts as $hostid => $foo) {
 				$ins_hosts[$hostid][$templateid] = [];
+			}
+		}
+
+		self::checkParentsOfInsTemplatesLinkedTwice($ins_templates, $del_links, $ins_hosts);
+		$this->checkChildrenOfInsTemplatesLinkedTwice($ins_templates, $del_links);
+
+		if ($this instanceof CTemplate) {
+			self::checkInsTemplatesLinkedTwiceOnChildrenOfTargetTemplates($ins_hosts, $del_links);
+		}
+	}
+
+	/**
+	 * Check whether parents of templates to link are linked twice to target hosts or templates.
+	 *
+	 * @param array  $ins_templates
+	 * @param string $ins_templates[<templateid>][<hostid>]  Array of IDs of templates to replace on target object.
+	 * @param array  $del_links
+	 * @param array  $ins_hosts
+	 */
+	private static function checkParentsOfInsTemplatesLinkedTwice(array $ins_templates, array $del_links,
+			array &$ins_hosts): void {
+		foreach ($ins_hosts as $hostid => $templates) {
+			$templateids = $ins_templates[key($templates)][$hostid];
+
+			foreach ($templates as $templateid => $foo) {
+				$ins_templates[$templateid][$hostid] = &$templateids;
 			}
 		}
 
@@ -645,21 +649,97 @@ abstract class CHostBase extends CApiService {
 				$tpl_map[$link['templateid']][$link['hostid']] = true;
 			}
 		} while ($_templateids);
+	}
 
-		if (!$this instanceof CTemplate) {
-			return;
-		}
+	/**
+	 * Check whether children of templates to link are linked twice to target hosts or templates.
+	 *
+	 * @param array  $ins_templates
+	 * @param string $ins_templates[<templateid>][<hostid>]  Array of IDs of templates to replace on target object.
+	 * @param array  $del_links
+	 */
+	private function checkChildrenOfInsTemplatesLinkedTwice(array $ins_templates, array $del_links): void {
+		$_templateids = $ins_templates;
+		$tpl_map = [];
 
+		do {
+			$links = DBfetchArray(DBselect(
+				'SELECT ht.templateid,ht.hostid'.
+				' FROM hosts_templates ht,hosts h'.
+				' WHERE ht.hostid=h.hostid'.
+					' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE]).
+					' AND '.dbConditionId('ht.templateid', array_keys($_templateids))
+			));
+
+			if ($this instanceof CTemplate) {
+				foreach (array_intersect_key($ins_templates, $_templateids) as $templateid => $templateids) {
+					foreach ($templateids as $hostid => $foo) {
+						$links[] = ['templateid' => $templateid, 'hostid' => $hostid];
+					}
+				}
+			}
+
+			$_templateids = [];
+
+			foreach ($links as $link) {
+				if (array_key_exists($link['templateid'], $del_links)
+						&& array_key_exists($link['hostid'], $del_links[$link['templateid']])) {
+					continue;
+				}
+
+				foreach (self::getRootTemplateIds([$link['templateid'] => true], $tpl_map) as $ins_templateid => $foo) {
+					foreach ($ins_templates[$ins_templateid] as $hostid => $templateids) {
+						if (in_array($link['hostid'], $templateids)) {
+							$objects = DB::select('hosts', [
+								'output' => ['host', 'status', 'flags'],
+								'hostids' => [$ins_templateid, $hostid, $link['hostid']],
+								'preservekeys' => true
+							]);
+
+							if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
+								$error = _('Cannot link template "%1$s" to template "%2$s", because it would be linked twice through template "%3$s".');
+							}
+							elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+								$error = _('Cannot link template "%1$s" to host prototype "%2$s", because it would be linked twice through template "%3$s".');
+							}
+							else {
+								$error = _('Cannot link template "%1$s" to host "%2$s", because it would be linked twice through template "%3$s".');
+							}
+
+							self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
+								$objects[$ins_templateid]['host'], $objects[$hostid]['host'],
+								$objects[$link['hostid']]['host']
+							));
+						}
+					}
+				}
+
+				if (!array_key_exists($link['hostid'], $tpl_map)) {
+					$_templateids[$link['hostid']] = true;
+				}
+
+				$tpl_map[$link['hostid']][$link['templateid']] = true;
+			}
+		} while ($_templateids);
+	}
+
+	/**
+	 * Check whether templates to link are linked twice to children of target templates.
+	 *
+	 * @param array  $ins_hosts
+	 * @param array  $del_links
+	 */
+	protected static function checkInsTemplatesLinkedTwiceOnChildrenOfTargetTemplates(array $ins_hosts,
+			array $del_links): void {
 		$_templateids = $ins_hosts;
 		$tpl_map = [];
 
 		do {
 			$result = DBselect(
-				'SELECT ht.templateid,ht.hostid,ht2.templateid AS other_templateid'.
-				' FROM hosts_templates ht,hosts_templates ht2'.
-				' WHERE ht.hostid=ht2.hostid'.
-					' AND ht.templateid!=ht2.templateid'.
-					' AND '.dbConditionId('ht.templateid', array_keys($_templateids))
+				'SELECT ht.templateid,ht.hostid,'.dbConditionCoalesce('ht2.templateid', 0, 'other_templateid').
+				' FROM hosts_templates ht'.
+				' LEFT JOIN hosts_templates ht2 ON ht.hostid=ht2.hostid AND ht.templateid!=ht2.templateid'.
+				' WHERE '.dbConditionId('ht.templateid', array_keys($_templateids))
 			);
 
 			$_templateids = [];
@@ -668,7 +748,10 @@ abstract class CHostBase extends CApiService {
 			$host_templates = [];
 
 			while ($row = DBfetch($result)) {
-				$links[] = $row;
+				if ($row['other_templateid'] != 0) {
+					$links[] = $row;
+				}
+
 				$host_templates[$row['hostid']][$row['templateid']] = true;
 			}
 
@@ -702,10 +785,10 @@ abstract class CHostBase extends CApiService {
 							'preservekeys' => true
 						]);
 
-						if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
+						if ($objects[$link['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
 							$error = _('Cannot link template "%1$s" to template "%2$s", because it would be linked to template "%3$s" twice.');
 						}
-						elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						elseif ($objects[$link['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 							$error = _('Cannot link template "%1$s" to template "%2$s", because it would be linked to host prototype "%3$s" twice.');
 						}
 						else {
@@ -726,10 +809,10 @@ abstract class CHostBase extends CApiService {
 									'preservekeys' => true
 								]);
 
-								if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
+								if ($objects[$link['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
 									$error = _('Cannot link template "%1$s" to template "%2$s", because its parent template "%3$s" would be linked to template "%4$s" twice.');
 								}
-								elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+								elseif ($objects[$link['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 									$error = _('Cannot link template "%1$s" to template "%2$s", because its parent template "%3$s" would be linked to host prototype "%4$s" twice.');
 								}
 								else {
@@ -744,14 +827,40 @@ abstract class CHostBase extends CApiService {
 						}
 					}
 				}
+			}
 
-				if (!array_key_exists($link['hostid'], $tpl_map)) {
-					$_templateids[$link['hostid']] = true;
+			foreach ($host_templates as $hostid => $templates) {
+				if (!array_key_exists($hostid, $tpl_map)) {
+					$_templateids[$hostid] = true;
 				}
 
-				$tpl_map[$link['hostid']][$link['templateid']] = true;
+				foreach ($templates as $templateid => $foo) {
+					$tpl_map[$hostid][$templateid] = true;
+				}
 			}
 		} while ($_templateids);
+	}
+
+	/**
+	 * Recursively collects the roots of the given templates based on the given template map.
+	 *
+	 * @param array $templateids
+	 * @param array $tpl_map
+	 *
+	 * @return array
+	 */
+	protected static function getRootTemplateIds(array $templateids, array $tpl_map): array {
+		$root_templateids = $templateids;
+
+		foreach ($templateids as $templateid => $foo) {
+			if (array_key_exists($templateid, $tpl_map)) {
+				unset($root_templateids[$templateid]);
+
+				$root_templateids += self::getRootTemplateIds($tpl_map[$templateid], $tpl_map);
+			}
+		}
+
+		return $root_templateids;
 	}
 
 	/**
