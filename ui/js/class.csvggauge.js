@@ -577,6 +577,8 @@ class CSVGGauge {
 
 		this.#addAttributesNS(path, {d: pathDefinition});
 
+		this.#setColor(path, this.data.empty_color, 'fill');
+
 		this.#calculateCoordinatesOfContainer(this.elements[elementName]);
 	}
 
