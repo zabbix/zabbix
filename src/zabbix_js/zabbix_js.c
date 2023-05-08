@@ -22,7 +22,6 @@
 #include "zbxembed.h"
 #include "zbxmutexs.h"
 #include "zbxstr.h"
-#include "cfg.h"
 
 const char	*progname;
 const char	title_message[] = "zabbix_js";
@@ -143,7 +142,6 @@ int	main(int argc, char **argv)
 	progname = get_program_name(argv[0]);
 
 	zbx_init_library_common(zbx_log_impl);
-	zbx_init_library_cfg(program_type);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,

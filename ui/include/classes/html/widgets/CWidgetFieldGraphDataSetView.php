@@ -68,7 +68,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 				]))
 					->setId('dataset-add')
 					->addClass(ZBX_STYLE_BTN_ALT),
-				(new CButton(null, '&#8203;'))
+				(new CButton(null, ZWSPACE()))
 					->setId('dataset-menu')
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
@@ -94,7 +94,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		$field_name = $this->field->getName();
 
 		$dataset_head = [
-			new CDiv((new CSimpleButton('&nbsp;'))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
+			new CDiv((new CSimpleButton(NBSP()))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
 			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
 

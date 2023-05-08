@@ -1401,7 +1401,6 @@ int	main(int argc, char **argv)
 	int		ret;
 #endif
 	zbx_init_library_common(zbx_log_impl);
-	zbx_init_library_cfg(program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -1445,6 +1444,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
+
+	zbx_init_library_cfg(program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	zbx_init_metrics();

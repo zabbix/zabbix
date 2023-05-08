@@ -1252,6 +1252,7 @@ static int	dbsync_compare_global_macro(const zbx_um_macro_t *gmacro, const zbx_d
 {
 	char	*macro = NULL, *context = NULL;
 	int	ret = FAIL;
+	unsigned char	context_op;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[3], gmacro->type))
 		return FAIL;
@@ -1267,7 +1268,7 @@ static int	dbsync_compare_global_macro(const zbx_um_macro_t *gmacro, const zbx_d
 			return FAIL;
 	}
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[1], &macro, &context, NULL, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[1], &macro, &context, NULL, &context_op))
 		return FAIL;
 
 	if (0 != strcmp(gmacro->name, macro))
@@ -1283,6 +1284,9 @@ static int	dbsync_compare_global_macro(const zbx_um_macro_t *gmacro, const zbx_d
 	}
 
 	if (NULL == gmacro->context)
+		goto out;
+
+	if (gmacro->context_op != context_op)
 		goto out;
 
 	if (0 == strcmp(gmacro->context, context))
@@ -1373,8 +1377,9 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dbsync_compare_host_macro(const zbx_um_macro_t *hmacro, const zbx_db_row_t dbrow)
 {
-	char	*macro = NULL, *context = NULL;
-	int	ret = FAIL;
+	char		*macro = NULL, *context = NULL;
+	int		ret = FAIL;
+	unsigned char	context_op;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[4], hmacro->type))
 		return FAIL;
@@ -1393,7 +1398,7 @@ static int	dbsync_compare_host_macro(const zbx_um_macro_t *hmacro, const zbx_db_
 	if (FAIL == dbsync_compare_uint64(dbrow[1], hmacro->hostid))
 		return FAIL;
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[2], &macro, &context, NULL, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[2], &macro, &context, NULL, &context_op))
 		return FAIL;
 
 	if (0 != strcmp(hmacro->name, macro))
@@ -1410,6 +1415,9 @@ static int	dbsync_compare_host_macro(const zbx_um_macro_t *hmacro, const zbx_db_
 
 	if (NULL == hmacro->context)
 		goto out;
+
+	if (context_op != hmacro->context_op)
+		goto  out;
 
 	if (0 == strcmp(hmacro->context, context))
 		ret = SUCCEED;
