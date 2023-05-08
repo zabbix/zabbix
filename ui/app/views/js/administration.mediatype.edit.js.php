@@ -52,11 +52,11 @@ window.mediatype_edit_popup = new class {
 		//	);
 
 		for (const parameter of this.mediatype.parameters_webhook) {
-			this._addWebhookParam(parameter)
+			this._addWebhookParam(parameter);
 		}
 
 		for (const parameter of this.mediatype.parameters_exec) {
-			this._addExecParam(parameter)
+			this._addExecParam(parameter);
 			this.row_num ++;
 		}
 
@@ -99,7 +99,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	_toggleChangePswdButton() {
-		this.form.querySelector('#chPass_btn').style.display = "none"
+		this.form.querySelector('#chPass_btn').style.display = "none";
 		this.form.querySelector('#passwd').style.display = 'block';
 		this.form.querySelector('#passwd').disabled = false;
 		this.form.querySelector('#passwd').focus();
@@ -154,6 +154,16 @@ window.mediatype_edit_popup = new class {
 			if (typeof fields[key] === 'string') {
 				fields[key] = fields[key].trim();
 			}
+		}
+
+		const maxsessions_type = document.querySelector('input[name="maxsessions_type"]:checked').value;
+		const maxsessions = document.querySelector('#maxsessions').value;
+
+		if (maxsessions_type === 'one') {
+			fields.maxsessions = 1;
+		}
+		else if (maxsessions_type === 'custom' && maxsessions.trim() === '') {
+			fields.maxsessions = 0;
 		}
 
 		const curl = new Curl('zabbix.php');
@@ -237,7 +247,7 @@ window.mediatype_edit_popup = new class {
 						params.old_message_type = params.message_type;
 
 						Array.from(row.querySelectorAll('input[type="hidden"]')).forEach(function(input) {
-							var name = input.getAttribute('name').match(/\[([^\]]+)]$/);
+							const name = input.getAttribute('name').match(/\[([^\]]+)]$/);
 
 							if (name) {
 								params[name[1]] = input.value;
@@ -298,6 +308,9 @@ window.mediatype_edit_popup = new class {
 		document.querySelector('#type').onchange = (e) => {
 			this._hideFormFields('all');
 			this._loadTypeFields(e);
+
+			this.form.querySelector('#smtp_authentication').dispatchEvent(new Event('change'));
+			this.form.querySelector('#smtp_security').dispatchEvent(new Event('change'));
 		};
 
 		const max_sessions = this.form.querySelector('#maxsessions_type');
@@ -310,15 +323,39 @@ window.mediatype_edit_popup = new class {
 		max_sessions.dispatchEvent(new Event('change'));
 	}
 
-	_loadMaxSessionField(e) {
-		const concurrent_sessions = typeof e.target.value === 'undefined' ? this.max_session_checked : e.target.value;
+	/**
+	 * Set concurrent sessions accessibility.
+	 *
+	 * @param {number} media_type		Selected media type.
+	 */
+	_setMaxSessionsType(media_type) {
+		const maxsessions_type = document.querySelectorAll('#maxsessions_type input[type="radio"]');
 
-		if (concurrent_sessions === 'one' || concurrent_sessions === 'unlimited') {
-			this.form.querySelector("#maxsessions").style.display = 'none';
+		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
+			maxsessions_type.forEach(function (radio) {
+				radio.disabled = true;
+				if (radio.value === "one") {
+					radio.disabled = false;
+				}
+			});
 		}
 		else {
-			this.form.querySelector("#maxsessions").style.display = '';
-			this.form.querySelector('#maxsessions').focus();
+			maxsessions_type.forEach(function (radio) {
+				radio.disabled = false;
+			});
+		}
+	}
+
+	_loadMaxSessionField(e) {
+		const concurrent_sessions = typeof e.target.value === 'undefined' ? this.max_session_checked : e.target.value;
+		const maxsessions = this.form.querySelector("#maxsessions");
+
+		if (concurrent_sessions === 'one' || concurrent_sessions === 'unlimited') {
+			maxsessions.style.display = 'none';
+		}
+		else {
+			maxsessions.style.display = '';
+			maxsessions.focus();
 		}
 	}
 
@@ -329,9 +366,6 @@ window.mediatype_edit_popup = new class {
 		if (event.target.value) {
 			this.type = parseInt(event.target.value);
 		}
-		// todo - fix leave data when changing type fields.
-		// this.smtp_security = this.form.querySelector('input[name="smtp_security"]:checked').value;
-		// this.authentication = this.form.querySelector('input[name="smtp_authentication"]:checked').value;
 
 		let show_fields = [];
 
@@ -341,11 +375,13 @@ window.mediatype_edit_popup = new class {
 					'#email-provider-label', '#email-provider-field'
 				];
 
+				// Load provider fields.
 				const provider = this.form.querySelector('#provider');
 
 				provider.onchange = (e) => {
 					const change = typeof e.detail === 'undefined' ? true : e.detail.change;
 					this._loadProviderFields(change, parseInt(provider.value));
+
 				};
 
 				provider.dispatchEvent(new CustomEvent('change', {detail: {change:false}}));
@@ -377,6 +413,8 @@ window.mediatype_edit_popup = new class {
 				break;
 		}
 
+		this._setMaxSessionsType(this.type);
+
 		show_fields.forEach((field) => {
 			this.form.querySelector(field).style.display = '';
 		});
@@ -385,6 +423,7 @@ window.mediatype_edit_popup = new class {
 	_adjustDataByProvider(provider) {
 		const providers = this.mediatype.providers;
 
+		this.form.querySelector('#smtp_username').value = '';
 		this.form.querySelector('#smtp_verify_host').checked = providers[provider]['smtp_verify_host'];
 		this.form.querySelector('#smtp_verify_peer').checked = providers[provider]['smtp_verify_peer'];
 		this.form.querySelector('#smtp_port').value = providers[provider]['smtp_port'];
@@ -403,6 +442,7 @@ window.mediatype_edit_popup = new class {
 	 * Displays or hides fields in the popup based on the value of selected email provider.
 	 */
 	_loadProviderFields(change, provider) {
+		this.provider = provider;
 		let show_fields = [];
 		this._hideFormFields('email');
 
@@ -412,8 +452,8 @@ window.mediatype_edit_popup = new class {
 
 		const authentication = this.form.querySelector('#smtp_authentication');
 
-		authentication.onchange = (e) => {
-			this._loadAuthenticationFields(e, provider);
+		authentication.onchange = () => {
+			this._loadAuthenticationFields(provider);
 		};
 
 		authentication.dispatchEvent(new Event('change'));
@@ -433,8 +473,8 @@ window.mediatype_edit_popup = new class {
 
 				const smtp_security = this.form.querySelector('#smtp_security');
 
-				smtp_security.onchange = (e) => {
-					this._loadSmtpSecurityFields(e);
+				smtp_security.onchange = () => {
+					this._loadSmtpSecurityFields();
 				};
 
 				smtp_security.dispatchEvent(new Event('change'));
@@ -451,6 +491,7 @@ window.mediatype_edit_popup = new class {
 
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>:
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>:
+
 				show_fields = [
 					'#smtp-email-label', '#smtp-email-field',
 					'#smtp-authentication-label', '#smtp-authentication-field',
@@ -464,60 +505,18 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
-	_loadSmtpSecurityFields(e) {
-		const smtp_security = typeof e.target.value === 'undefined' ? this.smtp_security : e.target.value;
+	_loadSmtpSecurityFields() {
+		let smtp_security = this.form.querySelector('input[name="smtp_security"]:checked').value;
 
-		switch (parseInt(smtp_security)) {
-			case <?= SMTP_CONNECTION_SECURITY_NONE ?>:
-				this.form.querySelector('#smtp_verify_peer').checked = false;
-				this.form.querySelector('#smtp_verify_host').checked = false;
-
-				const hide_fields = [
-					'#verify-peer-label', '#verify-peer-field',
-					'#verify-host-label', '#verify-host-field'
-				];
-
-				hide_fields.forEach((field) => {
-					this.form.querySelector(field).style.display = 'none';
-				});
-				break;
-
-			case <?= SMTP_CONNECTION_SECURITY_STARTTLS ?>:
-			case <?= SMTP_CONNECTION_SECURITY_SSL_TLS ?>:
-				const show_fields = [
-					'#verify-peer-label', '#verify-peer-field',
-					'#verify-host-label', '#verify-host-field'
-				];
-
-				show_fields.forEach((field) => {
-					this.form.querySelector(field).style.display = '';
-				});
-				break;
-		}
-	}
-
-	_loadAuthenticationFields(e, provider) {
-		const authentication = typeof e.target.value === 'undefined' ? this.authentication : e.target.value;
-		const passwd_label = this.form.querySelector('#passwd_label');
-		const passwd = this.form.querySelector('#passwd');
-		const smtp_auth_1 = this.form.querySelector(`label[for= 'smtp_authentication_1']`);
-
-		passwd_label.setAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-		passwd.setAttribute('aria-required', 'true');
-
-		if (parseInt(provider) === <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>) {
-			smtp_auth_1.innerHTML = <?= json_encode(_('Username and password')) ?>;
-			passwd_label.removeAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-			passwd.removeAttribute('aria-required', 'true');
-
-			switch (parseInt(authentication)) {
-				case <?= SMTP_AUTHENTICATION_NONE ?>:
-					this.form.querySelector('#smtp_username').value = '';
-					this.form.querySelector('#passwd').value = '';
+		if (parseInt(this.type) === <?= MEDIA_TYPE_EMAIL ?>) {
+			switch (parseInt(smtp_security)) {
+				case <?= SMTP_CONNECTION_SECURITY_NONE ?>:
+					this.form.querySelector('#smtp_verify_peer').checked = false;
+					this.form.querySelector('#smtp_verify_host').checked = false;
 
 					const hide_fields = [
-						'#smtp-username-label', '#smtp-username-field',
-						'#passwd_label', '#passwd_field'
+						'#verify-peer-label', '#verify-peer-field',
+						'#verify-host-label', '#verify-host-field'
 					];
 
 					hide_fields.forEach((field) => {
@@ -525,10 +524,11 @@ window.mediatype_edit_popup = new class {
 					});
 					break;
 
-				case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+				case <?= SMTP_CONNECTION_SECURITY_STARTTLS ?>:
+				case <?= SMTP_CONNECTION_SECURITY_SSL_TLS ?>:
 					const show_fields = [
-						'#smtp-username-label', '#smtp-username-field',
-						'#passwd_label', '#passwd_field'
+						'#verify-peer-label', '#verify-peer-field',
+						'#verify-host-label', '#verify-host-field'
 					];
 
 					show_fields.forEach((field) => {
@@ -537,36 +537,79 @@ window.mediatype_edit_popup = new class {
 					break;
 			}
 		}
+	}
 
-		if (provider === <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>
+	_loadAuthenticationFields(provider) {
+		let authentication = this.form.querySelector('input[name="smtp_authentication"]:checked').value;
+		const passwd_label = this.form.querySelector('#passwd_label');
+		const passwd = this.form.querySelector('#passwd');
+		const smtp_auth_1 = this.form.querySelector(`label[for= 'smtp_authentication_1']`);
+
+		passwd_label.setAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+		passwd.setAttribute('aria-required', 'true');
+
+		if (parseInt(this.type) === <?= MEDIA_TYPE_EMAIL ?>) {
+			if (parseInt(provider) === <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>) {
+				smtp_auth_1.innerHTML = <?= json_encode(_('Username and password')) ?>;
+				passwd_label.removeAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+				passwd.removeAttribute('aria-required', 'true');
+
+				switch (parseInt(authentication)) {
+					case <?= SMTP_AUTHENTICATION_NONE ?>:
+						this.form.querySelector('#passwd').value = '';
+						this.form.querySelector('#smtp_username').value = '';
+
+						const hide_fields = [
+							'#smtp-username-label', '#smtp-username-field',
+							'#passwd_label', '#passwd_field'
+						];
+
+						hide_fields.forEach((field) => {
+							this.form.querySelector(field).style.display = 'none';
+						});
+						break;
+
+					case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+						const show_fields = [
+							'#smtp-username-label', '#smtp-username-field',
+							'#passwd_label', '#passwd_field'
+						];
+
+						show_fields.forEach((field) => {
+							this.form.querySelector(field).style.display = '';
+						});
+						break;
+				}
+			}
+
+			if (provider === <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>
 				|| provider === <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>) {
-			smtp_auth_1.innerHTML = <?= json_encode(_('Email and password')) ?>;
+				smtp_auth_1.innerHTML = <?= json_encode(_('Email and password')) ?>;
 
-			this.form.querySelector('#smtp_username').value = '';
-			this.form.querySelector('#passwd').value = '';
+				switch (parseInt(authentication)) {
+					case <?= SMTP_AUTHENTICATION_NONE ?>:
+						this.form.querySelector('#passwd').value = '';
 
-			switch (parseInt(authentication)) {
-				case <?= SMTP_AUTHENTICATION_NONE ?>:
-					const hide_fields = [
-						'#smtp-username-label', '#smtp-username-field',
-						'#passwd_label', '#passwd_field'
-					];
+						const hide_fields = [
+							'#smtp-username-label', '#smtp-username-field',
+							'#passwd_label', '#passwd_field'
+						];
 
-					hide_fields.forEach((field) => {
-						this.form.querySelector(field).style.display = 'none';
-					});
-					break;
+						hide_fields.forEach((field) => {
+							this.form.querySelector(field).style.display = 'none';
+						});
+						break;
 
-				case <?= SMTP_AUTHENTICATION_NORMAL ?>:
-					const show_fields = [
-						'#passwd_label', '#passwd_field'
-					];
+					case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+						const show_fields = [
+							'#passwd_label', '#passwd_field'
+						];
 
-					show_fields.forEach((field) => {
-						this.form.querySelector(field).style.display = '';
-					});
-
-					break;
+						show_fields.forEach((field) => {
+							this.form.querySelector(field).style.display = '';
+						});
+						break;
+				}
 			}
 		}
 	}
@@ -576,43 +619,28 @@ window.mediatype_edit_popup = new class {
 
 		if (type === 'email') {
 			fields = [
-				'#smtp-username-label', '#smtp-username-field',
-				'#smtp-server-label', '#smtp-server-field',
-				'#smtp-port-label', '#smtp-port-field',
-				'#smtp-email-label', '#smtp-email-field',
-				'#smtp-helo-label', '#smtp-helo-field',
-				'#smtp-security-label', '#smtp-security-field',
-				'#verify-peer-label', '#verify-peer-field',
-				'#verify-host-label', '#verify-host-field',
-				'#passwd_label', '#passwd_field',
+				'#smtp-username-label', '#smtp-username-field', '#smtp-server-label', '#smtp-server-field',
+				'#smtp-port-label', '#smtp-port-field', '#smtp-email-label', '#smtp-email-field', '#smtp-helo-label',
+				'#smtp-helo-field', '#smtp-security-label', '#smtp-security-field', '#verify-peer-label',
+				'#verify-peer-field', '#verify-host-label', '#verify-host-field', '#passwd_label', '#passwd_field',
 				'#smtp-authentication-label', '#smtp-authentication-field'
 			];
 		}
 
 		if (type === 'all') {
 			fields = [
-				'#email-provider-label', '#email-provider-field',
-				'#smtp-server-label', '#smtp-server-field',
-				'#smtp-port-label', '#smtp-port-field',
-				'#smtp-email-label', '#smtp-email-field',
-				'#smtp-helo-label', '#smtp-helo-field',
-				'#smtp-security-label', '#smtp-security-field',
-				'#verify-peer-label', '#verify-peer-field',
-				'#verify-host-label', '#verify-host-field',
-				'#smtp-authentication-label', '#smtp-authentication-field',
-				'#smtp-username-label', '#smtp-username-field',
-				'#exec-path-label', '#exec-path-field',
-				'#row_exec_params_label', '#row_exec_params_field',
-				'#gsm_modem_label', '#gsm_modem_field',
-				'#passwd_label', '#passwd_field',
-				'#content_type_label', '#content_type_field',
-				'#webhook_parameters_label', '#webhook_parameters_field',
-				'#webhook_script_label', '#webhook_script_field',
-				'#webhook_timeout_label', '#webhook_timeout_field',
-				'#webhook_tags_label', '#webhook_tags_field',
-				'#webhook_event_menu_label', '#webhook_event_menu_field',
-				'#webhook_url_name_label', '#webhook_url_name_field',
-				'#webhook_event_menu_url_label', '#webhook_event_menu_url_field'
+				'#email-provider-label', '#email-provider-field', '#smtp-server-label', '#smtp-server-field',
+				'#smtp-port-label', '#smtp-port-field', '#smtp-email-label', '#smtp-email-field', '#smtp-helo-label',
+				'#smtp-helo-field', '#smtp-security-label', '#smtp-security-field', '#verify-peer-label',
+				'#verify-peer-field', '#verify-host-label', '#verify-host-field', '#smtp-authentication-label',
+				'#smtp-authentication-field', '#smtp-username-label', '#smtp-username-field', '#exec-path-label',
+				'#exec-path-field', '#row_exec_params_label', '#row_exec_params_field', '#gsm_modem_label',
+				'#gsm_modem_field', '#passwd_label', '#passwd_field', '#content_type_label', '#content_type_field',
+				'#webhook_parameters_label', '#webhook_parameters_field', '#webhook_script_label',
+				'#webhook_script_field', '#webhook_timeout_label', '#webhook_timeout_field', '#webhook_tags_label',
+				'#webhook_tags_field', '#webhook_event_menu_label', '#webhook_event_menu_field',
+				'#webhook_url_name_label', '#webhook_url_name_field', '#webhook_event_menu_url_label',
+				'#webhook_event_menu_url_field'
 			];
 		}
 
@@ -620,5 +648,4 @@ window.mediatype_edit_popup = new class {
 			this.form.querySelector(field).style.display = 'none';
 		});
 	}
-
 }
