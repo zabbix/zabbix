@@ -226,6 +226,7 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 			Username:      cd.uri.User(),
 			ConnectString: connectString,
 			Password:      godror.NewPassword(cd.uri.Password()),
+			Timezone:      time.Now().Location(),
 		},
 		ConnParams: connParams,
 	})

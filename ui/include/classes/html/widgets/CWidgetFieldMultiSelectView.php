@@ -30,6 +30,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 	protected bool $custom_select = false;
 
 	protected array $filter_preselect = [];
+	protected array $popup_parameters = [];
 
 	public function __construct(CWidgetFieldMultiSelect $field, array $data) {
 		$this->field = $field;
@@ -54,24 +55,6 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 		return $this->getMultiselect();
 	}
 
-	public function getJavaScript(): string {
-		return $this->getMultiselect()->getPostJS();
-	}
-
-	public function setFilterPreselect(array $filter_preselect): self {
-		$this->filter_preselect = $filter_preselect;
-
-		return $this;
-	}
-
-	protected function getObjectName(): string {
-		return '';
-	}
-
-	protected function getPopupParameters(): array {
-		return [];
-	}
-
 	private function getMultiselect(): CMultiSelect {
 		if ($this->multiselect === null) {
 			$multiselect_name = $this->field->getName().($this->field->isMultiple() ? '[]' : '');
@@ -90,9 +73,9 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 			else {
 				$options['popup'] = [
 					'parameters' => [
-							'dstfrm' => $this->form_name,
-							'dstfld1' => zbx_formatDomId($multiselect_name)
-						] + $this->getPopupParameters() + $this->field->getFilterParameters()
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($multiselect_name)
+					] + $this->getPopupParameters()
 				];
 
 				if ($this->filter_preselect) {
@@ -106,5 +89,29 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 		}
 
 		return $this->multiselect;
+	}
+
+	public function getJavaScript(): string {
+		return $this->getView()->getPostJS();
+	}
+
+	public function setFilterPreselect(array $filter_preselect): self {
+		$this->filter_preselect = $filter_preselect;
+
+		return $this;
+	}
+
+	public function setPopupParameter(string $name, $value): self {
+		$this->popup_parameters[$name] = $value;
+
+		return $this;
+	}
+
+	protected function getPopupParameters(): array {
+		return $this->popup_parameters;
+	}
+
+	protected function getObjectName(): string {
+		return '';
 	}
 }

@@ -1269,14 +1269,14 @@ function getMenuPopupDropdown(options, trigger_elem) {
 		else if (options.submit_form) {
 			row.url = 'javascript:void(0);';
 			row.clickCallback = () => {
-				var $_form = trigger_elem.closest('form');
+				const form = trigger_elem.closest('form').get(0);
 
-				if (!$_form.data("action")) {
-					$_form.data("action", $_form.attr("action"));
+				if (!form.dataset.action) {
+					form.dataset.action = form.getAttribute('action');
 				}
 
-				$_form.attr("action", item.url);
-				$_form.submit();
+				form.setAttribute('action', item.url);
+				form.submit();
 			}
 		}
 

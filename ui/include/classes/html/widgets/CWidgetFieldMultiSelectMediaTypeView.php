@@ -32,7 +32,7 @@ class CWidgetFieldMultiSelectMediaTypeView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		return $this->popup_parameters + [
 			'srctbl' => 'media_types',
 			'srcfld1' => 'mediatypeid',
 			'srcfld2' => 'name'
