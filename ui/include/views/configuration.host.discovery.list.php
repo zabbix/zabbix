@@ -221,10 +221,10 @@ foreach ($data['discoveries'] as $discovery) {
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($discovery['master_item']['name']);
+			$description[] = $discovery['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($discovery['master_item']['name']),
+			$description[] = (new CLink($discovery['master_item']['name'],
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('itemid', $discovery['master_item']['itemid'])
@@ -239,7 +239,7 @@ foreach ($data['discoveries'] as $discovery) {
 	}
 
 	$description[] = new CLink(
-		CHtml::encode($discovery['name']),
+		$discovery['name'],
 		(new CUrl('host_discovery.php'))
 			->setArgument('form', 'update')
 			->setArgument('itemid', $discovery['itemid'])
@@ -328,7 +328,7 @@ foreach ($data['discoveries'] as $discovery) {
 				CViewHelper::showNum($discovery['hostPrototypes'])
 			]
 			: '',
-		(new CDiv(CHtml::encode($discovery['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,

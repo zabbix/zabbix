@@ -155,7 +155,7 @@ foreach ($data['templates'] as $template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$linked_templates_output[] = ' &hellip;';
+			$linked_templates_output[] = [' ', HELLIP()];
 
 			break;
 		}
@@ -184,7 +184,7 @@ foreach ($data['templates'] as $template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$linked_to_output[] = ' &hellip;';
+			$linked_to_output[] = [' ', HELLIP()];
 
 			break;
 		}
