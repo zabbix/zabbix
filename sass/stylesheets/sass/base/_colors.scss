@@ -93,12 +93,18 @@ $menu-main-submenu-next-level-shadow: rgba(#768D99, .35) !default;
 
 // User menu.
 $menu-user-icon-color: $sidebar-color !default;
+$menu-user-expanded-icon-color: $menu-user-icon-color !default;
+
 $menu-user-color: lighten($sidebar-color, 15%) !default;
 $menu-user-hover-color: #ffffff !default;
+
+$menu-user-hover-border-color: transparent !default;
 $menu-user-disabled-color: $disabled-item-color !default;
 $menu-user-selected-color: $menu-main-selected-color !default;
 $menu-user-selected-bg-color: $menu-main-selected-bg-color !default;
 $menu-user-selected-border-color: $menu-main-selected-border-color !default;
+
+
 $menu-user-expanded-color: $menu-main-expanded-color !default;
 $menu-user-expanded-bg-color: $menu-main-expanded-bg-color !default;
 $menu-user-expanded-border-color: $menu-main-expanded-border-color !default;

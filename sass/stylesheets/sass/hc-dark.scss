@@ -1,5 +1,7 @@
 $theme-name: 'hc-dark';
 
+$ui-transitions: false;
+
 // Notification & Alert
 $red: #ff5050;
 // $light-red: #ff3a3a; // TODO: clean not used
@@ -40,7 +42,10 @@ $sidebar-mode-icon-hover-color: #000000;
 
 // Main
 $font-color: #ffffff;
-// $font-selected-color: #ffffff; default
+$font-selected-color: #000000; //#000000
+$ui-selected-color: #000000; //#000000
+$ui-selected-hover-color: #000000;
+
 $font-alt-color: #cacaca;
 $body-bg-color: #111111;
 $overlay-bg-color: #222222;
@@ -81,9 +86,12 @@ $menu-main-submenu-next-level-shadow: transparent !default;
 //$menu-main-arrow-hover-bg-position: -579px -434px; // TODO: DF to be deleted
 
 //$menu-icon-color: red; // TODO: DF to be deleted
+$menu-user-icon-color: #000000;
+$menu-user-expanded-icon-color: #ffffff;
 
 $menu-user-color: #131619;
 $menu-user-hover-color: #000000;
+$menu-user-hover-border-color: #000000;
 $menu-user-disabled-color: #787878;
 
 $menu-user-submenu-color: #0c0c0c;
@@ -161,6 +169,7 @@ $scrollbar-thumb-color: #999999;
 $scrollbar-thumb-color-darken: 30%;
 
 // Search form
+$form-search-icon-color: #000000;
 $form-search-color: #000000;
 $form-search-bg-color: #ffffff;
 $form-search-border-color: #000000;
@@ -174,6 +183,10 @@ $form-search-focused-border-color: #000000;
 //$form-search-focused-icon-hover-bg-position: $form-search-focused-icon-bg-position;
 
 $input-placeholder-color: #bbbbbb;
+
+// Icons
+$icon-btn-color: #7d7d7d;
+$icon-btn-hover-color: #ffffff;
 
 // Buttons
 $btn-color: #333333;
@@ -232,7 +245,7 @@ $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
 // Multiselect
-$multiselect-selected-bg-color: #222222;
+$multiselect-selected-bg-color: #999999;
 
 // Dashboard list table.
 $dashboard-shared-bg-color: #e0e0e0;
@@ -335,37 +348,29 @@ a.btn-icon,
 // components/menu-user
 .menu-user {
 	a {
-		padding-left: 13px;
-		border-left: 3px solid transparent;
-
 		&:link,
 		&:visited {
 			border-bottom: 0;
 		}
-
-		//&:hover,
-		//&:focus {
-		//	border-color: #000000; // FIXME: DF duplicate color is set in menu user file
-		//}
 	}
 }
 
 .dashboard-navigation-tabs {
-	.csortable-list {
-		& > .csortable-item:focus:not(:active) {
+	.sortable-list {
+		& > .sortable-item:focus:not(:active) {
 			& > div {
-				box-shadow: 0 0 0 2px $blue;
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
 
-	& .csortable > .csortable-item > div,
-	& .csortable-list > .csortable-item > div:hover {
+	& .sortable > .sortable-item > div,
+	& .sortable-list > .sortable-item > div:hover {
 		border: 1px solid transparent;
 	}
 
-	& .csortable > .csortable-item > div.selected-tab,
-	& .csortable-list > .csortable-item > div.selected-tab {
+	& .sortable > .sortable-item > div.selected-tab,
+	& .sortable-list > .sortable-item > div.selected-tab {
 		span {
 			color: $white; // FIXME: DF variable name is incorrect
 		}
@@ -721,7 +726,7 @@ a.link-action {
 
 // .subfilter-enabled,
 // .subfilter-disable-btn {
-// 	//background-color: $ui-bg-color; // TODO DF to be cleaned
+// background-color: $ui-bg-color;
 // }
 
 .tag {
@@ -1051,6 +1056,10 @@ td.log-disaster-bg {
 	height: 27px;
 	position: relative;
 	margin: 0 0 0 -42px;
+
+	.notif-indic-snooze {
+		margin-top: 32px;
+	}
 }
 
 td.inactive-bg {
@@ -1216,42 +1225,6 @@ td.inactive-bg {
 		//		background-position: -87px -547px;
 		//	}
 		//}
-	}
-}
-
-.btn-time-left {
-	//background-position: -397px -657px;
-
-	&:hover,
-	&:focus {
-		//background-position: -245px -658px;
-		@include btn-hover-active($btn-color, $btn-bg-color);
-	}
-
-	&:focus {
-		//background-color: darken($btn-bg-color, 10%);
-	}
-
-	&:disabled {
-		//background-position: -397px -657px;
-	}
-}
-
-.btn-time-right {
-	//background-position: -395px -623px;
-
-	&:hover,
-	&:focus {
-		//background-position: -243px -624px;
-		@include btn-hover-active($btn-color, $btn-bg-color);
-	}
-
-	&:focus {
-		//background-color: darken($btn-bg-color, 10%);
-	}
-
-	&:disabled {
-		//background-position: -395px -623px;
 	}
 }
 

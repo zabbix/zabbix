@@ -1,5 +1,7 @@
 $theme-name: 'hc-light';
 
+$ui-transitions: false;
+
 // Notification & alert
 $red: #990000;
 // $light-red: #cc0000; // TODO: to be cleaned
@@ -25,6 +27,9 @@ $disabled-item-bg-color: #9f9f9f;
 $header-bg-color: #f3f3f3;
 $sidebar-bg-color: #000000;
 
+$sidebar-mode-icon-color: #9f9f9f;
+$sidebar-mode-icon-hover-color: #ffffff;
+
 // $scrollbar-track-color: rgba(#acbbc2, .55);
 // $scrollbar-thumb-color: rgba(#878787, .85); // TODO: to be cleaned
 // $scrollbar-thumb-color-darken: 5% !default; // TODO: CLean duplicate
@@ -43,6 +48,9 @@ $overlay-bg-color: #000000;
 $overlay-border-color: #383838;
 
 // Main menu
+$menu-main-icon-color: #ffffff;
+$menu-main-expanded-icon-color: #000000;
+
 $menu-main-color: #ffffff;
 $menu-main-hover-color: #000000;
 $menu-main-hover-bg-color: #e6e6e6;
@@ -65,8 +73,12 @@ $menu-main-submenu-selected-border-color: #949494;
 $menu-main-submenu-next-level-bg: #000000 !default;
 $menu-main-submenu-next-level-shadow: transparent !default;
 
+$menu-user-icon-color: #cedae1;
+$menu-user-expanded-icon-color: #000000;
+
 $menu-user-color: #cedae1;
 $menu-user-hover-color: #ffffff;
+$menu-user-hover-border-color: #ffffff;
 $menu-user-disabled-color: #9f9f9f;
 
 $menu-user-submenu-color: #f4f4f4;
@@ -145,6 +157,7 @@ $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
 
 // Search form
+$form-search-icon-color: #ffffff;
 $form-search-bg-color: #000000;
 $form-search-border-color: #ffffff;
 $form-search-focused-color: #000000;
@@ -157,6 +170,12 @@ $form-search-focused-border-color: #ffffff;
 // $form-search-focused-icon-hover-bg-position: $form-search-focused-icon-bg-position;
 
 $input-placeholder-color: #777777;
+
+// Icons.
+$icon-color: #555555;
+$icon-btn-color: #555555;
+$icon-btn-hover-color: #000000 !default;
+$icon-btn-disabled-color: #cccccc; // TODO: to check color
 
 // Buttons
 $btn-bg-color: #555555;
@@ -295,37 +314,29 @@ a.btn-icon,
 // components/menu-user
 .menu-user {
 	a {
-		padding-left: 13px;
-		border-left: 3px solid transparent;
-
 		&:link,
 		&:visited {
 			border-bottom: 0;
-		}
-
-		&:hover,
-		&:focus {
-			border-color: #ffffff;
 		}
 	}
 }
 
 .dashboard-navigation-tabs {
-	.csortable-list {
-		& > .csortable-item:focus:not(:active) {
+	.sortable-list {
+		& > .sortable-item:focus:not(:active) {
 			& > div {
 				box-shadow: 0 0 0 2px $blue;
 			}
 		}
 	}
 
-	& .csortable > .csortable-item > div,
-	& .csortable-list > .csortable-item > div:hover {
+	& .sortable > .sortable-item > div,
+	& .sortable-list > .sortable-item > div:hover {
 		border: 1px solid darken($action-hover-color, 40%);
 	}
 
-	& .csortable > .csortable-item > div.selected-tab,
-	& .csortable-list > .csortable-item > div.selected-tab {
+	& .sortable > .sortable-item > div.selected-tab,
+	& .sortable-list > .sortable-item > div.selected-tab {
 		span {
 			color: $white;
 		}
@@ -944,6 +955,10 @@ td.log-disaster-bg {
 	height: 27px;
 	position: relative;
 	margin: 0 0 0 -42px;
+
+	.notif-indic-snooze {
+		margin-top: 32px;
+	}
 }
 
 td.inactive-bg {
@@ -1085,17 +1100,6 @@ td.inactive-bg {
 // 	}
 // }
 
-.btn-time-right,
-.btn-time-left {
-	&:hover,
-	&:focus {
-		@include btn-hover-active($btn-color, $btn-bg-color);
-	}
-
-	&:focus {
-		background-color: lighten($btn-bg-color, 10%);
-	}
-}
 
 .time-quick {
 	li {

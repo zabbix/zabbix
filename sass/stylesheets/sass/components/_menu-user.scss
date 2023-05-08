@@ -17,9 +17,10 @@
 	span {
 		position: relative;
 		display: block;
-		padding: 12px 14px 12px 16px;
+		padding: 12px 14px 12px 13px;
 		font-size: 12px;
 		white-space: nowrap;
+		border-left: 3px solid transparent;
 
 		@if $ui-transitions {
 			transition: color $ui-transition-duration ease-out;
@@ -38,6 +39,7 @@
 		&:hover,
 		&:focus {
 			border-bottom: 0;
+			border-color: $menu-user-hover-border-color;
 			color: $menu-user-hover-color;
 		}
 	}
@@ -62,6 +64,12 @@
 					background: $menu-user-expanded-bg-color;
 					border-left-color: $menu-user-expanded-border-color;
 					color: $menu-user-expanded-color;
+				}
+
+				&[class^="zi-"], &[class*=" zi-"] {
+					&::before {
+						color: $menu-user-expanded-icon-color;
+					}
 				}
 			}
 		}
