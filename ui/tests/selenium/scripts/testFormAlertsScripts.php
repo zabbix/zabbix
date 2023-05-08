@@ -1033,7 +1033,7 @@ class testFormAlertsScripts extends CWebTest {
 				unset($parameter);
 			}
 
-			$modal->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['Parameters']);
+			$this->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['Parameters']);
 		}
 
 		// Check testing confirmation while configuring.
@@ -1088,7 +1088,7 @@ class testFormAlertsScripts extends CWebTest {
 					unset($parameter);
 				}
 
-				$modal->query('id:parameters-table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
+				$this->query('id:parameters-table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
 			}
 		}
 		$modal->close();
@@ -1122,8 +1122,7 @@ class testFormAlertsScripts extends CWebTest {
 	public function testFormAlertsScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.list');
-		$this->query('link:Script for Update')->waitUntilClickable()->one()->click();
+		$this->openScriptForEditing(self::$ids['Script for Update']);
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $modal->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill([
