@@ -27,6 +27,8 @@ $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmaps.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
+ob_start();
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -115,6 +117,7 @@ $allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
  */
 if (hasRequest('add') || hasRequest('update')) {
 	if (!$allowed_edit) {
+		ob_end_clean();
 		access_deny(ACCESS_DENY_PAGE);
 	}
 
@@ -228,6 +231,7 @@ if (hasRequest('add') || hasRequest('update')) {
 elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 		|| (hasRequest('action') && getRequest('action') == 'map.massdelete')) {
 	if (!$allowed_edit) {
+		ob_end_clean();
 		access_deny(ACCESS_DENY_PAGE);
 	}
 
@@ -266,6 +270,7 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
  */
 if (hasRequest('form')) {
 	if (!$allowed_edit) {
+		ob_end_clean();
 		access_deny(ACCESS_DENY_PAGE);
 	}
 
@@ -451,5 +456,7 @@ else {
 	// render view
 	echo (new CView('monitoring.sysmap.list', $data))->getOutput();
 }
+
+ob_end_flush();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

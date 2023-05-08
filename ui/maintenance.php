@@ -28,6 +28,8 @@ $page['title'] = _('Configuration of maintenance periods');
 $page['file'] = 'maintenance.php';
 $page['scripts'] = ['class.calendar.js'];
 
+ob_start();
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -99,6 +101,7 @@ if (hasRequest('action') && (!hasRequest('maintenanceids') || !is_array(getReque
 $allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 
 if (!$allowed_edit && hasRequest('form') && getRequest('form') !== 'update') {
+	ob_end_clean();
 	access_deny(ACCESS_DENY_PAGE);
 }
 
@@ -111,6 +114,7 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (!$allowed_edit) {
+		ob_end_clean();
 		access_deny(ACCESS_DENY_PAGE);
 	}
 
@@ -197,6 +201,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdelete') {
 	if (!$allowed_edit) {
+		ob_end_clean();
 		access_deny(ACCESS_DENY_PAGE);
 	}
 
@@ -223,6 +228,8 @@ elseif (hasRequest('delete') || getRequest('action', '') == 'maintenance.massdel
 
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));
 }
+
+ob_end_flush();
 
 /*
  * Display
