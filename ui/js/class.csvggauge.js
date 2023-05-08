@@ -72,6 +72,8 @@ class CSVGGauge {
 		// Contains all the elements - description, value, min/max, thresholds ...
 		this.elements = {};
 
+		this.widgetContents = document.querySelector('.dashboard-widget-gauge');
+
 		// Create the main SVG element.
 		this.svg = document.createElementNS(SVGNS, 'svg');
 
@@ -97,11 +99,6 @@ class CSVGGauge {
 		this.thresholdArcContainerId = 'threshold-arc-container';
 
 		this.thresholdsArcParts = [];
-
-		// TO DO: Background color set to parent DIV. But let's leave this in for now to test if saving image will work.
-		// if (this.options.bg_color !== '') {
-		// 	this.#addAttributesNS(this.svg, {style: `background-color: ${this.options.bg_color}`});
-		// }
 
 		// Add all objects to DOM.
 		this.#draw();
@@ -146,6 +143,9 @@ class CSVGGauge {
 		if (this.initialLoad) {
 			this.container.appendChild(this.svg);
 		}
+
+		// Set background color of widget
+		this.#setColor(this.widgetContents, this.data.bg_color, 'background-color');
 
 		this.minMaxFontSize = (this.height * this.data.minmax.font_size / 100) * FONT_SIZE_RATIO;
 

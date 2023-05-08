@@ -83,7 +83,6 @@ class CWidgetGauge extends CWidget {
 				this.gauge = new CSVGGauge({
 					container: container,
 					theme: response.gauge_data.user.theme,
-					bg_color: '#' + response.gauge_data.bg_color,
 					canvas: {
 						width: width,
 						height: height

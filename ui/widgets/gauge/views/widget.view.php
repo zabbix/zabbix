@@ -31,10 +31,6 @@ if ($data['error'] !== '') {
 }
 else {
 	$body = (new CDiv())->addClass(ZBX_STYLE_SVG_GAUGE_CONTAINER);
-
-	if ($data['bg_color'] !== '') {
-		$body->addStyle('background-color: #'.$data['bg_color'].';');
-	}
 }
 
 (new CWidgetView($data))

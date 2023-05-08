@@ -184,7 +184,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getWidgetName(),
 			'error' => $error,
 			'url' => $url,
-			'bg_color' => $this->fields_values['bg_color'],
 			'contents_width' => (int) $this->getInput('contents_width', self::GAUGE_WIDTH_MIN),
 			'contents_height' => (int) $this->getInput('contents_height', self::GAUGE_HEIGHT_MIN),
 			'data' => [
@@ -226,6 +225,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'font_size' => $this->fields_values['minmax_size']
 				],
 				'empty_color' => $this->fields_values['empty_color'],
+				'bg_color' => $this->fields_values['bg_color'],
 				'thresholds' => [
 					'data' => $this->thresholds,
 					'show_arc' => ($this->fields_values['th_show_arc'] == 1),
