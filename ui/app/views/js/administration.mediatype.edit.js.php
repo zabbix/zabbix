@@ -99,10 +99,12 @@ window.mediatype_edit_popup = new class {
 	}
 
 	_toggleChangePswdButton() {
-		this.form.querySelector('#chPass_btn').style.display = "none";
-		this.form.querySelector('#passwd').style.display = 'block';
-		this.form.querySelector('#passwd').disabled = false;
-		this.form.querySelector('#passwd').focus();
+		if (this.form.querySelector('#chPass_btn') !== null) {
+			this.form.querySelector('#chPass_btn').style.display = "none";
+			this.form.querySelector('#passwd').style.display = 'block';
+			this.form.querySelector('#passwd').disabled = false;
+			this.form.querySelector('#passwd').focus();
+		}
 	}
 
 	_addWebhookParam(parameter) {
