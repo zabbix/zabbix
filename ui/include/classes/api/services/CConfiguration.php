@@ -206,7 +206,7 @@ class CConfiguration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (mb_substr($params['source'], 0, 1) == pack('H*', 'EFBBBF')) {
+		if (mb_substr($params['source'], 0, 1) === pack('H*', 'EFBBBF')) {
 			$params['source'] = mb_substr($params['source'], 1);
 		}
 
