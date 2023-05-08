@@ -1659,24 +1659,24 @@ div.dashboard-widget-gauge .dashboard-grid-widget-body > div {
   box-sizing: border-box;
   height: 100%;
   padding: 10px; }
-div.dashboard-widget-gauge .dashboard-grid-widget-body div {
-  line-height: 1.2em;
-  text-align: center;
-  white-space: nowrap; }
 
 .svg-gauge div {
   line-height: 1.2em;
   text-align: center;
-  white-space: nowrap; }
+  white-space: nowrap;
+  color: #000000; }
 .svg-gauge #value,
 .svg-gauge #units {
   white-space: pre; }
 .svg-gauge .arc.empty {
   fill: #ffffff; }
 .svg-gauge .arc.value {
-  fill: #555555; }
+  fill: #555555;
+  transition: fill 0.2s; }
 .svg-gauge #needle {
-  fill: #000000; }
+  fill: #000000;
+  stroke: #000000;
+  transition: fill 0.2s; }
 
 div.dashboard-widget-gauge a:link {
   border-bottom: none; }

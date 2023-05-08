@@ -21,7 +21,6 @@ const SVGNS = 'http://www.w3.org/2000/svg';
 const XMLNS = 'http://www.w3.org/1999/xhtml';
 const FONT_SIZE_RATIO = 0.82;
 
-
 // Must be synced with PHP.
 const DESC_V_POSITION_TOP = 0
 const DESC_V_POSITION_BOTTOM = 1;
@@ -33,6 +32,9 @@ const UNITS_POSITION_BELOW = 3;
 
 // If min/max block widths exceed this (current 1/4) of total SVG width, then limit the width of min/max blocks.
 const MAX_WIDTH_MINMAX_RATIO = 0.25;
+
+// Needle's bottom radius ratio compared to thickness of necessary arc
+const NEEDLE_THICKNESS_RATIO = 0.25;
 
 class CSVGGauge {
 	// TO DO: add description?
@@ -85,6 +87,9 @@ class CSVGGauge {
 		this.radiusThresholdArc = 0;
 		this.thicknessValueArc = 70;
 		this.thicknessThresholdArc = 70;
+
+		// Radius of needle's round part at the bottom
+		this.thicknessNeedle = 10;
 
 		this.gapBetweenArcs = 5;
 
@@ -144,32 +149,39 @@ class CSVGGauge {
 
 		this.minMaxFontSize = (this.height * this.data.minmax.font_size / 100) * FONT_SIZE_RATIO;
 
-		this.#addDescription(this.data.description);
+		this.#addDescription();
 
 		if (this.data.description.pos === DESC_V_POSITION_TOP) {
 			this.#reposition(this.elements.description, this.x, 0, 'top center');
 			this.#show(this.elements.description);
 		}
 
+		this.#addValue();
+
 		this.#processArc();
 
-		this.#addValue(this.data.value, this.data.units);
-		this.#reposition(this.elements.value, this.width / 2, this.y, 'bottom center');
-		this.#show(this.elements.value);
+		this.#addNeedle();
 
 		if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
-			this.#reposition(this.elements.description, this.x, this.y, 'top center');
+			this.#reposition(this.elements.description, this.x, this.height, 'bottom center');
 			this.#show(this.elements.description);
 		}
 
 		this.#processMinMax();
 
-		this.#addNeedle();
+		// Position value element
+		if (this.data.needle.show) {
+			this.#reposition(this.elements.value, this.width / 2, this.y + this.thicknessNeedle, 'top center');
+		}
+		else {
+			this.#reposition(this.elements.value, this.width / 2, this.y, 'bottom center');
+		}
+		this.#show(this.elements.value);
 	}
 
 	// TO DO: add description
-	#addDescription(description) {
-		const line_height = this.height * description.font_size / 100;
+	#addDescription() {
+		const line_height = this.height * this.data.description.font_size / 100;
 		const font_size = line_height * FONT_SIZE_RATIO;
 
 		let foreign_object = this.svg.querySelector('#description-container');
@@ -179,30 +191,23 @@ class CSVGGauge {
 			foreign_object = document.createElementNS(SVGNS, 'foreignObject');
 			div = document.createElement('div');
 
-			this.#addAttributesNS(foreign_object, {x: 0, y: 0, width: '100%', height: '100%', visibility: 'hidden', id: 'description-container'});
-			this.#addAttributes(div, {xmlns: XMLNS, style: `display: inline-flex; font-size: ${font_size}px;`, id: 'description-container-div'});
+			this.#addAttributesNS(foreign_object, {id: 'description-container'});
+			this.#addAttributes(div, {xmlns: XMLNS, style: 'display: inline-flex;', id: 'description-container-div'});
 
 			foreign_object.appendChild(div);
 			this.svg.appendChild(foreign_object);
 		}
 		else {
 			div.innerHTML = '';
-
-			this.#addAttributesNS(foreign_object, {width: '100%', height: '100%'});
 		}
 
-		if (description.is_bold) {
-			this.#addAttributes(div, {style: 'font-weight: bold;'});
-		}
-		else {
-			this.#addAttributes(div, {style: 'font-weight: normal;'});
-		}
+		this.#addAttributesNS(foreign_object, {x: 0, y: 0, width: '100%', height: '100%', visibility: 'hidden'});
+		this.#addAttributes(div, {style: `font-size: ${font_size}px;`});
 
-		if (description.color !== '') {
-			this.#addAttributes(div, {style: `color: #${description.color};`});
-		}
+		this.#setFontWeight(div, this.data.description.is_bold);
+		this.#setColor(div, this.data.description.color, 'color');
 
-		const lines = description.text.split('\n');
+		const lines = this.data.description.text.split('\n');
 
 		let line_count;
 
@@ -244,12 +249,25 @@ class CSVGGauge {
 			this.y = this.height - this.elements.description.height;
 		}
 
+		if (this.data.needle.show) {
+			this.y -= this.thicknessNeedle + this.elements.value.height;
+		}
+
+		this.#prepareThresholdsArcParts();
+
 		// Show both arcs
 		if (this.data.value.show_arc && this.data.thresholds.show_arc && this.data.thresholds.data.length) {
 			this.thicknessThresholdArc = 20;
 			this.thicknessValueArc = 50;
+
 			this.radiusThresholdArc = this.height - this.elements.description.height - this.thicknessThresholdArc;
 			this.radiusValueArc = this.height - this.elements.description.height - this.thicknessValueArc - this.thicknessThresholdArc - this.gapBetweenArcs;
+
+			if (this.data.needle.show) {
+				this.thicknessNeedle = this.thicknessValueArc * NEEDLE_THICKNESS_RATIO;
+				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
+				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
+			}
 
 			this.#addThresholdArc();
 			this.#addValueArc();
@@ -265,6 +283,11 @@ class CSVGGauge {
 			this.thicknessValueArc = 70;
 			this.radiusValueArc = this.height - this.elements.description.height - this.thicknessValueArc;
 
+			if (this.data.needle.show) {
+				this.thicknessNeedle = this.thicknessValueArc * NEEDLE_THICKNESS_RATIO;
+				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
+			}
+
 			this.#addValueArc();
 		}
 		// Show only threshold arc
@@ -275,6 +298,11 @@ class CSVGGauge {
 
 			this.thicknessThresholdArc = 70;
 			this.radiusThresholdArc = this.height - this.elements.description.height - this.thicknessThresholdArc;
+
+			if (this.data.needle.show) {
+				this.thicknessNeedle = this.thicknessThresholdArc * NEEDLE_THICKNESS_RATIO;
+				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
+			}
 
 			this.#addThresholdArc();
 		}
@@ -334,9 +362,7 @@ class CSVGGauge {
 			}
 		}
 
-		this.#prepareThresholdsArcParts();
-
-		this.#calculateCoordinatesOfContainer(this.elements.thresholdArcContainer);
+		this.#drawThresholdsArcParts();
 
 		if (this.data.thresholds.show_labels) {
 			this.#addThresholdsLabels();
@@ -345,6 +371,20 @@ class CSVGGauge {
 			if (this.elements.thresholdsLabelsContainer) {
 				this.elements.thresholdsLabelsContainer.node.innerHTML = '';
 			}
+		}
+	}
+
+	#drawThresholdsArcParts() {
+		for (let i = 0; i < this.thresholdsArcParts.length; i++) {
+			const path = document.createElementNS(SVGNS, 'path');
+
+			this.#addAttributesNS(path, {class: 'arc-threshold-part'});
+
+			this.elements.thresholdArcContainer.node.appendChild(path);
+
+			const pathDefinition = this.#defineArc(this.x, this.y, this.radiusThresholdArc, this.thresholdsArcParts[i].angleStart, this.thresholdsArcParts[i].angleEnd, this.thicknessThresholdArc);
+
+			this.#addAttributesNS(path, {d: pathDefinition, style: `fill: #${this.data.thresholds.data[i].color}`});
 		}
 	}
 
@@ -364,18 +404,9 @@ class CSVGGauge {
 			this.thresholdsArcParts[i] = {
 				angleStart: this.#getAngle(this.data.thresholds.data[i].threshold_value, this.data.minmax.min.raw, this.data.minmax.max.raw),
 				angleEnd: this.#getAngle(valueEnd, this.data.minmax.min.raw, this.data.minmax.max.raw),
-				label: this.data.thresholds.data[i].text
+				label: this.data.thresholds.data[i].text,
+				color: this.data.thresholds.data[i].color
 			};
-
-			const path = document.createElementNS(SVGNS, 'path');
-
-			this.#addAttributesNS(path, {class: 'arc-threshold-part'});
-
-			this.elements.thresholdArcContainer.node.appendChild(path);
-
-			const pathDefinition = this.#defineArc(this.x, this.y, this.radiusThresholdArc, this.thresholdsArcParts[i].angleStart, this.thresholdsArcParts[i].angleEnd, this.thicknessThresholdArc);
-
-			this.#addAttributesNS(path, {d: pathDefinition, style: `fill: #${this.data.thresholds.data[i].color}`});
 		}
 	}
 
@@ -484,8 +515,6 @@ class CSVGGauge {
 
 		this.#addArcEmpty(this.elements.valueArcContainer.node);
 		this.#addArcValue();
-
-		this.#calculateCoordinatesOfContainer(this.elements.valueArcContainer);
 	}
 
 	#addArcValue() {
@@ -506,23 +535,26 @@ class CSVGGauge {
 		window.requestAnimationFrame(() => {
 			this.#animate(this.angleOld, (currentAngle) => {
 				const pathDefinition = this.#defineArc(this.x, this.y, this.radiusValueArc, this.angleStart, currentAngle, this.thicknessValueArc);
-				this.#addAttributesNS(this.elements.valueArc.node, {d: pathDefinition});
+				this.#addAttributesNS(this.elements.valueArc.node, {d: pathDefinition, style: `fill: #${this.#getCurrentThresholdColor(currentAngle)}`});
 			})
 		});
 	}
 
 	#addArcEmpty(container) {
 		let arcId = '';
+		let elementName = '';
 		let radius = 0;
 		let thickness = 0;
 
 		if (container.id === this.valueArcContainerId) {
 			arcId = 'arc-empty-value';
+			elementName = 'valueArcEmpty';
 			radius = this.radiusValueArc;
 			thickness = this.thicknessValueArc;
 		}
 		else if (container.id === this.thresholdArcContainerId) {
 			arcId = 'arc-empty-threshold';
+			elementName = 'thresholdArcEmpty';
 			radius = this.radiusThresholdArc;
 			thickness = this.thicknessThresholdArc;
 		}
@@ -535,15 +567,21 @@ class CSVGGauge {
 			this.#addAttributesNS(path, {id: arcId, class: 'arc empty'});
 
 			container.appendChild(path);
+
+			this.elements[elementName] = {
+				node: path
+			};
 		}
 
 		const pathDefinition = this.#defineArc(this.x, this.y, radius, this.angleStart, this.angleEnd, thickness);
 
 		this.#addAttributesNS(path, {d: pathDefinition});
+
+		this.#calculateCoordinatesOfContainer(this.elements[elementName]);
 	}
 
 	// TO DO: add description
-	#addValue(value, units) {
+	#addValue() {
 		let foreign_object = this.svg.querySelector('#value-container');
 		let div = this.svg.querySelector('#value-container-div');
 
@@ -561,13 +599,13 @@ class CSVGGauge {
 			div.innerHTML = '';
 		}
 
-		const value_line_height = this.height * value.font_size / 100;
+		const value_line_height = this.height * this.data.value.font_size / 100;
 		const value_font_size = value_line_height * FONT_SIZE_RATIO;
 
 		let block_height = 0;
 
 		// Create two div blocks inside, otherwise add text element to parent.
-		if (units.show && units.text !== '') {
+		if (this.data.units.show && this.data.units.text !== '') {
 			let value_div = this.svg.querySelector('#value');
 			let units_div = this.svg.querySelector('#units');
 
@@ -583,83 +621,75 @@ class CSVGGauge {
 				value_div.innerHTML = '';
 			}
 
-			const units_line_height = this.height * units.font_size / 100;
+			const units_line_height = this.height * this.data.units.font_size / 100;
 			const units_font_size = units_line_height * FONT_SIZE_RATIO;
 
 			// Append font size to each element.
 			this.#addAttributes(value_div, {xmlns: XMLNS, style: `font-size: ${value_font_size}px;`});
 			this.#addAttributes(units_div, {xmlns: XMLNS, style: `font-size: ${units_font_size}px;`});
 
-			if (value.is_bold) {
-				this.#addAttributes(value_div, {style: `font-weight: bold;`});
-			}
-			if (value.color !== '') {
-				this.#addAttributes(value_div, {style: `color: #${value.color};`});
-			}
+			this.#setFontWeight(value_div, this.data.value.is_bold);
+			this.#setFontWeight(units_div, this.data.units.is_bold);
 
-			if (units.is_bold) {
-				this.#addAttributes(units_div, {style: `font-weight: bold;`});
-			}
-			if (units.color !== '') {
-				this.#addAttributes(units_div, {style: `color: #${units.color};`});
-			}
+			this.#setColor(value_div, this.data.value.color, 'color');
+			this.#setColor(units_div, this.data.units.color, 'color');
 
-			if (units.pos === UNITS_POSITION_BEFORE) {
+			if (this.data.units.pos === UNITS_POSITION_BEFORE) {
 				// Take the largest height from both.
-				block_height = (units_line_height > value_line_height) ? units_line_height : value_line_height;
+				block_height = (units_line_height >= value_line_height) ? units_line_height : value_line_height;
 
 				// If units are larger, add space after units. If value is larger add space before value.
-				if (units_line_height > value_line_height) {
-					units_div.appendChild(document.createTextNode(units.text + ' '));
-					value_div.appendChild(document.createTextNode(value.text));
+				if (units_line_height >= value_line_height) {
+					units_div.appendChild(document.createTextNode(this.data.units.text + ' '));
+					value_div.appendChild(document.createTextNode(this.data.value.text));
 				}
 				else {
-					units_div.appendChild(document.createTextNode(units.text));
-					value_div.appendChild(document.createTextNode(' ' + value.text));
+					units_div.appendChild(document.createTextNode(this.data.units.text));
+					value_div.appendChild(document.createTextNode(' ' + this.data.value.text));
 				}
 
-				this.#addAttributes(div, {'style': 'align-items: baseline;'});
+				this.#addAttributes(div, {'style': 'align-items: baseline; flex-direction: row;'});
 
 				div.appendChild(units_div);
 				div.appendChild(value_div);
 			}
-			else if (units.pos === UNITS_POSITION_AFTER) {
+			else if (this.data.units.pos === UNITS_POSITION_AFTER) {
 				// Take the largest height from both.
-				block_height = (units_line_height > value_line_height) ? units_line_height : value_line_height;
+				block_height = (units_line_height >= value_line_height) ? units_line_height : value_line_height;
 
 				// If units are larger, add space before units. If value is larger add space after value.
-				if (units_line_height > value_line_height) {
-					units_div.appendChild(document.createTextNode(' ' + units.text));
-					value_div.appendChild(document.createTextNode(value.text));
+				if (units_line_height >= value_line_height) {
+					units_div.appendChild(document.createTextNode(' ' + this.data.units.text));
+					value_div.appendChild(document.createTextNode(this.data.value.text));
 				}
 				else {
-					units_div.appendChild(document.createTextNode(units.text));
-					value_div.appendChild(document.createTextNode(value.text + ''));
+					units_div.appendChild(document.createTextNode(this.data.units.text));
+					value_div.appendChild(document.createTextNode(this.data.value.text + ' '));
 				}
 
-				this.#addAttributes(div, {'style': 'align-items: baseline;'});
+				this.#addAttributes(div, {'style': 'align-items: baseline; flex-direction: row;'});
 
 				div.appendChild(value_div);
 				div.appendChild(units_div);
 			}
-			else if (units.pos === UNITS_POSITION_ABOVE) {
+			else if (this.data.units.pos === UNITS_POSITION_ABOVE) {
 				// Total height is both units and value combined.
 				block_height = units_line_height + value_line_height;
 
-				units_div.appendChild(document.createTextNode(units.text));
-				value_div.appendChild(document.createTextNode(value.text));
+				units_div.appendChild(document.createTextNode(this.data.units.text));
+				value_div.appendChild(document.createTextNode(this.data.value.text));
 
 				this.#addAttributes(div, {'style': 'align-items: center; flex-direction: column;'});
 
 				div.appendChild(units_div);
 				div.appendChild(value_div);
 			}
-			else if (units.pos === UNITS_POSITION_BELOW) {
+			else if (this.data.units.pos === UNITS_POSITION_BELOW) {
 				// Total height is both units and value combined.
 				block_height = units_line_height + value_line_height;
 
-				units_div.appendChild(document.createTextNode(units.text));
-				value_div.appendChild(document.createTextNode(value.text));
+				units_div.appendChild(document.createTextNode(this.data.units.text));
+				value_div.appendChild(document.createTextNode(this.data.value.text));
 
 				this.#addAttributes(div, {'style': 'align-items: center; flex-direction: column;'});
 
@@ -671,18 +701,12 @@ class CSVGGauge {
 			// No units.
 			block_height = value_line_height;
 
-			// Append font size to parent.
 			this.#addAttributes(div, {style: `font-size: ${value_font_size}px;`});
 
-			if (value.is_bold) {
-				this.#addAttributes(div, {style: `font-weight: bold;`});
-			}
+			this.#setFontWeight(div, this.data.value.is_bold);
+			this.#setColor(div, this.data.value.color, 'color');
 
-			if (value.color !== '') {
-				this.#addAttributes(div, {style: `color: #${value.color};`});
-			}
-
-			div.appendChild(document.createTextNode(value.text));
+			div.appendChild(document.createTextNode(this.data.value.text));
 		}
 
 		const height = div.offsetHeight + (block_height - div.offsetHeight);
@@ -710,16 +734,16 @@ class CSVGGauge {
 			let maxY = 0;
 
 			if (this.data.thresholds.show_arc) {
-				minX = this.elements.thresholdArcContainer.coordinates.x1;
-				maxX = this.elements.thresholdArcContainer.coordinates.x2;
-				minY = this.elements.thresholdArcContainer.coordinates.y4;
-				maxY = this.elements.thresholdArcContainer.coordinates.y4;
+				minX = this.elements.thresholdArcEmpty.coordinates.x1;
+				maxX = this.elements.thresholdArcEmpty.coordinates.x2;
+				minY = this.elements.thresholdArcEmpty.coordinates.y4;
+				maxY = this.elements.thresholdArcEmpty.coordinates.y4;
 			}
 			else {
-				minX = this.elements.valueArcContainer.coordinates.x1;
-				maxX = this.elements.valueArcContainer.coordinates.x2;
-				minY = this.elements.valueArcContainer.coordinates.y4;
-				maxY = this.elements.valueArcContainer.coordinates.y4;
+				minX = this.elements.valueArcEmpty.coordinates.x1;
+				maxX = this.elements.valueArcEmpty.coordinates.x2;
+				minY = this.elements.valueArcEmpty.coordinates.y4;
+				maxY = this.elements.valueArcEmpty.coordinates.y4;
 			}
 
 			this.#reposition(this.elements.min, minX, minY, 'bottom right');
@@ -815,11 +839,9 @@ class CSVGGauge {
 
 	// TO DO: finish the function
 	#addNeedle() {
-		// Depends on whether there is at least one arc. If both arcs exist, needle takes radius of the smallest arc.
-
 		let path = this.svg.querySelector('#needle');
 
-		if (this.data.needle.show && this.data.thresholds.show_arc && !this.data.value.show_arc) {
+		if (this.data.needle.show) {
 			if (this.initialLoad || !path) {
 				path = document.createElementNS(SVGNS, 'path');
 
@@ -836,9 +858,15 @@ class CSVGGauge {
 				node: path
 			};
 
+			// Move needle element to the bottom of svg tree, so it can be shown on top of arc
+			const needleClone = this.elements.needle.node;
+			this.elements.needle.node.remove();
+			this.svg.appendChild(needleClone);
+
 			window.requestAnimationFrame(() => {
 				this.#animate(this.angleOld, (currentAngle) => {
 					this.#addAttributesNS(this.elements.needle.node, {transform: `translate(${this.x} ${this.y}) rotate(${currentAngle}) translate(${-this.x} ${-this.y})`});
+					this.#setNeedleColor(currentAngle);
 				})
 			});
 		}
@@ -847,12 +875,42 @@ class CSVGGauge {
 		}
 	}
 
-	#defineNeedle() {
-		// Radius of needle's round part at the bottom
-		const radius = 10;
+	#setNeedleColor(angle) {
+		if (this.data.needle.color) {
+			// Use user chosen color
+			this.#addAttributes(this.elements.needle.node, {style: `fill: #${this.data.needle.color};`});
+		}
+		else if (this.data.thresholds.data.length) {
+			// Use thresholds colors
+			const color = this.#getCurrentThresholdColor(angle);
+			this.#setColor(this.elements.needle.node, color, 'fill');
+		}
+		else {
+			// Use default theme color
+			this.#removeAttributes(this.elements.needle.node, {style: 'fill'});
+		}
+	}
 
+	#getCurrentThresholdColor(angle) {
+		for (let i = 0; i < this.thresholdsArcParts?.length; i++) {
+			if (this.thresholdsArcParts[i].angleStart <= angle && angle <= this.thresholdsArcParts[i].angleEnd) {
+				return this.thresholdsArcParts[i].color;
+			}
+		}
+
+		return '';
+	}
+
+	#defineNeedle() {
 		// Length of needle
-		const length = this.radiusThresholdArc + this.thicknessThresholdArc / 2;
+		let length = 0;
+
+		if (this.data.thresholds.show_arc) {
+			length = this.radiusThresholdArc + this.thicknessThresholdArc / 2;
+		}
+		else if (this.data.value.show_arc) {
+			length = this.radiusValueArc + this.thicknessValueArc / 2;
+		}
 
 		// 0 degrees (needle points to the top) because here is defined only needle's path
 		// Needle will be rotated later to necessary angle
@@ -863,8 +921,8 @@ class CSVGGauge {
 		const tipY = this.y + (length * Math.sin(angleInRadians));
 
 		return [
-			'M', this.x + radius, this.y,
-			'A', radius, radius, 0, 0, 1, this.x - radius, this.y,
+			'M', this.x + this.thicknessNeedle, this.y,
+			'A', this.thicknessNeedle, this.thicknessNeedle, 0, 0, 1, this.x - this.thicknessNeedle, this.y,
 			'L', tipX, tipY,
 			'Z'
 		].join(' ');
@@ -1044,6 +1102,26 @@ class CSVGGauge {
 		container.height = rect.height;
 
 		container.coordinates = this.#calcCoordinates(this.x - rect.width / 2, this.y - rect.height, rect.width, rect.height);
+	}
+
+	#setFontWeight(element, isBold) {
+		if (isBold) {
+			this.#addAttributes(element, {style: 'font-weight: bold;'});
+		}
+		else {
+			this.#addAttributes(element, {style: 'font-weight: normal;'});
+		}
+	}
+
+	#setColor(element, color, attribute) {
+		if (color === '') {
+			// Use default color
+			this.#removeAttributes(element, {style: attribute});
+		}
+		else {
+			// Use user chosen color
+			this.#addAttributes(element, {style: `${attribute}: #${color};`});
+		}
 	}
 
 	// TO DO: add description

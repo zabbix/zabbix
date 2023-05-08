@@ -93,12 +93,6 @@ div.dashboard-widget-gauge {
 			height: 100%;
 			padding: 10px;
 		}
-
-		div {
-			line-height: $line-height;
-			text-align: center;
-			white-space: nowrap;
-		}
 	}
 }
 
@@ -111,6 +105,7 @@ div.dashboard-widget-gauge {
 		line-height: $line-height;
 		text-align: center;
 		white-space: nowrap;
+		color: $font-color;
 	}
 
 	#value,
@@ -125,11 +120,14 @@ div.dashboard-widget-gauge {
 
 		&.value {
 			fill: $gauge-fill-color;
+			transition: fill 0.2s;
 		}
 	}
 
 	#needle {
 		fill: $gauge-needle-color;
+		stroke: $gauge-needle-color;
+		transition: fill 0.2s;
 	}
 }
 
