@@ -41,7 +41,7 @@ zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBfetch \
 	-Wl,--wrap=DBselect \
 	-Wl,--wrap=DBis_null \
-	-Wl,--wrap=zbx_tsdb_recalc_time_period
+	-Wl,--wrap=zbx_recalc_time_period
 
 zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -62,7 +62,7 @@ zbx_baseline_get_data_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBselect \
 	-Wl,--wrap=DBis_null \
 	-Wl,--wrap=zbx_trends_get_avg \
-	-Wl,--wrap=zbx_tsdb_recalc_time_period
+	-Wl,--wrap=zbx_recalc_time_period
 
 zbx_baseline_get_data_CFLAGS = $(COMMON_COMPILER_FLAGS)
 

@@ -50,7 +50,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 *
 	 * @var integer
 	 */
-	protected static $host_prototoypeid_remove_inherited;
+	protected static $host_prototypeid_remove_inherited;
 
 	public $vault_object = 'host prototype';
 	public $vault_error_field = '/1/macros/6/value';
@@ -129,7 +129,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 				]
 		]);
 		$this->assertArrayHasKey('hostids', $response);
-		self::$host_prototoypeid_remove_inherited = $response['hostids'][0];
+		self::$host_prototypeid_remove_inherited = $response['hostids'][0];
 	}
 
 	/**
@@ -138,7 +138,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @onBeforeOnce prepareHostPrototypeRemoveMacrosData
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$host_prototoypeid_remove_inherited,
+		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$host_prototypeid_remove_inherited,
 				self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
