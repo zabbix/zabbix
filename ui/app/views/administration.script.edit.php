@@ -337,7 +337,7 @@ $form_grid
 			(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
 				->setAttribute('disabled', $data['enable_confirmation'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			'&nbsp;',
+			NBSP(),
 			(new CButton('testConfirmation', _('Test confirmation')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->setAttribute('disabled', $data['enable_confirmation'])

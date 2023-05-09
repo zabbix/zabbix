@@ -223,7 +223,7 @@ class testDashboardClockWidget extends CWebTest {
 		}
 
 		// Check that it's possible to select host items, when time type is "Host Time".
-		$fields = ['Type', 'Name', 'Refresh interval', 'Time type', 'Clock type'];
+		$fields = ['Type', 'Show header', 'Name', 'Refresh interval', 'Time type', 'Clock type'];
 
 		foreach (['Local time', 'Server time', 'Host time'] as $type) {
 			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
@@ -235,7 +235,7 @@ class testDashboardClockWidget extends CWebTest {
 			 * while - (0) length parameter - specifies how many elements will be removed.
 			 */
 			if ($type === 'Host time') {
-				array_splice($fields, 4, 0, ['Item']);
+				array_splice($fields, 5, 0, ['Item']);
 				$form->checkValue(['Item' => '']);
 				$form->isRequired('Item');
 			}

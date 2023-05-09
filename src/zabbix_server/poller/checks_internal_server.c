@@ -19,7 +19,6 @@
 
 #include "zbxcommon.h"
 #include "zbxcachevalue.h"
-#include "zbxlld.h"
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
@@ -27,6 +26,7 @@
 #include "../ha/ha.h"
 
 #include "checks_internal.h"
+#include "../lld/lld_protocol.h"
 
 /******************************************************************************
  *                                                                            *
