@@ -44,14 +44,20 @@ class CWidgetGauge extends CWidget {
 		};
 	}
 
+	onResize() {
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
+	}
+
 	resize() {
 		super.resize();
 
 		if (this.gauge !== null) {
 			const container = this._target.querySelector('.' + ZBX_STYLE_SVG_GAUGE_CONTAINER);
 			const padding = this.#getContainerPadding(container);
-			const width = this._getContentSize().content_width - padding.left - padding.right;
-			const height = this._getContentSize().content_height - padding.top - padding.bottom;
+			const width = this._contents_size.contents_width - padding.left - padding.right;
+			const height = this._contents_size.contents_height - padding.top - padding.bottom;
 
 			this.gauge.resize(width, height);
 		}

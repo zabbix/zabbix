@@ -1026,9 +1026,10 @@ class CSVGGauge {
 		// Set main SVG size again.
 		this.width = width;
 		this.height = height;
-		this.#addAttributesNS(this.svg, {width: width, height: height});
+		this.#addAttributesNS(this.svg, {width: this.width, height: this.height});
 
-		// TO DO: rezise all other elements and calculate coordinates.
+		this.x = this.width / 2;
+		this.y = this.height / 2;
 	}
 
 	#reposition(element, x_start, y_start, anchor) {
