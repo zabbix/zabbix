@@ -31,7 +31,7 @@ $output = [
 			$data['errors'],
 			(new CTabView())->addTab('scriptTab', null,
 				(new CPre(
-					(new CList([bold($data['command']), SPACE, $data['message']]))
+					(new CList([bold($data['command']), NBSP(), $data['message']]))
 				))
 			)
 		])

@@ -67,7 +67,7 @@ foreach ($data['valuemaps'] as $valuemap) {
 	$mappings = [];
 
 	foreach ($valuemap['mappings'] as $mapping) {
-		$mappings[] = $mapping['value'].' &rArr; '.$mapping['newvalue'];
+		$mappings[] = [$mapping['value'], ' ', RARR(), ' ', $mapping['newvalue']];
 		$mappings[] = BR();
 	}
 	array_pop($mappings);
