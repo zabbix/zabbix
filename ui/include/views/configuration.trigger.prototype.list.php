@@ -91,7 +91,7 @@ foreach ($data['triggers'] as $trigger) {
 	);
 
 	$description[] = new CLink(
-		CHtml::encode($trigger['description']),
+		$trigger['description'],
 		(new CUrl('trigger_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
@@ -106,9 +106,8 @@ foreach ($data['triggers'] as $trigger) {
 		foreach ($trigger['dependencies'] as $dependency) {
 			$depTrigger = $data['dependencyTriggers'][$dependency['triggerid']];
 
-			$depTriggerDescription = CHtml::encode(
-				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description']
-			);
+			$depTriggerDescription =
+				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description'];
 
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$triggerDependencies[] = (new CLink(

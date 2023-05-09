@@ -32,9 +32,19 @@ class CWidgetFieldMultiSelectItemView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		$parameters = $this->popup_parameters + [
 			'srctbl' => 'items',
 			'srcfld1' => 'itemid'
 		];
+
+		return $parameters + ($this->field->isTemplateDashboard()
+			? [
+				'hostid' => $this->field->getTemplateId(),
+				'hide_host_filter' => true
+			]
+			: [
+				'real_hosts' => true
+			]
+		);
 	}
 }

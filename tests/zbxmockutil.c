@@ -326,6 +326,9 @@ int	zbx_mock_str_to_return_code(const char *str)
 	if (0 == strcmp(str, "CONFIG_ERROR"))
 		return CONFIG_ERROR;
 
+	if (0 == strcmp(str, "SIG_ERROR"))
+		return SIG_ERROR;
+
 	if (0 == strcmp(str, "SYSINFO_RET_OK"))
 		return SYSINFO_RET_OK;
 

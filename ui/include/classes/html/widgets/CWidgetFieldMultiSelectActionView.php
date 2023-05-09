@@ -32,7 +32,7 @@ class CWidgetFieldMultiSelectActionView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		return $this->popup_parameters + [
 			'srctbl' => 'actions',
 			'srcfld1' => 'actionid',
 			'srcfld2' => 'name'

@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 #include "log.h"
@@ -144,6 +143,13 @@ static int	DBpatch_6050011(void)
 	return DBmodify_field_type("trends", &field, &field);
 }
 
+static int	DBpatch_6050012(void)
+{
+	const zbx_db_field_t	field = {"allow_redirect", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -162,5 +168,6 @@ DBPATCH_ADD(6050008, 0, 1)
 DBPATCH_ADD(6050009, 0, 1)
 DBPATCH_ADD(6050010, 0, 1)
 DBPATCH_ADD(6050011, 0, 1)
+DBPATCH_ADD(6050012, 0, 1)
 
 DBPATCH_END()

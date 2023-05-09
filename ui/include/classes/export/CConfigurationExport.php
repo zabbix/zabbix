@@ -504,6 +504,12 @@ class CConfigurationExport {
 		$hostids = [];
 		$itemids = [];
 		$graphids = [];
+		$mapids = [];
+		$serviceids = [];
+		$slaids = [];
+		$userids = [];
+		$actionids = [];
+		$mediatypeids = [];
 
 		// Collect IDs.
 		foreach ($dashboard_pages as $dashboard_page) {
@@ -523,6 +529,30 @@ class CConfigurationExport {
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
 							$graphids[$field['value']] = true;
 							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MAP:
+							$mapids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+							$serviceids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SLA:
+							$slaids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_USER:
+							$userids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ACTION:
+							$actionids[$field['value']] = true;
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+							$mediatypeids[$field['value']] = true;
+							break;
 					}
 				}
 			}
@@ -531,6 +561,12 @@ class CConfigurationExport {
 		$hosts = $this->getHostsReferences(array_keys($hostids));
 		$items = $this->getItemsReferences(array_keys($itemids));
 		$graphs = $this->getGraphsReferences(array_keys($graphids));
+		$sysmaps = $this->getMapsReferences(array_keys($mapids));
+		$services = $this->getServicesReferences(array_keys($serviceids));
+		$slas = $this->getSlasReferences(array_keys($slaids));
+		$users = $this->getUsersReferences(array_keys($userids));
+		$actions = $this->getActionsReferences(array_keys($actionids));
+		$media_types = $this->getMediaTypesReferences(array_keys($mediatypeids));
 
 		// Replace IDs.
 		foreach ($dashboard_pages as &$dashboard_page) {
@@ -549,6 +585,30 @@ class CConfigurationExport {
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
 							$field['value'] = $graphs[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MAP:
+							$field['value'] = $sysmaps[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+							$field['value'] = $services[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SLA:
+							$field['value'] = $slas[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_USER:
+							$field['value'] = $users[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ACTION:
+							$field['value'] = $actions[$field['value']];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+							$field['value'] = $media_types[$field['value']];
 							break;
 					}
 				}
@@ -1751,6 +1811,146 @@ class CConfigurationExport {
 
 		foreach ($images as $id => $image) {
 			$ids[$id] = ['name' => $image['name']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get services references by service ids.
+	 *
+	 * @param array $serviceids
+	 *
+	 * @return array
+	 */
+	protected function getServicesReferences(array $serviceids) {
+		$ids = [];
+
+		$services = API::Service()->get([
+			'output' => ['name'],
+			'serviceids' => $serviceids,
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($services) != count($serviceids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($services as $id => $service) {
+			$ids[$id] = ['name' => $service['name']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get SLAs references by SLA ids.
+	 *
+	 * @param array $slaids
+	 *
+	 * @return array
+	 */
+	protected function getSlasReferences(array $slaids) {
+		$ids = [];
+
+		$slas = API::Sla()->get([
+			'output' => ['name'],
+			'slaids' => $slaids,
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($slas) != count($slaids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($slas as $id => $sla) {
+			$ids[$id] = ['name' => $sla['name']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get users references by user ids.
+	 *
+	 * @param array $userids
+	 *
+	 * @return array
+	 */
+	protected function getUsersReferences(array $userids) {
+		$ids = [];
+
+		$users = API::User()->get([
+			'userids' => $userids,
+			'output' => ['username'],
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($users) != count($userids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($users as $id => $user) {
+			$ids[$id] = ['username' => $user['username']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get actions references by action ids.
+	 *
+	 * @param array $actionids
+	 *
+	 * @return array
+	 */
+	protected function getActionsReferences(array $actionids) {
+		$ids = [];
+
+		$actions = API::Action()->get([
+			'actionids' => $actionids,
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($actions) != count($actionids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($actions as $id => $action) {
+			$ids[$id] = ['name' => $action['name']];
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Get media types references by media type ids.
+	 *
+	 * @param array $mediatypeids
+	 *
+	 * @return array
+	 */
+	protected function getMediaTypesReferences(array $mediatypeids) {
+		$ids = [];
+
+		$media_types = API::MediaType()->get([
+			'mediatypeids' => $mediatypeids,
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
+
+		// Access denied for some objects?
+		if (count($media_types) != count($mediatypeids)) {
+			throw new CConfigurationExportException();
+		}
+
+		foreach ($media_types as $id => $media_type) {
+			$ids[$id] = ['name' => $media_type['name']];
 		}
 
 		return $ids;

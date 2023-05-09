@@ -386,7 +386,11 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 
 static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 {
+#if (defined(HAVE_PROC_STAT) || defined(HAVE_SYS_PSTAT_H) || \
+		(defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)) || defined(HAVE_KSTAT_H) || \
+		defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME) || defined(HAVE_LIBPERFSTAT))
 	int		idx;
+#endif
 	zbx_uint64_t	counter[ZBX_CPU_STATE_COUNT];
 
 #if defined(HAVE_PROC_STAT)

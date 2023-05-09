@@ -372,9 +372,11 @@ int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 								if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
 								{
 									char	*p;
+									size_t	l;
 
+									l = strlen(tmp);
 									/* dismiss trailing \n */
-									p = tmp + strlen(tmp) - 1;
+									p = tmp + l - 1;
 									if ('\n' == *p)
 										*p = '\0';
 

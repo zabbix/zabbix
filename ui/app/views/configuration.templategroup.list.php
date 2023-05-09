@@ -83,7 +83,7 @@ foreach ($data['groups'] as $group) {
 		$n++;
 
 		if ($n > $data['config']['max_in_table']) {
-			$templates_output[] = ' &hellip;';
+			$templates_output[] = [' ', HELLIP()];
 
 			break;
 		}
@@ -106,7 +106,7 @@ foreach ($data['groups'] as $group) {
 
 	$template_count = $data['groupCounts'][$group['groupid']]['templates'];
 
-	$name = (new CLink(CHtml::encode($group['name']),
+	$name = (new CLink($group['name'],
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'templategroup.edit')
 			->setArgument('groupid', $group['groupid'])
