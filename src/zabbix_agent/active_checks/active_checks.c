@@ -385,8 +385,6 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	/* remove executed commands */
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		int	found = 0;
-
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
 		if (ZBX_METRIC_TYPE_REMOTE_COMMAND_PROCESSED != metric->type)
