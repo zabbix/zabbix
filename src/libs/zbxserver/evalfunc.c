@@ -2858,7 +2858,7 @@ static int	evaluate_TREND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 
 		if (SUCCEED != get_function_parameter_str(parameters, 5, &dev_alg) || '\0' == *dev_alg)
 		{
-			dev_alg = zbx_strdup(NULL, "mad");
+			dev_alg = zbx_strdup(dev_alg, "mad");
 		}
 		else if ((0 != strcmp("mad", dev_alg) && (0 != strcmp("stddevpop", dev_alg)) &&
 				(0 != strcmp("stddevsamp", dev_alg))))
