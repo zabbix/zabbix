@@ -83,6 +83,7 @@
 #include "zbxavailability.h"
 #include "zbxdbwrap.h"
 #include "lld/lld_protocol.h"
+#include "scripts/scripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -1120,6 +1121,8 @@ static void	zbx_on_exit(int ret)
 		/* free history value cache */
 		zbx_vc_destroy();
 
+		zbx_deinit_remote_commands_cache();
+
 		/* free vmware support */
 		zbx_vmware_destroy();
 
@@ -1493,6 +1496,13 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			return FAIL;
 		}
+
+		if (SUCCEED != zbx_init_remote_commands_cache(&error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize commands cache: %s", error);
+			zbx_free(error);
+			return FAIL;
+		}
 	}
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
@@ -1788,6 +1798,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_free_selfmon_collector();
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs);
+	zbx_deinit_remote_commands_cache();
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif

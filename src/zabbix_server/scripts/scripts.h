@@ -33,4 +33,10 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 		char **result, char *error, size_t max_error_len, char **debug);
 zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_host_t *host, zbx_uint64_t alertid,
 		int now);
+int	zbx_init_remote_commands_cache(char **error);
+void	zbx_deinit_remote_commands_cache(void);
+int	zbx_process_agent_commands(struct zbx_json_parse *jp, char **info);
+void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid);
+int	zbx_get_unsent_commands_num(void);
+
 #endif

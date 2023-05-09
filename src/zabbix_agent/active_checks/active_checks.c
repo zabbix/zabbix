@@ -53,6 +53,10 @@ extern char			*CONFIG_HOST_INTERFACE_ITEM;
 extern int			CONFIG_BUFFER_SEND;
 extern int			CONFIG_BUFFER_SIZE;
 
+#define ZBX_METRIC_TYPE_COMMON				0
+#define ZBX_METRIC_TYPE_REMOTE_COMMAND_NEW		1
+#define ZBX_METRIC_TYPE_REMOTE_COMMAND_PROCESSED	-1
+
 typedef struct
 {
 	char		*host;
@@ -74,7 +78,9 @@ active_buffer_element_t;
 typedef struct
 {
 	active_buffer_element_t	*data;
+	active_buffer_element_t	*commands;
 	int			count;
+	int			ccount;
 	int			pcount;
 	int			lastsent;
 	int			first_error;
@@ -108,6 +114,9 @@ static void	init_active_metrics(void)
 		buffer.data = (active_buffer_element_t *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
+		buffer.commands = (active_buffer_element_t *)zbx_malloc(buffer.commands, sz);
+		memset(buffer.commands, 0, sz);
+		buffer.ccount = 0;
 		buffer.pcount = 0;
 		buffer.lastsent = (int)time(NULL);
 		buffer.first_error = 0;
@@ -175,13 +184,17 @@ static int	get_min_nextcheck(void)
 	return min;
 }
 
-static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
+static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize_or_id, int mtime,
+		int type)
 {
 	ZBX_ACTIVE_METRIC	*metric;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__func__, key, refresh, lastlogsize, mtime);
+			__func__, key, refresh, lastlogsize_or_id, mtime);
+
+	if (ZBX_METRIC_TYPE_COMMON != type)
+		goto new_metric;
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
@@ -196,7 +209,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 			zbx_free(metric->key);
 			metric->key = zbx_strdup(NULL, key);
-			metric->lastlogsize = lastlogsize;
+			metric->lastlogsize = lastlogsize_or_id;
 			metric->mtime = mtime;
 			metric->big_rec = 0;
 			metric->use_ino = 0;
@@ -247,7 +260,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 		goto out;
 	}
-
+new_metric:
 	metric = (ZBX_ACTIVE_METRIC *)zbx_malloc(NULL, sizeof(ZBX_ACTIVE_METRIC));
 
 	/* add new metric */
@@ -256,7 +269,17 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->refresh = refresh;
 	metric->nextcheck = 0;
 	metric->state = ITEM_STATE_NORMAL;
-	metric->lastlogsize = lastlogsize;
+	if (ZBX_METRIC_TYPE_REMOTE_COMMAND_NEW == type)
+	{
+		metric->command_id = lastlogsize_or_id;
+		metric->lastlogsize = 0;
+	}
+	else
+	{
+		metric->lastlogsize = lastlogsize_or_id;
+		metric->command_id = 0;
+	}
+
 	metric->mtime = mtime;
 	/* existing log[], log.count[] and eventlog[] data can be skipped */
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
@@ -266,6 +289,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->logfiles_num = 0;
 	metric->logfiles = NULL;
 	metric->flags = ZBX_METRIC_FLAG_NEW;
+	metric->type = type;
 
 	if ('l' == metric->key[0] && 'o' == metric->key[1] && 'g' == metric->key[2])
 	{
@@ -345,17 +369,33 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 		zbx_uint32_t *config_revision_local)
 {
 	const char		*p;
-	size_t			name_alloc = 0, key_orig_alloc = 0;
-	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN],
-				tmp[MAX_STRING_LEN], exp_delimiter;
-	zbx_uint64_t		lastlogsize;
+	size_t			name_alloc = 0, key_orig_alloc = 0, command_alloc = 0, error_alloc = 0;
+	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN], *command = NULL,
+				tmp[MAX_STRING_LEN], exp_delimiter, *error = NULL;
+	zbx_uint64_t		lastlogsize, command_id;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;
 	zbx_vector_str_t	received_metrics;
-	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
+	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL, commands_num = 0,
+				no_data = 0;
 	zbx_uint32_t		config_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	/* remove executed commands */
+	for (i = 0; i < active_metrics.values_num; i++)
+	{
+		int	found = 0;
+
+		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+
+		if (ZBX_METRIC_TYPE_REMOTE_COMMAND_PROCESSED != metric->type)
+			continue;
+
+		zbx_vector_ptr_remove_noorder(&active_metrics, i);
+		free_active_metric(metric);
+		i--;	/* consider the same index on the next run */
+	}
 
 	zbx_vector_str_create(&received_metrics);
 
@@ -393,11 +433,16 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		if (0 != *config_revision_local)
-			goto success;
+		size_t offset = 0;
 
-		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
-		goto out;
+		no_data = 1;
+
+		if (0 != *config_revision_local)
+			goto commands;
+
+		zbx_snprintf_alloc(&error, &error_alloc, &offset, "cannot parse list of active checks: %s",
+				zbx_json_strerror());
+		goto commands;
 	}
 
 	*config_revision_local = config_revision;
@@ -452,51 +497,106 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 		else
 			mtime = atoi(tmp);
 
-		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime);
+		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime, ZBX_METRIC_TYPE_COMMON);
 
 		/* remember what was received */
 		zbx_vector_str_append(&received_metrics, zbx_strdup(NULL, key_orig));
 	}
-
-	/* remove what wasn't received */
-	for (i = 0; i < active_metrics.values_num; i++)
+commands:
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_COMMANDS, &jp_data))
 	{
-		int	found = 0;
+		if (0 != *config_revision_local)
+			goto success;
 
-		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
-
-		/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set to 'skip'. */
-		/* We need to keep their state, namely 'skip_old_data', in case the items become NOTSUPPORTED as */
-		/* server might not send them in a new active check list. */
-
-		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & metric->flags) && ITEM_STATE_NOTSUPPORTED == metric->state &&
-				0 == metric->skip_old_data && SUCCEED == mode_parameter_is_skip(metric->flags,
-				metric->key))
+		if (NULL != error)
 		{
-			continue;
+			zabbix_log(LOG_LEVEL_ERR, "%s", error);
+			goto out;
 		}
-
-		for (j = 0; j < received_metrics.values_num; j++)
+	}
+	else
+	{
+		p = NULL;
+		while (NULL != (p = zbx_json_next(&jp_data, p)))
 		{
-			if (0 == strcmp(metric->key_orig, received_metrics.values[j]))
+			size_t offset = 0;
+
+			if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 			{
-				found = 1;
-				break;
+				zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active commands: %s",
+						zbx_json_strerror());
+				goto out;
 			}
-		}
 
-		if (0 == found)
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_COMMAND, &command,
+					&command_alloc, NULL) || '\0' == *command)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"",
+						ZBX_PROTO_TAG_COMMAND);
+				continue;
+			}
+
+			zbx_snprintf_alloc(&key_orig, &key_orig_alloc, &offset, "system.run[%s,nowait]", command);
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ID, tmp, sizeof(tmp), NULL) ||
+							SUCCEED != zbx_is_uint64(tmp, &command_id))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_ID);
+				continue;
+			}
+
+			add_check(key_orig, key_orig, 1, command_id, 0, ZBX_METRIC_TYPE_REMOTE_COMMAND_NEW);
+
+			commands_num++;
+		}
+	}
+
+	if (0 == no_data)
+	{
+		/* remove what wasn't received */
+		for (i = 0; i < active_metrics.values_num; i++)
 		{
+			int	found = 0;
+
+			metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+
+			/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set */
+			/* to 'skip'. */
+			/* We need to keep their state, namely 'skip_old_data', in case the items become */
+			/* NOTSUPPORTED as  server might not send them in a new active check list. */
+
+			if (0 != (ZBX_METRIC_FLAG_LOG_LOG & metric->flags) && ITEM_STATE_NOTSUPPORTED == metric->state &&
+					0 == metric->skip_old_data && SUCCEED == mode_parameter_is_skip(metric->flags,
+					metric->key))
+			{
+				continue;
+			}
+
+			if (ZBX_METRIC_TYPE_REMOTE_COMMAND_NEW == metric->type)
+				continue;
+
+			for (j = 0; j < received_metrics.values_num; j++)
+			{
+				if (0 == strcmp(metric->key_orig, received_metrics.values[j]))
+				{
+					found = 1;
+					break;
+				}
+			}
+
+			if (0 == found)
+			{
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-			if (NULL != metric->persistent_file_name)
-			{
-				zbx_add_to_persistent_inactive_list(&persistent_inactive_vec, metric->key_orig,
-						metric->persistent_file_name);
-			}
+				if (NULL != metric->persistent_file_name)
+				{
+					zbx_add_to_persistent_inactive_list(&persistent_inactive_vec, metric->key_orig,
+							metric->persistent_file_name);
+				}
 #endif
-			zbx_vector_ptr_remove_noorder(&active_metrics, i);
-			free_active_metric(metric);
-			i--;	/* consider the same index on the next run */
+				zbx_vector_ptr_remove_noorder(&active_metrics, i);
+				free_active_metric(metric);
+				i--;	/* consider the same index on the next run */
+			}
 		}
 	}
 
@@ -565,6 +665,8 @@ out:
 	zbx_vector_str_destroy(&received_metrics);
 	zbx_free(key_orig);
 	zbx_free(name);
+	zbx_free(error);
+	zbx_free(command);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
@@ -816,9 +918,6 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			__func__, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 			buffer.count, CONFIG_BUFFER_SIZE);
 
-	if (0 == buffer.count)
-		goto ret;
-
 	now = (int)time(NULL);
 
 	if (CONFIG_BUFFER_SIZE / 2 > buffer.pcount && CONFIG_BUFFER_SIZE > buffer.count &&
@@ -829,9 +928,16 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		goto ret;
 	}
 
+	if (0 == buffer.count && 0 == buffer.ccount)
+		goto ret;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AGENT_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_SESSION, session_token, ZBX_JSON_TYPE_STRING);
+
+	if (0 == buffer.count)
+		goto commands;
+
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
 	for (i = 0; i < buffer.count; i++)
@@ -878,6 +984,28 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 	}
 
 	zbx_json_close(&json);
+commands:
+	if (0 != buffer.ccount)
+	{
+		zbx_json_addarray(&json, ZBX_PROTO_TAG_COMMANDS);
+
+		for (i = 0; i < buffer.ccount; i++)
+		{
+			el = &buffer.commands[i];
+
+			zbx_json_addobject(&json, NULL);
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_ID, el->id);
+
+			if (NULL != el->value && 1 == atoi(el->value))
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
+			else
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_ERROR, el->value, ZBX_JSON_TYPE_STRING);
+
+			zbx_json_close(&json);
+		}
+
+		zbx_json_close(&json);
+	}
 
 	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
@@ -944,7 +1072,19 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		}
 		buffer.count = 0;
 		buffer.pcount = 0;
+
+		for (i = 0; i < buffer.ccount; i++)
+		{
+			el = &buffer.commands[i];
+
+			zbx_free(el->host);
+			zbx_free(el->key);
+			zbx_free(el->value);
+		}
+
+		buffer.ccount = 0;
 		buffer.lastsent = now;
+
 		if (0 != buffer.first_error)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] is working again",
@@ -1141,6 +1281,79 @@ out:
 	return ret;
 }
 
+static int	process_remote_command_value(zbx_vector_addr_ptr_t *addrs, const char *host, const char *key,
+		const char *value, zbx_uint64_t id, const zbx_config_tls_t *config_tls, int config_timeout)
+{
+	active_buffer_element_t	*el = NULL;
+	int			i, ret = FAIL;
+	size_t			sz;
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+
+		/* log a dummy lastlogsize to keep the same record format for simpler parsing */
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' lastlogsize:null value:'%s'", __func__, host, key,
+				ZBX_NULL2STR(value));
+	}
+
+	/* do not send data from buffer if host are the same as previous unless buffer is full already */
+	if (0 < buffer.ccount)
+	{
+		el = &buffer.commands[buffer.ccount - 1];
+
+		if (CONFIG_BUFFER_SIZE <= (buffer.count + buffer.ccount) || 0 != strcmp(el->host, host))
+			send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
+	}
+
+	if (CONFIG_BUFFER_SIZE > buffer.ccount)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "buffer: new element %d", buffer.count);
+		el = &buffer.commands[buffer.ccount];
+		buffer.ccount++;
+	}
+	else
+	{
+		for (i = 0; i < buffer.ccount; i++)
+		{
+			el = &buffer.commands[i];
+			if (0 == strcmp(el->host, host))
+				break;
+		}
+
+		if (NULL != el)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "remove element [%d] Key:'%s:%s'", i, el->host, el->key);
+
+			zbx_free(el->host);
+			zbx_free(el->key);
+			zbx_free(el->value);
+		}
+
+		sz = (size_t)(CONFIG_BUFFER_SIZE - i - 1) * sizeof(active_buffer_element_t);
+		memmove(&buffer.commands[i], &buffer.commands[i + 1], sz);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "commands buffer full: new element %d", buffer.ccount - 1);
+
+		el = &buffer.data[CONFIG_BUFFER_SIZE - 1];
+	}
+
+	memset(el, 0, sizeof(active_buffer_element_t));
+	el->host = zbx_strdup(NULL, host);
+	el->key = zbx_strdup(NULL, key);
+	if (NULL != value)
+		el->value = zbx_strdup(NULL, value);
+
+	el->id = id;
+
+	if ( CONFIG_BUFFER_SIZE <= (buffer.count + buffer.ccount))
+		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
+
+	ret = SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		unsigned char old_state, zbx_uint64_t lastlogsize_last, int mtime_last)
 {
@@ -1201,6 +1414,9 @@ static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC 
 	AGENT_RESULT	result;
 	char		**pvalue;
 
+	if (ZBX_METRIC_TYPE_REMOTE_COMMAND_PROCESSED == metric->type)
+		return SUCCEED;
+
 	zbx_init_agent_result(&result);
 
 	if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result)))
@@ -1214,11 +1430,22 @@ static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC 
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
-		process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
-				NULL, NULL, NULL, NULL, metric->flags, config_tls, config_timeout);
+		if (ZBX_METRIC_TYPE_COMMON == metric->type)
+		{
+			process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL,
+					NULL, NULL, NULL, NULL, NULL, metric->flags, config_tls, config_timeout);
+		}
+		else if (ZBX_METRIC_TYPE_REMOTE_COMMAND_NEW == metric->type)
+		{
+			process_remote_command_value(addrs, CONFIG_HOSTNAME, metric->key_orig, *pvalue,
+					metric->command_id, config_tls, config_timeout);
+		}
 	}
 out:
 	zbx_free_agent_result(&result);
+
+	if (ZBX_METRIC_TYPE_REMOTE_COMMAND_NEW == metric->type)
+		metric->type = ZBX_METRIC_TYPE_REMOTE_COMMAND_PROCESSED;
 
 	return ret;
 }
@@ -1320,7 +1547,11 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 			metric->error_count = 0;
 			metric->processed_bytes = 0;
 
-			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
+			if (ZBX_METRIC_TYPE_COMMON == metric->type)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key,
+						perror);
+			}
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 			/* only for log*[] items */
 			if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags) &&
@@ -1339,9 +1570,18 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 						metric->mtime);
 			}
 #endif
-			process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
-					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags,
-					config_tls, config_timeout);
+
+			if (ZBX_METRIC_TYPE_COMMON == metric->type)
+			{
+				process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, perror,
+						ITEM_STATE_NOTSUPPORTED, &metric->lastlogsize, &metric->mtime, NULL,
+						NULL, NULL, NULL, metric->flags, config_tls, config_timeout);
+			}
+			else
+			{
+				process_remote_command_value(addrs, CONFIG_HOSTNAME, metric->key_orig, perror,
+						metric->command_id, config_tls, config_timeout);
+			}
 
 			zbx_free(error);
 		}
@@ -1388,6 +1628,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 		}
 
 		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
+
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
 	}
 

@@ -26,6 +26,7 @@
 #define ZBX_PROTO_TAG_CLOCK			"clock"
 #define ZBX_PROTO_TAG_NS			"ns"
 #define ZBX_PROTO_TAG_DATA			"data"
+#define ZBX_PROTO_TAG_COMMANDS			"commands"
 #define ZBX_PROTO_TAG_REGEXP			"regexp"
 #define ZBX_PROTO_TAG_DELAY			"delay"
 #define ZBX_PROTO_TAG_REFRESH_UNSUPPORTED	"refresh_unsupported"

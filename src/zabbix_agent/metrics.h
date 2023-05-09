@@ -43,6 +43,7 @@ typedef struct
 	char			*key;
 	char			*key_orig;
 	zbx_uint64_t		lastlogsize;
+	zbx_uint64_t		command_id;
 	int			refresh;
 	int			nextcheck;
 	int			mtime;
@@ -62,6 +63,7 @@ typedef struct
 	zbx_uint64_t		processed_bytes;	/* number of processed bytes for log[], log.count[], logrt[], */
 							/* logrt.count[] items */
 	char			*persistent_file_name;	/* not used on Microsoft Windows */
+	char			type;
 }
 ZBX_ACTIVE_METRIC;
 
