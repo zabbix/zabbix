@@ -147,7 +147,7 @@ $item_form_list
 				->addItem(new CRow([
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
@@ -383,7 +383,7 @@ $item_form_list
 		(new CVisibilityBox('visible[valuemapid]', 'valuemap', _('Original')))
 			->setLabel(_('Show value'))
 			->setChecked(isset($data['visible']['valuemapid'])),
-		(new CDiv([$valuemap_select, SPACE,
+		(new CDiv([$valuemap_select, NBSP(),
 			(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 				->getUrl()

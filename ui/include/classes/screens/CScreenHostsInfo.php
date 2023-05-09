@@ -99,7 +99,7 @@ class CScreenHostsInfo extends CScreenBase {
 				'groupids' => [$this->screenitem['resourceid']]
 			]);
 
-			$header->addItem((new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']]));
+			$header->addItem((new CList())->addItem([_('Group'), ':', NBSP(), $groups[0]['name']]));
 		}
 
 		$table = new CTableInfo();

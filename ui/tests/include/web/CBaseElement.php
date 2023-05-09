@@ -59,12 +59,6 @@ abstract class CBaseElement extends RemoteWebElement {
 
 			$this->reload();
 		}
-		// Workaraund for communication errors present on Jenkins
-		catch (\Facebook\WebDriver\Exception\WebDriverException $exception) {
-			if (strpos($exception->getMessage(), 'START_MAP') === false) {
-				throw $exception;
-			}
-		}
 
 		return call_user_func_array(['parent', $method], $params);
 	}

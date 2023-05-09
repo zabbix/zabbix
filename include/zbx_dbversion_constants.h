@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -18,45 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ZBX_DBVERSION_CONSTANTS_H
+#define ZABBIX_ZBX_DBVERSION_CONSTANTS_H
 
-/**
- * A helper class for working with HTML.
- */
-class CHtml {
+/* ZBX_*_MIN_VERSION - hard limit */
 
-	/**
-	 * Encodes the value to be used in HTML code. If the given value is an array, the values will be
-	 * encoded recursively.
-	 *
-	 * @static
-	 *
-	 * @param mixed $data
-	 *
-	 * @return mixed
-	 */
-	public static function encode($data) {
-		if (is_array($data)) {
-			$rs = [];
-			foreach ($data as $key => $value) {
-				$rs[$key] = self::encode($value);
-			}
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
+#define ZBX_TIMESCALE_MIN_VERSION				10500
+#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
+#define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 
-			return $rs;
-		}
-
-		return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-	}
-
-	/**
-	 * Encodes the data as a JSON string with HTML entities escaped.
-	 *
-	 * @static
-	 *
-	 * @param array $data
-	 *
-	 * @return string
-	 */
-	public static function serialize(array $data) {
-		return self::encode(json_encode($data));
-	}
-}
+#endif /*ZABBIX_ZBX_DBVERSION_CONSTANTS_H*/

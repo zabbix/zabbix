@@ -109,22 +109,28 @@ if ($data['action']['filter']['conditions']) {
 $formula = (new CTextBox('formula', $data['action']['filter']['formula']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
-	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+	->setAttribute('placeholder', 'A or (B and C) ...');
 
 $action_tab->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
-	(new CSelect('evaltype'))
-		->setId('evaltype')
-		->setFocusableElementId('label-evaltype')
-		->setValue($data['action']['filter']['evaltype'])
-		->addOptions(CSelect::createOptionsFromArray([
-			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-			CONDITION_EVAL_TYPE_AND => _('And'),
-			CONDITION_EVAL_TYPE_OR => _('Or'),
-			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-		])),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CSpan())->setId('conditionLabel'),
-	$formula
+	(new CDiv(
+		(new CSelect('evaltype'))
+			->setId('evaltype')
+			->setFocusableElementId('label-evaltype')
+			->setValue($data['action']['filter']['evaltype'])
+			->addOptions(CSelect::createOptionsFromArray([
+				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+				CONDITION_EVAL_TYPE_AND => _('And'),
+				CONDITION_EVAL_TYPE_OR => _('Or'),
+				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+			]))
+			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+	))->addClass(ZBX_STYLE_CELL),
+	(new CDiv([
+		(new CSpan())->setId('conditionLabel'),
+		$formula
+	]))
+		->addClass(ZBX_STYLE_CELL)
+		->addClass(ZBX_STYLE_CELL_EXPRESSION)
 ]);
 
 $condition_table->addRow([

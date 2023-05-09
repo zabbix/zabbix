@@ -717,16 +717,10 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 	private function checkRefreshInterval($data, $header) {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($header);
-		$refresh = CTestArrayHelper::get($data['fields'], 'Refresh interval', 'Default (15 minutes)');
-		$mapping = [
-			'Default (15 minutes)' => 900,
-			'No refresh' => 0,
-			'10 seconds' => 10,
-			'1 minute' => 60,
-			'2 minutes' => 120,
-			'10 minutes' => 600
-		];
-		$this->assertEquals($widget->getRefreshInterval(), $mapping[$refresh]);
+		$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (15 minutes)')
+			? '15 minutes'
+			: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '15 minutes'));
+		$this->assertEquals($widget->getRefreshInterval(), $refresh);
 	}
 
 	/*

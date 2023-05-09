@@ -140,7 +140,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Get dashboard widget element by widget title ('Problem hosts').
 		$widget = $dashboard->getWidget('Problem hosts');
 		// Check refresh interval of widget.
-		$this->assertEquals(60, $widget->getRefreshInterval());
+		$this->assertEquals('1 minute', $widget->getRefreshInterval());
 
 		// Get widget content as table.
 		$table = $widget->getContent()->asTable();

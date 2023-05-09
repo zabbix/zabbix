@@ -35,6 +35,13 @@ define('USER_ACTION_ADD', 'add');
 define('USER_ACTION_UPDATE', 'update');
 define('USER_ACTION_REMOVE', 'remove');
 
+define('STRING_6000', str_repeat('long_string_', 500));
+define('STRING_2200', substr(STRING_6000, 0, 2200));
+define('STRING_2048', substr(STRING_6000, 0, 2048));
+define('STRING_1024', substr(STRING_6000, 0, 1024));
+define('STRING_255', substr(STRING_6000, 0, 255));
+define('STRING_128', substr(STRING_6000, 0, 128));
+
 /**
  * Base class of php unit tests.
  */

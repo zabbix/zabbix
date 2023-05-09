@@ -75,7 +75,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 				->removeAttribute('name')
 				->removeId()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol('&rArr;'))->addStyle('vertical-align: top;'),
+		(new CCol(RARR()))->addStyle('vertical-align: top;'),
 		(new CCol(
 			(new CTextAreaFlexible('macros['.$macro_name.']', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)

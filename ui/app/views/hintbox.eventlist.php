@@ -47,7 +47,7 @@ if (array_key_exists('problems', $data)) {
 
 		$div->addItem(
 			(new CDiv())
-				->addItem(new CLink(CHtml::encode($data['trigger']['url']), $trigger_url))
+				->addItem(new CLink($data['trigger']['url'], $trigger_url))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addStyle('max-width: 500px')
 		);

@@ -924,10 +924,10 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag) {
 				->setArgument('filter_hostids', [$template['hostid']]);
 		}
 
-		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
+		$name = (new CLink($template['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
-		$name = new CSpan(CHtml::encode($template['name']));
+		$name = new CSpan($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -968,13 +968,13 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag) {
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
 			}
 
-			$name = new CLink(CHtml::encode($template['name']), $url);
+			$name = new CLink($template['name'], $url);
 		}
 		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);
 
 		$itemid = $parent_templates['links'][$itemid]['itemid'];
 	}

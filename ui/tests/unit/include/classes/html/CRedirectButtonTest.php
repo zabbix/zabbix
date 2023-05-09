@@ -43,7 +43,7 @@ class CRedirectButtonTest extends CTagTest {
 			// parameter encoding
 			[
 				['caption', 'url"&"'],
-				'<button type="button" data-url="url&quot;&&quot;">caption</button>'
+				'<button type="button" data-url="url&quot;&amp;&quot;">caption</button>'
 			]
 		];
 	}
