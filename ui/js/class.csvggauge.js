@@ -104,8 +104,6 @@ class CSVGGauge {
 		this.#draw();
 
 		this.initialLoad = false;
-
-		this.#addDebugGrid(25,5);
 	}
 
 	update(data) {
@@ -156,6 +154,8 @@ class CSVGGauge {
 			this.#show(this.elements.description);
 		}
 
+		this.#processMinMax();
+
 		this.#addValue();
 
 		this.#processArc();
@@ -167,16 +167,9 @@ class CSVGGauge {
 			this.#show(this.elements.description);
 		}
 
-		this.#processMinMax();
+		this.#positionMinMaxElements();
 
-		// Position value element
-		if (this.data.needle.show) {
-			this.#reposition(this.elements.value, this.width / 2, this.y + this.thicknessNeedle, 'top center');
-		}
-		else {
-			this.#reposition(this.elements.value, this.width / 2, this.y, 'bottom center');
-		}
-		this.#show(this.elements.value);
+		this.#positionValueElement();
 	}
 
 	// TO DO: add description
@@ -255,18 +248,33 @@ class CSVGGauge {
 
 		this.#prepareThresholdsArcParts();
 
+		// Maximum available space for arc depending on widget size
+		let maxSpace = this.height;
+
+		if (this.width <= this.height) {
+			maxSpace = this.width;
+		}
+
 		// Show both arcs
 		if (this.data.value.show_arc && this.data.thresholds.show_arc && this.data.thresholds.data.length) {
 			this.thicknessThresholdArc = 20;
 			this.thicknessValueArc = 50;
 
-			this.radiusThresholdArc = this.height - this.elements.description.height - this.thicknessThresholdArc;
-			this.radiusValueArc = this.height - this.elements.description.height - this.thicknessValueArc - this.thicknessThresholdArc - this.gapBetweenArcs;
+			this.radiusThresholdArc = maxSpace - this.elements.description.height - this.thicknessThresholdArc;
+			this.radiusValueArc = maxSpace - this.elements.description.height - this.thicknessValueArc - this.thicknessThresholdArc - this.gapBetweenArcs;
 
 			if (this.data.needle.show) {
 				this.thicknessNeedle = this.thicknessValueArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
 				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
+			}
+
+			if (this.width <= this.radiusThresholdArc * 2 + this.thicknessThresholdArc * 2 + (this.elements.min?.width || 0) * 2) {
+				// Widget width is too small - need to shrink elements
+				const offsetThresholdArc = this.radiusThresholdArc - this.width / 2 + this.thicknessThresholdArc + (this.elements.min?.width || 0);
+				const offsetValueArc = this.radiusValueArc - this.width / 2 + this.thicknessValueArc + (this.elements.min?.width || 0) + this.thicknessThresholdArc + this.gapBetweenArcs;
+				this.radiusThresholdArc -= offsetThresholdArc;
+				this.radiusValueArc -= offsetValueArc;
 			}
 
 			this.#addThresholdArc();
@@ -281,11 +289,17 @@ class CSVGGauge {
 			delete this.elements.thresholdsLabelsContainer;
 
 			this.thicknessValueArc = 70;
-			this.radiusValueArc = this.height - this.elements.description.height - this.thicknessValueArc;
+			this.radiusValueArc = maxSpace - this.elements.description.height - this.thicknessValueArc;
 
 			if (this.data.needle.show) {
 				this.thicknessNeedle = this.thicknessValueArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
+			}
+
+			if (this.width <= this.radiusValueArc * 2 + this.thicknessValueArc * 2 + (this.elements.min?.width || 0) * 2) {
+				// Widget width is too small - need to shrink elements
+				const offsetValueArc = this.radiusValueArc - this.width / 2 + this.thicknessValueArc + (this.elements.min?.width || 0);
+				this.radiusValueArc -= offsetValueArc;
 			}
 
 			this.#addValueArc();
@@ -297,11 +311,17 @@ class CSVGGauge {
 			delete this.elements.valueArcContainer;
 
 			this.thicknessThresholdArc = 70;
-			this.radiusThresholdArc = this.height - this.elements.description.height - this.thicknessThresholdArc;
+			this.radiusThresholdArc = maxSpace - this.elements.description.height - this.thicknessThresholdArc;
 
 			if (this.data.needle.show) {
 				this.thicknessNeedle = this.thicknessThresholdArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
+			}
+
+			if (this.width <= this.radiusThresholdArc * 2 + this.thicknessThresholdArc * 2 + (this.elements.min?.width || 0) * 2) {
+				// Widget width is too small - need to shrink elements
+				const offsetThresholdArc = this.radiusThresholdArc - this.width / 2 + this.thicknessThresholdArc + (this.elements.min?.width || 0);
+				this.radiusThresholdArc -= offsetThresholdArc;
 			}
 
 			this.#addThresholdArc();
@@ -729,36 +749,17 @@ class CSVGGauge {
 	#processMinMax() {
 		if (this.data.minmax.show) {
 			this.#addMinMax();
-
-			let minX = 0;
-			let maxX = 0;
-			let minY = 0;
-			let maxY = 0;
-
-			if (this.data.thresholds.show_arc) {
-				minX = this.elements.thresholdArcEmpty.coordinates.x1;
-				maxX = this.elements.thresholdArcEmpty.coordinates.x2;
-				minY = this.elements.thresholdArcEmpty.coordinates.y4;
-				maxY = this.elements.thresholdArcEmpty.coordinates.y4;
-			}
-			else {
-				minX = this.elements.valueArcEmpty.coordinates.x1;
-				maxX = this.elements.valueArcEmpty.coordinates.x2;
-				minY = this.elements.valueArcEmpty.coordinates.y4;
-				maxY = this.elements.valueArcEmpty.coordinates.y4;
-			}
-
-			this.#reposition(this.elements.min, minX, minY, 'bottom right');
-			this.#reposition(this.elements.max, maxX, maxY, 'bottom left');
-			this.#show(this.elements.min);
-			this.#show(this.elements.max);
 		}
 		else {
 			if (this.elements.min) {
 				this.elements.min.node.innerHTML = '';
+				this.elements.min.width = 0;
+				this.elements.min.height = 0;
 			}
 			if (this.elements.max) {
 				this.elements.max.node.innerHTML = '';
+				this.elements.max.width = 0;
+				this.elements.max.height = 0;
 			}
 		}
 	}
@@ -1030,6 +1031,42 @@ class CSVGGauge {
 
 		this.x = this.width / 2;
 		this.y = this.height / 2;
+	}
+
+	#positionMinMaxElements() {
+		if (this.data.minmax.show) {
+			let minX = 0;
+			let maxX = 0;
+			let minY = 0;
+			let maxY = 0;
+
+			if (this.data.thresholds.show_arc) {
+				minX = this.elements.thresholdArcEmpty.coordinates.x1;
+				maxX = this.elements.thresholdArcEmpty.coordinates.x2;
+				minY = this.elements.thresholdArcEmpty.coordinates.y4;
+				maxY = this.elements.thresholdArcEmpty.coordinates.y4;
+			} else {
+				minX = this.elements.valueArcEmpty.coordinates.x1;
+				maxX = this.elements.valueArcEmpty.coordinates.x2;
+				minY = this.elements.valueArcEmpty.coordinates.y4;
+				maxY = this.elements.valueArcEmpty.coordinates.y4;
+			}
+
+			this.#reposition(this.elements.min, minX, minY, 'bottom right');
+			this.#reposition(this.elements.max, maxX, maxY, 'bottom left');
+			this.#show(this.elements.min);
+			this.#show(this.elements.max);
+		}
+	}
+
+	#positionValueElement() {
+		if (this.data.needle.show) {
+			this.#reposition(this.elements.value, this.width / 2, this.y + this.thicknessNeedle, 'top center');
+		}
+		else {
+			this.#reposition(this.elements.value, this.width / 2, this.y, 'bottom center');
+		}
+		this.#show(this.elements.value);
 	}
 
 	#reposition(element, x_start, y_start, anchor) {
