@@ -216,7 +216,7 @@ class CControllerPopupMassupdateTrigger extends CController {
 			if ($result) {
 				$messages = CMessageHelper::getMessages();
 				$output = ['title' => $this->hasInput('prototype')
-					? _('Trigger prototypes updated')
+					? _n('Trigger prototype updated', 'Trigger prototypes updated', $triggers_count)
 					: _('Trigger updated')
 				];
 				if (count($messages)) {
