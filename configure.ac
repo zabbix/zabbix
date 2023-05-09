@@ -1928,6 +1928,9 @@ case "x$ARCH" in
 		;;
 esac
 
+found_cmocka="no"
+found_yaml="no"
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Output configuration results                  *
