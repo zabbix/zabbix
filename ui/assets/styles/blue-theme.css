@@ -2801,10 +2801,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
     box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
     border-radius: 2px; }
 
-._list-table.problem-list .problem-row button.zi-eye-off, ._list-table.problem-list .problem-row a.zi-eye-off.btn,
-._list-table.problem-list .problem-row a.zi-eye-off.btn-icon {
-  width: 18px;
-  min-height: 18px; }
 ._list-table.problem-list.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
   color: #1f2c33; }
   ._list-table.problem-list.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td sup,

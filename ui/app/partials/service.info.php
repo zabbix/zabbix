@@ -97,9 +97,7 @@ if (array_key_exists('slas', $data)) {
 			(new CDiv($data['service']['name']))->addClass(ZBX_STYLE_SERVICE_NAME),
 			(new CDiv(
 				$data['is_editable']
-					? (new CButton(null))
-						->addClass(ZBX_STYLE_BTN_ICON)
-						->addClass(ZBX_ICON_PENCIL)
+					? (new CButtonIcon(ZBX_ICON_PENCIL, _('Edit')))
 						->addClass('js-edit-service')
 						->setAttribute('data-serviceid', $data['service']['serviceid'])
 						->setEnabled(!$data['service']['readonly'])

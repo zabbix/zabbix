@@ -1556,7 +1556,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 		);
 	}
 
-	return (new CSimpleButton(array_key_exists('suppress_until', $data['suppress_until'][0])
+	return (new CButtonIcon(array_key_exists('suppress_until', $data['suppress_until'][0])
 		? ZBX_ICON_EYE_OFF // TODO: ZBX_STYLE_ACTION_ICON_SUPPRESS
 		: ZBX_ICON_EYE     // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
 	))->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);

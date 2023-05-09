@@ -453,18 +453,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ._list-table {
 	// TODO - check
 	span.zi-calendar-warning {
@@ -507,12 +495,7 @@
 	&.problem-list {
 
 
-		.problem-row {
-			button.zi-eye-off {
-				width: 18px; // TODO check width
-				min-height: 18px;
-			}
-		}
+
 
 		&.compact-view {
 			tr {
