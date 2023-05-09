@@ -3901,6 +3901,7 @@ static int	validate_db_type_name(const int expected_type, const char *type_name,
 		case ZBX_TYPE_CUID:
 			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name) && COMPAT_TYPE_CUID_LEN <= type_length)
 				return SUCCEED;
+			break;
 		default:
 			return FAIL;
 	}
