@@ -1,16 +1,13 @@
 $red: #e33734 !default;
-// $light-red: #ed9898 !default; // TODO: not used
 $lighter-red: #e3c5c5 !default;
 
 $orange: #f24f1d !default;
 
 $yellow: #fad634 !default;
 $dark-yellow: #e99003 !default;
-// $light-yellow: #fcf39d !default; // TODO: delete no usage
 $lighter-yellow: #fcf7c2 !default;
 
 $green: #429e47 !default;
-// $light-green: #a5d6a7 !default;
 $lighter-green: #c5e3c6 !default;
 
 $blue: #1e87e3 !default;
@@ -24,14 +21,14 @@ $alt-light-green: #86cc89;
 $alt-dark-blue: #7499ff;
 $alt-blue-grey: #97aab3;
 
+$teal: #0f998b;
+
 $white: #ffffff !default;
 $transparent: transparent;
 
 $disabled-bg-color: #ebebeb !default;
 $disabled-item-color: #768d99 !default;
 $disabled-item-bg-color: #ccd5d9 !default;
-
-$teal: #0f998b;
 
 // Layout.
 $header-bg-color: #ffffff !default;
@@ -103,7 +100,6 @@ $menu-user-disabled-color: $disabled-item-color !default;
 $menu-user-selected-color: $menu-main-selected-color !default;
 $menu-user-selected-bg-color: $menu-main-selected-bg-color !default;
 $menu-user-selected-border-color: $menu-main-selected-border-color !default;
-
 
 $menu-user-expanded-color: $menu-main-expanded-color !default;
 $menu-user-expanded-bg-color: $menu-main-expanded-bg-color !default;
@@ -210,11 +206,6 @@ $link-visited-color: $link-color !default;
 
 $link-alt-underline-color: #768d99 !default;
 
-$link-main-subnav-color: rgba(#ffffff, .8) !default;
-// $link-main-subnav-hover-color: rgba(#ffffff, 1) !default; // TODO: to be cleaned not used
-// $link-main-subnav-active-color: rgba(#ffffff, 1) !default;
-// $link-main-subnav-visited-color: rgba(#ffffff, .8) !default;
-
 // Icons.
 $icon-color: #768d99 !default;
 
@@ -223,6 +214,7 @@ $icon-btn-hover-color: $icon-color !default;
 $icon-btn-disabled-color: lighten($icon-color, 35%) !default;
 
 // FIXME need to check color variables
+// FIXME DF has variables that are not used, need to check after problems page
 $icon-hint-color: #768d99 !default;
 $icon-calendar-color: #acbbc2 !default;
 $icon-action-arrow-up: #e33734 !default;

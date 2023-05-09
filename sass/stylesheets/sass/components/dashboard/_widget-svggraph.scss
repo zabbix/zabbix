@@ -145,7 +145,7 @@ form.dashboard-widget-svggraph {
 		}
 
 		.zi-drag-handle {
-			opacity: .7;
+			// opacity: .7; // TODO: DF clean
 
 			&::before {
 				vertical-align: text-bottom;

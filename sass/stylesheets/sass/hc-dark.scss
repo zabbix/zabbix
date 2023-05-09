@@ -4,17 +4,14 @@ $ui-transitions: false;
 
 // Notification & Alert
 $red: #ff5050;
-// $light-red: #ff3a3a; // TODO: clean not used
 
 $orange: #ff7800;
 
 $dark-yellow: #ffa20d;
 $yellow: #a78820;
-// $light-yellow: #2f280a; // TODO: clean no usage
 $lighter-yellow: #222222;
 
 $green: #23d545;
-// $light-green: #23d545;
 $lighter-green: #44e763;
 
 $blue: #ffffff;
@@ -31,14 +28,6 @@ $sidebar-bg-color: #ffffff;
 
 $sidebar-mode-icon-color: #404040;
 $sidebar-mode-icon-hover-color: #000000;
-
-// $scrollbar-track-color: rgba(#acbbc2, .55);
-// $scrollbar-thumb-color: rgba(#878787, .85); TODO: DF delete
-
-// $sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
-// $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
-
-// $sidebar-toggle-bg-position: -630px -592px; // TODO: DF delete
 
 // Main
 $font-color: #ffffff;
@@ -82,10 +71,6 @@ $menu-main-submenu-selected-border-color: #787878;
 $menu-main-submenu-next-level-bg: #ffffff !default;
 $menu-main-submenu-next-level-shadow: transparent !default;
 
-//$menu-main-arrow-bg-position: -579px -434px;
-//$menu-main-arrow-hover-bg-position: -579px -434px; // TODO: DF to be deleted
-
-//$menu-icon-color: red; // TODO: DF to be deleted
 $menu-user-icon-color: #000000;
 $menu-user-expanded-icon-color: #ffffff;
 
@@ -107,35 +92,8 @@ $menu-user-submenu-selected-border-color: #787878;
 $menu-user-submenu-next-level-bg: #ffffff !default;
 $menu-user-submenu-next-level-shadow: transparent !default;
 
-// $menu-user-arrow-bg-position: -579px -434px; // TODO: DF to be deleted
-// $menu-user-arrow-hover-bg-position: -579px -434px;
-
 // Sidebar
 $sidebar-server-name-color: #787878;
-
-/*$menu-main-icons: (
-	dashboards: -600px -856px,
-	dashboard: -600px -664px,
-	problems: -600px -688px,
-	monitoring: -600px -712px,
-	services: -600px -832px,
-	inventory: -600px -736px,				// TODO: DF Clean
-	reports: -600px -760px,
-	data-collection: -600px -784px,
-	alerts: -600px -879px,
-	configuration: -600px -784px,
-	users: -600px -904px,
-	administration: -600px -808px
-);*/
-
-/*$menu-user-icons: (
-	support: -247px -84px,
-	integrations: -168px -84px,
-	help: -168px -48px,
-	guest: -247px -192px,
-	profile: -168px -120px,
-	signout: -168px -156px
-);*/
 
 // UI
 $ui-bg-color: #000000;
@@ -168,7 +126,9 @@ $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #999999;
 $scrollbar-thumb-color-darken: 30%;
 
-// Search form
+// Forms
+$input-placeholder-color: #bbbbbb;
+
 $form-search-icon-color: #000000;
 $form-search-color: #000000;
 $form-search-bg-color: #ffffff;
@@ -176,17 +136,6 @@ $form-search-border-color: #000000;
 $form-search-focused-color: #ffffff;
 $form-search-focused-bg-color: #000000;
 $form-search-focused-border-color: #000000;
-// $form-search-icon-bg-position: -600px -616px; // TODO: DF to be deleted
-// $form-search-icon-opacity: 1;
-//$form-search-focused-icon-bg-position: -570px -616px;
-// $form-search-icon-focused-bg-position: -600px -616px;
-//$form-search-focused-icon-hover-bg-position: $form-search-focused-icon-bg-position;
-
-$input-placeholder-color: #bbbbbb;
-
-// Icons
-$icon-btn-color: #7d7d7d;
-$icon-btn-hover-color: #ffffff;
 
 // Buttons
 $btn-color: #333333;
@@ -199,7 +148,6 @@ $btn-focus-outline-color: #ffffff;
 $btn-alt-color: $font-color;
 
 $btn-form-font-color: #f2f2f2;
-// $btn-form-bg-color: $form-bg-color; // TODO: Clean DF
 $btn-form-hover-color: #414141;
 $btn-form-border-color: $form-border-color;
 
@@ -219,15 +167,11 @@ $link-visited-color: #f8f8f8;
 
 $link-alt-underline-color: #818181;
 
-//$link-main-nav-color: rgba(#ffffff, .8); // TODO: DF to be cleaned
-//$link-main-nav-hover-color: #ffffff;
-//$link-main-nav-active-color: #ffffff;
-//$link-main-nav-visited-color: rgba(#ffffff, .8);
+// Icons
+$icon-color: #dddddd;
 
-//$link-main-subnav-color: rgba(#000000, .8);
-//$link-main-subnav-hover-color: #000000; // TODO: DF to be cleaned
-//$link-main-subnav-active-color: #000000;
-//$link-main-subnav-visited-color: rgba(#000000, .8);
+$icon-btn-color: #7d7d7d;
+$icon-btn-hover-color: #ffffff;
 
 // Error messages
 $msg-bad-btn-color: $font-color;
@@ -273,7 +217,7 @@ $arrow-fill-up-down: #FFFFFF;
 	.logo {
 		&:focus {
 			.zabbix-logo-sidebar {
-				box-shadow: 0 0 0 2px #000000; // FIXME: DF duplicate, only color changes
+				box-shadow: 0 0 0 2px #000000;
 			}
 		}
 	}
@@ -284,21 +228,6 @@ $arrow-fill-up-down: #FFFFFF;
 		}
 	}
 
-//.button-hide {
-//	background-position: -600px -568px; // TODO: DF clean
-//}
-//	.button-show {
-//		background-position: -630px -568px;
-//	}
-
-//	.button-compact {
-//		background-position: -570px -544px;
-//	}
-
-//	.button-expand {
-//		background-position: -570px -520px;
-//	}
-
 	&.is-compact:not(.is-opened) {
 		.menu-main {
 			& > li {
@@ -306,10 +235,6 @@ $arrow-fill-up-down: #FFFFFF;
 					> a {
 						background: $menu-main-expanded-bg-color;
 						border-left-color: $menu-main-expanded-border-color;
-
-						//&::before {
-						//	background-position-x: -570px; // TODO: DF clean
-						//}
 					}
 				}
 			}
@@ -326,24 +251,6 @@ a.btn-icon,
 		border-bottom: none;
 	}
 }
-
-// TODO: DF clean
-// components/menu-main
-//.menu-main {
-	// li.has-submenu {
-	//	&.is-expanded > a,
-	//	.is-selected > a,
-	//	& > a:hover,
-	//	& > a:focus {
-	//		&::before {
-	//			background-position-x: -570px;
-	//		}
-	//		&::after {
-	//			background-position-x: -606px;
-	//		}
-	//	}
-	//}
-//}
 
 // components/menu-user
 .menu-user {
@@ -372,7 +279,7 @@ a.btn-icon,
 	& .sortable > .sortable-item > div.selected-tab,
 	& .sortable-list > .sortable-item > div.selected-tab {
 		span {
-			color: $white; // FIXME: DF variable name is incorrect
+			color: $white;
 		}
 	}
 }
@@ -389,16 +296,9 @@ a.btn-icon,
 		background-color: transparent;
 	}
 
-	//.dashboard-widget-placeholder-label {
-		//&::before {
-		//	background: url($sprite-path) no-repeat -269px -888px; // TODO - CLEAN
-		//}
-	//}
-
 	.dashboard-widget-placeholder-resizing {
 		border: 2px dashed $font-color;
 		box-shadow: none;
-		// background: darken($body-bg-color, 6%); // FIXME DF: duplicate
 	}
 }
 
@@ -406,7 +306,7 @@ a.btn-icon,
 	&.dashboard-grid-widget-hidden-header {
 		&.dashboard-grid-widget-focus {
 			.dashboard-grid-widget-header {
-				box-shadow: 0 -6px 8px -2px #000000; // FIXME DF: Only color changes
+				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}
 	}
@@ -415,7 +315,7 @@ a.btn-icon,
 .dashboard-grid-iterator {
 	&.dashboard-grid-iterator-focus {
 		.dashboard-grid-iterator-header {
-			box-shadow: 0 -6px 8px -2px #000000; // FIXME DF: Only color changes
+			box-shadow: 0 -6px 8px -2px #000000;
 		}
 	}
 }
@@ -425,7 +325,7 @@ a.btn-icon,
 		&.ui-draggable-dragging {
 			&.dashboard-grid-widget-hidden-header {
 				.dashboard-grid-widget-header {
-					box-shadow: 0 -6px 8px -2px #000000; // FIXME DF: Only color changes
+					box-shadow: 0 -6px 8px -2px #000000;
 				}
 			}
 		}
@@ -433,7 +333,7 @@ a.btn-icon,
 		&.ui-resizable-resizing,
 		&.ui-draggable-dragging {
 			&::before {
-				box-shadow: 0 4px 20px 2px #000000; // FIXME DF: Only color changes
+				box-shadow: 0 4px 20px 2px #000000;
 			}
 		}
 	}
@@ -441,14 +341,14 @@ a.btn-icon,
 	.dashboard-grid-iterator {
 		&.ui-draggable-dragging {
 			.dashboard-grid-iterator-header {
-				box-shadow: 0 -6px 8px -2px #000000; // FIXME DF: Only color changes
+				box-shadow: 0 -6px 8px -2px #000000;
 			}
 		}
 
 		&.ui-resizable-resizing,
 		&.ui-draggable-dragging {
 			&::before {
-				box-shadow: 0 4px 20px 2px #000000; // FIXME DF: Only color changes
+				box-shadow: 0 4px 20px 2px #000000;
 			}
 
 			.dashboard-grid-iterator-mask {
@@ -471,13 +371,6 @@ a.btn-icon,
 		}
 	}
 }
-
-//$icon-widget-btn: ( // TODO - DF needs to be deleted
-//	alarm-off: url($sprite-path) no-repeat -318px -582px, // TODO - AS: should be removed DF: is used
-//	sound-on: url($sprite-path) no-repeat -318px -474px, // TODO - AS: should be removed DF: is used
-//	sound-off: url($sprite-path) no-repeat -318px -510px, // TODO - AS: should be removed DF: is used
-//	info-clock: url($sprite-path) no-repeat -399px -762px // TODO - AS: should be removed DF: is used
-//);
 
 .subfilter-enabled {
 	.link-action {
@@ -520,14 +413,7 @@ a.btn-icon,
 			}
 		}
 
-		//&.selected { // TODO: DF to be removed
-		// &::before {
-		// background: url($sprite-path) no-repeat -317px -835px;
-		// }
-		//}
-
 		&.disabled {
-			// background-color: transparent;  // FIXME: DF dublicate
 			color: $form-disabled-font-color;
 		}
 	}
@@ -553,22 +439,6 @@ a.btn-icon,
 		}
 	}
 }
-
-//.btn-add {
-//	background: url($sprite-path) no-repeat -357px -550px !important; // TODO - AS: should be removed
-//}
-
-//.btn-edit {
-//	background: url($sprite-path) no-repeat -357px -477px !important; // TODO - AS: should be removed
-//}
-
-//.btn-import {
-//	background: url($sprite-path) no-repeat -357px -514px !important; // TODO - AS: should be removed
-//}
-
-//.drag-icon {
-//	background: url($sprite-path) no-repeat -318px -762px !important; // TODO - AS: should be removed DF: Clean
-//}
 
 // Colors and general.
 // TODO - CHECK
@@ -641,7 +511,7 @@ a.link-action {
 	border-bottom: 1px dotted; // FIXME: needs to be checked if because link-action class has this value
 }
 
-.link-action { // TODO: DF deleted duplicates
+.link-action {
 	&:hover {
 		border-bottom-color: $link-hover-color;
 	}
@@ -674,10 +544,6 @@ a.link-action {
 	&:active {
 		border-bottom-color: $link-active-color;
 	}
-}
-
-.server-name {
-	color: $link-main-subnav-color;
 }
 
 // .status-dark-grey {
@@ -723,11 +589,6 @@ a.link-action {
 		border-top-color: #000000 !important; // FIXME DF not needed
 	}
 }
-
-// .subfilter-enabled,
-// .subfilter-disable-btn {
-// background-color: $ui-bg-color;
-// }
 
 .tag {
 	color: $ui-bg-color;
@@ -855,18 +716,6 @@ a.icon-count {
 					transform: scale(.8);
 				}
 			}
-
-			//.icon-depend-up::before {
-			//	background-position: -361px -731px, // TODO: DF to be cleaned
-			//}
-
-			//.icon-depend-down::before {
-			//	background-position: -361px -767px
-			//}
-
-			//.icon-wizard-action {
-			//	background: transparent url($sprite-path) no-repeat -318px -624px; // TODO - AS: should be removed
-			//}
 		}
 	}
 }
@@ -877,7 +726,6 @@ a.icon-count {
 }
 
 // Severity statuses.
-
 .status-container {
 	.status-na-bg,
 	.status-info-bg,
@@ -943,39 +791,6 @@ a.icon-count {
 		}
 	}
 }
-
-//.na-bg::after,
-//.log-na-bg::after {
-//	background-position: -106px -443px;	// TODO: DF clean
-//}
-
-//.normal-bg::after {
-//	background-position: -76px -443px;
-//}
-
-//.info-bg::after,
-//.log-info-bg::after {
-//	background-position: -136px -443px;
-//}
-
-//.average-bg::after {
-//	background-position: -196px -442px;
-//}
-
-//.warning-bg::after,
-//.log-warning-bg::after {
-//	background-position: -166px -443px;
-//}
-
-//.high-bg::after,
-//.log-high-bg::after {
-//	background-position: -226px -443px; // TODO: DF Clean
-//}
-
-//.disaster-bg::after,
-//.log-disaster-bg::after {
-//	background-position: -256px -443px;
-//}
 
 .na-bg,
 .log-na-bg,
@@ -1043,11 +858,11 @@ td.log-disaster-bg {
 	}
 
 	p {
-		margin-bottom: 2px; // FIXME DF only margin-bottom changes
+		margin-bottom: 2px;
 	}
 
 	li {
-		padding-left: 42px; // FIXME DF only padding-left changes
+		padding-left: 42px;
 	}
 }
 
@@ -1085,16 +900,6 @@ td.inactive-bg {
 		min-height: 28px;
 		background-color: $alt-red;
 	}
-
-	// &::after {
-	// 	content: '';
-	// 	background: url($sprite-path) no-repeat -256px -443px; // TODO - DF changed icon to font, clean this
-	// 	width: 22px;
-	// 	height: 18px;
-	// 	top: 5px;
-	// 	left: 6px;
-	// 	position: absolute;
-	// }
 }
 
 // Error messages.
@@ -1129,56 +934,19 @@ td.inactive-bg {
 }
 
 .map-element-selected {
-	border-color: $font-color; // FIXME DF only color should change
+	border-color: $font-color;
 }
 
 // Multiline input control.
-// TODO: DF: to be cleaned
-//.multilineinput-control {
-//	button {
-//		&::after {
-//			background-position: -359px -478px;
-//		}
-
-//		&:focus::after {
-//			background-position: -359px -478px;
-//		}
-//	}
-//}
-
-.btn-back-map-container { // TODO: To be checked
+.btn-back-map-container {
 	a {
 		border-bottom: 0;
 	}
-
-	// .btn-back-map {
-	// 	.btn-back-map-icon {	// TODO: To be cleaned
-	// 		background-position: -85px -725px;
-	// 	}
-	// }
 }
 
-// Time selection. // TODO: DF needs to be checked after filtertab fix
+// Time selection. // FIXME: DF needs to be checked after filtertab fix
 
 .ui-tabs-nav {
-	//.btn-info {
-	//	&::after {
-	//		background-position: -279px -621px; // TODO: DF be cleaned
-	//	}
-	//}
-
-	//.btn-time {
-	//	&::after {
-	//		background-position: -246px -583px;
-	//	}
-	//}
-
-	//.filter-trigger {
-	//	&::after {
-	//		background-position: -246px -547px;
-	//	}
-	//}
-
 	.btn-time,
 	.filter-trigger {
 		&:hover {
@@ -1206,147 +974,21 @@ td.inactive-bg {
 			}
 		}
 	}
-
-	.ui-tabs-active {
-		//.btn-info {
-		//	&::after {			 					TODO DF: to be cleaned
-		//		background-position: -431px -621px;
-		//	}
-		//}
-
-		//.btn-time {
-		//	&::after {
-		//		background-position: -87px -583px;
-		//	}
-		//}
-
-		//.filter-trigger {
-		//	&::after {
-		//		background-position: -87px -547px;
-		//	}
-		//}
-	}
 }
 
 .time-quick {
 	li {
 		a {
 			&:focus {
-				//border-radius: 2px; // FIXME DF duplicate
-				box-shadow: 0 0 0 2px $blue; // FIXME only color changes
+				box-shadow: 0 0 0 2px $blue;
 			}
 		}
 	}
 }
 
-//.icon-action-command::before {
-//	background-position: -249px -325px; // TODO:  DF to be cleaned and check defines.inc
-//}
-
-//.icon-action-close::before {
-//	background-position: -224px -325px;
-//}
-
-//.icon-action-msg::before {
-//	background-position: -299px -325px;
-//}
-
-//.icon-action-severity-up::before {
-//	background-position: -349px -325px;
-//}
-
-//.icon-action-severity-down::before {
-//	background-position: -374px -325px;
-//}
-
-//.icon-action-severity-changed::before {
-//	background-position: -399px -325px;
-//}
-
-//.icon-action-message::before {
-//	background-position: -199px -325px;
-//}
-
-//.icon-action-ack::before {
-//	background-position: -323px -325px;
-//}
-
-//.icon-action-unack::before {
-//	background-position: -173px -325px;
-//}
-
-//.icon-action-ack-green::before {
-//	background-position: -398px -356px;
-//}
-
-//.icon-action-suppress::before {
-//	background-position: -401px -803px;
-//}
-
-//.icon-action-unsuppress::before {
-//	background-position: -401px -836px;
-//}
-
-//.icon-action-cause::before {
-//	background-position: -435px -693px;
-//}
-
-//.icon-action-symptom::before {
-//	background-position: -434px -656px;
-//}
-
-//.icon-invisible::before {
-//	background-position: -401px -803px;
-//}
-
-//.icon-problem-generated::before {
-//	background-position: -449px -325px;
-//}
-
-//.icon-problem-recovery::before {
-//	background-position: -424px -325px;
-//}
-
-//.icon-action-msgs,
-//.icon-description {
-//	&::before {
-//		background-position: -474px -325px;
-//	}
-//}
-
-//.icon-actions-number-gray {
-//	&::before {
-//		background-position: -499px -325px;
-//	}
-//}
-
-//.icon-actions-number-yellow {
-//	&::before {
-//		background-position: -549px -325px;
-//	}
-//}
-
-//.icon-user {
-//	&::before {
-//		background-position: -379px -46px;
-//	}
-//}
-
-//.icon-user-group {
-//	&::before {
-//		background-position: -379px -8px;
-//	}
-//}
-
-//.icon-actions-number-red {
-//	&::before {
-//		background-position: -524px -325px;
-//	}
-//}
-
 .problem-icon-link {
 	&:focus {
-		box-shadow: 0 0 0 2px $blue; // FIXME DF only colors changes
+		box-shadow: 0 0 0 2px $blue;
 	}
 }
 
@@ -1438,7 +1080,7 @@ td.inactive-bg {
 
 		&::before {
 			display: flex;
-			flex-direction: column; // TODO: SHOULD BE checked to AS
+			flex-direction: column; // FIXME: SHOULD BE checked to AS
 			justify-content: center;
 		}
 	}
@@ -1453,18 +1095,14 @@ td.inactive-bg {
 // Tabfilter.
 
 .filter-container.tabfilter-container {
-//	.icon-filter::before {
-//		background: url($sprite-path) no-repeat -87px -547px; // TODO - AS: should be removed DF: To be cleaned
-//	}
-
 	.tabfilter-item-label {
 		&.focused {
-			box-shadow: 0 0 0 2px $blue; // FIXME: DF only color changes
+			box-shadow: 0 0 0 2px $blue;
 		}
 	}
 }
 
-// TODO: DF ask AS
+// FIXME: TO check
 .breadcrumbs {
 	&>::after {
 		content: " /";
@@ -1474,35 +1112,3 @@ td.inactive-bg {
 		content: "";
 	}
 }
-
-// Host interfaces.
-
-//.interfaces {
-//	.interface-row {
-//		&[data-type="2"] {
-//			.interface-btn-toggle {
-//				background-position: -318px -690px; // TODO:  DF to be cleaned
-//			}
-
-//			&.list-accordion-item-opened {
-//				.interface-btn-toggle {
-//					background-position: -318px -655px;
-//				}
-//			}
-//		}
-//	}
-//}
-
-// Section (components/_section.scss).
-
-// section {
-//	.section-toggle {
-//		background-position: -318px -654px; // TODO: DF to be cleaned
-//	}
-
-//	&.section-collapsed {
-//		.section-toggle {
-//			background-position: -318px -690px;
-//		}
-//	}
-//}

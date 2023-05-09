@@ -969,7 +969,7 @@ form {
 		padding-bottom: 0;
 	}
 
-	.icon-help,
+	//.icon-help, // TODO change to icon-help-filled-small
 	.icon-info {
 		position: relative;
 		top: 1px;
@@ -1634,7 +1634,7 @@ select {
 }
 
 button {
-	&.icon-help,
+	//&.icon-help, // TODO change to icon-help-filled-small
 	&.icon-info {
 		width: 16px;
 		height: 16px;
@@ -1642,20 +1642,20 @@ button {
 		vertical-align: text-bottom;
 	}
 
-	&.icon-help {
-		color: $icon-color;
-		border: none;
-		background: transparent;
+	//&.icon-help { // TODO change to icon-help-filled-small
+	//	color: $icon-color;
+	//	border: none;
+	//	background: transparent;
 
-		&:focus {
-			box-shadow: none;
+	//	&:focus {
+	//		box-shadow: none;
 
-			&::before {
-				border-radius: 50%;
-				box-shadow: inset 0 0 0 2px $btn-focus-outline-color;
-			}
-		}
-	}
+	//		&::before {
+	//			border-radius: 50%;
+	//			box-shadow: inset 0 0 0 2px $btn-focus-outline-color;
+	//		}
+	//	}
+	//}
 
 	&.icon-info {
 		&::before {
@@ -4793,7 +4793,7 @@ z-select,
 	position: absolute;
 	left: -22px;
 	top: 5px;
-	opacity: .5;
+	//opacity: .5; // TODO: DF CLEAN
 
 	&::before {
 		font-size: 24px;

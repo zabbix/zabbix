@@ -1044,7 +1044,6 @@ footer {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
     line-height: 1.4em; }
-  .form-grid .icon-help,
   .form-grid .icon-info {
     position: relative;
     top: 1px;
@@ -2274,14 +2273,12 @@ form.dashboard-widget-svggraph .list-accordion-item {
     display: none; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
     padding-left: 0; }
-  form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle {
-    opacity: .7; }
-    form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle::before {
-      vertical-align: text-bottom;
-      font-size: 24px;
-      color: #555555; }
-    form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle.disabled {
-      opacity: .35; }
+  form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle::before {
+    vertical-align: text-bottom;
+    font-size: 24px;
+    color: #555555; }
+  form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle.disabled {
+    opacity: .35; }
 form.dashboard-widget-svggraph .single-item-table .table-col-handle {
   width: 26px; }
 form.dashboard-widget-svggraph .single-item-table .table-col-no {
@@ -4639,7 +4636,6 @@ form.is-loading {
   .table-forms .dynamic-row-control > td {
     padding-top: 0;
     padding-bottom: 0; }
-  .table-forms .icon-help,
   .table-forms .icon-info {
     position: relative;
     top: 1px;
@@ -4996,25 +4992,12 @@ z-select[readonly] a.btn-icon,
 .zi-tree-top-bottom::before {
   font-size: 12px; }
 
-button.icon-help, a.icon-help.btn,
-a.icon-help.btn-icon, button.icon-info, a.icon-info.btn,
+button.icon-info, a.icon-info.btn,
 a.icon-info.btn-icon {
   width: 16px;
   height: 16px;
   min-height: 16px;
   vertical-align: text-bottom; }
-button.icon-help, a.icon-help.btn,
-a.icon-help.btn-icon {
-  color: #555555;
-  border: none;
-  background: transparent; }
-  button.icon-help:focus, a.icon-help.btn:focus,
-  a.icon-help.btn-icon:focus {
-    box-shadow: none; }
-    button.icon-help:focus::before, a.icon-help.btn:focus::before,
-    a.icon-help.btn-icon:focus::before {
-      border-radius: 50%;
-      box-shadow: inset 0 0 0 2px #111111; }
 button.icon-info::before, a.icon-info.btn::before,
 a.icon-info.btn-icon::before {
   font-size: 12px; }
@@ -7128,8 +7111,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .zi-drag-handle {
   position: absolute;
   left: -22px;
-  top: 5px;
-  opacity: .5; }
+  top: 5px; }
   .zi-drag-handle::before {
     font-size: 24px; }
 
@@ -7255,9 +7237,6 @@ a.link-action {
   margin-bottom: -2px; }
 .header-navigation > li > span a:focus {
   line-height: 12px; }
-
-.server-name {
-  color: rgba(255, 255, 255, 0.8); }
 
 .btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
   font-weight: bold !important;

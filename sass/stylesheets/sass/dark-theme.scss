@@ -2,16 +2,13 @@ $theme-name: 'dark';
 
 // Notification & Alert.
 $red: #e45959;
-// $light-red: #503434; TODO: clean
 $lighter-red: #433131;
 
 $dark-yellow: #e99003;
 $yellow: #a78820;
-$light-yellow: #2f280a;
 $lighter-yellow: #2f280a;
 
 $green: #59db8f;
-$light-green: #344e3f;
 $lighter-green: #32453a;
 
 $blue: #429ae3;
@@ -25,15 +22,6 @@ $header-bg-color: #2b2b2b;
 
 $sidebar-color: #9c9c9c;
 $sidebar-bg-color: #454545;
-
-// $scrollbar-track-color: rgba(#acbbc2, .55);
-// $scrollbar-thumb-color: rgba(#878787, .85); // TODO: to be cleaned
-// $scrollbar-thumb-color-darken: 5%;
-
-// $sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
-// $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
-
-// $sidebar-toggle-bg-position: -630px -592px; // TODO: clean duplicate
 
 // Main
 $font-color: #f2f2f2;
@@ -59,7 +47,6 @@ $menu-main-submenu-border-color: #0d0f11;
 $menu-main-submenu-hover-bg-color: #0e0e0e;
 $menu-main-submenu-selected-bg-color: #1c1c1c;
 $menu-main-submenu-selected-border-color: #c5c5c5;
-
 $menu-main-submenu-next-level-bg: #454545 !default;
 $menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
 
@@ -97,8 +84,7 @@ $scrollbar-thumb-color: #383838;
 
 // Search form
 $form-search-bg-color: #191919;
-$form-search-focused-border-color: $form-border-focus-color;
-// $form-search-icon-bg-position: -570px -616px; // TODO: to be cleaned not used
+$form-search-focused-border-color: $form-border-focus-color; // TODO: to be cleaned not used
 
 // Buttons
 $btn-color: #f2f2f2;
@@ -109,7 +95,6 @@ $btn-alt-color: #768d99;
 $btn-alt-bg-color: transparent;
 
 $btn-form-font-color: #f2f2f2;
-//$btn-form-bg-color: $form-bg-color; // TODO: clean DF
 $btn-form-hover-color: #414141;
 $btn-form-border-color: $form-border-color;
 
@@ -126,16 +111,6 @@ $link-color: #4796c4;	// TODO: to ask AS for permission
 $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
 $link-visited-color: #4796c4;
-
-// $link-main-nav-color: rgba(#ffffff, .8); // TODO: to be cleaned not used
-// $link-main-nav-hover-color: #ffffff;
-// $link-main-nav-active-color: #ffffff;
-// $link-main-nav-visited-color: rgba(#ffffff, .8);
-
-// $link-main-subnav-color: rgba(#ffffff, .8);
-// $link-main-subnav-hover-color: #ffffff; // TODO: to be cleaned not used
-// $link-main-subnav-active-color: #ffffff;
-// $link-main-subnav-visited-color: rgba(#ffffff, .8);
 
 // Icons
 $icon-color: #69808d;

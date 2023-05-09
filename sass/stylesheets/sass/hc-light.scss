@@ -4,17 +4,14 @@ $ui-transitions: false;
 
 // Notification & alert
 $red: #990000;
-// $light-red: #cc0000; // TODO: to be cleaned
 
 $orange: #ed3400;
 
 $dark-yellow: #af6b00;
 $yellow: #a78820;
-// $light-yellow: #f4f4f4; // TODO: to be cleaned
 $lighter-yellow: #f4f4f4;
 
 $green: #009900;
-// $light-green: #009900; // TODO: to be cleaned
 $lighter-green: #00cc00;
 
 $blue: #111111;
@@ -29,15 +26,6 @@ $sidebar-bg-color: #000000;
 
 $sidebar-mode-icon-color: #9f9f9f;
 $sidebar-mode-icon-hover-color: #ffffff;
-
-// $scrollbar-track-color: rgba(#acbbc2, .55);
-// $scrollbar-thumb-color: rgba(#878787, .85); // TODO: to be cleaned
-// $scrollbar-thumb-color-darken: 5% !default; // TODO: CLean duplicate
-
-// $sidebar-scrollbar-track-color: rgba(#87d1ff, .55);
-// $sidebar-scrollbar-thumb-color: rgba(#87d1ff, .85);
-
-// $sidebar-toggle-bg-position: -600px -592px; // TODO: clean duplicate
 
 // Main
 $font-color: #000000;
@@ -94,36 +82,8 @@ $menu-user-submenu-selected-border-color: #949494;
 $menu-user-submenu-next-level-bg: #000000 !default;
 $menu-user-submenu-next-level-shadow: transparent !default;
 
-// $menu-user-arrow-bg-position: -606px -434px; // TODO: to be cleaned
-// $menu-user-arrow-hover-bg-position: -606px -434px;
-// $menu-user-selected-arrow-bg-position: -579px -434px;
-
 // Sidebar
 $sidebar-server-name-color: #9f9f9f;
-
-//$menu-main-icons: (	to be cleaned
-//	dashboards: -570px -856px,
-//	dashboard: -570px -664px,
-//	problems: -570px -688px,
-//	monitoring: -570px -712px,
-//	services: -570px -832px,
-//	inventory: -570px -736px,
-//	reports: -570px -760px,
-//	data-collection: -570px -784px,
-//	alerts: -570px -879px,
-//	configuration: -570px -784px,
-//	users: -570px -904px,
-//	administration: -570px -808px
-//);
-
-//$menu-user-expanded-icons: (
-//	support: -247px -84px,
-//	integrations: -168px -84px,
-//	help: -168px -48px,
-//	guest: -247px -192px,
-//	profile: -168px -120px,
-//	signout: -168px -156px
-//);
 
 // UI
 $ui-bg-color: #ffffff;
@@ -163,19 +123,8 @@ $form-search-border-color: #ffffff;
 $form-search-focused-color: #000000;
 $form-search-focused-bg-color: #ffffff;
 $form-search-focused-border-color: #ffffff;
-// $form-search-icon-bg-position: -570px -616px; // TODO: to be cleaned not used
-// $form-search-icon-opacity: 1; // TODO: to be cleaned not used
-// $form-search-focused-icon-bg-position: -600px -616px;
-// $form-search-icon-focused-bg-position: -570px -616px;
-// $form-search-focused-icon-hover-bg-position: $form-search-focused-icon-bg-position;
 
 $input-placeholder-color: #777777;
-
-// Icons.
-$icon-color: #555555;
-$icon-btn-color: #555555;
-$icon-btn-hover-color: #000000 !default;
-$icon-btn-disabled-color: #cccccc; // TODO: to check color
 
 // Buttons
 $btn-bg-color: #555555;
@@ -187,7 +136,6 @@ $btn-focus-outline-color: #111111;
 $btn-alt-color: $font-color;
 
 $btn-form-font-color: #333333;
-//$btn-form-bg-color: $form-bg-color; // TODO: clean DF
 $btn-form-hover-color: #f4f4f4;
 $btn-form-border-color: $form-border-color;
 
@@ -207,27 +155,18 @@ $link-visited-color: #555555;
 
 $link-alt-underline-color: #808080;
 
-// $link-main-nav-color: rgba(0, 0, 0, .8); // TODO: to be cleaned not used
-// $link-main-nav-hover-color: #000000;
-// $link-main-nav-active-color: #000000;
-// $link-main-nav-visited-color: rgba(0, 0, 0, .8);
+// Icons.
+$icon-color: #555555;
 
-// $link-main-subnav-color: rgba(255, 255, 255, .8);
-// $link-main-subnav-hover-color: #ffffff; // TODO: to be cleaned not used
-// $link-main-subnav-active-color: #ffffff;
-// $link-main-subnav-visited-color: rgba(255, 255, 255, .8);
+$icon-btn-color: #555555;
+$icon-btn-hover-color: #000000 !default;
+$icon-btn-disabled-color: #cccccc; // TODO: to check color
 
 // Analog clock
 $clock-face-color: #ffffff;
 $clock-hand-color: #000000;
 $clock-hand-sec-color: #555555;
 $clock-lines-color: #555555;
-
-// Statuses
-// $problem-unack-fg-color: #cc0000; // TODO: clean already this color by default
-// $problem-ack-fg-color: #cc0000;
-// $ok-unack-fg-color: #009900; // TODO: clean default
-// $ok-ack-fg-color: #009900;
 
 // Multiselect
 $multiselect-selected-bg-color: #777777;
@@ -237,7 +176,6 @@ $dashboard-shared-bg-color: #555555;
 $dashboard-my-bg-color: #555555;
 
 // Import compare.
-// $toc-title-color: #ffffff; // TODO: clean default color
 $toc-title-bg-color: #333333;
 $diff-added-bg-color: transparent;
 $diff-removed-bg-color: transparent;
@@ -273,33 +211,12 @@ $arrow-fill-up-down: #000000;
 					> a {
 						background: $menu-main-expanded-bg-color;
 						border-left-color: $menu-main-expanded-border-color;
-
-						//&::before { // TODO: DF CLEAN
-							//background-position-x: -600px;
-						//}
 					}
 				}
 			}
 		}
 	}
 }
-
-// components/menu-main // TODO: DF clean
-// .menu-main {
-// 	li.has-submenu {
-// 		&.is-expanded > a,
-// 		.is-selected > a,
-// 		& > a:hover,
-// 		& > a:focus {
-// 			//&::before {
-// 			//	background-position-x: -600px;
-// 			//}
-// 			//&::after {
-// 			//	background-position-x: -579px;
-// 			//}
-// 		}
-// 	}
-// }
 
 a.btn-icon,
 .btn-icon {
@@ -355,12 +272,6 @@ a.btn-icon,
 		background-color: transparent;
 	}
 
-	//.dashboard-widget-placeholder-label { // TODO: DF clean
-	//	&::before {
-	//		background: url($sprite-path) no-repeat -213px -888px; // TODO - AS: should be removed
-	//	}
-	//}
-
 	.dashboard-widget-placeholder-resizing {
 		border: 2px dashed $font-color;
 		box-shadow: none;
@@ -378,7 +289,7 @@ a.btn-icon,
 	}
 }
 
-.dashboard-widget-graph-link { // TODO: moved because is dashboard
+.dashboard-widget-graph-link {
 	&:focus {
 		&::after {
 			background: $blue;
@@ -424,42 +335,13 @@ a.btn-icon,
 			.arrow-right {
 				border-left-color: #ffffff;
 			}
-
-			// &.selected {
-			// 	&::before {
-			// 		background: url($sprite-path) no-repeat -317px -835px; // TODO - DF: to be cleaned
-			// 	}
-			// }
 		}
 
-		// &.selected {
-		// 	&::before {
-		// 		background: url($sprite-path) no-repeat -164px -835px; // TODO - DF: to be cleaned
-		// 	}
-		// }
-
 		&.disabled {
-			// background-color: transparent; // FIXME: DF dublicate
 			color: $form-disabled-font-color;
 		}
 	}
 }
-
-// .btn-add {
-// 	background: url($sprite-path) no-repeat -204px -550px !important; // TODO - AS: should be removed
-// }
-
-// .btn-edit {
-// 	background: url($sprite-path) no-repeat -204px -477px !important; // TODO - AS: should be removed
-// }
-
-// .btn-import {
-// 	background: url($sprite-path) no-repeat -204px -514px !important; // TODO - AS: should be removed
-// }
-
-// .drag-icon {
-// 	background: url($sprite-path) no-repeat -165px -762px !important; // TODO - AS: should be removed
-// }
 
 // Colors and general.
 // TODO - check
@@ -519,7 +401,7 @@ a {
 		border-bottom: 1px solid rgba($link-hover-color, .5);
 	}
 
-	&:visited, &:hover { // FIXME: DF joined
+	&:visited, &:hover {
 		border-bottom: 1px solid $link-hover-color;
 	}
 
@@ -532,7 +414,7 @@ a.link-action {
 	border-bottom: 1px dotted;
 }
 
-.link-action { // TODO: DF deleted duplicates
+.link-action {
 	&:hover {
 		border-bottom-color: $link-hover-color;
 	}
@@ -582,16 +464,12 @@ a.link-action {
 	}
 }
 
-.server-name {
-	color: $link-main-subnav-color;
-}
-
 //.status-dark-grey {
 //	border: none !important; // TODO: DF clean not used anywhere
 //	background-color: #666666 !important;
 //}
 
-.btn-link { // TODO: DF needs to be checked manually
+.btn-link { // FIXME: DF needs to be checked manually
 	font-weight: bold !important;
 	color: #000000 !important;
 
@@ -749,22 +627,6 @@ a.link-action {
 			}
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
-
-			//.icon-depend-up::before { 		// TODO: DF clean
-			//	background-position: -208px -731px;
-			//}
-
-			//.icon-depend-down::before {
-			//	background-position: -208px -767px;
-			//}
-
-			//.icon-wizard-action {
-			//	background: transparent url($sprite-path) no-repeat -318px -624px; // TODO - AS: should be removed
-			//}
-
-			//.icon-wizard-action {
-			//	background: transparent url($sprite-path) no-repeat -165px -624px; // TODO - AS: should be removed
-			//}
 		}
 	}
 }
@@ -842,39 +704,6 @@ a.link-action {
 		}
 	}
 }
-
-// .na-bg::after,
-// .log-na-bg::after {
-// 	background-position: -106px -411px;
-// }
-
-//.normal-bg::after {
-//	background-position: -76px -411px;
-//}
-
-//.info-bg::after,
-//.log-info-bg::after {
-//	background-position: -136px -411px;
-//}
-
-//.average-bg::after {
-//	background-position: -196px -410px;
-//}
-
-//.warning-bg::after,
-//.log-warning-bg::after {
-//	background-position: -166px -411px;
-//}
-
-//.high-bg::after,
-//.log-high-bg::after {
-//	background-position: -226px -411px;
-//}
-
-//.disaster-bg::after,
-//.log-disaster-bg::after {
-//	background-position: -256px -411px;
-//}
 
 .na-bg,
 .log-na-bg,
@@ -971,7 +800,7 @@ td.inactive-bg {
 	padding-left: 42px;
 }
 
-.inactive-bg::before {	// TODO: DF changed svg to icon
+.inactive-bg::before {	// FIXME: DF should be checked by AS
 	@extend %icons-font;
 	content: $zi-stop-sign;
 	font-size: $icon-medium-size * 1.75;
@@ -985,16 +814,6 @@ td.inactive-bg {
 	min-height: 28px;
 	background-color: $alt-red;
 }
-
-// .inactive-bg::after {
-// 	content: '';
-// 	background: url($sprite-path) no-repeat -256px -411px; // TODO - AS: should be removed
-// 	width: 22px;
-// 	height: 18px;
-// 	top: 5px;
-// 	left: 6px;
-// 	position: absolute;
-// }
 
 // Error messages.
 .msg-bad,
@@ -1024,32 +843,13 @@ td.inactive-bg {
 }
 
 .map-element-selected {
-	border-color: $font-color; // TODO: DF changed only color changes
+	border-color: $font-color;
 }
-
-// Multiline input control. TODO: DF: to be cleaned
-//.multilineinput-control {
-//	button {
-//		&::after {
-//			background-position: -206px -478px;
-//		}
-
-//		&:focus::after {
-//			background-position: -206px -478px;
-//		}
-//	}
-//}
 
 .btn-back-map-container {
 	a {
 		border-bottom: 0;
 	}
-
-	//.btn-back-map {
-	//	.btn-back-map-icon {
-	//		background-position: -85px -725px; // TODO: To be cleaned
-	//	}
-	//}
 }
 
 // Time selection.
@@ -1084,141 +884,19 @@ td.inactive-bg {
 	}
 }
 
-// .btn-time-left { // TODO: DF to be cleaned
-// 	background-position: -244px -657px;
-
-// 	&:disabled {
-// 		background-position: -244px -657px;
-// 	}
-// }
-
-// .btn-time-right { TODO: DF to be cleaned
-// 	background-position: -242px -623px;
-
-// 	&:disabled {
-// 		background-position: -242px -623px;
-// 	}
-// }
-
-
 .time-quick {
 	li {
 		a {
 			&:focus {
-				// border-radius: 2px; // TODO: to be cleaned duplicate
 				box-shadow: 0 0 0 2px $blue;
 			}
 		}
 	}
 }
 
-// .icon-action-command::before {			// TODO: DF to be cleaned
-// 	background-position: -249px -325px;
-// }
-
-// .icon-action-close::before {
-// 	background-position: -224px -325px;
-// }
-
-// .icon-action-msg::before {
-// 	background-position: -299px -285px;
-// }
-
-// .icon-action-severity-up::before {
-// 	background-position: -349px -285px;
-// }
-
-// .icon-action-severity-down::before {
-// 	background-position: -375px -285px;
-// }
-
-// .icon-action-severity-changed::before {
-// 	background-position: -399px -285px;
-// }
-
-// .icon-action-message::before {
-// 	background-position: -199px -285px;
-// }
-
-// .icon-action-ack::before {
-// 	background-position: -323px -285px;
-// }
-
-// .icon-action-unack::before {
-// 	background-position: -173px -285px;
-// }
-
-// .icon-action-ack-green::before {
-// 	background-position: -373px -356px;
-// }
-
-// .icon-action-suppress::before {
-// 	background-position: -249px -803px;
-// }
-
-// .icon-action-unsuppress::before {
-// 	background-position: -249px -836px;
-// }
-
-// .icon-action-cause::before {
-// 	background-position: -283px -693px;
-// }
-
-// .icon-action-symptom::before {
-// 	background-position: -282px -656px;
-// }
-
-//.icon-invisible::before {
-//	background-position: -249px -803px;
-//}
-
-// icon-problem-generated::before {
-// 	background-position: -449px -285px;
-// }
-
-// .icon-problem-recovery::before {
-// 	background-position: -424px -285px;
-// }
-
-// .icon-action-msgs,
-// .icon-description {
-// 	&::before {
-// 		background-position: -474px -285px;
-// 	}
-// }
-
-// .icon-actions-number-gray {
-// 	&::before {
-// 		background-position: -499px -285px;
-// 	}
-// }
-
-// .icon-actions-number-yellow {
-// 	&::before {
-// 		background-position: -549px -285px;
-// 	}
-
-// .icon-actions-number-red {
-// 	&::before {
-// 		background-position: -524px -285px;
-// 	}
-// }
-
-// .icon-user {
-// 	&::before {
-// 		background-position: -419px -46px;
-// 	}
-// }
-
-// .icon-user-group {
-// 	&::before {
-// 		background-position: -419px -8px;
-// 	}
-// }
-
 .problem-icon-link {
 	&:focus {
-		box-shadow: 0 0 0 2px $blue; // FIXME DF only colors changes
+		box-shadow: 0 0 0 2px $blue;
 	}
 }
 
@@ -1231,7 +909,7 @@ td.inactive-bg {
 		padding-left: 20px;
 
 		&::before {
-			//-webkit-text-stroke: 0.2px black; // TODO: should be asked AS
+			//-webkit-text-stroke: 0.2px black; // FIXME: should be asked AS for acception
 			background-repeat: no-repeat;
 			border-radius: 3px;
 			position: absolute;
@@ -1311,7 +989,7 @@ td.inactive-bg {
 
 		&::before {
 			display: flex;
-			flex-direction: column; // TODO: SHOULD BE checked to AS
+			flex-direction: column; // FIXME: SHOULD BE checked to AS
 			justify-content: center;
 		}
 	}
@@ -1328,7 +1006,7 @@ td.inactive-bg {
 .filter-container.tabfilter-container {
 	.tabfilter-item-label {
 		&.focused {
-			box-shadow: 0 0 0 2px $blue; // FIXME: DF only color changes
+			box-shadow: 0 0 0 2px $blue;
 		}
 	}
 }
@@ -1342,16 +1020,3 @@ td.inactive-bg {
 		content: "";
 	}
 }
-// Section (components/_section.scss).
-
-// section { // TODO: to be cleaned
-// 	.section-toggle {
-// 		background-position: -165px -654px;
-// 	}
-
-// 	&.section-collapsed {
-// 		.section-toggle {
-// 			background-position: -165px -690px;
-// 		}
-// 	}
-// }

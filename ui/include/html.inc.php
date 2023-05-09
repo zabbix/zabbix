@@ -1047,8 +1047,7 @@ function makeDescriptionIcon($description): CSimpleButton {
  */
 function makeHelpIcon($help_text): CSimpleButton {
 	return (new CSimpleButton())
-		->addClass(ZBX_STYLE_ICON_HELP)
-		->addClass(ZBX_ICON_CIRCLE_QUESTION_FILLED)
+		->addClass(ZBX_ICON_HELP_FILLED_SMALL)
 		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
 }
 

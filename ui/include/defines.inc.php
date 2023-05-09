@@ -1959,7 +1959,6 @@ define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_ICON', 'icon');
 define('ZBX_STYLE_ICON_COUNT', 'icon-count');
-define('ZBX_STYLE_ICON_HELP', 'icon-help');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
 //define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
 //define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom'); // TODO: DF clean
@@ -2252,6 +2251,7 @@ define('ZBX_ICON_EYE_OFF', 'zi-eye-off');
 define('ZBX_ICON_FILTER', 'zi-filter');
 define('ZBX_ICON_FULLSCREEN', 'zi-fullscreen');
 define('ZBX_ICON_HELP', 'zi-help');
+define('ZBX_ICON_HELP_FILLED_SMALL', 'icon-help-filled-small');
 define('ZBX_ICON_HIERARCHY', 'zi-hierarchy');
 define('ZBX_ICON_HOME', 'zi-home');
 define('ZBX_ICON_I', 'zi-i');
