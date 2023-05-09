@@ -28,6 +28,8 @@ class CItemPrototype extends CItemGeneral {
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status', 'discover'];
 
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
 	/**
 	 * Define a set of supported pre-processing rules.
 	 *
@@ -337,22 +339,6 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Check item prototype data and set flags field.
-	 *
-	 * @param array $items
-	 * @param bool  $update
-	 */
-	protected function checkInput(array &$items, $update = false) {
-		parent::checkInput($items, $update);
-
-		// set proper flags to divide normal and discovered items in future processing
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		}
-		unset($item);
-	}
-
-	/**
 	 * Create item prototype.
 	 *
 	 * @param array $items
@@ -363,11 +349,6 @@ class CItemPrototype extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$this->checkInput($items);
-
-		foreach ($items as $key => $item) {
-			$items[$key]['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-			unset($items[$key]['itemid']);
-		}
 
 		// Validate item prototype status and discover status fields.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

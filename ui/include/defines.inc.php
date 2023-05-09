@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.14rc2');
-define('ZABBIX_API_VERSION',	'6.0.14');
+define('ZABBIX_VERSION',		'6.0.18rc1');
+define('ZABBIX_API_VERSION',	'6.0.18');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
 define('ZABBIX_DB_VERSION',		6000000);
@@ -1237,11 +1237,6 @@ define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
 define('ZBX_FUNCTION_TYPE_STRING',		7);
 
 /**
- * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
- */
-define('SPACE',	'&nbsp;');
-
-/**
  * Symbol used to separate name pairs such as "host: item" or "proxy: host".
  *
  * Should not be used as just a colon.
@@ -1380,6 +1375,10 @@ define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
 define('API_FILTER_VALUES',			57);
+
+// any type
+define('API_ANY',					59);
+
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1791,6 +1790,7 @@ define('ZBX_STYLE_BROWSER_LOGO_SAFARI', 'browser-logo-safari');
 define('ZBX_STYLE_BROWSER_WARNING_CONTAINER', 'browser-warning-container');
 define('ZBX_STYLE_BROWSER_WARNING_FOOTER', 'browser-warning-footer');
 define('ZBX_STYLE_CELL', 'cell');
+define('ZBX_STYLE_CELL_EXPRESSION', 'expression-cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
@@ -2133,6 +2133,7 @@ define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
+define('ZBX_SERVER_PORT_DEFAULT', 10051);
 
 define('ZBX_PROPERTY_INHERITED',	0x01);
 define('ZBX_PROPERTY_OWN',			0x02);

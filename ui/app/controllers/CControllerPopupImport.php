@@ -24,7 +24,7 @@ class CControllerPopupImport extends CController {
 	protected function checkInput() {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'in host,template,mediatype,map',
+			'rules_preset' => 'required|in host,template,mediatype,map',
 			'rules' => 'array'
 		];
 
@@ -48,66 +48,79 @@ class CControllerPopupImport extends CController {
 	protected function checkPermissions() {
 		$user_type = $this->getUserType();
 
-		switch ($this->getInput('rules_preset', '')) {
+		switch ($this->getInput('rules_preset')) {
 			case 'map' :
 				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
 
 			case 'host':
 			case 'template':
-			case 'mediatype':
 				return ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN);
 
-			default:
-				return false;
+			case 'mediatype':
+				return $user_type === USER_TYPE_SUPER_ADMIN;
 		}
 	}
 
 	protected function doAction() {
-		$rules = [];
+		$user_type = $this->getUserType();
 
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
 			case 'host':
-				$rules['groups'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
+				$rules = [
+					'groups' => ['updateExisting' => true],
+					'hosts' => ['updateExisting' => true, 'createMissing' => true],
+					'valueMaps' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'templateLinkage' => ['createMissing' => true, 'deleteMissing' => false],
+					'items' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'discoveryRules' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'triggers' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'graphs' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'httptests' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false]
 				];
-				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+
+				if ($user_type == USER_TYPE_SUPER_ADMIN) {
+					$rules['groups']['createMissing'] = true;
+				}
 				break;
 
 			case 'template':
-				$rules['groups'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
+				$rules = [
+					'groups' => ['updateExisting' => true],
+					'templates' => ['updateExisting' => true, 'createMissing' => true],
+					'valueMaps' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'templateDashboards' => ['updateExisting' => true, 'createMissing' => true,
+						'deleteMissing' => false
+					],
+					'templateLinkage' => ['createMissing' => true, 'deleteMissing' => false],
+					'items' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'discoveryRules' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'triggers' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'graphs' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false],
+					'httptests' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false]
 				];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
-				];
-				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+
+				if ($user_type == USER_TYPE_SUPER_ADMIN) {
+					$rules['groups']['createMissing'] = true;
+				}
 				break;
 
 			case 'mediatype':
-				$rules['mediaTypes'] = ['updateExisting' => false, 'createMissing' => true];
+				$rules = [
+					'mediaTypes' => ['updateExisting' => false, 'createMissing' => true]
+				];
 				break;
 
 			case 'map':
-				$rules['maps'] = [
-					'updateExisting' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
-					'createMissing' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
+				$rules = [
+					'maps' => ['updateExisting' => true, 'createMissing' => true]
 				];
-				$rules['images'] = ['updateExisting' => false, 'createMissing' => true];
+
+				if ($user_type == USER_TYPE_SUPER_ADMIN) {
+					$rules += [
+						'images' => ['updateExisting' => false, 'createMissing' => true]
+					];
+				}
 				break;
 		}
 
@@ -125,7 +138,8 @@ class CControllerPopupImport extends CController {
 
 			if (!isset($_FILES['import_file'])) {
 				error(_('No file was uploaded.'));
-			} else {
+			}
+			else {
 				// CUploadFile throws exceptions, so we need to catch them
 				try {
 					$file = new CUploadFile($_FILES['import_file']);
@@ -166,8 +180,6 @@ class CControllerPopupImport extends CController {
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
 				'user' => [
-					'type' => $this->getUserType(),
-					'can_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),
 					'debug_mode' => $this->getDebugMode()
 				]
 			]));
