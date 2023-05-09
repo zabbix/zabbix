@@ -641,8 +641,11 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 
 	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
-	zbx_activate_item_interface(ts, &item, &data, &data_alloc, &data_offset);
-	ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
+	if (SUCCEED == errcode)
+	{
+		zbx_activate_item_interface(ts, &item, &data, &data_alloc, &data_offset);
+		ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
+	}
 
 	zbx_dc_config_clean_items(&item, &errcode, 1);
 
@@ -677,9 +680,12 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
 
 	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
-	zbx_deactivate_item_interface(ts, &item, &data, &data_alloc, &data_offset, unavailable_delay,
-			unreachable_period, unreachable_delay, error);
-	ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
+	if (SUCCEED == errcode)
+	{
+		zbx_deactivate_item_interface(ts, &item, &data, &data_alloc, &data_offset, unavailable_delay,
+				unreachable_period, unreachable_delay, error);
+		ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
+	}
 
 	zbx_dc_config_clean_items(&item, &errcode, 1);
 
