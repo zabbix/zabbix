@@ -227,7 +227,7 @@ if ($data['plaintext']) {
 			$pre->addItem([$text, BR()]);
 		}
 
-		$html_page->addItem($pre->addStyle('white-space: nowrap;'));
+		$html_page->addItem($pre->addClass(ZBX_STYLE_NOWRAP));
 	}
 }
 else {
