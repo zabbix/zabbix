@@ -147,8 +147,10 @@ window.script_edit_popup = new class {
 			}
 		}
 
-		fields.parameters.name = fields.parameters.name.map(name => name.trim());
-		fields.parameters.value = fields.parameters.value.map(value => value.trim());
+		if (typeof fields.parameters !== 'undefined') {
+			fields.parameters.name = fields.parameters.name.map(name => name.trim());
+			fields.parameters.value = fields.parameters.value.map(value => value.trim());
+		}
 
 		const curl = new Curl('zabbix.php');
 
