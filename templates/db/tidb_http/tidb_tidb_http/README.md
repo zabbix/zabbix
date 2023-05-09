@@ -17,7 +17,7 @@ Zabbix version: 6.4 and higher.
 ## Tested versions
 
 This template has been tested on:
-- TiDB cluster 4.0.10 
+- TiDB cluster 4.0.10, 6.5.1
 
 ## Configuration
 
@@ -54,17 +54,20 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |TiDB: Get instance metrics|<p>Get TiDB instance metrics.</p>|HTTP agent|tidb.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li>Prometheus to JSON</li></ul>|
 |TiDB: Get instance status|<p>Get TiDB instance status info.</p>|HTTP agent|tidb.get_status<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"status": "0"}`</p></li></ul>|
 |TiDB: Status|<p>Status of PD instance.</p>|Dependent item|tidb.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `1`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|TiDB: Total "error" server query, rate|<p>The number of queries on TiDB instance per second with failure of command execution results.</p>|Dependent item|tidb.server_query.error.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
-|TiDB: Total "ok" server query, rate|<p>The number of queries on TiDB instance per second with success of command execution results.</p>|Dependent item|tidb.server_query.ok.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
-|TiDB: Total server query, rate|<p>The number of queries per second on TiDB instance.</p>|Dependent item|tidb.server_query.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "tidb_server_query_total")].value.sum()`</p></li><li>Change per second</li></ul>|
-|TiDB: SQL statements, rate|<p>The total number of SQL statements executed per second.</p>|Dependent item|tidb.statement_total.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_executor_statement_total")].value.sum()`</p></li><li>Change per second</li></ul>|
+|TiDB: Get total server query metrics|<p>Get information about server queries.</p>|Dependent item|tidb.server_query.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "tidb_server_query_total")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|TiDB: Total "error" server query, rate|<p>The number of queries on TiDB instance per second with failure of command execution results.</p>|Dependent item|tidb.server_query.error.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.result == "Error")].value.sum()`</p></li><li>Change per second</li></ul>|
+|TiDB: Total "ok" server query, rate|<p>The number of queries on TiDB instance per second with success of command execution results.</p>|Dependent item|tidb.server_query.ok.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.result == "OK")].value.sum()`</p></li><li>Change per second</li></ul>|
+|TiDB: Total server query, rate|<p>The number of queries per second on TiDB instance.</p>|Dependent item|tidb.server_query.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..value.sum()`</p></li><li>Change per second</li></ul>|
+|TiDB: Get SQL statements metrics|<p>Get SQL statements metrics.</p>|Dependent item|tidb.statement_total.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_executor_statement_total")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|TiDB: SQL statements, rate|<p>The total number of SQL statements executed per second.</p>|Dependent item|tidb.statement_total.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..value.sum()`</p></li><li>Change per second</li></ul>|
 |TiDB: Failed Query, rate|<p>The number of error occurred when executing SQL statements per second (such as syntax errors and primary key conflicts).</p>|Dependent item|tidb.execute_error.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_server_execute_error_total")].value.sum()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|TiDB: Get TiKV client metrics|<p>Get TiKV client metrics.</p>|Dependent item|tidb.tikvclient.get_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=~"tidb_tikvclient_*")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |TiDB: KV commands, rate|<p>The number of executed KV commands per second.</p>|Dependent item|tidb.tikvclient_txn.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 |TiDB: PD TSO commands, rate|<p>The number of TSO commands that TiDB obtains from PD per second.</p>|Dependent item|tidb.pd_tso_cmd.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 |TiDB: PD TSO requests, rate|<p>The number of TSO requests that TiDB obtains from PD per second.</p>|Dependent item|tidb.pd_tso_request.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 |TiDB: TiClient region errors, rate|<p>The number of region related errors returned by TiKV per second.</p>|Dependent item|tidb.tikvclient_region_err.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_tikvclient_region_err_total")].value.sum()`</p></li><li>Change per second</li></ul>|
 |TiDB: Lock resolves, rate|<p>The number of DDL tasks that are waiting.</p>|Dependent item|tidb.tikvclient_lock_resolver_action.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
-|TiDB: DDL waiting jobs|<p>The number of TiDB operations that resolve locks per second. When TiDB's read or write request encounters a lock, it tries to resolve the lock.</p>|Dependent item|tidb.ddl_waiting_jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_ddl_waiting_jobs")].value.sum()`</p></li></ul>|
+|TiDB: DDL waiting jobs|<p>The number of TiDB operations that resolve locks per second. When TiDB's read or write request encounters a lock, it tries to resolve the lock.</p>|Dependent item|tidb.ddl_waiting_jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_ddl_waiting_jobs")].value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |TiDB: Load schema total, rate|<p>The statistics of the schemas that TiDB obtains from TiKV per second.</p>|Dependent item|tidb.domain_load_schema.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_domain_load_schema_total")].value.sum()`</p></li><li>Change per second</li></ul>|
 |TiDB: Load schema failed, rate|<p>The total number of failures to reload the latest schema information in TiDB per second.</p>|Dependent item|tidb.domain_load_schema.failed.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 |TiDB: Schema lease "outdate" errors , rate|<p>The number of schema lease errors per second.</p><p>"outdate" errors means that the schema cannot be updated, which is a more serious error and triggers an alert.</p>|Dependent item|tidb.session_schema_lease_error.outdate.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
@@ -96,7 +99,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |TiDB: Too few keep alive operations|<p>Indicates whether the TiDB process still exists. If the number of times for tidb_monitor_keep_alive_total increases less than 10 per minute, the TiDB process might already exit and an alert is triggered.</p>|`max(/TiDB by HTTP/tidb.monitor_keep_alive.rate,5m)<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}`|Average||
 |TiDB: Heap memory usage is too high||`min(/TiDB by HTTP/tidb.heap_bytes,5m)>{$TIDB.HEAP.USAGE.MAX.WARN}`|Warning||
 |TiDB: Current number of open files is too high|<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p>|`min(/TiDB by HTTP/tidb.process_open_fds,5m)/last(/TiDB by HTTP/tidb.process_max_fds)*100>{$TIDB.OPEN.FDS.MAX.WARN}`|Warning||
-|TiDB: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB by HTTP/tidb.uptime)<10m`|Info|**Manual close**: Yes|
+|TiDB: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB by HTTP/tidb.uptime)<10m`|Info|**Manual close**: Yes|
 |TiDB: Version has changed|<p>TiDB version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2) and length(last(/TiDB by HTTP/tidb.version))>0`|Info|**Manual close**: Yes|
 |TiDB: Too many time jump backs||`min(/TiDB by HTTP/tidb.monitor_time_jump_back.rate,5m)>{$TIDB.TIME_JUMP_BACK.MAX.WARN}`|Warning||
 |TiDB: There are panicked TiDB threads|<p>When a panic occurs, an alert is triggered. The thread is often recovered, otherwise, TiDB will frequently restart.</p>|`last(/TiDB by HTTP/tidb.tidb_server_panic_total.rate)>0`|Average||
@@ -105,26 +108,27 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|QPS metrics discovery|<p>Discovery QPS specific metrics.</p>|Dependent item|tidb.qps.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_server_query_total")]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|QPS metrics discovery|<p>Discovery QPS specific metrics.</p>|Dependent item|tidb.qps.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for QPS metrics discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB: Server query "OK": {#TYPE}, rate|<p>The number of queries on TiDB instance per second with success of command execution results.</p>|Dependent item|tidb.server_query.ok.rate[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
-|TiDB: Server query "Error": {#TYPE}, rate|<p>The number of queries on TiDB instance per second with failure of command execution results.</p>|Dependent item|tidb.server_query.error.rate[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|TiDB: Get QPS metrics: {#TYPE}|<p>Get QPS metrics of {#TYPE}.</p>|Dependent item|tidb.qps.get_metrics[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.type == "{#TYPE}")]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|TiDB: Server query "OK": {#TYPE}, rate|<p>The number of queries on TiDB instance per second with success of command execution results.</p>|Dependent item|tidb.server_query.ok.rate[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.result == "OK")].value.first()`</p></li><li>Change per second</li></ul>|
+|TiDB: Server query "Error": {#TYPE}, rate|<p>The number of queries on TiDB instance per second with failure of command execution results.</p>|Dependent item|tidb.server_query.error.rate[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.result == "Error")].value.first()`</p></li><li>Change per second</li></ul>|
 
 ### LLD rule Statement metrics discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Statement metrics discovery|<p>Discovery statement specific metrics.</p>|Dependent item|tidb.statement.discover<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="tidb_executor_statement_total")]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Statement metrics discovery|<p>Discovery statement specific metrics.</p>|Dependent item|tidb.statement.discover<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Statement metrics discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TiDB: SQL statements: {#TYPE}, rate|<p>The number of SQL statements executed per second.</p>|Dependent item|tidb.statement.rate[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|TiDB: SQL statements: {#TYPE}, rate|<p>The number of SQL statements executed per second.</p>|Dependent item|tidb.statement.rate[{#TYPE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.labels.type == "{#TYPE}")].value.first()`</p></li><li>Change per second</li></ul>|
 
 ### LLD rule KV metrics discovery
 
