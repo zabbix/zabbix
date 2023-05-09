@@ -1033,7 +1033,7 @@ class testFormAlertsScripts extends CWebTest {
 				unset($parameter);
 			}
 
-			$this->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['Parameters']);
+			$modal->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['Parameters']);
 		}
 
 		// Check testing confirmation while configuring.
@@ -1088,7 +1088,7 @@ class testFormAlertsScripts extends CWebTest {
 					unset($parameter);
 				}
 
-				$this->query('id:parameters-table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
+				$modal->query('id:parameters-table')->asMultifieldTable()->one()->checkValue($data['Parameters']);
 			}
 		}
 		$modal->close();
@@ -1617,14 +1617,9 @@ class testFormAlertsScripts extends CWebTest {
 
 	/**
 	 * Logs in, opens Script list and presses the Create script button.
-	 *
-	 * @param bool	$login	Is a login needed?
 	 */
-	private function openCreateScriptForm($login=true) {
-		if($login){
-			$this->page->login();
-		}
-		$this->page->open('zabbix.php?action=script.list');
+	private function openCreateScriptForm() {
+		$this->page->login()->open('zabbix.php?action=script.list');
 		$this->query('button:Create script')->waitUntilClickable()->one()->click();
 	}
 }
