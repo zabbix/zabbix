@@ -1136,8 +1136,16 @@ msgstr ""
 msgid "Alternatively, you can install it manually:"
 msgstr "혹은, 수동으로 인스톨 하실 수 있습니다:"
 
+#: include/classes/data/CItemData.php:1462
+msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1449
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1482
+msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1469
@@ -1390,6 +1398,14 @@ msgstr "시도횟수"
 msgid "Attribution"
 msgstr ""
 
+#: app/views/administration.geomaps.edit.php:90
+msgid "Attribution HTML"
+msgstr ""
+
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -1562,8 +1578,16 @@ msgstr "감시 중"
 msgid "Average"
 msgstr "가벼운 장애"
 
+#: include/classes/data/CItemData.php:1542
+msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1529
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1562
+msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1549
@@ -1760,12 +1784,28 @@ msgstr "CPU정보. string 값 혹은 integer 값을 리턴"
 msgid "CPU load. Returns float"
 msgstr "CPU의 부하량. float 값을 리턴"
 
+#: include/classes/data/CItemData.php:1442
+msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1429
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1294
+msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1281
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1286
+msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1446
+msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1273
@@ -3616,6 +3656,15 @@ msgstr "시각"
 #: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:355
 msgid "Clone"
 msgstr "복제"
+
+#: app/views/configuration.host.edit.php:63
+#: app/views/js/popup.host.edit.js.php:47 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:194
+msgid "Cloned template parameter values have been modified."
+msgstr ""
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
@@ -5694,32 +5743,64 @@ msgstr "디스커버리 리스트"
 msgid "Discovery object"
 msgstr "디스커버리 오브젝트"
 
+#: include/classes/data/CItemData.php:1242
+msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1229
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1250
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1237
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1302
+msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1289
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1326
+msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1313
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1570
+msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1557
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1582
+msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1569
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1514
+msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1501
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1458
+msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1445
@@ -8086,6 +8167,16 @@ msgstr ""
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "호스트명 \"%1$s\"를 가진 호스트 프로토타입은 디스커버리 규칙 \"%2$s\"에 이미 존재합니다."
+
+#: include/classes/api/services/CHostPrototype.php:1111
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1108
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
@@ -10529,6 +10620,10 @@ msgstr ""
 msgid "LLD macros"
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:709
+msgid "LLD rule with the same UUID already exists"
+msgstr ""
+
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:57
 #: app/views/popup.lldoverride.php:101 include/maps.inc.php:45
@@ -11100,6 +11195,10 @@ msgstr "데이터수집을 하지 않는 메인터넌스"
 #, c-format
 msgid "Maintenance: %1$s"
 msgstr "메인테넌스 : %1$s"
+
+#: app/views/administration.geomaps.edit.php:60
+msgid "Make sure the code comes from a reliable source and does not contain malicious scripts."
+msgstr ""
 
 #: app/views/administration.token.view.php:42
 #: app/views/administration.user.token.view.php:41
@@ -12094,6 +12193,10 @@ msgstr ""
 msgid "Network timeout for script execution"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1526
+msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1513
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr ""
@@ -12838,6 +12941,10 @@ msgstr "11월"
 msgid "Number of CPUs. Returns integer"
 msgstr "CPU 수. integer를 리턴."
 
+#: include/classes/data/CItemData.php:1310
+msgid "Number of available DS paths, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - Datastore name, \"partitionid\" - internal id of physical device from vmware.hv.datastore.discovery"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1297
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr ""
@@ -12895,13 +13002,25 @@ msgstr "장애의 수"
 msgid "Number of problems and expand most critical one"
 msgstr "장애의 수와 가장 치명적인 1건을 전개"
 
+#: include/classes/data/CItemData.php:1342
+msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1329
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상의 프로세서 코어 수, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 이름"
 
+#: include/classes/data/CItemData.php:1346
+msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1333
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상의 프로세서 스레드 수, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저의 호스트 이름"
+
+#: include/classes/data/CItemData.php:1430
+msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1417
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -12979,6 +13098,10 @@ msgstr "테이블 TRENDS내의 값 보존 수."
 #: include/classes/data/CItemData.php:1713
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "테이블 TRENDS_UINT내의 값 보존 수."
+
+#: include/classes/data/CItemData.php:1414
+msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1401
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -13868,6 +13991,10 @@ msgstr "잠시 억제된 문제의 실행을 일시중지"
 msgid "Peak memory usage: %1$s"
 msgstr "피크 때의 메모리 사용량 : %1$s"
 
+#: include/classes/data/CItemData.php:1426
+msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1413
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
@@ -13876,8 +14003,16 @@ msgstr ""
 msgid "Percentage"
 msgstr "백분율"
 
+#: include/classes/data/CItemData.php:1510
+msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1497
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1434
+msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1421
@@ -14069,6 +14204,10 @@ msgstr "포스트 형식"
 
 #: app/views/administration.housekeeping.edit.php:164
 msgid "PostgreSQL database server version is too old."
+msgstr ""
+
+#: include/classes/data/CItemData.php:1390
+msgid "Power usage , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"max\" - Maximum allowed power usage"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1377
@@ -17435,8 +17574,16 @@ msgstr ""
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1546
+msgid "The average time a read from the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1533
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1550
+msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1537
@@ -17481,6 +17628,10 @@ msgstr ""
 
 #: include/html.inc.php:686
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
+msgstr ""
+
+#: app/controllers/CControllerHostEdit.php:265 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
 msgstr ""
 
 #: include/html.inc.php:637
@@ -17543,6 +17694,10 @@ msgstr ""
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "수신된 리모트 프로시져는 존재하지 않거나 이용할 수 없습니다."
+
+#: templates.php:180
+msgid "The template being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/administration.token.view.php:52
 #: app/views/administration.user.token.view.php:51
@@ -17809,6 +17964,10 @@ msgstr "전체 Elasticsearch 시간 : %1$s"
 #, c-format
 msgid "Total SQL time: %1$s"
 msgstr "전체 SQL시간: %1$s"
+
+#: include/classes/data/CItemData.php:1466
+msgid "Total time elapsed, in seconds, since last operating system boot-up, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1453
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19183,8 +19342,16 @@ msgstr "유저"
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware 캐쉬통계. 이용가능한 모드：total, free, pfree, used, pused."
 
+#: include/classes/data/CItemData.php:1238
+msgid "VMware cluster performance counter, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1225
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1246
+msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1233
@@ -19200,217 +19367,433 @@ msgstr ""
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "VMware datastore의 바이트 단위 혹은 전체에서 퍼센트 용량에서의 통계치. 바이트 단위라면 integer, 퍼센트라면 float 로 리턴"
 
+#: include/classes/data/CItemData.php:1254
+msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1241
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1258
+msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - \"latency\"/\"maxlatency\" - average or maximum"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1245
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1266
+msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - \"latency\"/\"maxlatency\" - average or maximum"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1253
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1274
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - \"all\" (default), \"skip\" - skip processing of older data"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1261
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1358
+msgid "VMware hypervisor BIOS UUID, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1345
 msgid "VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1398
+msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1385
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1370
+msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1357
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 벌루닝된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
+
+#: include/classes/data/CItemData.php:1282
+msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1269
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 클래스터 이름, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
+#: include/classes/data/CItemData.php:1298
+msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1285
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1314
+msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1301
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware하이퍼바이저 데이터스토어 읽기통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <datastore> - 데이터스토어 이름, <mode> - latency"
 
+#: include/classes/data/CItemData.php:1322
+msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1309
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware하이퍼바이저 데이터스토어 쓰기통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <datastore> - 데이터스토어 이름, <mode> - latency"
 
+#: include/classes/data/CItemData.php:1306
+msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1293
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1394
+msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1381
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1354
+msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1341
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 모델, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
+
+#: include/classes/data/CItemData.php:1330
+msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1317
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware하이퍼바이저 이름, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름"
 
+#: include/classes/data/CItemData.php:1378
+msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - \"bps\""
+msgstr ""
+
 #: include/classes/data/CItemData.php:1365
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware하이퍼바이저 네트워크입력통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <mode> - bps"
+
+#: include/classes/data/CItemData.php:1382
+msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - \"bps\""
+msgstr ""
 
 #: include/classes/data/CItemData.php:1369
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware하이퍼바이저 네트워크출력통계, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저 호스트 이름, <mode> - bps"
 
+#: include/classes/data/CItemData.php:1386
+msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1373
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware하이퍼바이저 퍼포먼스 카운터, <url> - VMware서비스URL, <uuid> - VMware하이퍼바이저의 호스트 이름, <path> - 퍼포먼스 카운터의 패스, <instance> - 퍼포먼스 카운터의 인스턴스"
+
+#: include/classes/data/CItemData.php:1334
+msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1321
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 주파수, <url> - VMware 서비스 URL, <uuid> -  VMware 하이퍼바이저 호스트 명"
 
+#: include/classes/data/CItemData.php:1338
+msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1325
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 모델, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/data/CItemData.php:1290
+msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1277
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 프로세서 사용량(Hz), <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
+#: include/classes/data/CItemData.php:1402
+msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1389
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 상태, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/data/CItemData.php:1350
+msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1337
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 전체 메모리 사이즈, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
+#: include/classes/data/CItemData.php:1406
+msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1393
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 가동시간(초), <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/data/CItemData.php:1374
+msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1361
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 사용된 메모리 사이즈, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
 
+#: include/classes/data/CItemData.php:1362
+msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1349
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 벤더 이름, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 명"
+
+#: include/classes/data/CItemData.php:1410
+msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1397
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware 하이퍼바이저 버전, <url> - VMware 서비스 URL, <uuid> - VMware 하이퍼바이저 호스트 이름"
 
+#: include/classes/data/CItemData.php:1278
+msgid "VMware service full name, \"url\" - VMware service URL"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1265
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware서비스 풀네임, <url> - VMware서비스URL"
+
+#: include/classes/data/CItemData.php:1418
+msgid "VMware service version, \"url\" - VMware service URL"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1405
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware서비스버전, <url> - VMware서비스URL"
 
+#: include/classes/data/CItemData.php:1474
+msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1461
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신에서 발루닝된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
+
+#: include/classes/data/CItemData.php:1538
+msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1525
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 커밋된 저장용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
+#: include/classes/data/CItemData.php:1478
+msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1465
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 압축된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
+#: include/classes/data/CItemData.php:1454
+msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns string"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1441
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1574
+msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1561
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware가상 머신 디스크 디바이스 읽기 통계, <url> - VMware서비스 URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 디스크 디바이스 인스턴스, <mode> - bps/ops - 매 초 바이트 / 오퍼레이션"
 
+#: include/classes/data/CItemData.php:1578
+msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1565
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware 가상 머신 디스크 디바이스 쓰기 통계, <url> - VMware 서비스 URL, <uuid> - VMware 가상 머신호스트 이름, <instance> - 디스크 디바이스 인스턴스, <mode> - bps/ops - 매 초 바이트/오퍼레이션"
+
+#: include/classes/data/CItemData.php:1586
+msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\" - total/free/used/pfree/pused"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1573
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware가상 머신 파일 시스템통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <fsname> - 파일 시스템 이름, <mode> - total/free/used/pfree/pused"
 
+#: include/classes/data/CItemData.php:1498
+msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1485
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 게스트 메모리사용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
+
+#: include/classes/data/CItemData.php:1502
+msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1489
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 호스트 메모리사용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
+#: include/classes/data/CItemData.php:1470
+msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1457
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 하이퍼바이저 이름, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
+
+#: include/classes/data/CItemData.php:1422
+msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1409
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 이름, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
+#: include/classes/data/CItemData.php:1518
+msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1505
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware가상 머신네트워크인터페이스 입력통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 네트워크인터페이스인스턴스, <mode> - bps/pps - 매 초 바이트/패킷"
+
+#: include/classes/data/CItemData.php:1522
+msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1509
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware가상 머신네트워크인터페이스 출력통계, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름, <instance> - 네트워크인터페이스인스턴스, <mode> - bps/pps - 매 초 바이트/패킷"
 
+#: include/classes/data/CItemData.php:1530
+msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1517
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware가상 머신의 퍼포먼스 카운터, <url> - VMware서비스URL, <uuid> - VMware가상 머신의 호스트 이름, <path> - 퍼포먼스 카운터의 패스, <instance> - 퍼포먼스 카운터의 인스턴스"
+
+#: include/classes/data/CItemData.php:1534
+msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1521
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 전원상태, <url> - VMware서비스URL, <uuid> - VMware가상 머신호스트 이름"
 
+#: include/classes/data/CItemData.php:1486
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1473
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 private 메모리 사이즈, <url> - VMware 서비스URL, <uuid> - VMware 가상 머신호스트 이름"
+
+#: include/classes/data/CItemData.php:1438
+msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1425
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신의 프로세서 유효시간(ms)、<url> - VMware 서비스 URL、<uuid> - VMware 가상 머신 호스트 이름"
 
+#: include/classes/data/CItemData.php:1450
+msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1437
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신의 프로세서사용량(Hz), <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
+
+#: include/classes/data/CItemData.php:1490
+msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1477
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 공유메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
+#: include/classes/data/CItemData.php:1494
+msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1481
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 스왑된 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
+
+#: include/classes/data/CItemData.php:1506
+msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1493
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 전체 메모리 사이즈, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
 
+#: include/classes/data/CItemData.php:1554
+msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1541
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상 머신 커밋되지 않은 저장용량, <url> - VMware서비스URL, <uuid> - VMware가상 머신 호스트 이름"
+
+#: include/classes/data/CItemData.php:1558
+msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1545
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신의 공유하지 않은 저장용량, <url> - VMware서비스 URL, <uuid> - VMware가상 머신 호스트명"
 
+#: include/classes/data/CItemData.php:1566
+msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1553
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신 가동시간, <url> - VMware서비스 URL, <uuid> - VMware 가상머신 호스트명"
+
+#: include/classes/data/CItemData.php:1366
+msgid "VVMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1353
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
@@ -20619,6 +21002,10 @@ msgstr ""
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr ""
@@ -21144,6 +21531,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "글로벌 데이터의 보존기간 설정"
 
+#: include/classes/api/services/CGraphGeneral.php:836
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:830
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
 msgid "h"
@@ -21164,11 +21559,19 @@ msgstr "호스트"
 msgid "host group"
 msgstr "호스트 그룹"
 
+#: include/classes/api/services/CHostGroup.php:819
+msgid "host group with the same UUID already exists"
+msgstr ""
+
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:338
 msgid "host pattern"
 msgstr "호스트 패턴"
+
+#: include/classes/api/services/CHostPrototype.php:1174
+msgid "host prototype with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -21383,6 +21786,14 @@ msgstr ""
 msgid "item pattern"
 msgstr "아이템 패턴"
 
+#: include/classes/api/services/CItemGeneral.php:715
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:703
+msgid "item with the same UUID already exists"
+msgstr ""
+
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "키가 설정되지 않았습니다."
@@ -21534,6 +21945,11 @@ msgstr "max() - 기간T 안의 최대치"
 msgid "maximum dependent items count reached"
 msgstr "의존 아이템수가 최대 수에 도달하였습니다"
 
+#: include/classes/validators/CApiInputValidator.php:1556
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -21667,6 +22083,11 @@ msgstr "신규"
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
 msgstr "데이터 없음"
+
+#: include/classes/api/services/CHostPrototype.php:1344
+#, c-format
+msgid "no default interface for \"%1$s\" type"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
@@ -21961,6 +22382,10 @@ msgstr "선택"
 msgid "service"
 msgstr ""
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr "짧은 설명"
@@ -22084,6 +22509,14 @@ msgstr ""
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "템플릿ID \"%1$s\"가 %2$s번 사용되고 있습니다"
 
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:449
+msgid "template with the same UUID already exists"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
 msgstr ""
@@ -22202,9 +22635,17 @@ msgstr ""
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "트리거 프로토타입은 다른 템플릿이나 호스트에 이동할 수 없습니다"
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1889
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "링크가 있는 트리거는 다른 템플릿이나 호스트로 이동할 수 없습니다"
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -22429,6 +22870,10 @@ msgstr "값 %1$s는 이미 존재합니다"
 msgid "value is too long"
 msgstr "값이 너무 깁니다"
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -22528,6 +22973,10 @@ msgstr "via"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
+msgstr ""
+
+#: include/classes/api/services/CHttpTest.php:438
+msgid "web scenario with the same UUID already exists"
 msgstr ""
 
 #: include/classes/api/services/CTask.php:443

@@ -86,7 +86,7 @@ if (array_key_exists('slas', $data)) {
 	}
 
 	if ($data['slas_count'] > count($data['slas'])) {
-		$slas[] = (new CDiv('&hellip;'))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA);
+		$slas[] = (new CDiv(HELLIP()))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA);
 	}
 }
 

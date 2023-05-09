@@ -541,7 +541,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	public function testFormUpdateProblem_Form($data) {
 		// Open filtered Problems list.
-		$this->page->login()->open('zabbix.php?&action=problem.view&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?&action=problem.view&filter_set=1&show_suppressed=1&hostids%5B%5D='.self::$hostid)->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		$count = count($data['problems']);
