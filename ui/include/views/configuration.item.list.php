@@ -237,14 +237,14 @@ foreach ($data['items'] as $item) {
 		$triggerInfo = '';
 	}
 
-	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_BTN_ICON)
-		->addClass(ZBX_ICON_MORE)
-		->setMenuPopup(CMenuPopupHelper::getItem([
-			'itemid' => $item['itemid'],
-			'context' => $data['context'],
-			'backurl' => $backurl
-		]));
+	$wizard = (new CButtonIcon(ZBX_ICON_MORE))  // TODO: ZBX_STYLE_ICON_WIZARD_ACTION
+		->setMenuPopup(
+			CMenuPopupHelper::getItem([
+				'itemid' => $item['itemid'],
+				'context' => $data['context'],
+				'backurl' => $backurl
+			])
+		);
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';

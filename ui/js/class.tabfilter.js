@@ -204,8 +204,8 @@ class CTabFilter extends CBaseComponent {
 
 		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
 			buttons = {
-				decrement_button: this._target.querySelector('button.btn-time-left'),
-				increment_button: this._target.querySelector('button.btn-time-right'),
+				decrement_button: this._target.querySelector('button.js-btn-time-left'),
+				increment_button: this._target.querySelector('button.js-btn-time-right'),
 				zoomout_button: this._target.querySelector('button.btn-time-zoomout')
 			};
 

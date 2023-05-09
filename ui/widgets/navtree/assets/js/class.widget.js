@@ -562,7 +562,7 @@ class CWidgetNavTree extends CWidget {
 
 				button_remove.type = 'button';
 				button_remove.title = t('Remove');
-				button_remove.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE, 'js-remove');
+				button_remove.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALL, 'js-remove');
 				button_remove.setAttribute('data-id', item.id);
 				tools.appendChild(button_remove);
 			}

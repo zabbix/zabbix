@@ -413,7 +413,7 @@ Overlay.prototype.unsetProperty = function(key) {
 			break;
 
 		case 'doc_url':
-			const doc_link = this.$dialogue.$head[0].querySelector('.' + ZBX_ICON_HELP);
+			const doc_link = this.$dialogue.$head[0].querySelector('.' + ZBX_ICON_HELP_SMALL);
 			if (doc_link !== null) {
 				doc_link.remove();
 			}
@@ -472,7 +472,7 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'doc_url':
 				this.unsetProperty(key);
 				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} zi-help" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
 				`);
 				break;
 

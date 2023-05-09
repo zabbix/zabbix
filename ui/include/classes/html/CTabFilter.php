@@ -318,19 +318,15 @@ class CTabFilter extends CDiv {
 		$enabled = (!$selected['filter_custom_time'] && !$data['disabled']);
 
 		return [
-			(new CSimpleButton())
-				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_LEFT)
-				->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+			(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))
+				->addClass('js-btn-time-left')
+				->setEnabled($enabled),
 			(new CSimpleButton(_('Zoom out')))
-				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT),
-			(new CSimpleButton())
-				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_RIGHT)
-				->addClass(ZBX_STYLE_BTN_TIME_RIGHT),
+				->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT)
+				->setEnabled($enabled),
+			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))
+				->addClass('js-btn-time-right')
+				->setEnabled($enabled),
 			(new CListItem(
 				(new CLink(relativeDateToText($data['from'], $data['to'])))
 					->setAttribute('tabindex', $enabled ? 0 : -1)
@@ -367,14 +363,8 @@ class CTabFilter extends CDiv {
 		array_unshift($sortable, array_shift($static));
 
 		$nav_list = new CList([
-			(new CSimpleButton())
-				->setAttribute('data-action', 'toggleTabsList')
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_DOWN),
-			(new CSimpleButton())
-				->setAttribute('data-action', 'selectNextTab')
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_RIGHT)
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->setAttribute('data-action', 'toggleTabsList'),
+			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))->setAttribute('data-action', 'selectNextTab')
 		]);
 
 		if (array_key_exists('timeselector', $this->options)) {
@@ -384,10 +374,7 @@ class CTabFilter extends CDiv {
 		}
 
 		return new CTag('nav', true , new CList([
-			(new CSimpleButton())
-				->setAttribute('data-action', 'selectPrevTab')
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_LEFT),
+			(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->setAttribute('data-action', 'selectPrevTab'),
 			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
 			$static ?: null,
 			$nav_list

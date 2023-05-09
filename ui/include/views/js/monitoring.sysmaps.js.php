@@ -77,9 +77,9 @@ function createFontSelect(string $name): CSelect {
 	<?= (new CDiv([
 			(new CTag('h4', true, _('Map element'))),
 			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_ELEMENT)))
-				->setTitle(_('Help'))
 				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_HELP)
+				->addClass(ZBX_ICON_HELP_SMALL)
+				->setTitle(_('Help'))
 				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
@@ -351,9 +351,9 @@ function createFontSelect(string $name): CSelect {
 	<?= (new CDiv([
 			(new CTag('h4', true, _('Map shape'))),
 			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_SHAPE)))
-				->setTitle(_('Help'))
 				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_HELP)
+				->addClass(ZBX_ICON_HELP_SMALL)
+				->setTitle(_('Help'))
 				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
@@ -510,9 +510,9 @@ function createFontSelect(string $name): CSelect {
 	<?= (new CDiv([
 			(new CTag('h4', true, _('Mass update shapes'))),
 			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_MASSUPDATE_SHAPES)))
-				->setTitle(_('Help'))
 				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_HELP)
+				->addClass(ZBX_ICON_HELP_SMALL)
+				->setTitle(_('Help'))
 				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
@@ -640,9 +640,9 @@ function createFontSelect(string $name): CSelect {
 	<?= (new CDiv([
 			(new CTag('h4', true, _('Mass update elements'))),
 			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_MASSUPDATE_ELEMENTS)))
-				->setTitle(_('Help'))
 				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_HELP)
+				->addClass(ZBX_ICON_HELP_SMALL)
+				->setTitle(_('Help'))
 				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)

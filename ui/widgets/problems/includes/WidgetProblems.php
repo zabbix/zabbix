@@ -21,21 +21,21 @@
 
 namespace Widgets\Problems\Includes;
 
-use CTableInfo,
-	CColHeader,
+use CButtonIcon,
 	CCol,
-	CRow,
-	CLinkAction,
-	CLink,
-	CSimpleButton,
-	CButton,
-	CSpan,
-	CUrl,
-	CScreenProblem,
+	CColHeader,
 	CHintBoxHelper,
+	CIcon,
+	CLink,
+	CLinkAction,
+	CMacrosResolverHelper,
 	CMenuPopupHelper,
+	CRow,
+	CScreenProblem,
 	CSeverityHelper,
-	CMacrosResolverHelper;
+	CSpan,
+	CTableInfo,
+	CUrl;
 
 class WidgetProblems extends CTableInfo {
 	private array $data;
@@ -235,7 +235,7 @@ class WidgetProblems extends CTableInfo {
 			$cell_status = new CSpan($value_str);
 
 			if (isEventUpdating($in_closing, $problem)) {
-				$cell_status->addClass('blink');
+				$cell_status->addClass('js-blink');
 			}
 
 			// Add colors and blinking to span depending on configuration and trigger parameters.
@@ -276,9 +276,9 @@ class WidgetProblems extends CTableInfo {
 						? getUserFullname($data['users'][$unsuppression_action['userid']])
 						: _('Inaccessible user');
 
-					$info_icons[] = (new CSimpleButton())
-						->addClass(ZBX_ICON_EYE)
-						->addClass('blink')
+					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE)) // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
+						->addClass(ZBX_STYLE_COLOR_ICON)
+						->addClass('js-blink')
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 				}
 				elseif ($problem['suppression_data']) {
@@ -368,15 +368,14 @@ class WidgetProblems extends CTableInfo {
 
 				if ($blink_period != 0 && $duration < $blink_period) {
 					$description
-						->addClass('blink')
+						->addClass('js-blink')
 						->setAttribute('data-time-to-blink', $blink_period - $duration)
 						->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 				}
 			}
 
 			$symptom_col = (new CCol(
-				makeActionIcon(['icon' => ZBX_ICON_ARROW_TOP_RIGHT, 'title' => _('Symptom')])
-					->addClass(ZBX_STYLE_SYMPTOM)
+				new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom')) // TODO: ZBX_STYLE_ACTION_ICON_SYMPTOM
 			))->addClass(ZBX_STYLE_RIGHT);
 
 			$empty_col = new CCol();
@@ -397,13 +396,10 @@ class WidgetProblems extends CTableInfo {
 					))->addClass(ZBX_STYLE_RIGHT);
 
 					$collapse_expand_col = (new CCol(
-						(new CSimpleButton())
+						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand')))  // TODO: ZBX_STYLE_BTN_WIDGET_EXPAND
+							->addClass(ZBX_STYLE_COLLAPSED)
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
-							->addClass(ZBX_STYLE_BTN_ICON)
-							->addClass(ZBX_ICON_CHEVRON_DOWN)
-							->addClass(ZBX_STYLE_COLLAPSED)
-							->setTitle(_('Expand'))
 					))
 						->addClass(ZBX_STYLE_RIGHT)
 						->addClass(ZBX_STYLE_THIRD_COL);

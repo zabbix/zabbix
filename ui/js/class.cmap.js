@@ -185,7 +185,7 @@ ZABBIX.apps.map = (function($) {
 			// create container for forms
 			this.formContainer = $('<div>', {
 					id: 'map-window',
-					class: 'overlay-dialogue',
+					class: 'overlay-dialogue modal',
 					style: 'display: none; top: 0; left: 0;'
 				})
 				.appendTo('.wrapper')

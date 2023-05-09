@@ -223,7 +223,7 @@ var jqBlink = {
 		var that = this;
 
 		setInterval(function() {
-			var $collection = jQuery('.blink');
+			var $collection = jQuery('.js-blink');
 
 			$collection.each(function() {
 				var $el = jQuery(this),
@@ -235,14 +235,14 @@ var jqBlink = {
 
 				if (blink) {
 					if (typeof $el.data('toggleClass') !== 'undefined') {
-						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggleClass'));
+						$el.toggleClass($el.data('toggleClass'));
 					}
 					else {
-						$el.css('visibility', that.shown ? 'visible' : 'hidden');
+						$el.css('opacity', that.shown ? '1' : '0');
 					}
 				}
 				else if (that.shown) {
-					$el.removeClass('blink').removeClass($el.data('toggleClass')).css('visibility', '');
+					$el.removeClass('js-blink').removeClass($el.data('toggleClass')).css('opacity', 1);
 				}
 			});
 

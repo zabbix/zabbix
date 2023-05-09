@@ -891,8 +891,6 @@ function getAdministrationGeneralSubmenu(): array {
  * Renders an icon list.
  *
  * @param array $info_icons  The list of information icons.
- *
- * @return CDiv|string
  */
 function makeInformationList($info_icons) {
 	return $info_icons ? (new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER) : '';
@@ -972,110 +970,52 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 
 	$maintenances = implode(',', $maintenance_names);
 
-	return (new CSimpleButton())
-		->addClass(ZBX_STYLE_BTN_ICON)
-		->addClass(ZBX_ICON_EYE_OFF)
-		->addClass($blink ? 'blink' : null)
+	return (new CButtonIcon(ZBX_ICON_EYE)) // TODO ZBX_STYLE_ACTION_ICON_SUPPRESS
+		->addClass($blink ? 'js-blink' : null)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
-			"\n".
-			($username !== '' ? _s('Manually by: %1$s', $username)."\n" : '').
-			($maintenances !== '' ? _s('Maintenance: %1$s', $maintenances)."\n" : '')
+			($username !== '' ? "\n"._s('Manually by: %1$s', $username) : '').
+			($maintenances !== '' ? "\n"._s('Maintenance: %1$s', $maintenances) : '')
 		);
 }
 
 /**
- * Renders an action icon.
- *
- * @param array  $icon_data
- *        string $icon_data[icon]    Icon style.
- *        array  $icon_data[hint]    Hintbox content (optional).
- *        bool   $icon_data[button]  Use button element (optional).
- *        int    $icon_data[num]     Number displayed over the icon (optional).
- *
- * @return CTag  Returns CSpan or CButton depending on boolean $icon_data['button'] parameter
- */
-function makeActionIcon(array $icon_data): CTag {
-	$icon = array_key_exists('button', $icon_data) && $icon_data['button']
-		? (new CSimpleButton())->addClass(ZBX_STYLE_BTN_ICON)
-		: (new CSpan())->addClass(ZBX_STYLE_ICON);
-
-	$icon->addClass($icon_data['icon']);
-
-	if (array_key_exists('num', $icon_data)) {
-		if ($icon_data['num'] > 99) {
-			$icon_data['num'] = '99+';
-		}
-		$icon->setAttribute('data-count', $icon_data['num']);
-	}
-
-	if (array_key_exists('hint', $icon_data)) {
-		$icon->setHint($icon_data['hint'], '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
-	}
-	elseif (array_key_exists('title', $icon_data)) {
-		$icon->setTitle($icon_data['title']);
-	}
-
-	if (array_key_exists('style', $icon_data)) {
-		$icon->addStyle($icon_data['style']);
-	}
-
-	if (array_key_exists('aria-label', $icon_data)) {
-		$icon->setAttribute('aria-label', $icon_data['aria-label']);
-	}
-
-	return $icon;
-}
-
-/**
  * Renders an icon for a description.
- *
- * @param string $description
  */
-function makeDescriptionIcon($description): CSimpleButton {
-	return (new CSimpleButton())
-		->addClass(ZBX_STYLE_BTN_ICON)
-		->addClass(ZBX_ICON_ALERT)
-		->addClass(ZBX_STYLE_TRIGGER_DESCRIPTION)
+function makeDescriptionIcon(string $description): CButtonIcon {
+	return (new CButtonIcon(ZBX_ICON_ALERT_WITH_CONTENT))
+		->setAttribute('data-content', '?')
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 
+// TODO: Fixe to CButtonIcon
 /**
  * Renders an icon with question mark and text in hint.
- *
- * @param CTag|array|string $help_text
  */
 function makeHelpIcon($help_text): CSimpleButton {
 	return (new CSimpleButton())
 		->addClass(ZBX_ICON_HELP_FILLED_SMALL)
-		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
+		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP)
+		->addStyle('background-color: red;');
 }
 
 /**
  * Renders a warning icon like yellow [i] with error message
- *
- * @param CTag|array|string $error
  */
-function makeWarningIcon($error): CSimpleButton {
-	return (new CSimpleButton())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass(ZBX_STYLE_STATUS_YELLOW)
-		->addClass(ZBX_ICON_I)
-		->setHint($error, ZBX_STYLE_HINTBOX_WRAP);
+function makeWarningIcon($warning): CButtonIcon {
+	return (new CButtonIcon(ZBX_ICON_I))
+		->addClass(ZBX_STYLE_STATUS_YELLOW) // TODO - (?) maybe change to color class
+		->setHint($warning, ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**
  * Renders an error icon like red [i] with error message
- *
- * @param CTag|array|string $error
  */
 
-function makeErrorIcon($error): CSimpleButton {
-	return (new CSimpleButton())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass(ZBX_STYLE_STATUS_RED)
-		->addClass(ZBX_ICON_I)
-		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
+function makeErrorIcon($error): CButtonIcon {
+	return (new CButtonIcon(ZBX_ICON_I))
+		->addClass(ZBX_STYLE_STATUS_RED) // TODO - (?) maybe change to color class
+		->setHint($error, ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_RED);
 }
 
 /**

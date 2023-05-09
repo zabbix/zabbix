@@ -86,15 +86,11 @@ $dashboard->addItem(
 			(new CDiv())
 				->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 				->addItem([
-					(new CSimpleButton())
+					(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
-						->addClass(ZBX_STYLE_BTN_ICON)
-						->addClass(ZBX_ICON_CHEVRON_LEFT)
 						->setEnabled(false),
-					(new CSimpleButton())
+					(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE)
-						->addClass(ZBX_STYLE_BTN_ICON)
-						->addClass(ZBX_ICON_CHEVRON_RIGHT)
 						->setEnabled(false)
 				])
 		)

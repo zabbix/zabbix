@@ -30,9 +30,9 @@ jQuery(function($) {
 			to_clndr: $container.find('[name=to_calendar]'),
 			apply: $container.find('[name=apply]'),
 			increment: $container.find('.btn-time-right'),
-			decrement: $container.find('.btn-time-left'),
+			decrement: $container.find('.js-btn-time-left'),
 			zoomout: $container.find('.btn-time-zoomout'),
-			quickranges: $container.find('.time-quick a'),
+			quickranges: $container.find('.js-time-quick a'),
 			label: $container.find('.btn-time')
 		},
 		request_data = {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,20 +19,17 @@
 **/
 
 
-/**
- * A button used for submitting a form.
- */
-class CSubmitButton extends CSimpleButton {
+class CButtonIcon extends CSimpleButton {
 
-	public function __construct($caption = '', $name = null, $value = null) {
-		parent::__construct($caption);
-		$this->setAttribute('type', 'submit');
+	public function __construct($icon_class, $title = null) {
+		parent::__construct();
 
-		if ($name !== null) {
-			$this->setAttribute('name', $name);
-		}
-		if ($value !== null) {
-			$this->setAttribute('value', $value);
+		$this
+			->addClass(ZBX_STYLE_BTN_ICON)
+			->addClass($icon_class);
+
+		if ($title !== null) {
+			$this->setTitle($title);
 		}
 	}
 }

@@ -1815,10 +1815,12 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 		->setAttribute('aria-label', $aria_labels[$class]);
 
 	if ($show_close_box) {
-		$msg_box->addItem((new CSimpleButton())
-			->addClass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
-			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
-			->setTitle(_('Close')));
+		$msg_box->addItem(
+			(new CSimpleButton())
+				->addClass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
+				->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
+				->setTitle(_('Close'))
+		);
 	}
 
 	return $msg_box;

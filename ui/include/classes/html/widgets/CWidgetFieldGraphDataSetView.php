@@ -94,10 +94,8 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		$field_name = $this->field->getName();
 
 		$dataset_head = [
-			new CDiv((new CSimpleButton())
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_UP)
-				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)
+			new CDiv(
+				(new CButtonIcon(ZBX_ICON_CHEVRON_UP))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)
 			),
 			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
@@ -208,10 +206,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		}
 
 		$dataset_head[] = (new CDiv(
-			(new CSimpleButton())
-				->setAttribute('title', _('Delete'))
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_REMOVE)
+			new CButtonIcon(ZBX_ICON_REMOVE_SMALL, _('Delete'))
 		))->addClass('dataset-actions');
 
 		return (new CListItem([

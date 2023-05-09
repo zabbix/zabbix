@@ -31,10 +31,7 @@
 		(new CInput('hidden', 'interfaces[#{iface.interfaceid}][type]', '#{iface.type}'))
 			->setId('interface_type_#{iface.interfaceid}'),
 		(new CDiv(
-			(new CSimpleButton())
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_DOWN)
-				->addClass(ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE)
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))->addClass(ZBX_STYLE_HOST_INTERFACE_BTN_TOGGLE)
 		))->addClass(ZBX_STYLE_HOST_INTERFACE_CELL),
 		(new CDiv('#{iface.type_name}'))
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL.' '.ZBX_STYLE_HOST_INTERFACE_CELL_TYPE),

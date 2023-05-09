@@ -24,7 +24,11 @@ $alt-blue-grey: #97aab3;
 $teal: #0f998b;
 
 $white: #ffffff !default;
-$transparent: transparent;
+$teal: #0f998b;
+
+$negative-color: $red !default;
+$positive-color: $green !default;
+$warning-color: $dark-yellow !default;
 
 $disabled-bg-color: #ebebeb !default;
 $disabled-item-color: #768d99 !default;
@@ -208,6 +212,7 @@ $link-alt-underline-color: #768d99 !default;
 
 // Icons.
 $icon-color: #768d99 !default;
+$icon-content-color: #ffffff !default;
 
 $icon-btn-color: lighten($icon-color, 25%) !default;
 $icon-btn-hover-color: $icon-color !default;
@@ -219,7 +224,7 @@ $icon-hint-color: #768d99 !default;
 $icon-calendar-color: #acbbc2 !default;
 $icon-action-arrow-up: #e33734 !default;
 $icon-action-check: #009900 !default;
-$icon-action-severity-down: #009900 !default;
+$icon-action-severity-down: #009900 !default; // TODO - delete
 $icon-action-severety-up: #e33734 !default;
 $icon-action-severety-changed: #768d99 !default;
 $icon-action-list-table-color: #768d99 !default;
@@ -252,13 +257,13 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 // Indicators.
 $indicator-count-color: #768d99;
-$indicator-mark-color: #009900;
+$indicator-mark-color: #009900; // TODO: fix to green color
 
 // Statuses.
 $problem-unack-fg-color: #cc0000 !default;
 $problem-ack-fg-color: #cc0000 !default;
-$ok-unack-fg-color: #009900 !default;
-$ok-ack-fg-color: #009900 !default;
+$ok-unack-fg-color: #009900 !default; // TODO: fix to green color
+$ok-ack-fg-color: #009900 !default; // TODO: fix to green color
 
 $status-color: $white;
 $status-green-bg-color: darken(desaturate($alt-green, 10%), 16%);
@@ -282,7 +287,7 @@ $multiselect-item-disabled-bg-color: $disabled-item-bg-color;
 $host-avail-true-bg-color: $alt-light-green !default;
 $host-avail-false-bg-color: $alt-red !default;
 $host-avail-unknown-bg-color: $alt-blue-grey !default;
-$host-avail-total-bg-color: $transparent !default;
+$host-avail-total-bg-color: transparent !default;
 
 // Preloader.
 $preloader-bg-color: $body-bg-color !default;

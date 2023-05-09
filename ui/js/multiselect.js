@@ -832,7 +832,7 @@
 							title: item.name
 						}))
 						.append($('<span>')
-							.addClass([ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE])
+							.addClass([ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALL])
 							.on('click', function() {
 								if (!ms.options.disabled && !item_disabled) {
 									removeSelected($obj, item.id);

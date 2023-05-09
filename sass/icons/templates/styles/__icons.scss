@@ -10,10 +10,7 @@
 }
 
 %icons-font {
-	font-family: '{{fontname}}' !important;
-	font-size: {{fontSize}};
-	font-style: normal;
-	line-height: 1;
+	font: {{fontSize}} / 1 '{{fontname}}';
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 
@@ -23,6 +20,7 @@
 }
 
 %icon-position {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
 	vertical-align: top;
@@ -30,10 +28,6 @@
 	&:empty {
 		justify-content: center;
 	}
-}
-
-.icon {
-	@extend %icon-position;
 }
 
 [class^="{{prefix}}-"], [class*=" {{prefix}}-"] {

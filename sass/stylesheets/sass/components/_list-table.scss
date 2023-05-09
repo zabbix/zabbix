@@ -6,17 +6,67 @@
 
 	thead {
 		th {
+			height: 100%;
 			overflow: hidden;
 			border-bottom-width: 2px;
 			border-bottom-color: darken($table-border-color, 5%);
 			color: $font-alt-color;
 			white-space: nowrap;
 			vertical-align: bottom;
+
+			.vertical {
+				writing-mode: vertical-lr;
+				transform: rotate(180deg);
+			}
+
+			.arrow-up {
+				margin-left: 3px;
+				border-bottom-color: $font-alt-color;
+			}
+
+			.arrow-right {
+				margin-left: 3px;
+				border-left-color: $font-alt-color;
+			}
+
+			.arrow-down {
+				margin-left: 3px;
+				border-top-color: $font-alt-color;
+			}
+
+			.treeview {
+				span {
+					margin: 0;
+				}
+			}
+
+			a {
+				display: block;
+				position: relative;
+				margin: -1em;
+				padding: 1em;
+				border: 0;
+
+				@if $ui-transitions {
+					transition: background-color .2s ease-out;
+				}
+
+				&:hover,
+				&:focus,
+				&:active {
+					text-decoration: none;
+					background-color: $ui-hover-color;
+				}
+			}
 		}
 	}
 
 	tbody {
 		tr {
+			&.hidden {
+				display: none;
+			}
+
 			&:last-child {
 				th,
 				td {
@@ -24,28 +74,41 @@
 				}
 			}
 
-			&:hover {
+			&:not(.hover-nobg):not(.row-selected):hover {
 				background-color: $ui-hover-color;
+			}
+
+			&.row-selected {
+				background-color: $lighter-yellow;
+			}
+		}
+
+		th,
+		td {
+			&.table-info {
+				color: $font-alt-color;
+			}
+
+			&.list-table-actions {
+				text-align: right;
+				white-space: nowrap;
 			}
 		}
 	}
 
-	th, td {
+	th,
+	td {
 		position: relative;
 		padding: 6px 5px;
 		line-height: 18px;
 		text-align: left;
 		vertical-align: top;
 		border-bottom: 1px solid $table-border-color;
-	}
 
-	&.nothing-to-show {
-		color: $font-alt-color;
-		text-align: center;
-		transition: 0s;
-
-		td:hover {
-			background-color: $ui-bg-color;
+		&.second-col {
+			padding-left: 0;
+			padding-right: 0;
+			text-align: center;
 		}
 	}
 
@@ -74,11 +137,200 @@
 		}
 	}
 
-	// Timeline.
+	.list-table-footer {
+		border-bottom: 0;
+		color: $font-alt-color;
+		text-align: right;
+
+		&:hover {
+			background-color: $ui-bg-color;
+		}
+	}
+
+	.action-container {
+		display: flex;
+		width: 100%;
+
+		.link-action {
+			@extend %overflow-ellipsis;
+
+			height: 16px;
+			min-width: 1ch;
+		}
+
+		.rel-container {
+			display: flex;
+		}
+
+		.separator {
+			flex-shrink: 0;
+			margin-right: 4px;
+		}
+	}
+
+	.vertical_rotation_inner {
+		transform: rotate(270deg);
+		white-space: nowrap;
+	}
+
+	.nothing-to-show {
+		td {
+			color: $font-alt-color;
+			text-align: center;
+
+			&:hover {
+				background-color: $ui-bg-color;
+			}
+		}
+	}
+
+	.latest-values,
+	.opdata {
+		max-width: 300px;
+	}
+
+	.checkbox-radio {
+		margin: 1px 0;
+
+		& + label {
+			display: inline-block;
+			margin: 1px 0;
+			line-height: 1;
+			vertical-align: top;
+
+			span {
+				margin: 0;
+			}
+		}
+	}
+
+	&.compact-view {
+		td {
+			padding-top: 2px;
+			padding-bottom: 2px;
+			border-bottom: 0;
+			box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
+			white-space: nowrap;
+
+			.rel-container {
+				span {
+					margin: 0;
+				}
+			}
+
+			&.nowrap {
+				text-overflow: clip;
+			}
+		}
+	}
+}
+
+// Buttons and Icons.
+.list-table {
+	.btn-icon,
+	.icon,
+	.link-action {
+		&:not(:first-child) {
+			margin-left: 5px;
+		}
+	}
+
+	.btn-icon,
+	.icon {
+		width: 18px;
+		min-height: 18px;
+	}
+}
+
+// Tags.
+.list-table {
+	thead {
+		th {
+			&.column-tags-1 {
+				width: 75px;
+
+				@media screen and (min-width: 1200px) {
+					width: 106px;
+				}
+
+				@media screen and (min-width: 1400px) {
+					width: 137px;
+				}
+
+				@media screen and (min-width: 1600px) {
+					width: 168px;
+				}
+			}
+
+			&.column-tags-2 {
+				width: 124px;
+
+				@media screen and (min-width: 1200px) {
+					width: 186px;
+				}
+
+				@media screen and (min-width: 1400px) {
+					width: 248px;
+				}
+
+				@media screen and (min-width: 1600px) {
+					width: 310px;
+				}
+			}
+
+			&.column-tags-3 {
+				width: 173px;
+
+				@media screen and (min-width: 1200px) {
+					width: 266px;
+				}
+
+				@media screen and (min-width: 1400px) {
+					width: 359px;
+				}
+
+				@media screen and (min-width: 1600px) {
+					width: 452px;
+				}
+			}
+		}
+	}
+
+	.tag {
+		margin: 1px 0;
+		cursor: pointer;
+		vertical-align: top;
+
+		&:not(:last-of-type) {
+			margin-right: 3px;
+		}
+	}
+
+	&.compact-view {
+		.tag {
+			max-width: 40px;
+
+			@media screen and (min-width: 1200px) {
+				max-width: 71px;
+			}
+
+			@media screen and (min-width: 1400px) {
+				max-width: 102px;
+			}
+
+			@media screen and (min-width: 1600px) {
+				max-width: 133px;
+			}
+		}
+	}
+}
+
+// Timeline.
+.list-table {
 	.timeline-date,
 	.timeline-axis,
 	.timeline-td {
-		border-bottom-color: $ui-bg-color;
+		border-bottom-color: transparent;
 	}
 
 	.timeline-date {
@@ -133,15 +385,30 @@
 			border: 2px solid $btn-bg-color;
 		}
 	}
+}
 
-	// Symptoms.
+// Symptoms.
+.list-table {
 	.problem-expand-td {
-		border-bottom-color: $ui-bg-color;
+		border-bottom-color: transparent;
 	}
 
-	.second-col {
-		padding-left: 0;
-		padding-right: 0;
+	.problem-nested:not([class*='flh-']):not(.row-selected) {
+		background-color: darken($ui-bg-color, 5%);
+
+		td,
+		.timeline-axis,
+		.timeline-td {
+			border-bottom-color: darken($ui-bg-color, 5%);;
+		}
+	}
+
+	.problem-nested-small {
+		font-size: 11px;
+
+		.tag {
+			font-size: 12px;
+		}
 	}
 
 	.symptoms-count {
@@ -149,124 +416,23 @@
 		padding: 2px 3px;
 		margin: 1px 0;
 		min-width: 10px;
-		color: $font-selected-color;
+		color: $icon-content-color;
 		vertical-align: top;
 		text-align: center;
 		line-height: 1;
-		background-color: $ui-bg-selected-color;
+		background-color: $icon-color;
 		border-radius: 2px;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
-	// Inputs.
-	.checkbox-radio {
-		margin: 1px 0;
-
-		& + label {
-			display: inline-block;
-			margin: 1px 0;
-			line-height: 1;
-			vertical-align: top;
-
-			span {
-				margin: 0;
+	&.compact-view {
+		.problem-nested:not([class*='flh-']):not(.row-selected) {
+			td,
+			.timeline-axis,
+			.timeline-td {
+				border-bottom-style: none;
 			}
-		}
-	}
-
-	// Buttons and icons.
-	td {
-		&.list-table-actions {
-			text-align: right;
-			white-space: nowrap;
-		}
-	}
-
-	.btn-icon,
-	.icon {
-		background-color: rgba(255,0,0,.1); // TODO debug
-		width: 18px;
-		min-height: 18px;
-
-		&:not(:first-child) {
-			margin-left: 5px;
-		}
-	}
-
-	.btn-icon {
-		box-shadow: 0 0 0 2px $btn-focus-outline-color; // TODO debug
-	}
-
-	.symptom {
-		&::before {
-			color: $icon-color;
-		}
-	}
-
-	// Tags.
-	thead {
-		th {
-			&.column-tags-1 {
-				width: 75px;
-			}
-
-			&.column-tags-2 {
-				width: 124px;
-			}
-
-			&.column-tags-3 {
-				width: 173px;
-			}
-
-			@media screen and (min-width: 1200px) {
-				&.column-tags-1 {
-					width: 106px;
-				}
-
-				&.column-tags-2 {
-					width: 186px;
-				}
-
-				&.column-tags-3 {
-					width: 266px;
-				}
-			}
-
-			@media screen and (min-width: 1400px) {
-				&.column-tags-1 {
-					width: 137px;
-				}
-
-				&.column-tags-2 {
-					width: 248px;
-				}
-
-				&.column-tags-3 {
-					width: 359px;
-				}
-			}
-
-			@media screen and (min-width: 1600px) {
-				&.column-tags-1 {
-					width: 168px;
-				}
-
-				&.column-tags-2 {
-					width: 310px;
-				}
-
-				&.column-tags-3 {
-					width: 452px;
-				}
-			}
-		}
-	}
-
-	.tag {
-		margin: 1px 0;
-		vertical-align: top;
-
-		&:not(:first-child) {
-			margin-left: 3px;
 		}
 	}
 }
@@ -278,12 +444,28 @@
 
 
 
-._list-table {
-	//width: 100%;
-	//background-color: $ui-bg-color;
-	//border-collapse: separate;
-	//border: 1px solid $ui-border-color;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+._list-table {
 	// TODO - check
 	span.zi-calendar-warning {
 		display: inline-block;
@@ -294,28 +476,6 @@
 			display: inline-block;
 			width: 18px;
 			height: 18px;
-		}
-	}
-
-	.action-container {
-		display: flex;
-		width: 100%;
-		height: 18px;
-		line-height: 18px;
-
-		.link-action {
-			height: 16px;
-			min-width: 1em;
-			@extend %overflow-ellipsis;
-		}
-
-		.rel-container {
-			display: flex;
-		}
-
-		.separator {
-			flex-shrink: 0;
-			margin-right: 4px;
 		}
 	}
 
@@ -340,545 +500,17 @@
 				border-radius: 2px;
 			}
 		}
-
-		// Align tags and checkboxes. Tags are too low.
-		//.tag {
-		//	margin-top: -1px;
-		//}
-
-		// Checkboxes are too high up.
-		//.checkbox-radio {
-		//	& + label {
-		//		span {
-		//			margin-top: 1px;
-		//		}
-		//	}
-		//}
-	}
-
-	//.second-col {
-	//	padding-left: 0;
-	//	padding-right: 0;
-
-	//	// Default icon marging makes the cell too wide.
-	//	.icon-action-symptom {
-	//		margin-right: 0;
-	//	}
-	//}
-
-	.third-col {
-		// Padding top removed because it pushes the collapse and expand icon too far down.
-		padding-top: 0;
-		// Padding bottom removed because Chrome and Safari expands the row.
-		padding-bottom: 0;
-		padding-left: 2px;
-
-		.icon-action-symptom {
-			// Align the symptom icon in the third column, since padding is removed.
-			margin-top: 6px;
-			// Default icon marging makes the cell too wide.
-			margin-right: 0;
-		}
-	}
-
-	// Make the row more narrow.
-	.symptom-limit-td {
-		padding-top: 0;
-		padding-bottom: 0;
-	}
-
-	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
-		background-color: darken($ui-bg-color, 5%);
-
-		td,
-		.timeline-axis,
-		.timeline-td {
-			border-bottom-color: darken($ui-bg-color, 5%) !important;
-		}
-	}
-
-	.problem-nested-small {
-		font-size: calc(#{$font-mono-size} - 1px);
-
-		.tag {
-			font-size: 12px;
-		}
-	}
-
-	thead th {
-		//color: $font-alt-color;
-		height: 100%; // TODO ???
-		//overflow: hidden;
-		//white-space: nowrap;
-		//padding: 6px 5px;
-		//vertical-align: bottom; // TODO ???
-		//border-bottom: 2px solid darken($table-border-color, 5%);
-		//text-align: left;
-
-		//&.column-tags-1 {
-		//	width: 75px;
-		//}
-
-		//&.column-tags-2 {
-		//	width: 124px;
-		//}
-
-		//&.column-tags-3 {
-		//	width: 173px;
-		//}
-
-		//@media screen and (min-width: 1200px) {
-		//	&.column-tags-1 {
-		//		width: 106px;
-		//	}
-
-		//	&.column-tags-2 {
-		//		width: 186px;
-		//	}
-
-		//	&.column-tags-3 {
-		//		width: 266px;
-		//	}
-		//}
-
-		//@media screen and (min-width: 1400px) {
-		//	&.column-tags-1 {
-		//		width: 137px;
-		//	}
-
-		//	&.column-tags-2 {
-		//		width: 248px;
-		//	}
-
-		//	&.column-tags-3 {
-		//		width: 359px;
-		//	}
-		//}
-
-		//@media screen and (min-width: 1600px) {
-		//	&.column-tags-1 {
-		//		width: 168px;
-		//	}
-
-		//	&.column-tags-2 {
-		//		width: 310px;
-		//	}
-
-		//	&.column-tags-3 {
-		//		width: 452px;
-		//	}
-		//}
-
-		.arrow-up {
-			margin: 0 0 0 3px;
-			border-bottom-color: $font-alt-color;
-		}
-
-		.arrow-right {
-			margin: 0 0 0 3px;
-			border-left-color: $font-alt-color;
-		}
-
-		.arrow-down {
-			margin: 0 0 0 3px;
-			border-top-color: $font-alt-color;
-		}
-
-		.treeview {
-			span {
-				margin: 0;
-			}
-		}
-
-		.vertical {
-			writing-mode: vertical-lr;
-			transform: rotate(180deg);
-		}
-
-		a {
-			display: block;
-			position: relative;
-			margin: -1em;
-			padding: 1em;
-			border: 0;
-			transition: background-color .2s ease-out;
-
-			&:hover,
-			&:focus,
-			&:active {
-				text-decoration: none;
-				background-color: $ui-hover-color;
-			}
-		}
-	}
-
-	tbody tr {
-		&:hover {
-			//background-color: $ui-hover-color;
-
-			.timeline-axis,
-			.timeline-td {
-				border-bottom-color: $ui-hover-color !important;
-			}
-
-			// TODO - AS: check
-			/*
-			.timeline-axis {
-				background-color: $ui-bg-color;
-			}
-
-			.timeline-date {
-				background-color: $ui-bg-color;
-			}
-
-			.timeline-td {
-				background-color: $ui-bg-color !important;
-			}
-			*/
-		}
-
-		&.row-selected {
-			@extend %found-bg;
-
-			.timeline-axis,
-			.timeline-td {
-				border-bottom-color: $lighter-yellow !important;
-			}
-
-			// TODO - AS: check
-			/*
-			.timeline-axis {
-				background-color: $ui-bg-color;
-			}
-
-			.timeline-date {
-				background-color: $ui-bg-color;
-			}
-
-			.timeline-td {
-				background-color: $ui-bg-color;
-			}
-			*/
-
-			.btn-widget-expand,  // FIXME
-			.btn-widget-collapse { // FIXME
-				background-color: $lighter-yellow;
-			}
-		}
-
-		//&.nothing-to-show {
-		//	@extend %nothing-to-show;
-		//}
-
-		//&:last-child th,
-		//&:last-child td {
-		//	border-bottom: 0;
-		//}
-
-		&.hover-nobg {
-			background-color: $ui-bg-color;
-
-			.timeline-axis,
-			.timeline-td {
-				border-bottom-color: $ui-bg-color !important;
-			}
-		}
-
-		&.hover-nobg-problem-nested {
-			background-color: darken($ui-bg-color, 5%);
-
-			.timeline-axis,
-			.timeline-td {
-				border-bottom-color: darken($ui-bg-color, 5%) !important;
-			}
-		}
-
-		&.hidden {
-			display: none;
-		}
-	}
-
-	tbody th,
-	td {
-		//padding: 6px 5px;
-		//position: relative;
-		//border-bottom: 1px solid $table-border-color;
-		//line-height: 18px;
-		//vertical-align: top;
-
-		&.table-info {
-			color: $font-alt-color;
-		}
-	}
-
-	tbody th {
-		//text-align: left;
-	}
-
-	.vertical_rotation_inner {
-		transform: rotate(270deg);
-		white-space: nowrap;
-	}
-
-	.list-table-footer {
-		border-bottom: 0;
-		color: $font-alt-color;
-		text-align: right;
-	}
-
-	.latest-values,
-	.opdata {
-		max-width: 300px;
-	}
-
-	//.list-table-actions {
-	//	text-align: right;
-	//	white-space: nowrap;
-
-		//.btn-icon {
-		//	width: 18px;
-		//	min-height: 18px;
-
-		//	&:not(:first-of-type) {
-		//		margin-left: 5px;
-		//	}
-		//}
-	//}
-
-	//&.sticky-header {
-	//	thead {
-	//		position: sticky;
-	//		top: 0;
-	//		z-index: 1;
-	//		background: $ui-bg-color;
-	//	}
-	//}
-
-	//&.sticky-footer {
-		// tbody {
-		//	tr:last-of-type {
-		//		td, th {
-		//			border-bottom: none;
-		//		}
-		//	}
-		//}
-
-		// tfoot {
-		//	position: sticky;
-		//	bottom: 0;
-		//	z-index: 1;
-		//	background: $ui-bg-color;
-
-		//	tr:first-of-type {
-		//		td, th {
-		//			border-top: 2px solid darken($table-border-color, 5%);
-		//			border-bottom: 0;
-		//		}
-		//	}
-		//}
-	//}
-
-	.zi-command, // TODO - check
-	.zi-checkbox,
-	.zi-check,
-	.zi-eye-off,
-	.zi-eye,
-	.zi-uncheck,
-	.zi-alert-more,
-	.zi-calendar-warning,
-	.zi-calendar-check,
-	.zi-envelope-filled,
-	.zi-arrow-top-right {
-		color: $icon-action-list-table-color;
-
-		&::before {
-			vertical-align: middle;
-		}
-	}
-
-	a,
-	button {
-		&.trigger-description { // TODO - clean
-			vertical-align: top;
-			width: 18px;
-			height: 18px;
-			min-height: 0;
-			padding: 0;
-			margin-right: 5px;
-
-			&::before {
-				color: $icon-color;
-			}
-		}
-	}
-
-	.trigger-description { // TODO - clean
-		&::after {
-			position: absolute;
-			top: 4px;
-			width: 18px;
-			height: 18px;
-			display: inline-flex;
-			justify-content: center;
-			align-items: center;
-			font-size: 9px;
-			font-family: inherit;
-		}
-	}
-
-	.trigger-description { // TODO - clean
-		margin-left: 5px;
-
-		&::after {
-			content: '?' !important;
-		}
 	}
 }
 
-
-
-
-
-
-
 ._list-table {
 	&.problem-list {
-		a,
-		button {
-			&.event-action-red,
-			&.event-action-yellow,
-			&.event-action-gray,
-			&.event-messages,
-			&.event-acknowledged,
-			&.event-severity-down,
-			&.event-severity-up,
-			&.event-severity-changed,
-			&.trigger-dependency,
-			&.suppressions-problem {
-				vertical-align: top;
-				width: 18px;
-				height: 18px;
-				min-height: 0;
-				padding: 0;
-				margin-right: 5px;
 
-				&::before {
-					color: $icon-color;
-				}
-			}
-		}
 
 		.problem-row {
 			button.zi-eye-off {
 				width: 18px; // TODO check width
 				min-height: 18px;
-			}
-		}
-
-		//.btn-widget-collapse, // FIXME
-		//.btn-widget-expand {   // FIXME
-		//	width: 18px;
-		//	min-height: 18px;
-		//	margin-top: 7px;
-
-		//	&::before {
-		//		font-size: $icon-medium-size;
-		//	}
-		//}
-
-		//.btn-widget-collapse { // FIXME
-		//	transform: rotate(180deg);
-		//}
-
-		//.btn-widget-expand { // FIXME
-		//	transform: rotate(0);
-		//}
-
-		[class^="event-action-"], [class*=" event-action-"],
-		.event-messages {
-			&::after {
-				position: absolute;
-				top: 4px;
-				width: 18px;
-				height: 18px;
-				display: inline-flex;
-				justify-content: center;
-				align-items: center;
-				font-size: 9px;
-				font-family: inherit;
-			}
-		}
-
-		[class^="event-action-"], [class*=" event-action-"],
-		.event-messages {
-			&::after {
-				content: attr(data-count);
-			}
-		}
-
-		.event-messages {
-			&::before {
-				top: 1px;
-			}
-
-			&::after {
-				top: 5px;
-				color: $white;
-			}
-		}
-
-		[class^="event-action-"], [class*=" event-action-"] {
-			&::before {
-				position: absolute;
-				top: 12px;
-				color: $icon-event-action-red !important;
-			}
-
-			&::after {
-				position: absolute;
-				color: $font-color;
-			}
-		}
-
-		.event-action-red {
-			&::before {
-				color: $icon-event-action-red !important;
-			}
-		}
-
-		.event-action-yellow {
-			&::before {
-				color: $icon-event-action-yellow !important;
-			}
-		}
-
-		.event-action-gray {
-			&::before {
-				color: $icon-event-action-gray !important;
-			}
-		}
-
-		.event-severity-down {
-			&::before {
-				font-size: $icon-small-size !important; // FIXME important
-				color: $icon-action-severity-down !important;
-			}
-		}
-
-		.event-severity-up {
-			&::before {
-				font-size: $icon-small-size !important; // FIXME important
-				color: $icon-action-severety-up !important;
-			}
-		}
-
-		.event-acknowledged {
-			display: inline-block;
-			width: 18px;
-			min-height: 18px;
-
-			&::before {
-				color: $icon-action-check !important;
 			}
 		}
 
@@ -954,20 +586,7 @@
 				}
 			}
 
-			td.nowrap {
-				text-overflow: clip;
-			}
 
-			button.zi-more {
-				min-height: 12px;
-			}
-
-			.event-messages,
-			.trigger-description { // TODO - clean
-				&::after {
-					top: 1px;
-				}
-			}
 
 			[class^="event-action-"], [class*=" event-action-"] {
 				&::before {
@@ -987,6 +606,7 @@
 					color: $link-hover-color;
 				}
 
+				// deprecated use .color-negative
 				&.red {
 					color: $red;
 				}
@@ -1001,55 +621,6 @@
 
 				&.green {
 					color: $green;
-				}
-			}
-
-			.problem-nested:not([class*='flh-']):not(.row-selected) {
-				td, .timeline-axis, .timeline-td {
-					border-bottom: 0 !important;
-				}
-			}
-
-			td {
-				padding-top: 0;
-				padding-bottom: 0;
-				border-bottom: 0;
-				box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
-				height: 22px;
-				vertical-align: middle;
-				white-space: nowrap;
-
-				.rel-container {
-					span {
-						margin: 0;
-					}
-				}
-
-				.tag {
-					display: inline-block;
-					line-height: 16px;
-					margin-right: 3px;
-					padding: 0 3px;
-					max-width: 40px;
-
-					@media screen and (min-width: 1200px) {
-						max-width: 71px;
-					}
-
-					@media screen and (min-width: 1400px) {
-						max-width: 102px;
-					}
-
-					@media screen and (min-width: 1600px) {
-						max-width: 133px;
-					}
-				}
-
-				// Align the expand and collapse icons in compact view.
-				.btn-widget-expand, // FIXME
-				.btn-widget-collapse { // FIXME
-					vertical-align: top;
-					margin: 0;
 				}
 			}
 		}

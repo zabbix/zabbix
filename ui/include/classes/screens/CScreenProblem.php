@@ -972,7 +972,7 @@ class CScreenProblem extends CScreenBase {
 			));
 
 			$this->data['filter']['compact_view']
-				? $header_check_box->addStyle('width: 20px;')
+				? $header_check_box->addStyle('width: 18px;')
 				: $header_check_box->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			$link = $url->getUrl();
@@ -993,11 +993,11 @@ class CScreenProblem extends CScreenBase {
 				$col_header_2 = (new CColHeader())->addClass(ZBX_STYLE_THIRD_COL);
 
 				if ($this->data['filter']['compact_view']) {
-					$header[] = $col_header_1->addStyle('width: 28px;');
-					$header[] = $col_header_2->addStyle('width: 20px;');
+					$header[] = $col_header_1->addStyle('width: 18px;');
+					$header[] = $col_header_2->addStyle('width: 18px;');
 				}
 				else {
-					$header[] = $col_header_1->addStyle('width: 20px;');
+					$header[] = $col_header_1->addStyle(ZBX_STYLE_CELL_WIDTH);
 					$header[] = $col_header_2->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 			}
@@ -1006,7 +1006,7 @@ class CScreenProblem extends CScreenBase {
 				$col_header = (new CColHeader())->addClass(ZBX_STYLE_THIRD_COL);
 
 				if ($this->data['filter']['compact_view']) {
-					$header[] = $col_header->addStyle('width: 20px;');
+					$header[] = $col_header->addStyle('width: 18px;');
 				}
 				else {
 					$header[] = $col_header->addClass(ZBX_STYLE_CELL_WIDTH);
@@ -1366,7 +1366,7 @@ class CScreenProblem extends CScreenBase {
 			$cell_status = new CSpan($value_str);
 
 			if (isEventUpdating($in_closing, $problem)) {
-				$cell_status->addClass('blink');
+				$cell_status->addClass('js-blink');
 			}
 
 			// Add colors and blinking to span depending on configuration and trigger parameters.
@@ -1407,9 +1407,9 @@ class CScreenProblem extends CScreenBase {
 						? getUserFullname($data['users'][$unsuppression_action['userid']])
 						: _('Inaccessible user');
 
-					$info_icons[] = (new CSimpleButton())
-						->addClass(ZBX_ICON_EYE)
-						->addClass('blink')
+					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE)) // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
+						->addClass(ZBX_STYLE_COLOR_ICON)
+						->addClass('js-blink')
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 				}
 				elseif ($problem['suppression_data']) {
@@ -1427,11 +1427,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			if ($data['filter']['compact_view'] && $data['filter']['show_suppressed'] && count($info_icons) > 1) {
-				$cell_info = (new CButton(null))
-					->addClass(ZBX_STYLE_BTN_ICON)
-					->addClass(ZBX_ICON_MORE)
-					->addStyle('margin-left: -3px;')  // FIXME
-					->setHint(makeInformationList($info_icons));
+				$cell_info = (new CButtonIcon(ZBX_ICON_MORE))->setHint(makeInformationList($info_icons));
 			}
 			else {
 				$cell_info = makeInformationList($info_icons);
@@ -1496,8 +1492,7 @@ class CScreenProblem extends CScreenBase {
 			$checkbox_col = new CCol(new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']));
 			$empty_col = new CCol();
 			$symptom_col = (new CCol(
-				makeActionIcon(['icon' => ZBX_ICON_ARROW_TOP_RIGHT, 'title' => _('Symptom')])
-					->addClass(ZBX_STYLE_SYMPTOM)
+				new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom')) // TODO: ZBX_STYLE_ACTION_ICON_SYMPTOM
 			));
 
 			if ($data['show_timeline']) {
@@ -1515,22 +1510,19 @@ class CScreenProblem extends CScreenBase {
 					// Show symptom counter and collapse/expand button.
 					$symptom_count_span = (new CSpan($problem['symptom_count']))
 						->addClass(ZBX_STYLE_SYMPTOMS_COUNT)
-						->addStyle('max-width: 22px;'); // TODO - check & clean
+						->addStyle('max-width: 3ch;');
 
-					if ($problem['symptom_count'] >= 1000) {
+					if ($problem['symptom_count'] >= 0) {
 						$symptom_count_span->setHint($problem['symptom_count']);
 					}
 
 					$symptom_count_col = (new CCol($symptom_count_span))->addClass(ZBX_STYLE_SECOND_COL);
 
 					$collapse_expand_col = (new CCol(
-						(new CSimpleButton())
+						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand')))
+							->addClass(ZBX_STYLE_COLLAPSED)
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
-							->addClass(ZBX_STYLE_BTN_ICON)
-							->addClass(ZBX_ICON_CHEVRON_DOWN)
-							->addClass(ZBX_STYLE_COLLAPSED)
-							->setTitle(_('Expand'))
 					))->addClass(ZBX_STYLE_THIRD_COL);
 
 					if ($data['show_timeline']) {

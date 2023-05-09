@@ -152,19 +152,17 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototype([
-		'itemid' => $item['itemid'],
-		'context' => $data['context'],
-		'backurl' => (new CUrl('disc_prototypes.php'))
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('context', $data['context'])
-			->getUrl()
-	]);
-
-	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_BTN_ICON)
-		->addClass(ZBX_ICON_MORE)
-		->setMenuPopup($item_menu);
+	$wizard = (new CButtonIcon(ZBX_ICON_MORE)) // TODO: ZBX_STYLE_ICON_WIZARD_ACTION
+		->setMenuPopup(
+			CMenuPopupHelper::getItemPrototype([
+				'itemid' => $item['itemid'],
+				'context' => $data['context'],
+				'backurl' => (new CUrl('disc_prototypes.php'))
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('context', $data['context'])
+					->getUrl()
+			])
+		);
 
 	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),

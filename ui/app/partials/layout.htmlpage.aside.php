@@ -37,30 +37,18 @@ $header = (new CDiv())
 	)
 	->addItem(
 		(new CDiv([
-			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_DOUBLE_LEFT)
-				->addClass('button-compact')
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOUBLE_LEFT, _('Collapse sidebar')))
 				->addClass('js-sidebar-mode')
-				->setAttribute('title', _('Collapse sidebar')),
-			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_CHEVRON_DOUBLE_RIGHT)
-				->addClass('button-expand')
+				->addClass('button-compact'),
+			(new CButtonIcon(ZBX_ICON_CHEVRON_DOUBLE_RIGHT, _('Expand sidebar')))
 				->addClass('js-sidebar-mode')
-				->setAttribute('title', _('Expand sidebar')),
-			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_COLLAPSE)
-				->addClass('button-hide')
+				->addClass('button-expand'),
+			(new CButtonIcon(ZBX_ICON_COLLAPSE, _('Hide sidebar')))
 				->addClass('js-sidebar-mode')
-				->setAttribute('title', _('Hide sidebar')),
-			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_EXPAND)
+				->addClass('button-hide'),
+			(new CButtonIcon(ZBX_ICON_EXPAND, _('Show sidebar')))
+				->addClass('js-sidebar-mode')
 				->addClass('button-show')
-				->addClass('js-sidebar-mode')
-				->setAttribute('title', _('Show sidebar'))
 		]))->addClass('sidebar-header-buttons')
 	);
 
@@ -68,7 +56,7 @@ $server_name = ($data['server_name'] !== '')
 	? (new CDiv($data['server_name']))->addClass(ZBX_STYLE_SERVER_NAME)
 	: null;
 
-$search_icon = (new CSubmitButton(null))
+$search_icon = (new CSubmitButton())
 	->addClass(ZBX_STYLE_BTN_ICON)
 	->addClass(ZBX_ICON_SEARCH)
 	->addClass('js-search')

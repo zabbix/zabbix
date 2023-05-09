@@ -1845,9 +1845,9 @@ define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
 define('ZBX_STYLE_BTN_OVERLAY_CLOSE', 'btn-overlay-close');
 define('ZBX_STYLE_BTN_TAG', 'btn-tag');
 define('ZBX_STYLE_BTN_TIME', 'btn-time');
-define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
+define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left'); // TODO - clean
 define('ZBX_STYLE_BTN_TIME_ZOOMOUT', 'btn-time-zoomout');
-define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right');
+define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right'); // TODO - clean
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse'); // TODO - clean
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand'); // TODO - clean
 define('ZBX_STYLE_BOTTOM', 'bottom');
@@ -1875,6 +1875,10 @@ define('ZBX_STYLE_CLOCK_LINES', 'clock-lines');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
 define('ZBX_STYLE_COLLAPSED', 'collapsed');
 define('ZBX_STYLE_COLOR_PREVIEW_BOX', 'color-preview-box');
+define('ZBX_STYLE_COLOR_ICON', 'color-icon');
+define('ZBX_STYLE_COLOR_NEGATIVE', 'color-negative');
+define('ZBX_STYLE_COLOR_POSITIVE', 'color-positive');
+define('ZBX_STYLE_COLOR_WARNING', 'color-warning');
 define('ZBX_STYLE_COLUMN_TAGS_1', 'column-tags-1');
 define('ZBX_STYLE_COLUMN_TAGS_2', 'column-tags-2');
 define('ZBX_STYLE_COLUMN_TAGS_3', 'column-tags-3');
@@ -1906,13 +1910,10 @@ define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
 define('ZBX_STYLE_EVENT_ACTION_RED', 'event-action-red');
 define('ZBX_STYLE_EVENT_ACTION_YELLOW', 'event-action-yellow');
 define('ZBX_STYLE_EVENT_ACTION_GRAY', 'event-action-gray');
-define('ZBX_STYLE_EVENT_SEVERITY_DOWN', 'event-severity-down');
-define('ZBX_STYLE_EVENT_SEVERITY_UP', 'event-severity-up');
-define('ZBX_STYLE_EVENT_SEVERITY_CHANGED', 'event-severity-changed');
-define('ZBX_STYLE_EVENT_ACKNOWLEDGED', 'event-acknowledged');
+//define('ZBX_STYLE_EVENT_ACKNOWLEDGED', 'event-acknowledged'); // TODO - delete
 define('ZBX_STYLE_EVENT_MESSAGES', 'event-messages');
 define('ZBX_STYLE_TRIGGER_DEPENDENCY', 'trigger-dependency');
-define('ZBX_STYLE_SUPPRESSIONS_PROBLEM', 'suppressions-problem');
+define('ZBX_STYLE_SUPPRESSIONS_PROBLEM', 'suppressions-problem'); // TODO: clear
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
 define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
@@ -1928,7 +1929,7 @@ define('ZBX_STYLE_TIME_INPUT_ERROR', 'time-input-error');
 define('ZBX_STYLE_TIME_QUICK', 'time-quick');
 define('ZBX_STYLE_TIME_QUICK_RANGE', 'time-quick-range');
 define('ZBX_STYLE_TIME_SELECTION_CONTAINER', 'time-selection-container');
-define('ZBX_STYLE_TRIGGER_DESCRIPTION', 'trigger-description');
+define('ZBX_STYLE_TRIGGER_DESCRIPTION', 'trigger-description'); // TODO zi-alert-with-content
 define('ZBX_STYLE_FILTER_BTN_CONTAINER', 'filter-btn-container');
 define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
@@ -1957,9 +1958,30 @@ define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
+define('ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL', 'hintbox-wrap-horizontal');
 define('ZBX_STYLE_ICON', 'icon');
 define('ZBX_STYLE_ICON_COUNT', 'icon-count');
-define('ZBX_STYLE_ICON_INFO', 'icon-info');
+define('ZBX_STYLE_ICON_HELP', 'icon-help');
+define('ZBX_STYLE_ICON_INFO', 'icon-info'); // TODO: clean
+
+
+define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
+define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
+define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
+define('ZBX_STYLE_ACTION_ICON_MSGS', 'icon-action-msgs');
+define('ZBX_STYLE_ACTION_ICON_SEV_UP', 'icon-action-severity-up');
+define('ZBX_STYLE_ACTION_ICON_SEV_DOWN', 'icon-action-severity-down'); // TODO - delete
+define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
+define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
+define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
+define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
+define('ZBX_STYLE_ACTION_ICON_ACK_GREEN', 'icon-action-ack-green');
+define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
+define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
+define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
+define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom');
+
+
 //define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
 //define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom'); // TODO: DF clean
 //define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
@@ -2054,6 +2076,8 @@ define('ZBX_STYLE_SETUP_LEFT_CURRENT', 'setup-left-current');
 define('ZBX_STYLE_SETUP_RIGHT', 'setup-right');
 define('ZBX_STYLE_SETUP_RIGHT_BODY', 'setup-right-body');
 define('ZBX_STYLE_SETUP_TITLE', 'setup-title');
+define('ZBX_STYLE_SEVERITY_DOWN', 'severity-down'); // TODO - delete
+define('ZBX_STYLE_SEVERITY_UP', 'severity-up');
 define('ZBX_STYLE_SIGNIN_CONTAINER', 'signin-container');
 define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
@@ -2108,11 +2132,10 @@ define('ZBX_STYLE_PROBLEM_EXPAND_TD', 'problem-expand-td');
 define('ZBX_STYLE_PROBLEM_NESTED', 'problem-nested');
 define('ZBX_STYLE_PROBLEM_NESTED_SMALL', 'problem-nested-small');
 define('ZBX_STYLE_NO_HOVER_PROBLEM_NESTED', 'hover-nobg-problem-nested');
-define('ZBX_STYLE_SYMPTOM', 'symptom');
-define('ZBX_STYLE_SYMPTOM_LIMIT_TD', 'symptom-limit-td');
+define('ZBX_STYLE_SYMPTOM_LIMIT_TD', 'symptom-limit-td'); // TODO: check if needs
 define('ZBX_STYLE_SYMPTOMS_COUNT', 'symptoms-count');
 define('ZBX_STYLE_SECOND_COL', 'second-col');
-define('ZBX_STYLE_THIRD_COL', 'third-col');
+define('ZBX_STYLE_THIRD_COL', 'third-col'); // TODO: check if needs
 define('ZBX_STYLE_TOC', 'toc');
 define('ZBX_STYLE_TOC_ARROW', 'toc-arrow');
 define('ZBX_STYLE_TOC_ITEM', 'toc-item');
@@ -2208,18 +2231,22 @@ define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
 // Icons.
 define('ZBX_ICON_ALERT', 'zi-alert');
+define('ZBX_ICON_ALERT_WITH_CONTENT', 'zi-alert-with-content');
 define('ZBX_ICON_ALERT_MORE', 'zi-alert-more');
 define('ZBX_ICON_ARROW_BACK', 'zi-arrow-back');
 define('ZBX_ICON_ARROW_DOWN', 'zi-arrow-down');
+define('ZBX_ICON_ARROW_DOWN_SMALL', 'zi-arrow-down-small');
 define('ZBX_ICON_ARROW_RIGHT_TOP', 'zi-arrow-right-top');
 define('ZBX_ICON_ARROW_TOP_RIGHT', 'zi-arrow-top-right');
 define('ZBX_ICON_ARROW_UP', 'zi-arrow-up');
+define('ZBX_ICON_ARROW_UP_SMALL', 'zi-arrow-up-small');
 define('ZBX_ICON_ARROWS_TOP_BOTTOM', 'zi-arrows-top-bottom');
 define('ZBX_ICON_BELL', 'zi-bell');
 define('ZBX_ICON_BELL_OFF', 'zi-bell-off');
 define('ZBX_ICON_BULLET_ALT_DOWN', 'zi-bullet-alt-down');
 define('ZBX_ICON_BULLET_ALT_UP', 'zi-bullet-alt-up');
 define('ZBX_ICON_BULLET_RIGHT', 'zi-bullet-right');
+define('ZBX_ICON_BULLET_RIGHT_WITH_CONTENT', 'zi-bullet-right-with-content');
 define('ZBX_ICON_CALENDAR', 'zi-calendar');
 define('ZBX_ICON_CALENDAR_CHECK', 'zi-calendar-check');
 define('ZBX_ICON_CALENDAR_WARNING', 'zi-calendar-warning');
@@ -2252,6 +2279,7 @@ define('ZBX_ICON_FILTER', 'zi-filter');
 define('ZBX_ICON_FULLSCREEN', 'zi-fullscreen');
 define('ZBX_ICON_HELP', 'zi-help');
 define('ZBX_ICON_HELP_FILLED_SMALL', 'icon-help-filled-small');
+define('ZBX_ICON_HELP_SMALL', 'zi-help-small');
 define('ZBX_ICON_HIERARCHY', 'zi-hierarchy');
 define('ZBX_ICON_HOME', 'zi-home');
 define('ZBX_ICON_I', 'zi-i');
@@ -2265,6 +2293,7 @@ define('ZBX_ICON_PENCIL', 'zi-pencil');
 define('ZBX_ICON_PLAY', 'zi-play');
 define('ZBX_ICON_PLUS', 'zi-plus');
 define('ZBX_ICON_REMOVE', 'zi-remove');
+define('ZBX_ICON_REMOVE_SMALL', 'zi-remove-small');
 define('ZBX_ICON_REPORT', 'zi-report');
 define('ZBX_ICON_SEARCH', 'zi-search');
 define('ZBX_ICON_SIGNOUT', 'zi-signout');

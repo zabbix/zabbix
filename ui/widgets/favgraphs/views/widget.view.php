@@ -38,9 +38,7 @@ foreach ($data['graphs'] as $graph) {
 			? new CLink($graph['label'], $url)
 			: $graph['label'],
 		(new CCol(
-			(new CSimpleButton())
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_REMOVE)
+			(new CButtonIcon(ZBX_ICON_REMOVE_SMALL, _('Delete')))
 				->setAttribute('data-itemid', $graph['itemid'])
 				->setAttribute('aria-label', _xs('Remove, %1$s', 'screen reader', $graph['label']))
 				->onClick('rm4favorites("itemid", this.dataset.itemid);')

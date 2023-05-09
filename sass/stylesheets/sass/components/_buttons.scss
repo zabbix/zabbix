@@ -1,4 +1,5 @@
 button {
+	position: relative;
 	min-height: 24px;
 	padding: 0 11px;
 	margin: 0;
@@ -46,7 +47,7 @@ button {
 		&:not(:empty) {
 			&::before {
 				margin-right: 4px;
-				margin-left: -4px;
+				margin-left: -6px;
 			}
 		}
 
@@ -117,21 +118,15 @@ a.btn-icon {
 a.btn-icon,
 .btn-icon,
 .btn-overlay-close {
+	color: $icon-btn-color;
 	background: transparent;
 	border: none;
-
-	&::before {
-		color: $icon-btn-color;
-	}
 
 	&:hover,
 	&:focus,
 	&:active {
+		color: $icon-btn-hover-color;
 		background: transparent;
-
-		&::before {
-			color: $icon-btn-hover-color;
-		}
 	}
 
 	&[disabled] {
@@ -152,15 +147,14 @@ a.btn-icon,
 }
 
 .btn-link {
-	position: relative;
-	background-color: $transparent;
+	padding: 0;
+	min-height: inherit;
+	color: $link-color;
+	font-size: inherit;
+	background-color: transparent;
 	border: 0;
 	border-bottom: 1px dotted $link-color;
 	border-radius: 0;
-	color: $link-color;
-	font-size: inherit;
-	padding: 0;
-	min-height: inherit;
 
 	&.red {
 		color: $red;
@@ -197,10 +191,10 @@ a.btn-icon,
 	}
 
 	&[disabled] {
-		background-color: $transparent;
+		background-color: transparent;
 
 		&:hover {
-			background-color: $transparent;
+			background-color: transparent;
 		}
 	}
 }

@@ -1,0 +1,75 @@
+%icon-small {
+	&::before {
+		font-size: $icon-small-size;
+	}
+}
+
+%icon-with-content {
+	&::after {
+		content: attr(data-content);
+		position: absolute;
+		top: 3px;
+		font-size: 9px;
+		line-height: 1;
+		letter-spacing: -.25px;
+	}
+}
+
+.icon {
+	@extend %icon-position;
+
+	color: $icon-color;
+}
+
+.zi-alert-with-content {
+	@extend .zi-alert;
+	@extend %icon-with-content;
+
+	color: $icon-color;
+
+	&::before {
+		font-size: 20px;
+		line-height: 18px;
+	}
+
+	&::after {
+		color: $icon-content-color;
+	}
+}
+
+.zi-arrow-down-small {
+	@extend .zi-arrow-down;
+	@extend %icon-small;
+}
+
+.zi-arrow-up-small {
+	@extend .zi-arrow-up;
+	@extend %icon-small;
+}
+
+.zi-bullet-right-with-content {
+	@extend .zi-bullet-right;
+	@extend %icon-with-content;
+
+	color: $icon-color;
+
+	&::before {
+		position: absolute;
+		bottom: 0;
+		line-height: 6px;
+	}
+
+	&::after {
+		color: $font-color;
+	}
+}
+
+.zi-help-small {
+	@extend .zi-help;
+	@extend %icon-small;
+}
+
+.zi-remove-small {
+	@extend .zi-remove;
+	@extend %icon-small;
+}

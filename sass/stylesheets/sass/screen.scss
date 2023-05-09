@@ -39,6 +39,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "layout/form-grid";
 
 @import "components/buttons";
+@import "components/icons_extended";
 @import "components/checkbox-list";
 @import "components/color-picker";
 @import "components/columns-wrapper";
@@ -425,7 +426,7 @@ form {
 	cursor: auto;
 	text-align: center;
 	border: 0;
-	background-color: $transparent;
+	background-color: transparent;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -438,7 +439,7 @@ form {
 
 	&:hover,
 	&:focus {
-		background-color: $transparent;
+		background-color: transparent;
 
 		.arrow-right {
 			border-left-color: $link-color;
@@ -590,7 +591,7 @@ form {
 	}
 }
 
-.btn-time-zoomout {
+.btn-time-zoomout {   // TODO: Fix js-btn-time-zoomout
 	vertical-align: top;
 	color: $font-color;
 	background-color: transparent;
@@ -970,7 +971,7 @@ form {
 	}
 
 	//.icon-help, // TODO change to icon-help-filled-small
-	.icon-info {
+	.icon-info { // TODO check with class zi-i
 		position: relative;
 		top: 1px;
 		margin-left: 5px;
@@ -1593,7 +1594,7 @@ select {
 }
 
 %btn-widget-hover-active {
-	background-color: $transparent;
+	background-color: transparent;
 	opacity: 1;
 }
 
@@ -1635,7 +1636,7 @@ select {
 
 button {
 	//&.icon-help, // TODO change to icon-help-filled-small
-	&.icon-info {
+	&.icon-info { // TODO check with class zi-i
 		width: 16px;
 		height: 16px;
 		min-height: 16px;
@@ -1657,7 +1658,7 @@ button {
 	//	}
 	//}
 
-	&.icon-info {
+	&.icon-info { // TODO check with class zi-i
 		&::before {
 			font-size: $icon-small-size;
 		}
@@ -1969,6 +1970,21 @@ button {
 	.dashboard-widget-head {
 		margin: -8px -10px 6px -10px;
 		padding: 8px 10px;
+
+		a.btn-icon,
+		.btn-icon,
+		.btn-overlay-close {
+			position: initial;
+			width: 18px;
+			height: 18px;
+			min-height: 18px;
+			margin-top: -9px;
+			margin-left: 4px;
+
+			&:last-child {
+				margin-right: -6px;
+			}
+		}
 	}
 
 	&.modal {
@@ -1979,25 +1995,6 @@ button {
 
 		.dashboard-widget-head {
 			margin-bottom: 12px;
-
-			a.btn-icon,
-			.btn-icon,
-			.btn-overlay-close {
-				position: initial;
-				width: 18px;
-				height: 18px;
-				min-height: 18px;
-				margin-top: -9px;
-				margin-left: 4px;
-
-				&::before {
-					font-size: $icon-small-size;
-				}
-
-				&:last-child {
-					margin-right: -6px;
-				}
-			}
 		}
 
 		.overlay-dialogue-body {
@@ -2097,12 +2094,16 @@ button {
 		}
 	}
 
-	.hintbox-wrap {
+	.hintbox-wrap,
+	.hintbox-wrap-horizontal {
 		overflow: auto;
-		max-height: 240px;
 		max-width: 800px;
 		overflow-wrap: break-word;
 		@extend %webkit-scrollbar;
+	}
+
+	.hintbox-wrap {
+		max-height: 240px;
 	}
 
 	.msg-bad,
@@ -2475,7 +2476,7 @@ button {
 
 	.btn-grey {
 		border: 0;
-		background-color: $transparent;
+		background-color: transparent;
 	}
 }
 
@@ -2894,7 +2895,7 @@ a.link-action {
 	}
 }
 
-.status-container {
+.status-container { // TODO: check, fix font size and paddings
 	display: inline-block;
 	white-space: nowrap;
 	margin: 1px 3px 1px 0;
@@ -3106,7 +3107,7 @@ a.link-action {
 		transition: none;
 	}
 
-	&.blink-hidden {
+	&.blink-hidden { // TODO: check
 		background-color: transparent;
 
 		a {
@@ -3429,7 +3430,7 @@ tr.cursor-move {
 	min-width: 16px;
 	white-space: nowrap;
 
-	.icon-info {
+	.icon-info { // TODO check with class zi-i
 		margin-left: 5px;
 
 		&:first-of-type {
@@ -4040,7 +4041,7 @@ a.icon-count {
 .icon-action-msg,
 .icon-action-msgs,
 .icon-action-severity-up,
-.icon-action-severity-down,
+.icon-action-severity-down, // TODO - delete
 .icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
@@ -4073,7 +4074,7 @@ a.icon-count {
 }
 
 // Screen reader.
-.inline-sr-only {
+.inline-sr-only { // TODO: WTF
 	font-size: 0;
 }
 
@@ -4797,5 +4798,30 @@ z-select,
 
 	&::before {
 		font-size: 24px;
+	}
+}
+
+// Dynamically generated classes:
+// .color-negative
+// .color-positive
+// .color-warning
+// .color-icon
+@each $class, $color in (
+	color-icon: $icon-color,
+	color-negative: $negative-color,
+	color-positive: $positive-color,
+	color-warning: $warning-color
+) {
+	.#{$class} {
+		color: $color;
+	}
+
+	.btn-icon {
+		&.#{$class} {
+			&:hover,
+			&:focus {
+				color: $color;
+			}
+		}
 	}
 }

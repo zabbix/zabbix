@@ -114,26 +114,17 @@ foreach ($data['services'] as $serviceid => $service) {
 		zbx_date2str(DATE_FORMAT, $service['created_at']),
 		$data['tags'][$serviceid],
 		(new CCol([
-			(new CSimpleButton())
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_PLUS)
+			(new CButtonIcon(ZBX_ICON_PLUS, _('Add child service')))
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Add child service'))
 				->setEnabled(!$service['readonly'] && $service['problem_tags'] == 0),
-			(new CSimpleButton())
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_PENCIL)
+			(new CButtonIcon(ZBX_ICON_PENCIL, _('Edit')))
 				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Edit'))
 				->setEnabled(!$service['readonly']),
-			(new CSimpleButton())
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass(ZBX_ICON_REMOVE)
+			(new CButtonIcon(ZBX_ICON_REMOVE_SMALL, _('Delete')))
 				->addClass('js-delete-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Delete'))
 				->setEnabled(!$service['readonly'])
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	])));

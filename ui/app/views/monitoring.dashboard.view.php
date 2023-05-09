@@ -154,14 +154,14 @@ $html_page = (new CHtmlPage())
 				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
 				->addItem(
 					(new CSimpleButton())
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
 						->addClass(ZBX_ICON_CHEVRON_LEFT)
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
 						->setTitle(_('Previous page'))
 				)
 				->addItem(
 					(new CSimpleButton())
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
 						->addClass(ZBX_ICON_PAUSE)
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
 							: _s('Start slideshow')
@@ -174,8 +174,8 @@ $html_page = (new CHtmlPage())
 				)
 				->addItem(
 					(new CSimpleButton())
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
 						->addClass(ZBX_ICON_CHEVRON_RIGHT)
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
 						->setTitle(_('Next page'))
 				)
 			: null
@@ -224,15 +224,12 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 				(new CDiv())
 					->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 					->addItem([
-						(new CSimpleButton())
-							->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
-							->addClass(ZBX_STYLE_BTN_ICON)
+						(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
 							->addClass(ZBX_ICON_CHEVRON_LEFT)
+							->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
 							->setEnabled(false),
-						(new CSimpleButton())
+						(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))
 							->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE)
-							->addClass(ZBX_STYLE_BTN_ICON)
-							->addClass(ZBX_ICON_CHEVRON_RIGHT)
 							->setEnabled(false),
 						(new CSimpleButton([
 							(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),

@@ -807,7 +807,7 @@ a.icon-count {
 .warning-bg,
 .high-bg,
 .disaster-bg {
-	&.blink-hidden::after {
+	&.blink-hidden::after { // TODO: check
 		content: none;
 	}
 

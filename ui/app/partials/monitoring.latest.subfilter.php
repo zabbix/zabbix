@@ -167,7 +167,7 @@ if (count($subfilters['tags']) > 0) {
 		$subfilter_options['tags'][] = (new CButton('expand_tag_values'))
 			->setAttribute('data-name', 'tags')
 			->addClass(ZBX_STYLE_BTN_ICON)
-			->addClass(ZBX_ICON_MORE);
+			->addClass(ZBX_ICON_MORE); // TODO: ZBX_STYLE_ICON_WIZARD_ACTION
 	}
 }
 else {

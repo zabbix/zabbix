@@ -176,10 +176,10 @@ class CHtmlPage {
 		if ($this->doc_url !== '') {
 			$divs[] = (new CDiv(
 				(new CLink(null, $this->doc_url))
-					->setTitle(_('Help'))
-					->setTarget('_blank')
 					->addClass(ZBX_STYLE_BTN_ICON)
 					->addClass(ZBX_ICON_HELP)
+					->setTitle(_('Help'))
+					->setTarget('_blank')
 			))->addClass(self::ZBX_STYLE_HEADER_DOC_LINK);
 		}
 
