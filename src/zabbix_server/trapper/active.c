@@ -349,12 +349,10 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, buffer);
 
-	zbx_alarm_on(config_timeout);
-	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
+	if (SUCCEED != zbx_tcp_send_ext(sock, buffer, strlen(buffer), 0, 0, config_timeout))
 		zbx_strlcpy(error, zbx_socket_strerror(), MAX_STRING_LEN);
 	else
 		ret = SUCCEED;
-	zbx_alarm_off();
 
 	zbx_free(buffer);
 out:
@@ -737,7 +735,7 @@ error:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, json.buffer);
 
-	ret = zbx_tcp_send(sock, json.buffer);
+	ret = zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_json_free(&json);
 out:
