@@ -34,6 +34,8 @@ window.mediatype_edit_popup = new class {
 		this.mediatypeid = mediatype.mediatypeid;
 		this.mediatype = mediatype;
 		this.row_num = 0;
+		this.message_template_list = {};
+		this.message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>;
 
 		this._loadView(mediatype);
 		this._initActions();
@@ -42,23 +44,23 @@ window.mediatype_edit_popup = new class {
 	}
 
 	_initActions() {
-		// todo implement this functionality after message template popup submit is implemented:
-		// var limit_reached = (Object.keys(message_template_list).length == Object.keys(message_templates).length);
-		// jQuery('#message-templates-footer .btn-link')
-		//	.prop('disabled', limit_reached)
-		//	.text(limit_reached
-		//		? <?php // = json_encode(_('Add (message type limit reached)')) ?>
-		//		: <?php // = json_encode(_('Add')) ?>
-		//	);
+		if (typeof(this.mediatype.parameters_webhook) === 'object') {
+			this.mediatype.parameters_webhook = Object.values(this.mediatype.parameters_webhook);
 
-		for (const parameter of this.mediatype.parameters_webhook) {
-			this._addWebhookParam(parameter);
+			for (const parameter of this.mediatype.parameters_webhook) {
+				this._addWebhookParam(parameter);
+			}
 		}
 
-		for (const parameter of this.mediatype.parameters_exec) {
-			this._addExecParam(parameter);
-			this.row_num ++;
+		if (typeof(this.mediatype.parameters_exec) === 'object') {
+			this.mediatype.parameters_exec = Object.values(this.mediatype.parameters_exec);
+
+			for (const parameter of this.mediatype.parameters_exec) {
+				this._addExecParam(parameter);
+				this.row_num ++;
+			}
 		}
+
 
 		const event_menu = this.form.querySelector('#show_event_menu');
 
@@ -66,9 +68,14 @@ window.mediatype_edit_popup = new class {
 			if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
 			}
+			else if (e.target.classList.contains('js-remove-msg-template')) {
+				this._removeMessageTemplate(e);
+			}
 		});
 
+		// Message templates.
 		this._initMessageTemplates();
+		this._populateMessageTemplates(<?= json_encode(array_values($data['message_templates'])) ?>);
 
 		document.querySelector("#message-templates > table").addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-remove')) {
@@ -96,6 +103,12 @@ window.mediatype_edit_popup = new class {
 				this._toggleChangePswdButton();
 			});
 		}
+	}
+
+	_removeMessageTemplate(e) {
+		e.target.closest('tr').remove();
+		delete this.message_template_list[e.target.closest('tr').getAttribute('data-message-type')];
+		this._toggleAddButton();
 	}
 
 	_toggleChangePswdButton() {
@@ -152,6 +165,10 @@ window.mediatype_edit_popup = new class {
 		const fields = getFormFields(this.form);
 
 		// todo - after all fields added/fixed : check if works as expected
+		// todo - do not trim description
+		// todo - trim script parameters
+		// todo - trim webhook parameters
+
 		for (let key in fields) {
 			if (typeof fields[key] === 'string') {
 				fields[key] = fields[key].trim();
@@ -222,11 +239,16 @@ window.mediatype_edit_popup = new class {
 	}
 
 	_initMessageTemplates() {
-		document.querySelector('#message-templates').addEventListener('click', function(event) {
-			var target = event.target;
+		let overlay;
+
+		document.querySelector('#message-templates').addEventListener('click', (event)=> {
+			let target = event.target;
+			let row = null;
+
 			if (target.hasAttribute('data-action')) {
-				var btn = target;
-				var params = {
+
+				const btn = target;
+				let params = {
 					type: document.querySelector('#type').value,
 					content_type: document.querySelector('input[name="content_type"]:checked').value,
 					message_types: Array.from(document.querySelectorAll('tr[data-message-type]')).map(function(tr) {
@@ -236,14 +258,15 @@ window.mediatype_edit_popup = new class {
 
 				switch (btn.dataset.action) {
 					case 'add':
-						PopUp('popup.mediatype.message', params, {
+						overlay = PopUp('mediatype.message.edit', params, {
 							dialogue_class: 'modal-popup-medium',
+							dialogueid: 'mediatype-message-form',
 							trigger_element: target
 						});
 						break;
 
 					case 'edit':
-						var row = btn.closest('tr');
+						row = btn.closest('tr');
 
 						params.message_type = row.dataset.messageType;
 						params.old_message_type = params.message_type;
@@ -256,14 +279,88 @@ window.mediatype_edit_popup = new class {
 							}
 						});
 
-						PopUp('popup.mediatype.message', params, {
+						overlay = PopUp('mediatype.message.edit', params, {
 							dialogue_class: 'modal-popup-medium',
+							dialogueid: 'mediatype-message-form',
 							trigger_element: target
 						});
 						break;
 				}
+
+				overlay.$dialogue[0].addEventListener('message.submit', (e) => {
+					if (row !== null) {
+						this._addMessageTemplateRow(e.detail, row);
+						row.remove();
+					}
+					else {
+						this._addMessageTemplateRow(e.detail);
+					}
+				});
 			}
 		});
+	}
+
+	_addMessageTemplateRow(input, row = null) {
+		const template = new Template(this.form.querySelector('#message-templates-row-tmpl').innerHTML);
+
+		if (row === null) {
+			this.form
+				.querySelector('#message-templates tbody')
+				.insertAdjacentHTML('beforeend', template.evaluate(input));
+		}
+		else {
+			row.insertAdjacentHTML('afterend', template.evaluate(input));
+		}
+
+		this.message_template_list[input.message_type] = input;
+		this._toggleAddButton();
+	}
+
+	_populateMessageTemplates(list) {
+		for (const key in list) {
+			if (!Object.prototype.hasOwnProperty.call(list, key)) continue;
+			const template = list[key];
+			const messageTemplate = this._getMessageTemplate(template.eventsource, template.recovery);
+
+			template.message_type = messageTemplate.message_type;
+			template.message_type_name = messageTemplate.name;
+
+			this._addMessageTemplateRow(template);
+			this.message_template_list[template.message_type] = template;
+		}
+
+		this._toggleAddButton();
+	}
+
+	_getMessageTemplate(eventsource, recovery) {
+		for (let message_type in this.message_templates) {
+			if (!this.message_templates.hasOwnProperty(message_type)) {
+				continue;
+			}
+
+			const template = this.message_templates[message_type];
+
+			if (template.eventsource == eventsource && template.recovery == recovery) {
+				return {
+					message_type: message_type,
+					name: template.name
+				};
+			}
+		}
+	}
+
+	/**
+	 * Toggles the "Add" button state and changes its text depending on message template count.
+	 */
+	_toggleAddButton() {
+		const limit_reached = (Object.keys(this.message_template_list).length == Object.keys(this.message_templates).length);
+
+		const linkBtn = this.form.querySelector('#message-templates-footer .btn-link');
+		linkBtn.disabled = limit_reached;
+		linkBtn.textContent = limit_reached
+			? <?= json_encode(_('Add (message type limit reached)')) ?>
+			: <?= json_encode(_('Add')) ?>
+
 	}
 
 	_addExecParamsRow() {

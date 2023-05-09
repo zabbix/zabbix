@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,28 +19,26 @@
 **/
 
 
-/**
- * Controller class containing operations for adding and updating media type message templates.
- */
-class CControllerPopupMediatypeMessage extends CController {
+class CControllerMediatypeMessageCheck extends CController {
 
 	/**
 	 * @var array  An array with all message template types.
 	 */
 	protected $message_types = [];
 
-	protected function init() {
+
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
 
 		$this->message_types = CMediatypeHelper::getAllMessageTypes();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'content_type' =>		'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_type' =>		'in -1,'.implode(',', $this->message_types),
-			'old_message_type' =>	'in -1,'.implode(',', $this->message_types),
+			'message_type' =>		'in '.implode(',', $this->message_types),
 			'message_types' =>		'array',
 			'subject' =>			'db media_type_message.subject',
 			'message' =>			'db media_type_message.message'
@@ -65,41 +63,24 @@ class CControllerPopupMediatypeMessage extends CController {
 		return true;
 	}
 
+	/**
+	 * @throws JsonException
+	 */
 	protected function doAction() {
 		$data = [
 			'type' => $this->getInput('type'),
 			'content_type' => $this->getInput('content_type'),
 			'message_type' => $this->getInput('message_type', -1),
-			'old_message_type' => $this->getInput('old_message_type', -1),
 			'message_types' => $this->getInput('message_types', []),
 			'subject' => $this->getInput('subject', ''),
 			'message' => $this->getInput('message', '')
 		];
 
-		if (!$this->hasInput('message_type')) {
-			$diff = array_diff($this->message_types, $data['message_types']);
-			$diff = reset($diff);
-			$data['message_type'] = $diff ? $diff : CMediatypeHelper::MSG_TYPE_PROBLEM;
-			$message_template = CMediatypeHelper::getMessageTemplate($data['type'], $data['message_type'],
-				$data['content_type']
-			);
-			$data['subject'] = $message_template['subject'];
-			$data['message'] = $message_template['message'];
-		}
-		else {
-			$from = CMediatypeHelper::transformFromMessageType($data['message_type']);
-			$data['eventsource'] = $from['eventsource'];
-			$data['recovery'] = $from['recovery'];
-		}
+		$from = CMediatypeHelper::transformFromMessageType($data['message_type']);
+		$data['eventsource'] = $from['eventsource'];
+		$data['recovery'] = $from['recovery'];
+		$data['message_type_name'] = $from['name'];
 
-		$output = [
-			'title' => _('Message template'),
-			'params' => $data,
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		];
-
-		$this->setResponse(new CControllerResponseData($output));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));
 	}
 }

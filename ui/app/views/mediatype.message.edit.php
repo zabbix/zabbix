@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -25,9 +25,9 @@
  */
 
 $form = (new CForm())
-	->setId('mediatype_message_form')
-	->setName('mediatype_message_form')
-	->addVar('action', 'popup.mediatype.message')
+	->setId('mediatype-message-form')
+	//->setName('mediatype_message_form')
+	->addVar('action', 'mediatype.message.edit')
 	->addVar('type', $data['params']['type'])
 	->addVar('content_type', $data['params']['content_type'])
 	->addVar('old_message_type', $data['params']['old_message_type'])
@@ -94,7 +94,10 @@ $form_list->addRow(_('Message'),
 
 $form
 	->addItem($form_list)
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
+	->addItem(
+		(new CScriptTag('mediatype_message_popup.init();'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => $data['title'],
@@ -105,11 +108,10 @@ $output = [
 			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitMessageTemplate(overlay);'
+			'action' => 'mediatype_message_popup.submit();'
 		]
 	],
-	'params' => $data['params'],
-	'script_inline' => $this->readJsFile('popup.mediatype.message.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.message.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

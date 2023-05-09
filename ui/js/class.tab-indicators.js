@@ -1097,7 +1097,7 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#message-templates tbody tr:not(:last-child)')
+			.querySelectorAll('#message-templates tbody tr')
 			.length;
 	}
 

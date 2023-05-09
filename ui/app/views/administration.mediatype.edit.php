@@ -372,6 +372,31 @@ $mediatype_form_grid
 		)
 	]);
 
+$message_template = (new CTemplateTag('message-templates-row-tmpl'))
+	->addItem(
+		(new CRow([
+			new CCol('#{message_type_name}'),
+			(new CCol([
+				new CSpan('#{message}'),
+				new CInput('hidden', 'message_templates[#{message_type}][eventsource]', '#{eventsource}'),
+				new CInput('hidden', 'message_templates[#{message_type}][recovery]', '#{recovery}'),
+				new CInput('hidden', 'message_templates[#{message_type}][subject]', '#{subject}'),
+				new CInput('hidden', 'message_templates[#{message_type}][message]', '#{message}')
+			]))
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;'),
+			(new CHorList([
+				(new CSimpleButton(_('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('data-action', 'edit'),
+				(new CSimpleButton(_('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-remove-msg-template')
+			]))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setAttribute('data-message-type', '#{message_type}')
+	);
+
 // Message templates tab.
 $message_templates_form_grid = (new CFormGrid())
 	->setId('messageTemplatesFormlist')
@@ -384,21 +409,24 @@ $message_templates_form_grid = (new CFormGrid())
 					_('Template'),
 					_('Actions')
 				])
-				->setFooter(
-					(new CRow(
-						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass('msg-template-add')
-								->setAttribute('data-action', 'add')
-								->addClass(ZBX_STYLE_BTN_LINK)
-						))->setColSpan(3)
-					))->setId('message-templates-footer')
+				->addItem(
+					(new CTag('tfoot', true))
+						->setId('message-templates-footer')
+						->addItem(
+							(new CCol(
+								(new CSimpleButton(_('Add')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->setAttribute('data-action', 'add')
+									->addClass('msg-template-add')
+							))->setColSpan(2)
+						)
 				)
 		))
 			->setId('message-templates')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
+	)
+	->addItem($message_template);
 
 // Media options tab.
 $max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;

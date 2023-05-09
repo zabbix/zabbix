@@ -57,7 +57,6 @@ class CControllerMediatypeEdit extends CController {
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
 			'description' =>			'db media_type.description',
-			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
 			'message_templates' =>		'array',
 			'provider' =>				'int32| in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
@@ -196,6 +195,7 @@ class CControllerMediatypeEdit extends CController {
 					$data['event_menu_url'] = $this->mediatype['event_menu_url'];
 					$data['event_menu_name'] = $this->mediatype['event_menu_name'];
 					$data['parameters_webhook'] = $this->mediatype['parameters'];
+
 					CArrayHelper::sort($data['parameters_webhook'], ['name']);
 					break;
 			}
@@ -211,26 +211,6 @@ class CControllerMediatypeEdit extends CController {
 			'event_menu_name', 'description', 'provider'
 		]);
 
-		if ($this->hasInput('form_refresh')) {
-			$data['parameters_exec'] = [];
-			foreach (array_values($this->getInput('parameters_exec', [])) as $sortorder => $parameter) {
-				$data['parameters_exec'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
-			}
-
-			$data['parameters_webhook'] = [];
-			$parameters = $this->getInput('parameters_webhook', ['name' => [], 'value' => []]);
-			$name = reset($parameters['name']);
-			$value = reset($parameters['value']);
-
-			while ($name !== false) {
-				$data['parameters_webhook'][] = compact('name', 'value');
-				$name = next($parameters['name']);
-				$value = next($parameters['value']);
-			}
-
-			$message_templates = $this->getInput('message_templates', []);
-		}
-
 		if ($message_templates) {
 			CArrayHelper::sort($message_templates, ['recovery']);
 
@@ -245,6 +225,7 @@ class CControllerMediatypeEdit extends CController {
 				}
 			}
 		}
+
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);

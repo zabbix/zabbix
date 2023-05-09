@@ -27,11 +27,6 @@
 $this->includeJsFile('administration.mediatype.list.js.php');
 $this->addJsFile('multilineinput.js');
 
-// todo - remove this?
-if ($data['uncheck']) {
-	uncheckTableRows('mediatype');
-}
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_LIST))
