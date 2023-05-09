@@ -97,7 +97,7 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 
 		curline++
 		if curline >= startline {
-			if out, ok := zbxregexp.ExecuteRegex(decode(encoder, scanner.Bytes()), rx, []byte(output)); ok {
+			if out, ok := zbxregexp.ExecuteRegex(decode(encoder, scanner.Bytes(), len(scanner.Bytes())), rx, []byte(output)); ok {
 				return out, nil
 			}
 		}

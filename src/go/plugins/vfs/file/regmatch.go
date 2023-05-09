@@ -20,19 +20,25 @@
 package file
 
 import (
-	"bufio"
+	//	"io/ioutil"
+	"bytes"
+	"io"
+	//"bufio"
 	"errors"
 	"fmt"
 	"math"
 	"regexp"
 	"strconv"
 	"time"
+	"git.zabbix.com/ap/plugin-support/log"
+	"strings"
 )
 
 func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error) {
-	var startline, endline, curline uint64
+	var startline, endline/*, curline*/ uint64
 
 	start := time.Now()
+	log.Infof("BADGER: %s", strings.Join(params,", "))
 
 	if len(params) > 5 {
 		return nil, errors.New("Too many parameters.")
@@ -74,31 +80,91 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		return nil, fmt.Errorf("Cannot open file %s: %s", params[0], err)
 	}
 	defer file.Close()
+	
+	// sc2, err := ioutil.ReadFile(params[0])
+	// if err != nil {
+	// 	return nil, fmt.Errorf("Cannot badger")
+	// }
 
-	// Start reading from the file with a reader.
-	scanner := bufio.NewScanner(file)
-	curline = 0
+	// log.Infof("BADGER STRATA: %v", sc2)
+
+
+	const MAX_BUFFER_LEN = 65536
+
 	ret := 0
 	r, err := regexp.Compile(params[1])
 	if err != nil {
 		return nil, fmt.Errorf("Cannot compile regular expression %s: %s", params[1], err)
 	}
 
-	for scanner.Scan() {
+	buffer := make([]byte, MAX_BUFFER_LEN)
+
+	for {
 		elapsed := time.Since(start)
 		if elapsed.Seconds() > float64(p.options.Timeout) {
 			return nil, errors.New("Timeout while processing item.")
 		}
 
-		curline++
-		if curline >= startline {
-			if match := r.Match(decode(encoder, scanner.Bytes())); match {
-				ret = 1
+
+		bytesread, err := file.Read(buffer)
+
+		if err != nil {
+			if err != io.EOF {
+				fmt.Println(err)
 			}
-		}
-		if curline >= endline {
+			
 			break
 		}
+
+		log.Infof("TOYOTA bytes read: ", bytesread)
+		log.Infof("TOYOTA bytestream to string: ", string(buffer[:bytesread]))
+
+		x := decode(encoder, buffer, bytesread)
+
+		for _, m := range bytes.Split(x, []byte("\n")) {
+			log.Infof("TOYOTA LINE X: %s", m)
+		}
+		
+		///log.Infof("TOYOTA X: ", x)
+
+
+		
+		if match := r.Match(x); match {
+			ret = 1
+		}
+
+
 	}
 	return ret, nil
+	
+	// Start reading from the file with a reader.
+	// scanner := bufio.NewScanner(file)
+	// curline = 0
+	// ret := 0
+	// r, err := regexp.Compile(params[1])
+	// if err != nil {
+	// 	return nil, fmt.Errorf("Cannot compile regular expression %s: %s", params[1], err)
+	// }
+
+	// for scanner.Scan() {
+	// 	elapsed := time.Since(start)
+	// 	if elapsed.Seconds() > float64(p.options.Timeout) {
+	// 		return nil, errors.New("Timeout while processing item.")
+	// 	}
+
+	// 	curline++
+	// 	if curline >= startline {
+	// 		a := scanner.Bytes()
+	// 		log.Infof("ALPHA: %v", a)
+	// 		x := decode(encoder, a)
+	// 		log.Infof("BADGER: %v", x)
+	// 		if match := r.Match(x); match {
+	// 			ret = 1
+	// 		}
+	// 	}
+	// 	if curline >= endline {
+	// 		break
+	// 	}
+	// }
+	// return ret, nil
 }

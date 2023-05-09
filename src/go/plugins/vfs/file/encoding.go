@@ -35,14 +35,22 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 )
 
-func decode(encoder string, inbuf []byte) (outbuf []byte) {
+func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
+	log.Infof("AAAAAA")
+
+
+		log.Infof("BADGERL %d", bytecount)
+		for i :=0 ; i < bytecount; i++ {
+		log.Infof("BADGER INBUF X: %x", inbuf[i])
+		}
+
 
 	if "" == encoder {
-		if len(inbuf) > 3 && 0xef == inbuf[0] && 0xbb == inbuf[1] && 0xbf == inbuf[2] {
+		if bytecount > 3 && 0xef == inbuf[0] && 0xbb == inbuf[1] && 0xbf == inbuf[2] {
 			encoder = "UTF-8"
-		} else if len(inbuf) > 2 && 0xff == inbuf[0] && 0xfe == inbuf[1] {
+		} else if bytecount > 2 && 0xff == inbuf[0] && 0xfe == inbuf[1] {
 			encoder = "UTF-16LE"
-		} else if len(inbuf) > 2 && 0xfe == inbuf[0] && 0xff == inbuf[1] {
+		} else if bytecount > 2 && 0xfe == inbuf[0] && 0xff == inbuf[1] {
 			encoder = "UTF-16BE"
 		} else {
 			return inbuf
@@ -57,34 +65,48 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 	defer C.free(unsafe.Pointer(fromcode))
 
 	log.Tracef("Calling C function \"iconv_open()\"")
+
+	log.Infof("BADGER tocode: %s", C.GoString(tocode))
+	log.Infof("BADGER fromcode: %s", C.GoString(fromcode))
 	cd, err := C.iconv_open(tocode, fromcode)
 
 	if err != nil {
 		return inbuf
 	}
 
-	outbuf = make([]byte, len(inbuf))
-	inbytes := C.size_t(len(inbuf))
-	outbytes := C.size_t(len(inbuf))
+	outbuf = make([]byte, bytecount)
+	inbytes := C.size_t(bytecount)
+	outbytes := C.size_t(bytecount)
 
 	for {
-		inptr := (*C.char)(unsafe.Pointer(&inbuf[len(inbuf)-int(inbytes)]))
-		outptr := (*C.char)(unsafe.Pointer(&outbuf[len(outbuf)-int(outbytes)]))
+		inptr := (*C.char)(unsafe.Pointer(&inbuf[bytecount-int(inbytes)]))
+		outptr := (*C.char)(unsafe.Pointer(&outbuf[bytecount-int(outbytes)]))
+
+			
 		log.Tracef("Calling C function \"call_iconv()\"")
 		_, err := C.call_iconv(cd, inptr, &inbytes, outptr, &outbytes)
 		if err == nil || err.(syscall.Errno) != syscall.E2BIG {
+			log.Infof("BADGER HELLO WORLD")
 			break
 		}
-		outbytes += C.size_t(len(inbuf))
-		tmp := make([]byte, len(outbuf)+len(inbuf))
+
+		for i :=0 ; i < len(outbuf); i++ {
+		log.Infof("BADGER OUTBUF X: %x", outbuf[i])
+		}
+
+		outbytes += C.size_t(bytecount)
+		tmp := make([]byte, len(outbuf)+bytecount)
 		copy(tmp, outbuf)
 		outbuf = tmp
 	}
 	outbuf = outbuf[:len(outbuf)-int(outbytes)]
 	log.Tracef("Calling C function \"iconv_close()\"")
-	C.iconv_close(cd)
+ 	C.iconv_close(cd)
+	log.Infof("BADGER decode outbuf before: %v", outbuf)
 	if len(outbuf) > 3 && 0xef == outbuf[0] && 0xbb == outbuf[1] && 0xbf == outbuf[2] {
 		outbuf = outbuf[3:]
 	}
+
+	log.Infof("BADGER decode outbuf after %v", outbuf)
 	return
 }
