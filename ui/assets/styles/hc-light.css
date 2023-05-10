@@ -298,7 +298,7 @@ a[class*=" zi-"].btn-icon, .btn-overlay-close, .icon, .multiselect .multiselect-
 .zi-play:before {
   content: "\ea4e"; }
 
-.zi-plus:before {
+.zi-plus:before, .zi-plus-small:before {
   content: "\ea4f"; }
 
 .zi-reload:before {
@@ -1209,9 +1209,6 @@ a.btn-icon,
     .btn-link[disabled]:hover {
       background-color: transparent; }
 
-.btn-alt.zi-plus::before {
-  font-size: 12px; }
-
 button.btn-overlay-close, a.btn-overlay-close.btn,
 a.btn-overlay-close.btn-icon, button.zi-remove, a.zi-remove.btn, a.btn.zi-remove-small,
 a.zi-remove.btn-icon,
@@ -1253,7 +1250,7 @@ a.btn-icon.zi-remove-small, button.zi-remove-small {
     background-color: #f4f4f4;
     border-color: #000000; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-help-small::before, .zi-remove-small::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-help-small::before, .zi-plus-small::before, .zi-remove-small::before {
   font-size: 12px; }
 
 .zi-alert-with-content::after, .zi-bullet-right-with-content::after {
@@ -1508,8 +1505,8 @@ a.btn-icon.zi-remove-small, button.zi-remove-small {
       color: #ffffff; }
   .dashboard-navigation-tabs .sortable-dragging .sortable-item {
     opacity: 1; }
-  .dashboard-navigation-tabs .btn-dashboard-page-properties:hover::before, .dashboard-navigation-tabs .btn-dashboard-page-properties:focus::before, .dashboard-navigation-tabs .btn-dashboard-page-properties:active::before {
-    color: inherit; }
+  .dashboard-navigation-tabs .btn-dashboard-page-properties:hover, .dashboard-navigation-tabs .btn-dashboard-page-properties:focus, .dashboard-navigation-tabs .btn-dashboard-page-properties:active {
+    color: #ffffff; }
 
 .dashboard-navigation-controls {
   display: flex;
@@ -2771,10 +2768,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
     box-shadow: 0 0 0 2px #111111;
     border-radius: 2px; }
 
-._list-table.problem-list .problem-row button.zi-eye-off, ._list-table.problem-list .problem-row a.zi-eye-off.btn,
-._list-table.problem-list .problem-row a.zi-eye-off.btn-icon {
-  width: 18px;
-  min-height: 18px; }
 ._list-table.problem-list.compact-view [class^="event-action-"]::before, ._list-table.problem-list.compact-view [class*=" event-action-"]::before {
   top: 7px; }
 ._list-table.problem-list.compact-view [class^="event-action-"]::after, ._list-table.problem-list.compact-view [class*=" event-action-"]::after {
@@ -7288,15 +7281,15 @@ td.inactive-bg {
 
 .inactive-bg::before {
   content: "";
-  font-size: 28px;
-  color: #ffffff;
-  text-align: center;
-  width: 34px;
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
+  width: 34px;
   min-height: 28px;
+  color: #ffffff;
+  font-size: 28px;
+  text-align: center;
   background-color: #e45959; }
 
 .msg-bad .link-action:hover,
@@ -7349,22 +7342,20 @@ td.inactive-bg {
 
 .problem-icon-link .problem-icon-list-item,
 .problem-icon-list .problem-icon-list-item {
-  background: transparent;
-  color: #000000;
   position: relative;
-  padding-left: 20px; }
+  padding-left: 20px;
+  color: #000000;
+  background: transparent; }
   .problem-icon-link .problem-icon-list-item::before,
   .problem-icon-list .problem-icon-list-item::before {
-    background-repeat: no-repeat;
-    border-radius: 3px;
     position: absolute;
     top: 0;
     left: 0;
-    height: 17px;
     width: 17px;
+    height: 17px;
     font-size: 16px;
-    color: #ffffff;
-    text-align: center; }
+    text-align: center;
+    border-radius: 3px; }
 .problem-icon-link .status-na-bg::before,
 .problem-icon-list .status-na-bg::before {
   content: ""; }

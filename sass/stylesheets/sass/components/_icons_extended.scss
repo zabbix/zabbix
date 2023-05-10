@@ -69,6 +69,11 @@
 	@extend %icon-small;
 }
 
+.zi-plus-small {
+	@extend .zi-plus;
+	@extend %icon-small;
+}
+
 .zi-remove-small {
 	@extend .zi-remove;
 	@extend %icon-small;

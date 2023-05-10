@@ -311,7 +311,7 @@ a[class*=" zi-"].btn-icon, .btn-overlay-close, .icon, .multiselect .multiselect-
 .zi-play:before {
   content: "\ea4e"; }
 
-.zi-plus:before {
+.zi-plus:before, .zi-plus-small:before {
   content: "\ea4f"; }
 
 .zi-reload:before {
@@ -1250,9 +1250,6 @@ a.btn-icon,
     .btn-link[disabled]:hover {
       background-color: transparent; }
 
-.btn-alt.zi-plus::before {
-  font-size: 12px; }
-
 button.btn-overlay-close, a.btn-overlay-close.btn,
 a.btn-overlay-close.btn-icon, button.zi-remove, a.zi-remove.btn, a.btn.zi-remove-small,
 a.zi-remove.btn-icon,
@@ -1296,7 +1293,7 @@ a.btn-icon.zi-remove-small, button.zi-remove-small {
     background-color: #414141;
     border-color: #768d99; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-help-small::before, .zi-remove-small::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-help-small::before, .zi-plus-small::before, .zi-remove-small::before {
   font-size: 12px; }
 
 .zi-alert-with-content::after, .zi-bullet-right-with-content::after {
@@ -1552,8 +1549,8 @@ a.btn-icon.zi-remove-small, button.zi-remove-small {
       color: #f2f2f2; }
   .dashboard-navigation-tabs .sortable-dragging .sortable-item {
     opacity: 1; }
-  .dashboard-navigation-tabs .btn-dashboard-page-properties:hover::before, .dashboard-navigation-tabs .btn-dashboard-page-properties:focus::before, .dashboard-navigation-tabs .btn-dashboard-page-properties:active::before {
-    color: inherit; }
+  .dashboard-navigation-tabs .btn-dashboard-page-properties:hover, .dashboard-navigation-tabs .btn-dashboard-page-properties:focus, .dashboard-navigation-tabs .btn-dashboard-page-properties:active {
+    color: #f2f2f2; }
 
 .dashboard-navigation-controls {
   display: flex;
@@ -2814,10 +2811,6 @@ div.dashboard-widget-tophosts z-bar-gauge {
     box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
     border-radius: 2px; }
 
-._list-table.problem-list .problem-row button.zi-eye-off, ._list-table.problem-list .problem-row a.zi-eye-off.btn,
-._list-table.problem-list .problem-row a.zi-eye-off.btn-icon {
-  width: 18px;
-  min-height: 18px; }
 ._list-table.problem-list.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
   color: #000000; }
   ._list-table.problem-list.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td sup,

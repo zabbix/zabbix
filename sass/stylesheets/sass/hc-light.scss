@@ -803,15 +803,15 @@ td.inactive-bg {
 .inactive-bg::before {	// FIXME: DF should be checked by AS
 	@extend %icons-font;
 	content: $zi-stop-sign;
-	font-size: $icon-medium-size * 1.75;
-	color: #ffffff;
-	text-align: center;
-	width: 34px;
 	position: absolute;
 	top: 0;
 	left: 0;
 	bottom: 0;
+	width: 34px;
 	min-height: 28px;
+	color: #ffffff;
+	font-size: $icon-medium-size * 1.75;
+	text-align: center;
 	background-color: $alt-red;
 }
 
@@ -903,23 +903,20 @@ td.inactive-bg {
 .problem-icon-link,
 .problem-icon-list {
 	.problem-icon-list-item {
-		background: transparent;
-		color: $font-color;
 		position: relative;
 		padding-left: 20px;
+		color: $font-color;
+		background: transparent;
 
 		&::before {
-			//-webkit-text-stroke: 0.2px black; // FIXME: should be asked AS for acception
-			background-repeat: no-repeat;
-			border-radius: 3px;
 			position: absolute;
 			top: 0;
 			left: 0;
-			height: 17px;
 			width: 17px;
+			height: 17px;
 			font-size: $icon-medium-size;
-			color: #ffffff;
 			text-align: center;
+			border-radius: 3px;
 		}
 	}
 

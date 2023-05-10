@@ -53,7 +53,7 @@ $html_page = (new CHtmlPage())
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem((new CButton('dashboard-add-widget', _('Add')))
-							->addClass(ZBX_ICON_PLUS)
+							->addClass(ZBX_ICON_PLUS_SMALL)
 							->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
 							(new CButton('dashboard-add'))

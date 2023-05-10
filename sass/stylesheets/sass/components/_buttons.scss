@@ -199,14 +199,6 @@ a.btn-icon,
 	}
 }
 
-.btn-alt {
-	&.zi-plus {
-		&::before {
-			font-size: $icon-small-size;
-		}
-	}
-}
-
 button {
 	&.btn-overlay-close,
 	&.zi-remove {

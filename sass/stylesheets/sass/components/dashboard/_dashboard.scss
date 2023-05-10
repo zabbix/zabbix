@@ -28,11 +28,6 @@
 		li {
 			vertical-align: middle;
 
-			//.btn-alt.zi-plus::before { // TODO acikuns check
-			//	font-size: 12px * .8;
-			//	font-weight: bolder;
-			//}
-
 			&:first-child {
 				padding: 0;
 			}
@@ -168,9 +163,7 @@
 		&:hover,
 		&:focus,
 		&:active {
-			&::before {
-				color: inherit;
-			}
+			color: $btn-color;
 		}
 	}
 }

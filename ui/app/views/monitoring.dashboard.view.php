@@ -133,7 +133,7 @@ $html_page = (new CHtmlPage())
 						->addItem(
 							(new CButton('dashboard-add-widget', _('Add')))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_ICON_PLUS)
+								->addClass(ZBX_ICON_PLUS_SMALL)
 						)
 						->addItem(
 							(new CButton('dashboard-add'))
