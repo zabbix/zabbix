@@ -312,7 +312,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'zabbix.stats[127.0.0.1,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'threshold' => 500,
+			'threshold' => 50,
 			// Removing initial block ->
 			// {"response":"success","data":{"boottime":1683011633,"uptime":113,<- ,
 			// since uptime is flaky (e.g. values "113" and "114" on agent 1 and 2 can appear)
