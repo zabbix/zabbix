@@ -20,6 +20,7 @@ zabbix_export:
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
         Currently the template supports the discovery of virtual machines (VMs), Cosmos DB for MongoDB, Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+        Currently the template supports the discovery of virtual machines (VMs), Cosmos DB for MongoDB, Storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
@@ -155,6 +156,8 @@ zabbix_export:
                     {"method": "Microsoft.DBforMySQL/servers", "version": "2017-12-01"},
                     {"method": "Microsoft.DBforPostgreSQL/flexibleServers", "version": "2021-06-01"},
                     {"method": "Microsoft.DBforPostgreSQL/servers", "version": "2017-12-01"},
+                    {"method": "Microsoft.Sql/servers", "version": "2022-05-01-preview"},
+                    {"method": "Microsoft.DocumentDB/databaseAccounts", "version": "2022-11-15-preview"}
                     {"method": "Microsoft.Sql/servers", "version": "2022-05-01-preview"},
                     {"method": "Microsoft.DocumentDB/databaseAccounts", "version": "2022-11-15-preview"}
                 ];
@@ -590,6 +593,7 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
               -
@@ -728,6 +732,7 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
           description: 'The list of the MySQL servers is provided by the subscription.'
@@ -861,6 +866,7 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
           description: 'The list of the PostgreSQL servers is provided by the subscription.'
@@ -986,9 +992,11 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
                 formulaid: A
               -
                 macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
@@ -1370,6 +1378,7 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1402,6 +1411,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
@@ -1477,6 +1487,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
                 This number includes successful and failed requests and also requests that produced errors.
                 Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
@@ -1641,6 +1653,7 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1671,6 +1684,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
+              description: 'The upper limit on the amount of storage that can be used by Azure Files Service, in bytes.'
               description: 'The upper limit on the amount of storage that can be used by Azure Files Service, in bytes.'
               preprocessing:
                 -
@@ -1732,6 +1746,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
+              description: 'The amount of storage used by the snapshots in storage account''s File service, in bytes.'
               description: 'The amount of storage used by the snapshots in storage account''s File service, in bytes.'
               preprocessing:
                 -
@@ -1795,6 +1810,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
@@ -1872,6 +1888,8 @@ zabbix_export:
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests that produced errors.
                 Use `ResponseType` dimension for the number of different types of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -1903,6 +1921,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
@@ -2032,6 +2051,7 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2094,6 +2114,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
@@ -2171,6 +2192,8 @@ zabbix_export:
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests that produced errors.
                 Use `ResponseType` dimension for the number of different types of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -2203,6 +2226,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
@@ -2452,6 +2476,7 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
+              description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2484,6 +2509,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
+                The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 The average end-to-end latency of successful requests made to a storage service or the specified API operation, expressed in milliseconds.
                 This value includes the required processing time within Azure Storage to read the request, send the response, and receive acknowledgment of the response.
               preprocessing:
@@ -2561,6 +2587,8 @@ zabbix_export:
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests that produced errors.
                 Use `ResponseType` dimension for the number of different types of responses.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
                 -
                   type: JSONPATH
@@ -2592,6 +2620,8 @@ zabbix_export:
               history: 7d
               description: |
                 The number of requests made to the storage service or a specified API operation.
+                This number includes successful and failed requests and also requests that produced errors.
+                Use `ResponseType` dimension for the number of different types of responses.
                 This number includes successful and failed requests and also requests that produced errors.
                 Use `ResponseType` dimension for the number of different types of responses.
               preprocessing:
@@ -2658,11 +2688,13 @@ zabbix_export:
               graph_items:
                 -
                   color: 199C0D
+                  color: 199C0D
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.used.capacity[{#NAME}]'
                 -
                   sortorder: '1'
+                  color: F63100
                   color: F63100
                   item:
                     host: 'Azure by HTTP'
@@ -2670,11 +2702,13 @@ zabbix_export:
                 -
                   sortorder: '2'
                   color: 00611C
+                  color: 00611C
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.table.capacity[{#NAME}]'
                 -
                   sortorder: '3'
+                  color: F7941D
                   color: F7941D
                   item:
                     host: 'Azure by HTTP'
@@ -2691,11 +2725,13 @@ zabbix_export:
               graph_items:
                 -
                   color: 199C0D
+                  color: 199C0D
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.transactions[{#NAME}]'
                 -
                   sortorder: '1'
+                  color: F63100
                   color: F63100
                   item:
                     host: 'Azure by HTTP'
@@ -2703,11 +2739,13 @@ zabbix_export:
                 -
                   sortorder: '2'
                   color: 00611C
+                  color: 00611C
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.table.transactions[{#NAME}]'
                 -
                   sortorder: '3'
+                  color: F7941D
                   color: F7941D
                   item:
                     host: 'Azure by HTTP'
@@ -2778,6 +2816,7 @@ zabbix_export:
                 formulaid: B
               -
                 macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
@@ -2872,6 +2911,22 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
         -
+          macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
+          macro: '{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+        -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
@@ -2933,9 +2988,11 @@ zabbix_export:
           description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
           macro: '{$AZURE.RESOURCE.GROUP.MATCHES}'
+          macro: '{$AZURE.RESOURCE.GROUP.MATCHES}'
           value: '.*'
           description: 'This macro is used in discovery rules.'
         -
+          macro: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
           macro: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in discovery rules.'
@@ -4697,6 +4754,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
+          description: 'The space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -4744,6 +4802,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
+          description: 'The space used in `tempdb` transaction log file, expressed in bytes. Not applicable to the data warehouses.'
           description: 'The space used in `tempdb` transaction log file, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
@@ -4799,22 +4858,27 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of CPU utilization, expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
+          description: 'The critical threshold of memory utilization, expressed in %.'
           description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
           description: 'The critical threshold of storage utilization, expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
+          description: 'The warning threshold of storage utilization, expressed in %.'
           description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
@@ -5663,6 +5727,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
+          description: 'Space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
               type: JSONPATH
@@ -5710,6 +5775,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
+          description: 'Space used in `tempdb` transaction log files, expressed in bytes. Not applicable to the data warehouses.'
           description: 'Space used in `tempdb` transaction log files, expressed in bytes. Not applicable to the data warehouses.'
           preprocessing:
             -
@@ -5765,22 +5831,27 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of CPU utilization, expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
+          description: 'The critical threshold of memory utilization, expressed in %.'
           description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
           description: 'The critical threshold of storage utilization, expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
+          description: 'The warning threshold of storage utilization, expressed in %.'
           description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
@@ -5974,9 +6045,11 @@ zabbix_export:
             -
               uuid: 3346ea2331c14fa18658eb33e461ec7c
               expression: 'min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED.CONN.MAX.WARN}'
+              expression: 'min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED.CONN.MAX.WARN}'
               name: 'Azure MySQL: Server has aborted connections'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
+              description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED.CONN.MAX.WARN}`.'
               description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED.CONN.MAX.WARN}`.'
               tags:
                 -
@@ -6368,6 +6441,7 @@ zabbix_export:
           value_type: FLOAT
           units: bps
           description: 'Network egress of a host, expressed in bytes.'
+          description: 'Network egress of a host, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6392,6 +6466,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
+          description: 'Network ingress of a host, expressed in bytes.'
           description: 'Network ingress of a host, expressed in bytes.'
           preprocessing:
             -
@@ -6438,6 +6513,7 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The replication lag, expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -6460,6 +6536,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Used backup storage, expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6481,6 +6558,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The storage limit, expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6501,6 +6579,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The storage utilization, expressed in %.'
           description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
@@ -6546,6 +6625,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Used storage space, expressed in bytes.'
+          description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -6574,8 +6654,10 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
+          value: 15s
           description: 'A response timeout for an API.'
         -
+          macro: '{$AZURE.DB.ABORTED.CONN.MAX.WARN}'
           macro: '{$AZURE.DB.ABORTED.CONN.MAX.WARN}'
           value: '25'
           description: 'The number of failed attempts to connect to the MySQL server for a trigger expression.'
@@ -6583,13 +6665,16 @@ zabbix_export:
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of CPU utilization, expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
           description: 'The critical threshold of the storage utilization, expressed in %.'
+          description: 'The critical threshold of the storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
+          description: 'The warning threshold of the storage utilization, expressed in %.'
           description: 'The warning threshold of the storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
@@ -6804,9 +6889,11 @@ zabbix_export:
             -
               uuid: 5b3a09ca04704e6a9972ee4865d358cd
               expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED.CONN.MAX.WARN}'
+              expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED.CONN.MAX.WARN}'
               name: 'Azure MySQL: Server has failed connections'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
+              description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED.CONN.MAX.WARN}`.'
               description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED.CONN.MAX.WARN}`.'
               tags:
                 -
@@ -7179,6 +7266,7 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The replication lag, expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -7201,6 +7289,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Used backup storage, expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7222,6 +7311,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The storage limit, expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7242,6 +7332,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The storage utilization, expressed in %.'
           description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
@@ -7287,6 +7378,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The storage limit of a server log, expressed in bytes.'
+          description: 'The storage limit of a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7307,6 +7399,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The storage utilization by a server log, expressed in %.'
           description: 'The storage utilization by a server log, expressed in %.'
           preprocessing:
             -
@@ -7329,6 +7422,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The storage space used by a server log, expressed in bytes.'
+          description: 'The storage space used by a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -7349,6 +7443,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
+          description: 'Used storage space, expressed in bytes.'
           description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
@@ -7378,12 +7473,15 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of CPU utilization, expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
+          macro: '{$AZURE.DB.FAILED.CONN.MAX.WARN}'
           macro: '{$AZURE.DB.FAILED.CONN.MAX.WARN}'
           value: '25'
           description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
@@ -7391,13 +7489,16 @@ zabbix_export:
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of memory utilization, expressed in %.'
+          description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
           description: 'The critical threshold of storage utilization, expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
+          description: 'The warning threshold of storage utilization, expressed in %.'
           description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
@@ -8158,6 +8259,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Used backup storage, expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8180,6 +8282,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Free storage space, expressed in bytes.'
+          description: 'Free storage space, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8200,6 +8303,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The storage utilization, expressed in %.'
           description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
@@ -8245,6 +8349,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The storage space used by a transaction log, expressed in bytes.'
+          description: 'The storage space used by a transaction log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8265,6 +8370,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
+          description: 'Used storage space, expressed in bytes.'
           description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
@@ -8314,22 +8420,27 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of CPU utilization, expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
+          description: 'The critical threshold of memory utilization, expressed in %.'
           description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
           description: 'The critical threshold of storage utilization, expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
+          description: 'The warning threshold of storage utilization, expressed in %.'
           description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
@@ -8908,6 +9019,7 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'The replication lag, expressed in seconds.'
+          description: 'The replication lag, expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -8929,6 +9041,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
+          description: 'Lag for the most lagging replica, expressed in bytes.'
           description: 'Lag for the most lagging replica, expressed in bytes.'
           preprocessing:
             -
@@ -8952,6 +9065,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'Used backup storage, expressed in bytes.'
+          description: 'Used backup storage, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8973,6 +9087,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The storage limit, expressed in bytes.'
+          description: 'The storage limit, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -8993,6 +9108,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The storage utilization, expressed in %.'
           description: 'The storage utilization, expressed in %.'
           preprocessing:
             -
@@ -9038,6 +9154,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The storage limit of a server log, expressed in bytes.'
+          description: 'The storage limit of a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -9058,6 +9175,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'The storage utilization by a server log, expressed in %.'
           description: 'The storage utilization by a server log, expressed in %.'
           preprocessing:
             -
@@ -9080,6 +9198,7 @@ zabbix_export:
           value_type: FLOAT
           units: B
           description: 'The storage space used by a server log, expressed in bytes.'
+          description: 'The storage space used by a server log, expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -9100,6 +9219,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
+          description: 'Used storage space, expressed in bytes.'
           description: 'Used storage space, expressed in bytes.'
           preprocessing:
             -
@@ -9129,22 +9249,27 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of CPU utilization, expressed in %.'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
+          description: 'The critical threshold of memory utilization, expressed in %.'
           description: 'The critical threshold of memory utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
           description: 'The critical threshold of storage utilization, expressed in %.'
+          description: 'The critical threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
+          description: 'The warning threshold of storage utilization, expressed in %.'
           description: 'The warning threshold of storage utilization, expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
@@ -9591,6 +9716,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
+          description: 'Baseline bytes per second throughput that the data disk can achieve without bursting.'
           description: 'Baseline bytes per second throughput that the data disk can achieve without bursting.'
           preprocessing:
             -
@@ -10068,6 +10194,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: 'The number of current flows in the inbound direction (the traffic going into the VM).'
+          description: 'The number of current flows in the inbound direction (the traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -10109,6 +10236,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
+          description: 'The number of current flows in the outbound direction (the traffic going out of the VM).'
           description: 'The number of current flows in the outbound direction (the traffic going out of the VM).'
           preprocessing:
             -
@@ -10173,6 +10301,7 @@ zabbix_export:
           value_type: FLOAT
           units: bps
           description: 'The number of bytes received by the VMs via all network interfaces (incoming traffic).'
+          description: 'The number of bytes received by the VMs via all network interfaces (incoming traffic).'
           preprocessing:
             -
               type: JSONPATH
@@ -10198,6 +10327,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
+          description: 'The number of bytes sent by the VMs via all network interfaces (outgoing traffic).'
           description: 'The number of bytes sent by the VMs via all network interfaces (outgoing traffic).'
           preprocessing:
             -
@@ -10269,6 +10399,7 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: 'Maximum bytes per second throughput that the OS Disk can achieve with bursting.'
+          description: 'Maximum bytes per second throughput that the OS Disk can achieve with bursting.'
           preprocessing:
             -
               type: JSONPATH
@@ -10290,6 +10421,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
+          description: 'Maximum IOPS that the OS Disk can achieve with bursting.'
           description: 'Maximum IOPS that the OS Disk can achieve with bursting.'
           preprocessing:
             -
@@ -10377,6 +10509,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
+          description: 'Baseline bytes per second throughput that the OS Disk can achieve without bursting.'
           description: 'Baseline bytes per second throughput that the OS Disk can achieve without bursting.'
           preprocessing:
             -
@@ -10638,6 +10771,7 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
+          value: 15s
           description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.PASSWORD}'
@@ -10655,6 +10789,7 @@ zabbix_export:
         -
           macro: '{$AZURE.VM.CPU.UTIL.CRIT}'
           value: '90'
+          description: 'The critical threshold of CPU utilization, expressed in %.'
           description: 'The critical threshold of CPU utilization, expressed in %.'
       valuemaps:
         -
@@ -10680,11 +10815,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.read.bps
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10695,11 +10832,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.data.disk.read.ops
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10710,11 +10849,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.read.bytes
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10725,11 +10866,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.disk.read.ops
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10740,11 +10883,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.inbound
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10752,11 +10897,13 @@ zabbix_export:
         -
           sortorder: '2'
           color: 00611C
+          color: 00611C
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.flows.inbound.max
         -
           sortorder: '3'
+          color: F7941D
           color: F7941D
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10767,11 +10914,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.network.in.total
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10782,11 +10931,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.read.bps
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10797,11 +10948,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.read.ops
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10812,11 +10965,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.data.disk.cache.read.hit
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10827,11 +10982,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.hit
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Virtual Machine by HTTP'
@@ -10842,17 +10999,20 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
           color: F63100
+          color: F63100
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.connections.failed.system
         -
           sortorder: '2'
+          color: 00611C
           color: 00611C
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
@@ -10863,17 +11023,20 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.connections.successful
         -
           sortorder: '1'
           color: F63100
+          color: F63100
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.connections.failed.system
         -
           sortorder: '2'
+          color: 00611C
           color: 00611C
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
@@ -10884,11 +11047,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.cpu.limit
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
@@ -10899,11 +11064,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.cpu.limit
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
@@ -10914,11 +11081,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.storage.used
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
@@ -10929,11 +11098,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.storage.used
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
@@ -10944,11 +11115,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure Cosmos DB for MongoDB by HTTP'
             key: azure.cosmosdb.server.side.latency.gateway
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure Cosmos DB for MongoDB by HTTP'
@@ -11025,11 +11198,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.connections.active
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure MySQL Single Server by HTTP'
@@ -11040,11 +11215,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.connections.active
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
@@ -11061,11 +11238,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.network.egress
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure MySQL Single Server by HTTP'
@@ -11091,11 +11270,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.server.log.used
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure MySQL Single Server by HTTP'
@@ -11106,11 +11287,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure MySQL Single Server by HTTP'
             key: azure.db.mysql.storage.used
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure MySQL Single Server by HTTP'
@@ -11121,11 +11304,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
             key: azure.db.mysql.storage.used
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure MySQL Flexible Server by HTTP'
@@ -11135,6 +11320,7 @@ zabbix_export:
       name: 'Azure PostgreSQL: Connections'
       graph_items:
         -
+          color: 199C0D
           color: 199C0D
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
@@ -11151,11 +11337,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.connections.active
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
@@ -11172,11 +11360,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.network.egress
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
@@ -11187,11 +11377,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.network.egress
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
@@ -11202,11 +11394,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.server.log.used
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
@@ -11217,11 +11411,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
             key: azure.db.pgsql.storage.used
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure PostgreSQL Flexible Server by HTTP'
@@ -11232,11 +11428,13 @@ zabbix_export:
       graph_items:
         -
           color: 199C0D
+          color: 199C0D
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
             key: azure.db.pgsql.storage.used
         -
           sortorder: '1'
+          color: F63100
           color: F63100
           item:
             host: 'Azure PostgreSQL Single Server by HTTP'
