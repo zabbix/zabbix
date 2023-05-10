@@ -27,62 +27,64 @@
 <script>
 	const view = {
 		init({host, dashboard, widget_defaults, configuration_hash, time_period, web_layout_mode}) {
-			timeControl.refreshPage = false;
+			if (dashboard.pages[0].widgets.length !== 0) {
+				timeControl.refreshPage = false;
 
-			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
-				containers: {
-					grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
-					navigation: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION ?>'),
-					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
-				},
-				buttons: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>
-					? {
-						previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE?>'),
-						next_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE ?>'),
-						slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW ?>')
-					}
-					: {
-						previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE ?>'),
-						next_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NEXT_PAGE ?>'),
-						slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW ?>')
+				ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
+					containers: {
+						grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
+						navigation: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION ?>'),
+						navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
 					},
-				data: {
-					dashboardid: dashboard.dashboardid,
-					name: dashboard.name,
-					userid: null,
-					templateid: dashboard.templateid,
-					display_period: dashboard.display_period,
-					auto_start: dashboard.auto_start
-				},
-				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
-				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-				cell_height: 70,
-				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
-				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
-				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults,
-				configuration_hash,
-				is_editable: false,
-				is_edit_mode: false,
-				can_edit_dashboards: false,
-				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
-				time_period: time_period,
-				dynamic_hostid: host.hostid,
-				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
-			});
+					buttons: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>
+						? {
+							previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE?>'),
+							next_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE ?>'),
+							slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW ?>')
+						}
+						: {
+							previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE ?>'),
+							next_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NEXT_PAGE ?>'),
+							slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW ?>')
+						},
+					data: {
+						dashboardid: dashboard.dashboardid,
+						name: dashboard.name,
+						userid: null,
+						templateid: dashboard.templateid,
+						display_period: dashboard.display_period,
+						auto_start: dashboard.auto_start
+					},
+					max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
+					cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
+					cell_height: 70,
+					max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
+					max_rows: <?= DASHBOARD_MAX_ROWS ?>,
+					widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
+					widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
+					widget_defaults,
+					configuration_hash,
+					is_editable: false,
+					is_edit_mode: false,
+					can_edit_dashboards: false,
+					is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
+					time_period: time_period,
+					dynamic_hostid: host.hostid,
+					csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
+				});
 
-			for (const page of dashboard.pages) {
-				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+				for (const page of dashboard.pages) {
+					for (const widget of page.widgets) {
+						widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					}
+
+					ZABBIX.Dashboard.addDashboardPage(page);
 				}
 
-				ZABBIX.Dashboard.addDashboardPage(page);
+				ZABBIX.Dashboard.activate();
+
+				ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 			}
-
-			ZABBIX.Dashboard.activate();
-
-			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
 			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
 				document.getElementById('dashboardid').addEventListener('change', this.events.dashboardChange);

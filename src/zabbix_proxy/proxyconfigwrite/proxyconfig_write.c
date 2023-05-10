@@ -1026,8 +1026,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 				zbx_vector_db_value_ptr_append(&values, value);
 			}
 
-			zbx_db_insert_add_values_dyn(&db_insert, (const zbx_db_value_t **)values.values,
-					values.values_num);
+			zbx_db_insert_add_values_dyn(&db_insert, values.values, values.values_num);
 clean:
 			for (j = 0; j < values.values_num; j++)
 			{

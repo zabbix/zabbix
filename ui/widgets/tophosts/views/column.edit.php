@@ -85,7 +85,14 @@ $parameters = [
 	'srctbl' => 'items',
 	'srcfld1' => 'itemid',
 	'dstfrm' => $form->getName(),
-	'dstfld1' => 'item'
+	'dstfld1' => 'item',
+	'value_types' => [
+		ITEM_VALUE_TYPE_FLOAT,
+		ITEM_VALUE_TYPE_STR,
+		ITEM_VALUE_TYPE_LOG,
+		ITEM_VALUE_TYPE_UINT64,
+		ITEM_VALUE_TYPE_TEXT
+	]
 ];
 
 if ($data['templateid'] === '') {

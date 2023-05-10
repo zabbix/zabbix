@@ -1247,9 +1247,10 @@ int	main(int argc, char **argv)
 
 	/* required for simple checks */
 	zbx_init_metrics();
+	zbx_init_library_cfg(program_type, config_file);
+
 	zbx_load_config(&t);
 
-	zbx_init_library_cfg(program_type);
 	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_dbwrap(zbx_lld_process_agent_result);
 	zbx_init_library_icmpping(&config_icmpping);

@@ -182,7 +182,7 @@ foreach ($data['users'] as $user) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$users_groups[] = ' &hellip;';
+			$users_groups[] = [' ', HELLIP()];
 
 			break;
 		}
