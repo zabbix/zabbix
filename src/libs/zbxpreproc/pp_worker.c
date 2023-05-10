@@ -122,6 +122,7 @@ static void	*pp_worker_entry(void *args)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
 
 	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
