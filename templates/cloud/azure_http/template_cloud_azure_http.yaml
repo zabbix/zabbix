@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:13:23Z'
+  date: '2023-05-10T10:13:12Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -461,18 +461,18 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
+            - lld_macro: '{#GROUP}'
+              path: $.resourceGroup
             - lld_macro: '{#ID}'
               path: $.id
-            - lld_macro: '{#NAME}'
-              path: $.name
             - lld_macro: '{#LOCATION}'
               path: $.location
+            - lld_macro: '{#NAME}'
+              path: $.name
             - lld_macro: '{#TYPE}'
               path: $.type
             - lld_macro: '{#VERSION}'
               path: $.kind
-            - lld_macro: '{#GROUP}'
-              path: $.resourceGroup
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -552,20 +552,20 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#ID}'
-              path: $.id
-            - lld_macro: '{#NAME}'
-              path: $.name
-            - lld_macro: '{#LOCATION}'
-              path: $.location
-            - lld_macro: '{#TYPE}'
-              path: $.type
-            - lld_macro: '{#SIZE}'
-              path: $.sku.name
-            - lld_macro: '{#VERSION}'
-              path: $.kind
             - lld_macro: '{#GROUP}'
               path: $.resourceGroup
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#LOCATION}'
+              path: $.location
+            - lld_macro: '{#NAME}'
+              path: $.name
+            - lld_macro: '{#SIZE}'
+              path: $.sku.name
+            - lld_macro: '{#TYPE}'
+              path: $.type
+            - lld_macro: '{#VERSION}'
+              path: $.kind
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -574,18 +574,6 @@ zabbix_export:
               parameters:
                 - 6h
           overrides:
-            - name: Serverless
-              step: '1'
-              filter:
-                conditions:
-                  - macro: '{#VERSION}'
-                    value: '^.*serverless$'
-                    formulaid: A
-              operations:
-                - operationobject: HOST_PROTOTYPE
-                  operator: REGEXP
-                  templates:
-                    - name: 'Azure Microsoft SQL Serverless Database by HTTP'
             - name: Server
               step: '2'
               filter:
@@ -598,6 +586,18 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     - name: 'Azure Microsoft SQL Database by HTTP'
+            - name: Serverless
+              step: '1'
+              filter:
+                conditions:
+                  - macro: '{#VERSION}'
+                    value: '^.*serverless$'
+                    formulaid: A
+              operations:
+                - operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    - name: 'Azure Microsoft SQL Serverless Database by HTTP'
         - uuid: 7fafbef68f8b46d083eb43da7cd1e2cc
           name: 'MySQL servers discovery'
           type: DEPENDENT
@@ -653,20 +653,20 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#ID}'
-              path: $.id
-            - lld_macro: '{#NAME}'
-              path: $.name
-            - lld_macro: '{#LOCATION}'
-              path: $.location
-            - lld_macro: '{#TYPE}'
-              path: $.type
-            - lld_macro: '{#SIZE}'
-              path: $.sku.name
-            - lld_macro: '{#VERSION}'
-              path: $.properties.version
             - lld_macro: '{#GROUP}'
               path: $.resourceGroup
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#LOCATION}'
+              path: $.location
+            - lld_macro: '{#NAME}'
+              path: $.name
+            - lld_macro: '{#SIZE}'
+              path: $.sku.name
+            - lld_macro: '{#TYPE}'
+              path: $.type
+            - lld_macro: '{#VERSION}'
+              path: $.properties.version
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -754,20 +754,20 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#ID}'
-              path: $.id
-            - lld_macro: '{#NAME}'
-              path: $.name
-            - lld_macro: '{#LOCATION}'
-              path: $.location
-            - lld_macro: '{#TYPE}'
-              path: $.type
-            - lld_macro: '{#SIZE}'
-              path: $.sku.name
-            - lld_macro: '{#VERSION}'
-              path: $.properties.version
             - lld_macro: '{#GROUP}'
               path: $.resourceGroup
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#LOCATION}'
+              path: $.location
+            - lld_macro: '{#NAME}'
+              path: $.name
+            - lld_macro: '{#SIZE}'
+              path: $.sku.name
+            - lld_macro: '{#TYPE}'
+              path: $.type
+            - lld_macro: '{#VERSION}'
+              path: $.properties.version
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2254,14 +2254,14 @@ zabbix_export:
           master_item:
             key: azure.get.storage.acc
           lld_macro_paths:
-            - lld_macro: '{#ID}'
-              path: $.id
-            - lld_macro: '{#NAME}'
-              path: $.name
-            - lld_macro: '{#LOCATION}'
-              path: $.location
             - lld_macro: '{#GROUP}'
               path: $.resourceGroup
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#LOCATION}'
+              path: $.location
+            - lld_macro: '{#NAME}'
+              path: $.name
             - lld_macro: '{#TOKEN}'
               path: $.token
           preprocessing:
@@ -2325,20 +2325,20 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#ID}'
-              path: $.id
-            - lld_macro: '{#NAME}'
-              path: $.name
-            - lld_macro: '{#LOCATION}'
-              path: $.location
-            - lld_macro: '{#TYPE}'
-              path: $.type
-            - lld_macro: '{#SIZE}'
-              path: $.properties.hardwareProfile.vmSize
-            - lld_macro: '{#OS}'
-              path: $.properties.storageProfile.osDisk.osType
             - lld_macro: '{#GROUP}'
               path: $.resourceGroup
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#LOCATION}'
+              path: $.location
+            - lld_macro: '{#NAME}'
+              path: $.name
+            - lld_macro: '{#OS}'
+              path: $.properties.storageProfile.osDisk.osType
+            - lld_macro: '{#SIZE}'
+              path: $.properties.hardwareProfile.vmSize
+            - lld_macro: '{#TYPE}'
+              path: $.type
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3077,14 +3077,8 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: show
                       value: '2'
-                    - type: STRING
-                      name: description
-                      value: adv_conf
                     - type: ITEM
                       name: itemid
                       value:
@@ -3102,12 +3096,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show
                       value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: STRING
-                      name: description
-                      value: adv_conf
                     - type: ITEM
                       name: itemid
                       value:
@@ -3122,12 +3110,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show
                       value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: STRING
-                      name: description
-                      value: adv_conf
                     - type: ITEM
                       name: itemid
                       value:
@@ -3150,9 +3132,6 @@ zabbix_export:
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
-                    - type: STRING
-                      name: description
-                      value: adv_conf
                     - type: STRING
                       name: units
                       value: '%'
