@@ -27,7 +27,7 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	CProfiler::getInstance()->show();
 
-	(new CButton(null))
+	(new CSimpleButton())
 		->addClass(ZBX_STYLE_BTN_DEBUG)
 		->show();
 }

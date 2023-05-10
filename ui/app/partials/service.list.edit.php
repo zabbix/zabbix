@@ -135,13 +135,13 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-service')
-			->addClass('no-chkbxrange')
+			->addClass('js-no-chkbxrange')
 	],
 	'service.massdelete' => [
 		'content' => (new CSimpleButton(_('Delete')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdelete-service')
-			->addClass('no-chkbxrange')
+			->addClass('js-no-chkbxrange')
 	]
 ], $path !== null ? 'service_'.implode('_', $path) : 'service');
 

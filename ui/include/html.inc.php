@@ -980,23 +980,19 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 }
 
 /**
+ * Renders an icon with question mark and text in hint.
+ */
+function makeHelpIcon($help_text): CSimpleButton {
+	return (new CButtonIcon(ZBX_ICON_HELP_FILLED_SMALL))->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
+}
+
+/**
  * Renders an icon for a description.
  */
 function makeDescriptionIcon(string $description): CButtonIcon {
 	return (new CButtonIcon(ZBX_ICON_ALERT_WITH_CONTENT))
 		->setAttribute('data-content', '?')
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
-}
-
-// TODO: Fixe to CButtonIcon
-/**
- * Renders an icon with question mark and text in hint.
- */
-function makeHelpIcon($help_text): CSimpleButton {
-	return (new CSimpleButton())
-		->addClass(ZBX_ICON_HELP_FILLED_SMALL)
-		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP)
-		->addStyle('background-color: red;');
 }
 
 /**

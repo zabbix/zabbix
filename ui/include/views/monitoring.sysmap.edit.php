@@ -294,9 +294,7 @@ foreach ($data['sysmap']['urls'] as $url) {
 				->setValue($url['elementtype'])
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->onClick('$("#url-row-'.$i.'").remove();')
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))->onClick('$("#url-row-'.$i.'").remove();')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('url-row-'.$i)
 	);
@@ -306,10 +304,8 @@ foreach ($data['sysmap']['urls'] as $url) {
 // Append "add" button to url table.
 $url_table->addRow(
 	(new CCol(
-		(new CButton(null, _('Add')))
-			->setId('add-url')
-			->addClass(ZBX_STYLE_BTN_LINK))
-	)->setColSpan(4)
+		(new CButtonLink(_('Add')))->setId('add-url')
+	))->setColSpan(4)
 );
 
 // Append url table to form list.
@@ -327,8 +323,8 @@ $user_group_shares_table = (new CTable())
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
 	->setAttribute('style', 'width: 100%;');
 
-$add_user_group_btn = ([(new CButton(null, _('Add')))
-	->onClick(
+$add_user_group_btn = ([
+	(new CButtonLink(_('Add')))->onClick(
 		'return PopUp("popup.generic", '.json_encode([
 			'srctbl' => 'usrgrp',
 			'srcfld1' => 'usrgrpid',
@@ -337,7 +333,7 @@ $add_user_group_btn = ([(new CButton(null, _('Add')))
 			'multiselect' => '1'
 		]).', {dialogue_class: "modal-popup-generic"});'
 	)
-	->addClass(ZBX_STYLE_BTN_LINK)]);
+]);
 
 $user_group_shares_table->addRow(
 	(new CRow(
@@ -364,8 +360,8 @@ $user_shares_table = (new CTable())
 	->setHeader([_('Users'), _('Permissions'), _('Action')])
 	->setAttribute('style', 'width: 100%;');
 
-$add_user_btn = ([(new CButton(null, _('Add')))
-	->onClick(
+$add_user_btn = ([
+	(new CButtonLink(_('Add')))->onClick(
 		'return PopUp("popup.generic", '.json_encode([
 			'srctbl' => 'users',
 			'srcfld1' => 'userid',
@@ -374,7 +370,7 @@ $add_user_btn = ([(new CButton(null, _('Add')))
 			'multiselect' => '1'
 		]).', {dialogue_class: "modal-popup-generic"});'
 	)
-	->addClass(ZBX_STYLE_BTN_LINK)]);
+]);
 
 $user_shares_table->addRow(
 	(new CRow(

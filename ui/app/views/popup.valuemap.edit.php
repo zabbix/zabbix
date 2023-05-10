@@ -58,9 +58,7 @@ $mappings = (new CDiv([
 		->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 		->setFooter(new CRow(
 			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-row-action', 'add_row')
+				(new CButtonLink(_('Add')))->setAttribute('data-row-action', 'add_row')
 			))->setColSpan(count($header_row))
 		))
 ]))->setAttribute('data-sortable-pairs-table', '1');

@@ -4192,7 +4192,7 @@ a.icon-count {
 	}
 
 	.btn-change {
-		&:disabled {
+		&[disabled] {
 			display: none;
 		}
 	}
@@ -4814,14 +4814,17 @@ z-select,
 ) {
 	.#{$class} {
 		color: $color;
-	}
 
-	.btn-icon {
-		&.#{$class} {
-			&:hover,
-			&:focus {
+		&.btn-icon {
+			color: $color;
+
+			&:active,
+			&:focus,
+			&:hover {
 				color: $color;
 			}
 		}
 	}
+
+
 }

@@ -115,13 +115,15 @@ $form = (new CForm())
 		(new CInput('submit', 'submit'))->addStyle('display: none;'),
 		(new CTag('script'))
 			->addItem((new CRow([
-				(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
-					->setAriaRequired()
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				(new CCol(
+					(new CTextBox('sendto_emails[#{rowNum}]', ''))
+						->setAriaRequired()
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				)),
-				(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
+				(new CCol(
+					(new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
 				))
 			]))
 				->addClass('form_row')

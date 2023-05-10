@@ -346,9 +346,9 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				$status_class = ZBX_STYLE_RED;
 			}
 
-			$status = (new CSimpleButton($status_label))
+			$status = (new CButtonLink($status_label))
 				->onClick(!$data['readonly'] ? $status_action : null)
-				->addClass(ZBX_STYLE_BTN_LINK.($data['readonly'] ? '' : ' '.$status_class))
+				->addClass(!$data['readonly'] ? $status_class : null)
 				->setEnabled(!$data['readonly']);
 		}
 		else {
@@ -399,14 +399,12 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				$status,
 				(new CCol(
 					new CHorList([
-						(new CButton(null, _('Edit')))
-							->setEnabled(!$data['readonly'])
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Edit')))
 							->setAttribute('data-parameters', json_encode($parameters))
-							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters));'),
-						(new CButton(null, _('Remove')))
 							->setEnabled(!$data['readonly'])
-							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters));'),
+						(new CButtonLink(_('Remove')))
+							->setEnabled(!$data['readonly'])
 							->onClick('removeMedia('.$index.');')
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -417,10 +415,9 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 	$media_form_list->addRow(_('Media'),
 		(new CDiv([
 			$media_table_info,
-			(new CButton(null, _('Add')))
-				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Add')))
 				->setEnabled(!$data['readonly'])
+				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

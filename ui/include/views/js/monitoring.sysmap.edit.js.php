@@ -32,9 +32,7 @@
 			(new CSelect('urls[#{id}][elementtype]'))
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->onClick('$("#url-row-#{id}").remove();')
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))->onClick('$("#url-row-#{id}").remove();')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('url-row-#{id}')
 	?>

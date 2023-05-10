@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,30 +19,11 @@
 **/
 
 
-/**
- * @var CView $this
- * @var array $data
- */
+class CButtonLink extends CSimpleButton {
 
-$page_header = (new CHtmlPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']', CWebUser::getLang()));
+	public function __construct($caption) {
+		parent::__construct($caption);
 
-$page_header
-	->setTheme($data['theme'])
-	->addCssFile('assets/styles/'.$page_header->getTheme().'.css')
-	->show();
-
-$buttons = array_key_exists('buttons', $data)
-	? $data['buttons']
-	: [(new CSimpleButton(_('Retry')))->onClick('document.location.reload();')];
-
-echo '<body>';
-
-(new CDiv((new CTag('main', true,
-	new CWarning($data['header'], $data['messages'], $buttons)
-))))
-	->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
-	->show();
-
-echo get_js("setTimeout('document.location.reload();', 30000);");
-echo '</body>';
-echo '</html>';
+		$this->addClass(ZBX_STYLE_BTN_LINK);
+	}
+}

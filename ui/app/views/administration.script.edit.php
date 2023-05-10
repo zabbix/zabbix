@@ -42,11 +42,9 @@ $row_template = (new CTag('script', true))
 			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('script_param', 'value')))
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
-			(new CButton('', _('Remove')))
-				->removeId()
-				->onClick('$(this).closest("tr").remove()')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Remove')))
 				->addClass('element-table-remove')
+				->onClick('$(this).closest("tr").remove()')
 		]))->addClass('form_row')
 	);
 
@@ -80,11 +78,9 @@ foreach ($data['parameters'] as $parameter) {
 		(new CTextBox('parameters[value][]', $parameter['value'], false, DB::getFieldLength('script_param', 'value')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
-		(new CButton('', _('Remove')))
-			->removeId()
-			->onClick('$(this).closest("tr").remove()')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CButtonLink(_('Remove')))
 			->addClass('element-table-remove')
+			->onClick('$(this).closest("tr").remove()')
 	], 'form_row');
 }
 

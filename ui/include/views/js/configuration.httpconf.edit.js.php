@@ -54,9 +54,8 @@
 				->setAttribute('data-hintbox', '#{enabled_hint}'),
 			'#{required}',
 			'#{status_codes}',
-			(new CCol((new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+			(new CCol(
+				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
@@ -81,9 +80,7 @@
 				->setAttribute('data-type', 'value')
 				->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
+				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')

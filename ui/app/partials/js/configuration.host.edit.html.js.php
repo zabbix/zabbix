@@ -97,9 +97,7 @@
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CHorList([
-					(new CSimpleButton(_('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
+					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 				])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))

@@ -1559,7 +1559,9 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 	return (new CButtonIcon(array_key_exists('suppress_until', $data['suppress_until'][0])
 		? ZBX_ICON_EYE_OFF // TODO: ZBX_STYLE_ACTION_ICON_SUPPRESS
 		: ZBX_ICON_EYE     // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
-	))->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
+	))
+		->addClass(ZBX_STYLE_COLOR_ICON)
+		->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
 }
 
 /**
@@ -1743,16 +1745,13 @@ function makeEventActionsIcon(array $data, $eventid): ?CButtonIcon {
 		return null;
 	}
 
-	$button = new CButtonIcon(ZBX_ICON_BULLET_RIGHT_WITH_CONTENT);
+	$button = new CButtonIcon(ZBX_ICON_BULLET_RIGHT_WITH_CONTENT); // TODO: ZBX_STYLE_ACTIONS_NUM_GRAY
 
 	if ($data['has_failed_action']) {
 		$button->addClass(ZBX_STYLE_COLOR_NEGATIVE);  // TODO: ZBX_STYLE_ACTIONS_NUM_RED
 	}
 	elseif ($data['has_uncomplete_action']) {
 		$button->addClass(ZBX_STYLE_COLOR_WARNING); // TODO: ZBX_STYLE_ACTIONS_NUM_YELLOW
-	}
-	else {
-		$button->addClass(ZBX_STYLE_COLOR_ICON); // TODO: ZBX_STYLE_ACTIONS_NUM_GRAY
 	}
 
 	return $button

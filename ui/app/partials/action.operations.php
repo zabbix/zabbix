@@ -88,8 +88,7 @@ foreach ($data['action']['operations'] as $operation) {
 	}, ARRAY_FILTER_USE_KEY);
 
 	$buttons = (new CHorList([
-		(new CSimpleButton(_('Edit')))
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CButtonLink(_('Edit')))
 			->addClass('js-edit-operation')
 			->setAttribute('data-operation', json_encode([
 				'operationid' => $i,
@@ -133,12 +132,11 @@ $operations_table->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
+				(new CButtonLink(_('Add')))
+					->addClass('js-operation-details')
 					->setAttribute('data-actionid', array_key_exists('actionid', $data) ? $data['actionid'] : 0)
 					->setAttribute('data-eventsource', $data['eventsource'])
 					->setAttribute('operationtype', ACTION_OPERATION)
-					->addClass('js-operation-details')
-					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(4)
 		)
 );

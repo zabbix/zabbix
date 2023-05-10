@@ -25,8 +25,6 @@
 	@extend .zi-alert;
 	@extend %icon-with-content;
 
-	color: $icon-color;
-
 	&::before {
 		font-size: 20px;
 		line-height: 18px;
@@ -34,6 +32,10 @@
 
 	&::after {
 		color: $icon-content-color;
+	}
+
+	&.btn-icon {
+		color: $icon-color;
 	}
 }
 
@@ -51,8 +53,6 @@
 	@extend .zi-bullet-right;
 	@extend %icon-with-content;
 
-	color: $icon-color;
-
 	&::before {
 		position: absolute;
 		bottom: 0;
@@ -62,11 +62,47 @@
 	&::after {
 		color: $font-color;
 	}
+
+	&.btn-icon {
+		color: $icon-color;
+	}
 }
 
 .zi-help-small {
 	@extend .zi-help;
 	@extend %icon-small;
+}
+
+.zi-help-filled-small {
+	@extend .zi-help;
+	@extend %icon-small;
+
+	color: $icon-content-color;
+
+	&::before {
+		padding: 1px;
+		background-color: $icon-color;
+		border-radius: 50%;
+	}
+
+	&.btn-icon {
+		border-radius: 50%;
+	}
+
+	&.btn-icon {
+		color: $icon-content-color;
+	}
+}
+
+.zi-i-negative {
+	@extend .zi-i;
+	@extend %icon-small;
+
+	&::before {
+		padding: 1px;
+		color: $icon-content-color;
+		background-color: $negative-color;
+	}
 }
 
 .zi-plus-small {

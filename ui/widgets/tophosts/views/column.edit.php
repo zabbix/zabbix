@@ -240,9 +240,7 @@ $thresholds = (new CDiv(
 		->setHeader($header_row)
 		->setFooter(new CRow(
 			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-add')
+				(new CButtonLink(_('Add')))->addClass('element-table-add')
 			))->setColSpan(count($header_row))
 		))
 ))

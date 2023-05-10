@@ -144,14 +144,11 @@ if ($data['host']['parentTemplates']) {
 			(new CCol(
 				($template['link_type'] == TEMPLATE_LINK_MANUAL)
 					? new CHorList([
-						(new CSimpleButton(_('Unlink')))
-							->onClick('host_edit.unlinkTemplate(this)')
-							->addClass(ZBX_STYLE_BTN_LINK),
+						(new CButtonLink(_('Unlink')))->onClick('host_edit.unlinkTemplate(this)'),
 						($data['clone_hostid'] === null)
-							? (new CSimpleButton(_('Unlink and clear')))
+							? (new CButtonLink(_('Unlink and clear')))
 								->setAttribute('data-templateid', $template['templateid'])
 								->onClick('host_edit.unlinkAndClearTemplate(this, this.dataset.templateid)')
-								->addClass(ZBX_STYLE_BTN_LINK)
 							: null
 					])
 					: ''
@@ -236,8 +233,7 @@ $host_tab
 			$host_is_discovered
 				? null
 				: new CDiv(
-					(new CButton(null, _('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Add')))
 						->setMenuPopup([
 							'type' => 'submenu',
 							'data' => [

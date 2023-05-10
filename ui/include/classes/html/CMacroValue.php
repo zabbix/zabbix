@@ -90,11 +90,11 @@ class CMacroValue extends CInput {
 	 * Allow to revert macro value.
 	 */
 	public function addRevertButton() {
-		$this->revert_button = (new CButton(null))
-			->setAttribute('title', _('Revert changes'))
-			->addClass(self::ZBX_STYLE_BTN_UNDO)
+		$this->revert_button = (new CSimpleButton())
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass(ZBX_ICON_ARROW_BACK);
+			->addClass(ZBX_ICON_ARROW_BACK)
+			->addClass(self::ZBX_STYLE_BTN_UNDO)
+			->setAttribute('title', _('Revert changes'));
 
 		return $this;
 	}

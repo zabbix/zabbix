@@ -119,9 +119,7 @@ $item_form_list
 				->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 				->setFooter(new CRow(
 					(new CCol(
-						(new CButton(null, _('Add')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->setAttribute('data-row-action', 'add_row')
+						(new CButtonLink(_('Add')))->setAttribute('data-row-action', 'add_row')
 					))->setColSpan(5)
 				)),
 			(new CTag('script', true))
@@ -136,9 +134,7 @@ $item_form_list
 					'&rArr;',
 					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-					(new CButton(null, _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->setAttribute('data-row-action', 'remove_row')
+					(new CButtonLink(_('Remove')))->setAttribute('data-row-action', 'remove_row')
 				])),
 			$headers
 		]))

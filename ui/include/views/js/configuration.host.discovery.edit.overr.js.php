@@ -29,10 +29,10 @@
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});')))),
 			'#{stop_verbose}',
-			(new CCol((new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->setEnabled(false)
+			(new CCol(
+				(new CButtonLink(_('Remove')))
+					->addClass('element-table-remove')
+					->setEnabled(false)
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()
 	?>
@@ -52,9 +52,8 @@
 				->setWidth('350'),
 			(new CCol('#{stop_verbose}'))
 				->setWidth('100'),
-			(new CCol((new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+			(new CCol(
+				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 			))
 				->addClass(ZBX_STYLE_NOWRAP)
 				->setWidth('50')
@@ -106,8 +105,7 @@
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			(new CCol(
-				(new CButton(null, _('View')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('View')))
 					->addClass('element-table-open')
 					->onClick('lldoverrides.operations.open(#{no});')
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -118,12 +116,10 @@
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			(new CHorList([
-				(new CButton(null, _('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Edit')))
 					->addClass('element-table-open')
 					->onClick('lldoverrides.operations.open(#{no});'),
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))
 					->addClass('element-table-remove')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()

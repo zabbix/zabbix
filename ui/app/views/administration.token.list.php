@@ -210,7 +210,7 @@ $token_form->addItem([
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-token')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 				->removeid()
 		]
 	], 'token')

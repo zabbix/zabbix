@@ -256,7 +256,7 @@ a[class*=" zi-"].btn-icon, .btn-overlay-close, .icon, .multiselect .multiselect-
 .zi-fullscreen:before {
   content: "\ea40"; }
 
-.zi-help:before, .zi-help-small:before {
+.zi-help:before, .zi-help-small:before, .zi-help-filled-small:before {
   content: "\ea41"; }
 
 .zi-hierarchy:before {
@@ -265,7 +265,7 @@ a[class*=" zi-"].btn-icon, .btn-overlay-close, .icon, .multiselect .multiselect-
 .zi-home:before {
   content: "\ea43"; }
 
-.zi-i:before {
+.zi-i:before, .zi-i-negative:before {
   content: "\ea44"; }
 
 .zi-list:before {
@@ -1134,7 +1134,8 @@ a.btn-icon {
   border-color: #666666; }
   .btn-grey:hover, .btn-grey:focus, .btn-grey:active {
     color: #f2f2f2;
-    background-color: #414141;
+    background-color: #414141; }
+  .btn-grey:hover {
     border-color: #666666; }
   .btn-grey:focus, .btn-grey:active {
     border-color: #bbbbbb; }
@@ -1145,69 +1146,51 @@ a.btn-icon,
   color: #7d7d7d;
   background: transparent;
   border: none; }
-  a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:active,
+  a.btn-icon:hover,
   .btn-icon:hover,
-  .btn-icon:focus,
-  .btn-icon:active,
-  .btn-overlay-close:hover,
-  .btn-overlay-close:focus,
-  .btn-overlay-close:active {
+  .btn-overlay-close:hover {
     color: #ffffff;
+    background: transparent; }
+  a.btn-icon:active, a.btn-icon:focus,
+  .btn-icon:active,
+  .btn-icon:focus,
+  .btn-overlay-close:active,
+  .btn-overlay-close:focus {
+    color: #dddddd;
     background: transparent; }
   a.btn-icon[disabled],
   .btn-icon[disabled],
   .btn-overlay-close[disabled] {
-    cursor: default; }
-    a.btn-icon[disabled], a.btn-icon[disabled]:hover, a.btn-icon[disabled]:focus, a.btn-icon[disabled]:active,
-    .btn-icon[disabled],
-    .btn-icon[disabled]:hover,
-    .btn-icon[disabled]:focus,
-    .btn-icon[disabled]:active,
-    .btn-overlay-close[disabled],
-    .btn-overlay-close[disabled]:hover,
-    .btn-overlay-close[disabled]:focus,
-    .btn-overlay-close[disabled]:active {
-      background: transparent;
-      box-shadow: none; }
-      a.btn-icon[disabled]::before, a.btn-icon[disabled]:hover::before, a.btn-icon[disabled]:focus::before, a.btn-icon[disabled]:active::before,
-      .btn-icon[disabled]::before,
-      .btn-icon[disabled]:hover::before,
-      .btn-icon[disabled]:focus::before,
-      .btn-icon[disabled]:active::before,
-      .btn-overlay-close[disabled]::before,
-      .btn-overlay-close[disabled]:hover::before,
-      .btn-overlay-close[disabled]:focus::before,
-      .btn-overlay-close[disabled]:active::before {
-        color: white; }
+    color: white !important;
+    background-color: transparent !important; }
 
-.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
+.btn-link {
   padding: 0;
   min-height: inherit;
-  color: #f8f8f8;
   font-size: inherit;
-  background-color: transparent;
-  border: 0;
-  border-bottom: 1px dotted #f8f8f8;
+  border-width: 0 0 1px;
+  border-style: dotted;
   border-radius: 0; }
-  .btn-link.red {
-    color: #ff5050;
-    border-color: #ff5050; }
-  .btn-link.green {
-    color: #23d545;
-    border-color: #23d545; }
-  .btn-link:focus {
-    outline: none;
-    margin-bottom: -2px !important;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0 0 0 !important; }
-    .btn-link:focus.red {
+  .btn-link, .btn-link:active, .btn-link:hover, .btn-link:focus {
+    background-color: transparent;
+    color: #f8f8f8;
+    border-color: #f8f8f8; }
+    .btn-link.red, .btn-link:active.red, .btn-link:hover.red, .btn-link:focus.red {
+      color: #ff5050;
       border-color: #ff5050; }
-    .btn-link:focus.green {
+    .btn-link.green, .btn-link:active.green, .btn-link:hover.green, .btn-link:focus.green {
+      color: #23d545;
       border-color: #23d545; }
+  .btn-link:hover, .btn-link:focus {
+    border-style: solid; }
+  .btn-link:focus {
+    margin-bottom: -2px;
+    border-bottom-width: 2px;
+    border-color: rgba(211, 211, 211, 0.5);
+    box-shadow: none; }
   .btn-link[disabled] {
-    background-color: transparent; }
-    .btn-link[disabled]:hover {
-      background-color: transparent; }
+    background-color: transparent !important;
+    border-style: dotted !important; }
 
 button.btn-overlay-close, a.btn-overlay-close.btn,
 a.btn-overlay-close.btn-icon, button.zi-remove, a.zi-remove.btn, a.btn.zi-remove-small,
@@ -1250,7 +1233,7 @@ a.btn-icon.zi-remove-small, button.zi-remove-small {
     background-color: #414141;
     border-color: #bbbbbb; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-help-small::before, .zi-plus-small::before, .zi-remove-small::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-plus-small::before, .zi-remove-small::before {
   font-size: 12px; }
 
 .zi-alert-with-content::after, .zi-bullet-right-with-content::after {
@@ -1264,22 +1247,38 @@ a.btn-icon.zi-remove-small, button.zi-remove-small {
 .icon {
   color: #dddddd; }
 
-.zi-alert-with-content {
+.zi-alert-with-content::before {
+  font-size: 20px;
+  line-height: 18px; }
+.zi-alert-with-content::after {
+  color: #000000; }
+.zi-alert-with-content.btn-icon {
   color: #dddddd; }
-  .zi-alert-with-content::before {
-    font-size: 20px;
-    line-height: 18px; }
-  .zi-alert-with-content::after {
+
+.zi-bullet-right-with-content::before {
+  position: absolute;
+  bottom: 0;
+  line-height: 6px; }
+.zi-bullet-right-with-content::after {
+  color: #ffffff; }
+.zi-bullet-right-with-content.btn-icon {
+  color: #dddddd; }
+
+.zi-help-filled-small {
+  color: #000000; }
+  .zi-help-filled-small::before {
+    padding: 1px;
+    background-color: #dddddd;
+    border-radius: 50%; }
+  .zi-help-filled-small.btn-icon {
+    border-radius: 50%; }
+  .zi-help-filled-small.btn-icon {
     color: #000000; }
 
-.zi-bullet-right-with-content {
-  color: #dddddd; }
-  .zi-bullet-right-with-content::before {
-    position: absolute;
-    bottom: 0;
-    line-height: 6px; }
-  .zi-bullet-right-with-content::after {
-    color: #ffffff; }
+.zi-i-negative::before {
+  padding: 1px;
+  color: #000000;
+  background-color: #ff5050; }
 
 .checkbox-list {
   display: grid;
@@ -6522,7 +6521,7 @@ a.icon-count {
   .macro-input-group .btn-change,
   .macro-input-group .btn-undo {
     border-radius: 0; }
-  .macro-input-group .btn-change:disabled {
+  .macro-input-group .btn-change[disabled] {
     display: none; }
   .macro-input-group .btn-undo {
     display: none;
@@ -6908,27 +6907,31 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 
 .color-icon {
   color: #dddddd; }
-
-.btn-icon.color-icon:hover, .btn-icon.color-icon:focus {
-  color: #dddddd; }
+  .color-icon.btn-icon {
+    color: #dddddd; }
+    .color-icon.btn-icon:active, .color-icon.btn-icon:focus, .color-icon.btn-icon:hover {
+      color: #dddddd; }
 
 .color-negative {
   color: #ff5050; }
-
-.btn-icon.color-negative:hover, .btn-icon.color-negative:focus {
-  color: #ff5050; }
+  .color-negative.btn-icon {
+    color: #ff5050; }
+    .color-negative.btn-icon:active, .color-negative.btn-icon:focus, .color-negative.btn-icon:hover {
+      color: #ff5050; }
 
 .color-positive {
   color: #23d545; }
-
-.btn-icon.color-positive:hover, .btn-icon.color-positive:focus {
-  color: #23d545; }
+  .color-positive.btn-icon {
+    color: #23d545; }
+    .color-positive.btn-icon:active, .color-positive.btn-icon:focus, .color-positive.btn-icon:hover {
+      color: #23d545; }
 
 .color-warning {
   color: #ffa20d; }
-
-.btn-icon.color-warning:hover, .btn-icon.color-warning:focus {
-  color: #ffa20d; }
+  .color-warning.btn-icon {
+    color: #ffa20d; }
+    .color-warning.btn-icon:active, .color-warning.btn-icon:focus, .color-warning.btn-icon:hover {
+      color: #ffa20d; }
 
 .sidebar .logo:focus .zabbix-logo-sidebar {
   box-shadow: 0 0 0 2px #000000; }
@@ -7076,7 +7079,7 @@ a.link-action {
 .link-alt:active {
   border-bottom-color: #f8f8f8; }
 
-.btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
+.btn-link {
   font-weight: bold !important;
   color: #ffffff !important; }
   .btn-link:focus {

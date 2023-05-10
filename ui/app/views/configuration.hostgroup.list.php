@@ -184,19 +184,19 @@ $form->addItem([
 			'content' => (new CSimpleButton(_('Enable hosts')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massenable-hostgroup')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'hostgroup.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable hosts')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdisable-hostgroup')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'hostgroup.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-hostgroup')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'hostgroup')
 ]);

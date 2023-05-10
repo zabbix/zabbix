@@ -209,7 +209,8 @@ $triggersForm->addItem([
 				'confirm' => _('Create triggers from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.triggerprototype' => [
-				'content' => (new CButton('', _('Mass update')))
+				'content' => (new CSimpleButton(_('Mass update')))
+					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.triggerprototype', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('triggerprototype').
@@ -218,8 +219,6 @@ $triggersForm->addItem([
 							trigger_element: this
 						});"
 					)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
 			],
 			'triggerprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected trigger prototypes?'), 'csrf_token' => $csrf_token

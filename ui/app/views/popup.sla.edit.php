@@ -132,9 +132,7 @@ $sla_tab = (new CFormGrid())
 					)
 					->setFooter(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))
 					),
 				(new CTemplateTag('service-tag-row-tmpl'))
@@ -156,9 +154,7 @@ $sla_tab = (new CFormGrid())
 							))
 								->setAttribute('placeholder', _('value'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						]))->addClass('form_row')
 					)
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -190,9 +186,7 @@ $excluded_downtimes->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-add')
+				(new CButtonLink(_('Add')))->addClass('js-add')
 			))->setColSpan(4)
 		)
 );

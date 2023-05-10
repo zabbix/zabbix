@@ -65,7 +65,7 @@ button {
 		&:hover,
 		&:focus,
 		&:active {
-			color: $btn-disabled-font-color;
+			color: $btn-disabled-color;
 			background-color: $btn-disabled-bg-color;
 			border-color: $btn-disabled-border-color;
 			box-shadow: none;
@@ -101,6 +101,9 @@ button {
 	&:active {
 		color: $btn-form-font-color;
 		background-color: $btn-form-hover-color;
+	}
+
+	&:hover {
 		border-color: $btn-form-border-color;
 	}
 
@@ -122,86 +125,71 @@ a.btn-icon,
 	background: transparent;
 	border: none;
 
-	&:hover,
-	&:focus,
-	&:active {
+	&:hover {
 		color: $icon-btn-hover-color;
 		background: transparent;
 	}
 
+	&:active,
+	&:focus {
+		color: $icon-btn-focus-color;
+		background: transparent;
+	}
+
 	&[disabled] {
-		cursor: default;
-
-		&,
-		&:hover,
-		&:focus,
-		&:active {
-			background: transparent;
-			box-shadow: none;
-
-			&::before {
-				color: $icon-btn-disabled-color;
-			}
-		}
+		color: $icon-btn-disabled-color !important;
+		background-color: transparent !important;
 	}
 }
 
 .btn-link {
 	padding: 0;
 	min-height: inherit;
-	color: $link-color;
 	font-size: inherit;
-	background-color: transparent;
-	border: 0;
-	border-bottom: 1px dotted $link-color;
+	border-width: 0 0 1px;
+	border-style: dotted;
 	border-radius: 0;
 
-	&.red {
-		color: $red;
-		border-color: $red
-	}
-
-	&.green {
-		color: $green;
-		border-color: $green
-	}
-
-	&:hover {
-		@extend .btn-link;
-	}
-
+	&,
+	&:active,
+	&:hover,
 	&:focus {
-		@extend .btn-link;
-		outline: none;
-		margin-bottom: -2px !important;
-		border-bottom: 2px solid rgba($link-hover-color, .5);
-		box-shadow: 0 0 0 0 !important;
+		background-color: transparent;
+		color: $link-color;
+		border-color: $link-color;
 
 		&.red {
-			border-color: $red
+			color: $negative-color;
+			border-color: $negative-color;
 		}
 
 		&.green {
-			border-color: $green
+			color: $positive-color;
+			border-color: $positive-color;
 		}
 	}
 
-	&:active {
-		@extend .btn-link;
+	&:hover,
+	&:focus {
+		border-style: solid;
+	}
+
+	&:focus {
+		margin-bottom: -2px;
+		border-bottom-width: 2px;
+		border-color: rgba($btn-focus-border-color, .5);
+		box-shadow: none;
 	}
 
 	&[disabled] {
-		background-color: transparent;
-
-		&:hover {
-			background-color: transparent;
-		}
+		background-color: transparent !important;
+		border-style: dotted !important;
 	}
 }
 
 button {
 	&.btn-overlay-close,
-	&.zi-remove {
+	&.zi-remove { // TODO: check
 		width: 18px;
 		height: 18px;
 		min-height: 18px;

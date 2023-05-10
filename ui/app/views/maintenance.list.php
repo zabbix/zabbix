@@ -134,7 +134,7 @@ if ($data['allowed_edit']) {
 				'content' => (new CSimpleButton(_('Delete')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdelete-maintenance')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			]
 		], 'maintenance')
 	);

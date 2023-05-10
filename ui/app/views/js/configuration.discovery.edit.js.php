@@ -30,12 +30,8 @@
 				(new CDiv('#{name}'))->addClass(ZBX_STYLE_WORDWRAP)
 			))->setId('dcheckCell_#{dcheckid}'),
 			(new CHorList([
-				(new CButton(null, _('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-action', 'edit'),
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick("removeDCheckRow('#{dcheckid}');")
+				(new CButtonLink(_('Edit')))->setAttribute('data-action', 'edit'),
+				(new CButtonLink(_('Remove')))->onClick("removeDCheckRow('#{dcheckid}');")
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setId('dcheckRow_#{dcheckid}')

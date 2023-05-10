@@ -2399,10 +2399,8 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 				$table->addRow($description);
 			}
 
-			$result[] = (new CButton())
-				->addClass(ZBX_STYLE_BTN_ICON)
-				->addClass($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP) // TODO: ZBX_STYLE_ICON_DEPEND_DOWN : ZBX_STYLE_ICON_DEPEND_UP
-				->addClass(ZBX_STYLE_TRIGGER_DEPENDENCY)
+			$result[] = (new CButtonIcon($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP))  // TODO: ZBX_STYLE_ICON_DEPEND_DOWN : ZBX_STYLE_ICON_DEPEND_UP
+				->addClass(ZBX_STYLE_COLOR_ICON)
 				->setHint($table, '', $freeze_on_click);
 		}
 	}

@@ -210,7 +210,8 @@ $itemForm->addItem([
 				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.itemprototype' => [
-				'content' => (new CButton('', _('Mass update')))
+				'content' => (new CSimpleButton(_('Mass update')))
+					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.itemprototype', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('itemprototype').
@@ -219,8 +220,6 @@ $itemForm->addItem([
 							trigger_element: this
 						});"
 					)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
 			],
 			'itemprototype.massdelete' => ['name' => _('Delete'),
 				'confirm' => _('Delete selected item prototypes?'),

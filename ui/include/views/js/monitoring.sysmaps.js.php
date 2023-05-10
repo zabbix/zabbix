@@ -202,9 +202,7 @@ function createFontSelect(string $name): CSelect {
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 							new CDiv(
-								(new CButton(null, _('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
-									->setId('newSelementTriggers')
+								(new CButtonLink(_('Add')))->setId('newSelementTriggers')
 						)]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
@@ -218,7 +216,7 @@ function createFontSelect(string $name): CSelect {
 							->setAriaRequired(),
 						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CButton(null, _('Select')))
+						(new CSimpleButton(_('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
 							->onClick(
 								'return PopUp("popup.generic", jQuery.extend('.json_encode([
@@ -318,9 +316,7 @@ function createFontSelect(string $name): CSelect {
 								->setHeader([_('Name'), _('URL'), _('Action')])
 								->setId('urlContainer')
 								->setAttribute('style', 'width: 100%;'),
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->setId('newSelementUrl')
+							(new CButtonLink(_('Add')))->setId('newSelementUrl')
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -328,16 +324,16 @@ function createFontSelect(string $name): CSelect {
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 						(new CDiv([
-							(new CButton(null, _('Apply')))
-								->addClass('element-edit-control')
-								->setId('elementApply'),
-							(new CButton(null, _('Remove')))
-								->addClass('element-edit-control')
+							(new CSimpleButton(_('Apply')))
+								->setId('elementApply')
+								->addClass('element-edit-control'),
+							(new CSimpleButton(_('Remove')))
+								->setId('elementRemove')
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->setId('elementRemove'),
-							(new CButton(null, _('Close')))
-								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass('element-edit-control'),
+							(new CSimpleButton(_('Close')))
 								->setId('elementClose')
+								->addClass(ZBX_STYLE_BTN_ALT)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
@@ -487,16 +483,16 @@ function createFontSelect(string $name): CSelect {
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 						(new CDiv([
-							(new CButton(null, _('Apply')))
+							(new CSimpleButton(_('Apply')))
+								->setId('shapeApply')
+								->addClass('shape-edit-control'),
+							(new CSimpleButton(_('Remove')))
+								->setId('shapeRemove')
 								->addClass('shape-edit-control')
-								->setId('shapeApply'),
-							(new CButton(null, _('Remove')))
-								->addClass('shape-edit-control')
-								->addClass(ZBX_STYLE_BTN_ALT)
-								->setId('shapeRemove'),
-							(new CButton(null, _('Close')))
-								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_STYLE_BTN_ALT),
+							(new CSimpleButton(_('Close')))
 								->setId('shapeClose')
+								->addClass(ZBX_STYLE_BTN_ALT)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
@@ -617,16 +613,16 @@ function createFontSelect(string $name): CSelect {
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 						(new CDiv([
-							(new CButton(null, _('Apply')))
+							(new CSimpleButton(_('Apply')))
+								->setId('shapeMassApply')
+								->addClass('shape-edit-control'),
+							(new CSimpleButton(_('Remove')))
+								->setId('shapeMassRemove')
 								->addClass('shape-edit-control')
-								->setId('shapeMassApply'),
-							(new CButton(null, _('Remove')))
-								->addClass('shape-edit-control')
-								->addClass(ZBX_STYLE_BTN_ALT)
-								->setId('shapeMassRemove'),
-							(new CButton(null, _('Close')))
-								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_STYLE_BTN_ALT),
+							(new CSimpleButton(_('Close')))
 								->setId('shapeMassClose')
+								->addClass(ZBX_STYLE_BTN_ALT)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
@@ -728,16 +724,16 @@ function createFontSelect(string $name): CSelect {
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 						(new CDiv([
-							(new CButton(null, _('Apply')))
-								->addClass('element-edit-control')
-								->setId('massApply'),
-							(new CButton(null, _('Remove')))
-								->addClass('element-edit-control')
+							(new CSimpleButton(_('Apply')))
+								->setId('massApply')
+								->addClass('element-edit-control'),
+							(new CSimpleButton(_('Remove')))
+								->setId('massRemove')
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->setId('massRemove'),
-							(new CButton(null, _('Close')))
-								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass('element-edit-control'),
+							(new CSimpleButton(_('Close')))
 								->setId('massClose')
+								->addClass(ZBX_STYLE_BTN_ALT)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
@@ -813,18 +809,16 @@ function createFontSelect(string $name): CSelect {
 								->setHeader([_('Trigger'), _('Type'), _('Color'), _('Action')])
 								->setAttribute('style', 'width: 100%;')
 								->setId('linkTriggerscontainer'),
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->onClick(
-									'return PopUp("popup.generic", '.json_encode([
-										'srctbl' => 'triggers',
-										'srcfld1' => 'triggerid',
-										'reference' => 'linktrigger',
-										'multiselect' => '1',
-										'real_hosts' => '1',
-										'with_triggers' => '1'
-									]).', {dialogue_class: "modal-popup-generic"});'
-								)
+							(new CButtonLink(_('Add')))->onClick(
+								'return PopUp("popup.generic", '.json_encode([
+									'srctbl' => 'triggers',
+									'srcfld1' => 'triggerid',
+									'reference' => 'linktrigger',
+									'multiselect' => '1',
+									'real_hosts' => '1',
+									'with_triggers' => '1'
+								]).', {dialogue_class: "modal-popup-generic"});'
+							)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -832,13 +826,14 @@ function createFontSelect(string $name): CSelect {
 					->addItem([
 						(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
 						(new CDiv([
-							(new CButton(null, _('Apply')))->setId('formLinkApply'),
-							(new CButton(null, _('Remove')))
-								->addClass(ZBX_STYLE_BTN_ALT)
-								->setId('formLinkRemove'),
-							(new CButton(null, _('Close')))
-								->addClass(ZBX_STYLE_BTN_ALT)
+							(new CSimpleButton(_('Apply')))
+								->setId('formLinkApply'),
+							(new CSimpleButton(_('Remove')))
+								->setId('formLinkRemove')
+								->addClass(ZBX_STYLE_BTN_ALT),
+							(new CSimpleButton(_('Close')))
 								->setId('formLinkClose')
+								->addClass(ZBX_STYLE_BTN_ALT)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 							->addClass(ZBX_STYLE_TFOOT_BUTTONS)
@@ -853,8 +848,7 @@ function createFontSelect(string $name): CSelect {
 			'#{toElementName}',
 			(new CCol())->addClass('element-urls'),
 			(new CCol(
-				(new CButton(null, _('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Edit')))
 					->addClass('openlink')
 					->setAttribute('data-linkid', '#{linkid}')
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -868,8 +862,7 @@ function createFontSelect(string $name): CSelect {
 			'#{toElementName}',
 			(new CCol())->addClass('element-urls'),
 			(new CCol(
-				(new CButton(null, _('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Edit')))
 					->addClass('openlink')
 					->setAttribute('data-linkid', '#{linkid}')
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -895,8 +888,7 @@ function createFontSelect(string $name): CSelect {
 			],
 			(new CColor('linktrigger_#{linktriggerid}_color', '#{color}'))->appendColorPickerJs(false),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))
 					->addClass('triggerRemove')
 					->setAttribute('data-linktriggerid', '#{linktriggerid}')
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -912,9 +904,7 @@ function createFontSelect(string $name): CSelect {
 			(new CTextBox('url_#{selementurlid}_url', '#{url}', false, DB::getFieldLength('sysmap_url', 'url')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('jQuery("#urlrow_#{selementurlid}").remove();')
+				(new CButtonLink(_('Remove')))->onClick('jQuery("#urlrow_#{selementurlid}").remove();')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setId('urlrow_#{selementurlid}')
@@ -941,8 +931,7 @@ function createFontSelect(string $name): CSelect {
 				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),
 				(new CVar('element_name[#{triggerid}]', '#{name}')),
 				(new CVar('element_priority[#{triggerid}]', '#{priority}')),
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))
 					->addStyle('margin: 0 5px;')
 					->onClick('jQuery("#triggerrow_#{triggerid}").remove();')
 			]))->addClass(ZBX_STYLE_NOWRAP)

@@ -42,8 +42,7 @@ $timeperiods = (new CTable())
 		(new CTag('tfoot', true))
 			->addItem(
 				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Add')))
 						->addClass('js-add')
 						->setEnabled($data['allowed_edit'])
 				))
@@ -66,12 +65,10 @@ $timeperiod_template = new CTemplateTag('timeperiod-row-tmpl',
 		(new CCol('#{formatted_period}')),
 		(new CCol(
 			(new CHorList([
-				(new CSimpleButton(_('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Edit')))
 					->addClass('js-edit')
 					->setEnabled($data['allowed_edit']),
-				(new CSimpleButton(_('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))
 					->addClass('js-remove')
 					->setEnabled($data['allowed_edit'])
 			]))
@@ -93,8 +90,7 @@ $tags = (new CTable())
 	)
 	->setFooter(
 		(new CCol(
-			(new CSimpleButton(_('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Add')))
 				->addClass('element-table-add')
 				->setEnabled($data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 		))

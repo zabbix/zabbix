@@ -330,12 +330,12 @@ if ($data['context'] === 'host') {
 $button_list += [
 	'item.masscopyto' => [
 		'content' => (new CSimpleButton(_('Copy')))
-			->addClass('js-copy')
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeId()
+			->addClass('js-copy')
 	],
 	'popup.massupdate.item' => [
-		'content' => (new CButton('', _('Mass update')))
+		'content' => (new CSimpleButton(_('Mass update')))
+			->addClass(ZBX_STYLE_BTN_ALT)
 			->onClick(
 				"openMassupdatePopup('popup.massupdate.item', {".
 					CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('item').
@@ -344,8 +344,6 @@ $button_list += [
 					trigger_element: this
 				});"
 			)
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeAttribute('id')
 	],
 	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'), 'csrf_token' => $csrf_token]
 ];

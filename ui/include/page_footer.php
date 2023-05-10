@@ -53,7 +53,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			CProfiler::getInstance()->stop();
 			CProfiler::getInstance()->show();
 
-			(new CButton(null))
+			(new CSimpleButton())
 				->addClass(ZBX_STYLE_BTN_DEBUG)
 				->show();
 		}

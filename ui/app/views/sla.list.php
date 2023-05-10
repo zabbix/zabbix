@@ -163,19 +163,19 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 				'content' => (new CSimpleButton(_('Enable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massenable-sla')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			],
 			'sla.massdisable' => [
 				'content' => (new CSimpleButton(_('Disable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdisable-sla')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			],
 			'sla.massdelete' => [
 				'content' => (new CSimpleButton(_('Delete')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdelete-sla')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			]
 		], 'sla')
 	);

@@ -111,19 +111,19 @@ $form
 				'content' => (new CSimpleButton(_('Enable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massenable-connector')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			],
 			'connector.massdisable' => [
 				'content' => (new CSimpleButton(_('Disable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdisable-connector')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			],
 			'connector.massdelete' => [
 				'content' => (new CSimpleButton(_('Delete')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdelete-connector')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			]
 		], 'connector')
 );

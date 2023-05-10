@@ -77,8 +77,7 @@ foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 		$details_column,
 		(new CCol(
 			new CHorList([
-				(new CSimpleButton(_('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Edit')))
 					->addClass('js-edit-operation')
 					->setAttribute('data-operation', json_encode([
 						'operationid' => $i,
@@ -108,15 +107,17 @@ $operations_table->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
+				(new CButtonLink(_('Add')))
+					->addClass('js-recovery-operations-create')
 					->setAttribute('operationtype', ACTION_RECOVERY_OPERATION)
-					->setAttribute('data-actionid', array_key_exists('actionid', $data) ? $data['actionid'] : 0)
+					->setAttribute('data-actionid', array_key_exists('actionid', $data)
+						? $data['actionid']
+						: 0
+					)
 					->setAttribute('data-eventsource', array_key_exists('eventsource', $data)
 						? $data['eventsource']
 						: $operation['eventsource']
 					)
-					->addClass('js-recovery-operations-create')
-					->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(4)
 		)
 );

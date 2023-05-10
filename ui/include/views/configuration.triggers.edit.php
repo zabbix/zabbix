@@ -203,13 +203,13 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 }
 elseif ($data['expression_constructor'] != IM_FORCED) {
-	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick(
-			'document.getElementById("toggle_expression_constructor").value=1;'.
-			'document.getElementById("expression_constructor").value='.
-				(($data['expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();');
+	$input_method_toggle = (new CButtonLink(_('Expression constructor')))->onClick(
+		'document.getElementById("toggle_expression_constructor").value=1;'.
+		'document.getElementById("expression_constructor").value='.
+			(($data['expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
+	);
+
 	$expression_row[] = [BR(), $input_method_toggle];
 }
 
@@ -272,8 +272,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$readonly
 						? (new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Remove')))
 								->setAttribute('data-id', $e['id'])
 								->onClick('
 									if (confirm('.json_encode(_('Delete expression?')).')) {
@@ -320,12 +319,11 @@ if ($data['expression_constructor'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
-	$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick('javascript: '.
-			'document.getElementById("toggle_expression_constructor").value=1;'.
-			'document.getElementById("expression_constructor").value='.IM_ESTABLISHED.';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();');
+	$input_method_toggle = (new CButtonLink(_('Close expression constructor')))->onClick(
+		'document.getElementById("toggle_expression_constructor").value=1;'.
+		'document.getElementById("expression_constructor").value='.IM_ESTABLISHED.';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();');
+
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
 
@@ -404,14 +402,12 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 }
 elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
-	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick('javascript: '.
-			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
-			'document.getElementById("recovery_expression_constructor").value='.
-				(($data['recovery_expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();'
-		);
+	$input_method_toggle = (new CButtonLink(_('Expression constructor')))->onClick(
+		'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
+		'document.getElementById("recovery_expression_constructor").value='.
+			(($data['recovery_expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
+	);
 	$recovery_expression_row[] = [BR(), $input_method_toggle];
 }
 
@@ -476,8 +472,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$readonly
 						? (new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Remove')))
 								->setAttribute('data-id', $e['id'])
 								->onClick('
 									if (confirm('.json_encode(_('Delete expression?')).')) {
@@ -524,13 +519,11 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	], null, 'recovery_expression_constructor_row');
 
-	$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick('javascript: '.
-			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
-			'document.getElementById("recovery_expression_constructor").value='.IM_ESTABLISHED.';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();'
-		);
+	$input_method_toggle = (new CButtonLink(_('Close expression constructor')))->onClick(
+		'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
+		'document.getElementById("recovery_expression_constructor").value='.IM_ESTABLISHED.';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
+	);
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
 }
 

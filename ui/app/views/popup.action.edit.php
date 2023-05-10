@@ -56,8 +56,7 @@ $formula = (new CTextBox('formula', $data['formula'], false, DB::getFieldLength(
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
 
 $condition_hidden_data = (new CCol([
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
+	(new CButtonLink(_('Remove')))
 		->addClass('js-remove-condition'),
 	(new CInput('hidden'))
 		->setAttribute('value', '#{conditiontype}')
@@ -154,10 +153,9 @@ $condition_table->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->setAttribute('data-eventsource', $data['eventsource'])
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Add')))
 					->addClass('js-condition-create')
+					->setAttribute('data-eventsource', $data['eventsource'])
 			))->setColSpan(4)
 		)
 );

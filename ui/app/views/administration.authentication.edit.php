@@ -233,9 +233,7 @@ $ldap_tab = (new CFormGrid())
 						(new CTag('tfoot', true))
 							->addItem(
 								(new CCol(
-									(new CSimpleButton(_('Add')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('js-add')
+									(new CButtonLink(_('Add')))->addClass('js-add')
 								))->setColSpan(5)
 							)
 					)->addStyle('width: 100%;')
@@ -492,11 +490,10 @@ $saml_tab = (new CFormGrid())
 					->addItem(
 						(new CTag('tfoot', true))->addItem(
 							(new CCol(
-								(new CSimpleButton(_('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
+								(new CButtonLink(_('Add')))
 									->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
-									->setEnabled($data['saml_enabled'])
 									->addClass('js-add')
+									->setEnabled($data['saml_enabled'])
 							))->setColSpan(5)
 						)
 					)
@@ -529,11 +526,10 @@ $saml_tab = (new CFormGrid())
 					->addItem(
 						(new CTag('tfoot', true))->addItem(
 							(new CCol(
-								(new CSimpleButton(_('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
+								(new CButtonLink(_('Add')))
 									->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
-									->setEnabled($data['saml_enabled'])
 									->addClass('js-add')
+									->setEnabled($data['saml_enabled'])
 							))->setColSpan(5)
 						)
 					)
@@ -588,9 +584,7 @@ $templates['saml_provisioning_group_row'] = (string) (new CRow([
 	],
 	(new CCol('#{user_group_names}'))->addClass(ZBX_STYLE_WORDBREAK),
 	(new CCol('#{role_name}'))->addClass(ZBX_STYLE_WORDBREAK),
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('js-remove')
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 // SAML provisioning medias row template.
 $templates['saml_provisioning_media_row'] = (string) (new CRow([
@@ -604,9 +598,7 @@ $templates['saml_provisioning_media_row'] = (string) (new CRow([
 	],
 	(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
 	(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('js-remove')
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 // LDAP servers list row.
 $templates['ldap_servers_row'] = (string) (new CRow([
@@ -643,9 +635,7 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 			->setId('ldap_default_row_index_#{row_index}'),
 		(new CLabel(new CSpan(), 'ldap_default_row_index_#{row_index}'))->addClass(ZBX_STYLE_WORDWRAP)
 	],
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('js-remove')
+	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 
 (new CScriptTag(

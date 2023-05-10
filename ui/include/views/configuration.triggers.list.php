@@ -371,7 +371,8 @@ $triggers_form->addItem([
 					->removeId()
 			],
 			'popup.massupdate.trigger' => [
-				'content' => (new CButton('', _('Mass update')))
+				'content' => (new CSimpleButton(_('Mass update')))
+					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.trigger', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('trigger').
@@ -380,8 +381,6 @@ $triggers_form->addItem([
 							trigger_element: this
 						});"
 					)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
 			],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?'),
 				'csrf_token' => $csrf_token

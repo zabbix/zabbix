@@ -1912,7 +1912,7 @@ define('ZBX_STYLE_EVENT_ACTION_YELLOW', 'event-action-yellow');
 define('ZBX_STYLE_EVENT_ACTION_GRAY', 'event-action-gray');
 //define('ZBX_STYLE_EVENT_ACKNOWLEDGED', 'event-acknowledged'); // TODO - delete
 define('ZBX_STYLE_EVENT_MESSAGES', 'event-messages');
-define('ZBX_STYLE_TRIGGER_DEPENDENCY', 'trigger-dependency');
+define('ZBX_STYLE_TRIGGER_DEPENDENCY', 'trigger-dependency'); // TODO: clear
 define('ZBX_STYLE_SUPPRESSIONS_PROBLEM', 'suppressions-problem'); // TODO: clear
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
@@ -2278,8 +2278,8 @@ define('ZBX_ICON_EYE_OFF', 'zi-eye-off');
 define('ZBX_ICON_FILTER', 'zi-filter');
 define('ZBX_ICON_FULLSCREEN', 'zi-fullscreen');
 define('ZBX_ICON_HELP', 'zi-help');
-define('ZBX_ICON_HELP_FILLED_SMALL', 'icon-help-filled-small');
 define('ZBX_ICON_HELP_SMALL', 'zi-help-small');
+define('ZBX_ICON_HELP_FILLED_SMALL', 'zi-help-filled-small');
 define('ZBX_ICON_HIERARCHY', 'zi-hierarchy');
 define('ZBX_ICON_HOME', 'zi-home');
 define('ZBX_ICON_I', 'zi-i');

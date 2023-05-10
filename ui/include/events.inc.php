@@ -819,9 +819,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 					}
 				}
 
-				$tags[$element[$key]][] = (new CButton(null))
-					->addClass(ZBX_STYLE_BTN_ICON)    // TODO: ZBX_STYLE_ICON_WIZARD_ACTION
-					->addClass(ZBX_ICON_MORE)
+				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE)) // TODO: ZBX_STYLE_ICON_WIZARD_ACTION
 					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP);
 			}
 		}

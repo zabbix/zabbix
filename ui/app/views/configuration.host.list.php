@@ -541,7 +541,9 @@ $form->addItem([
 			)
 		],
 		'popup.massupdate.host' => [
-			'content' => (new CButton('', _('Mass update')))
+			'content' => (new CSimpleButton(_('Mass update')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-no-chkbxrange')
 				->onClick(
 					"openMassupdatePopup('popup.massupdate.host', {".
 						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".$csrf_token_massupdate.
@@ -550,15 +552,13 @@ $form->addItem([
 						trigger_element: this
 					});"
 				)
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
 		],
 		'host.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected hosts?'))
 				->onClick('view.massDeleteHosts(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 				->removeAttribute('id')
 		]
 	], 'hosts')

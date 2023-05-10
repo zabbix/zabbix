@@ -194,7 +194,7 @@ $btn-form-bg-color: $form-bg-color !default;
 $btn-form-hover-color: #e8f5ff !default;
 $btn-form-border-color: $form-border-color !default;
 
-$btn-disabled-font-color: #acbbc2 !default;
+$btn-disabled-color: #acbbc2 !default;
 $btn-disabled-bg-color: #ebebeb !default;
 $btn-disabled-border-color: #ccd5d9 !default;
 
@@ -214,9 +214,10 @@ $link-alt-underline-color: #768d99 !default;
 $icon-color: #768d99 !default;
 $icon-content-color: #ffffff !default;
 
-$icon-btn-color: lighten($icon-color, 25%) !default;
+$icon-btn-color: lighten($icon-color, 20%) !default;
 $icon-btn-hover-color: $icon-color !default;
-$icon-btn-disabled-color: lighten($icon-color, 35%) !default;
+$icon-btn-focus-color: $icon-color !default;
+$icon-btn-disabled-color: lighten($icon-color, 30%) !default;
 
 // FIXME need to check color variables
 // FIXME DF has variables that are not used, need to check after problems page

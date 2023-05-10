@@ -296,7 +296,8 @@ $form->addItem([
 				)
 			],
 			'popup.massupdate.template' => [
-				'content' => (new CButton('', _('Mass update')))
+				'content' => (new CSimpleButton(_('Mass update')))
+					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.template', ".
 							json_encode([CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('template')]).
@@ -305,8 +306,6 @@ $form->addItem([
 							trigger_element: this
 						});"
 					)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
 			],
 			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?'),
 				'csrf_token' => CCsrfTokenHelper::get('templates.php')

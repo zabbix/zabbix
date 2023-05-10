@@ -186,11 +186,9 @@ foreach ($data['parameters_webhook'] as $parameter) {
 		))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
-		(new CButton('', _('Remove')))
-			->removeId()
-			->onClick('jQuery(this).closest("tr").remove()')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CButtonLink(_('Remove')))
 			->addClass('element-table-remove')
+			->onClick('jQuery(this).closest("tr").remove()')
 	], 'form_row');
 }
 
@@ -205,11 +203,9 @@ $row_template = (new CTag('script', true))
 			(new CTextBox('parameters_webhook[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
-			(new CButton('', _('Remove')))
-				->removeId()
-				->onClick('jQuery(this).closest("tr").remove()')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Remove')))
 				->addClass('element-table-remove')
+				->onClick('jQuery(this).closest("tr").remove()')
 		]))->addClass('form_row')
 	);
 
@@ -303,9 +299,7 @@ $message_templates_formlist = (new CFormList('messageTemplatesFormlist'))
 				->setFooter(
 					(new CRow(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->setAttribute('data-action', 'add')
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Add')))->setAttribute('data-action', 'add')
 						))->setColSpan(3)
 					))->setId('message-templates-footer')
 				)

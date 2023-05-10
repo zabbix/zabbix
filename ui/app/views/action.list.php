@@ -167,19 +167,19 @@ $form->addItem([
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massenable-action')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'action.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdisable-action')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'action.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-action')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'action_'.$data['eventsource'])
 ]);

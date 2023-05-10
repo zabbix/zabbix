@@ -62,13 +62,13 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		return (new CList())
 			->addClass(ZBX_STYLE_BTN_SPLIT)
 			->addItem(
-				(new CButton(null, _('Add new data set')))
-					->addClass(ZBX_ICON_PLUS_SMALL)
+				(new CSimpleButton(_('Add new data set')))
+					->setId('dataset-add')
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->setId('dataset-add'),
+					->addClass(ZBX_ICON_PLUS_SMALL),
 			)
 			->addItem(
-				(new CButton(null))
+				(new CSimpleButton())
 					->setId('dataset-menu')
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass(ZBX_ICON_CHEVRON_DOWN)
@@ -192,9 +192,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 								(new CList())
 									->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
 									->addItem(
-										(new CSimpleButton(_('Add')))
-											->addClass(ZBX_STYLE_BTN_LINK)
-											->addClass('js-add-item')
+										(new CButtonLink(_('Add')))->addClass('js-add-item')
 									)
 							))->setColSpan(5)
 						)

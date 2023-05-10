@@ -32,24 +32,25 @@ if ($data['uncheck']) {
 $html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_LIST))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
-			->addItem(
-				(new CButton('', _('Import')))
-					->onClick(
-						'return PopUp("popup.import", {
-							rules_preset: "mediatype", '.
-							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
-						'"},{
-							dialogueid: "popup_import",
-							dialogue_class: "modal-popup-generic"
-						});'
-					)
-					->removeId()
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit')
+				)
+				->addItem(
+					(new CSimpleButton(_('Import')))
+						->onClick(
+							'return PopUp("popup.import", {
+								rules_preset: "mediatype", '.
+								CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+							'"},{
+								dialogueid: "popup_import",
+								dialogue_class: "modal-popup-generic"
+							});'
+						)
+				)
+			))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'mediatype.list'))
