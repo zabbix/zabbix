@@ -236,7 +236,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.4/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|RabbitMQ: Version has changed|<p>The RabbitMQ version has changed. Acknowledge to close the problem manually.</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0`|Info|**Manual close**: Yes|
+|RabbitMQ: Version has changed|<p>RabbitMQ version has changed. Acknowledge to close the problem manually.</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0`|Info|**Manual close**: Yes|
 |RabbitMQ: Number of network partitions is too high|<p>For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).</p>|`min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0`|Warning||
 |RabbitMQ: Memory alarm|<p>For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1`|Average||
 |RabbitMQ: Free disk space alarm|<p>For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1`|Average||

@@ -4,7 +4,7 @@
 ## Overview
 
 This template is designed for the effortless deployment of Apache monitoring by Zabbix via Zabbix agent and doesn't require any external scripts.
-The template `Apache by Zabbix agent` - collects metrics by polling [Apache Status module](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
+The template `Apache by Zabbix agent` - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
   
 ```text
 127.0.0.1
@@ -64,7 +64,7 @@ This template has been tested on:
 
 ## Setup
 
-See the setup instructions for [Apache Status module](https://httpd.apache.org/docs/current/mod/mod_status.html).
+See the setup instructions for [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html).
 
 Check the availability of the module with this command line: `httpd -M 2>/dev/null | grep status_module`
 
@@ -96,7 +96,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.4/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Apache: Get status|<p>Getting data from a machine-readable version of the Apache status page.</p><p>For more information see [Apache Satus module](https://httpd.apache.org/docs/current/mod/mod_status.html).</p>|Zabbix agent|web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Apache: Get status|<p>Getting data from a machine-readable version of the Apache status page.</p><p>For more information see Apache Module [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html).</p>|Zabbix agent|web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Apache: Service ping||Zabbix agent|net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Apache: Service response time||Zabbix agent|net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]|
 |Apache: Total bytes|<p>The total bytes served.</p>|Dependent item|apache.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["Total kBytes"]`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|

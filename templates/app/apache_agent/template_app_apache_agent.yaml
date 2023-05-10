@@ -10,7 +10,7 @@ zabbix_export:
       template: 'Apache by Zabbix agent'
       name: 'Apache by Zabbix agent'
       description: |
-        Get metrics from Apache Satus module using HTTP agent.
+        Get metrics from mod_status module using HTTP agent.
         https://httpd.apache.org/docs/current/mod/mod_status.html
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache
@@ -497,7 +497,7 @@ zabbix_export:
           value_type: TEXT
           description: |
             Getting data from a machine-readable version of the Apache status page.
-            For more information see [Apache Satus module](https://httpd.apache.org/docs/current/mod/mod_status.html).
+            For more information see Apache Module [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html).
           preprocessing:
             -
               type: JAVASCRIPT

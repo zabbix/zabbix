@@ -1591,7 +1591,7 @@ zabbix_export:
               name: 'RabbitMQ: Version has changed'
               event_name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The RabbitMQ version has changed. Acknowledge to close the problem manually.'
+              description: 'RabbitMQ version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
