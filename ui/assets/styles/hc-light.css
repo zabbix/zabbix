@@ -46,8 +46,8 @@ svg *:focus {
 z-select a.focusable.btn-icon::after,
 .z-select button.focusable::after,
 .z-select a.focusable.btn::after,
-.z-select a.focusable.btn-icon::after, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link,
-.problem-icon-list {
+.z-select a.focusable.btn-icon::after, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link .problem-icon-list-item::before,
+.problem-icon-list .problem-icon-list-item::before {
   font: 18px / 1 'zabbix-icons';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
@@ -7348,24 +7348,21 @@ td.inactive-bg {
 .time-quick li a:focus {
   box-shadow: 0 0 0 2px #111111; }
 
-.problem-icon-link:focus {
-  box-shadow: 0 0 0 2px #111111; }
+.problem-icon-link {
+  border-radius: 3px; }
+  .problem-icon-link:focus {
+    box-shadow: 0 0 0 2px #111111; }
 
 .problem-icon-link .problem-icon-list-item,
 .problem-icon-list .problem-icon-list-item {
-  position: relative;
-  padding-left: 20px;
+  padding-left: 0;
   color: #000000;
+  border: none;
   background: transparent; }
   .problem-icon-link .problem-icon-list-item::before,
   .problem-icon-list .problem-icon-list-item::before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 17px;
-    height: 17px;
+    margin-right: 4px;
     font-size: 16px;
-    text-align: center;
     border-radius: 3px; }
 .problem-icon-link .status-na-bg::before,
 .problem-icon-list .status-na-bg::before {

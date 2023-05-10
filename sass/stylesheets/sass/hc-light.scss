@@ -242,7 +242,7 @@ a.btn-icon,
 	.sortable-list {
 		& > .sortable-item:focus:not(:active) {
 			& > div {
-				box-shadow: 0 0 0 2px $blue;
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
@@ -385,7 +385,7 @@ a.btn-icon,
 
 			&:focus + label {
 				background-color: lighten($btn-bg-color, 10%) !important;
-				box-shadow: 0 0 0 2px $blue !important;
+				box-shadow: 0 0 0 2px $btn-focus-outline-color !important;
 				color: $white;
 			}
 
@@ -862,7 +862,7 @@ td.inactive-bg {
 
 		&:focus {
 			background-color: lighten($btn-bg-color, 10%);
-			box-shadow: 0 0 0 2px $blue;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 	}
 
@@ -870,7 +870,7 @@ td.inactive-bg {
 		.btn-time,
 		.filter-trigger {
 			background-color: lighten($btn-bg-color, 10%);
-			box-shadow: 0 0 0 2px $blue;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 
 		&.ui-tabs-active {
@@ -878,7 +878,7 @@ td.inactive-bg {
 			.filter-trigger {
 				background-color: $ui-hover-color;
 				border-color: $ui-hover-color;
-				box-shadow: 0 0 0 2px $blue;
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
@@ -888,38 +888,45 @@ td.inactive-bg {
 	li {
 		a {
 			&:focus {
-				box-shadow: 0 0 0 2px $blue;
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
 }
 
 .problem-icon-link {
+	border-radius: 3px;
+
 	&:focus {
-		box-shadow: 0 0 0 2px $blue;
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
 }
 
-.problem-icon-link, // TODO: check
-.problem-icon-list { // TODO: check
-	.problem-icon-list-item { // TODO: check
-		position: relative;
-		padding-left: 20px;
+.problem-icon-link,
+.problem-icon-list {
+	.problem-icon-list-item {
+		padding-left: 0;
 		color: $font-color;
+		border: none;
 		background: transparent;
 
 		&::before {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 17px;
-			height: 17px;
+			@extend %icons-font;
+
+			margin-right: 4px;
 			font-size: $icon-medium-size;
-			text-align: center;
 			border-radius: 3px;
 		}
 	}
 
+	// Dynamically generated classes:
+	//  .status-na-bg
+	//  .status-normal-bg
+	//  .status-info-bg
+	//  .status-average-bg
+	//  .status-warning-bg
+	//  .status-high-bg
+	//  .status-disaster-bg
 	@each $type, $icon in (
 		na-bg: $zi-circle-question-filled,
 		normal-bg: $zi-circle-check-filled,
@@ -929,8 +936,6 @@ td.inactive-bg {
 		high-bg: $zi-triangle-flipped-warning,
 		disaster-bg: $zi-stop-sign
 	) {
-		@extend %icons-font;
-
 		.status-#{$type}::before {
 			content: $icon;
 		}
@@ -995,7 +1000,7 @@ td.inactive-bg {
 // InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused { // TODO FIX to input:focus + .btn-undo, textarea:focus + .btn-undo
-	box-shadow: 0 1px 0 $blue, 0 -1px 0 $blue;
+	box-shadow: 0 1px 0 $btn-focus-outline-color, 0 -1px 0 $btn-focus-outline-color;
 }
 
 // Tabfilter
@@ -1003,7 +1008,7 @@ td.inactive-bg {
 .filter-container.tabfilter-container {
 	.tabfilter-item-label {
 		&.focused {
-			box-shadow: 0 0 0 2px $blue;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 	}
 }
