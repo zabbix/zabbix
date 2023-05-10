@@ -85,6 +85,7 @@ zbx_log_t;
 #define AR_LOG		0x10
 #define AR_MESSAGE	0x20
 #define AR_META		0x40
+#define AR_BIN		0x80
 
 /* agent return structure */
 typedef struct
@@ -96,6 +97,7 @@ typedef struct
 	char		*text;
 	char		*msg;		/* possible error message */
 	zbx_log_t	*log;
+	char		*bin;
 	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 }
@@ -158,6 +160,7 @@ ZBX_METRIC;
 #define ZBX_ISSET_DBL(res)	((res)->type & AR_DOUBLE)
 #define ZBX_ISSET_STR(res)	((res)->type & AR_STRING)
 #define ZBX_ISSET_TEXT(res)	((res)->type & AR_TEXT)
+#define ZBX_ISSET_BIN(res)	((res)->type & AR_BIN)
 #define ZBX_ISSET_LOG(res)	((res)->type & AR_LOG)
 #define ZBX_ISSET_MSG(res)	((res)->type & AR_MESSAGE)
 #define ZBX_ISSET_META(res)	((res)->type & AR_META)
@@ -208,6 +211,18 @@ do									\
 }									\
 while (0)
 
+#define ZBX_UNSET_BIN_RESULT(res)					\
+									\
+do									\
+{									\
+	if ((res)->type & AR_BIN)					\
+	{								\
+		zbx_free((res)->bin);					\
+		(res)->type &= ~AR_BIN	;				\
+	}								\
+}									\
+while (0)
+
 #define ZBX_UNSET_LOG_RESULT(res)					\
 									\
 do									\
@@ -243,6 +258,7 @@ do										\
 	if (!(exc_type & AR_DOUBLE))	ZBX_UNSET_DBL_RESULT(res);		\
 	if (!(exc_type & AR_STRING))	ZBX_UNSET_STR_RESULT(res);		\
 	if (!(exc_type & AR_TEXT))	ZBX_UNSET_TEXT_RESULT(res);		\
+	if (!(exc_type & AR_BIN))	ZBX_UNSET_BIN_RESULT(res);		\
 	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);		\
 	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);		\
 }										\
@@ -256,6 +272,7 @@ while (0)
 	ZBX_UNSET_DBL_RESULT((result));		\
 	ZBX_UNSET_STR_RESULT((result));		\
 	ZBX_UNSET_TEXT_RESULT((result));	\
+	ZBX_UNSET_BIN_RESULT(result);		\
 	ZBX_UNSET_LOG_RESULT((result));		\
 	ZBX_UNSET_MSG_RESULT((result));		\
 }
@@ -305,6 +322,15 @@ typedef struct
 	int		clock;
 	int		ns;
 	const char	*value;
+}
+ZBX_HISTORY_BIN;
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		ns;
+	const char	*value;
 	const char	*source;
 	int		timestamp;
 	int		logeventid;
@@ -319,6 +345,7 @@ typedef struct
 	void	(*history_string_cb)(const ZBX_HISTORY_STRING *history, int history_num);
 	void	(*history_text_cb)(const ZBX_HISTORY_TEXT *history, int history_num);
 	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
+	void	(*history_bin_cb)(const ZBX_HISTORY_BIN *history, int history_num);
 }
 ZBX_HISTORY_WRITE_CBS;
 

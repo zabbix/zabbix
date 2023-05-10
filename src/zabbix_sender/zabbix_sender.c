@@ -1500,12 +1500,14 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-	zbx_init_library_cfg(program_type);
-
 	parse_commandline(argc, argv);
 
 	if (NULL != config_file)
+	{
+		zbx_init_library_cfg(program_type, config_file);
 		zbx_load_config(config_file);
+	}
+
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
 	{
@@ -1866,9 +1868,7 @@ exit:
 	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 	{
 		zbx_tls_free();
-#if defined(_WINDOWS)
-		zbx_tls_library_deinit();
-#endif
+		zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);
 	}
 #endif
 	zbx_config_tls_free(zbx_config_tls);

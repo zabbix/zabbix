@@ -1294,6 +1294,11 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 			add_log_result(result, c);
 			ret = SUCCEED;
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return ret;

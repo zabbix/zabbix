@@ -23,9 +23,6 @@
 #include "log.h"
 #include "zbxstr.h"
 
-#define WAIT_READ	0
-#define WAIT_WRITE	1
-
 #define CMD_IAC		255
 #define CMD_WILL	251
 #define CMD_WONT	252
@@ -35,31 +32,30 @@
 
 static char	prompt_char = '\0';
 
-static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
+static int	telnet_waitsocket(ZBX_SOCKET socket_fd, short mode)
 {
-	struct timeval	tv;
 	int		rc;
-	fd_set		fd, *readfd = NULL, *writefd = NULL;
+	zbx_pollfd_t	pd;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	tv.tv_sec = 0;
-	tv.tv_usec = 100000;	/* 1/10 sec */
+	pd.fd = socket_fd;
+	pd.events = mode;
 
-	FD_ZERO(&fd);
-	FD_SET(socket_fd, &fd);
-
-	if (WAIT_READ == mode)
-		readfd = &fd;
-	else
-		writefd = &fd;
-
-	rc = select(ZBX_SOCKET_TO_INT(socket_fd) + 1, readfd, writefd, NULL, &tv);
-
-	if (ZBX_PROTO_ERROR == rc)
+	if (0 > (rc = zbx_socket_poll(&pd, 1, 100)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]", __func__, rc, zbx_socket_last_error(),
-				strerror_from_system(zbx_socket_last_error()));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() poll() error rc:%d errno:%d error:[%s]", __func__, rc,
+				zbx_socket_last_error(), strerror_from_system(zbx_socket_last_error()));
+	}
+	else if (0 < rc && POLLIN != (pd.revents & (POLLIN | POLLERR | POLLHUP | POLLNVAL)))
+	{
+		char	*errmsg;
+
+		errmsg = socket_poll_error(pd.revents);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, errmsg);
+		zbx_free(errmsg);
+		rc = ZBX_PROTO_ERROR;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, rc);
@@ -67,14 +63,14 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, int mode)
 	return rc;
 }
 
-static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
+static ssize_t	telnet_socket_read(zbx_socket_t *s, void *buf, size_t count)
 {
 	ssize_t	rc;
 	int	error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_READ(socket_fd, buf, count)))
+	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_READ(s->socket, buf, count)))
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
@@ -85,9 +81,15 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 		if (EAGAIN == error)
 #endif
 		{
+			if (SUCCEED != zbx_socket_check_deadline(s))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() timeout error", __func__);
+				goto ret;
+			}
+
 			/* wait and if there is still an error or no input available */
 			/* we assume the other side has nothing more to say */
-			if (1 > (rc = telnet_waitsocket(socket_fd, WAIT_READ)))
+			if (1 > (rc = telnet_waitsocket(s->socket, POLLIN)))
 				goto ret;
 
 			continue;
@@ -106,14 +108,14 @@ ret:
 	return rc;
 }
 
-static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t count)
+static ssize_t	telnet_socket_write(zbx_socket_t *s, const void *buf, size_t count)
 {
 	ssize_t	rc;
 	int	error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_WRITE(socket_fd, buf, count)))
+	while (ZBX_PROTO_ERROR == (rc = ZBX_TCP_WRITE(s->socket, buf, count)))
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
@@ -124,7 +126,13 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 		if (EAGAIN == error)
 #endif
 		{
-			telnet_waitsocket(socket_fd, WAIT_WRITE);
+			if (SUCCEED != zbx_socket_check_deadline(s))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() timeout error", __func__);
+				break;
+			}
+
+			telnet_waitsocket(s->socket, POLLOUT);
 			continue;
 		}
 
@@ -139,7 +147,7 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 #undef WAIT_READ
 #undef WAIT_WRITE
 
-static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, size_t *buf_offset)
+static ssize_t	telnet_read(zbx_socket_t *s, char *buf, size_t *buf_left, size_t *buf_offset)
 {
 	unsigned char	c, c1, c2, c3;
 	ssize_t		rc = ZBX_PROTO_ERROR;
@@ -148,7 +156,7 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 
 	for (;;)
 	{
-		if (1 > (rc = telnet_socket_read(socket_fd, &c1, 1)))
+		if (1 > (rc = telnet_socket_read(s, &c1, 1)))
 			break;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() c1:[%x=%c]", __func__, c1, isprint(c1) ? c1 : ' ');
@@ -156,7 +164,7 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 		switch (c1)
 		{
 			case CMD_IAC:
-				while (0 == (rc = telnet_socket_read(socket_fd, &c2, 1)))
+				while (0 == (rc = telnet_socket_read(s, &c2, 1)))
 					;
 
 				if (ZBX_PROTO_ERROR == rc)
@@ -177,7 +185,7 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 					case CMD_WONT:
 					case CMD_DO:
 					case CMD_DONT:
-						while (0 == (rc = telnet_socket_read(socket_fd, &c3, 1)))
+						while (0 == (rc = telnet_socket_read(s, &c3, 1)))
 							;
 
 						if (ZBX_PROTO_ERROR == rc)
@@ -189,7 +197,7 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 						/* unless it is Suppress Go Ahead (SGA)        */
 
 						c = CMD_IAC;
-						telnet_socket_write(socket_fd, &c, 1);
+						telnet_socket_write(s, &c, 1);
 
 						if (CMD_WONT == c2)
 							c = CMD_DONT;	/* the only valid response */
@@ -200,8 +208,8 @@ static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, si
 						else
 							c = (c2 == CMD_DO ? CMD_WONT : CMD_DONT);
 
-						telnet_socket_write(socket_fd, &c, 1);
-						telnet_socket_write(socket_fd, &c3, 1);
+						telnet_socket_write(s, &c, 1);
+						telnet_socket_write(s, &c3, 1);
 						break;
 					default:
 						break;
@@ -326,7 +334,7 @@ static void	telnet_rm_prompt(const char *buf, size_t *offset)
 	}
 }
 
-int	zbx_telnet_test_login(ZBX_SOCKET socket_fd)
+int	zbx_telnet_test_login(zbx_socket_t *s)
 {
 	char	buf[MAX_BUFFER_LEN];
 	size_t	sz, offset;
@@ -336,7 +344,7 @@ int	zbx_telnet_test_login(ZBX_SOCKET socket_fd)
 
 	sz = sizeof(buf);
 	offset = 0;
-	while (ZBX_PROTO_ERROR != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
+	while (ZBX_PROTO_ERROR != (rc = telnet_read(s, buf, &sz, &offset)))
 	{
 		if (':' == telnet_lastchar(buf, offset))
 			break;
@@ -353,7 +361,7 @@ int	zbx_telnet_test_login(ZBX_SOCKET socket_fd)
 	return ret;
 }
 
-int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result)
+int	zbx_telnet_login(zbx_socket_t *s, const char *username, const char *password, AGENT_RESULT *result)
 {
 	char	buf[MAX_BUFFER_LEN], c;
 	size_t	sz, offset;
@@ -363,7 +371,7 @@ int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *pas
 
 	sz = sizeof(buf);
 	offset = 0;
-	while (ZBX_PROTO_ERROR != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
+	while (ZBX_PROTO_ERROR != (rc = telnet_read(s, buf, &sz, &offset)))
 	{
 		if (':' == telnet_lastchar(buf, offset))
 			break;
@@ -378,12 +386,12 @@ int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *pas
 		goto fail;
 	}
 
-	telnet_socket_write(socket_fd, username, strlen(username));
-	telnet_socket_write(socket_fd, "\r\n", 2);
+	telnet_socket_write(s, username, strlen(username));
+	telnet_socket_write(s, "\r\n", 2);
 
 	sz = sizeof(buf);
 	offset = 0;
-	while (ZBX_PROTO_ERROR != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
+	while (ZBX_PROTO_ERROR != (rc = telnet_read(s, buf, &sz, &offset)))
 	{
 		if (':' == telnet_lastchar(buf, offset))
 			break;
@@ -398,12 +406,12 @@ int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *pas
 		goto fail;
 	}
 
-	telnet_socket_write(socket_fd, password, strlen(password));
-	telnet_socket_write(socket_fd, "\r\n", 2);
+	telnet_socket_write(s, password, strlen(password));
+	telnet_socket_write(s, "\r\n", 2);
 
 	sz = sizeof(buf);
 	offset = 0;
-	while (ZBX_PROTO_ERROR != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
+	while (ZBX_PROTO_ERROR != (rc = telnet_read(s, buf, &sz, &offset)))
 	{
 		if ('$' == (c = telnet_lastchar(buf, offset)) || '#' == c || '>' == c || '%' == c)
 		{
@@ -428,7 +436,7 @@ fail:
 	return ret;
 }
 
-int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding)
+int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *result, const char *encoding)
 {
 	char	buf[MAX_BUFFER_LEN];
 	size_t	sz, offset;
@@ -449,13 +457,13 @@ int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *
 	command_crlf = (char *)zbx_malloc(command_crlf, offset_lf * 2 + 1);
 	convert_unix_to_telnet_eol(command_lf, offset_lf, command_crlf, &offset_crlf);
 
-	telnet_socket_write(socket_fd, command_crlf, offset_crlf);
-	telnet_socket_write(socket_fd, "\r\n", 2);
+	telnet_socket_write(s, command_crlf, offset_crlf);
+	telnet_socket_write(s, "\r\n", 2);
 
 	sz = sizeof(buf);
 	offset = 0;
 
-	while (ZBX_PROTO_ERROR != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
+	while (ZBX_PROTO_ERROR != (rc = telnet_read(s, buf, &sz, &offset)))
 	{
 		if (prompt_char == telnet_lastchar(buf, offset))
 			break;
@@ -466,14 +474,15 @@ int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		if (EINTR == zbx_socket_last_error() && SUCCEED == zbx_alarm_timed_out())
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find prompt after command execution: "
-					"execution timed out"));
-			goto fail;
-		}
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
-				strerror_from_system(zbx_socket_last_error())));
+		const char	*errmsg;
+
+		if (SUCCEED == zbx_socket_check_deadline(s))
+			errmsg = strerror_from_system(zbx_socket_last_error());
+		else
+			errmsg = "timeout occurred";
+
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s", errmsg));
+
 		goto fail;
 	}
 
@@ -507,7 +516,7 @@ int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *
 		offset--;
 	buf[offset] = '\0';
 
-	SET_STR_RESULT(result, zbx_convert_to_utf8(buf, offset, encoding));
+	SET_TEXT_RESULT(result, zbx_convert_to_utf8(buf, offset, encoding));
 	ret = SUCCEED;
 fail:
 	zbx_free(command_lf);

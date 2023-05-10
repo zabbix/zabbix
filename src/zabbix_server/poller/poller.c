@@ -301,9 +301,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_agent(item, result);
-			zbx_alarm_off();
+			res = get_value_agent(item, config_comms->config_timeout, result);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -327,18 +325,14 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_ssh(item, result);
-			zbx_alarm_off();
+			res = get_value_ssh(item, config_comms->config_timeout, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			zbx_alarm_on(config_comms->config_timeout);
-			res = get_value_telnet(item, result);
-			zbx_alarm_off();
+			res = get_value_telnet(item, config_comms->config_timeout, result);
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
@@ -730,10 +724,8 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
-		zbx_alarm_on(config_comms->config_timeout);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num,
 				config_comms->config_timeout);
-		zbx_alarm_off();
 	}
 	else if (1 == num)
 	{
