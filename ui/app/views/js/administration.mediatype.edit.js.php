@@ -47,18 +47,16 @@ window.mediatype_edit_popup = new class {
 		this._addParameterData();
 		this._populateMessageTemplates(<?= json_encode(array_values($data['message_templates'])) ?>);
 
-		this.form.querySelector('#message-templates').addEventListener('click', (event) => {
-			this._editMessageTemplate(event);
-		});
+		this.form.querySelector('#message-templates').addEventListener('click', (event) =>
+			this._editMessageTemplate(event)
+		);
 
 		this.form.querySelector('.element-table-add').addEventListener('click', () => {
 			this._addExecParam();
 			this.row_num ++;
 		});
 
-		this.form.querySelector('.webhook-param-add').addEventListener('click', () => {
-			this._addWebhookParam();
-		});
+		this.form.querySelector('.webhook-param-add').addEventListener('click', () => this._addWebhookParam());
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-remove')) {
@@ -70,17 +68,12 @@ window.mediatype_edit_popup = new class {
 		});
 
 		if (this.form.querySelector('#chPass_btn') !== null) {
-			this.form.querySelector('#chPass_btn').addEventListener('click', () => {
-				this._toggleChangePswdButton();
-			});
+			this.form.querySelector('#chPass_btn').addEventListener('click', () => this._toggleChangePswdButton());
 		}
 
 		const event_menu = this.form.querySelector('#show_event_menu');
 
-		event_menu.onchange = () => {
-			this._toggleEventMenuFields(event_menu);
-		};
-
+		event_menu.onchange = () => this._toggleEventMenuFields(event_menu);
 		event_menu.dispatchEvent(new Event('change'));
 	}
 
@@ -126,11 +119,11 @@ window.mediatype_edit_popup = new class {
 
 		// Trim all string values within the 'parameters_exec' object.
 		if (typeof fields.parameters_exec !== 'undefined') {
-			Object.values(fields.parameters_exec).forEach((key, index) => {
-				Object.values(key).forEach(value => {
-					fields.parameters_exec[index].value = value.trim();
+			Object.keys(fields.parameters_exec).forEach((key) => {
+				Object.values(key).forEach(param => {
+					fields.parameters_exec[param].value = fields.parameters_exec[param].value.trim();
 				});
-			})
+			});
 		}
 
 		// Set maxsessions value.
@@ -220,7 +213,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	/**
-	 * Removes row and toggles the "Add" button in message template table; updates message template list.
+	 * Removes row and toggles the "Add" button in message template table, updates message template list.
 	 */
 	_removeMessageTemplate(event) {
 		event.target.closest('tr').remove();
@@ -361,13 +354,15 @@ window.mediatype_edit_popup = new class {
 	 * Toggles the "Add" button state and changes its text depending on message template count.
 	 */
 	_toggleAddButton() {
-		const limit_reached = (Object.keys(this.message_template_list).length == Object.keys(this.message_templates).length);
+		const limit_reached = (
+			Object.keys(this.message_template_list).length === Object.keys(this.message_templates).length
+		);
 
 		const linkBtn = this.form.querySelector('#message-templates-footer .btn-link');
 		linkBtn.disabled = limit_reached;
 		linkBtn.textContent = limit_reached
 			? <?= json_encode(_('Add (message type limit reached)')) ?>
-			: <?= json_encode(_('Add')) ?>
+			: <?= json_encode(_('Add')) ?>;
 	}
 
 	/**
