@@ -85,7 +85,8 @@ class CItem extends CItemGeneral {
 		ITEM_VALUE_TYPE_STR => ['valuemapid', 'inventory_link'],
 		ITEM_VALUE_TYPE_LOG => ['logtimefmt'],
 		ITEM_VALUE_TYPE_UINT64 => ['units', 'trends', 'valuemapid', 'inventory_link'],
-		ITEM_VALUE_TYPE_TEXT => ['inventory_link']
+		ITEM_VALUE_TYPE_TEXT => ['inventory_link'],
+		ITEM_VALUE_TYPE_BINARY => []
 	];
 
 	/**
@@ -532,7 +533,10 @@ class CItem extends CItemGeneral {
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
-			'value_type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
+									['else' => true, 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
@@ -690,7 +694,7 @@ class CItem extends CItemGeneral {
 				$api_input_rules = self::getDiscoveredValidationRules();
 			}
 			else {
-				$item += array_intersect_key($db_item, array_flip(['value_type']));
+				$item += array_intersect_key($db_item, array_flip(['type', 'value_type']));
 
 				$api_input_rules = self::getValidationRules();
 			}
@@ -734,7 +738,10 @@ class CItem extends CItemGeneral {
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
-			'value_type' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
@@ -1717,42 +1724,43 @@ class CItem extends CItemGeneral {
 			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
 		}
 
-		// adding history data
-		$requestedOutput = [];
-		if ($this->outputIsRequested('lastclock', $options['output'])) {
-			$requestedOutput['lastclock'] = true;
-		}
-		if ($this->outputIsRequested('lastns', $options['output'])) {
-			$requestedOutput['lastns'] = true;
-		}
-		if ($this->outputIsRequested('lastvalue', $options['output'])) {
-			$requestedOutput['lastvalue'] = true;
-		}
-		if ($this->outputIsRequested('prevvalue', $options['output'])) {
-			$requestedOutput['prevvalue'] = true;
-		}
-		if ($requestedOutput) {
+		$requested_output = array_filter([
+			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
+			'lastns' => $this->outputIsRequested('lastns', $options['output']),
+			'lastvalue' => $this->outputIsRequested('lastvalue', $options['output']),
+			'prevvalue' => $this->outputIsRequested('prevvalue', $options['output'])
+		]);
+
+		if ($requested_output) {
 			$history = Manager::History()->getLastValues($result, 2, timeUnitToSeconds(CSettingsHelper::get(
 				CSettingsHelper::HISTORY_PERIOD
 			)));
-			foreach ($result as &$item) {
-				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
-				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
-				$no_value = in_array($item['value_type'],
-						[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]) ? '' : '0';
 
-				if (isset($requestedOutput['lastclock'])) {
-					$item['lastclock'] = $lastHistory ? $lastHistory['clock'] : '0';
+			foreach ($result as &$item) {
+				$last_history = null;
+				$prev_history = null;
+				$no_value = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]) ? '0' : '';
+
+				if (array_key_exists($item['itemid'], $history)) {
+					[$last_history, $prev_history] = $history[$item['itemid']] + [null, null];
+
+					if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+						if ($last_history) {
+							$last_history['value'] = base64_encode($last_history['value']);
+						}
+
+						if ($prev_history) {
+							$prev_history['value'] = base64_encode($prev_history['value']);
+						}
+					}
 				}
-				if (isset($requestedOutput['lastns'])) {
-					$item['lastns'] = $lastHistory ? $lastHistory['ns'] : '0';
-				}
-				if (isset($requestedOutput['lastvalue'])) {
-					$item['lastvalue'] = $lastHistory ? $lastHistory['value'] : $no_value;
-				}
-				if (isset($requestedOutput['prevvalue'])) {
-					$item['prevvalue'] = $prevHistory ? $prevHistory['value'] : $no_value;
-				}
+
+				$item += array_intersect_key([
+					'lastclock' => $last_history ? $last_history['clock'] : '0',
+					'lastns' => $last_history ? $last_history['ns'] : '0',
+					'lastvalue' => $last_history ? $last_history['value'] : $no_value,
+					'prevvalue' => $prev_history ? $prev_history['value'] : $no_value
+				], $requested_output);
 			}
 			unset($item);
 		}
@@ -1973,7 +1981,7 @@ class CItem extends CItemGeneral {
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
 				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 0)) {
-			array_push($table_names, 'history', 'history_log', 'history_str', 'history_text', 'history_uint');
+			$table_names = array_merge($table_names, CHistoryManager::getTableName());
 		}
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1

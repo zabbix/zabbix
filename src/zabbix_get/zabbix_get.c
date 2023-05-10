@@ -22,7 +22,6 @@
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
-#include "cfg.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
@@ -311,8 +310,6 @@ int	main(int argc, char **argv)
 
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
-
-	zbx_init_library_cfg(program_type);
 
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())

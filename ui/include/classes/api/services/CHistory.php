@@ -87,7 +87,7 @@ class CHistory extends CApiService {
 	 */
 	public function get($options = []) {
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-			ITEM_VALUE_TYPE_TEXT
+			ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
 		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -147,16 +147,27 @@ class CHistory extends CApiService {
 
 		switch (CHistoryManager::getDataSourceType($options['history'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
-				return $this->getFromElasticsearch($options);
-				
+				$result = $this->getFromElasticsearch($options);
+				break;
 			default:
 				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
 					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
 				}
 
-				return $this->getFromSql($options);
+				$result = $this->getFromSql($options);
+				break;
 		}
+
+		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
+				&& $this->outputIsRequested('value', $options['output'])) {
+			foreach ($result as &$row) {
+				$row['value'] = base64_encode($row['value']);
+			}
+			unset($row);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -178,7 +189,7 @@ class CHistory extends CApiService {
 
 		// itemids
 		if ($options['itemids'] !== null) {
-			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
+			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
 		}
 
 		// time_from
