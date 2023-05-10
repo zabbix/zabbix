@@ -33,9 +33,6 @@ const UNITS_POSITION_BELOW = 3;
 // If min/max block widths exceed this (current 1/4) of total SVG width, then limit the width of min/max blocks.
 const MAX_WIDTH_MINMAX_RATIO = 0.25;
 
-// Needle's bottom radius ratio compared to thickness of necessary arc
-const NEEDLE_THICKNESS_RATIO = 0.25;
-
 class CSVGGauge {
 	// TO DO: add description?
 	constructor(options, data) {
@@ -91,7 +88,7 @@ class CSVGGauge {
 		this.thicknessThresholdArc = 70;
 
 		// Radius of needle's round part at the bottom
-		this.thicknessNeedle = 10;
+		this.thicknessNeedle = 15;
 
 		this.gapBetweenArcs = 5;
 
@@ -260,7 +257,6 @@ class CSVGGauge {
 			this.radiusValueArc = maxSpace - this.elements.description.height - this.thicknessValueArc - this.thicknessThresholdArc - this.gapBetweenArcs;
 
 			if (this.data.needle.show && this.data.angle === 180) {
-				this.thicknessNeedle = this.thicknessValueArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
 				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
 			}
@@ -299,7 +295,6 @@ class CSVGGauge {
 			this.radiusValueArc = maxSpace - this.elements.description.height - this.thicknessValueArc;
 
 			if (this.data.needle.show && this.data.angle === 180) {
-				this.thicknessNeedle = this.thicknessValueArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
 			}
 
@@ -330,7 +325,6 @@ class CSVGGauge {
 			this.radiusThresholdArc = maxSpace - this.elements.description.height - this.thicknessThresholdArc;
 
 			if (this.data.needle.show && this.data.angle === 180) {
-				this.thicknessNeedle = this.thicknessThresholdArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
 			}
 
