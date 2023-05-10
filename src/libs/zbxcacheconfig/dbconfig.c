@@ -2281,14 +2281,13 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 						&config->interface_snmpaddrs, &interface_snmpaddr_local)))
 				{
 					dc_strpool_acquire(interface_snmpaddr_local.addr);
-
-					interface_snmpaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_insert(
-							&config->interface_snmpaddrs, &interface_snmpaddr_local,
-							sizeof(ZBX_DC_INTERFACE_ADDR));
-					zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
+					zbx_vector_uint64_create_ext(&(interface_snmpaddr_local.interfaceids),
 							__config_shmem_malloc_func,
 							__config_shmem_realloc_func,
 							__config_shmem_free_func);
+					interface_snmpaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_insert(
+							&config->interface_snmpaddrs, &interface_snmpaddr_local,
+							sizeof(ZBX_DC_INTERFACE_ADDR));
 				}
 
 				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
