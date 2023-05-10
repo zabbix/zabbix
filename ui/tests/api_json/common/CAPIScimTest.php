@@ -20,7 +20,7 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CAPITest.php';
+require_once dirname(__FILE__) . '/../../include/CAPITest.php';
 
 /**
  * Base class for SCIM API tests.

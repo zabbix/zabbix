@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPIScimTest.php';
+require_once dirname(__FILE__) . '/common/CAPIScimTest.php';
 
 /**
  * @onBefore prepareGroupData
