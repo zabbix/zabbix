@@ -242,10 +242,6 @@ class CSVGGauge {
 			this.y = this.height - this.elements.description.height;
 		}
 
-		if (this.data.needle.show) {
-			this.y -= this.thicknessNeedle + this.elements.value.height;
-		}
-
 		this.#prepareThresholdsArcParts();
 
 		// Maximum available space for arc depending on widget size
@@ -263,7 +259,7 @@ class CSVGGauge {
 			this.radiusThresholdArc = maxSpace - this.elements.description.height - this.thicknessThresholdArc;
 			this.radiusValueArc = maxSpace - this.elements.description.height - this.thicknessValueArc - this.thicknessThresholdArc - this.gapBetweenArcs;
 
-			if (this.data.needle.show) {
+			if (this.data.needle.show && this.data.angle === 180) {
 				this.thicknessNeedle = this.thicknessValueArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
 				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
@@ -275,6 +271,17 @@ class CSVGGauge {
 				const offsetValueArc = this.radiusValueArc - this.width / 2 + this.thicknessValueArc + (this.elements.min?.width || 0) + this.thicknessThresholdArc + this.gapBetweenArcs;
 				this.radiusThresholdArc -= offsetThresholdArc;
 				this.radiusValueArc -= offsetValueArc;
+			}
+
+			if (this.data.angle === 270) {
+				this.y -= this.radiusThresholdArc / 2.4;
+				this.radiusThresholdArc /= 2;
+				this.radiusValueArc /= 2;
+				this.radiusValueArc -= this.thicknessThresholdArc + this.gapBetweenArcs;
+			}
+
+			if (this.data.needle.show && this.data.angle === 180) {
+				this.y -= this.thicknessNeedle + this.elements.value.height;
 			}
 
 			this.#addThresholdArc();
@@ -291,7 +298,7 @@ class CSVGGauge {
 			this.thicknessValueArc = 70;
 			this.radiusValueArc = maxSpace - this.elements.description.height - this.thicknessValueArc;
 
-			if (this.data.needle.show) {
+			if (this.data.needle.show && this.data.angle === 180) {
 				this.thicknessNeedle = this.thicknessValueArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
 			}
@@ -300,6 +307,15 @@ class CSVGGauge {
 				// Widget width is too small - need to shrink elements
 				const offsetValueArc = this.radiusValueArc - this.width / 2 + this.thicknessValueArc + (this.elements.min?.width || 0);
 				this.radiusValueArc -= offsetValueArc;
+			}
+
+			if (this.data.angle === 270) {
+				this.y -= this.radiusValueArc / 1.9;
+				this.radiusValueArc /= 2.2;
+			}
+
+			if (this.data.needle.show && this.data.angle === 180) {
+				this.y -= this.thicknessNeedle + this.elements.value.height;
 			}
 
 			this.#addValueArc();
@@ -313,7 +329,7 @@ class CSVGGauge {
 			this.thicknessThresholdArc = 70;
 			this.radiusThresholdArc = maxSpace - this.elements.description.height - this.thicknessThresholdArc;
 
-			if (this.data.needle.show) {
+			if (this.data.needle.show && this.data.angle === 180) {
 				this.thicknessNeedle = this.thicknessThresholdArc * NEEDLE_THICKNESS_RATIO;
 				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
 			}
@@ -322,6 +338,15 @@ class CSVGGauge {
 				// Widget width is too small - need to shrink elements
 				const offsetThresholdArc = this.radiusThresholdArc - this.width / 2 + this.thicknessThresholdArc + (this.elements.min?.width || 0);
 				this.radiusThresholdArc -= offsetThresholdArc;
+			}
+
+			if (this.data.angle === 270) {
+				this.y -= this.radiusThresholdArc / 1.9;
+				this.radiusThresholdArc /= 2.2;
+			}
+
+			if (this.data.needle.show && this.data.angle === 180) {
+				this.y -= this.thicknessNeedle + this.elements.value.height;
 			}
 
 			this.#addThresholdArc();
@@ -508,7 +533,21 @@ class CSVGGauge {
 		const x = (this.x + Math.cos(radians) * (this.radiusThresholdArc + this.thicknessThresholdArc));
 		const y = (this.y + Math.sin(radians) * (this.radiusThresholdArc + this.thicknessThresholdArc));
 
-		const anchor = angle < 0 ? 'bottom right' : 'bottom left';
+		let anchor = '';
+
+		// Positions in arc quadrants
+		if (angle < -90) {
+			anchor = 'top right';
+		}
+		else if (angle >= -90 && angle < 0) {
+			anchor = 'bottom right';
+		}
+		else if (angle >= 0 && angle < 90) {
+			anchor = 'bottom left';
+		}
+		else if (angle >= 90) {
+			anchor = 'top left';
+		}
 
 		this.#reposition(this.elements.thresholdsLabelsContainer.children[i], x, y, anchor);
 		this.#show(this.elements.thresholdsLabelsContainer.children[i]);
@@ -599,7 +638,7 @@ class CSVGGauge {
 
 		this.#setColor(path, this.data.empty_color, 'fill');
 
-		this.#calculateCoordinatesOfContainer(this.elements[elementName]);
+		this.#calculateCoordinatesOfArcContainer(this.elements[elementName]);
 	}
 
 	// TO DO: add description
@@ -972,7 +1011,8 @@ class CSVGGauge {
 			const angleNext = currentAngle + step;
 			if (angleNext <= this.angleNew) {
 				currentAngle = angleNext;
-			} else {
+			}
+			else {
 				currentAngle += this.angleNew - currentAngle;
 			}
 		}
@@ -1045,11 +1085,29 @@ class CSVGGauge {
 				maxX = this.elements.thresholdArcEmpty.coordinates.x2;
 				minY = this.elements.thresholdArcEmpty.coordinates.y4;
 				maxY = this.elements.thresholdArcEmpty.coordinates.y4;
-			} else {
+			}
+			else {
 				minX = this.elements.valueArcEmpty.coordinates.x1;
 				maxX = this.elements.valueArcEmpty.coordinates.x2;
 				minY = this.elements.valueArcEmpty.coordinates.y4;
 				maxY = this.elements.valueArcEmpty.coordinates.y4;
+			}
+
+			if (this.data.angle === 270) {
+				const angleMin = -135;
+				const angleMax = 135;
+
+				const radiansMin = this.#degreesToRadians(angleMin);
+				const radiansMax = this.#degreesToRadians(angleMax);
+
+				minX = (this.x + Math.cos(radiansMin) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+				minY = (this.y + Math.sin(radiansMin) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+
+				maxX = (this.x + Math.cos(radiansMax) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+				maxY = (this.y + Math.sin(radiansMax) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+
+				minX -= this.elements.min.height;
+				maxX += this.elements.max.height;
 			}
 
 			this.#reposition(this.elements.min, minX, minY, 'bottom right');
@@ -1060,12 +1118,35 @@ class CSVGGauge {
 	}
 
 	#positionValueElement() {
-		if (this.data.needle.show) {
-			this.#reposition(this.elements.value, this.width / 2, this.y + this.thicknessNeedle, 'top center');
+		let y = 0;
+		let yWithNeedle = 0;
+		let anchor = 'bottom center';
+
+		if (this.data.thresholds.show_arc) {
+			y = this.elements.thresholdArcEmpty.coordinates.y3;
 		}
 		else {
-			this.#reposition(this.elements.value, this.width / 2, this.y, 'bottom center');
+			y = this.elements.valueArcEmpty.coordinates.y3;
 		}
+
+		if (this.data.angle === 180) {
+			yWithNeedle = y + this.thicknessNeedle;
+
+			if (this.data.needle.show) {
+				anchor = 'top center';
+			}
+		}
+		else if (this.data.angle === 270) {
+			yWithNeedle = y;
+		}
+
+		if (this.data.needle.show) {
+			this.#reposition(this.elements.value, this.width / 2, yWithNeedle, anchor);
+		}
+		else {
+			this.#reposition(this.elements.value, this.width / 2, y, anchor);
+		}
+
 		this.#show(this.elements.value);
 	}
 
@@ -1135,13 +1216,28 @@ class CSVGGauge {
 		return coordinates;
 	}
 
-	#calculateCoordinatesOfContainer(container) {
+	#calculateCoordinatesOfArcContainer(container) {
 		const rect = container.node.getBoundingClientRect();
 
 		container.width = rect.width;
 		container.height = rect.height;
 
-		container.coordinates = this.#calcCoordinates(this.x - rect.width / 2, this.y - rect.height, rect.width, rect.height);
+		let radius = 0;
+		let thickness = 0;
+
+		if (this.data.thresholds.show_arc) {
+			radius = this.radiusThresholdArc;
+			thickness = this.thicknessThresholdArc;
+		}
+		else {
+			radius = this.radiusValueArc;
+			thickness = this.thicknessValueArc;
+		}
+
+		const x = this.x - radius - thickness;
+		const y = this.y - radius - thickness;
+
+		container.coordinates = this.#calcCoordinates(x, y, rect.width, rect.height);
 	}
 
 	#setFontWeight(element, isBold) {
