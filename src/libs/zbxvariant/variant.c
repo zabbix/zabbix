@@ -151,6 +151,7 @@ void	zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *vector)
  ******************************************************************************/
 void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 {
+	int			i;
 	zbx_vector_var_t	*var_vector;
 
 	switch (source->type)
@@ -176,8 +177,12 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 		case ZBX_VARIANT_VECTOR:
 			var_vector = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
 			zbx_vector_var_create(var_vector);
-			zbx_vector_var_append_array(var_vector, source->data.vector->values,
-					source->data.vector->values_num);
+			zbx_vector_var_reserve(var_vector, source->data.vector->values_num);
+			var_vector->values_num = source->data.vector->values_num;
+
+			for (i = 0; i < source->data.vector->values_num; i++)
+				zbx_variant_copy(&(var_vector->values[i]), &(source->data.vector->values[i]));
+
 			zbx_variant_set_vector(value, var_vector);
 			break;
 	}
@@ -633,19 +638,6 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	return variant_compare_str(value1, value2);
 }
 
-int	zbx_vector_var_is_double(zbx_vector_var_t *v)
-{
-	int 	i;
-
-	for (i = 0; i < v->values_num; i++)
-	{
-		if (v->values[i].type != ZBX_VARIANT_DBL)
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: populate dbl vector with values converted to dbl from var vector  *
@@ -694,4 +686,31 @@ int	zbx_vector_var_to_dbl(zbx_vector_var_t *values, char **error)
 	}
 
 	return SUCCEED;
+}
+
+int	zbx_vector_var_get_type(zbx_vector_var_t *v)
+{
+	int 	i, type = ITEM_VALUE_TYPE_MAX;
+
+	for (i = 0; i < v->values_num; i++)
+	{
+		if (v->values[i].type == ZBX_VARIANT_UI64)
+		{
+			if (type == ITEM_VALUE_TYPE_MAX)
+				type = ITEM_VALUE_TYPE_UINT64;
+			else if (type != ITEM_VALUE_TYPE_UINT64)
+				return ITEM_VALUE_TYPE_STR;
+		}
+		else if (v->values[i].type == ZBX_VARIANT_DBL)
+		{
+			if (type == ITEM_VALUE_TYPE_MAX)
+				type = ITEM_VALUE_TYPE_FLOAT;
+			else if (type != ITEM_VALUE_TYPE_FLOAT)
+				return ITEM_VALUE_TYPE_STR;
+		}
+		else
+			return ITEM_VALUE_TYPE_STR;
+	}
+
+	return type;
 }

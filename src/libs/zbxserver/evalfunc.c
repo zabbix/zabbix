@@ -1179,7 +1179,8 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 #define COUNT_ALL	0
 #define COUNT_UNIQUE	1
 
-int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char value_type, zbx_eval_count_pattern_data_t *pdata, char **error)
+int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char value_type,
+		zbx_eval_count_pattern_data_t *pdata, char **error)
 {
 	pdata->numeric_search = (ITEM_VALUE_TYPE_UINT64 == value_type || ITEM_VALUE_TYPE_FLOAT == value_type);
 
@@ -1293,7 +1294,8 @@ int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char valu
 			}
 		}
 	}
-	else if (OP_LIKE != pdata->op && OP_REGEXP != pdata->op && OP_IREGEXP != pdata->op && OP_EQ != pdata->op && OP_NE != pdata->op)
+	else if (OP_LIKE != pdata->op && OP_REGEXP != pdata->op && OP_IREGEXP != pdata->op && OP_EQ != pdata->op &&
+			OP_NE != pdata->op && ITEM_VALUE_TYPE_MAX != value_type)
 	{
 		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting textual values", operator);
 		return FAIL;

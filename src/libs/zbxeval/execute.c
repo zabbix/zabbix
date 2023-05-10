@@ -2681,8 +2681,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 
 		zbx_vector_expression_create(&pdata.regexps);
 
-		value_type = (SUCCEED != zbx_vector_var_is_double(arg_vector->data.vector) ?
-				ITEM_VALUE_TYPE_STR : ITEM_VALUE_TYPE_FLOAT);
+		value_type = zbx_vector_var_get_type(arg_vector->data.vector);
 
 		if (FAIL == zbx_validate_count_pattern(operator, pattern, value_type, &pdata, error))
 		{
