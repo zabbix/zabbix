@@ -461,7 +461,7 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 
 		session_local.userid = userid;
 		session_local.sid = zbx_create_token(0);
-		session_local.cookie = report_create_cookie(manager, session->sid);
+		session_local.cookie = report_create_cookie(manager, session_local.sid);
 		session_local.db_lastaccess = now;
 		session_local.lastaccess = now;
 
