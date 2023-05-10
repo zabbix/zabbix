@@ -188,13 +188,14 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			services_updated = 0, services_removed = 0;
-	double			time_now, time_stat, time_idle = 0;
-	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_thread_vmware_args	*vmware_args_in = (zbx_thread_vmware_args *)(((zbx_thread_args_t *)args)->args);
+	int				services_updated = 0, services_removed = 0,
+					server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	double				time_now, time_stat, time_idle = 0;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	const zbx_thread_vmware_args	*vmware_args_in = (const zbx_thread_vmware_args *)
+					(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);

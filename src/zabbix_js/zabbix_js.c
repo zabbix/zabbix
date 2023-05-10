@@ -138,7 +138,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int			zbx_optind = 0;
 
-	const char		*config_source_ip = "invalid config source ip";
+	const char		*config_source_ip = NULL;
 
 	progname = get_program_name(argv[0]);
 

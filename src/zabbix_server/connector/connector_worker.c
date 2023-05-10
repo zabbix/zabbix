@@ -138,14 +138,14 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 	zbx_ipc_message_t			message;
 	double					time_stat, time_idle = 0, time_now, time_read;
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
-	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
+						process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_vector_connector_data_point_t	connector_data_points;
 	zbx_uint64_t				processed_num = 0, connections_num = 0;
 
-	zbx_thread_connector_worker_args	*connector_worker_args_in = (zbx_thread_connector_worker_args *)
-							(((zbx_thread_args_t *)args)->args);
+	const zbx_thread_connector_worker_args	*connector_worker_args_in = (const zbx_thread_connector_worker_args *)
+						(((zbx_thread_args_t *)args)->args);
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(info->program_type), process_num);
 

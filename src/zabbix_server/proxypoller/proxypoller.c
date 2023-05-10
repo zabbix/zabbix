@@ -476,7 +476,7 @@ static int	proxy_get_data(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_e
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, config_timeout, config_source_ip,
-		&answer, &ts)))
+			&answer, &ts)))
 	{
 		goto out;
 	}

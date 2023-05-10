@@ -2730,24 +2730,24 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
 	zbx_free(counter);
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: authenticates vmware service                                         *
- *                                                                               *
- * Parameters: service          - [IN] vmware service                            *
- *             easyhandle       - [IN] CURL handle                               *
- *             page             - [IN] CURL output buffer                        *
- *             config_source_ip - [IN]                                           *
- *             error            - [OUT] error message in the case of failure     *
- *                                                                               *
- * Return value: SUCCEED - authentication was completed successfully             *
- *               FAIL    - authentication process has failed                     *
- *                                                                               *
- * Comments: If service type is unknown this function will attempt to            *
- *           determine the right service type by trying to login with vCenter    *
- *           and vSphere session managers.                                       *
- *                                                                               *
- *********************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: authenticates vmware service                                       *
+ *                                                                             *
+ * Parameters: service          - [IN] vmware service                          *
+ *             easyhandle       - [IN] CURL handle                             *
+ *             page             - [IN] CURL output buffer                      *
+ *             config_source_ip - [IN]                                         *
+ *             error            - [OUT] error message in the case of failure   *
+ *                                                                             *
+ * Return value: SUCCEED - authentication was completed successfully           *
+ *               FAIL    - authentication process has failed                   *
+ *                                                                             *
+ * Comments: If service type is unknown this function will attempt to          *
+ *           determine the right service type by trying to login with vCenter  *
+ *           and vSphere session managers.                                     *
+ *                                                                             *
+ *******************************************************************************/
 static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
 		const char *config_source_ip, char **error)
 {
@@ -8535,7 +8535,7 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
  *                                                                            *
  * Purpose: updates object with a new data from vmware service                *
  *                                                                            *
- * Parameters: service          - [IN]vmware service                          *
+ * Parameters: service          - [IN] vmware service                         *
  *             config_source_ip - [IN]                                        *
  *                                                                            *
  ******************************************************************************/

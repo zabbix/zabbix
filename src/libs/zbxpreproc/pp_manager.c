@@ -109,7 +109,7 @@ void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb)
  *                                                                            *
  * Parameters: workers_num      - [IN] number of workers to create            *
  *             finished_cb      - [IN] callback to call after finishing       *
- *                                  task (optional)                           *
+ *                                     task (optional)                        *
  *             finished_data    - [IN] callback data (optional)               *
  *             config_source_ip - [IN]                                        *
  *             error            - [OUT]                                       *
@@ -1110,25 +1110,24 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 #define PP_MANAGER_DELAY_SEC	0
 #define PP_MANAGER_DELAY_NS	5e8
 
-	zbx_ipc_service_t		service;
-	char				*error = NULL;
-	zbx_ipc_client_t		*client;
-	zbx_ipc_message_t		*message;
-	int				ret;
-	double				time_stat, time_idle = 0, time_now, time_flush, sec;
-	zbx_timespec_t			timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
-	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_thread_pp_manager_args	*pp_args = ((zbx_thread_args_t *)args)->args;
-	zbx_pp_manager_t		*manager;
-	zbx_vector_pp_task_ptr_t	tasks;
-	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0,
-					processing_num = 0;
+	zbx_ipc_service_t			service;
+	char					*error = NULL;
+	zbx_ipc_client_t			*client;
+	zbx_ipc_message_t			*message;
+	double					time_stat, time_idle = 0, time_now, time_flush, sec;
+	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
+	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
+	int					ret, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+						process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_thread_pp_manager_args		*pp_args = ((zbx_thread_args_t *)args)->args;
+	zbx_pp_manager_t			*manager;
+	zbx_vector_pp_task_ptr_t		tasks;
+	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
+						processing_num = 0;
 
-	zbx_thread_pp_manager_args	*pp_manager_args_in = (zbx_thread_pp_manager_args *)
-							(((zbx_thread_args_t *)args)->args);
+	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
+						(((zbx_thread_args_t *)args)->args);
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

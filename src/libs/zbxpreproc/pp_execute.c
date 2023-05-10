@@ -926,7 +926,7 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  *                                                                            *
  ******************************************************************************/
 int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char value_type,
-		zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_step_t *step, zbx_variant_t *history_value,
+		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_step_t *step, zbx_variant_t *history_value,
 		zbx_timespec_t *history_ts, const char *config_source_ip)
 {
 	int	ret;

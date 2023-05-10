@@ -435,8 +435,9 @@ out:
  *                TIMEOUT_ERROR - a timeout occurred                        *
  *                                                                          *
  ****************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params, int config_timeout,
-		const char *config_source_ip, char **result, char *error, size_t max_error_len, char **debug)
+int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
+		int config_timeout, const char *config_source_ip, char **result, char *error, size_t max_error_len,
+		char **debug)
 {
 	int	ret = FAIL;
 

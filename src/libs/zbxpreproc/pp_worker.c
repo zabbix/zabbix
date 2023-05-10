@@ -188,7 +188,7 @@ static void	*pp_worker_entry(void *arg)
  *             id               - [IN] worker id (index)                      *
  *             queue            - [IN] task queue                             *
  *             timekeeper       - [IN] timekeeper object for busy/idle worker *
- *                               state reporting                              *
+ *                                     state reporting                        *
  *             config_source_ip - [IN]                                        *
  *             error            - [OUT]                                       *
  *                                                                            *
