@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-04-21 20:12+0000\n"
+"PO-Revision-Date: 2023-04-28 20:15+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1238,7 +1238,7 @@ msgstr "Permet el tancament manual"
 
 #: app/views/popup.discovery.check.php:125
 msgid "Allow redirect"
-msgstr ""
+msgstr "Permetre les redireccions"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -2978,12 +2978,12 @@ msgstr "No es poden pas ampliar les macros."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "No es troba l'SLA \"%1$s\" emprat al tauler \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:241
 #, c-format
 msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'acció \"%1$s\" emprat al tauler \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
@@ -3096,7 +3096,7 @@ msgstr "No es pot pas trobar l'element \"%1$s\" emprat al tauler \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:193
 #, c-format
 msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "No es troba pas el mapa \"%1$s\" emprat al tauler \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
@@ -3106,12 +3106,12 @@ msgstr "No es pot pas trobar el mapa \"%1$s\" emprat al mapa \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:253
 #, c-format
 msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "No es troba pas el tipus de suport \"%1$s\" emprat al tauler \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:205
 #, c-format
 msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar el servei \"%1$s\" emprat al tauler \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
@@ -3132,7 +3132,7 @@ msgstr "No es pot pas trobar el trigger \"%1$s\" emprat al mapa \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:229
 #, c-format
 msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "No es pot pas trobar l'usuari \"%1$s\" emprat al tauler \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:1510
 msgid "Cannot find user directory for LDAP."
@@ -4398,11 +4398,11 @@ msgstr "Clonar"
 #: app/views/configuration.host.edit.php:61
 #: app/views/js/popup.host.edit.js.php:45 host_prototypes.php:177
 msgid "Cloned host parameter values have been modified."
-msgstr ""
+msgstr "S'han modificat els valors dels paràmetres de l'equip clonat."
 
 #: templates.php:195
 msgid "Cloned template parameter values have been modified."
-msgstr ""
+msgstr "S'han modificat els valors dels paràmetres de la plantilla clonada."
 
 #: app/views/popup.import.compare.php:162 app/views/popup.token.view.php:86
 #: include/func.inc.php:1723 include/views/js/monitoring.sysmaps.js.php:339
@@ -9300,7 +9300,7 @@ msgstr "Tipus d'etiqueta d'equips"
 #: widgets/dataover/includes/WidgetForm.php:64
 #: widgets/trigover/includes/WidgetForm.php:71
 msgid "Host location"
-msgstr ""
+msgstr "Ubicació de l'equip"
 
 #: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
@@ -18314,7 +18314,7 @@ msgstr "Mostra"
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
 msgid "Show data in maintenance"
-msgstr ""
+msgstr "Mostra les dades que són en manteniment"
 
 #: app/partials/monitoring.latest.filter.php:182
 #: app/partials/monitoring.problem.filter.php:277
@@ -19632,7 +19632,7 @@ msgstr "El gràfic ja no es troba pas i s'esborrarà eo proper cop que es proces
 
 #: app/controllers/CControllerHostEdit.php:283 host_prototypes.php:171
 msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
-msgstr ""
+msgstr "L'equip clonat pertany a un grup d'equips al qual no teniu permisos d'escriptura. El grup que no es pot escriure s'ha esborrat del nou equip."
 
 #: include/html.inc.php:637
 #, c-format
@@ -19699,7 +19699,7 @@ msgstr "El procediment remot sol·licitat no existeix / no és pas disponible"
 
 #: templates.php:181
 msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
-msgstr ""
+msgstr "La plantilla clonada pertany a un grup de plantilles al qual no teniu permisos d'escriptura. El grup que no es pot escriure s'ha esborrat de la nova plantilla."
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -23379,7 +23379,7 @@ msgstr "tots els mitjans"
 #: include/classes/screens/CScreenDiscovery.php:207
 #: include/discovery.inc.php:84
 msgid "allow redirect"
-msgstr ""
+msgstr "permetre les redireccions"
 
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
@@ -23531,6 +23531,10 @@ msgstr "atan() - L'arctangent d'un valor com a angle, expressat en radians"
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() - L'arctangent de les coordenades ordenades (exprue) i abscisses especificades com a angle, expressat en radians"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
 
 #: include/events.inc.php:63
 msgid "autoregistered host"
