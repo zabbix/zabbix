@@ -582,11 +582,11 @@ zabbix_export:
           description: 'The critical rate of the dropped connections for a trigger expression.'
         -
           macro: '{$NGINX.PROCESS.NAME.PARAMETER}'
-          description: 'The process name of the Nginx server (Nginx), used in item key `proc.get` (insert if you know the correct process name).'
+          description: 'The process name of the Nginx server (Nginx) used in the item key `proc.get`. It could be specified if the correct process name is known.'
         -
           macro: '{$NGINX.PROCESS_NAME}'
           value: nginx
-          description: 'The filter to include the process name of the Nginx server.'
+          description: 'The process name filter for the Nginx process discovery.'
         -
           macro: '{$NGINX.RESPONSE_TIME.MAX.WARN}'
           value: '10'
@@ -594,7 +594,7 @@ zabbix_export:
         -
           macro: '{$NGINX.STUB_STATUS.HOST}'
           value: localhost
-          description: 'The Hostname or an IP address of the Nginx host or Nginx container of `astub_status`.'
+          description: 'The hostname or IP address of the Nginx host or Nginx container of `astub_status`.'
         -
           macro: '{$NGINX.STUB_STATUS.PATH}'
           value: basic_status

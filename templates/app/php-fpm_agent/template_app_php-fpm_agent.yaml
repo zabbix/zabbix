@@ -691,7 +691,7 @@ zabbix_export:
         -
           macro: '{$PHP_FPM.HOST}'
           value: localhost
-          description: 'The Hostname or an IP address of the PHP-FPM status for a host or container.'
+          description: 'The hostname or IP address of the PHP-FPM status for a host or container.'
         -
           macro: '{$PHP_FPM.PING.PAGE}'
           value: ping
@@ -706,11 +706,11 @@ zabbix_export:
           description: 'The port of the PHP-FPM status host or container.'
         -
           macro: '{$PHP_FPM.PROCESS.NAME.PARAMETER}'
-          description: 'The process name of the PHP-FPM, used in item key `proc.get` (insert if you know the correct process name).'
+          description: 'The process name of the PHP-FPM used in the item key `proc.get`. It could be specified if the correct process name is known.'
         -
           macro: '{$PHP_FPM.PROCESS_NAME}'
           value: php-fpm
-          description: 'The filter to include the process name of the PHP-FPM process. May vary depending on your OS distribution.'
+          description: 'The process name filter for the PHP-FPM process discovery. May vary depending on your OS distribution.'
         -
           macro: '{$PHP_FPM.QUEUE.WARN.MAX}'
           value: '80'

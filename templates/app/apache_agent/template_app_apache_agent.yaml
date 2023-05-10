@@ -952,11 +952,11 @@ zabbix_export:
       macros:
         -
           macro: '{$APACHE.PROCESS.NAME.PARAMETER}'
-          description: 'The process name of the Apache web server (Apache), used in item key `proc.get` (insert if you know the correct process name).'
+          description: 'The process name of the Apache web server (Apache) used in the item key `proc.get`. It could be specified if the correct process name is known.'
         -
           macro: '{$APACHE.PROCESS_NAME}'
           value: (httpd|apache2)
-          description: 'The filter to include the process name of the Apache web server (Apache).'
+          description: 'The process name filter for the Apache process discovery.'
         -
           macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'
           value: '10'
@@ -964,7 +964,7 @@ zabbix_export:
         -
           macro: '{$APACHE.STATUS.HOST}'
           value: 127.0.0.1
-          description: 'The hostname or an IP address of the Apache status page.'
+          description: 'The hostname or IP address of the Apache status page.'
         -
           macro: '{$APACHE.STATUS.PATH}'
           value: 'server-status?auto'

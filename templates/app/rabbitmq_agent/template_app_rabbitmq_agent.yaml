@@ -1129,7 +1129,7 @@ zabbix_export:
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]'
               history: 7d
               description: |
-                It responds with a status code`200 OK` if there are no alarms in effect in the cluster.
+                It responds with a status code `200 OK` if there are no alarms in effect in the cluster.
                 Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1196,7 +1196,7 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.API.CLUSTER_HOST}'
           value: 127.0.0.1
-          description: 'The hostname or an IP of the API endpoint for the RabbitMQ cluster.'
+          description: 'The hostname or IP of the API endpoint for the RabbitMQ cluster.'
         -
           macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
@@ -3027,7 +3027,7 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.API.HOST}'
           value: 127.0.0.1
-          description: 'The hostname or an IP of the API endpoint for the RabbitMQ.'
+          description: 'The hostname or IP of the API endpoint for the RabbitMQ.'
         -
           macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
@@ -3060,11 +3060,11 @@ zabbix_export:
           description: 'The maximum number of messages in the queue for a trigger expression.'
         -
           macro: '{$RABBITMQ.PROCESS.NAME.PARAMETER}'
-          description: 'The process name of the RabbitMQ server, used in item key `proc.get` (insert if you know the correct process name).'
+          description: 'The process name of the RabbitMQ server used in the item key `proc.get`. It could be specified if the correct process name is known.'
         -
           macro: '{$RABBITMQ.PROCESS_NAME}'
           value: beam.smp
-          description: 'The filter to include the process name of the RabbitMQ server process.'
+          description: 'The process name filter for the RabbitMQ process discovery.'
         -
           macro: '{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
           value: '10'

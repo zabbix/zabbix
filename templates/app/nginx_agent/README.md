@@ -36,7 +36,7 @@ This template has been tested on:
 ## Setup
 
 See the setup instructions for [ngx_http_stub_status_module](https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html).
-Test the availability of the `http_stub_status_module` `nginx -V 2>&1 | grep -o with-http_stub_status_module`.
+Test the availability of the `http_stub_status_module` with `nginx -V 2>&1 | grep -o with-http_stub_status_module`.
 
 Example configuration of Nginx:
 ```text
@@ -66,13 +66,13 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.4/manual
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NGINX.STUB_STATUS.HOST}|<p>The Hostname or an IP address of the Nginx host or Nginx container of `astub_status`.</p>|`localhost`|
+|{$NGINX.STUB_STATUS.HOST}|<p>The hostname or IP address of the Nginx host or Nginx container of `astub_status`.</p>|`localhost`|
 |{$NGINX.STUB_STATUS.PATH}|<p>The path of the `Nginx stub_status` page.</p>|`basic_status`|
 |{$NGINX.STUB_STATUS.PORT}|<p>The port of the `Nginx stub_status` host or container.</p>|`80`|
 |{$NGINX.RESPONSE_TIME.MAX.WARN}|<p>The maximum response time of Nginx expressed in seconds for a trigger expression.</p>|`10`|
 |{$NGINX.DROP_RATE.MAX.WARN}|<p>The critical rate of the dropped connections for a trigger expression.</p>|`1`|
-|{$NGINX.PROCESS_NAME}|<p>The filter to include the process name of the Nginx server.</p>|`nginx`|
-|{$NGINX.PROCESS.NAME.PARAMETER}|<p>The process name of the Nginx server (Nginx), used in item key `proc.get` (insert if you know the correct process name).</p>||
+|{$NGINX.PROCESS_NAME}|<p>The process name filter for the Nginx process discovery.</p>|`nginx`|
+|{$NGINX.PROCESS.NAME.PARAMETER}|<p>The process name of the Nginx server (Nginx) used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
 
 ### Items
 

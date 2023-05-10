@@ -4,7 +4,7 @@
 ## Overview
 
 This template is designed for the effortless deployment of Apache monitoring by Zabbix via Zabbix agent and doesn't require any external scripts.
-The template `Apache by Zabbix agent` - collects metrics by polling [Apache Satus module](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
+The template `Apache by Zabbix agent` - collects metrics by polling [Apache Status module](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
   
 ```text
 127.0.0.1
@@ -64,7 +64,7 @@ This template has been tested on:
 
 ## Setup
 
-See the setup instructions for [Apache Satus module](https://httpd.apache.org/docs/current/mod/mod_status.html).
+See the setup instructions for [Apache Status module](https://httpd.apache.org/docs/current/mod/mod_status.html).
 
 Check the availability of the module with this command line: `httpd -M 2>/dev/null | grep status_module`
 
@@ -84,13 +84,13 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.4/manual
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$APACHE.STATUS.HOST}|<p>The hostname or an IP address of the Apache status page.</p>|`127.0.0.1`|
+|{$APACHE.STATUS.HOST}|<p>The hostname or IP address of the Apache status page.</p>|`127.0.0.1`|
 |{$APACHE.STATUS.PORT}|<p>The port of the Apache status page.</p>|`80`|
 |{$APACHE.STATUS.PATH}|<p>The URL path.</p>|`server-status?auto`|
 |{$APACHE.STATUS.SCHEME}|<p>The request scheme, which may be either HTTP or HTTPS.</p>|`http`|
 |{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>The maximum Apache response time expressed in seconds for a trigger expression.</p>|`10`|
-|{$APACHE.PROCESS_NAME}|<p>The filter to include the process name of the Apache web server (Apache).</p>|`(httpd\|apache2)`|
-|{$APACHE.PROCESS.NAME.PARAMETER}|<p>The process name of the Apache web server (Apache), used in item key `proc.get` (insert if you know the correct process name).</p>||
+|{$APACHE.PROCESS_NAME}|<p>The process name filter for the Apache process discovery.</p>|`(httpd\|apache2)`|
+|{$APACHE.PROCESS.NAME.PARAMETER}|<p>The process name of the Apache web server (Apache) used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
 
 ### Items
 

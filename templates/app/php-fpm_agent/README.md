@@ -80,13 +80,13 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 |Name|Description|Default|
 |----|-----------|-------|
 |{$PHP_FPM.PORT}|<p>The port of the PHP-FPM status host or container.</p>|`80`|
-|{$PHP_FPM.HOST}|<p>The Hostname or an IP address of the PHP-FPM status for a host or container.</p>|`localhost`|
+|{$PHP_FPM.HOST}|<p>The hostname or IP address of the PHP-FPM status for a host or container.</p>|`localhost`|
 |{$PHP_FPM.STATUS.PAGE}|<p>The path of the PHP-FPM status page.</p>|`status`|
 |{$PHP_FPM.PING.PAGE}|<p>The path of the PHP-FPM ping page.</p>|`ping`|
 |{$PHP_FPM.PING.REPLY}|<p>The expected reply to the ping.</p>|`pong`|
 |{$PHP_FPM.QUEUE.WARN.MAX}|<p>The maximum percent of the PHP-FPM queue usage for a trigger expression.</p>|`80`|
-|{$PHP_FPM.PROCESS_NAME}|<p>The filter to include the process name of the PHP-FPM process. May vary depending on your OS distribution.</p>|`php-fpm`|
-|{$PHP_FPM.PROCESS.NAME.PARAMETER}|<p>The process name of the PHP-FPM, used in item key `proc.get` (insert if you know the correct process name).</p>||
+|{$PHP_FPM.PROCESS_NAME}|<p>The process name filter for the PHP-FPM process discovery. May vary depending on your OS distribution.</p>|`php-fpm`|
+|{$PHP_FPM.PROCESS.NAME.PARAMETER}|<p>The process name of the PHP-FPM used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
 
 ### Items
 
