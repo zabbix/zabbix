@@ -1386,6 +1386,8 @@ class testFormAlertsScripts extends CWebTest {
 				}
 			}
 		}
+		$modal->close();
+
 	}
 
 	/**
