@@ -38,6 +38,11 @@ AC_DEFUN([CONF_TESTS],
 			fi
 		fi
 
+		AX_LD_CHECK_FLAG([-Wl,--wrap=test],[void test() {}],[],[],
+		[
+			AC_MSG_ERROR([linker do not support function wrapping]);
+		])
+
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 			#include <stdlib.h>
 			]], [[
