@@ -203,7 +203,7 @@ int	main (void)
 		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
 
-	zbx_log_level = LOG_LEVEL_INFORMATION;
+	*zbx_plog_level = LOG_LEVEL_INFORMATION;
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

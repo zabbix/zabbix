@@ -271,12 +271,12 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 	{
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, id_name, stats->id);
-		zbx_json_adduint64(json, "delay5", stats->delay5);
-		zbx_json_adduint64(json, "delay10", stats->delay10);
-		zbx_json_adduint64(json, "delay30", stats->delay30);
-		zbx_json_adduint64(json, "delay60", stats->delay60);
-		zbx_json_adduint64(json, "delay300", stats->delay300);
-		zbx_json_adduint64(json, "delay600", stats->delay600);
+		zbx_json_addint64(json, "delay5", stats->delay5);
+		zbx_json_addint64(json, "delay10", stats->delay10);
+		zbx_json_addint64(json, "delay30", stats->delay30);
+		zbx_json_addint64(json, "delay60", stats->delay60);
+		zbx_json_addint64(json, "delay300", stats->delay300);
+		zbx_json_addint64(json, "delay600", stats->delay600);
 		zbx_json_close(json);
 	}
 
@@ -352,7 +352,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 		goto out;
 	}
 
-	now = time(NULL);
+	now = (int)time(NULL);
 	zbx_vector_ptr_create(&queue);
 	zbx_dc_get_item_queue(&queue, ZBX_QUEUE_FROM_DEFAULT, ZBX_QUEUE_TO_INFINITY);
 
@@ -424,7 +424,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 				zbx_json_addobject(&json, NULL);
 				zbx_json_adduint64(&json, "itemid", item->itemid);
-				zbx_json_adduint64(&json, "nextcheck", item->nextcheck);
+				zbx_json_addint64(&json, "nextcheck", item->nextcheck);
 				zbx_json_close(&json);
 			}
 
@@ -485,7 +485,7 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 		goto out;
 
 	zbx_db_free_result(result);
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	if (NULL == (result = zbx_db_select("select max(lastaccess) from sessions where status=%d group by userid,status",
 			ZBX_SESSION_ACTIVE)))
@@ -942,7 +942,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 		}
 
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE, zbx_dc_get_item_queue(NULL, from, to));
+		zbx_json_addint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE, zbx_dc_get_item_queue(NULL, from, to));
 	}
 	else
 	{
@@ -1304,6 +1304,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 #ifdef HAVE_NETSNMP
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 	zbx_ipc_async_socket_t	rtc;
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 #endif

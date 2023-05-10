@@ -92,11 +92,11 @@ static int	rtc_option_get_ui64(const char *param, size_t *size, zbx_uint64_t *va
 
 	if (ptr != param)
 	{
-		if (FAIL == zbx_is_uint64_n(param, ptr - param, value))
+		if (FAIL == zbx_is_uint64_n(param, (size_t)(ptr - param), value))
 			return FAIL;
 	}
 
-	*size = ptr - param;
+	*size = (size_t)(ptr - param);
 
 	return SUCCEED;
 }
@@ -150,7 +150,7 @@ int	rtc_option_get_process_type(const char *param, size_t *size, int *proc_type,
 	int		ret = FAIL;
 
 	if (NULL != (ptr = strchr(param, ',')))
-		*size = ptr - param;
+		*size = (size_t)(ptr - param);
 	else
 		*size = strlen(param);
 

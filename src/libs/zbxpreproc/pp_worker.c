@@ -110,8 +110,7 @@ static	void	pp_task_process_sequence(zbx_pp_context_t *ctx, zbx_pp_task_t *task_
  ******************************************************************************/
 static void	*pp_worker_entry(void *args)
 {
-	zbx_pp_worker_args_t	*worker_args = (zbx_pp_worker_args_t *)args;
-	zbx_pp_worker_t		*worker = worker_args->worker;
+	zbx_pp_worker_t		*worker = (zbx_pp_worker_t *)args;
 	zbx_pp_queue_t		*queue = worker->queue;
 	zbx_pp_task_t		*in;
 	char			*error = NULL, component[MAX_ID_LEN + 1];
@@ -120,17 +119,17 @@ static void	*pp_worker_entry(void *args)
 
 	zbx_snprintf(component, sizeof(component), "%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
-	*worker->logger.level = worker_args->log_level;
-	zbx_free(worker_args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGINT);
 
 	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
