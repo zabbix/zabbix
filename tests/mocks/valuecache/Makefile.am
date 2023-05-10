@@ -11,4 +11,4 @@ libvaluecachemock_a_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests \
-	$(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+	$(TLS_CFLAGS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
