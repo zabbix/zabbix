@@ -164,18 +164,23 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickButtonText('Create discovery rule');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilVisible();
 		$this->fillInFields($data);
 
 		if (array_key_exists('error_in_checks', $data)) {
 			foreach ($data['error_in_checks'] as $error) {
 				$this->zbxTestTextPresentInMessageDetails($error);
 			}
-			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="Cancel"]');
+			COverlayDialogElement::find()->waitUntilVisible()->all()->last()->query('button:Cancel')
+					->waitUntilClickable()->one()->click();
+
 			return;
 		}
 
-		$this->zbxTestClick('add');
+		$dialog->asForm()->submit();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
+
+		$dialog->close();
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));
@@ -331,9 +336,12 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 	public function testFormNetworkDiscovery_Create($data) {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickButtonText('Create discovery rule');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->fillInFields($data);
 
-		$this->zbxTestClickWait('add');
+		$dialog->query('xpath:.//div[@class="overlay-dialogue-footer"]//button[text()="Add"]')
+				->waitUntilClickable()->one()->click();
+		$dialog->ensureNotPresent();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
 		$this->zbxTestTextPresent($data['name']);
@@ -411,18 +419,21 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickLinkText($data['old_name']);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->fillInFields($data);
 
 		if (array_key_exists('error_in_checks', $data)) {
 			foreach ($data['error_in_checks'] as $error) {
 				$this->zbxTestTextPresentInMessageDetails($error);
 			}
-			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="Cancel"]');
+			COverlayDialogElement::find()->waitUntilReady()->all()->last()->query('button:Cancel')
+					->waitUntilClickable()->one()->click();
 			return;
 		}
 
-		$this->zbxTestClick('update');
+		$dialog->asForm()->submit();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
+		$dialog->close();
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));
@@ -571,10 +582,11 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					switch ($key) {
 						case 'check_action':
 							$action = $value;
-							COverlayDialogElement::ensureNotPresent();
 							$this->zbxTestClickButtonText($action);
+
 							if ($action !== 'Remove') {
-								COverlayDialogElement::find()->one()->waitUntilReady();
+								$check_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+								$this->assertEquals('Discovery check', $check_dialog->getTitle());
 							}
 							break;
 						case 'type':
@@ -617,12 +629,14 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					}
 				}
 				if ($action === 'Add' || $action === 'Edit') {
+					$dialog = COverlayDialogElement::find()->all()->last();
 					$button = ($action === 'Add') ? 'Add' : 'Update';
-					$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]/button[text()="'.$button.'"]');
+					$dialog->query('xpath:.//div[@class="overlay-dialogue-footer"]/button[text()="'.$button.'"]')
+							->waitUntilClickable()->one()->click();
 					if (!array_key_exists('error_in_checks', $data)) {
-						COverlayDialogElement::ensureNotPresent();
 						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@id="dcheckList"]'.
-								'//div[contains(text(), "'.$check['type'].'")]'));
+								'//td[contains(text(), "'.$check['type'].'")]')
+						);
 					}
 				}
 			}
@@ -634,7 +648,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		if (array_key_exists('radio_buttons', $data)) {
 			foreach ($data['radio_buttons'] as $field_name => $label) {
-				$prefix = '//div[@class="table-forms-td-left"]//label[text()='.CXPathHelper::escapeQuotes($field_name).']/../..';
+				$prefix = '//label[text()='.CXPathHelper::escapeQuotes($field_name).']/../..';
 				$xpath = $prefix.'//label[text()='.CXPathHelper::escapeQuotes($label).']';
 				$this->zbxTestClickXpathWait($xpath);
 			}
