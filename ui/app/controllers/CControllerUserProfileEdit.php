@@ -78,6 +78,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 				? ['mediatypeid', 'period', 'sendto', 'severity', 'active']
 				: null,
 			'userids' => CWebUser::$data['userid'],
+			'selectUsrgrps' => ['userdirectoryid'],
 			'editable' => true
 		]);
 
@@ -115,7 +116,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'url' => $this->user['url'],
 			'messages' => $this->getInput('messages', []) + getMessageSettings(),
 			'form_refresh' => 0,
-			'action' => $this->getAction()
+			'action' => $this->getAction(),
+			'internal_auth' => array_sum(array_column($this->user['usrgrps'], 'userdirectoryid')) == ZBX_AUTH_INTERNAL
 		];
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
@@ -148,8 +150,6 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'output' => ['status'],
 			'preservekeys' => true
 		]);
-
-		$data['internal_authentication'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('User profile'));

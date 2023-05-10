@@ -169,12 +169,13 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$data['groups'] = $user_groups
 			? API::UserGroup()->get([
-				'output' => ['usrgrpid', 'name'],
+				'output' => ['usrgrpid', 'name', 'userdirectoryid'],
 				'usrgrpids' => $user_groups
 			])
 			: [];
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
+		$data['internal_auth'] = array_sum(array_column($data['groups'], 'userdirectoryid')) == ZBX_AUTH_INTERNAL;
 
 		if ($data['roleid']) {
 			$roles = API::Role()->get([
