@@ -402,6 +402,8 @@ function invalid_url($msg = null) {
 	$messages_backup = CMessageHelper::getMessages();
 	CMessageHelper::clear();
 
+	global $page;
+
 	require_once dirname(__FILE__).'/page_header.php';
 
 	// Rollback reset messages.
