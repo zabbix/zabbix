@@ -32,4 +32,10 @@ class CButtonIcon extends CSimpleButton {
 			$this->setTitle($title);
 		}
 	}
+
+	public function setSmall(): self {
+		$this->addClass(ZBX_STYLE_BTN_SMALL);
+
+		return $this;
+	}
 }

@@ -173,8 +173,6 @@ $icon-color: #dddddd;
 $icon-btn-color: #7d7d7d;
 $icon-btn-hover-color: #ffffff;
 
-$icon-content-color: #000000;
-
 // Error messages
 $msg-bad-btn-color: $font-color;
 
@@ -891,15 +889,15 @@ td.inactive-bg {
 	&::before {
 		@extend %icons-font;
 		content: $zi-stop-sign;
+		font-size: $icon-medium-size * 1.75;
+		color: #000000;
+		text-align: center;
+		width: 34px;
 		position: absolute;
 		top: 0;
 		left: 0;
 		bottom: 0;
-		width: 34px;
 		min-height: 28px;
-		color: #000000;
-		font-size: $icon-medium-size * 1.75;
-		text-align: center;
 		background-color: $alt-red;
 	}
 }
@@ -994,24 +992,25 @@ td.inactive-bg {
 	}
 }
 
-.problem-icon-link,
-.problem-icon-list {
-	.problem-icon-list-item {
+.problem-icon-link, // TODO: check
+.problem-icon-list { // TODO: check
+	.problem-icon-list-item { // TODO: check
+		background: transparent;
+		color: $font-color;
 		position: relative;
 		padding-left: 20px;
-		color: $font-color;
-		background: transparent;
 
 		&::before {
+			background-repeat: no-repeat;
+			border-radius: 3px;
 			position: absolute;
 			top: 0;
 			left: 0;
-			width: 17px;
 			height: 17px;
-			color: #000000;
+			width: 17px;
 			font-size: $icon-medium-size;
+			color: #000000;
 			text-align: center;
-			border-radius: 3px;
 		}
 	}
 

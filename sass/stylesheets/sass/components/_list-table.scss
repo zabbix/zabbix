@@ -235,10 +235,20 @@
 		}
 	}
 
-	.btn-icon,
+	.btn-icon:not(.btn-small),
 	.icon {
 		width: 18px;
 		min-height: 18px;
+	}
+
+	.btn-small,
+	.problem-icon-link,
+	.status-container,
+	.symptoms-count,
+	.tag {
+		margin-top: 1px;
+		margin-bottom: 1px;
+		vertical-align: top;
 	}
 }
 
@@ -297,9 +307,7 @@
 	}
 
 	.tag {
-		margin: 1px 0;
 		cursor: pointer;
-		vertical-align: top;
 
 		&:not(:last-of-type) {
 			margin-right: 3px;
@@ -414,10 +422,8 @@
 	.symptoms-count {
 		display: inline-block;
 		padding: 2px 3px;
-		margin: 1px 0;
 		min-width: 10px;
 		color: $icon-content-color;
-		vertical-align: top;
 		text-align: center;
 		line-height: 1;
 		background-color: $icon-color;

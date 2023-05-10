@@ -62,6 +62,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/range-control";
 @import "components/section";
 @import "components/service/info";
+@import "components/status-container";
 @import "components/subfilter";
 @import "components/svg-graph";
 @import "components/tabfilter";
@@ -970,11 +971,13 @@ form {
 		padding-bottom: 0;
 	}
 
-	//.icon-help, // TODO change to icon-help-filled-small
-	.icon-info { // TODO check with class zi-i
-		position: relative;
-		top: 1px;
+	.btn-icon {
 		margin-left: 5px;
+
+		&.btn-small {
+			top: 1px;
+			vertical-align: text-bottom;
+		}
 	}
 }
 
@@ -1631,61 +1634,6 @@ select {
 	.drag-icon,
 	.dashboard-widget-head {
 		@extend %cursor-dragging;
-	}
-}
-
-button {
-	//&.icon-help, // TODO change to icon-help-filled-small
-	&.icon-info { // TODO check with class zi-i
-		width: 16px;
-		height: 16px;
-		min-height: 16px;
-		vertical-align: text-bottom;
-	}
-
-	//&.icon-help { // TODO change to icon-help-filled-small
-	//	color: $icon-color;
-	//	border: none;
-	//	background: transparent;
-
-	//	&:focus {
-	//		box-shadow: none;
-
-	//		&::before {
-	//			border-radius: 50%;
-	//			box-shadow: inset 0 0 0 2px $btn-focus-outline-color;
-	//		}
-	//	}
-	//}
-
-	&.icon-info { // TODO check with class zi-i
-		&::before {
-			font-size: $icon-small-size;
-		}
-
-		&.status-green {
-			&:hover,
-			&:focus {
-				border-color: $status-green-border-color;
-				background-color: $status-green-bg-color;
-			}
-		}
-
-		&.status-yellow {
-			&:hover,
-			&:focus {
-				border-color: $status-yellow-border-color;
-				background-color: $status-yellow-bg-color;
-			}
-		}
-
-		&.status-red {
-			&:hover,
-			&:focus {
-				border-color: $status-red-border-color;
-				background-color: $status-red-bg-color;
-			}
-		}
 	}
 }
 
@@ -2881,103 +2829,6 @@ a.link-action {
 	}
 }
 
-%status {
-	padding: 2px 3px 1px;
-	font-size: $font-h3-size;
-	text-align: center;
-	min-width: .7em;
-	line-height: 1em;
-	display: inline-block;
-	border-radius: 2px;
-
-	&:not(:last-of-type) {
-		border-right: 0;
-	}
-}
-
-.status-container { // TODO: check, fix font size and paddings
-	display: inline-block;
-	white-space: nowrap;
-	margin: 1px 3px 1px 0;
-
-	&:last-child {
-		margin: 0;
-	}
-
-	span {
-		border-radius: 0;
-
-		&:first-of-type {
-			border-top-left-radius: 2px;
-			border-bottom-left-radius: 2px;
-		}
-
-		&:last-of-type {
-			border-top-right-radius: 2px;
-			border-bottom-right-radius: 2px;
-		}
-	}
-
-	.status-na-bg,
-	.status-info-bg,
-	.status-warning-bg,
-	.status-average-bg,
-	.status-high-bg,
-	.status-disaster-bg {
-		@extend %status;
-		border: 1px solid rgba($font-color, .2);
-		border-radius: 0;
-	}
-}
-
-.status-disabled-bg {
-	color: $form-disabled-font-color;
-	border: 1px solid rgba($font-color, .2);
-	background-color: $form-disabled-bg-color;
-	// TODO check
-	//@extend %status;
-}
-
-.status-green {
-	color: $white;
-	border: 1px solid $status-green-border-color;
-	background-color: $status-green-bg-color;
-	// TODO check
-	//@extend %status;
-}
-
-.status-yellow {
-	color: $white;
-	border: 1px solid $status-yellow-border-color;
-	background-color: $status-yellow-bg-color;
-	// TODO check
-	//@extend %status;
-}
-
-.status-red {
-	color: $status-color;
-	border: 1px solid $status-red-border-color;
-	background-color: $status-red-bg-color;
-
-	// TODO check
-	//@extend %status;
-}
-
-.status-grey {
-	color: $form-disabled-font-color;
-	border: 1px solid $status-grey-border-color;
-	background-color: $status-grey-bg-color;
-	// TODO check
-	//@extend %status;
-}
-
-.status-dark-grey {
-	border: 1px solid $status-dark-grey-border-color;
-	background-color: $status-dark-grey-bg-color;
-	// TODO check
-	//@extend %status;
-}
-
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
@@ -3429,14 +3280,6 @@ tr.cursor-move {
 	display: inline-block;
 	min-width: 16px;
 	white-space: nowrap;
-
-	.icon-info { // TODO check with class zi-i
-		margin-left: 5px;
-
-		&:first-of-type {
-			margin-left: 0;
-		}
-	}
 }
 
 main {
@@ -3987,20 +3830,26 @@ a.icon-count {
 
 .problem-icon-link,
 .problem-icon-list {
-	display: inline-flex;
-	margin: 1px 0;
+	display: inline-block;
+	height: 16px;
+	white-space: nowrap;
 
 	.problem-icon-list-item {
 		color: $btn-color;
 		font-size: 12px;
-		line-height: 1;
-		padding: 3px 5px 2px;
+	}
+}
+
+.problem-icon-list {
+	.problem-icon-list-item {
+		&:not(:last-of-type) {
+			margin-right: 5px;
+		}
 	}
 }
 
 .problem-icon-link {
 	overflow: hidden;
-	border-radius: 3px;
 
 	&:link,
 	&:hover,
@@ -4010,16 +3859,6 @@ a.icon-count {
 
 	&:focus {
 		box-shadow: 0 0 0 2px $btn-focus-outline-color;
-	}
-}
-
-.problem-icon-list {
-	.problem-icon-list-item {
-		border-radius: 3px;
-
-		&:not(:last-of-type) {
-			margin-right: 5px;
-		}
 	}
 }
 
@@ -4512,11 +4351,11 @@ z-select,
 		}
 	}
 
-	> .status-green:not(:last-of-type) {
+	> .status-green:not(:last-of-type) { // TODO: check status
 		border-right: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	}
 
-	> .status-grey:not(:last-of-type) {
+	> .status-grey:not(:last-of-type) { // TODO: check status
 		border-right: 1px solid $form-disabled-border-color;
 	}
 }

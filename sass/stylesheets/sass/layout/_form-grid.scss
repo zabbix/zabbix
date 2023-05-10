@@ -96,11 +96,13 @@
 		}
 	}
 
-	//.icon-help, // TODO: change to icon-help-filled-small
-	.icon-info { // TODO check with class zi-i
-		position: relative;
-		top: 1px;
+	.btn-icon {
 		margin-left: 5px;
+
+		&.btn-small {
+			top: 1px;
+			vertical-align: text-bottom;
+		}
 	}
 
 	&.form-grid-1-1 {

@@ -900,9 +900,9 @@ td.inactive-bg {
 	}
 }
 
-.problem-icon-link,
-.problem-icon-list {
-	.problem-icon-list-item {
+.problem-icon-link, // TODO: check
+.problem-icon-list { // TODO: check
+	.problem-icon-list-item { // TODO: check
 		position: relative;
 		padding-left: 20px;
 		color: $font-color;

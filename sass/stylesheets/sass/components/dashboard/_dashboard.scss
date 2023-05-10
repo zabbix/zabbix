@@ -1050,12 +1050,12 @@
 		justify-content: space-between;
 		height: 18px;
 
-		.status-green {
+		.status-green { // TODO: check status
 			background-color: $dashboard-my-bg-color;
 			border-color: $dashboard-my-bg-color;
 		}
 
-		.status-yellow {
+		.status-yellow { // TODO: check status
 			background-color: $dashboard-shared-bg-color;
 			border-color: $dashboard-shared-bg-color;
 		}

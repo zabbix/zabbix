@@ -77,20 +77,16 @@
 	@extend .zi-help;
 	@extend %icon-small;
 
-	color: $icon-content-color;
-
 	&::before {
 		padding: 1px;
-		background-color: $icon-color;
 		border-radius: 50%;
 	}
 
-	&.btn-icon {
-		border-radius: 50%;
-	}
-
+	&,
 	&.btn-icon {
 		color: $icon-content-color;
+		background-color: $icon-color;
+		border-radius: 50%;
 	}
 }
 
@@ -98,10 +94,32 @@
 	@extend .zi-i;
 	@extend %icon-small;
 
-	&::before {
-		padding: 1px;
+	&,
+	&.btn-icon {
 		color: $icon-content-color;
 		background-color: $negative-color;
+	}
+}
+
+.zi-i-positive {
+	@extend .zi-i;
+	@extend %icon-small;
+
+	&,
+	&.btn-icon {
+		color: $icon-content-color;
+		background-color: $positive-color;
+	}
+}
+
+.zi-i-warning {
+	@extend .zi-i;
+	@extend %icon-small;
+
+	&,
+	&.btn-icon {
+		color: $icon-content-color;
+		background-color: $warning-color;
 	}
 }
 

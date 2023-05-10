@@ -45,7 +45,7 @@ output {
 	.msg-details {
 		width: 100%;
 
-		&:first-of-type {
+		&:not(:first-child) {
 			margin-top: 6px;
 			padding-top: 6px;
 			border-top: 1px dashed;

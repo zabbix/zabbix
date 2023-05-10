@@ -142,6 +142,13 @@ a.btn-icon,
 	}
 }
 
+.btn-icon {
+	&.btn-small {
+		width: 16px;
+		min-height: 16px;
+	}
+}
+
 .btn-link {
 	padding: 0;
 	min-height: inherit;

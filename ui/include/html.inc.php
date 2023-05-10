@@ -897,19 +897,6 @@ function makeInformationList($info_icons) {
 }
 
 /**
- * Renders an information icon like green [i] with message.
- *
- * @param CTag|array|string $message
- */
-function makeInformationIcon($message): CLink {
-	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO)
-		->addClass(ZBX_STYLE_STATUS_GREEN)
-		->addClass(ZBX_ICON_I)
-		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
-}
-
-/**
  * Renders an icon for host in maintenance.
  *
  * @param int    $type         Type of the maintenance.
@@ -983,7 +970,9 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
  * Renders an icon with question mark and text in hint.
  */
 function makeHelpIcon($help_text): CSimpleButton {
-	return (new CButtonIcon(ZBX_ICON_HELP_FILLED_SMALL))->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
+	return (new CButtonIcon(ZBX_ICON_HELP_FILLED_SMALL))
+		->setSmall()
+		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**
@@ -996,11 +985,20 @@ function makeDescriptionIcon(string $description): CButtonIcon {
 }
 
 /**
+ * Renders an information icon like green [i] with message.
+ */
+function makeInformationIcon($message): CButtonIcon {
+	return (new CButtonIcon(ZBX_ICON_I_POSITIVE))
+		->setSmall()
+		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
+}
+
+/**
  * Renders a warning icon like yellow [i] with error message
  */
 function makeWarningIcon($warning): CButtonIcon {
-	return (new CButtonIcon(ZBX_ICON_I))
-		->addClass(ZBX_STYLE_STATUS_YELLOW) // TODO - (?) maybe change to color class
+	return (new CButtonIcon(ZBX_ICON_I_WARNING))
+		->setSmall()
 		->setHint($warning, ZBX_STYLE_HINTBOX_WRAP);
 }
 
@@ -1009,8 +1007,8 @@ function makeWarningIcon($warning): CButtonIcon {
  */
 
 function makeErrorIcon($error): CButtonIcon {
-	return (new CButtonIcon(ZBX_ICON_I))
-		->addClass(ZBX_STYLE_STATUS_RED) // TODO - (?) maybe change to color class
+	return (new CButtonIcon(ZBX_ICON_I_NEGATIVE))
+		->setSmall()
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_RED);
 }
 
