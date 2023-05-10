@@ -23576,6 +23576,10 @@ msgstr "atan() - Arkustangent hodnoty jako úhel vyjádřený v radiánech"
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() – Arkustangens souřadnic (vyjádřených) a souřadnic zadaných jako úhel, vyjádřený v radiánech"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr "automaticky registrované zařízení"

@@ -23272,6 +23272,10 @@ msgstr "atan() - 反正切，以弧度表示"
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() - 指定为角度的纵坐标（exprue）和横坐标的反正切，以弧度表示"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr "自动注册主机"

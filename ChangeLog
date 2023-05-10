@@ -1,12 +1,19 @@
 Changes for 6.4.3rc1
 
 New features:
+...G...PS. [ZBXNEXT-8273] implemented reading of relative Include paths in config based on current directory of the config (dgoloscapov)
 .........T [ZBXNEXT-8209] added azure cosmosdb for mongodb template (egordymov)
 ..F....... [ZBXNEXT-8078] removed unnecessary new line for each element in array for export .yaml templates (rdetlavs)
 .........T [ZBXNEXT-8391] added healthcheck metric for container in Docker by Zabbix agent 2 template (egordymov)
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-22732] fixed description of ATAN2 mathematical function (dpetra)
+.......PS. [ZBX-22664] fixed user macros with regex context being resynced without any changes (wiper)
+..F....... [ZBX-22661] fixed templated dashboard display in Monitoring Hosts Dashboards (dpetra)
+.........T [ZBX-21599] optimised preprocessing steps and added dashboard in the TiDB TiKV by HTTP template (aiantsen)
+.........T [ZBX-21598] optimised preprocessing steps and added dashboard in the TiDB PD by HTTP template (aiantsen)
+.........T [ZBX-21600] optimised preprocessing steps and added dashboard in the TiDB by HTTP template (aiantsen)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 ..F....... [ZBX-22714] fixed signature for mqtt.get key in Standard items popup (dpetra)
 .........T [ZBX-21397] fixed preprocessing step in discovery for k8s kubelet template (egordymov)
@@ -114,6 +121,8 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 ........S. [ZBXNEXT-8105] fixed connector diagnostic information reporting in case there are no connectors (vso)
 
 Bug fixes:
+.......PS. [ZBX-22471] fixed SNMP walk item returns units if MIB files are installed (akozlovs)
+.......PS. [ZBX-22513] fixed use of SourceIP option for vmware tags (MVekslers)
 .......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ..F....... [ZBX-22205] fixed the inability to update a dependent item that is inherited from a template (jfreibergs)
 .......PS. [ZBX-22310] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
@@ -1181,6 +1190,12 @@ New features:
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+..F....... [ZBX-22732] fixed description of ATAN2 mathematical function (dpetra)
+.......PS. [ZBX-22664] fixed user macros with regex context being resynced without any changes (wiper)
+..F....... [ZBX-22661] fixed templated dashboard display in Monitoring Hosts Dashboards (dpetra)
+.........T [ZBX-21599] optimised preprocessing steps and added dashboard in the TiDB TiKV by HTTP template (aiantsen)
+.........T [ZBX-21598] optimised preprocessing steps and added dashboard in the TiDB PD by HTTP template (aiantsen)
+.........T [ZBX-21600] optimised preprocessing steps and added dashboard in the TiDB by HTTP template (aiantsen)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 ..F....... [ZBX-22714] fixed signature for mqtt.get key in Standard items popup (dpetra)
 .........T [ZBX-21397] fixed preprocessing step in discovery for k8s kubelet template (egordymov)
