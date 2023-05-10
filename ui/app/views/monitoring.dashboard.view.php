@@ -225,7 +225,6 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 					->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 					->addItem([
 						(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
-							->addClass(ZBX_ICON_CHEVRON_LEFT)
 							->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
 							->setEnabled(false),
 						(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))

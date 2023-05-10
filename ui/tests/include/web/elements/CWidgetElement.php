@@ -66,7 +66,7 @@ class CWidgetElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEditable() {
-		return $this->query('xpath:.//button[contains(@class, "js-widget-editt")]')->one()->isPresent();
+		return $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->one()->isPresent();
 	}
 
 	/**

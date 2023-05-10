@@ -1457,14 +1457,14 @@ function getEventUpdates(array $event): array {
 /**
  * Make icons (suppressions, messages, severity changes, actions) for actions column.
  *
- * @param string $eventid          ID for event, for which icons are created.
- * @param array  $actions          Array of actions data.
- *        array  $actions          ['suppressions']  Suppression icon data.
- *        array  $actions          ['messages']      Messages icon data.
- *        array  $actions          ['severities']    Severity change icon data.
- *        array  $actions          ['actions']       Actions icon data.
- * @param array  $users            User name, surname and username.
- * @param bool   $is_acknowledged  Is the event currently acknowledged. If true, display icon.
+ * @param string $eventid                  ID for event, for which icons are created.
+ * @param array  $actions                  Array of actions data.
+ *        array  $actions['suppressions']  Suppression icon data.
+ *        array  $actions['messages']      Messages icon data.
+ *        array  $actions['severities']    Severity change icon data.
+ *        array  $actions['actions']       Actions icon data.
+ * @param array  $users                    User name, surname and username.
+ * @param bool   $is_acknowledged          Is the event currently acknowledged. If true, display icon.
  *
  * @throws Exception
  */
@@ -1506,7 +1506,7 @@ function makeEventActionsIcons($eventid, array $actions, array $users, bool $is_
  * @param array $data
  *        array  $data['suppress_until'][]['suppress_until']  Time until problem is suppressed by user.
  *        string $data['suppress_until'][]['clock']           Suppression creation time.
- * @param array $users  User name, surname and username.
+ * @param array $users                                        User name, surname and username.
  *
  * @throws Exception
  */
@@ -1572,7 +1572,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
  *        array  $data['messages']               Array of messages.
  *        string $data['messages'][]['message']  Message text.
  *        string $data['messages'][]['clock']    Message creation time.
- * @param array $users  User name, surname and username.
+ * @param array $users                           User name, surname and username.
  *
  * @throws Exception
  */
@@ -1622,7 +1622,7 @@ function makeEventMessagesIcon(array $data, array $users): ?CButtonIcon {
  *        string $data['severities'][]['clock']         Severity change time.
  *        string $data['original_severity']             Severity before change.
  *        string $data['current_severity']              Current severity.
- * @param array  $users  User name, surname and username.
+ * @param array  $users                                 User name, surname and username.
  *
  * @throws Exception
  */
