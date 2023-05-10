@@ -118,6 +118,7 @@ static void	*pp_worker_entry(void *args)
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
