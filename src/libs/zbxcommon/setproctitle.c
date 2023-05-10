@@ -200,6 +200,7 @@ char	**zbx_setproctitle_init(int argc, char **argv)
 }
 #endif
 
+#if !defined(HAVE_FUNCTION_SETPROCTITLE) && (defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV))
 /******************************************************************************
  *                                                                            *
  * Purpose: set a process command line displayed by "ps" command.             *
@@ -261,6 +262,7 @@ static void	setproctitle_set_status(const char *status)
 	}
 #endif
 }
+#endif /* !defined(HAVE_FUNCTION_SETPROCTITLE) && (defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)) */
 
 /******************************************************************************
  *                                                                            *

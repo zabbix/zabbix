@@ -63,7 +63,7 @@ class CControllerDiscoveryEdit extends CController {
 				'selectDChecks' => [
 					'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
 					'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
-					'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source'
+					'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source', 'allow_redirect'
 				],
 				'editable' => true
 			]);
@@ -155,7 +155,8 @@ class CControllerDiscoveryEdit extends CController {
 		$dcheck['name'] = discovery_check2str(
 			$db_dcheck['type'],
 			array_key_exists('key_', $db_dcheck) ? $db_dcheck['key_'] : '',
-			array_key_exists('ports', $db_dcheck) ? $db_dcheck['ports'] : ''
+			array_key_exists('ports', $db_dcheck) ? $db_dcheck['ports'] : '',
+			array_key_exists('allow_redirect', $db_dcheck) ? $db_dcheck['allow_redirect'] : 0
 		);
 
 		switch($db_dcheck['type']) {
@@ -186,6 +187,13 @@ class CControllerDiscoveryEdit extends CController {
 					$dcheck += [
 						'snmpv3_privprotocol' => $db_dcheck['snmpv3_privprotocol'],
 						'snmpv3_privpassphrase' => $db_dcheck['snmpv3_privpassphrase']
+					];
+				}
+				break;
+			case SVC_ICMPPING:
+				if ($db_dcheck['allow_redirect'] == 1) {
+					$dcheck += [
+						'allow_redirect' => $db_dcheck['allow_redirect']
 					];
 				}
 				break;

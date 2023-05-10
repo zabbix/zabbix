@@ -262,7 +262,7 @@ foreach ($data['hosts'] as $host) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = (new CLink(CHtml::encode($host['name']),
+	$description[] = (new CLink($host['name'],
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $host['hostid'])
@@ -325,7 +325,7 @@ foreach ($data['hosts'] as $host) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$hostTemplates[] = ' &hellip;';
+			$hostTemplates[] = [' ', HELLIP()];
 
 			break;
 		}
@@ -333,7 +333,7 @@ foreach ($data['hosts'] as $host) {
 		if (array_key_exists($template['templateid'], $data['writable_templates'])
 				&& $data['allowed_ui_conf_templates']) {
 			$caption = [
-				(new CLink(CHtml::encode($template['name']),
+				(new CLink($template['name'],
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')
 						->setArgument('templateid', $template['templateid'])
@@ -344,7 +344,7 @@ foreach ($data['hosts'] as $host) {
 		}
 		else {
 			$caption = [
-				(new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY)
+				(new CSpan($template['name']))->addClass(ZBX_STYLE_GREY)
 			];
 		}
 
@@ -358,7 +358,7 @@ foreach ($data['hosts'] as $host) {
 			foreach ($parent_templates as $parent_template) {
 				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
 						&& $data['allowed_ui_conf_templates']) {
-					$caption[] = (new CLink(CHtml::encode($parent_template['name']),
+					$caption[] = (new CLink($parent_template['name'],
 						(new CUrl('templates.php'))
 							->setArgument('form', 'update')
 							->setArgument('templateid', $parent_template['templateid'])
@@ -367,7 +367,7 @@ foreach ($data['hosts'] as $host) {
 						->addClass(ZBX_STYLE_GREY);
 				}
 				else {
-					$caption[] = (new CSpan(CHtml::encode($parent_template['name'])))->addClass(ZBX_STYLE_GREY);
+					$caption[] = (new CSpan($parent_template['name']))->addClass(ZBX_STYLE_GREY);
 				}
 
 				$caption[] = ', ';
