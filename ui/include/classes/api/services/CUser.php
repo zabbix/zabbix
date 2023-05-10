@@ -2024,7 +2024,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		self::updateForce($users, $db_users);
+		self::updateForce(array_values($users), $db_users);
 
 		return $user;
 	}
