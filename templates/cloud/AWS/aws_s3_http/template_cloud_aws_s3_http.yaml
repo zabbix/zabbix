@@ -1,12 +1,10 @@
 zabbix_export:
   version: '6.4'
   template_groups:
-    -
-      uuid: c2c162144c2d4c5491c8801193af4945
+    - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
   templates:
-    -
-      uuid: a14ab6b4e80643fe8daa9d7288658f79
+    - uuid: a14ab6b4e80643fe8daa9d7288658f79
       template: 'AWS S3 bucket by HTTP'
       name: 'AWS S3 bucket by HTTP'
       description: |
@@ -20,11 +18,9 @@ zabbix_export:
         name: Zabbix
         version: 6.4-0
       groups:
-        -
-          name: Templates/Cloud
+        - name: Templates/Cloud
       items:
-        -
-          uuid: 7c746594159f4f1c94e8790ed1bdf2af
+        - uuid: 7c746594159f4f1c94e8790ed1bdf2af
           name: 'AWS S3: Requests: Errors, 4xx'
           type: DEPENDENT
           key: aws.s3.4xx_errors
@@ -36,22 +32,18 @@ zabbix_export:
             The average statistic shows the error rate, and the sum statistic shows the count of that type of error, during each period.
             Statistic: Average (reports per request).
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "4xxErrors")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: errors
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 806de74ed57b4797b294ebe8fa509429
+        - uuid: 806de74ed57b4797b294ebe8fa509429
           name: 'AWS S3: Requests: Errors, 5xx'
           type: DEPENDENT
           key: aws.s3.5xx_errors
@@ -63,22 +55,18 @@ zabbix_export:
             The average statistic shows the error rate, and the sum statistic shows the count of that type of error, during each period.
             Statistic: Average (reports per request).
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "5xxErrors")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: errors
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 7ca108eafb0d4b65a304815ee637174e
+        - uuid: 7ca108eafb0d4b65a304815ee637174e
           name: 'AWS S3: Get alarms check'
           type: DEPENDENT
           key: aws.s3.alarms.check
@@ -88,34 +76,28 @@ zabbix_export:
           value_type: CHAR
           description: 'Data collection check.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
           master_item:
             key: aws.s3.get_alarms
           tags:
-            -
-              tag: component
+            - tag: component
               value: status
           triggers:
-            -
-              uuid: a8f8a7518aad4e32b23a8611afc8f48c
+            - uuid: a8f8a7518aad4e32b23a8611afc8f48c
               expression: 'length(last(/AWS S3 bucket by HTTP/aws.s3.alarms.check))>0'
               name: 'AWS S3: Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: 7530d7ebe61942f4abc29a8ccb3b5516
+        - uuid: 7530d7ebe61942f4abc29a8ccb3b5516
           name: 'AWS S3: Requests: All'
           type: DEPENDENT
           key: aws.s3.all_requests
@@ -126,19 +108,16 @@ zabbix_export:
             The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
             If you're using a metrics configuration with a filter, then this metric only returns the HTTP requests that meet the filter's requirements.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "AllRequests")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: fceb9927715443059269fa4589f90f67
+        - uuid: fceb9927715443059269fa4589f90f67
           name: 'AWS S3: Bucket Size'
           type: DEPENDENT
           key: aws.s3.bucket_size_bytes
@@ -150,19 +129,16 @@ zabbix_export:
             This a daily metric for the bucket.
             The amount of data in bytes stored in a bucket in the STANDARD storage class, INTELLIGENT_TIERING storage class, Standard-Infrequent Access (STANDARD_IA) storage class, OneZone-Infrequent Access (ONEZONE_IA), Reduced Redundancy Storage (RRS) class, S3 Glacier Instant Retrieval storage class, Deep Archive Storage (S3 Glacier Deep Archive) class or, S3 Glacier Flexible Retrieval (GLACIER) storage class. This value is calculated by summing the size of all objects and metadata in the bucket (both current and noncurrent objects), including the size of all parts for all incomplete multipart uploads to the bucket.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "BucketSizeBytes")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: storage
-        -
-          uuid: 8758c16faef9477d8e3ff41426c2761b
+        - uuid: 8758c16faef9477d8e3ff41426c2761b
           name: 'AWS S3: Requests: Bytes downloaded'
           type: DEPENDENT
           key: aws.s3.bytes_downloaded
@@ -174,19 +150,16 @@ zabbix_export:
             The number of bytes downloaded for requests made to an Amazon S3 bucket, where the response includes a body.
             Statistic: Average (bytes per request).
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "BytesDownloaded")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 3f5141a7448b43d288a37dfe41a52288
+        - uuid: 3f5141a7448b43d288a37dfe41a52288
           name: 'AWS S3: Replication: Bytes pending'
           type: DEPENDENT
           key: aws.s3.bytes_pending_replication
@@ -196,19 +169,16 @@ zabbix_export:
           units: B
           description: 'The total number of bytes of objects pending replication for a given replication rule.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "BytesPendingReplication")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: replication
-        -
-          uuid: 99eefab6b9be405ead0e6ea57394a7e3
+        - uuid: 99eefab6b9be405ead0e6ea57394a7e3
           name: 'AWS S3: Requests: Bytes uploaded'
           type: DEPENDENT
           key: aws.s3.bytes_uploaded
@@ -220,19 +190,16 @@ zabbix_export:
             The number of bytes uploaded that contain a request body, made to an Amazon S3 bucket.
             Statistic: Average (bytes per request).
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "BytesUploaded")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: d9deb58254be4add996d3dec97344132
+        - uuid: d9deb58254be4add996d3dec97344132
           name: 'AWS S3: Requests: Delete'
           type: DEPENDENT
           key: aws.s3.delete_requests
@@ -243,19 +210,16 @@ zabbix_export:
             The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
             This also includes Delete Multiple Objects requests. This metric shows the number of requests, not the number of objects deleted.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "DeleteRequests")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: d8c8e91f383747e5b6e73f922f5b3278
+        - uuid: d8c8e91f383747e5b6e73f922f5b3278
           name: 'AWS S3: First byte latency, avg'
           type: DEPENDENT
           key: aws.s3.first_byte_latency.avg
@@ -267,22 +231,18 @@ zabbix_export:
             The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
             Statistic: Average.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "FirstByteLatency")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: latency
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 55cb2316171e43a0aa94e0d203832577
+        - uuid: 55cb2316171e43a0aa94e0d203832577
           name: 'AWS S3: First byte latency, p90'
           type: DEPENDENT
           key: aws.s3.first_byte_latency.p90
@@ -294,22 +254,18 @@ zabbix_export:
             The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
             Statistic: 90 percentile.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "FirstByteLatency")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: latency
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 6da0ea7130e64a7fb8ae32ee02290cbf
+        - uuid: 6da0ea7130e64a7fb8ae32ee02290cbf
           name: 'AWS S3: Get alarms data'
           type: SCRIPT
           key: aws.s3.get_alarms
@@ -486,33 +442,25 @@ zabbix_export:
             Get alarms data.
             DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
           preprocessing:
-            -
-              type: CHECK_NOT_SUPPORTED
+            - type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
           timeout: 15s
           parameters:
-            -
-              name: access_key
+            - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            -
-              name: secret_key
+            - name: secret_key
               value: '{$AWS.SECRET.ACCESS.KEY}'
-            -
-              name: region
+            - name: region
               value: '{$AWS.REGION}'
-            -
-              name: bucket_name
+            - name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
-            -
-              name: proxy
+            - name: proxy
               value: '{$AWS.PROXY}'
           tags:
-            -
-              tag: component
+            - tag: component
               value: raw
-        -
-          uuid: 598e9dc563334ad6b1d72245a6f8679f
+        - uuid: 598e9dc563334ad6b1d72245a6f8679f
           name: 'AWS S3: Get metrics data'
           type: SCRIPT
           key: aws.s3.get_metrics
@@ -713,36 +661,27 @@ zabbix_export:
             Get bucket metrics.
             Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
           preprocessing:
-            -
-              type: CHECK_NOT_SUPPORTED
+            - type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
           timeout: 15s
           parameters:
-            -
-              name: access_key
+            - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            -
-              name: secret_key
+            - name: secret_key
               value: '{$AWS.SECRET.ACCESS.KEY}'
-            -
-              name: region
+            - name: region
               value: '{$AWS.REGION}'
-            -
-              name: filter_id
+            - name: filter_id
               value: '{$AWS.S3.FILTER.ID}'
-            -
-              name: bucket_name
+            - name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
-            -
-              name: proxy
+            - name: proxy
               value: '{$AWS.PROXY}'
           tags:
-            -
-              tag: component
+            - tag: component
               value: raw
-        -
-          uuid: f2cff8aa3c3c4a308296550561b02829
+        - uuid: f2cff8aa3c3c4a308296550561b02829
           name: 'AWS S3: Requests: Get'
           type: DEPENDENT
           key: aws.s3.get_requests
@@ -753,19 +692,16 @@ zabbix_export:
             The number of HTTP GET requests made for objects in an Amazon S3 bucket. This doesn't include list operations.
             Paginated list-oriented requests, like List Multipart Uploads, List Parts, Get Bucket Object versions, and others, are not included in this metric.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "GetRequests")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 0d9f59f099cb47c8991cc2e353154dc7
+        - uuid: 0d9f59f099cb47c8991cc2e353154dc7
           name: 'AWS S3: Requests: Head'
           type: DEPENDENT
           key: aws.s3.head_requests
@@ -774,19 +710,16 @@ zabbix_export:
           value_type: FLOAT
           description: 'The number of HTTP HEAD requests made to an Amazon S3 bucket.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "HeadRequests")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: f9b09dbbf0a44ea9b34a86853a6ebfd0
+        - uuid: f9b09dbbf0a44ea9b34a86853a6ebfd0
           name: 'AWS S3: Requests: List'
           type: DEPENDENT
           key: aws.s3.list_requests
@@ -795,19 +728,16 @@ zabbix_export:
           value_type: FLOAT
           description: 'The number of HTTP requests that list the contents of a bucket.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "ListRequests")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 0e22c196ae834d2899068f25316ffed2
+        - uuid: 0e22c196ae834d2899068f25316ffed2
           name: 'AWS S3: Get metrics check'
           type: DEPENDENT
           key: aws.s3.metrics.check
@@ -817,34 +747,28 @@ zabbix_export:
           value_type: CHAR
           description: 'Data collection check.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: status
           triggers:
-            -
-              uuid: a8a0b4187f5f4e22b868dd038f53a2ba
+            - uuid: a8a0b4187f5f4e22b868dd038f53a2ba
               expression: 'length(last(/AWS S3 bucket by HTTP/aws.s3.metrics.check))>0'
               name: 'AWS S3: Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: 75b467e2079c41c5b3e8f79df8c5a9ba
+        - uuid: 75b467e2079c41c5b3e8f79df8c5a9ba
           name: 'AWS S3: Number of objects'
           type: DEPENDENT
           key: aws.s3.number_of_objects
@@ -856,19 +780,16 @@ zabbix_export:
             The total number of objects stored in a bucket for all storage classes. 
             This value is calculated by counting all objects in the bucket (both current and noncurrent objects) and the total number of parts for all incomplete multipart uploads to the bucket.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "NumberOfObjects")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: storage
-        -
-          uuid: ad753554ca7e45629e7eb144a3595228
+        - uuid: ad753554ca7e45629e7eb144a3595228
           name: 'AWS S3: Replication: Operations pending'
           type: DEPENDENT
           key: aws.s3.operations_pending_replication
@@ -877,19 +798,16 @@ zabbix_export:
           value_type: FLOAT
           description: 'The number of operations pending replication for a given replication rule.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "OperationsPendingReplication")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: replication
-        -
-          uuid: 9bb4416c7c454e5486a7ce4e4b4b90f0
+        - uuid: 9bb4416c7c454e5486a7ce4e4b4b90f0
           name: 'AWS S3: Requests: Post'
           type: DEPENDENT
           key: aws.s3.post_requests
@@ -900,19 +818,16 @@ zabbix_export:
             The number of HTTP POST requests made to an Amazon S3 bucket.
             Delete Multiple Objects and SELECT Object Content requests are not included in this metric.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "PostRequests")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 88a67025c835410eb54d74be96cf5b4c
+        - uuid: 88a67025c835410eb54d74be96cf5b4c
           name: 'AWS S3: Requests: Put'
           type: DEPENDENT
           key: aws.s3.put_requests
@@ -921,19 +836,16 @@ zabbix_export:
           value_type: FLOAT
           description: 'The number of HTTP PUT requests made for objects in an Amazon S3 bucket.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "PutRequests")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: ac0f6d6f6f2247379d99fa2f4f0ecc11
+        - uuid: ac0f6d6f6f2247379d99fa2f4f0ecc11
           name: 'AWS S3: Replication: Latency'
           type: DEPENDENT
           key: aws.s3.replication_latency
@@ -943,19 +855,16 @@ zabbix_export:
           units: s
           description: 'The maximum number of seconds by which the replication destination Region is behind the source Region for a given replication rule.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "ReplicationLatency")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: replication
-        -
-          uuid: 23c13e717a2845399068e7c2e627df4f
+        - uuid: 23c13e717a2845399068e7c2e627df4f
           name: 'AWS S3: Requests: Select, bytes returned'
           type: DEPENDENT
           key: aws.s3.select_bytes_returned
@@ -967,19 +876,16 @@ zabbix_export:
             The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 buckets.
             Statistic: Average (bytes per request).
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "SelectBytesReturned")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 042e84dc68c54390a3d0427b87d89e47
+        - uuid: 042e84dc68c54390a3d0427b87d89e47
           name: 'AWS S3: Requests: Select, bytes scanned'
           type: DEPENDENT
           key: aws.s3.select_bytes_scanned
@@ -991,19 +897,16 @@ zabbix_export:
             The number of bytes of data scanned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
             Statistic: Average (bytes per request).
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "SelectBytesScanned")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 616ec102597447cdbe2f21186937dcfe
+        - uuid: 616ec102597447cdbe2f21186937dcfe
           name: 'AWS S3: Requests: Select'
           type: DEPENDENT
           key: aws.s3.select_requests
@@ -1012,19 +915,16 @@ zabbix_export:
           value_type: FLOAT
           description: 'The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "SelectRequests")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: effa8475024843249ad213d726323e72
+        - uuid: effa8475024843249ad213d726323e72
           name: 'AWS S3: Total request latency, avg'
           type: DEPENDENT
           key: aws.s3.total_request_latency.avg
@@ -1037,22 +937,18 @@ zabbix_export:
             This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency.
             Statistic: Average.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "TotalRequestLatency")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: latency
-            -
-              tag: component
+            - tag: component
               value: requests
-        -
-          uuid: 886b748066834f01aa2f6f9327fceba0
+        - uuid: 886b748066834f01aa2f6f9327fceba0
           name: 'AWS S3: Total request latency, p90'
           type: DEPENDENT
           key: aws.s3.total_request_latency.p90
@@ -1065,23 +961,19 @@ zabbix_export:
             This includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency.
             Statistic: 90 percentile.
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "TotalRequestLatency")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.s3.get_metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: latency
-            -
-              tag: component
+            - tag: component
               value: requests
       discovery_rules:
-        -
-          uuid: 26c424a60a7a4975996ccc44601c4ee3
+        - uuid: 26c424a60a7a4975996ccc44601c4ee3
           name: 'Bucket Alarms discovery'
           type: DEPENDENT
           key: aws.s3.alarms.discovery
@@ -1089,19 +981,16 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#ALARM_NAME}'
+              - macro: '{#ALARM_NAME}'
                 value: '{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#ALARM_NAME}'
+              - macro: '{#ALARM_NAME}'
                 value: '{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Discovery bucket alarms.'
           item_prototypes:
-            -
-              uuid: b38bd6e4566445acb52e8ecce4014f0f
+            - uuid: b38bd6e4566445acb52e8ecce4014f0f
               name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State'
               type: DEPENDENT
               key: 'aws.s3.alarm.state["{#ALARM_NAME}"]'
@@ -1114,14 +1003,12 @@ zabbix_export:
               valuemap:
                 name: 'Alarm state'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       var state = ['OK', 'INSUFFICIENT_DATA', 'ALARM'];
@@ -1130,21 +1017,17 @@ zabbix_export:
               master_item:
                 key: aws.s3.get_alarms
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: alarms
               trigger_prototypes:
-                -
-                  uuid: 7f0ba96047784510b734c0064d434edc
+                - uuid: 7f0ba96047784510b734c0064d434edc
                   expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1'
                   name: 'AWS S3 Alarms: "{#ALARM_NAME}" has ''Insufficient data'' state'
                   priority: INFO
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: 7e536a43faf742058d303ffe21cd9a8c
+            - uuid: 7e536a43faf742058d303ffe21cd9a8c
               name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State reason'
               type: DEPENDENT
               key: 'aws.s3.alarm.state_reason["{#ALARM_NAME}"]'
@@ -1157,24 +1040,20 @@ zabbix_export:
                 Alarm description:
                 {#ALARM_DESCRIPTION}
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()'
                   error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
                 key: aws.s3.get_alarms
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: alarms
           trigger_prototypes:
-            -
-              uuid: c1b94199b7ac4cc9889ff0e724f7057d
+            - uuid: c1b94199b7ac4cc9889ff0e724f7057d
               expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0'
               name: 'AWS S3 Alarms: "{#ALARM_NAME}" has ''Alarm'' state'
               priority: AVERAGE
@@ -1182,14 +1061,12 @@ zabbix_export:
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
                 Reason: {ITEM.LASTVALUE2}
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
           master_item:
             key: aws.s3.get_alarms
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   var result = [];
@@ -1206,63 +1083,46 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
       tags:
-        -
-          tag: class
+        - tag: class
           value: software
-        -
-          tag: target
+        - tag: target
           value: aws
-        -
-          tag: target
+        - tag: target
           value: s3
       macros:
-        -
-          macro: '{$AWS.ACCESS.KEY.ID}'
+        - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
-        -
-          macro: '{$AWS.PROXY}'
+        - macro: '{$AWS.PROXY}'
           description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
-        -
-          macro: '{$AWS.REGION}'
+        - macro: '{$AWS.REGION}'
           value: us-west-1
           description: 'Amazon S3 Region code.'
-        -
-          macro: '{$AWS.S3.BUCKET.NAME}'
+        - macro: '{$AWS.S3.BUCKET.NAME}'
           description: 'S3 bucket name.'
-        -
-          macro: '{$AWS.S3.FILTER.ID}'
+        - macro: '{$AWS.S3.FILTER.ID}'
           description: 'S3 bucket requests filter identifier.'
-        -
-          macro: '{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}'
+        - macro: '{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable alarms by name.'
-        -
-          macro: '{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
+        - macro: '{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered alarms by name.'
-        -
-          macro: '{$AWS.SECRET.ACCESS.KEY}'
+        - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
       valuemaps:
-        -
-          uuid: 5f232f40f02246ab843c9aacdcf8d5c5
+        - uuid: 5f232f40f02246ab843c9aacdcf8d5c5
           name: 'Alarm state'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: OK
-            -
-              value: '1'
+            - value: '1'
               newvalue: 'Insufficient data'
-            -
-              value: '2'
+            - value: '2'
               newvalue: Alarm
-            -
-              value: '255'
+            - value: '255'
               newvalue: Unknown

@@ -1,12 +1,10 @@
 zabbix_export:
   version: '6.4'
   template_groups:
-    -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
-    -
-      uuid: 5630ec1b1baf449abe1bc5521f85fe6c
+    - uuid: 5630ec1b1baf449abe1bc5521f85fe6c
       template: 'Website certificate by Zabbix agent 2'
       name: 'Website certificate by Zabbix agent 2'
       description: |
@@ -21,11 +19,9 @@ zabbix_export:
         name: Zabbix
         version: 6.4-0
       groups:
-        -
-          name: Templates/Applications
+        - name: Templates/Applications
       items:
-        -
-          uuid: 42068372fbce4c12a4f3193fc490d4ec
+        - uuid: 42068372fbce4c12a4f3193fc490d4ec
           name: 'Cert: Subject alternative name'
           type: DEPENDENT
           key: cert.alternative_names
@@ -35,18 +31,15 @@ zabbix_export:
           value_type: TEXT
           description: 'The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.alternative_names
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: 946e205aaa84433a8bf1fe46b9362acd
+        - uuid: 946e205aaa84433a8bf1fe46b9362acd
           name: 'Cert: Issuer'
           type: DEPENDENT
           key: cert.issuer
@@ -56,18 +49,15 @@ zabbix_export:
           value_type: TEXT
           description: 'The field identifies the entity that has signed and issued the certificate.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.issuer
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: f124443debb447a792beb8265d2918ee
+        - uuid: f124443debb447a792beb8265d2918ee
           name: 'Cert: Last validation status'
           type: DEPENDENT
           key: cert.message
@@ -77,18 +67,15 @@ zabbix_export:
           value_type: TEXT
           description: 'Last check result message.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.result.message
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: e34bffac86ef41e2865fe8410c2d0aa0
+        - uuid: e34bffac86ef41e2865fe8410c2d0aa0
           name: 'Cert: Expires on'
           type: DEPENDENT
           key: cert.not_after
@@ -97,34 +84,28 @@ zabbix_export:
           units: unixtime
           description: 'The date on which the certificate validity period ends.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.not_after.timestamp
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
           triggers:
-            -
-              uuid: 8a0e3e73527a45618afe94707234f4c6
+            - uuid: 8a0e3e73527a45618afe94707234f4c6
               expression: '(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}'
               name: 'Cert: SSL certificate expires soon'
               event_name: 'Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days)'
               priority: WARNING
               description: 'The SSL certificate should be updated or it will become untrusted.'
               dependencies:
-                -
-                  name: 'Cert: SSL certificate is invalid'
+                - name: 'Cert: SSL certificate is invalid'
                   expression: 'find(/Website certificate by Zabbix agent 2/cert.validation,,"like","invalid")=1'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: c3ba835b28db4f1486ae4be87c3fe55f
+        - uuid: c3ba835b28db4f1486ae4be87c3fe55f
           name: 'Cert: Valid from'
           type: DEPENDENT
           key: cert.not_before
@@ -133,18 +114,15 @@ zabbix_export:
           units: unixtime
           description: 'The date on which the certificate validity period begins.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.not_before.timestamp
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: 08b47b376f0f4f999bd1110696465fd9
+        - uuid: 08b47b376f0f4f999bd1110696465fd9
           name: 'Cert: Public key algorithm'
           type: DEPENDENT
           key: cert.public_key_algorithm
@@ -154,18 +132,15 @@ zabbix_export:
           value_type: CHAR
           description: 'The digital signature algorithm is used to verify the signature of a certificate.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.public_key_algorithm
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: d7d4e592cc6741fcba9c21b5195b8544
+        - uuid: d7d4e592cc6741fcba9c21b5195b8544
           name: 'Cert: Serial number'
           type: DEPENDENT
           key: cert.serial_number
@@ -175,18 +150,15 @@ zabbix_export:
           value_type: CHAR
           description: 'The serial number is a positive integer assigned by the CA to each certificate. It is unique for each certificate issued by a given CA. Non-conforming CAs may issue certificates with serial numbers that are negative or zero.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.serial_number
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: 848cd98e80764f61bbe526316c70da11
+        - uuid: 848cd98e80764f61bbe526316c70da11
           name: 'Cert: Fingerprint'
           type: DEPENDENT
           key: cert.sha1_fingerprint
@@ -196,19 +168,16 @@ zabbix_export:
           value_type: CHAR
           description: 'The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.sha1_fingerprint
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
           triggers:
-            -
-              uuid: 7a4c69a5235e444cb7294e6b7189b2b6
+            - uuid: 7a4c69a5235e444cb7294e6b7189b2b6
               expression: 'last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint,#2)'
               name: 'Cert: Fingerprint has changed'
               event_name: 'Cert: Fingerprint has changed (new version: {ITEM.VALUE})'
@@ -218,11 +187,9 @@ zabbix_export:
                 There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: 67d4cb73b1e74c5f9e63423e9bbdd3a6
+        - uuid: 67d4cb73b1e74c5f9e63423e9bbdd3a6
           name: 'Cert: Signature algorithm'
           type: DEPENDENT
           key: cert.signature_algorithm
@@ -232,18 +199,15 @@ zabbix_export:
           value_type: CHAR
           description: 'The algorithm identifier for the algorithm used by the CA to sign the certificate.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.signature_algorithm
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: b44c554d025446c6b1761a5fde250f9f
+        - uuid: b44c554d025446c6b1761a5fde250f9f
           name: 'Cert: Subject'
           type: DEPENDENT
           key: cert.subject
@@ -253,18 +217,15 @@ zabbix_export:
           value_type: TEXT
           description: 'The field identifies the entity associated with the public key stored in the subject public key field.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.subject
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: 4fc3c39291ea4e3aa6ee04fcec4e1a8d
+        - uuid: 4fc3c39291ea4e3aa6ee04fcec4e1a8d
           name: 'Cert: Validation result'
           type: DEPENDENT
           key: cert.validation
@@ -274,29 +235,24 @@ zabbix_export:
           value_type: CHAR
           description: 'The certificate validation result. Possible values: valid/invalid/valid-but-self-signed'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.result.value
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
           triggers:
-            -
-              uuid: 854c791b765a4ae2982ce6436d6e78ca
+            - uuid: 854c791b765a4ae2982ce6436d6e78ca
               expression: 'find(/Website certificate by Zabbix agent 2/cert.validation,,"like","invalid")=1'
               name: 'Cert: SSL certificate is invalid'
               priority: HIGH
               description: 'SSL certificate has expired or it is issued for another domain.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: security
-        -
-          uuid: a8b04dfe285d47e39c9d360ea43fcdbe
+        - uuid: a8b04dfe285d47e39c9d360ea43fcdbe
           name: 'Cert: Version'
           type: DEPENDENT
           key: cert.version
@@ -306,18 +262,15 @@ zabbix_export:
           value_type: CHAR
           description: 'The version of the encoded certificate.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.x509.version
           master_item:
             key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cert
-        -
-          uuid: ec072b3b1c6847b79acac9f18d14df8a
+        - uuid: ec072b3b1c6847b79acac9f18d14df8a
           name: 'Cert: Get'
           key: 'web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]'
           delay: 15m
@@ -326,34 +279,26 @@ zabbix_export:
           value_type: TEXT
           description: 'Returns the JSON with attributes of a certificate of the requested site.'
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           tags:
-            -
-              tag: component
+            - tag: component
               value: raw
       tags:
-        -
-          tag: class
+        - tag: class
           value: software
-        -
-          tag: target
+        - tag: target
           value: certificate
       macros:
-        -
-          macro: '{$CERT.EXPIRY.WARN}'
+        - macro: '{$CERT.EXPIRY.WARN}'
           value: '7'
           description: 'Number of days until the certificate expires.'
-        -
-          macro: '{$CERT.WEBSITE.HOSTNAME}'
+        - macro: '{$CERT.WEBSITE.HOSTNAME}'
           value: '<Put DNS name>'
           description: 'The website DNS name for the connection.'
-        -
-          macro: '{$CERT.WEBSITE.IP}'
+        - macro: '{$CERT.WEBSITE.IP}'
           description: 'The website IP address for the connection.'
-        -
-          macro: '{$CERT.WEBSITE.PORT}'
+        - macro: '{$CERT.WEBSITE.PORT}'
           value: '443'
           description: 'The TLS/SSL port number of the website.'
