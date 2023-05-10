@@ -23,7 +23,7 @@ This template has been tested on:
 
 ## Setup
 
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.4/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual/installation/install_from_packages).
 
 Custom processes set in macros:
 

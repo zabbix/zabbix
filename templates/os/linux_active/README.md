@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Setup
 
-Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/6.4/manual/concepts/agent#agent-on-unix-like-systems).
+Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/7.0/manual/concepts/agent#agent-on-unix-like-systems).
 
 ### Macros used
 
