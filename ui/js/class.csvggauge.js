@@ -1125,8 +1125,18 @@ class CSVGGauge {
 		if (this.data.thresholds.show_arc) {
 			y = this.elements.thresholdArcEmpty.coordinates.y3;
 		}
-		else {
+		else if (this.data.value.show_arc) {
 			y = this.elements.valueArcEmpty.coordinates.y3;
+		}
+		else {
+			if (this.data.description.pos === DESC_V_POSITION_TOP) {
+				y = this.height / 2 + this.elements.description.height / 2;
+			}
+			else if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
+				y = this.height / 2 - this.elements.description.height / 2;
+			}
+
+			anchor = 'middle center';
 		}
 
 		if (this.data.angle === 180) {
