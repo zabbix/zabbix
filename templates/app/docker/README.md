@@ -11,20 +11,14 @@ Template `Docker by Zabbix agent 2` — collects metrics by polling zabbix-agent
 ## Requirements
 
 Zabbix version: 6.4 and higher.
-## Requirements
-
-Zabbix version: 6.4 and higher.
 
 ## Tested versions
 
 This template has been tested on:
 - Docker 23.0.3
-- Docker 23.0.3
 
 ## Configuration
-## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box) section.
 > Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box) section.
 
 ## Setup
@@ -41,12 +35,7 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 |{$DOCKER.LLD.FILTER.CONTAINER.NOT_MATCHES}|<p>Filter to exclude discovered containers.</p>|`CHANGE_IF_NEEDED`|
 |{$DOCKER.LLD.FILTER.IMAGE.MATCHES}|<p>Filter of discoverable images.</p>|`.*`|
 |{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}|<p>Filter to exclude discovered images.</p>|`CHANGE_IF_NEEDED`|
-|{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}|<p>Filter of discoverable containers.</p>|`.*`|
-|{$DOCKER.LLD.FILTER.CONTAINER.NOT_MATCHES}|<p>Filter to exclude discovered containers.</p>|`CHANGE_IF_NEEDED`|
-|{$DOCKER.LLD.FILTER.IMAGE.MATCHES}|<p>Filter of discoverable images.</p>|`.*`|
-|{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}|<p>Filter to exclude discovered images.</p>|`CHANGE_IF_NEEDED`|
 
-### Items
 ### Items
 
 |Name|Description|Type|Key and additional info|
@@ -181,3 +170,4 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
 You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+
