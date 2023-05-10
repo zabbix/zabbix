@@ -1350,8 +1350,10 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGALRM);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR1);
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGINT);
 
 	if (0 > (err = zbx_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block the signals: %s", zbx_strerror(err));
