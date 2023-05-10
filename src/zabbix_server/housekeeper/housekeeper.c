@@ -99,6 +99,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"history_log",		&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_str",		&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_text",	&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"history_bin",		&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_uint",	&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"trends",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
 	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
@@ -108,7 +109,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 };
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
+#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	(ITEM_VALUE_TYPE_BIN + 1)
 #define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
 #define HK_UPDATE_CACHE_TREND_COUNT		2
 
@@ -178,6 +179,9 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{.table = "history_text",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
 			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
 			.type = ITEM_VALUE_TYPE_TEXT},
+	{.table = "history_bin",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
+			.type = ITEM_VALUE_TYPE_BIN},
 	{.table = "trends",		.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
 			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends,
 			.type = ITEM_VALUE_TYPE_FLOAT},
@@ -392,7 +396,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		value_type = atoi(row[1]);
 		ZBX_STR2UINT64(hostid, row[4]);
 
-		if (value_type < ITEM_VALUE_TYPE_MAX &&
+		if (value_type <= ITEM_VALUE_TYPE_BIN &&
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
 			tmp = zbx_strdup(tmp, row[2]);
@@ -415,7 +419,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (0 != history && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
 				history = *rule->poption;
 
-			hk_history_item_update(rules, rule, ITEM_VALUE_TYPE_MAX, now, itemid, history);
+			hk_history_item_update(rules, rule, ITEM_VALUE_TYPE_BIN + 1, now, itemid, history);
 		}
 
 		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
@@ -1273,6 +1277,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_HOUSEKEEPER_EXECUTE, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE};
 
 	db_version_info = housekeeper_args_in->db_version_info;
 
@@ -1297,7 +1302,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	hk_history_compression_init();
 
-	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), housekeeper_args_in->config_timeout,
+			&rtc);
 
 #if defined(HAVE_POSTGRESQL)
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);

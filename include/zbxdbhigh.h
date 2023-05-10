@@ -128,6 +128,9 @@
 #define ZBX_HISTORY_TEXT_VALUE_LEN		65535
 #define ZBX_HISTORY_LOG_VALUE_LEN		65535
 
+/* Binary item type can only be as a dependent item. */
+#define ZBX_HISTORY_BIN_VALUE_LEN		MAX(ZBX_HISTORY_TEXT_VALUE_LEN, ZBX_HISTORY_LOG_VALUE_LEN)
+
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
 #define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
 
@@ -705,7 +708,7 @@ zbx_db_insert_t;
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num);
 void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
