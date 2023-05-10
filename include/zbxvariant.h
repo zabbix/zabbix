@@ -86,7 +86,7 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 
 int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
 
-void		zbx_variant_set_var_vector(zbx_variant_t *value, zbx_vector_var_t *var_vector);
+void		zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *var_vector);
 int		zbx_vector_dbl_from_vector_var(zbx_vector_var_t *input, zbx_vector_dbl_t *output, char **error);
 int		zbx_vector_var_to_dbl(zbx_vector_var_t *values, char **error);
 int		zbx_vector_var_is_double(zbx_vector_var_t *v);

@@ -132,7 +132,7 @@ void	zbx_variant_set_error(zbx_variant_t *value, char *error)
 	value->type = ZBX_VARIANT_ERR;
 }
 
-void	zbx_variant_set_var_vector(zbx_variant_t *value, zbx_vector_var_t *vector)
+void	zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *vector)
 {
 	value->data.vector = vector;
 	value->type = ZBX_VARIANT_VECTOR;
@@ -178,7 +178,7 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 			zbx_vector_var_create(var_vector);
 			zbx_vector_var_append_array(var_vector, source->data.vector->values,
 					source->data.vector->values_num);
-			zbx_variant_set_var_vector(value, var_vector);
+			zbx_variant_set_vector(value, var_vector);
 			break;
 	}
 }
@@ -481,8 +481,6 @@ static int	variant_compare_vector(const zbx_variant_t *value1, const zbx_variant
 		for (i = 0; i < value1->data.vector->values_num; i++)
 		{
 			int	ret;
-
-			ZBX_RETURN_IF_NOT_EQUAL(value1->data.vector->values[i].type, value2->data.vector->values[i].type);
 
 			if (0 != (ret = zbx_variant_compare(&value1->data.vector->values[i],
 					&value2->data.vector->values[i])))

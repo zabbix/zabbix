@@ -1366,7 +1366,7 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 
 	if (ZBX_ITEM_FUNC_EXISTS == item_func)
 	{
-		zbx_variant_set_var_vector(value, results);
+		zbx_variant_set_vector(value, results);
 	}
 	else
 	{
@@ -1536,7 +1536,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 
 	if (ZBX_MIXVALUE_FUNC_BRATE == item_func)
 	{
-		zbx_variant_set_var_vector(value, results);
+		zbx_variant_set_vector(value, results);
 		results = NULL;
 		ret = SUCCEED;
 	}
@@ -1800,7 +1800,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		zbx_history_record_vector_destroy(&values, dcitem->value_type);
 	}
 
-	zbx_variant_set_var_vector(value, results_var_vector);
+	zbx_variant_set_vector(value, results_var_vector);
 
 	ret = SUCCEED;
 out:
