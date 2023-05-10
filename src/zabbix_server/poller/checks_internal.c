@@ -935,8 +935,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 		if (FAIL == zbx_discovery_get_queue_size(&size))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "No \"%s\" processes started.",
-					get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERYMANAGER)));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "discoverer is not initialized: please check "
+					"\"StartDiscoverers\" configuration parameter"));
 			goto out;
 		}
 
