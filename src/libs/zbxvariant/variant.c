@@ -714,3 +714,4 @@ int	zbx_vector_var_get_type(zbx_vector_var_t *v)
 
 	return type;
 }
+
