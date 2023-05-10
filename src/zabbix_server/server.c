@@ -2093,6 +2093,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
+	zbx_register_stats_data_func(zbx_discovery_stats_ext_get, NULL);
 	zbx_register_stats_data_func(zbx_server_stats_ext_get, NULL);
 	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);

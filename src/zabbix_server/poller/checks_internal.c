@@ -925,7 +925,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 	}
 	else if (0 == strcmp(tmp, "discovery_queue"))			/* zabbix[discovery_queue] */
 	{
-		zbx_uint64_t size;
+		zbx_uint64_t	size;
+		char		*error = NULL;
 
 		if (1 != nparams)
 		{
@@ -933,10 +934,9 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			goto out;
 		}
 
-		if (FAIL == zbx_discovery_get_queue_size(&size))
+		if (FAIL == zbx_discovery_get_queue_size(&size, &error))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "discoverer is not initialized: please check "
-					"\"StartDiscoverers\" configuration parameter"));
+			SET_MSG_RESULT(result, error);
 			goto out;
 		}
 

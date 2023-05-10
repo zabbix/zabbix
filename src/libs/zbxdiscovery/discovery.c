@@ -609,20 +609,25 @@ static void	discovery_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t 
  *                                                                            *
  * Purpose: get queue size (enqueued checks count) of discovery manager       *
  *                                                                            *
- * Parameters: size - [OUT] enqueued item count                               *
+ * Parameters: size  - [OUT] enqueued item count                              *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - queue size retrieved                               *
  *               FAIL    - discovery manager is not initialized               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_discovery_get_queue_size(zbx_uint64_t *size)
+int	zbx_discovery_get_queue_size(zbx_uint64_t *size, char **error)
 {
 	zbx_ipc_message_t	message;
 
 	if (DISCOVERER_INITIALIZED_YES != discoverer_initialized)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "discoverer is not initialized: please check \"StartDiscoverers\""
-				" configuration parameter");
+		if (NULL != error)
+		{
+			*error = zbx_strdup(NULL, "discoverer is not initialized: please check \"StartDiscoverers\""
+					" configuration parameter");
+		}
+
 		return FAIL;
 	}
 
@@ -707,4 +712,15 @@ zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vect
 	(void)zbx_serialize_value(ptr, count);
 
 	return data_len;
+}
+
+void zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg)
+{
+	zbx_uint64_t	size;
+
+	ZBX_UNUSED(arg);
+
+	/* zabbix[discovery_queue] */
+	if (SUCCEED == zbx_discovery_get_queue_size(&size, NULL))
+		zbx_json_adduint64(json, "discovery_queue", size);
 }

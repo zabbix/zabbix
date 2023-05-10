@@ -48,6 +48,7 @@ void	zbx_discovery_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, z
 void	zbx_discovery_dcheck_free(zbx_dc_dcheck_t *dcheck);
 void	zbx_discovery_drule_free(zbx_dc_drule_t *drule);
 int	zbx_discovery_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error);
-int	zbx_discovery_get_queue_size(zbx_uint64_t *size);
+int	zbx_discovery_get_queue_size(zbx_uint64_t *size, char **error);
+void	zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg);
 zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
 #endif
