@@ -1393,6 +1393,10 @@ class CControllerPopupTriggerExpr extends CController {
 		}
 
 		if ($item) {
+			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+				throw new Exception(_s('Binary item "%1$s" cannot be used in trigger', $item['key_']));
+			}
+
 			$itemid = $item['itemid'];
 			$item_value_type = $item['value_type'];
 			$item_key = $item['key_'];

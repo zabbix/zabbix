@@ -61,8 +61,10 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
+		case ITEM_VALUE_TYPE_BIN:
 			ret = zbx_variant_convert(value, ZBX_VARIANT_STR);
 			break;
+		case ITEM_VALUE_TYPE_NONE:
 		default:
 			*errmsg = zbx_dsprintf(NULL, "Unknown value type \"%d\"", value_type);
 			THIS_SHOULD_NEVER_HAPPEN;

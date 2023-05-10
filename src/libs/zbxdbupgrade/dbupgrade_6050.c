@@ -151,6 +151,23 @@ static int	DBpatch_6050012(void)
 	return DBadd_field("dchecks", &field);
 }
 
+static int	DBpatch_6050013(void)
+{
+	const zbx_db_table_t	table =
+			{"history_bin", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -170,5 +187,6 @@ DBPATCH_ADD(6050009, 0, 1)
 DBPATCH_ADD(6050010, 0, 1)
 DBPATCH_ADD(6050011, 0, 1)
 DBPATCH_ADD(6050012, 0, 1)
+DBPATCH_ADD(6050013, 0, 1)
 
 DBPATCH_END()

@@ -314,22 +314,24 @@ static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t 
 		case ZBX_VARIANT_UI64:
 			offset += zbx_deserialize_uint64(offset, &value->data.ui64);
 			break;
-
 		case ZBX_VARIANT_DBL:
 			offset += zbx_deserialize_double(offset, &value->data.dbl);
 			break;
-
 		case ZBX_VARIANT_STR:
 			offset += zbx_deserialize_str(offset, &value->data.str, value_len);
 			break;
-
 		case ZBX_VARIANT_ERR:
 			offset += zbx_deserialize_str(offset, &value->data.err, value_len);
 			break;
-
 		case ZBX_VARIANT_BIN:
 			offset += zbx_deserialize_bin(offset, &value->data.bin, value_len);
 			break;
+		case ZBX_VARIANT_NONE:
+		case ZBX_VARIANT_DBL_VECTOR:
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return (int)(offset - data);
@@ -869,6 +871,12 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		{
 			if (value_len < (len = strlen(result->log->value)))
 				value_len = len;
+		}
+
+		if (0 != ZBX_ISSET_BIN(result))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 		}
 
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)

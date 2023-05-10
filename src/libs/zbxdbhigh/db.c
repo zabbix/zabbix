@@ -535,8 +535,9 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
 	switch(field->type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
-			return ZBX_SIZE_T_MAX;
+			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
@@ -553,9 +554,10 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
 	switch(field->type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
-			return ZBX_SIZE_T_MAX;
+			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
 			if (4000 < field->length)
@@ -573,7 +575,7 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 
 static size_t	get_string_field_chars(const zbx_db_field_t *field)
 {
-	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+	if ((ZBX_TYPE_LONGTEXT == field->type || ZBX_TYPE_BLOB == field->type) && 0 == field->length)
 		return ZBX_SIZE_T_MAX;
 	else if (ZBX_TYPE_CUID == field->type)
 		return CUID_LEN - 1;
@@ -2902,6 +2904,7 @@ static char	*zbx_db_format_values(zbx_db_field_t **fields, const zbx_db_value_t 
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%s'", value->str);
 				break;
 			case ZBX_TYPE_FLOAT:
@@ -2950,7 +2953,9 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
+				case ZBX_TYPE_BLOB:
 					zbx_free(row[j].str);
+					break;
 			}
 		}
 
@@ -3070,7 +3075,7 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  *           for insert preparation functions.                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num)
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num)
 {
 	int		i;
 	zbx_db_value_t	*row;
@@ -3095,15 +3100,23 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 #ifdef HAVE_ORACLE
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
 #else
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
 #endif
 				break;
-			default:
+			case ZBX_TYPE_INT:
+			case ZBX_TYPE_FLOAT:
+			case ZBX_TYPE_UINT:
+			case ZBX_TYPE_ID:
+			case ZBX_TYPE_SERIAL:
 				row[i] = *value;
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 	}
 
@@ -3148,6 +3161,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 				value->str = va_arg(args, char *);
 				break;
 			case ZBX_TYPE_INT:
@@ -3170,11 +3184,44 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	va_end(args);
 
-	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
+	zbx_db_insert_add_values_dyn(self, (zbx_db_value_t **)values.values, values.values_num);
 
 	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
 }
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decodes Base64 encoded binary data and escapes it allowing it to  *
+ *          be used inside sql statement                                      *
+ *                                                                            *
+ * Parameters: sql_insert_data     - [IN/OUT] base64 encoded unescaped data   *
+ *                                                                            *
+ * Comment: input data is released from memory and replaced with pointer      *
+ *          to the output data.                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
+{
+	size_t	binary_data_len;
+	char	*escaped_binary;
+
+	size_t	binary_data_max_len = strlen(*sql_insert_data) * 3 / 4 + 1;
+	char	*binary_data = (char*)zbx_malloc(NULL, binary_data_max_len);
+
+	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
+#if defined (HAVE_MYSQL)
+	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	zbx_mysql_escape_bin(binary_data, escaped_binary, binary_data_len);
+#elif defined (HAVE_POSTGRESQL)
+	zbx_postgresql_escape_bin(binary_data, &escaped_binary, binary_data_len);
+#endif
+	zbx_free(binary_data);
+	zbx_free(*sql_insert_data);
+	*sql_insert_data = escaped_binary;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -3346,7 +3393,7 @@ retry_oracle:
 #	endif
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			const zbx_db_value_t	*value = &values[j];
+			zbx_db_value_t	*value = &values[j];
 
 			field = (const zbx_db_field_t *)self->fields.values[j];
 
@@ -3360,6 +3407,16 @@ retry_oracle:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					break;
+				case ZBX_TYPE_BLOB:
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+					decode_and_escape_binary_value_for_sql(&(value->str));
+#elif defined(HAVE_ORACLE)
+					/* Oracle converts base64 to binary when it formats prepared statement */
+#endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
