@@ -473,25 +473,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
  *                                                                            *
  * Purpose: execute a select statement                                        *
  *                                                                            *
- ******************************************************************************/
-DB_RESULT	zbx_db_select_once(const char *fmt, ...)
-{
-	va_list		args;
-	DB_RESULT	rc;
-
-	va_start(args, fmt);
-
-	rc = zbx_db_vselect(fmt, args);
-
-	va_end(args);
-
-	return rc;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: execute a select statement                                        *
- *                                                                            *
  * Comments: retry until DB is up                                             *
  *                                                                            *
  ******************************************************************************/
@@ -2240,7 +2221,9 @@ int	zbx_db_table_exists(const char *table_name)
 
 int	zbx_db_field_exists(const char *table_name, const char *field_name)
 {
+#if (defined(HAVE_MYSQL) || defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3))
 	DB_RESULT	result;
+#endif
 #if defined(HAVE_MYSQL)
 	char		*field_name_esc;
 	int		ret;

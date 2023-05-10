@@ -129,7 +129,7 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\libs\zbxwin32\disk.o
 
-LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib $(LIBS)
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib delayimp.lib wevtapi.lib shlwapi.lib $(LIBS)
 
 !INCLUDE Makefile_pcre.inc
 !INCLUDE Makefile_tls.inc
