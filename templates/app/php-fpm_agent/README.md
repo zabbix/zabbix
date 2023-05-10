@@ -101,7 +101,7 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 |PHP-FPM: Pool name|<p>The name of the current pool.</p>|Dependent item|php-fpm.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pool`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |PHP-FPM: Uptime|<p>It indicates how long has this pool been running.</p>|Dependent item|php-fpm.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['start since']`</p></li></ul>|
 |PHP-FPM: Start time|<p>The time when this pool was started.</p>|Dependent item|php-fpm.start_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['start time']`</p></li></ul>|
-|PHP-FPM: Processes, total|<p>The total number of server processes running currently.</p>|Dependent item|php-fpm.processes_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['total processes']`</p></li></ul>|
+|PHP-FPM: Processes, total|<p>The total number of server processes currently running.</p>|Dependent item|php-fpm.processes_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['total processes']`</p></li></ul>|
 |PHP-FPM: Processes, idle|<p>The total number of idle processes.</p>|Dependent item|php-fpm.processes_idle<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['idle processes']`</p></li></ul>|
 |PHP-FPM: Queue usage|<p>The utilization of the queue.</p>|Calculated|php-fpm.listen_queue_usage|
 |PHP-FPM: Process manager|<p>The method used by the process manager to control the number of child processes for this pool.</p>|Dependent item|php-fpm.process_manager<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['process manager']`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|

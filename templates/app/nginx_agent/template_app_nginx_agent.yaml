@@ -318,13 +318,13 @@ zabbix_export:
           value_type: TEXT
           description: |
             The following status information is provided:
-             `Active connections` - the current number of active client connections including waiting connections.
-             `Accepted` - the total number of accepted client connections.
-             `Handled` - the total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections` limit).
-             `Requests` - the total number of client requests.
-             `Reading` - the current number of connections where Nginx is reading the request header.
-             `Writing` - the current number of connections where Nginx is writing a response back to the client.
-             `Waiting` - the current number of idle client connections waiting for a request.
+            `Active connections` - the current number of active client connections including waiting connections.
+            `Accepted` - the total number of accepted client connections.
+            `Handled` - the total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections` limit).
+            `Requests` - the total number of client requests.
+            `Reading` - the current number of connections where Nginx is reading the request header.
+            `Writing` - the current number of connections where Nginx is writing a response back to the client.
+            `Waiting` - the current number of idle client connections waiting for a request.
             
             See also [Module ngx_http_stub_status_module](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html).
           tags:

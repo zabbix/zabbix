@@ -94,7 +94,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of confirmed messages per second.'
+          description: 'The rate of messages confirmed per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -115,7 +115,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.deliver_get
           delay: '0'
           history: 7d
-          description: 'The sum of messages delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
+          description: 'The sum of messages delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to the `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
           preprocessing:
             -
               type: JSONPATH
@@ -137,7 +137,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of the sum of messages (per second) delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
+          description: 'The rate of the sum of messages (per second) delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to the `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
           preprocessing:
             -
               type: JSONPATH
@@ -180,7 +180,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of published messages per second.'
+          description: 'The rate of messages published per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -1747,7 +1747,7 @@ zabbix_export:
               name: 'RabbitMQ: Host has been restarted'
               event_name: 'RabbitMQ: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'The host uptime is less than 10 minutes.'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1760,7 +1760,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          description: 'The HTTP API endpoint that returns metrics from the nodes.'
+          description: 'The HTTP API endpoint that returns metrics of the nodes.'
           preprocessing:
             -
               type: REGEX
@@ -2307,7 +2307,7 @@ zabbix_export:
               name: 'RabbitMQ: Node is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'The RabbitMQ node is not running.'
+              description: 'RabbitMQ node is not running.'
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
@@ -2606,7 +2606,7 @@ zabbix_export:
               key: 'rabbitmq.queue.messages.deliver_get["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: 7d
-              description: 'The sum of messages delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
+              description: 'The sum of messages delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to the `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
               preprocessing:
                 -
                   type: JSONPATH

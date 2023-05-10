@@ -36,7 +36,7 @@ This template has been tested on:
 ## Setup
 
 See the setup instructions for [ngx_http_stub_status_module](https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html).
-Test the availability of the `http_stub_status_module` with `nginx -V 2>&1 | grep -o with-http_stub_status_module`.
+Test the availability of the `http_stub_status_module` `nginx -V 2>&1 | grep -o with-http_stub_status_module`.
 
 Example configuration of Nginx:
 ```text
@@ -78,7 +78,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.4/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Nginx: Get stub status page|<p>The following status information is provided:</p><p> `Active connections` - the current number of active client connections including waiting connections.</p><p> `Accepted` - the total number of accepted client connections.</p><p> `Handled` - the total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections` limit).</p><p> `Requests` - the total number of client requests.</p><p> `Reading` - the current number of connections where Nginx is reading the request header.</p><p> `Writing` - the current number of connections where Nginx is writing a response back to the client.</p><p> `Waiting` - the current number of idle client connections waiting for a request.</p><p></p><p>See also [Module ngx_http_stub_status_module](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html).</p>|Zabbix agent|web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]|
+|Nginx: Get stub status page|<p>The following status information is provided:</p><p>`Active connections` - the current number of active client connections including waiting connections.</p><p>`Accepted` - the total number of accepted client connections.</p><p>`Handled` - the total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections` limit).</p><p>`Requests` - the total number of client requests.</p><p>`Reading` - the current number of connections where Nginx is reading the request header.</p><p>`Writing` - the current number of connections where Nginx is writing a response back to the client.</p><p>`Waiting` - the current number of idle client connections waiting for a request.</p><p></p><p>See also [Module ngx_http_stub_status_module](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html).</p>|Zabbix agent|web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]|
 |Nginx: Service status||Zabbix agent|net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Nginx: Service response time||Zabbix agent|net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"]|
 |Nginx: Requests total|<p>The total number of client requests.</p>|Dependent item|nginx.requests.total<p>**Preprocessing**</p><ul><li><p>Regular expression: `The text is too long. Please see the template.`</p></li></ul>|
