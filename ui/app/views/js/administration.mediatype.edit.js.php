@@ -40,29 +40,25 @@ window.mediatype_edit_popup = new class {
 		this._loadView(mediatype);
 		this._initActions();
 
-		document.querySelector('#type').dispatchEvent(new Event('change'));
+		this.form.querySelector('#type').dispatchEvent(new Event('change'));
 	}
 
 	_initActions() {
-		if (typeof(this.mediatype.parameters_webhook) === 'object') {
-			this.mediatype.parameters_webhook = Object.values(this.mediatype.parameters_webhook);
+		this._addParameterData();
+		this._populateMessageTemplates(<?= json_encode(array_values($data['message_templates'])) ?>);
 
-			for (const parameter of this.mediatype.parameters_webhook) {
-				this._addWebhookParam(parameter);
-			}
-		}
+		this.form.querySelector('#message-templates').addEventListener('click', (event) => {
+			this._editMessageTemplate(event);
+		});
 
-		if (typeof(this.mediatype.parameters_exec) === 'object') {
-			this.mediatype.parameters_exec = Object.values(this.mediatype.parameters_exec);
+		this.form.querySelector('.element-table-add').addEventListener('click', () => {
+			this._addExecParam();
+			this.row_num ++;
+		});
 
-			for (const parameter of this.mediatype.parameters_exec) {
-				this._addExecParam(parameter);
-				this.row_num ++;
-			}
-		}
-
-
-		const event_menu = this.form.querySelector('#show_event_menu');
+		this.form.querySelector('.webhook-param-add').addEventListener('click', () => {
+			this._addWebhookParam();
+		});
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-remove')) {
@@ -73,68 +69,19 @@ window.mediatype_edit_popup = new class {
 			}
 		});
 
-		// Message templates.
-		this._initMessageTemplates();
-		this._populateMessageTemplates(<?= json_encode(array_values($data['message_templates'])) ?>);
+		if (this.form.querySelector('#chPass_btn') !== null) {
+			this.form.querySelector('#chPass_btn').addEventListener('click', () => {
+				this._toggleChangePswdButton();
+			});
+		}
 
-		document.querySelector("#message-templates > table").addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-remove')) {
-				e.target.closest('tr').remove();
-			}
-		});
-
-		this.form.querySelector('.element-table-add').addEventListener('click', () => {
-			this._addExecParamsRow();
-			this.row_num ++;
-		});
-
-		this.form.querySelector('.webhook-param-add').addEventListener('click', () => {
-			this._addWebhookParamsRow();
-		});
+		const event_menu = this.form.querySelector('#show_event_menu');
 
 		event_menu.onchange = () => {
 			this._toggleEventMenuFields(event_menu);
 		};
 
 		event_menu.dispatchEvent(new Event('change'));
-
-		if (this.form.querySelector('#chPass_btn') !== null) {
-			this.form.querySelector('#chPass_btn').addEventListener('click', () => {
-				this._toggleChangePswdButton();
-			});
-		}
-	}
-
-	_removeMessageTemplate(e) {
-		e.target.closest('tr').remove();
-		delete this.message_template_list[e.target.closest('tr').getAttribute('data-message-type')];
-		this._toggleAddButton();
-	}
-
-	_toggleChangePswdButton() {
-		if (this.form.querySelector('#chPass_btn') !== null) {
-			this.form.querySelector('#chPass_btn').style.display = "none";
-			this.form.querySelector('#passwd').style.display = 'block';
-			this.form.querySelector('#passwd').disabled = false;
-			this.form.querySelector('#passwd').focus();
-		}
-	}
-
-	_addWebhookParam(parameter) {
-		const template = new Template(this.form.querySelector('#webhook_params_template').innerHTML);
-
-		this.form
-			.querySelector('#parameters_table tbody')
-			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
-	}
-
-	_addExecParam(parameter) {
-		parameter.row_num = this.row_num;
-		const template = new Template(this.form.querySelector('#exec_params_template').innerHTML);
-
-		this.form
-			.querySelector('#exec_params_table tbody')
-			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
 	}
 
 	clone({title, buttons}) {
@@ -164,19 +111,31 @@ window.mediatype_edit_popup = new class {
 	submit() {
 		const fields = getFormFields(this.form);
 
-		// todo - after all fields added/fixed : check if works as expected
-		// todo - do not trim description
-		// todo - trim script parameters
-		// todo - trim webhook parameters
-
+		// Trim all string type fields.
 		for (let key in fields) {
 			if (typeof fields[key] === 'string') {
 				fields[key] = fields[key].trim();
 			}
 		}
 
-		const maxsessions_type = document.querySelector('input[name="maxsessions_type"]:checked').value;
-		const maxsessions = document.querySelector('#maxsessions').value;
+		// Trim all string values within the 'parameters_webhook' object.
+		if (typeof fields.parameters_webhook !== 'undefined') {
+			fields.parameters_webhook.name = fields.parameters_webhook.name.map(name => name.trim());
+			fields.parameters_webhook.value = fields.parameters_webhook.value.map(value => value.trim());
+		}
+
+		// Trim all string values within the 'parameters_exec' object.
+		if (typeof fields.parameters_exec !== 'undefined') {
+			Object.values(fields.parameters_exec).forEach((key, index) => {
+				Object.values(key).forEach(value => {
+					fields.parameters_exec[index].value = value.trim();
+				});
+			})
+		}
+
+		// Set maxsessions value.
+		const maxsessions_type = this.form.querySelector(`input[name='maxsessions_type']:checked`).value;
+		const maxsessions = this.form.querySelector('#maxsessions').value;
 
 		if (maxsessions_type === 'one') {
 			fields.maxsessions = 1;
@@ -238,68 +197,115 @@ window.mediatype_edit_popup = new class {
 			});
 	}
 
-	_initMessageTemplates() {
-		let overlay;
+	/**
+	 * Adds webhook parameter data to Parameter table and script parameter data to script parameters table.
+	 */
+	_addParameterData() {
+		if (typeof(this.mediatype.parameters_webhook) === 'object') {
+			this.mediatype.parameters_webhook = Object.values(this.mediatype.parameters_webhook);
 
-		document.querySelector('#message-templates').addEventListener('click', (event)=> {
-			let target = event.target;
-			let row = null;
+			for (const parameter of this.mediatype.parameters_webhook) {
+				this._addWebhookParam(parameter);
+			}
+		}
 
-			if (target.hasAttribute('data-action')) {
+		if (typeof(this.mediatype.parameters_exec) === 'object') {
+			this.mediatype.parameters_exec = Object.values(this.mediatype.parameters_exec);
 
-				const btn = target;
-				let params = {
-					type: document.querySelector('#type').value,
-					content_type: document.querySelector('input[name="content_type"]:checked').value,
-					message_types: Array.from(document.querySelectorAll('tr[data-message-type]')).map(function(tr) {
-						return tr.dataset.messageType;
-					})
-				};
+			for (const parameter of this.mediatype.parameters_exec) {
+				this._addExecParam(parameter);
+				this.row_num ++;
+			}
+		}
+	}
 
-				switch (btn.dataset.action) {
-					case 'add':
-						overlay = PopUp('mediatype.message.edit', params, {
-							dialogue_class: 'modal-popup-medium',
-							dialogueid: 'mediatype-message-form',
-							trigger_element: target
-						});
-						break;
+	/**
+	 * Removes row and toggles the "Add" button in message template table; updates message template list.
+	 */
+	_removeMessageTemplate(event) {
+		event.target.closest('tr').remove();
+		delete this.message_template_list[event.target.closest('tr').getAttribute('data-message-type')];
+		this._toggleAddButton();
+	}
 
-					case 'edit':
-						row = btn.closest('tr');
+	// todo - add parameter description
+	/**
+	 * Adds row to webhook parameter table.
+	 */
+	_addWebhookParam(parameter = {}) {
+		const template = new Template(this.form.querySelector('#webhook_params_template').innerHTML);
 
-						params.message_type = row.dataset.messageType;
-						params.old_message_type = params.message_type;
+		this.form
+			.querySelector('#parameters_table tbody')
+			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
+	}
 
-						Array.from(row.querySelectorAll('input[type="hidden"]')).forEach(function(input) {
-							const name = input.getAttribute('name').match(/\[([^\]]+)]$/);
+	// todo - add parameter description
+	/**
+	 * Adds row to script parameter table.
+	 */
+	_addExecParam(parameter = {}) {
+		parameter.row_num = this.row_num;
+		const template = new Template(this.form.querySelector('#exec_params_template').innerHTML);
 
-							if (name) {
-								params[name[1]] = input.value;
-							}
-						});
+		this.form
+			.querySelector('#exec_params_table tbody')
+			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
+	}
 
-						overlay = PopUp('mediatype.message.edit', params, {
-							dialogue_class: 'modal-popup-medium',
-							dialogueid: 'mediatype-message-form',
-							trigger_element: target
-						});
-						break;
-				}
+	/**
+	 * Opens message template popup and adds eventlistener for submit event.
+	 */
+	_editMessageTemplate(event) {
+		const target = event.target;
+		let row = null;
 
-				overlay.$dialogue[0].addEventListener('message.submit', (e) => {
-					if (row !== null) {
-						this._addMessageTemplateRow(e.detail, row);
-						row.remove();
-					}
-					else {
-						this._addMessageTemplateRow(e.detail);
+		if (target.hasAttribute('data-action')) {
+			const btn = target;
+			const params = {
+				type: this.form.querySelector('#type').value,
+				content_type: this.form.querySelector(`input[name='content_type']:checked`).value,
+				message_types: Array.from(this.form.querySelectorAll('tr[data-message-type]')).map(function(tr) {
+					return tr.dataset.messageType;
+				})
+			};
+
+			if (btn.dataset.action === 'edit') {
+				row = btn.closest('tr');
+
+				params.message_type = row.dataset.messageType;
+				params.old_message_type = params.message_type;
+
+				Array.from(row.querySelectorAll(`input[type='hidden']`)).forEach((input) => {
+					const name = input.getAttribute('name').match(/\[([^\]]+)]$/);
+
+					if (name) {
+						params[name[1]] = input.value;
 					}
 				});
 			}
-		});
+
+			const overlay = PopUp('mediatype.message.edit', params, {
+				dialogue_class: 'modal-popup-medium',
+				dialogueid: 'mediatype-message-form',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('message.submit', (e) => {
+				if (row !== null) {
+					this._addMessageTemplateRow(e.detail, row);
+					row.remove();
+				}
+				else {
+					this._addMessageTemplateRow(e.detail);
+				}
+			});
+		}
 	}
 
+	/**
+	 * Adds or updates message template row to message template table.
+	 */
 	_addMessageTemplateRow(input, row = null) {
 		const template = new Template(this.form.querySelector('#message-templates-row-tmpl').innerHTML);
 
@@ -316,6 +322,7 @@ window.mediatype_edit_popup = new class {
 		this._toggleAddButton();
 	}
 
+	// todo - write function and parameter description
 	_populateMessageTemplates(list) {
 		for (const key in list) {
 			if (!Object.prototype.hasOwnProperty.call(list, key)) continue;
@@ -332,6 +339,7 @@ window.mediatype_edit_popup = new class {
 		this._toggleAddButton();
 	}
 
+	// todo - write function and parameter description
 	_getMessageTemplate(eventsource, recovery) {
 		for (let message_type in this.message_templates) {
 			if (!this.message_templates.hasOwnProperty(message_type)) {
@@ -360,25 +368,23 @@ window.mediatype_edit_popup = new class {
 		linkBtn.textContent = limit_reached
 			? <?= json_encode(_('Add (message type limit reached)')) ?>
 			: <?= json_encode(_('Add')) ?>
-
 	}
 
-	_addExecParamsRow() {
-		const template = new Template(this.form.querySelector('#exec_params_template').innerHTML);
-
-		this.form
-			.querySelector('#exec_params_table tbody')
-			.insertAdjacentHTML('beforeend', template.evaluate({row_num: this.row_num}));
+	/**
+	 * Toggles the "Change password" button state.
+	 */
+	_toggleChangePswdButton() {
+		if (this.form.querySelector('#chPass_btn') !== null) {
+			this.form.querySelector('#chPass_btn').style.display = 'none';
+			this.form.querySelector('#passwd').style.display = 'block';
+			this.form.querySelector('#passwd').disabled = false;
+			this.form.querySelector('#passwd').focus();
+		}
 	}
 
-	_addWebhookParamsRow() {
-		const template = new Template(this.form.querySelector('#webhook_params_template').innerHTML);
-
-		this.form
-			.querySelector('#parameters_table tbody')
-			.insertAdjacentHTML('beforeend', template.evaluate({}));
-	}
-
+	/**
+	 * Toggles the Event menu name and Event menu URL text input field state.
+	 */
 	_toggleEventMenuFields(event_menu) {
 		const event_menu_name = this.form.querySelector('#event_menu_name');
 		const event_menu_url = this.form.querySelector('#event_menu_url');
@@ -404,7 +410,7 @@ window.mediatype_edit_popup = new class {
 		this.authentication = mediatype.smtp_authentication;
 
 		// Load type fields.
-		document.querySelector('#type').onchange = (e) => {
+		this.form.querySelector('#type').onchange = (e) => {
 			this._hideFormFields('all');
 			this._loadTypeFields(e);
 
@@ -413,10 +419,10 @@ window.mediatype_edit_popup = new class {
 		};
 
 		const max_sessions = this.form.querySelector('#maxsessions_type');
-		this.max_session_checked = document.querySelector('input[name="maxsessions_type"]:checked').value;
+		this.max_session_checked = this.form.querySelector(`input[name='maxsessions_type']:checked`).value;
 
 		max_sessions.onchange = (e) => {
-			this._loadMaxSessionField(e);
+			this._toggleMaxSessionField(e);
 		};
 
 		max_sessions.dispatchEvent(new Event('change'));
@@ -425,15 +431,15 @@ window.mediatype_edit_popup = new class {
 	/**
 	 * Set concurrent sessions accessibility.
 	 *
-	 * @param {number} media_type		Selected media type.
+	 * @param {number} media_type  Selected media type.
 	 */
 	_setMaxSessionsType(media_type) {
-		const maxsessions_type = document.querySelectorAll('#maxsessions_type input[type="radio"]');
+		const maxsessions_type = this.form.querySelectorAll(`#maxsessions_type input[type='radio']`);
 
 		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
 			maxsessions_type.forEach(function (radio) {
 				radio.disabled = true;
-				if (radio.value === "one") {
+				if (radio.value === 'one') {
 					radio.disabled = false;
 				}
 			});
@@ -445,9 +451,12 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	_loadMaxSessionField(e) {
+	/**
+	 * Toggles maxsessions field based on concurrent session field value.
+	 */
+	_toggleMaxSessionField(e) {
 		const concurrent_sessions = typeof e.target.value === 'undefined' ? this.max_session_checked : e.target.value;
-		const maxsessions = this.form.querySelector("#maxsessions");
+		const maxsessions = this.form.querySelector('#maxsessions');
 
 		if (concurrent_sessions === 'one' || concurrent_sessions === 'unlimited') {
 			maxsessions.style.display = 'none';
@@ -479,6 +488,9 @@ window.mediatype_edit_popup = new class {
 
 				provider.onchange = (e) => {
 					const change = typeof e.detail === 'undefined' ? true : e.detail.change;
+					if (change) {
+
+					}
 					this._loadProviderFields(change, parseInt(provider.value));
 
 				};
@@ -494,20 +506,17 @@ window.mediatype_edit_popup = new class {
 
 			case <?= MEDIA_TYPE_EXEC ?>:
 				show_fields = [
-					'#exec-path-label', '#exec-path-field',
-					'#row_exec_params_label', '#row_exec_params_field'
+					'#exec-path-label', '#exec-path-field', '#row_exec_params_label', '#row_exec_params_field'
 				];
 				break;
 
 			case <?= MEDIA_TYPE_WEBHOOK ?>:
 				show_fields = [
-					'#webhook_parameters_label', '#webhook_parameters_field',
-					'#webhook_script_label', '#webhook_script_field',
-					'#webhook_timeout_label', '#webhook_timeout_field',
-					'#webhook_tags_label', '#webhook_tags_field',
-					'#webhook_event_menu_label', '#webhook_event_menu_field',
-					'#webhook_url_name_label', '#webhook_url_name_field',
-					'#webhook_event_menu_url_label', '#webhook_event_menu_url_field'
+					'#webhook_parameters_label', '#webhook_parameters_field', '#webhook_script_label',
+					'#webhook_script_field', '#webhook_timeout_label', '#webhook_timeout_field', '#webhook_tags_label',
+					'#webhook_tags_field', '#webhook_event_menu_label', '#webhook_event_menu_field',
+					'#webhook_url_name_label', '#webhook_url_name_field', '#webhook_event_menu_url_label',
+					'#webhook_event_menu_url_field'
 				];
 				break;
 		}
@@ -519,6 +528,11 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
+	/**
+	 * Sets values to form fields and checks checkboxes according to the media type provider.
+	 *
+	 * @param {number} provider  Selected provider value.
+	 */
 	_adjustDataByProvider(provider) {
 		const providers = this.mediatype.providers;
 
@@ -528,17 +542,20 @@ window.mediatype_edit_popup = new class {
 		this.form.querySelector('#smtp_port').value = providers[provider]['smtp_port'];
 		this.form.querySelector('#smtp_email').value = providers[provider]['smtp_email'];
 		this.form.querySelector('#smtp_server').value = providers[provider]['smtp_server'];
-		this.form.querySelector('input[name=smtp_security][value="' + providers[provider]['smtp_security'] + '"]')
+		this.form.querySelector(`input[name=smtp_security][value= '${providers[provider]['smtp_security']}']`)
 			.checked = true;
-		this.form.querySelector('input[name=content_type][value="' + providers[provider]['content_type'] + '"]')
+		this.form.querySelector(`input[name=content_type][value= '${providers[provider]['content_type']}']`)
 			.checked = true;
 		this.form.querySelector(
-			'input[name=smtp_authentication][value="' + providers[provider]['smtp_authentication'] + '"]'
+			`input[name=smtp_authentication][value= '${providers[provider]['smtp_authentication']}']`
 		).checked = true;
 	}
 
 	/**
-	 * Displays or hides fields in the popup based on the value of selected email provider.
+	 * Displays or hides form fields based on the value of selected email provider.
+	 *
+	 * @param {boolean} change   Indicates whether the email provider has changed.
+	 * @param {number} provider  The value of selected email provider.
 	 */
 	_loadProviderFields(change, provider) {
 		this.provider = provider;
@@ -560,14 +577,11 @@ window.mediatype_edit_popup = new class {
 		switch (provider) {
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>:
 				show_fields = [
-					'#email-provider-label', '#email-provider-field',
-					'#smtp-server-label', '#smtp-server-field',
-					'#smtp-port-label', '#smtp-port-field',
-					'#smtp-email-label', '#smtp-email-field',
-					'#smtp-helo-label', '#smtp-helo-field',
-					'#smtp-security-label', '#smtp-security-field',
-					'#smtp-authentication-label', '#smtp-authentication-field',
-					'#content_type_label', '#content_type_field'
+					'#email-provider-label', '#email-provider-field', '#smtp-server-label', '#smtp-server-field',
+					'#smtp-port-label', '#smtp-port-field', '#smtp-email-label', '#smtp-email-field',
+					'#smtp-helo-label', '#smtp-helo-field', '#smtp-security-label', '#smtp-security-field',
+					'#smtp-authentication-label', '#smtp-authentication-field', '#content_type_label',
+					'#content_type_field'
 				];
 
 				const smtp_security = this.form.querySelector('#smtp_security');
@@ -582,19 +596,16 @@ window.mediatype_edit_popup = new class {
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL ?>:
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 ?>:
 				show_fields = [
-					'#smtp-email-label', '#smtp-email-field',
-					'#passwd_label', '#passwd_field',
-					'#content_type_label', '#content_type_field'
+					'#smtp-email-label', '#smtp-email-field', '#passwd_label', '#passwd_field', '#content_type_label',
+					'#content_type_field'
 				];
 				break;
 
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>:
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>:
-
 				show_fields = [
-					'#smtp-email-label', '#smtp-email-field',
-					'#smtp-authentication-label', '#smtp-authentication-field',
-					'#content_type_label', '#content_type_field'
+					'#smtp-email-label', '#smtp-email-field', '#smtp-authentication-label',
+					'#smtp-authentication-field', '#content_type_label', '#content_type_field'
 				];
 				break;
 		}
@@ -604,8 +615,11 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
+	/**
+	 * Displays or hides form fields based on the value of selected smtp security.
+	 */
 	_loadSmtpSecurityFields() {
-		let smtp_security = this.form.querySelector('input[name="smtp_security"]:checked').value;
+		let smtp_security = this.form.querySelector(`input[name='smtp_security']:checked`).value;
 
 		if (parseInt(this.type) === <?= MEDIA_TYPE_EMAIL ?>) {
 			switch (parseInt(smtp_security)) {
@@ -638,8 +652,13 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
+	/**
+	 * Displays or hides form fields based on the value of selected authentication.
+	 *
+	 * @param {number} provider  The value of selected email provider.
+	 */
 	_loadAuthenticationFields(provider) {
-		let authentication = this.form.querySelector('input[name="smtp_authentication"]:checked').value;
+		let authentication = this.form.querySelector(`input[name='smtp_authentication']:checked`).value;
 		const passwd_label = this.form.querySelector('#passwd_label');
 		const passwd = this.form.querySelector('#passwd');
 		const smtp_auth_1 = this.form.querySelector(`label[for= 'smtp_authentication_1']`);
@@ -713,6 +732,11 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
+	/**
+	 * Hides form fields based on the type.
+	 *
+	 * @param {string} type
+	 */
 	_hideFormFields(type) {
 		let fields = [];
 
