@@ -619,7 +619,7 @@ class testPageAlertsScripts extends CWebTest {
 		$scripts_count = ($scripts === []) ? CDBHelper::getCount(self::$script_sql) : count($scripts);
 
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
-		$this->assertEquals('Delete selected scripts?', $this->page->getAlertText());
+		$this->assertEquals('Delete selected script?', $this->page->getAlertText());
 		$this->page->dismissAlert();
 		$this->page->waitUntilReady();
 
