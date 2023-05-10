@@ -114,7 +114,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show tags', 'Tag display priority', 'Show details'],
+		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show tags', 'Tag display priority', 'State', 'Show details'],
 				$form->getLabels()->asText()
 		);
 		$this->assertTrue($this->query('button:Apply')->one()->isClickable());

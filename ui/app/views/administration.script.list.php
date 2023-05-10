@@ -99,7 +99,7 @@ foreach ($data['scripts'] as $script) {
 					$i++;
 
 					if ($i > $data['config']['max_in_table']) {
-						$actions[] = ' &hellip;';
+						$actions[] = [' ', HELLIP()];
 
 						break;
 					}
@@ -207,9 +207,7 @@ foreach ($data['scripts'] as $script) {
 		$actions,
 		$type,
 		$execute_on,
-		(new CCol(
-			zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'))
-		))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+		(new CCol(zbx_nl2br($script['command'])))->addClass(ZBX_STYLE_MONOSPACE_FONT),
 		($script['userGroupName'] === null) ? _('All') : $script['userGroupName'],
 		($script['hostGroupName'] === null) ? _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
