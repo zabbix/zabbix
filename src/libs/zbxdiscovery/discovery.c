@@ -724,3 +724,50 @@ void zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg)
 	if (SUCCEED == zbx_discovery_get_queue_size(&size, NULL))
 		zbx_json_adduint64(json, "discovery_queue", size);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get discovery worker usage statistics                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_discovery_get_worker_info(zbx_process_info_t *info)
+{
+	zbx_vector_dbl_t	usage;
+	char			*error = NULL;
+
+	zbx_vector_dbl_create(&usage);
+
+	memset(info, 0, sizeof(zbx_process_info_t));
+
+	if (SUCCEED != zbx_discovery_get_usage_stats(&usage, &info->count, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get discovery usage statistics: %s", error);
+		zbx_free(error);
+		goto out;
+	}
+
+	if (0 == usage.values_num)
+		goto out;
+
+	info->busy_min = info->busy_max = info->busy_avg = usage.values[0];
+
+	for (int i = 1; i < usage.values_num; i++)
+	{
+		if (usage.values[i] < info->busy_min)
+			info->busy_min = usage.values[i];
+
+		if (usage.values[i] > info->busy_max)
+			info->busy_max = usage.values[i];
+
+		info->busy_avg += usage.values[i];
+	}
+
+	info->busy_avg /= (double)usage.values_num;
+
+	info->idle_min = 100.0 - info->busy_min;
+	info->idle_max = 100.0 - info->busy_max;
+	info->idle_avg = 100.0 - info->busy_avg;
+	info->count = usage.values_num;
+out:
+	zbx_vector_dbl_destroy(&usage);
+}
