@@ -66,7 +66,7 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(CMOCKA_LIBS) $(YAML_LIBS)
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 SERVICE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_dc_get_nextid \
@@ -84,9 +84,9 @@ service_get_rootcause_eventids_SOURCES = \
 
 service_get_rootcause_eventids_LDADD = $(COMMON_LIBS)
 service_get_rootcause_eventids_LDADD += @SERVER_LIBS@
-service_get_rootcause_eventids_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+service_get_rootcause_eventids_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-service_get_rootcause_eventids_CFLAGS = $(SERVICE_WRAP_FUNCS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+service_get_rootcause_eventids_CFLAGS = $(SERVICE_WRAP_FUNCS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/zabbix_server/service
 
@@ -99,9 +99,9 @@ service_get_status_SOURCES = \
 
 service_get_status_LDADD = $(COMMON_LIBS)
 service_get_status_LDADD += @SERVER_LIBS@
-service_get_status_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+service_get_status_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-service_get_status_CFLAGS = $(SERVICE_WRAP_FUNCS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+service_get_status_CFLAGS = $(SERVICE_WRAP_FUNCS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/zabbix_server/service
 
@@ -114,9 +114,9 @@ service_get_main_status_SOURCES = \
 
 service_get_main_status_LDADD = $(COMMON_LIBS)
 service_get_main_status_LDADD += @SERVER_LIBS@
-service_get_main_status_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+service_get_main_status_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-service_get_main_status_CFLAGS = $(SERVICE_WRAP_FUNCS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+service_get_main_status_CFLAGS = $(SERVICE_WRAP_FUNCS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/zabbix_server/service
 
@@ -129,9 +129,9 @@ service_get_rule_status_SOURCES = \
 
 service_get_rule_status_LDADD = $(COMMON_LIBS)
 service_get_rule_status_LDADD += @SERVER_LIBS@
-service_get_rule_status_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+service_get_rule_status_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-service_get_rule_status_CFLAGS = $(SERVICE_WRAP_FUNCS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+service_get_rule_status_CFLAGS = $(SERVICE_WRAP_FUNCS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/zabbix_server/service
 
