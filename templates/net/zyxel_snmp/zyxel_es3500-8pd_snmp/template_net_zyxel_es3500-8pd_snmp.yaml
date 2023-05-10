@@ -1,12 +1,10 @@
 zabbix_export:
   version: '6.4'
   template_groups:
-    -
-      uuid: 36bff6c29af64692839d077febfc7079
+    - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
   templates:
-    -
-      uuid: b8a6f34fd5c447b1b9310746a96f4e80
+    - uuid: b8a6f34fd5c447b1b9310746a96f4e80
       template: 'ZYXEL ES3500-8PD by SNMP'
       name: 'ZYXEL ES3500-8PD by SNMP'
       description: |
@@ -31,11 +29,9 @@ zabbix_export:
         name: Zabbix
         version: 6.4-0
       groups:
-        -
-          name: 'Templates/Network devices'
+        - name: 'Templates/Network devices'
       items:
-        -
-          uuid: 294a49fc36e848cc9f9959624c9a5ab3
+        - uuid: 294a49fc36e848cc9f9959624c9a5ab3
           name: 'ZYXEL ES3500-8PD: SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
@@ -43,28 +39,23 @@ zabbix_export:
           valuemap:
             name: 'SNMP available'
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           tags:
-            -
-              tag: component
+            - tag: component
               value: network
           triggers:
-            -
-              uuid: 3bbbd93c114f4bf5b8f4788ca6825afd
+            - uuid: 3bbbd93c114f4bf5b8f4788ca6825afd
               expression: 'max(/ZYXEL ES3500-8PD by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'ZYXEL ES3500-8PD: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: 6d513a036f8547219b1120fc4fffff1d
+        - uuid: 6d513a036f8547219b1120fc4fffff1d
           name: 'ZYXEL ES3500-8PD: Contact'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.4.0
@@ -80,16 +71,13 @@ zabbix_export:
             on how to contact this person.
           inventory_link: CONTACT
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           tags:
-            -
-              tag: component
+            - tag: component
               value: inventory
-        -
-          uuid: e7fd0f225802477aabbbcbfe5ac4a7f6
+        - uuid: e7fd0f225802477aabbbcbfe5ac4a7f6
           name: 'ZYXEL ES3500-8PD: CPU utilization'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.72.12.7.0
@@ -102,12 +90,10 @@ zabbix_export:
             Show device CPU load in %, it's the snapshot of CPU load when
             getting the values.
           tags:
-            -
-              tag: component
+            - tag: component
               value: cpu
           triggers:
-            -
-              uuid: 3cf67f911a854d2ebeb9e006f3f97738
+            - uuid: 3cf67f911a854d2ebeb9e006f3f97738
               expression: 'min(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.cpuusage,5m)>{$CPU.UTIL.CRIT}'
               name: 'ZYXEL ES3500-8PD: High CPU utilization'
               event_name: 'ZYXEL ES3500-8PD: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
@@ -115,11 +101,9 @@ zabbix_export:
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: performance
-        -
-          uuid: 8749f59cbfeb4c43b7753901f3219716
+        - uuid: 8749f59cbfeb4c43b7753901f3219716
           name: 'ZYXEL ES3500-8PD: ZyNOS F/W Version'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.72.1]'
@@ -131,8 +115,7 @@ zabbix_export:
           description: 'MIB: ZYXEL-ES3500-8PD-MIB'
           inventory_link: SOFTWARE_FULL
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   var inArray = JSON.parse(value);
@@ -144,17 +127,14 @@ zabbix_export:
                     + '(' + tmpObj["3.0"] + '.' + tmpObj["4.0"] + ')_'
                     + tmpObj["7.0"] + '.' + tmpObj["6.0"] + '.' + tmpObj["5.0"];
                   return strOut;
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           tags:
-            -
-              tag: component
+            - tag: component
               value: inventory
           triggers:
-            -
-              uuid: bd6d0fe201094c00b6c93d7c04c27729
+            - uuid: bd6d0fe201094c00b6c93d7c04c27729
               expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.fwversion,#1)<>last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.fwversion,#2) and length(last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.fwversion))>0'
               name: 'ZYXEL ES3500-8PD: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -162,11 +142,9 @@ zabbix_export:
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: ef45d91672ea43c3aa24cbc21f37d391
+        - uuid: ef45d91672ea43c3aa24cbc21f37d391
           name: 'ZYXEL ES3500-8PD: Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.25.1.1.0
@@ -182,22 +160,18 @@ zabbix_export:
             [RFC1907] because sysUpTime is the uptime of the
             network management portion of the system.
           preprocessing:
-            -
-              type: CHECK_NOT_SUPPORTED
+            - type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '0.01'
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: cbccb45e9d1d4b529cce2d43e6c96a24
+        - uuid: cbccb45e9d1d4b529cce2d43e6c96a24
           name: 'ZYXEL ES3500-8PD: Location'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.6.0
@@ -212,16 +186,13 @@ zabbix_export:
             `telephone closet, 3rd floor').
           inventory_link: LOCATION
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           tags:
-            -
-              tag: component
+            - tag: component
               value: inventory
-        -
-          uuid: 1479a543105a4cf2b524bf8d042afd00
+        - uuid: 1479a543105a4cf2b524bf8d042afd00
           name: 'ZYXEL ES3500-8PD: MAC address'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
@@ -239,16 +210,13 @@ zabbix_export:
             should contain an octet string of zero length.
           inventory_link: MACADDRESS_A
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           tags:
-            -
-              tag: component
+            - tag: component
               value: inventory
-        -
-          uuid: c753caf7686e49968931df18076a5d4f
+        - uuid: c753caf7686e49968931df18076a5d4f
           name: 'ZYXEL ES3500-8PD: Hardware model name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.1.0
@@ -267,27 +235,22 @@ zabbix_export:
             printable ASCII characters.
           inventory_link: MODEL
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           tags:
-            -
-              tag: component
+            - tag: component
               value: inventory
           triggers:
-            -
-              uuid: e03ca45643354a18a9d6ffbb38a07654
+            - uuid: e03ca45643354a18a9d6ffbb38a07654
               expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.model)<>"ES3500-8PD"'
               name: 'ZYXEL ES3500-8PD: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel ES3500-8PD, but connected to {ITEM.VALUE}'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: 2072ac4b4437425a9ef1496b90c64990
+        - uuid: 2072ac4b4437425a9ef1496b90c64990
           name: 'ZYXEL ES3500-8PD: Host name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.5.0
@@ -303,16 +266,13 @@ zabbix_export:
             fully-qualified domain name.
           inventory_link: NAME
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           tags:
-            -
-              tag: component
+            - tag: component
               value: inventory
-        -
-          uuid: bbd24719955740e0acc2316a945dac38
+        - uuid: bbd24719955740e0acc2316a945dac38
           name: 'ZYXEL ES3500-8PD: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
@@ -327,16 +287,13 @@ zabbix_export:
             network management portion of the system was last
             re-initialized.
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '0.01'
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: 93a3b8ef959e41fe822abb959f090939
+        - uuid: 93a3b8ef959e41fe822abb959f090939
           name: 'ZYXEL ES3500-8PD: Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.72.1.10.0
@@ -350,17 +307,14 @@ zabbix_export:
             Serial number
           inventory_link: SERIALNO_A
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           tags:
-            -
-              tag: component
+            - tag: component
               value: inventory
           triggers:
-            -
-              uuid: 83548aba74c148e28e6611d5abfb9694
+            - uuid: 83548aba74c148e28e6611d5abfb9694
               expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.serialnumber,#1)<>last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.serialnumber,#2) and length(last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.serialnumber))>0'
               name: 'ZYXEL ES3500-8PD: Device has been replaced'
               event_name: 'ZYXEL ES3500-8PD: Device has been replaced (new serial number received)'
@@ -368,20 +322,17 @@ zabbix_export:
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
       discovery_rules:
-        -
-          uuid: dfc515bfe86642e784735637bdb6c0a7
+        - uuid: dfc515bfe86642e784735637bdb6c0a7
           name: 'Memory pool discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ZYXEL.MEMORY.NAME},.1.3.6.1.4.1.890.1.5.8.72.124.1.1.2]'
           key: zyxel.3500_8pd.memory.discovery
           delay: 1h
           item_prototypes:
-            -
-              uuid: ae5a9303d10a49fba04064bb77b40b61
+            - uuid: ae5a9303d10a49fba04064bb77b40b61
               name: 'ZYXEL ES3500-8PD: Memory "{#ZYXEL.MEMORY.NAME}" utilization'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.124.1.1.5.{#SNMPINDEX}'
@@ -392,28 +343,23 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Utilization of memory pool in %.
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: memory
               trigger_prototypes:
-                -
-                  uuid: c59c3730eea44cf7a842fe46aa12fa3d
+                - uuid: c59c3730eea44cf7a842fe46aa12fa3d
                   expression: 'min(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: 'ZYXEL ES3500-8PD: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
                   event_name: 'ZYXEL ES3500-8PD: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: performance
-        -
-          uuid: c71d57f8ed0b470faae1bfd7033fbcf0
+        - uuid: c71d57f8ed0b470faae1bfd7033fbcf0
           name: 'Interface discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ZYXEL.IF.NAME},.1.3.6.1.4.1.890.1.5.8.72.24.1.1.3,{#ZYXEL.IF.LINKUPTYPE},.1.3.6.1.4.1.890.1.5.8.72.24.1.1.5]'
@@ -422,27 +368,22 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#ZYXEL.IF.NAME}'
+              - macro: '{#ZYXEL.IF.NAME}'
                 value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
                 formulaid: C
-              -
-                macro: '{#ZYXEL.IF.NAME}'
+              - macro: '{#ZYXEL.IF.NAME}'
                 value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-              -
-                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+              - macro: '{#ZYXEL.IF.LINKUPTYPE}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#ZYXEL.IF.LINKUPTYPE}'
+              - macro: '{#ZYXEL.IF.LINKUPTYPE}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           item_prototypes:
-            -
-              uuid: 91a0a38a0f60464cb97c65f375e8fbb7
+            - uuid: 91a0a38a0f60464cb97c65f375e8fbb7
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Administrative status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
@@ -456,22 +397,17 @@ zabbix_export:
               valuemap:
                 name: 'ZYXEL ES3500-8PD port admin status'
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 1daef38185b14a96b8f0fce757c48677
+            - uuid: 1daef38185b14a96b8f0fce757c48677
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Interface name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
@@ -483,22 +419,17 @@ zabbix_export:
                 MIB: IF-MIB
                 A textual string containing information about the interface
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 4de0488610054ed9bd869dc48a07174e
+            - uuid: 4de0488610054ed9bd869dc48a07174e
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Link speed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
@@ -509,26 +440,20 @@ zabbix_export:
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in bits per second
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '1000000'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 55cf0d86b8bc4a6fa6806c9f8bce7ee9
+            - uuid: 55cf0d86b8bc4a6fa6806c9f8bce7ee9
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
@@ -541,22 +466,17 @@ zabbix_export:
                 higher (sub-)layer, which were addressed to a broadcast
                 address at this sub-layer.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 0ce5c7ae49284615a41aba4cdd0f565b
+            - uuid: 0ce5c7ae49284615a41aba4cdd0f565b
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
@@ -570,22 +490,17 @@ zabbix_export:
                 address at this sub-layer.  For a MAC layer protocol, this
                 includes both Group and Functional addresses.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 34a86d17de7e4725aa6e5893c1e52526
+            - uuid: 34a86d17de7e4725aa6e5893c1e52526
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
@@ -597,26 +512,20 @@ zabbix_export:
                 The total number of octets received on the interface,
                 including framing characters.
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '8'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: b1c630d6f06748b88d695dfdb734cd19
+            - uuid: b1c630d6f06748b88d695dfdb734cd19
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
@@ -629,22 +538,17 @@ zabbix_export:
                 higher (sub-)layer, which were not addressed to a multicast
                 or broadcast address at this sub-layer
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: f24ad30d48ca427eb3b19d4459cab733
+            - uuid: f24ad30d48ca427eb3b19d4459cab733
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Incoming utilization'
               type: CALCULATED
               key: 'zyxel.3500_8pd.net.if.in.util[{#SNMPINDEX}]'
@@ -654,28 +558,22 @@ zabbix_export:
               params: 'last(//zyxel.3500_8pd.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
               preprocessing:
-                -
-                  type: IN_RANGE
+                - type: IN_RANGE
                   parameters:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 8c141ab269eb4a8891937a1847312890
+            - uuid: 8c141ab269eb4a8891937a1847312890
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Link type'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.24.1.1.5.{#SNMPINDEX}'
@@ -687,22 +585,17 @@ zabbix_export:
               valuemap:
                 name: 'ZYXEL ES3500-8PD operational mode port link up type'
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 018c1028b7904fbea8b1bb0d2fac1621
+            - uuid: 018c1028b7904fbea8b1bb0d2fac1621
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Interface description'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.24.1.1.3.{#SNMPINDEX}'
@@ -714,22 +607,17 @@ zabbix_export:
                 MIB:  ZYXEL-ES3500-8PD-MIB
                 A textual string containing information about the interface
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 4f75b84c02b4496db2cbedca8df00c04
+            - uuid: 4f75b84c02b4496db2cbedca8df00c04
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Operational status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
@@ -743,23 +631,18 @@ zabbix_export:
               valuemap:
                 name: 'ZYXEL ES3500-8PD port operational status'
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
               trigger_prototypes:
-                -
-                  uuid: 27ba4832c79d447186ae6de254aad9d7
+                - uuid: 27ba4832c79d447186ae6de254aad9d7
                   expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])<>2'
@@ -775,11 +658,9 @@ zabbix_export:
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: bb4c00143a4f4cc2b445daeffdcf6b57
+            - uuid: bb4c00143a4f4cc2b445daeffdcf6b57
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
@@ -793,22 +674,17 @@ zabbix_export:
                 broadcast address at this sub-layer, including those that
                 were discarded or not sent.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 103385b00f6442beab10712ca42d5719
+            - uuid: 103385b00f6442beab10712ca42d5719
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
@@ -823,22 +699,17 @@ zabbix_export:
                 were discarded or not sent.  For a MAC layer protocol, this
                 includes both Group and Functional addresses.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 08cd8a42816040d582d3192a9d8c2fb7
+            - uuid: 08cd8a42816040d582d3192a9d8c2fb7
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
@@ -851,26 +722,20 @@ zabbix_export:
                 interface, including framing characters.  This object is a
                 64-bit version of ifOutOctets.
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '8'
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: df030eba0fd548d5be224e2fe120373c
+            - uuid: df030eba0fd548d5be224e2fe120373c
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
@@ -884,22 +749,17 @@ zabbix_export:
                 multicast or broadcast address at this sub-layer, including
                 those that were discarded or not sent.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: cabb6da9aa3e4ae0ae6938b3f3d47138
+            - uuid: cabb6da9aa3e4ae0ae6938b3f3d47138
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Outgoing utilization'
               type: CALCULATED
               key: 'zyxel.3500_8pd.net.if.out.util[{#SNMPINDEX}]'
@@ -909,28 +769,22 @@ zabbix_export:
               params: 'last(//zyxel.3500_8pd.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_8pd.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
               description: 'Interface utilization percentage'
               preprocessing:
-                -
-                  type: IN_RANGE
+                - type: IN_RANGE
                   parameters:
                     - '0'
                     - '100'
                   error_handler: DISCARD_VALUE
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 5200e032f5f6438e8326799208072845
+            - uuid: 5200e032f5f6438e8326799208072845
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Speed Duplex'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.24.1.1.1.{#SNMPINDEX}'
@@ -942,111 +796,90 @@ zabbix_export:
               valuemap:
                 name: 'ZYXEL ES3500-8PD operational mode port speed duplex'
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
           graph_prototypes:
-            -
-              uuid: a4b7fd4158464655a71732de5ebc9a9d
+            - uuid: a4b7fd4158464655a71732de5ebc9a9d
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Packets traffic'
               graph_items:
-                -
-                  color: 199C0D
+                - color: 199C0D
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.ucastpkts[{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: F63100
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.ucastpkts[{#SNMPINDEX}]'
-                -
-                  sortorder: '2'
+                - sortorder: '2'
                   color: 00611C
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.multicastpkts[{#SNMPINDEX}]'
-                -
-                  sortorder: '3'
+                - sortorder: '3'
                   color: F7941D
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.multicastpkts[{#SNMPINDEX}]'
-                -
-                  sortorder: '4'
+                - sortorder: '4'
                   color: FC6EA3
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.broadcastpkts[{#SNMPINDEX}]'
-                -
-                  sortorder: '5'
+                - sortorder: '5'
                   color: 6C59DC
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.broadcastpkts[{#SNMPINDEX}]'
-            -
-              uuid: 4e20dd0297a94188a6e4032df91432dc
+            - uuid: 4e20dd0297a94188a6e4032df91432dc
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Traffic'
               graph_items:
-                -
-                  color: 199C0D
+                - color: 199C0D
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.traffic[{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: F63100
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.traffic[{#SNMPINDEX}]'
-            -
-              uuid: c57f41ad6c084a358668e4d7a57b902e
+            - uuid: c57f41ad6c084a358668e4d7a57b902e
               name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
               graph_items:
-                -
-                  color: 199C0D
+                - color: 199C0D
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.util[{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: F63100
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.util[{#SNMPINDEX}]'
           overrides:
-            -
-              name: 'Don''t create triggers for matching interface'
+            - name: 'Don''t create triggers for matching interface'
               step: '1'
               filter:
                 conditions:
-                  -
-                    macro: '{#ZYXEL.IF.NAME}'
+                  - macro: '{#ZYXEL.IF.NAME}'
                     value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
                     operator: NOT_MATCHES_REGEX
                     formulaid: A
               operations:
-                -
-                  operationobject: TRIGGER_PROTOTYPE
+                - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
                   discover: NO_DISCOVER
-        -
-          uuid: 21d6664eb56c41b388b4f4709a81d33d
+        - uuid: 21d6664eb56c41b388b4f4709a81d33d
           name: 'SFP with DDM discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ZYXEL.SFP.WARN.MAX},.1.3.6.1.4.1.890.1.5.8.72.117.2.1.5,{#ZYXEL.SFP.WARN.MIN},.1.3.6.1.4.1.890.1.5.8.72.117.2.1.6,{#ZYXEL.SFP.DESCRIPTION},.1.3.6.1.4.1.890.1.5.8.72.117.2.1.8]'
@@ -1055,19 +888,16 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#ZYXEL.SFP.DESCRIPTION}'
+              - macro: '{#ZYXEL.SFP.DESCRIPTION}'
                 value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#ZYXEL.SFP.DESCRIPTION}'
+              - macro: '{#ZYXEL.SFP.DESCRIPTION}'
                 value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'SFP DDM module discovery.'
           item_prototypes:
-            -
-              uuid: 3a93aa9a9e2e44318f08c3eff86ce7bb
+            - uuid: 3a93aa9a9e2e44318f08c3eff86ce7bb
               name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.117.2.1.7.{#SNMPINDEX}'
@@ -1080,60 +910,48 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Transceiver module DDM data ({#ZYXEL.SFP.DESCRIPTION}).
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.01'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
               trigger_prototypes:
-                -
-                  uuid: 8ce109a9f09b41458a4e9d8698238ad0
+                - uuid: 8ce109a9f09b41458a4e9d8698238ad0
                   expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
                   name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-                -
-                  uuid: 6ecef48a1fdd4e16afe9472f59e0ad1a
+                - uuid: 6ecef48a1fdd4e16afe9472f59e0ad1a
                   expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
                   name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
           graph_prototypes:
-            -
-              uuid: c114cc7fee5c4c8fa3301db0eb3b60f7
+            - uuid: c114cc7fee5c4c8fa3301db0eb3b60f7
               name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
               graph_items:
-                -
-                  color: 199C0D
+                - color: 199C0D
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   var inArray = JSON.parse(value);
@@ -1153,8 +971,7 @@ zabbix_export:
                       outArr.push(item)
                   });
                   return JSON.stringify(outArr);
-        -
-          uuid: a003b7fdc07b4ac6a063379b892943fa
+        - uuid: a003b7fdc07b4ac6a063379b892943fa
           name: 'SFP without DDM discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ZYXEL.SFP.STATUS},.1.3.6.1.4.1.890.1.5.8.72.117.1.1.2]'
@@ -1163,19 +980,16 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#ZYXEL.SFP.STATUS}'
+              - macro: '{#ZYXEL.SFP.STATUS}'
                 value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#ZYXEL.SFP.STATUS}'
+              - macro: '{#ZYXEL.SFP.STATUS}'
                 value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'SFP module discovery.'
           item_prototypes:
-            -
-              uuid: 12345032490f4d24aeb7bfb07eae59fb
+            - uuid: 12345032490f4d24aeb7bfb07eae59fb
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Date code'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.117.1.1.7.{#SNMPINDEX}'
@@ -1188,22 +1002,17 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Transceiver module vendor's manufacturing date code.
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 2b30a4497cbd497886c52ae79ad03a01
+            - uuid: 2b30a4497cbd497886c52ae79ad03a01
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Part number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.117.1.1.4.{#SNMPINDEX}'
@@ -1216,22 +1025,17 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Part number provided by transceiver module vendor.
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 25aa375ed4a345e6b975bcb238cf530d
+            - uuid: 25aa375ed4a345e6b975bcb238cf530d
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Revision'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.117.1.1.6.{#SNMPINDEX}'
@@ -1244,22 +1048,17 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Revision level for part number provided by transceiver module vendor.
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 3f24d3aa58624ed0ad7a137fc9b1611a
+            - uuid: 3f24d3aa58624ed0ad7a137fc9b1611a
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Serial number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.117.1.1.5.{#SNMPINDEX}'
@@ -1272,23 +1071,18 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Serial number provided by transceiver module vendor.
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
               trigger_prototypes:
-                -
-                  uuid: 46739144d51b441886d544829749cf21
+                - uuid: 46739144d51b441886d544829749cf21
                   expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX} has been replaced'
                   event_name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX} has been replaced (new serial number received)'
@@ -1296,11 +1090,9 @@ zabbix_export:
                   description: 'SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: 054942c20bca4459b26e41aca8657e4c
+            - uuid: 054942c20bca4459b26e41aca8657e4c
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.117.1.1.2.{#SNMPINDEX}'
@@ -1313,22 +1105,17 @@ zabbix_export:
               valuemap:
                 name: 'ZYXEL ES3500-8PD SFP status'
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 7621973ef61b47c9bc034eec3d008957
+            - uuid: 7621973ef61b47c9bc034eec3d008957
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Transceiver'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.117.1.1.8.{#SNMPINDEX}'
@@ -1341,22 +1128,17 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Transceiver module type names.
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-            -
-              uuid: 715feecd140b4e9ca350b41490f7c7f9
+            - uuid: 715feecd140b4e9ca350b41490f7c7f9
               name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX}: Vendor'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.117.1.1.3.{#SNMPINDEX}'
@@ -1369,22 +1151,17 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 Transceiver module vendor name.
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#ZYXEL.IF.NAME}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#SNMPINDEX}'
-        -
-          uuid: 9c8f5212222a42bcbd42f8d848476804
+        - uuid: 9c8f5212222a42bcbd42f8d848476804
           name: 'Temperature discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ZYXEL.TEMP.THRESH.HIGH},.1.3.6.1.4.1.890.1.5.8.72.9.2.1.5]'
@@ -1394,8 +1171,7 @@ zabbix_export:
             An entry in tempTable.
             Index of temperature unit. 1:MAC, 2:CPU, 3:PHY
           item_prototypes:
-            -
-              uuid: f884edb984ab42ce8abffed0f66a2347
+            - uuid: f884edb984ab42ce8abffed0f66a2347
               name: 'ZYXEL ES3500-8PD: Temperature "{#ZYXEL.TEMP.ID}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.9.2.1.2.{#SNMPINDEX}'
@@ -1406,42 +1182,34 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 The current temperature measured at this sensor
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: sensor
-                -
-                  tag: component
+                - tag: component
                   value: temperature
               trigger_prototypes:
-                -
-                  uuid: 51fad2cd7daf49ad9027f44fd9ea81af
+                - uuid: 51fad2cd7daf49ad9027f44fd9ea81af
                   expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
                   name: 'ZYXEL ES3500-8PD: Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
           graph_prototypes:
-            -
-              uuid: a1931b48befb4c76a4d5a7ff6c15cbaf
+            - uuid: a1931b48befb4c76a4d5a7ff6c15cbaf
               name: 'ZYXEL ES3500-8PD: Temperature "{#ZYXEL.TEMP.ID}"'
               graph_items:
-                -
-                  color: 199C0D
+                - color: 199C0D
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.temp[{#SNMPINDEX}]'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   var inArray = JSON.parse(value);
@@ -1452,8 +1220,7 @@ zabbix_export:
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
-        -
-          uuid: 5cd3ac86665c459cbbee3178fca6560f
+        - uuid: 5cd3ac86665c459cbbee3178fca6560f
           name: 'Voltage discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#ZYXEL.VOLT.THRESH.LOW},.1.3.6.1.4.1.890.1.5.8.72.9.3.1.6,{#ZYXEL.VOLT.NOMINAL},.1.3.6.1.4.1.890.1.5.8.72.9.3.1.5]'
@@ -1461,8 +1228,7 @@ zabbix_export:
           delay: 1h
           description: 'An entry in voltageTable.'
           item_prototypes:
-            -
-              uuid: 01838a79d7304d838798bd2d6b427936
+            - uuid: 01838a79d7304d838798bd2d6b427936
               name: 'ZYXEL ES3500-8PD: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.72.9.3.1.2.{#SNMPINDEX}'
@@ -1474,46 +1240,37 @@ zabbix_export:
                 MIB: ZYXEL-ES3500-8PD-MIB
                 The current voltage reading.
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '0.001'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: sensor
-                -
-                  tag: component
+                - tag: component
                   value: voltage
               trigger_prototypes:
-                -
-                  uuid: 2cce1a60cfea4bb89e1b9582f6045d3c
+                - uuid: 2cce1a60cfea4bb89e1b9582f6045d3c
                   expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
                   name: 'ZYXEL ES3500-8PD: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
           graph_prototypes:
-            -
-              uuid: 94ee588ae558416da5bcf4c199797d93
+            - uuid: 94ee588ae558416da5bcf4c199797d93
               name: 'ZYXEL ES3500-8PD: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
               graph_items:
-                -
-                  color: 199C0D
+                - color: 199C0D
                   item:
                     host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.volt[{#SNMPINDEX}]'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   var inArray = JSON.parse(value);
@@ -1525,206 +1282,151 @@ zabbix_export:
                   });
                   return JSON.stringify(outArr);
       tags:
-        -
-          tag: class
+        - tag: class
           value: network
-        -
-          tag: target
+        - tag: target
           value: es3500-8pd
-        -
-          tag: target
+        - tag: target
           value: switch
-        -
-          tag: target
+        - tag: target
           value: zyxel
       macros:
-        -
-          macro: '{$CPU.UTIL.CRIT}'
+        - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-        -
-          macro: '{$MEMORY.UTIL.MAX}'
+        - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
-        -
-          macro: '{$SNMP.TIMEOUT}'
+        - macro: '{$SNMP.TIMEOUT}'
           value: 5m
           description: 'The time interval for SNMP agent availability trigger expression.'
-        -
-          macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
-        -
-          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
           value: 1|2
           description: |
             Filter of discoverable link types.
             0 - Down link
             1 - Cooper link
             2 - Fiber link
-        -
-          macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered by link types.'
-        -
-          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
           value: '.*'
           description: 'Filter by discoverable interface names.'
-        -
-          macro: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered interfaces by name.'
-        -
-          macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
           value: 1|2
           description: |
             Filter of discoverable status.
             0 - OK with DDM
             1 - OK without DDM
             2 - nonoperational
-        -
-          macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered by status.'
-        -
-          macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
           value: '.*'
           description: 'Filter by discoverable SFP modules name.'
-        -
-          macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
+        - macro: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
           value: N/A
           description: 'Filter to exclude discovered SFP modules by name.'
-        -
-          macro: '{$ZYXEL.LLD.SFP.UPDATE}'
+        - macro: '{$ZYXEL.LLD.SFP.UPDATE}'
           value: 10m
           description: 'Receiving data from the SFP module is slow, we do not recommend setting the interval less than 10 minutes.'
       dashboards:
-        -
-          uuid: db61810d6deb4c68a9f3c83bdbca6f7a
+        - uuid: db61810d6deb4c68a9f3c83bdbca6f7a
           name: 'Network interfaces'
           pages:
-            -
-              widgets:
-                -
-                  type: graphprototype
+            - widgets:
+                - type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '1'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '5'
-                    -
-                      type: GRAPH_PROTOTYPE
+                    - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'ZYXEL ES3500-8PD by SNMP'
                         name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Traffic'
       valuemaps:
-        -
-          uuid: 494c8983c4cf453789d2f0bbbe5cbbf3
+        - uuid: 494c8983c4cf453789d2f0bbbe5cbbf3
           name: 'SNMP available'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: 'not available'
-            -
-              value: '1'
+            - value: '1'
               newvalue: available
-            -
-              value: '2'
+            - value: '2'
               newvalue: unknown
-        -
-          uuid: 7cfe02e1eb224f6abe5216aaec31402c
+        - uuid: 7cfe02e1eb224f6abe5216aaec31402c
           name: 'ZYXEL ES3500-8PD operational mode port link up type'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: Down
-            -
-              value: '1'
+            - value: '1'
               newvalue: Cooper
-            -
-              value: '2'
+            - value: '2'
               newvalue: Fiber
-        -
-          uuid: b568c9f69a1a4dd5951f1121523475c9
+        - uuid: b568c9f69a1a4dd5951f1121523475c9
           name: 'ZYXEL ES3500-8PD operational mode port speed duplex'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: auto
-            -
-              value: '1'
+            - value: '1'
               newvalue: '10M half'
-            -
-              value: '2'
+            - value: '2'
               newvalue: '10M full'
-            -
-              value: '3'
+            - value: '3'
               newvalue: '100M half'
-            -
-              value: '4'
+            - value: '4'
               newvalue: '100M full'
-            -
-              value: '5'
+            - value: '5'
               newvalue: '1G full'
-        -
-          uuid: 4a20dd55c16b4c9082f267c532a4507a
+        - uuid: 4a20dd55c16b4c9082f267c532a4507a
           name: 'ZYXEL ES3500-8PD port admin status'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: Up
-            -
-              value: '2'
+            - value: '2'
               newvalue: Down
-            -
-              value: '3'
+            - value: '3'
               newvalue: Testing
-        -
-          uuid: 17635045a1ee4b8bba21b7d44634c57f
+        - uuid: 17635045a1ee4b8bba21b7d44634c57f
           name: 'ZYXEL ES3500-8PD port operational status'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: Up
-            -
-              value: '2'
+            - value: '2'
               newvalue: Down
-            -
-              value: '3'
+            - value: '3'
               newvalue: Testing
-            -
-              value: '4'
+            - value: '4'
               newvalue: Unknown
-            -
-              value: '5'
+            - value: '5'
               newvalue: Dormant
-            -
-              value: '6'
+            - value: '6'
               newvalue: NotPresent
-            -
-              value: '7'
+            - value: '7'
               newvalue: lowerLayerDown
-        -
-          uuid: 875833a6ca71431da2b3747c4c1e3008
+        - uuid: 875833a6ca71431da2b3747c4c1e3008
           name: 'ZYXEL ES3500-8PD SFP status'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: 'OK with DDM'
-            -
-              value: '2'
+            - value: '2'
               newvalue: 'OK without DDM'
-            -
-              value: '3'
+            - value: '3'
               newvalue: nonoperational
   triggers:
-    -
-      uuid: eb7a268bfa324366953221e3c1788127
+    - uuid: eb7a268bfa324366953221e3c1788127
       expression: '(last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.hw.uptime)>0 and last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.hw.uptime)<10m) or (last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.hw.uptime)=0 and last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.uptime)<10m)'
       name: 'ZYXEL ES3500-8PD: Host has been restarted'
       event_name: 'ZYXEL ES3500-8PD: {HOST.NAME} has been restarted (uptime < 10m)'
@@ -1732,18 +1434,15 @@ zabbix_export:
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       tags:
-        -
-          tag: scope
+        - tag: scope
           value: notice
   graphs:
-    -
-      uuid: 2d266c1cab6e462b89975538acc18266
+    - uuid: 2d266c1cab6e462b89975538acc18266
       name: 'ZYXEL ES3500-8PD: CPU utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
-        -
-          drawtype: GRADIENT_LINE
+        - drawtype: GRADIENT_LINE
           color: 199C0D
           item:
             host: 'ZYXEL ES3500-8PD by SNMP'
