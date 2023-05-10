@@ -1699,8 +1699,6 @@ out:
 		zbx_ha_kill();
 	}
 
-	zbx_free(ha_config);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1800,13 +1798,13 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	double			now, tick;
 	zbx_ha_info_t		info;
 	zbx_timespec_t		timeout;
-	zbx_ha_config_t		ha_config;
+	zbx_ha_config_t		*ha_config;
 
 	zbx_setproctitle("ha manager");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "starting HA manager");
 
-	ha_config = *(zbx_ha_config_t *)((zbx_thread_args_t *)args)->args;
+	ha_config = (zbx_ha_config_t *)((zbx_thread_args_t *)args)->args;
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_HA, &error))
 	{
@@ -1830,8 +1828,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	}
 
 	zbx_cuid_clear(info.ha_nodeid);
-	info.name = ZBX_NULL2EMPTY_STR(ha_config.ha_node_name);
-	info.ha_status = ha_config.ha_status;
+	info.name = ZBX_NULL2EMPTY_STR(ha_config->ha_node_name);
+	info.ha_status = ha_config->ha_status;
 	info.error = NULL;
 	info.db_status = ZBX_DB_DOWN;
 	info.offline_ticks_active = 0;
@@ -1843,7 +1841,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
 	{
-		ha_db_register_node(&info, &ha_config);
+		ha_db_register_node(&info, ha_config);
 
 		if (ZBX_NODE_STATUS_ERROR == info.ha_status)
 			goto pause;
@@ -1869,9 +1867,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 				int	old_status = info.ha_status, delay;
 
 				if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
-					ha_db_register_node(&info, &ha_config);
+					ha_db_register_node(&info, ha_config);
 				else
-					ha_check_nodes(&info, &ha_config);
+					ha_check_nodes(&info, ha_config);
 
 				if (old_status != info.ha_status && ZBX_NODE_STATUS_UNKNOWN != info.ha_status)
 					ha_update_parent(&rtc_socket, &info);
@@ -1916,7 +1914,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					pause = SUCCEED;
 					break;
 				case ZBX_IPC_SERVICE_HA_GET_NODES:
-					ha_send_node_list(&info, client, &ha_config);
+					ha_send_node_list(&info, client, ha_config);
 					break;
 				case ZBX_IPC_SERVICE_HA_REMOVE_NODE:
 					ha_remove_node(&info, client, message);
@@ -1999,6 +1997,7 @@ pause:
 	}
 
 	zbx_free(info.error);
+	zbx_free(ha_config);
 
 	ha_db_update_exit_status(&info);
 
