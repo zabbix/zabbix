@@ -796,13 +796,3 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 
 	zbx_free(buf);
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get log level                                                     *
- *                                                                            *
- ******************************************************************************/
-int	zbx_get_log_level(void)
-{
-	return *zbx_plog_level;
-}
