@@ -20,6 +20,7 @@
 #include "discoverer.h"
 
 #include "log.h"
+#include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
 #include "zbxserver.h"
@@ -52,6 +53,7 @@ typedef struct
 	unsigned char	snmpv3_securitylevel;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
+	unsigned char	allow_redirect;
 }
 DB_DCHECK;
 
@@ -183,8 +185,6 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 		zbx_dc_item_t	item;
 		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
 
-		zbx_alarm_on(config_timeout);
-
 		switch (dcheck->type)
 		{
 			/* simple checks */
@@ -246,7 +246,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, &result) &&
+					if (SUCCEED == get_value_agent(&item, config_timeout, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -324,19 +324,24 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 				}
 				break;
 			case SVC_ICMPPING:
+				zbx_alarm_on(config_timeout);
+
 				memset(&host, 0, sizeof(host));
 				host.addr = strdup(ip);
 
-				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
+				if (SUCCEED != zbx_ping(&host, 1, 3, 0, 0, 0, dcheck->allow_redirect, error,
+						sizeof(error)) || 0 == host.rcv)
+				{
 					ret = FAIL;
+				}
 
 				zbx_free(host.addr);
+
+				zbx_alarm_off();
 				break;
 			default:
 				break;
 		}
-
-		zbx_alarm_off();
 	}
 	zbx_free_agent_result(&result);
 
@@ -424,7 +429,7 @@ static void	process_checks(const zbx_db_drule *drule, int *host_status, char *ip
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			"select dcheckid,type,key_,snmp_community,snmpv3_securityname,snmpv3_securitylevel,"
 				"snmpv3_authpassphrase,snmpv3_privpassphrase,snmpv3_authprotocol,snmpv3_privprotocol,"
-				"ports,snmpv3_contextname"
+				"ports,snmpv3_contextname,allow_redirect"
 			" from dchecks"
 			" where druleid=" ZBX_FS_UI64,
 			drule->druleid);
@@ -455,6 +460,7 @@ static void	process_checks(const zbx_db_drule *drule, int *host_status, char *ip
 		dcheck.snmpv3_privprotocol = (unsigned char)atoi(row[9]);
 		dcheck.ports = row[10];
 		dcheck.snmpv3_contextname = row[11];
+		dcheck.allow_redirect = (unsigned char)atoi(row[12]);
 
 		zbx_vector_uint64_append(dcheckids, dcheck.dcheckid);
 
@@ -849,6 +855,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -866,7 +873,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_rtc_subscribe(process_type, process_num, discoverer_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), discoverer_args_in->config_timeout,
+			&rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

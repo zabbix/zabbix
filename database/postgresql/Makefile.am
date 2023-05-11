@@ -64,7 +64,6 @@ EXTRA_DIST = \
 	data.sql \
 	images.sql \
 	schema.sql \
-	double.sql \
 	$(DB_EXTENSION).sql \
 	history_pk_prepare.sql \
 	$(tsdb_wcompr_dir)/history_pk.sql \

@@ -1146,11 +1146,12 @@ int	main(int argc, char **argv)
 
 	/* required for simple checks */
 	zbx_init_metrics();
+	zbx_init_library_cfg(program_type, config_file);
 
 	zbx_load_config(&t);
 
-	zbx_init_library_cfg(program_type);
 	zbx_init_library_dbupgrade(get_program_type);
+	zbx_init_library_dbwrap(NULL);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
@@ -1273,7 +1274,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_proxymode, zbx_config_timeout};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
-								config_startup_time, config_unavailable_delay};
+								config_startup_time, config_unavailable_delay, 0, 0};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, zbx_config_timeout,
 								&config_server_addrs, CONFIG_HOSTNAME, CONFIG_SOURCE_IP,
@@ -1295,8 +1296,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, config_unavailable_delay};
 #endif
-	zbx_thread_pp_manager_args		preproc_man_args =
-						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
+	zbx_thread_pp_manager_args		preproc_man_args = {
+							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
@@ -1485,7 +1486,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
-		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
+		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT,
+				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			exit(EXIT_FAILURE);
