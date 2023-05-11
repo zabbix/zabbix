@@ -2325,8 +2325,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 		for (i = 0; i < input_vector->values_num; i++)
 		{
-
-			if (&input_vector->values[i].type == ZBX_VARIANT_STR)
+			if (input_vector->values[i].type == ZBX_VARIANT_STR)
 			{
 				zbx_variant_t	value_dbl;
 
