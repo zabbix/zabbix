@@ -1559,14 +1559,18 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 
 		zbx_vector_dbl_create(&results_tmp);
 
-		if (SUCCEED == (ret = zbx_vector_dbl_from_vector_var(results, &results_tmp, error)))
+		if (SUCCEED == (ret = zbx_eval_var_vector_to_dbl(results, &results_tmp, error)))
 		{
 			if (SUCCEED == (ret = zbx_eval_calc_histogram_quantile(percentage / 100, &results_tmp,
 					log_fn, &result, error)))
 			{
 				zbx_variant_set_dbl(value, result);
 			}
+			else
+				goto err;
 		}
+		else
+			goto err;
 
 		zbx_vector_dbl_destroy(&results_tmp);
 	}
