@@ -507,9 +507,9 @@ int	zbx_function_param_quote(char **param, int forced)
  *                                                                            *
  * Purpose: unescapes function parameter                                      *
  *                                                                            *
- * Parameters: param   - [IN] the parameter to unescape                       *
- *             len     - [IN] the parameter length                            *
- *             escaped - [OUT] the flag that specifies whether parameter was  *
+ * Parameters: param   - [IN] parameter to unescape                           *
+ *             len     - [IN] parameter length                                *
+ *             escaped - [OUT] flag that specifies whether parameter was      *
  *                            escaped before extraction                       *
  *                                                                            *
  * Return value: The unescaped parameter. This value must be freed by the     *

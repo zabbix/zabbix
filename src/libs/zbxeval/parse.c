@@ -393,12 +393,12 @@ static void	eval_parse_greater_character_token(zbx_eval_context_t *ctx, size_t p
  *                                                                            *
  * Purpose: parse string variable token                                       *
  *                                                                            *
- * Parameters: ctx                 - [IN] the evaluation context              *
- *             pos                 - [IN] the starting position               *
+ * Parameters: ctx                 - [IN] evaluation context                  *
+ *             pos                 - [IN] starting position                   *
  *             hist_str_v64_compat - [IN] allow old style strings             *
- *             token               - [OUT] the parsed token                   *
- *             error               - [OUT] the error message in the case      *
- *                                         of failure                         *
+ *             token               - [OUT] parsed token                       *
+ *             error               - [OUT] error message in the case of       *
+ *                                         failure                            *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
@@ -1211,11 +1211,11 @@ static void	eval_clear(zbx_eval_context_t *ctx)
  * Purpose: parse expression into tokens in postfix notation order            *
  *                                                                            *
  * Parameters: ctx                 - [OUT] the evaluation context             *
- *             expression          - [IN] the expression to parse             *
- *             rules               - [IN] the parsing rules                   *
+ *             expression          - [IN] expression to parse                 *
+ *             rules               - [IN] parsing rules                       *
  *             hist_str_v64_compat - [IN] allow old style strings             *
- *             error               - [OUT] the error message in the case      *
- *                                         of failure                         *
+ *             error               - [OUT] error message in the case of       *
+ *                                         failure                            *
  *                                                                            *
  * Return value: SUCCEED - expression was parsed successfully                 *
  *               FAIL    - otherwise                                          *
