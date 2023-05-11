@@ -181,9 +181,15 @@ class ScimHttpResponse {
 		if (array_key_exists('startIndex', $this->request_data)) {
 			$data['startIndex'] = max($this->request_data['startIndex'], 1);
 		}
+		else {
+			$data['startIndex'] = 1;
+		}
 
 		if (array_key_exists('count', $this->request_data)) {
 			$data['itemsPerPage'] = min($total_groups, max($this->request_data['count'], 0));
+		}
+		else {
+			$data['itemsPerPage'] = $total_groups;
 		}
 
 		foreach ($this->response_data as $groupid => $group_data) {

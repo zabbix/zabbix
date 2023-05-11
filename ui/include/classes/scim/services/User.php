@@ -222,6 +222,7 @@ class User extends ScimApiService {
 
 		$this->validatePut($options, $db_user);
 
+		$db_user = $db_user[0];
 		$user_group_names = [];
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 
@@ -383,8 +384,9 @@ class User extends ScimApiService {
 		}
 
 		$user= APIRPC::User()->updateProvisionedUser($new_user_data);
+		$user = $user ?: $new_user_data;
 
-		$this->addScimUserAttributes($user, $options);
+		$this->addScimUserAttributes($user, $user_idp_data);
 
 		return $user;
 	}

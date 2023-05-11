@@ -415,7 +415,8 @@ class Group extends ScimApiService {
 				$new_userids = array_diff($new_userids, array_column($db_userids, 'userid'));
 			}
 
-			$db_users = $this->verifyUserids(array_merge($new_userids, $del_userids), $userdirectoryid);
+			$db_users_new = $this->verifyUserids($new_userids, $userdirectoryid);
+			$db_users_delete = $this->verifyUserids($del_userids, $userdirectoryid);
 		}
 
 		if ($do_replace) {
@@ -438,14 +439,14 @@ class Group extends ScimApiService {
 			DB::insertBatch('user_scim_group', $values);
 		}
 
-		foreach (array_column($db_users, 'userid') as $db_userid) {
+		foreach (array_column(array_merge($db_users_new, $db_users_delete), 'userid') as $db_userid) {
 			$this->updateProvisionedUserGroups($db_userid, $userdirectoryid);
 		}
 
 		return [
 			'id' => $options['id'],
 			'displayName' => $db_scim_groups[0]['name'],
-			'users' => $db_users
+			'users' => isset($db_users_new) ? $db_users_new : []
 		];
 	}
 

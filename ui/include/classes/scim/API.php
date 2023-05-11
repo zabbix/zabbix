@@ -23,7 +23,6 @@ namespace SCIM;
 
 use CJsonRpc;
 use Exception;
-use CHttpRequest;
 use CApiClientResponse;
 use SCIM\clients\ScimApiClient;
 
