@@ -305,7 +305,7 @@ static void	rotate_log(const char *filename)
 }
 
 #ifndef _WINDOWS
-static sigset_t	orig_mask;
+static ZBX_THREAD_LOCAL sigset_t	orig_mask;
 
 static void	lock_log(void)
 {
