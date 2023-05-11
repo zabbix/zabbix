@@ -2521,7 +2521,7 @@ static unsigned char	*dup_serialized_expression(const unsigned char *src)
 static unsigned char	*config_decode_serialized_expression(const char *src)
 {
 	unsigned char	*dst;
-	int		data_len, src_len;
+	size_t		data_len, src_len;
 
 	if (NULL == src || '\0' == *src)
 		return NULL;

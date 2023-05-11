@@ -230,9 +230,9 @@ typedef enum
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
-	/* the number of defined value types */
-	ITEM_VALUE_TYPE_MAX,
-	ITEM_VALUE_TYPE_NONE,
+	ITEM_VALUE_TYPE_BIN,	/* Last real value. In some places it is also used in size of array or */
+				/* upper bound for iteration. Do not forget to update when adding new types. */
+	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
@@ -538,8 +538,9 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_GET_SCOPE(task)	(int)(((unsigned int)task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
 #define ZBX_RTC_GET_DATA(task)	(int)(((unsigned int)task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
 
-#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
-	(data << ZBX_RTC_DATA_SHIFT))
+#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	(((zbx_uint32_t)msg << ZBX_RTC_MSG_SHIFT) | \
+						((zbx_uint32_t)scope << ZBX_RTC_SCOPE_SHIFT) | \
+						((zbx_uint32_t)data << ZBX_RTC_DATA_SHIFT))
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
@@ -795,11 +796,22 @@ void	zbx_init_library_common(zbx_log_func_t log_func);
 void	zbx_log_handle(int level, const char *fmt, ...);
 int	zbx_get_log_level(void);
 void	zbx_set_log_level(int level);
+const char	*zbx_get_log_component_name(void);
 
 #ifndef _WINDOWS
 int		zabbix_increase_log_level(void);
 int		zabbix_decrease_log_level(void);
 const char	*zabbix_get_log_level_string(void);
+
+typedef struct
+{
+	int		level;
+	const char	*name;
+}
+zbx_log_component_t;
+
+void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
+void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
 #endif
 
 #endif

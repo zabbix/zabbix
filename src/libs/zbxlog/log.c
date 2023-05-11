@@ -31,13 +31,11 @@
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
-#define LOG_COMPONENT_LEN	64
+#define LOG_COMPONENT_NAME_LEN	64
 
 static char			log_filename[MAX_STRING_LEN];
 static int			log_type = LOG_TYPE_UNDEFINED;
 static zbx_mutex_t		log_access = ZBX_MUTEX_NULL;
-
-static ZBX_THREAD_LOCAL char	log_component[LOG_COMPONENT_LEN + 1];
 
 static int			config_log_file_size = -1;	/* max log file size in MB */
 
@@ -381,7 +379,7 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 					tm.tm_min,
 					tm.tm_sec,
 					milliseconds,
-					log_component
+					zbx_get_log_component_name()
 					);
 
 			vfprintf(log_file, fmt, args);
@@ -423,7 +421,7 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 				tm.tm_min,
 				tm.tm_sec,
 				milliseconds,
-				log_component
+				zbx_get_log_component_name()
 				);
 
 		vfprintf(stdout, fmt, args);
@@ -479,20 +477,20 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
-				syslog(LOG_CRIT, "%s%s", log_component, message);
+				syslog(LOG_CRIT, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_ERR:
-				syslog(LOG_ERR, "%s%s", log_component, message);
+				syslog(LOG_ERR, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_WARNING:
-				syslog(LOG_WARNING, "%s%s", log_component, message);
+				syslog(LOG_WARNING, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_DEBUG:
 			case LOG_LEVEL_TRACE:
-				syslog(LOG_DEBUG, "%s%s", log_component, message);
+				syslog(LOG_DEBUG, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_INFORMATION:
-				syslog(LOG_INFO, "%s%s", log_component, message);
+				syslog(LOG_INFO, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			default:
 				/* LOG_LEVEL_EMPTY - print nothing */
@@ -508,22 +506,22 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
-				zbx_error("ERROR: %s%s", log_component, message);
+				zbx_error("ERROR: %s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_ERR:
-				zbx_error("Error: %s%s", log_component, message);
+				zbx_error("Error: %s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_WARNING:
-				zbx_error("Warning: %s%s", log_component, message);
+				zbx_error("Warning: %s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_DEBUG:
-				zbx_error("DEBUG: %s%s", log_component, message);
+				zbx_error("DEBUG: %s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_TRACE:
-				zbx_error("TRACE: %s%s", log_component, message);
+				zbx_error("TRACE: %s%s", zbx_get_log_component_name(), message);
 				break;
 			default:
-				zbx_error("%s%s", log_component, message);
+				zbx_error("%s%s", zbx_get_log_component_name(), message);
 				break;
 		}
 
@@ -684,10 +682,6 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	zbx_free(buf);
 }
 
-void	zbx_set_log_component(const char *component)
-{
-	zbx_snprintf(log_component, sizeof(log_component), "[%s] ", component);
-}
 
 /* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
 /* configuration. For performance reasons manual reloading should be avoided when unnecessary. */

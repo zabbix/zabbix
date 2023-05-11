@@ -28,6 +28,7 @@
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #elif defined(HAVE_ORACLE)
+#	include "zbxcrypto.h"
 #	include "zbxdbschema.h"
 #	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
@@ -1232,6 +1233,7 @@ static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, 
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_CUID:
+		case ZBX_TYPE_BLOB:
 			*bufpp = context->rows[iter][context->position].str;
 			*alenp = ((size_t *)context->data)[iter];
 			break;
@@ -1321,6 +1323,28 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 			context->data = sizes;
 			data_type = SQLT_LNG;
 			break;
+		case ZBX_TYPE_BLOB:
+			sizes = (size_t *)zbx_malloc(NULL, sizeof(size_t) * rows_num);
+			context->size_max = 0;
+
+			for (i = 0; i < rows_num; i++)
+			{
+				size_t	dst_len;
+				size_t	src_len = strlen(rows[i][position].str) * 3 / 4 + 1;
+				char	*dst = (char*)zbx_malloc(NULL, src_len);
+
+				zbx_base64_decode(rows[i][position].str, (char *)dst, src_len, &dst_len);
+				sizes[i] = dst_len;
+				zbx_free(rows[i][position].str);
+				rows[i][position].str = dst;
+
+				if (sizes[i] > context->size_max)
+					context->size_max = sizes[i];
+			}
+
+			context->data = sizes;
+			data_type = SQLT_BIN;
+			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -1395,6 +1419,20 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "%s():%d", __func__, ret);
 
 	return ret;
+}
+#endif
+
+#if defined(HAVE_MYSQL)
+void	zbx_mysql_escape_bin(const char *src, char *dst, size_t size)
+{
+	mysql_real_escape_string(conn, dst, src, size);
+}
+#elif defined(HAVE_POSTGRESQL)
+void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size)
+{
+	size_t	dst_size;
+
+	*dst = (char*)PQescapeByteaConn(conn, (const unsigned char*)src, size, &dst_size);
 }
 #endif
 

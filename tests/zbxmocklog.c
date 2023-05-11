@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxmocktest.h"
+
 #include "zbxcommon.h"
 
 void	zbx_mock_log_impl(int level, const char *fmt, va_list args)

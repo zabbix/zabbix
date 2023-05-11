@@ -35,6 +35,7 @@ typedef struct
 	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
 	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
 	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
+	zbx_uint64_t	history_bin_counter;	/* the number of processed bin values */
 	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
 }
 zbx_dc_stats_t;
@@ -88,6 +89,8 @@ int	zbx_get_proxy_history_count(void);
 #define ZBX_STATS_HISTORY_INDEX_FREE	19
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
+#define ZBX_STATS_HISTORY_BIN_COUNTER	22
+
 void	*zbx_dc_get_stats(int request);
 void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);
 

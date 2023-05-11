@@ -24,8 +24,6 @@ package zbxlib
 
 #include "zbxcommon.h"
 
-int zbx_log_level = LOG_LEVEL_WARNING;
-
 int	zbx_agent_pid;
 
 void handleZabbixLog(int level, const char *message);
@@ -74,7 +72,7 @@ import (
 )
 
 func SetLogLevel(level int) {
-	C.zbx_log_level = C.int(level)
+	C.zbx_set_log_level(C.int(level))
 }
 
 func init() {
