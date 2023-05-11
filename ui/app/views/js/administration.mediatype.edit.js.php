@@ -47,9 +47,9 @@ window.mediatype_edit_popup = new class {
 		this._addParameterData();
 		this._populateMessageTemplates(<?= json_encode(array_values($data['message_templates'])) ?>);
 
-		this.form.querySelector('#message-templates').addEventListener('click', (event) =>
-			this._editMessageTemplate(event)
-		);
+		this.form.querySelector('#message-templates').addEventListener('click', (event) => {
+			this._editMessageTemplate(event);
+		});
 
 		this.form.querySelector('.element-table-add').addEventListener('click', () => {
 			this._addExecParam();
@@ -190,9 +190,6 @@ window.mediatype_edit_popup = new class {
 			});
 	}
 
-	/**
-	 * Adds webhook parameter data to Parameter table and script parameter data to script parameters table.
-	 */
 	_addParameterData() {
 		if (typeof(this.mediatype.parameters_webhook) === 'object') {
 			this.mediatype.parameters_webhook = Object.values(this.mediatype.parameters_webhook);
@@ -212,19 +209,12 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	/**
-	 * Removes row and toggles the "Add" button in message template table, updates message template list.
-	 */
 	_removeMessageTemplate(event) {
 		event.target.closest('tr').remove();
 		delete this.message_template_list[event.target.closest('tr').getAttribute('data-message-type')];
 		this._toggleAddButton();
 	}
 
-	// todo - add parameter description
-	/**
-	 * Adds row to webhook parameter table.
-	 */
 	_addWebhookParam(parameter = {}) {
 		const template = new Template(this.form.querySelector('#webhook_params_template').innerHTML);
 
@@ -233,10 +223,6 @@ window.mediatype_edit_popup = new class {
 			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
 	}
 
-	// todo - add parameter description
-	/**
-	 * Adds row to script parameter table.
-	 */
 	_addExecParam(parameter = {}) {
 		parameter.row_num = this.row_num;
 		const template = new Template(this.form.querySelector('#exec_params_template').innerHTML);
@@ -246,9 +232,6 @@ window.mediatype_edit_popup = new class {
 			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
 	}
 
-	/**
-	 * Opens message template popup and adds eventlistener for submit event.
-	 */
 	_editMessageTemplate(event) {
 		const target = event.target;
 		let row = null;
@@ -281,7 +264,8 @@ window.mediatype_edit_popup = new class {
 			const overlay = PopUp('mediatype.message.edit', params, {
 				dialogue_class: 'modal-popup-medium',
 				dialogueid: 'mediatype-message-form',
-				trigger_element: target
+				trigger_element: target,
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('message.submit', (e) => {
@@ -296,9 +280,6 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	/**
-	 * Adds or updates message template row to message template table.
-	 */
 	_addMessageTemplateRow(input, row = null) {
 		const template = new Template(this.form.querySelector('#message-templates-row-tmpl').innerHTML);
 
@@ -315,7 +296,11 @@ window.mediatype_edit_popup = new class {
 		this._toggleAddButton();
 	}
 
-	// todo - write function and parameter description
+	/**
+	 * Adds data to message template table upon media type configuration form opening.
+	 *
+	 * @param {array} list  An array of message templates.
+	 */
 	_populateMessageTemplates(list) {
 		for (const key in list) {
 			if (!Object.prototype.hasOwnProperty.call(list, key)) continue;
@@ -332,7 +317,14 @@ window.mediatype_edit_popup = new class {
 		this._toggleAddButton();
 	}
 
-	// todo - write function and parameter description
+	/**
+	 * Returns message type and name by the specified event source and operation mode.
+	 *
+	 * @param {number} eventsource  Event source.
+	 * @param {number} recovery     Operation mode.
+	 *
+	 * @return {object}
+	 */
 	_getMessageTemplate(eventsource, recovery) {
 		for (let message_type in this.message_templates) {
 			if (!this.message_templates.hasOwnProperty(message_type)) {
@@ -351,7 +343,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	/**
-	 * Toggles the "Add" button state and changes its text depending on message template count.
+	 * Toggles the "Add" button state and changes its text depending on already added message templates to the table.
 	 */
 	_toggleAddButton() {
 		const limit_reached = (
@@ -365,9 +357,6 @@ window.mediatype_edit_popup = new class {
 			: <?= json_encode(_('Add')) ?>;
 	}
 
-	/**
-	 * Toggles the "Change password" button state.
-	 */
 	_toggleChangePswdButton() {
 		if (this.form.querySelector('#chPass_btn') !== null) {
 			this.form.querySelector('#chPass_btn').style.display = 'none';
@@ -377,9 +366,6 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	/**
-	 * Toggles the Event menu name and Event menu URL text input field state.
-	 */
 	_toggleEventMenuFields(event_menu) {
 		const event_menu_name = this.form.querySelector('#event_menu_name');
 		const event_menu_url = this.form.querySelector('#event_menu_url');
@@ -396,9 +382,6 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	/**
-	 * Compiles necessary fields for popup based on mediatype data.
-	 */
 	_loadView(mediatype) {
 		this.type = parseInt(mediatype.type);
 		this.smtp_security = mediatype.smtp_security;
@@ -424,7 +407,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	/**
-	 * Set concurrent sessions accessibility.
+	 * Set concurrent sessions accessibility based on selected media type.
 	 *
 	 * @param {number} media_type  Selected media type.
 	 */
@@ -446,9 +429,6 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	/**
-	 * Toggles maxsessions field based on concurrent session field value.
-	 */
 	_toggleMaxSessionField(e) {
 		const concurrent_sessions = typeof e.target.value === 'undefined' ? this.max_session_checked : e.target.value;
 		const maxsessions = this.form.querySelector('#maxsessions');
@@ -462,9 +442,6 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	/**
-	 * Displays or hides fields in the popup based on the value of selected type.
-	 */
 	_loadTypeFields(event) {
 		if (event.target.value) {
 			this.type = parseInt(event.target.value);
@@ -546,12 +523,6 @@ window.mediatype_edit_popup = new class {
 		).checked = true;
 	}
 
-	/**
-	 * Displays or hides form fields based on the value of selected email provider.
-	 *
-	 * @param {boolean} change   Indicates whether the email provider has changed.
-	 * @param {number} provider  The value of selected email provider.
-	 */
 	_loadProviderFields(change, provider) {
 		this.provider = provider;
 		let show_fields = [];
@@ -610,9 +581,6 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
-	/**
-	 * Displays or hides form fields based on the value of selected smtp security.
-	 */
 	_loadSmtpSecurityFields() {
 		let smtp_security = this.form.querySelector(`input[name='smtp_security']:checked`).value;
 
@@ -647,11 +615,6 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	/**
-	 * Displays or hides form fields based on the value of selected authentication.
-	 *
-	 * @param {number} provider  The value of selected email provider.
-	 */
 	_loadAuthenticationFields(provider) {
 		let authentication = this.form.querySelector(`input[name='smtp_authentication']:checked`).value;
 		const passwd_label = this.form.querySelector('#passwd_label');
@@ -727,11 +690,6 @@ window.mediatype_edit_popup = new class {
 		}
 	}
 
-	/**
-	 * Hides form fields based on the type.
-	 *
-	 * @param {string} type
-	 */
 	_hideFormFields(type) {
 		let fields = [];
 

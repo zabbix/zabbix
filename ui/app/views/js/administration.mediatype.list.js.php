@@ -46,6 +46,9 @@
 				if (e.target.classList.contains('js-edit')) {
 					this._edit({mediatypeid: e.target.dataset.mediatypeid});
 				}
+				else if (e.target.classList.contains('js-test-edit')) {
+					this._testEdit({mediatypeid: e.target.dataset.mediatypeid});
+				}
 				else if (e.target.classList.contains('js-action-edit')) {
 					this._actionEdit({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
 				}
@@ -139,6 +142,13 @@
 			curl.setArgument('action', 'mediatype.delete');
 
 			this._post(target, mediatypeids, curl);
+		}
+
+		_testEdit(parameters) {
+			PopUp("mediatype.test.edit", parameters, {
+				dialogueid: "mediatypetest_edit",
+				dialogue_class: "modal-popup-medium"
+			});
 		}
 
 		_actionEdit(parameters = {}) {

@@ -54,18 +54,28 @@ $html_page = (new CHtmlPage())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			),
-			(new CFormList())->addRow(_('Status'),
-				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-					->addValue(_('Any'), -1)
-					->addValue(_('Enabled'), MEDIA_TYPE_STATUS_ACTIVE)
-					->addValue(_('Disabled'), MEDIA_TYPE_STATUS_DISABLED)
-					->setModern(true)
-			)
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Name'), 'filter_name'),
+					new CFormField(
+						(new CTextBox('filter_name', $data['filter']['name']))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setAttribute('autofocus', 'autofocus')
+					)
+				]),
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Status')),
+					new CFormField(
+						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+							->addValue(_('Any'), -1)
+							->addValue(_('Enabled'), DRULE_STATUS_ACTIVE)
+							->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
+							->setModern()
+					)
+				])
 		])
 		->addVar('action', 'mediatype.list')
 	);
@@ -164,12 +174,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 		->removeId()
 		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
 		->setAttribute('data-mediatypeid', $mediaType['mediatypeid'])
-		->onClick('
-			PopUp("popup.mediatypetest.edit", {mediatypeid: this.dataset.mediatypeid}, {
-				dialogueid: "mediatypetest_edit",
-				dialogue_class: "modal-popup-medium"
-			});
-		');
+		->addClass('js-test-edit');
 
 	$name = (new CLink($mediaType['name']))
 		->addClass('js-edit')

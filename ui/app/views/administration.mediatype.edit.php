@@ -25,12 +25,10 @@
  */
 
 $tabs = new CTabView();
-
 $csrf_token = CCsrfTokenHelper::get('mediatype');
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('media-type-form')
 	->addVar('form', 1)
@@ -46,7 +44,7 @@ $mediatype_form_grid = (new CFormGrid())
 			->setId('name-label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('name', $data['name'], false, 100))
+			(new CTextBox('name', $data['name'], false, DB::getFieldLength('media_type', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
@@ -179,7 +177,7 @@ $parameters_exec_template = (new CTemplateTag('exec_params_template'))
 		(new CRow([
 			(new CTextBox('parameters_exec[#{row_num}][value]', '', false, DB::getFieldLength('script_param', 'name')))
 				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-				->setAttribute('maxlength', 255)
+				->setAttribute('maxlength', DB::getFieldLength('media_type_param', 'name'))
 				->setAttribute('value', '#{value}')
 				->setId('parameters_exec_#{rowNum}_value')
 				->removeId(),
@@ -194,7 +192,9 @@ $mediatype_form_grid
 	->addItem([
 		(new CLabel([
 			_('Script parameters'),
-			makeHelpIcon(_('These parameters will be passed to the script as command-line arguments in the specified order.'))
+			makeHelpIcon(
+				_('These parameters will be passed to the script as command-line arguments in the specified order.')
+			)
 		]))->setId('row_exec_params_label'),
 		(new CFormField(
 			(new CFormField($parameters_exec_table))
@@ -362,7 +362,9 @@ $mediatype_form_grid
 	->addItem([
 		(new CLabel(_('Description'))),
 		new CFormField(
-			(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextArea('description', $data['description']))
+				->setAttribute('maxlength', DB::getFieldLength('media_type', 'description'))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	])
 	->addItem([
@@ -518,7 +520,7 @@ else {
 			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'mediatype_edit_popup.clone(' . json_encode([
+			'action' => 'mediatype_edit_popup.clone('.json_encode([
 					'title' => _('New script'),
 					'buttons' => [
 						[
@@ -535,7 +537,7 @@ else {
 							'action' => ''
 						]
 					]
-				]) . ');'
+				]).');'
 		],
 		[
 			'title' => _('Delete'),

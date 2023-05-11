@@ -39,7 +39,6 @@ class CControllerMediatypeMessageCheck extends CController {
 			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'content_type' =>		'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
 			'message_type' =>		'in '.implode(',', $this->message_types),
-			'message_types' =>		'array',
 			'subject' =>			'db media_type_message.subject',
 			'message' =>			'db media_type_message.message'
 		];
@@ -71,7 +70,6 @@ class CControllerMediatypeMessageCheck extends CController {
 			'type' => $this->getInput('type'),
 			'content_type' => $this->getInput('content_type'),
 			'message_type' => $this->getInput('message_type', -1),
-			'message_types' => $this->getInput('message_types', []),
 			'subject' => $this->getInput('subject', ''),
 			'message' => $this->getInput('message', '')
 		];

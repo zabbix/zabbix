@@ -82,7 +82,6 @@ class CControllerMediatypeEnable extends CController {
 		$updated = $result ? count($mediatypes) : count($mediatypeids);
 
 		if ($result) {
-			// todo - check if this works as expected:
 			if ($incomplete_configurations) {
 				$output['success']['title'] = _s('%1$s. %2$s: %3$s. %4$s.',
 					_n('Media type enabled', 'Media types enabled', $updated),

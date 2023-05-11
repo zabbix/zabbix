@@ -27,7 +27,7 @@
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatypetest')))->removeId())
 	->setName('mediatypetest_form')
-	->addVar('action', 'popup.mediatypetest.send')
+	->addVar('action', 'mediatypetest.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem(getMessages());
 
@@ -142,7 +142,7 @@ $form->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('popup.mediatypetest.edit.js.php'),
+	'script_inline' => $this->readJsFile('mediatype.test.edit.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupMediatypeTestSend extends CController {
+class CControllerMediatypeTestSend extends CController {
 
 	/**
 	 * Mediatype object.

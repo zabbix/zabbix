@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupMediatypeTestEdit extends CController {
+class CControllerMediatypeTestEdit extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
