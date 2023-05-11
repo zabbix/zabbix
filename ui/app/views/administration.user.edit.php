@@ -376,7 +376,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->setHint($severity_name.' ('.($media_active ? _('on') : _('off')).')', '', false)
 				->addClass($media_active
 					? CSeverityHelper::getStatusStyle($severity)
-					: ZBX_STYLE_STATUS_DISABLED_BG
+					: ZBX_STYLE_STATUS_DISABLED
 				);
 		}
 

@@ -9,10 +9,11 @@
 	line-height: 14px;
 	text-align: center;
 	vertical-align: top;
-	border: 1px solid rgba($form-border-color, .25);
+	border-width: 1px;
+	border-style: solid;
 
-	&:not(:first-of-type) {
-		border-left-style: none;
+	&:not(:last-of-type) {
+		border-right-style: none;
 	}
 
 	&:first-of-type {
@@ -43,105 +44,40 @@
 .status-high-bg,
 .status-disaster-bg {
 	@extend %status;
-}
 
-.status-disabled-bg {
-	@extend %status;
+	border-color: $status-border-color;
+	border-radius: 0;
 }
 
 .status-green {
 	@extend %status;
+
+	color: $status-color;
+	background-color: $status-green-bg-color;
+	border-color: $status-green-border-color;
 }
 
+.status-disabled,
 .status-grey {
 	@extend %status;
+
+	color: $form-disabled-font-color;
+	background-color: $status-grey-bg-color;
+	border-color: $status-grey-border-color;
 }
 
 .status-yellow {
 	@extend %status;
+
+	color: $status-color;
+	background-color: $status-yellow-bg-color;
+	border-color: $status-yellow-border-color;
 }
 
 .status-red {
 	@extend %status;
-}
 
-
-
-
-
-
-._status-container { // TODO: check, fix font size and paddings
-	//display: inline-block;
-	//white-space: nowrap;
-	margin: 1px 3px 1px 0;
-
-	&:last-child {
-		margin: 0;
-	}
-
-	span {
-		border-radius: 0;
-
-		&:first-of-type {
-			border-top-left-radius: 2px;
-			border-bottom-left-radius: 2px;
-		}
-
-		&:last-of-type {
-			border-top-right-radius: 2px;
-			border-bottom-right-radius: 2px;
-		}
-	}
-
-	.status-na-bg,
-	.status-info-bg,
-	.status-warning-bg,
-	.status-average-bg,
-	.status-high-bg,
-	.status-disaster-bg {
-		@extend %status;
-		border: 1px solid rgba($font-color, .2);
-		border-radius: 0;
-	}
-}
-
-._status-disabled-bg {
-	color: $form-disabled-font-color;
-	border: 1px solid rgba($font-color, .2);
-	background-color: $form-disabled-bg-color;
-	// TODO check
-	//@extend %status;
-}
-
-._status-green {
-	color: $white;
-	border: 1px solid $status-green-border-color;
-	background-color: $status-green-bg-color;
-	// TODO check
-	//@extend %status;
-}
-
-._status-yellow {
-	color: $white;
-	border: 1px solid $status-yellow-border-color;
-	background-color: $status-yellow-bg-color;
-	// TODO check
-	//@extend %status;
-}
-
-._status-red {
 	color: $status-color;
-	border: 1px solid $status-red-border-color;
 	background-color: $status-red-bg-color;
-
-	// TODO check
-	//@extend %status;
-}
-
-._status-grey {
-	color: $form-disabled-font-color;
-	border: 1px solid $status-grey-border-color;
-	background-color: $status-grey-bg-color;
-	// TODO check
-	//@extend %status;
+	border-color: $status-red-border-color;
 }

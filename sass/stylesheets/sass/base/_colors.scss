@@ -267,16 +267,15 @@ $ok-unack-fg-color: #009900 !default; // TODO: fix to green color
 $ok-ack-fg-color: #009900 !default; // TODO: fix to green color
 
 $status-color: $white;
+$status-border-color: rgba(#1f2c33, .05);
 $status-green-bg-color: darken(desaturate($alt-green, 10%), 16%);
 $status-green-border-color: darken(desaturate($alt-green, 10%), 20%);
-$status-yellow-bg-color: darken(desaturate($alt-yellow, 9%), 18%);
-$status-yellow-border-color: darken(desaturate($alt-yellow, 9%), 20%);
+$status-grey-bg-color: $disabled-bg-color;
+$status-grey-border-color: $disabled-item-bg-color;
 $status-red-bg-color: darken(desaturate($alt-red, 10%), 5%);
 $status-red-border-color: darken(desaturate($alt-red, 10%), 9%);
-$status-grey-bg-color: #ebebeb;
-$status-grey-border-color: #ccd5d9;
-$status-dark-grey-bg-color: darken(desaturate($alt-blue-grey, 10%), 8%);
-$status-dark-grey-border-color: darken(desaturate($alt-blue-grey, 10%), 12%);
+$status-yellow-bg-color: darken(desaturate($alt-yellow, 9%), 18%);
+$status-yellow-border-color: darken(desaturate($alt-yellow, 9%), 20%);
 
 // Multiselect.
 $multiselect-selected-bg-color: #93a5af !default;
