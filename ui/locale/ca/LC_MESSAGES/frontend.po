@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-04-17 21:10+0000\n"
+"PO-Revision-Date: 2023-04-28 19:46+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -3734,11 +3734,11 @@ msgstr "Clonar"
 #: app/views/configuration.host.edit.php:63
 #: app/views/js/popup.host.edit.js.php:47 host_prototypes.php:177
 msgid "Cloned host parameter values have been modified."
-msgstr ""
+msgstr "S'han modificat els valors dels paràmetres de l'equip clonat."
 
 #: templates.php:194
 msgid "Cloned template parameter values have been modified."
-msgstr ""
+msgstr "S'han modificat els valors dels paràmetres de la plantilla clonada."
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
@@ -17759,7 +17759,7 @@ msgstr "El gràfic ja no es troba pas i s'esborrarà eo proper cop que es proces
 
 #: app/controllers/CControllerHostEdit.php:265 host_prototypes.php:171
 msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
-msgstr ""
+msgstr "L'equip clonat pertany a un grup d'equips al qual no teniu permisos d'escriptura. El grup que no es pot escriure s'ha esborrat del nou equip."
 
 #: include/html.inc.php:637
 #, c-format
@@ -17826,7 +17826,7 @@ msgstr "El procediment remot sol·licitat no existeix / no és pas disponible"
 
 #: templates.php:180
 msgid "The template being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new template."
-msgstr ""
+msgstr "La plantilla clonada pertany a un grup d'equips al qual no teniu permisos d'escriptura. El grup que no es pot escriure s'ha esborrat de la nova plantilla."
 
 #: app/views/administration.token.view.php:52
 #: app/views/administration.user.token.view.php:51
@@ -21145,6 +21145,10 @@ msgstr "atan() - L'arctangent d'un valor com a angle, expressat en radians"
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() - L'arctangent de les coordenades ordenades (exprue) i abscisses especificades com a angle, expressat en radians"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
 
 #: include/events.inc.php:63
 msgid "autoregistered host"
