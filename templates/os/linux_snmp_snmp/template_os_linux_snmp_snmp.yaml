@@ -1,12 +1,10 @@
 zabbix_export:
   version: '7.0'
   template_groups:
-    -
-      uuid: 846977d1dfed4968bc5f8bdb363285bc
+    - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
   templates:
-    -
-      uuid: 4d3a7adbb6964bd08f2b9d28e0da6496
+    - uuid: 4d3a7adbb6964bd08f2b9d28e0da6496
       template: 'Linux by SNMP'
       name: 'Linux by SNMP'
       description: |
@@ -27,11 +25,9 @@ zabbix_export:
         name: Zabbix
         version: 7.0-0
       groups:
-        -
-          name: 'Templates/Operating systems'
+        - name: 'Templates/Operating systems'
       items:
-        -
-          uuid: 28f98683b9af4558813287cfa151719b
+        - uuid: 28f98683b9af4558813287cfa151719b
           name: 'Linux: ICMP ping'
           type: SIMPLE
           key: icmpping
@@ -39,25 +35,20 @@ zabbix_export:
           valuemap:
             name: 'Service state'
           tags:
-            -
-              tag: component
+            - tag: component
               value: health
-            -
-              tag: component
+            - tag: component
               value: network
           triggers:
-            -
-              uuid: 28927c3715714a77a259d48943ddb8fe
+            - uuid: 28927c3715714a77a259d48943ddb8fe
               expression: 'max(/Linux by SNMP/icmpping,#3)=0'
               name: 'Linux: Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: bc5a3fbab2834f8bb012325071c5b2e0
+        - uuid: bc5a3fbab2834f8bb012325071c5b2e0
           name: 'Linux: ICMP loss'
           type: SIMPLE
           key: icmppingloss
@@ -65,32 +56,25 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           tags:
-            -
-              tag: component
+            - tag: component
               value: health
-            -
-              tag: component
+            - tag: component
               value: network
           triggers:
-            -
-              uuid: f6d63c03e6f34888897464102fa369ec
+            - uuid: f6d63c03e6f34888897464102fa369ec
               expression: 'min(/Linux by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Linux by SNMP/icmppingloss,5m)<100'
               name: 'Linux: High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                -
-                  name: 'Linux: Unavailable by ICMP ping'
+                - name: 'Linux: Unavailable by ICMP ping'
                   expression: 'max(/Linux by SNMP/icmpping,#3)=0'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-                -
-                  tag: scope
+                - tag: scope
                   value: performance
-        -
-          uuid: b1e02fd733c14d71935e24fbe8786d40
+        - uuid: b1e02fd733c14d71935e24fbe8786d40
           name: 'Linux: ICMP response time'
           type: SIMPLE
           key: icmppingsec
@@ -98,35 +82,27 @@ zabbix_export:
           value_type: FLOAT
           units: s
           tags:
-            -
-              tag: component
+            - tag: component
               value: health
-            -
-              tag: component
+            - tag: component
               value: network
           triggers:
-            -
-              uuid: 1c1b86790d6442e59f50d94f9844c337
+            - uuid: 1c1b86790d6442e59f50d94f9844c337
               expression: 'avg(/Linux by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'Linux: High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                -
-                  name: 'Linux: High ICMP ping loss'
+                - name: 'Linux: High ICMP ping loss'
                   expression: 'min(/Linux by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Linux by SNMP/icmppingloss,5m)<100'
-                -
-                  name: 'Linux: Unavailable by ICMP ping'
+                - name: 'Linux: Unavailable by ICMP ping'
                   expression: 'max(/Linux by SNMP/icmpping,#3)=0'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-                -
-                  tag: scope
+                - tag: scope
                   value: performance
-        -
-          uuid: 85a597b741bb4e6e8fa9806e8737caf4
+        - uuid: 85a597b741bb4e6e8fa9806e8737caf4
           name: 'Linux: SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
@@ -137,11 +113,9 @@ zabbix_export:
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
-            -
-              tag: component
+            - tag: component
               value: network
-        -
-          uuid: e45c4b2df4a640a1a36154cb2b717e9d
+        - uuid: e45c4b2df4a640a1a36154cb2b717e9d
           name: 'Linux: System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
@@ -155,16 +129,13 @@ zabbix_export:
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
           inventory_link: CONTACT
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 12h
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: fdb0807c4a9a452f8a3cbab01a4ddb2e
+        - uuid: fdb0807c4a9a452f8a3cbab01a4ddb2e
           name: 'Linux: Interrupts per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.11.59.0
@@ -172,16 +143,13 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           preprocessing:
-            -
-              type: CHANGE_PER_SECOND
+            - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
-            -
-              tag: component
+            - tag: component
               value: cpu
-        -
-          uuid: eeaba506dee342518660c03d422faa2a
+        - uuid: eeaba506dee342518660c03d422faa2a
           name: 'Linux: Load average (1m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-1"]'
@@ -190,11 +158,9 @@ zabbix_export:
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cpu
-        -
-          uuid: e0c8a351d59f42b78e6db4a0c50aa5d2
+        - uuid: e0c8a351d59f42b78e6db4a0c50aa5d2
           name: 'Linux: Load average (5m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-5"]'
@@ -203,11 +169,9 @@ zabbix_export:
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cpu
-        -
-          uuid: 0a5c406d4e434dbba248a18318f6a869
+        - uuid: 0a5c406d4e434dbba248a18318f6a869
           name: 'Linux: Load average (15m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-15"]'
@@ -216,11 +180,9 @@ zabbix_export:
           value_type: FLOAT
           description: 'MIB: UCD-SNMP-MIB'
           tags:
-            -
-              tag: component
+            - tag: component
               value: cpu
-        -
-          uuid: f835f2d2e65c4efc8934a61870d907ca
+        - uuid: f835f2d2e65c4efc8934a61870d907ca
           name: 'Linux: Number of CPUs'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]'
@@ -230,18 +192,15 @@ zabbix_export:
             MIB: HOST-RESOURCES-MIB
             Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   //count the number of cores
                   return JSON.parse(value).length;
           tags:
-            -
-              tag: component
+            - tag: component
               value: cpu
-        -
-          uuid: e10a890dc6724cbda96f7c40c49cd730
+        - uuid: e10a890dc6724cbda96f7c40c49cd730
           name: 'Linux: Context switches per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.11.60.0
@@ -249,16 +208,13 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           preprocessing:
-            -
-              type: CHANGE_PER_SECOND
+            - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
-            -
-              tag: component
+            - tag: component
               value: cpu
-        -
-          uuid: abd4d4b7097644478329b578dfa7bf09
+        - uuid: abd4d4b7097644478329b578dfa7bf09
           name: 'Linux: System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
@@ -273,16 +229,13 @@ zabbix_export:
             include the full name and version identification of the system's hardware type, software operating-system, and
             networking software.
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 12h
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: d1a9af129dbb4fed8e67efcca383aeae
+        - uuid: d1a9af129dbb4fed8e67efcca383aeae
           name: 'Linux: Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
@@ -295,22 +248,18 @@ zabbix_export:
             MIB: HOST-RESOURCES-MIB
             The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
           preprocessing:
-            -
-              type: CHECK_NOT_SUPPORTED
+            - type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '0.01'
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: 9f2b3de3245e4ffea5aefc636e0f3da1
+        - uuid: 9f2b3de3245e4ffea5aefc636e0f3da1
           name: 'Linux: System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
@@ -324,16 +273,13 @@ zabbix_export:
             The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
           inventory_link: LOCATION
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 12h
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: 3ee68ecd1edc4f5d9cddefa78f8d502e
+        - uuid: 3ee68ecd1edc4f5d9cddefa78f8d502e
           name: 'Linux: System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
@@ -347,17 +293,14 @@ zabbix_export:
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
           inventory_link: NAME
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 12h
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
           triggers:
-            -
-              uuid: eeb0355174d74892a4e3a078e6ac7952
+            - uuid: eeb0355174d74892a4e3a078e6ac7952
               expression: 'last(/Linux by SNMP/system.name,#1)<>last(/Linux by SNMP/system.name,#2) and length(last(/Linux by SNMP/system.name))>0'
               name: 'Linux: System name has changed'
               event_name: 'Linux: System name has changed (new name: {ITEM.VALUE})'
@@ -365,14 +308,11 @@ zabbix_export:
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-                -
-                  tag: scope
+                - tag: scope
                   value: security
-        -
-          uuid: d3fba18851db4be08df04ab85536bb14
+        - uuid: d3fba18851db4be08df04ab85536bb14
           name: 'Linux: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
@@ -385,16 +325,13 @@ zabbix_export:
             MIB: SNMPv2-MIB
             The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '0.01'
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: 5b17833c4646423d8fd4115fa19d2ffe
+        - uuid: 5b17833c4646423d8fd4115fa19d2ffe
           name: 'Linux: System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
@@ -407,16 +344,13 @@ zabbix_export:
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
           preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 12h
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: a8ad10709a6e457187f58695de20b027
+        - uuid: a8ad10709a6e457187f58695de20b027
           name: 'Linux: Free swap space'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.4.0
@@ -427,19 +361,15 @@ zabbix_export:
             MIB: UCD-SNMP-MIB
             The amount of swap space currently unused or available.
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '1024'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
-            -
-              tag: component
+            - tag: component
               value: storage
-        -
-          uuid: 52ae3f1d7b3d4b669b40f0fddbb0e326
+        - uuid: 52ae3f1d7b3d4b669b40f0fddbb0e326
           name: 'Linux: Free swap space in %'
           type: CALCULATED
           key: 'system.swap.pfree[snmp]'
@@ -449,14 +379,11 @@ zabbix_export:
           params: 'last(//system.swap.free[memAvailSwap.0])/last(//system.swap.total[memTotalSwap.0])*100'
           description: 'The free space of the swap volume/file expressed in %.'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
-            -
-              tag: component
+            - tag: component
               value: storage
-        -
-          uuid: 7db5193027794961840c228c6280fe5b
+        - uuid: 7db5193027794961840c228c6280fe5b
           name: 'Linux: Total swap space'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.3.0
@@ -467,19 +394,15 @@ zabbix_export:
             MIB: UCD-SNMP-MIB
             The total amount of swap space configured for this host.
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '1024'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
-            -
-              tag: component
+            - tag: component
               value: storage
-        -
-          uuid: ad8a3857e8b04dffbc0c052a0d36fe08
+        - uuid: ad8a3857e8b04dffbc0c052a0d36fe08
           name: 'Linux: Available memory'
           type: CALCULATED
           key: 'vm.memory.available[snmp]'
@@ -488,11 +411,9 @@ zabbix_export:
           params: 'last(//vm.memory.free[memAvailReal.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCached.0])'
           description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
-        -
-          uuid: c071dae605b64cce886df7d2865e77e0
+        - uuid: c071dae605b64cce886df7d2865e77e0
           name: 'Linux: Memory (buffers)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.14.0
@@ -503,16 +424,13 @@ zabbix_export:
             MIB: UCD-SNMP-MIB
             Memory used by kernel buffers (Buffers in /proc/meminfo).
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '1024'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
-        -
-          uuid: d5e0a99bfd9844108c3d26d53d1a3d0c
+        - uuid: d5e0a99bfd9844108c3d26d53d1a3d0c
           name: 'Linux: Memory (cached)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.15.0
@@ -523,16 +441,13 @@ zabbix_export:
             MIB: UCD-SNMP-MIB
             Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '1024'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
-        -
-          uuid: fc3fb5310e8f4af7a093b9df9eede403
+        - uuid: fc3fb5310e8f4af7a093b9df9eede403
           name: 'Linux: Free memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.6.0
@@ -541,16 +456,13 @@ zabbix_export:
           units: B
           description: 'MIB: UCD-SNMP-MIB'
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '1024'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
-        -
-          uuid: de35484e53b24894aa050f15e1941106
+        - uuid: de35484e53b24894aa050f15e1941106
           name: 'Linux: Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.5.0
@@ -561,16 +473,13 @@ zabbix_export:
             MIB: UCD-SNMP-MIB
             The total memory expressed in bytes.
           preprocessing:
-            -
-              type: MULTIPLIER
+            - type: MULTIPLIER
               parameters:
                 - '1024'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
-        -
-          uuid: 640d893d48d44f2ebe2c9e9bb0158f76
+        - uuid: 640d893d48d44f2ebe2c9e9bb0158f76
           name: 'Linux: Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[snmp]'
@@ -580,30 +489,24 @@ zabbix_export:
           params: '(last(//vm.memory.total[memTotalReal.0])-(last(//vm.memory.free[memAvailReal.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCached.0])))/last(//vm.memory.total[memTotalReal.0])*100'
           description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
           tags:
-            -
-              tag: component
+            - tag: component
               value: memory
           triggers:
-            -
-              uuid: 063b87d246b04e74a439114a05f00fe5
+            - uuid: 063b87d246b04e74a439114a05f00fe5
               expression: 'min(/Linux by SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
               name: 'Linux: High memory utilization'
               event_name: 'Linux: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
-                -
-                  name: 'Linux: Lack of available memory'
+                - name: 'Linux: Lack of available memory'
                   expression: 'max(/Linux by SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by SNMP/vm.memory.total[memTotalReal.0])>0'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: capacity
-                -
-                  tag: scope
+                - tag: scope
                   value: performance
-        -
-          uuid: 03491bb9b98f4267bf1ff56cc226d819
+        - uuid: 03491bb9b98f4267bf1ff56cc226d819
           name: 'Linux: SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
@@ -617,39 +520,32 @@ zabbix_export:
           valuemap:
             name: zabbix.host.available
           tags:
-            -
-              tag: component
+            - tag: component
               value: health
-            -
-              tag: component
+            - tag: component
               value: network
           triggers:
-            -
-              uuid: 63d99e49b3584fb2bf61a7d56725fb3c
+            - uuid: 63d99e49b3584fb2bf61a7d56725fb3c
               expression: 'max(/Linux by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'Linux: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                -
-                  name: 'Linux: Unavailable by ICMP ping'
+                - name: 'Linux: Unavailable by ICMP ping'
                   expression: 'max(/Linux by SNMP/icmpping,#3)=0'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
       discovery_rules:
-        -
-          uuid: 4089ef5360ec4b2a98b7742e8e4e9dd6
+        - uuid: 4089ef5360ec4b2a98b7742e8e4e9dd6
           name: 'CPU discovery'
           type: DEPENDENT
           key: 'cpu.discovery[snmp]'
           delay: '0'
           description: 'This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That''s the only reason why LLD is used.'
           item_prototypes:
-            -
-              uuid: 528c02f7e0414cb5a97def6702fceb2a
+            - uuid: 528c02f7e0414cb5a97def6702fceb2a
               name: 'Linux: CPU guest time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.65.0
@@ -661,22 +557,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 Guest time - the time spent on running a virtual CPU for a guest operating system.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: ce514c83afb345b2b0f3b85d6ec89dc3
+            - uuid: ce514c83afb345b2b0f3b85d6ec89dc3
               name: 'Linux: CPU guest nice time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.66.0
@@ -688,22 +580,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time spent on running a niced guest (a virtual CPU for guest operating systems under the control of the Linux kernel).
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: 394bffd2086545af806f4ad990f853a1
+            - uuid: 394bffd2086545af806f4ad990f853a1
               name: 'Linux: CPU idle time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.53.0
@@ -715,22 +603,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent doing nothing.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: 88e9044abe71483a8670b572517ff4ad
+            - uuid: 88e9044abe71483a8670b572517ff4ad
               name: 'Linux: CPU interrupt time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.56.0
@@ -742,22 +626,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The amount of time the CPU has been servicing hardware interrupts.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: 87d1467c79cc4a3d8e5caf3b35de7e17
+            - uuid: 87d1467c79cc4a3d8e5caf3b35de7e17
               name: 'Linux: CPU iowait time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.54.0
@@ -769,22 +649,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The amount of time the CPU has been waiting for I/O to complete.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: d35896698d2a459fb682eb170e7005de
+            - uuid: d35896698d2a459fb682eb170e7005de
               name: 'Linux: CPU nice time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.51.0
@@ -796,22 +672,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running users' processes that have been niced.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: b48b79d7c2464bd996776477e55ce724
+            - uuid: b48b79d7c2464bd996776477e55ce724
               name: 'Linux: CPU softirq time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.61.0
@@ -823,22 +695,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The amount of time the CPU has been servicing software interrupts.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: f0e15f783b434cc49c97681e15def25c
+            - uuid: f0e15f783b434cc49c97681e15def25c
               name: 'Linux: CPU steal time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.64.0
@@ -850,22 +718,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The amount of "stolen" CPU from this virtual machine by the hypervisor for other tasks, such as running another virtual machine.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: 9f063ab6a217459e9e1ae95cc77071ff
+            - uuid: 9f063ab6a217459e9e1ae95cc77071ff
               name: 'Linux: CPU system time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.52.0
@@ -877,22 +741,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running the kernel and its processes.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: e07c1afe5f8c4db0bae364933df3e571
+            - uuid: e07c1afe5f8c4db0bae364933df3e571
               name: 'Linux: CPU user time'
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.2021.11.50.0
@@ -904,22 +764,18 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running users' processes that are not niced.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
-            -
-              uuid: dfd150b9966c49e6b8bf08570438f17c
+            - uuid: dfd150b9966c49e6b8bf08570438f17c
               name: 'Linux: CPU utilization'
               type: DEPENDENT
               key: 'system.cpu.util[snmp,{#SNMPINDEX}]'
@@ -929,8 +785,7 @@ zabbix_export:
               units: '%'
               description: 'The CPU utilization expressed in %.'
               preprocessing:
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       //Calculate utilization
@@ -938,12 +793,10 @@ zabbix_export:
               master_item:
                 key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: cpu
               trigger_prototypes:
-                -
-                  uuid: 34b29a2e43b347d0ada6b80a472a659e
+                - uuid: 34b29a2e43b347d0ada6b80a472a659e
                   expression: 'min(/Linux by SNMP/system.cpu.util[snmp,{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Linux: High CPU utilization'
                   event_name: 'Linux: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
@@ -951,78 +804,65 @@ zabbix_export:
                   priority: WARNING
                   description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: performance
           graph_prototypes:
-            -
-              uuid: fe9835f96dfd4912933e1c3db7943fdf
+            - uuid: fe9835f96dfd4912933e1c3db7943fdf
               name: 'Linux: CPU usage{#SINGLETON}'
               type: STACKED
               ymin_type_1: FIXED
               ymax_type_1: FIXED
               graph_items:
-                -
-                  color: 199C0D
+                - color: 199C0D
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: F63100
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]'
-                -
-                  sortorder: '2'
+                - sortorder: '2'
                   color: 00611C
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]'
-                -
-                  sortorder: '3'
+                - sortorder: '3'
                   color: F7941D
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]'
-                -
-                  sortorder: '4'
+                - sortorder: '4'
                   color: FC6EA3
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]'
-                -
-                  sortorder: '5'
+                - sortorder: '5'
                   color: 6C59DC
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]'
-                -
-                  sortorder: '6'
+                - sortorder: '6'
                   color: C7A72D
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]'
-                -
-                  sortorder: '7'
+                - sortorder: '7'
                   color: BA2A5D
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]'
-                -
-                  sortorder: '8'
+                - sortorder: '8'
                   color: F230E0
                   item:
                     host: 'Linux by SNMP'
                     key: 'system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]'
-            -
-              uuid: 22a742f192bb42a3b80e62b214eab9a8
+            - uuid: 22a742f192bb42a3b80e62b214eab9a8
               name: 'Linux: CPU utilization{#SINGLETON}'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
               graph_items:
-                -
-                  drawtype: GRADIENT_LINE
+                - drawtype: GRADIENT_LINE
                   color: 199C0D
                   item:
                     host: 'Linux by SNMP'
@@ -1030,14 +870,12 @@ zabbix_export:
           master_item:
             key: 'system.cpu.num[snmp]'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   //count the number of CPU cores
                   return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])
-        -
-          uuid: c29a7bbfba3441b1b155e68cbe44a685
+        - uuid: c29a7bbfba3441b1b155e68cbe44a685
           name: 'Network interfaces discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
@@ -1046,64 +884,51 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#IFADMINSTATUS}'
+              - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#IFADMINSTATUS}'
+              - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              -
-                macro: '{#IFOPERSTATUS}'
+              - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
                 formulaid: I
-              -
-                macro: '{#IFOPERSTATUS}'
+              - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: J
-              -
-                macro: '{#IFNAME}'
+              - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
                 formulaid: G
-              -
-                macro: '{#IFNAME}'
+              - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: H
-              -
-                macro: '{#IFDESCR}'
+              - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
                 formulaid: E
-              -
-                macro: '{#IFDESCR}'
+              - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-              -
-                macro: '{#IFALIAS}'
+              - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
-              -
-                macro: '{#IFALIAS}'
+              - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-              -
-                macro: '{#IFTYPE}'
+              - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
-              -
-                macro: '{#IFTYPE}'
+              - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
-            -
-              uuid: 772ca56d1df84c33847fb3de9a2fa048
+            - uuid: 772ca56d1df84c33847fb3de9a2fa048
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
@@ -1118,22 +943,17 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
-            -
-              uuid: 23d5c37a8a66495c81babc76085dd0d0
+            - uuid: 23d5c37a8a66495c81babc76085dd0d0
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
@@ -1144,22 +964,17 @@ zabbix_export:
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
-            -
-              uuid: 229e36fe673e43c0a69f942c086fea97
+            - uuid: 229e36fe673e43c0a69f942c086fea97
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
@@ -1171,26 +986,20 @@ zabbix_export:
                 MIB: IF-MIB
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '8'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
-            -
-              uuid: bbaad86407a349ed81b3b329e0754cdb
+            - uuid: bbaad86407a349ed81b3b329e0754cdb
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
@@ -1205,22 +1014,17 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
-            -
-              uuid: 184b63fa8f184915a8bd365afebae00f
+            - uuid: 184b63fa8f184915a8bd365afebae00f
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
@@ -1231,22 +1035,17 @@ zabbix_export:
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
-            -
-              uuid: ad64f09ccd88467f811499ef17096c0a
+            - uuid: ad64f09ccd88467f811499ef17096c0a
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
@@ -1258,26 +1057,20 @@ zabbix_export:
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '8'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
-            -
-              uuid: 54b1b171187b44c2a0b8dfadf06f9b00
+            - uuid: 54b1b171187b44c2a0b8dfadf06f9b00
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
@@ -1290,26 +1083,20 @@ zabbix_export:
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '1000000'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
-            -
-              uuid: 4aaabfdfeeac4c779255fd8b5a4550f4
+            - uuid: 4aaabfdfeeac4c779255fd8b5a4550f4
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
@@ -1328,18 +1115,14 @@ zabbix_export:
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
               trigger_prototypes:
-                -
-                  uuid: 038c4ebc6bdf48f69b60fca856318638
+                - uuid: 038c4ebc6bdf48f69b60fca856318638
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
@@ -1355,11 +1138,9 @@ zabbix_export:
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-            -
-              uuid: ce0a2b8f62ff4591b5e3bc8b348bf946
+            - uuid: ce0a2b8f62ff4591b5e3bc8b348bf946
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
@@ -1375,23 +1156,18 @@ zabbix_export:
               valuemap:
                 name: 'IF-MIB::ifType'
               preprocessing:
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
           trigger_prototypes:
-            -
-              uuid: 02387536c92f449384c23a0744e71ee3
+            - uuid: 02387536c92f449384c23a0744e71ee3
               expression: |
                 change(/Linux by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Linux by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
@@ -1414,16 +1190,13 @@ zabbix_export:
               description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: performance
-            -
-              uuid: efe5516d1c164a8cb243c4806b9684a2
+            - uuid: efe5516d1c164a8cb243c4806b9684a2
               expression: |
                 (avg(/Linux by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
                 avg(/Linux by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Linux by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
@@ -1439,16 +1212,13 @@ zabbix_export:
               description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: performance
-            -
-              uuid: dbbd6222837345b891dd613f6d40f98f
+            - uuid: dbbd6222837345b891dd613f6d40f98f
               expression: |
                 min(/Linux by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
                 or min(/Linux by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
@@ -1463,65 +1233,54 @@ zabbix_export:
               description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
               manual_close: 'YES'
               dependencies:
-                -
-                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Linux by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-                -
-                  tag: scope
+                - tag: scope
                   value: performance
           graph_prototypes:
-            -
-              uuid: c09b8ad9356741fcb9560446b50d8cf0
+            - uuid: c09b8ad9356741fcb9560446b50d8cf0
               name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
               graph_items:
-                -
-                  drawtype: GRADIENT_LINE
+                - drawtype: GRADIENT_LINE
                   color: 199C0D
                   item:
                     host: 'Linux by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   drawtype: BOLD_LINE
                   color: F63100
                   item:
                     host: 'Linux by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
-                -
-                  sortorder: '2'
+                - sortorder: '2'
                   color: 00611C
                   yaxisside: RIGHT
                   item:
                     host: 'Linux by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
-                -
-                  sortorder: '3'
+                - sortorder: '3'
                   color: F7941D
                   yaxisside: RIGHT
                   item:
                     host: 'Linux by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
-                -
-                  sortorder: '4'
+                - sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
                     host: 'Linux by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
-                -
-                  sortorder: '5'
+                - sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
                     host: 'Linux by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
-        -
-          uuid: 3943b515dcfc4321be0e15eb99eb0077
+        - uuid: 3943b515dcfc4321be0e15eb99eb0077
           name: 'EtherLike-MIB Discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.10.7.2.1.19,{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2]'
@@ -1530,18 +1289,15 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#IFOPERSTATUS}'
+              - macro: '{#IFOPERSTATUS}'
                 value: '1'
                 formulaid: A
-              -
-                macro: '{#SNMPVALUE}'
+              - macro: '{#SNMPVALUE}'
                 value: (2|3)
                 formulaid: B
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
           item_prototypes:
-            -
-              uuid: cc55ecff67a044b3a6cd17136757fc32
+            - uuid: cc55ecff67a044b3a6cd17136757fc32
               name: 'Interface {#IFNAME}({#IFALIAS}): Duplex status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
@@ -1576,30 +1332,24 @@ zabbix_export:
               valuemap:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: description
+                - tag: description
                   value: '{#IFALIAS}'
-                -
-                  tag: interface
+                - tag: interface
                   value: '{#IFNAME}'
               trigger_prototypes:
-                -
-                  uuid: 1e1f12c0cf744fd3aaac6570325bd661
+                - uuid: 1e1f12c0cf744fd3aaac6570325bd661
                   expression: 'last(/Linux by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: performance
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   try {
@@ -1615,8 +1365,7 @@ zabbix_export:
                       });
                   });
                   return JSON.stringify(data);
-        -
-          uuid: 57792d6e2b4e40a8a285848525bec38d
+        - uuid: 57792d6e2b4e40a8a285848525bec38d
           name: 'Block devices discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#DEVNAME},1.3.6.1.4.1.2021.13.15.1.1.2]'
@@ -1625,19 +1374,16 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#DEVNAME}'
+              - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#DEVNAME}'
+              - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable)'
           item_prototypes:
-            -
-              uuid: b136adad88154c31a123b46522b41191
+            - uuid: b136adad88154c31a123b46522b41191
               name: '{#DEVNAME}: Disk read rate'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.5.{#SNMPINDEX}'
@@ -1649,19 +1395,15 @@ zabbix_export:
                 MIB: UCD-DISKIO-MIB
                 The number of read accesses from this device since boot.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: disk
+                - tag: disk
                   value: '{#DEVNAME}'
-            -
-              uuid: b1fb6665c96b4c9f999b3803d45eea3e
+            - uuid: b1fb6665c96b4c9f999b3803d45eea3e
               name: '{#DEVNAME}: Disk utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.9.{#SNMPINDEX}'
@@ -1673,14 +1415,11 @@ zabbix_export:
                 MIB: UCD-DISKIO-MIB
                 The 1 minute average load of disk (%)
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: disk
+                - tag: disk
                   value: '{#DEVNAME}'
-            -
-              uuid: 147ad615fd544ab39494ce829da0bb14
+            - uuid: 147ad615fd544ab39494ce829da0bb14
               name: '{#DEVNAME}: Disk write rate'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.6.{#SNMPINDEX}'
@@ -1692,36 +1431,29 @@ zabbix_export:
                 MIB: UCD-DISKIO-MIB
                 The number of write accesses from this device since boot.
               preprocessing:
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: disk
+                - tag: disk
                   value: '{#DEVNAME}'
           graph_prototypes:
-            -
-              uuid: 76f7583a5256463a82d60c0fef3c6a7f
+            - uuid: 76f7583a5256463a82d60c0fef3c6a7f
               name: '{#DEVNAME}: Disk read/write rates'
               graph_items:
-                -
-                  color: 199C0D
+                - color: 199C0D
                   item:
                     host: 'Linux by SNMP'
                     key: 'vfs.dev.read.rate[diskIOReads.{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: F63100
                   item:
                     host: 'Linux by SNMP'
                     key: 'vfs.dev.write.rate[diskIOWrites.{#SNMPINDEX}]'
-        -
-          uuid: 0ba976a284574157b2b51f103a324d43
+        - uuid: 0ba976a284574157b2b51f103a324d43
           name: 'Mounted filesystem discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#FSTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]'
@@ -1730,28 +1462,23 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#FSTYPE}'
+              - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.MATCHES}'
                 formulaid: C
-              -
-                macro: '{#FSTYPE}'
+              - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-              -
-                macro: '{#FSNAME}'
+              - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#FSNAME}'
+              - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter'
           item_prototypes:
-            -
-              uuid: 96d3b16a29c44dacbf57127395d4f760
+            - uuid: 96d3b16a29c44dacbf57127395d4f760
               name: '{#FSNAME}: Free inodes in %'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2021.9.1.10["index","1.3.6.1.4.1.2021.9.1.2", "{#FSNAME}"]'
@@ -1763,20 +1490,16 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 If having problems collecting this item make sure access to UCD-SNMP-MIB is allowed.
               preprocessing:
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - 'return (100-value);'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: filesystem
+                - tag: filesystem
                   value: '{#FSNAME}'
               trigger_prototypes:
-                -
-                  uuid: c2a464a9d8f24b1f96251feabeec8b6a
+                - uuid: c2a464a9d8f24b1f96251feabeec8b6a
                   expression: 'min(/Linux by SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes'
                   event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
@@ -1788,14 +1511,11 @@ zabbix_export:
                     - 'No space left on device';
                     - 'Disk is full'.
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: capacity
-                    -
-                      tag: scope
+                    - tag: scope
                       value: performance
-                -
-                  uuid: 396da67ae447497781d9f37215490b71
+                - uuid: 396da67ae447497781d9f37215490b71
                   expression: 'min(/Linux by SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
                   name: '{#FSNAME}: Running out of free inodes'
                   event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
@@ -1807,18 +1527,14 @@ zabbix_export:
                     - 'No space left on device';
                     - 'Disk is full'.
                   dependencies:
-                    -
-                      name: '{#FSNAME}: Running out of free inodes'
+                    - name: '{#FSNAME}: Running out of free inodes'
                       expression: 'min(/Linux by SNMP/vfs.fs.inode.pfree[dskPercentNode.{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: capacity
-                    -
-                      tag: scope
+                    - tag: scope
                       value: performance
-            -
-              uuid: 0cb84e1611e944e68caf677492d169e5
+            - uuid: 0cb84e1611e944e68caf677492d169e5
               name: '{#FSNAME}: Space utilization'
               type: CALCULATED
               key: 'vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]'
@@ -1828,14 +1544,11 @@ zabbix_export:
               params: '(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
               description: 'The space utilization expressed in % for {#FSNAME}.'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: filesystem
+                - tag: filesystem
                   value: '{#FSNAME}'
-            -
-              uuid: 9117a148b85c4593a3df470a1e023573
+            - uuid: 9117a148b85c4593a3df470a1e023573
               name: '{#FSNAME}: Total space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
@@ -1848,19 +1561,15 @@ zabbix_export:
                 This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
                 For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: filesystem
+                - tag: filesystem
                   value: '{#FSNAME}'
-            -
-              uuid: 04168e44dd0f4d3c96496c3fadd13fde
+            - uuid: 04168e44dd0f4d3c96496c3fadd13fde
               name: '{#FSNAME}: Used space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
@@ -1871,20 +1580,16 @@ zabbix_export:
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
               preprocessing:
-                -
-                  type: MULTIPLIER
+                - type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: filesystem
+                - tag: filesystem
                   value: '{#FSNAME}'
           trigger_prototypes:
-            -
-              uuid: 4e84d5b0e3bb4729a6eabd5882d2d603
+            - uuid: 4e84d5b0e3bb4729a6eabd5882d2d603
               expression: |
                 last(/Linux by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/Linux by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
@@ -1900,14 +1605,11 @@ zabbix_export:
                 - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-                -
-                  tag: scope
+                - tag: scope
                   value: capacity
-            -
-              uuid: 210ae86feef14fa0a82c97331e522937
+            - uuid: 210ae86feef14fa0a82c97331e522937
               expression: |
                 last(/Linux by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/Linux by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
@@ -1923,1263 +1625,879 @@ zabbix_export:
                 - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
-                -
-                  name: '{#FSNAME}: Disk space is critically low'
+                - name: '{#FSNAME}: Disk space is critically low'
                   expression: |
                     last(/Linux by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Linux by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Linux by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-                -
-                  tag: scope
+                - tag: scope
                   value: capacity
           graph_prototypes:
-            -
-              uuid: 10878869ac0641bc96b9898820a4f3ea
+            - uuid: 10878869ac0641bc96b9898820a4f3ea
               name: '{#FSNAME}: Disk space usage'
               width: '600'
               height: '340'
               type: PIE
               show_3d: 'YES'
               graph_items:
-                -
-                  color: '969696'
+                - color: '969696'
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
                     host: 'Linux by SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
-                -
-                  sortorder: '1'
+                - sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
                     host: 'Linux by SNMP'
                     key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
       tags:
-        -
-          tag: class
+        - tag: class
           value: os
-        -
-          tag: target
+        - tag: target
           value: linux
       macros:
-        -
-          macro: '{$CPU.UTIL.CRIT}'
+        - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-        -
-          macro: '{$ICMP_LOSS_WARN}'
+        - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
-        -
-          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+        - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
-        -
-          macro: '{$IF.ERRORS.WARN}'
+        - macro: '{$IF.ERRORS.WARN}'
           value: '2'
-        -
-          macro: '{$IF.UTIL.MAX}'
+        - macro: '{$IF.UTIL.MAX}'
           value: '90'
-        -
-          macro: '{$IFCONTROL}'
+        - macro: '{$IFCONTROL}'
           value: '1'
-        -
-          macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
+        - macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
           value: '1.5'
           description: 'Load per CPU considered sustainable. Tune if needed.'
-        -
-          macro: '{$MEMORY.AVAILABLE.MIN}'
+        - macro: '{$MEMORY.AVAILABLE.MIN}'
           value: 20M
-        -
-          macro: '{$MEMORY.UTIL.MAX}'
+        - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
-        -
-          macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+        - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
           description: 'Ignore notPresent(6)'
-        -
-          macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+        - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
-        -
-          macro: '{$NET.IF.IFALIAS.MATCHES}'
+        - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
-        -
-          macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+        - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-        -
-          macro: '{$NET.IF.IFDESCR.MATCHES}'
+        - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
-        -
-          macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+        - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-        -
-          macro: '{$NET.IF.IFNAME.MATCHES}'
+        - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^.*$'
-        -
-          macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
+        - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
           description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
-        -
-          macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+        - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
-        -
-          macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+        - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
           description: 'Ignore notPresent(6)'
-        -
-          macro: '{$NET.IF.IFTYPE.MATCHES}'
+        - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
-        -
-          macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+        - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-        -
-          macro: '{$SNMP.TIMEOUT}'
+        - macro: '{$SNMP.TIMEOUT}'
           value: 5m
-        -
-          macro: '{$SWAP.PFREE.MIN.WARN}'
+        - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
-        -
-          macro: '{$VFS.DEV.DEVNAME.MATCHES}'
+        - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
           description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
+        - macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)'
           description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+        - macro: '{$VFS.FS.FREE.MIN.CRIT}'
           value: 5G
           description: 'The critical threshold of the filesystem utilization.'
-        -
-          macro: '{$VFS.FS.FREE.MIN.WARN}'
+        - macro: '{$VFS.FS.FREE.MIN.WARN}'
           value: 10G
           description: 'The warning threshold of the filesystem utilization.'
-        -
-          macro: '{$VFS.FS.FSNAME.MATCHES}'
+        - macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+        - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.FSTYPE.MATCHES}'
+        - macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: '.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$'
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+        - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: ^\s$
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
-        -
-          macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
+        - macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
           value: '10'
-        -
-          macro: '{$VFS.FS.INODE.PFREE.MIN.WARN}'
+        - macro: '{$VFS.FS.INODE.PFREE.MIN.WARN}'
           value: '20'
-        -
-          macro: '{$VFS.FS.PUSED.MAX.CRIT}'
+        - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
           value: '90'
-        -
-          macro: '{$VFS.FS.PUSED.MAX.WARN}'
+        - macro: '{$VFS.FS.PUSED.MAX.WARN}'
           value: '80'
       dashboards:
-        -
-          uuid: e0f04b83911a47ba8ee30fa91b4f63a9
+        - uuid: e0f04b83911a47ba8ee30fa91b4f63a9
           name: 'Network interfaces'
           pages:
-            -
-              widgets:
-                -
-                  type: graphprototype
+            - widgets:
+                - type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '1'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: GRAPH_PROTOTYPE
+                    - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-        -
-          uuid: 59f09fada3ab43d1bdb70091f92e77f1
+        - uuid: 59f09fada3ab43d1bdb70091f92e77f1
           name: 'System performance'
           pages:
-            -
-              widgets:
-                -
-                  type: graph
+            - widgets:
+                - type: graph
                   width: '12'
                   height: '5'
                   fields:
-                    -
-                      type: GRAPH
+                    - type: GRAPH
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: 'Linux: System load'
-                -
-                  type: graphprototype
+                - type: graphprototype
                   x: '12'
                   width: '12'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '1'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: GRAPH_PROTOTYPE
+                    - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: 'Linux: CPU usage{#SINGLETON}'
-                -
-                  type: graph
+                - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
-                    -
-                      type: GRAPH
+                    - type: GRAPH
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: 'Linux: Memory usage'
-                -
-                  type: graph
+                - type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
-                    -
-                      type: GRAPH
+                    - type: GRAPH
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: 'Linux: Swap usage'
-                -
-                  type: graphprototype
+                - type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '1'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: GRAPH_PROTOTYPE
+                    - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: '{#FSNAME}: Disk space usage'
-                -
-                  type: graphprototype
+                - type: graphprototype
                   'y': '15'
                   width: '24'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '1'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: GRAPH_PROTOTYPE
+                    - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: '{#DEVNAME}: Disk read/write rates'
-                -
-                  type: graphprototype
+                - type: graphprototype
                   'y': '20'
                   width: '24'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '1'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: source_type
                       value: '3'
-                    -
-                      type: ITEM_PROTOTYPE
+                    - type: ITEM_PROTOTYPE
                       name: itemid
                       value:
                         host: 'Linux by SNMP'
                         key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
-                -
-                  type: graphprototype
+                - type: graphprototype
                   'y': '25'
                   width: '24'
                   height: '5'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '1'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '1'
-                    -
-                      type: GRAPH_PROTOTYPE
+                    - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
-        -
-          uuid: 1fe48656fa5e4a23903921a5b0f2aac4
+        - uuid: 1fe48656fa5e4a23903921a5b0f2aac4
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: unknown
-            -
-              value: '2'
+            - value: '2'
               newvalue: halfDuplex
-            -
-              value: '3'
+            - value: '3'
               newvalue: fullDuplex
-        -
-          uuid: 1578e9a6c5f24dd1915d981c245b68fa
+        - uuid: 1578e9a6c5f24dd1915d981c245b68fa
           name: 'IF-MIB::ifOperStatus'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: up
-            -
-              value: '2'
+            - value: '2'
               newvalue: down
-            -
-              value: '4'
+            - value: '4'
               newvalue: unknown
-            -
-              value: '5'
+            - value: '5'
               newvalue: dormant
-            -
-              value: '6'
+            - value: '6'
               newvalue: notPresent
-            -
-              value: '7'
+            - value: '7'
               newvalue: lowerLayerDown
-        -
-          uuid: 4a342bf160284052bc94e123d13f7992
+        - uuid: 4a342bf160284052bc94e123d13f7992
           name: 'IF-MIB::ifType'
           mappings:
-            -
-              value: '1'
+            - value: '1'
               newvalue: other
-            -
-              value: '2'
+            - value: '2'
               newvalue: regular1822
-            -
-              value: '3'
+            - value: '3'
               newvalue: hdh1822
-            -
-              value: '4'
+            - value: '4'
               newvalue: ddnX25
-            -
-              value: '5'
+            - value: '5'
               newvalue: rfc877x25
-            -
-              value: '6'
+            - value: '6'
               newvalue: ethernetCsmacd
-            -
-              value: '7'
+            - value: '7'
               newvalue: iso88023Csmacd
-            -
-              value: '8'
+            - value: '8'
               newvalue: iso88024TokenBus
-            -
-              value: '9'
+            - value: '9'
               newvalue: iso88025TokenRing
-            -
-              value: '10'
+            - value: '10'
               newvalue: iso88026Man
-            -
-              value: '11'
+            - value: '11'
               newvalue: starLan
-            -
-              value: '12'
+            - value: '12'
               newvalue: proteon10Mbit
-            -
-              value: '13'
+            - value: '13'
               newvalue: proteon80Mbit
-            -
-              value: '14'
+            - value: '14'
               newvalue: hyperchannel
-            -
-              value: '15'
+            - value: '15'
               newvalue: fddi
-            -
-              value: '16'
+            - value: '16'
               newvalue: lapb
-            -
-              value: '17'
+            - value: '17'
               newvalue: sdlc
-            -
-              value: '18'
+            - value: '18'
               newvalue: ds1
-            -
-              value: '19'
+            - value: '19'
               newvalue: e1
-            -
-              value: '20'
+            - value: '20'
               newvalue: basicISDN
-            -
-              value: '21'
+            - value: '21'
               newvalue: primaryISDN
-            -
-              value: '22'
+            - value: '22'
               newvalue: propPointToPointSerial
-            -
-              value: '23'
+            - value: '23'
               newvalue: ppp
-            -
-              value: '24'
+            - value: '24'
               newvalue: softwareLoopback
-            -
-              value: '25'
+            - value: '25'
               newvalue: eon
-            -
-              value: '26'
+            - value: '26'
               newvalue: ethernet3Mbit
-            -
-              value: '27'
+            - value: '27'
               newvalue: nsip
-            -
-              value: '28'
+            - value: '28'
               newvalue: slip
-            -
-              value: '29'
+            - value: '29'
               newvalue: ultra
-            -
-              value: '30'
+            - value: '30'
               newvalue: ds3
-            -
-              value: '31'
+            - value: '31'
               newvalue: sip
-            -
-              value: '32'
+            - value: '32'
               newvalue: frameRelay
-            -
-              value: '33'
+            - value: '33'
               newvalue: rs232
-            -
-              value: '34'
+            - value: '34'
               newvalue: para
-            -
-              value: '35'
+            - value: '35'
               newvalue: arcnet
-            -
-              value: '36'
+            - value: '36'
               newvalue: arcnetPlus
-            -
-              value: '37'
+            - value: '37'
               newvalue: atm
-            -
-              value: '38'
+            - value: '38'
               newvalue: miox25
-            -
-              value: '39'
+            - value: '39'
               newvalue: sonet
-            -
-              value: '40'
+            - value: '40'
               newvalue: x25ple
-            -
-              value: '41'
+            - value: '41'
               newvalue: iso88022llc
-            -
-              value: '42'
+            - value: '42'
               newvalue: localTalk
-            -
-              value: '43'
+            - value: '43'
               newvalue: smdsDxi
-            -
-              value: '44'
+            - value: '44'
               newvalue: frameRelayService
-            -
-              value: '45'
+            - value: '45'
               newvalue: v35
-            -
-              value: '46'
+            - value: '46'
               newvalue: hssi
-            -
-              value: '47'
+            - value: '47'
               newvalue: hippi
-            -
-              value: '48'
+            - value: '48'
               newvalue: modem
-            -
-              value: '49'
+            - value: '49'
               newvalue: aal5
-            -
-              value: '50'
+            - value: '50'
               newvalue: sonetPath
-            -
-              value: '51'
+            - value: '51'
               newvalue: sonetVT
-            -
-              value: '52'
+            - value: '52'
               newvalue: smdsIcip
-            -
-              value: '53'
+            - value: '53'
               newvalue: propVirtual
-            -
-              value: '54'
+            - value: '54'
               newvalue: propMultiplexor
-            -
-              value: '55'
+            - value: '55'
               newvalue: ieee80212
-            -
-              value: '56'
+            - value: '56'
               newvalue: fibreChannel
-            -
-              value: '57'
+            - value: '57'
               newvalue: hippiInterface
-            -
-              value: '58'
+            - value: '58'
               newvalue: frameRelayInterconnect
-            -
-              value: '59'
+            - value: '59'
               newvalue: aflane8023
-            -
-              value: '60'
+            - value: '60'
               newvalue: aflane8025
-            -
-              value: '61'
+            - value: '61'
               newvalue: cctEmul
-            -
-              value: '62'
+            - value: '62'
               newvalue: fastEther
-            -
-              value: '63'
+            - value: '63'
               newvalue: isdn
-            -
-              value: '64'
+            - value: '64'
               newvalue: v11
-            -
-              value: '65'
+            - value: '65'
               newvalue: v36
-            -
-              value: '66'
+            - value: '66'
               newvalue: g703at64k
-            -
-              value: '67'
+            - value: '67'
               newvalue: g703at2mb
-            -
-              value: '68'
+            - value: '68'
               newvalue: qllc
-            -
-              value: '69'
+            - value: '69'
               newvalue: fastEtherFX
-            -
-              value: '70'
+            - value: '70'
               newvalue: channel
-            -
-              value: '71'
+            - value: '71'
               newvalue: ieee80211
-            -
-              value: '72'
+            - value: '72'
               newvalue: ibm370parChan
-            -
-              value: '73'
+            - value: '73'
               newvalue: escon
-            -
-              value: '74'
+            - value: '74'
               newvalue: dlsw
-            -
-              value: '75'
+            - value: '75'
               newvalue: isdns
-            -
-              value: '76'
+            - value: '76'
               newvalue: isdnu
-            -
-              value: '77'
+            - value: '77'
               newvalue: lapd
-            -
-              value: '78'
+            - value: '78'
               newvalue: ipSwitch
-            -
-              value: '79'
+            - value: '79'
               newvalue: rsrb
-            -
-              value: '80'
+            - value: '80'
               newvalue: atmLogical
-            -
-              value: '81'
+            - value: '81'
               newvalue: ds0
-            -
-              value: '82'
+            - value: '82'
               newvalue: ds0Bundle
-            -
-              value: '83'
+            - value: '83'
               newvalue: bsc
-            -
-              value: '84'
+            - value: '84'
               newvalue: async
-            -
-              value: '85'
+            - value: '85'
               newvalue: cnr
-            -
-              value: '86'
+            - value: '86'
               newvalue: iso88025Dtr
-            -
-              value: '87'
+            - value: '87'
               newvalue: eplrs
-            -
-              value: '88'
+            - value: '88'
               newvalue: arap
-            -
-              value: '89'
+            - value: '89'
               newvalue: propCnls
-            -
-              value: '90'
+            - value: '90'
               newvalue: hostPad
-            -
-              value: '91'
+            - value: '91'
               newvalue: termPad
-            -
-              value: '92'
+            - value: '92'
               newvalue: frameRelayMPI
-            -
-              value: '93'
+            - value: '93'
               newvalue: x213
-            -
-              value: '94'
+            - value: '94'
               newvalue: adsl
-            -
-              value: '95'
+            - value: '95'
               newvalue: radsl
-            -
-              value: '96'
+            - value: '96'
               newvalue: sdsl
-            -
-              value: '97'
+            - value: '97'
               newvalue: vdsl
-            -
-              value: '98'
+            - value: '98'
               newvalue: iso88025CRFPInt
-            -
-              value: '99'
+            - value: '99'
               newvalue: myrinet
-            -
-              value: '100'
+            - value: '100'
               newvalue: voiceEM
-            -
-              value: '101'
+            - value: '101'
               newvalue: voiceFXO
-            -
-              value: '102'
+            - value: '102'
               newvalue: voiceFXS
-            -
-              value: '103'
+            - value: '103'
               newvalue: voiceEncap
-            -
-              value: '104'
+            - value: '104'
               newvalue: voiceOverIp
-            -
-              value: '105'
+            - value: '105'
               newvalue: atmDxi
-            -
-              value: '106'
+            - value: '106'
               newvalue: atmFuni
-            -
-              value: '107'
+            - value: '107'
               newvalue: atmIma
-            -
-              value: '108'
+            - value: '108'
               newvalue: pppMultilinkBundle
-            -
-              value: '109'
+            - value: '109'
               newvalue: ipOverCdlc
-            -
-              value: '110'
+            - value: '110'
               newvalue: ipOverClaw
-            -
-              value: '111'
+            - value: '111'
               newvalue: stackToStack
-            -
-              value: '112'
+            - value: '112'
               newvalue: virtualIpAddress
-            -
-              value: '113'
+            - value: '113'
               newvalue: mpc
-            -
-              value: '114'
+            - value: '114'
               newvalue: ipOverAtm
-            -
-              value: '115'
+            - value: '115'
               newvalue: iso88025Fiber
-            -
-              value: '116'
+            - value: '116'
               newvalue: tdlc
-            -
-              value: '117'
+            - value: '117'
               newvalue: gigabitEthernet
-            -
-              value: '118'
+            - value: '118'
               newvalue: hdlc
-            -
-              value: '119'
+            - value: '119'
               newvalue: lapf
-            -
-              value: '120'
+            - value: '120'
               newvalue: v37
-            -
-              value: '121'
+            - value: '121'
               newvalue: x25mlp
-            -
-              value: '122'
+            - value: '122'
               newvalue: x25huntGroup
-            -
-              value: '123'
+            - value: '123'
               newvalue: trasnpHdlc
-            -
-              value: '124'
+            - value: '124'
               newvalue: interleave
-            -
-              value: '125'
+            - value: '125'
               newvalue: fast
-            -
-              value: '126'
+            - value: '126'
               newvalue: ip
-            -
-              value: '127'
+            - value: '127'
               newvalue: docsCableMaclayer
-            -
-              value: '128'
+            - value: '128'
               newvalue: docsCableDownstream
-            -
-              value: '129'
+            - value: '129'
               newvalue: docsCableUpstream
-            -
-              value: '130'
+            - value: '130'
               newvalue: a12MppSwitch
-            -
-              value: '131'
+            - value: '131'
               newvalue: tunnel
-            -
-              value: '132'
+            - value: '132'
               newvalue: coffee
-            -
-              value: '133'
+            - value: '133'
               newvalue: ces
-            -
-              value: '134'
+            - value: '134'
               newvalue: atmSubInterface
-            -
-              value: '135'
+            - value: '135'
               newvalue: l2vlan
-            -
-              value: '136'
+            - value: '136'
               newvalue: l3ipvlan
-            -
-              value: '137'
+            - value: '137'
               newvalue: l3ipxvlan
-            -
-              value: '138'
+            - value: '138'
               newvalue: digitalPowerline
-            -
-              value: '139'
+            - value: '139'
               newvalue: mediaMailOverIp
-            -
-              value: '140'
+            - value: '140'
               newvalue: dtm
-            -
-              value: '141'
+            - value: '141'
               newvalue: dcn
-            -
-              value: '142'
+            - value: '142'
               newvalue: ipForward
-            -
-              value: '143'
+            - value: '143'
               newvalue: msdsl
-            -
-              value: '144'
+            - value: '144'
               newvalue: ieee1394
-            -
-              value: '145'
+            - value: '145'
               newvalue: if-gsn
-            -
-              value: '146'
+            - value: '146'
               newvalue: dvbRccMacLayer
-            -
-              value: '147'
+            - value: '147'
               newvalue: dvbRccDownstream
-            -
-              value: '148'
+            - value: '148'
               newvalue: dvbRccUpstream
-            -
-              value: '149'
+            - value: '149'
               newvalue: atmVirtual
-            -
-              value: '150'
+            - value: '150'
               newvalue: mplsTunnel
-            -
-              value: '151'
+            - value: '151'
               newvalue: srp
-            -
-              value: '152'
+            - value: '152'
               newvalue: voiceOverAtm
-            -
-              value: '153'
+            - value: '153'
               newvalue: voiceOverFrameRelay
-            -
-              value: '154'
+            - value: '154'
               newvalue: idsl
-            -
-              value: '155'
+            - value: '155'
               newvalue: compositeLink
-            -
-              value: '156'
+            - value: '156'
               newvalue: ss7SigLink
-            -
-              value: '157'
+            - value: '157'
               newvalue: propWirelessP2P
-            -
-              value: '158'
+            - value: '158'
               newvalue: frForward
-            -
-              value: '159'
+            - value: '159'
               newvalue: rfc1483
-            -
-              value: '160'
+            - value: '160'
               newvalue: usb
-            -
-              value: '161'
+            - value: '161'
               newvalue: ieee8023adLag
-            -
-              value: '162'
+            - value: '162'
               newvalue: bgppolicyaccounting
-            -
-              value: '163'
+            - value: '163'
               newvalue: frf16MfrBundle
-            -
-              value: '164'
+            - value: '164'
               newvalue: h323Gatekeeper
-            -
-              value: '165'
+            - value: '165'
               newvalue: h323Proxy
-            -
-              value: '166'
+            - value: '166'
               newvalue: mpls
-            -
-              value: '167'
+            - value: '167'
               newvalue: mfSigLink
-            -
-              value: '168'
+            - value: '168'
               newvalue: hdsl2
-            -
-              value: '169'
+            - value: '169'
               newvalue: shdsl
-            -
-              value: '170'
+            - value: '170'
               newvalue: ds1FDL
-            -
-              value: '171'
+            - value: '171'
               newvalue: pos
-            -
-              value: '172'
+            - value: '172'
               newvalue: dvbAsiIn
-            -
-              value: '173'
+            - value: '173'
               newvalue: dvbAsiOut
-            -
-              value: '174'
+            - value: '174'
               newvalue: plc
-            -
-              value: '175'
+            - value: '175'
               newvalue: nfas
-            -
-              value: '176'
+            - value: '176'
               newvalue: tr008
-            -
-              value: '177'
+            - value: '177'
               newvalue: gr303RDT
-            -
-              value: '178'
+            - value: '178'
               newvalue: gr303IDT
-            -
-              value: '179'
+            - value: '179'
               newvalue: isup
-            -
-              value: '180'
+            - value: '180'
               newvalue: propDocsWirelessMaclayer
-            -
-              value: '181'
+            - value: '181'
               newvalue: propDocsWirelessDownstream
-            -
-              value: '182'
+            - value: '182'
               newvalue: propDocsWirelessUpstream
-            -
-              value: '183'
+            - value: '183'
               newvalue: hiperlan2
-            -
-              value: '184'
+            - value: '184'
               newvalue: propBWAp2Mp
-            -
-              value: '185'
+            - value: '185'
               newvalue: sonetOverheadChannel
-            -
-              value: '186'
+            - value: '186'
               newvalue: digitalWrapperOverheadChannel
-            -
-              value: '187'
+            - value: '187'
               newvalue: aal2
-            -
-              value: '188'
+            - value: '188'
               newvalue: radioMAC
-            -
-              value: '189'
+            - value: '189'
               newvalue: atmRadio
-            -
-              value: '190'
+            - value: '190'
               newvalue: imt
-            -
-              value: '191'
+            - value: '191'
               newvalue: mvl
-            -
-              value: '192'
+            - value: '192'
               newvalue: reachDSL
-            -
-              value: '193'
+            - value: '193'
               newvalue: frDlciEndPt
-            -
-              value: '194'
+            - value: '194'
               newvalue: atmVciEndPt
-            -
-              value: '195'
+            - value: '195'
               newvalue: opticalChannel
-            -
-              value: '196'
+            - value: '196'
               newvalue: opticalTransport
-            -
-              value: '197'
+            - value: '197'
               newvalue: propAtm
-            -
-              value: '198'
+            - value: '198'
               newvalue: voiceOverCable
-            -
-              value: '199'
+            - value: '199'
               newvalue: infiniband
-            -
-              value: '200'
+            - value: '200'
               newvalue: teLink
-            -
-              value: '201'
+            - value: '201'
               newvalue: q2931
-            -
-              value: '202'
+            - value: '202'
               newvalue: virtualTg
-            -
-              value: '203'
+            - value: '203'
               newvalue: sipTg
-            -
-              value: '204'
+            - value: '204'
               newvalue: sipSig
-            -
-              value: '205'
+            - value: '205'
               newvalue: docsCableUpstreamChannel
-            -
-              value: '206'
+            - value: '206'
               newvalue: econet
-            -
-              value: '207'
+            - value: '207'
               newvalue: pon155
-            -
-              value: '208'
+            - value: '208'
               newvalue: pon622
-            -
-              value: '209'
+            - value: '209'
               newvalue: bridge
-            -
-              value: '210'
+            - value: '210'
               newvalue: linegroup
-            -
-              value: '211'
+            - value: '211'
               newvalue: voiceEMFGD
-            -
-              value: '212'
+            - value: '212'
               newvalue: voiceFGDEANA
-            -
-              value: '213'
+            - value: '213'
               newvalue: voiceDID
-            -
-              value: '214'
+            - value: '214'
               newvalue: mpegTransport
-            -
-              value: '215'
+            - value: '215'
               newvalue: sixToFour
-            -
-              value: '216'
+            - value: '216'
               newvalue: gtp
-            -
-              value: '217'
+            - value: '217'
               newvalue: pdnEtherLoop1
-            -
-              value: '218'
+            - value: '218'
               newvalue: pdnEtherLoop2
-            -
-              value: '219'
+            - value: '219'
               newvalue: opticalChannelGroup
-            -
-              value: '220'
+            - value: '220'
               newvalue: homepna
-            -
-              value: '221'
+            - value: '221'
               newvalue: gfp
-            -
-              value: '222'
+            - value: '222'
               newvalue: ciscoISLvlan
-            -
-              value: '223'
+            - value: '223'
               newvalue: actelisMetaLOOP
-            -
-              value: '224'
+            - value: '224'
               newvalue: fcipLink
-            -
-              value: '225'
+            - value: '225'
               newvalue: rpr
-            -
-              value: '226'
+            - value: '226'
               newvalue: qam
-            -
-              value: '227'
+            - value: '227'
               newvalue: lmp
-            -
-              value: '228'
+            - value: '228'
               newvalue: cblVectaStar
-            -
-              value: '229'
+            - value: '229'
               newvalue: docsCableMCmtsDownstream
-            -
-              value: '230'
+            - value: '230'
               newvalue: adsl2
-            -
-              value: '231'
+            - value: '231'
               newvalue: macSecControlledIF
-            -
-              value: '232'
+            - value: '232'
               newvalue: macSecUncontrolledIF
-            -
-              value: '233'
+            - value: '233'
               newvalue: aviciOpticalEther
-            -
-              value: '234'
+            - value: '234'
               newvalue: atmbond
-            -
-              value: '235'
+            - value: '235'
               newvalue: voiceFGDOS
-            -
-              value: '236'
+            - value: '236'
               newvalue: mocaVersion1
-            -
-              value: '237'
+            - value: '237'
               newvalue: ieee80216WMAN
-            -
-              value: '238'
+            - value: '238'
               newvalue: adsl2plus
-            -
-              value: '239'
+            - value: '239'
               newvalue: dvbRcsMacLayer
-            -
-              value: '240'
+            - value: '240'
               newvalue: dvbTdm
-            -
-              value: '241'
+            - value: '241'
               newvalue: dvbRcsTdma
-            -
-              value: '242'
+            - value: '242'
               newvalue: x86Laps
-            -
-              value: '243'
+            - value: '243'
               newvalue: wwanPP
-            -
-              value: '244'
+            - value: '244'
               newvalue: wwanPP2
-            -
-              value: '245'
+            - value: '245'
               newvalue: voiceEBS
-            -
-              value: '246'
+            - value: '246'
               newvalue: ifPwType
-            -
-              value: '247'
+            - value: '247'
               newvalue: ilan
-            -
-              value: '248'
+            - value: '248'
               newvalue: pip
-            -
-              value: '249'
+            - value: '249'
               newvalue: aluELP
-            -
-              value: '250'
+            - value: '250'
               newvalue: gpon
-            -
-              value: '251'
+            - value: '251'
               newvalue: vdsl2
-            -
-              value: '252'
+            - value: '252'
               newvalue: capwapDot11Profile
-            -
-              value: '253'
+            - value: '253'
               newvalue: capwapDot11Bss
-            -
-              value: '254'
+            - value: '254'
               newvalue: capwapWtpVirtualRadio
-            -
-              value: '255'
+            - value: '255'
               newvalue: bits
-            -
-              value: '256'
+            - value: '256'
               newvalue: docsCableUpstreamRfPort
-            -
-              value: '257'
+            - value: '257'
               newvalue: cableDownstreamRfPort
-            -
-              value: '258'
+            - value: '258'
               newvalue: vmwareVirtualNic
-            -
-              value: '259'
+            - value: '259'
               newvalue: ieee802154
-            -
-              value: '260'
+            - value: '260'
               newvalue: otnOdu
-            -
-              value: '261'
+            - value: '261'
               newvalue: otnOtu
-            -
-              value: '262'
+            - value: '262'
               newvalue: ifVfiType
-            -
-              value: '263'
+            - value: '263'
               newvalue: g9981
-            -
-              value: '264'
+            - value: '264'
               newvalue: g9982
-            -
-              value: '265'
+            - value: '265'
               newvalue: g9983
-            -
-              value: '266'
+            - value: '266'
               newvalue: aluEpon
-            -
-              value: '267'
+            - value: '267'
               newvalue: aluEponOnu
-            -
-              value: '268'
+            - value: '268'
               newvalue: aluEponPhysicalUni
-            -
-              value: '269'
+            - value: '269'
               newvalue: aluEponLogicalLink
-            -
-              value: '270'
+            - value: '270'
               newvalue: aluGponOnu
-            -
-              value: '271'
+            - value: '271'
               newvalue: aluGponPhysicalUni
-            -
-              value: '272'
+            - value: '272'
               newvalue: vmwareNicTeam
-            -
-              value: '277'
+            - value: '277'
               newvalue: docsOfdmDownstream
-            -
-              value: '278'
+            - value: '278'
               newvalue: docsOfdmaUpstream
-            -
-              value: '279'
+            - value: '279'
               newvalue: gfast
-            -
-              value: '280'
+            - value: '280'
               newvalue: sdci
-            -
-              value: '281'
+            - value: '281'
               newvalue: xboxWireless
-            -
-              value: '282'
+            - value: '282'
               newvalue: fastdsl
-            -
-              value: '283'
+            - value: '283'
               newvalue: docsCableScte55d1FwdOob
-            -
-              value: '284'
+            - value: '284'
               newvalue: docsCableScte55d1RetOob
-            -
-              value: '285'
+            - value: '285'
               newvalue: docsCableScte55d2DsOob
-            -
-              value: '286'
+            - value: '286'
               newvalue: docsCableScte55d2UsOob
-            -
-              value: '287'
+            - value: '287'
               newvalue: docsCableNdf
-            -
-              value: '288'
+            - value: '288'
               newvalue: docsCableNdr
-            -
-              value: '289'
+            - value: '289'
               newvalue: ptm
-            -
-              value: '290'
+            - value: '290'
               newvalue: ghn
-        -
-          uuid: 1ccba0a6ed744226ba878957e7d1aa47
+        - uuid: 1ccba0a6ed744226ba878957e7d1aa47
           name: 'Service state'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: Down
-            -
-              value: '1'
+            - value: '1'
               newvalue: Up
-        -
-          uuid: 72e9f56c06b546319580d856fc112dc1
+        - uuid: 72e9f56c06b546319580d856fc112dc1
           name: zabbix.host.available
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: 'not available'
-            -
-              value: '1'
+            - value: '1'
               newvalue: available
-            -
-              value: '2'
+            - value: '2'
               newvalue: unknown
   triggers:
-    -
-      uuid: 8d66563ff7744cd6847325d473eaacfe
+    - uuid: 8d66563ff7744cd6847325d473eaacfe
       expression: 'max(/Linux by SNMP/system.swap.pfree[snmp],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by SNMP/system.swap.total[memTotalSwap.0])>0'
       name: 'Linux: High swap space usage'
       event_name: 'Linux: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
@@ -3187,18 +2505,14 @@ zabbix_export:
       priority: WARNING
       description: 'If there is no swap configured, this trigger is ignored.'
       dependencies:
-        -
-          name: 'Linux: High memory utilization'
+        - name: 'Linux: High memory utilization'
           expression: 'min(/Linux by SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
-        -
-          name: 'Linux: Lack of available memory'
+        - name: 'Linux: Lack of available memory'
           expression: 'max(/Linux by SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by SNMP/vm.memory.total[memTotalReal.0])>0'
       tags:
-        -
-          tag: scope
+        - tag: scope
           value: capacity
-    -
-      uuid: e129fb90ec084a83806aec27141cd6eb
+    - uuid: e129fb90ec084a83806aec27141cd6eb
       expression: '(last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Linux by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Linux: Host has been restarted'
       event_name: 'Linux: {HOST.NAME} has been restarted (uptime < 10m)'
@@ -3206,29 +2520,23 @@ zabbix_export:
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        -
-          name: 'Linux: No SNMP data collection'
+        - name: 'Linux: No SNMP data collection'
           expression: 'max(/Linux by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
-        -
-          tag: scope
+        - tag: scope
           value: notice
-    -
-      uuid: b0a04a6a01854d0eb6f9f225c1108261
+    - uuid: b0a04a6a01854d0eb6f9f225c1108261
       expression: 'max(/Linux by SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by SNMP/vm.memory.total[memTotalReal.0])>0'
       name: 'Linux: Lack of available memory'
       event_name: 'Linux: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       tags:
-        -
-          tag: scope
+        - tag: scope
           value: capacity
-        -
-          tag: scope
+        - tag: scope
           value: performance
-    -
-      uuid: 33df3354161047f0b47ad7736b70a302
+    - uuid: 33df3354161047f0b47ad7736b70a302
       expression: |
         min(/Linux by SNMP/system.cpu.load.avg1[laLoad.1],5m)/last(/Linux by SNMP/system.cpu.num[snmp])>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux by SNMP/system.cpu.load.avg5[laLoad.2])>0
@@ -3239,97 +2547,79 @@ zabbix_export:
       priority: AVERAGE
       description: 'The load average per CPU is too high. The system may be slow to respond.'
       tags:
-        -
-          tag: scope
+        - tag: scope
           value: capacity
-        -
-          tag: scope
+        - tag: scope
           value: performance
   graphs:
-    -
-      uuid: ff743a3e32e7497b9b98173b3611687f
+    - uuid: ff743a3e32e7497b9b98173b3611687f
       name: 'Linux: CPU jumps'
       graph_items:
-        -
-          color: 199C0D
+        - color: 199C0D
           item:
             host: 'Linux by SNMP'
             key: 'system.cpu.switches[ssRawContexts.0]'
-        -
-          sortorder: '1'
+        - sortorder: '1'
           color: F63100
           item:
             host: 'Linux by SNMP'
             key: 'system.cpu.intr[ssRawInterrupts.0]'
-    -
-      uuid: 16b11e6079864c71a7d068276a8e8650
+    - uuid: 16b11e6079864c71a7d068276a8e8650
       name: 'Linux: Memory usage'
       ymin_type_1: FIXED
       graph_items:
-        -
-          drawtype: BOLD_LINE
+        - drawtype: BOLD_LINE
           color: 199C0D
           item:
             host: 'Linux by SNMP'
             key: 'vm.memory.total[memTotalReal.0]'
-        -
-          sortorder: '1'
+        - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
             host: 'Linux by SNMP'
             key: 'vm.memory.available[snmp]'
-    -
-      uuid: 5cd95425d8fe4705833995ccfb484c66
+    - uuid: 5cd95425d8fe4705833995ccfb484c66
       name: 'Linux: Memory utilization'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
-        -
-          drawtype: GRADIENT_LINE
+        - drawtype: GRADIENT_LINE
           color: 199C0D
           item:
             host: 'Linux by SNMP'
             key: 'vm.memory.util[snmp]'
-    -
-      uuid: 421c99e9076c4f24931206255577c988
+    - uuid: 421c99e9076c4f24931206255577c988
       name: 'Linux: Swap usage'
       graph_items:
-        -
-          color: 199C0D
+        - color: 199C0D
           item:
             host: 'Linux by SNMP'
             key: 'system.swap.free[memAvailSwap.0]'
-        -
-          sortorder: '1'
+        - sortorder: '1'
           color: F63100
           item:
             host: 'Linux by SNMP'
             key: 'system.swap.total[memTotalSwap.0]'
-    -
-      uuid: feff7234e6cc420e94acc3c0dab0a61e
+    - uuid: feff7234e6cc420e94acc3c0dab0a61e
       name: 'Linux: System load'
       ymin_type_1: FIXED
       graph_items:
-        -
-          color: 199C0D
+        - color: 199C0D
           item:
             host: 'Linux by SNMP'
             key: 'system.cpu.load.avg1[laLoad.1]'
-        -
-          sortorder: '1'
+        - sortorder: '1'
           color: F63100
           item:
             host: 'Linux by SNMP'
             key: 'system.cpu.load.avg5[laLoad.2]'
-        -
-          sortorder: '2'
+        - sortorder: '2'
           color: 00611C
           item:
             host: 'Linux by SNMP'
             key: 'system.cpu.load.avg15[laLoad.3]'
-        -
-          sortorder: '3'
+        - sortorder: '3'
           color: F7941D
           yaxisside: RIGHT
           item:

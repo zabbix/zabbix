@@ -1,12 +1,10 @@
 zabbix_export:
   version: '7.0'
   template_groups:
-    -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
-    -
-      uuid: 90ac276995294a6aa88462c032d2ddaf
+    - uuid: 90ac276995294a6aa88462c032d2ddaf
       template: 'Systemd by Zabbix agent 2'
       name: 'Systemd by Zabbix agent 2'
       description: |
@@ -21,48 +19,39 @@ zabbix_export:
         name: Zabbix
         version: 7.0-0
       groups:
-        -
-          name: Templates/Applications
+        - name: Templates/Applications
       discovery_rules:
-        -
-          uuid: 0dfbc5994c1e44a6a1a2aa8ecc2f0347
+        - uuid: 0dfbc5994c1e44a6a1a2aa8ecc2f0347
           name: 'Service units discovery'
           key: 'systemd.unit.discovery[service]'
           delay: 30m
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#UNIT.ACTIVESTATE}'
+              - macro: '{#UNIT.ACTIVESTATE}'
                 value: '{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#UNIT.ACTIVESTATE}'
+              - macro: '{#UNIT.ACTIVESTATE}'
                 value: '{$SYSTEMD.ACTIVESTATE.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              -
-                macro: '{#UNIT.UNITFILESTATE}'
+              - macro: '{#UNIT.UNITFILESTATE}'
                 value: '{$SYSTEMD.UNITFILESTATE.SERVICE.MATCHES}'
                 formulaid: E
-              -
-                macro: '{#UNIT.UNITFILESTATE}'
+              - macro: '{#UNIT.UNITFILESTATE}'
                 value: '{$SYSTEMD.UNITFILESTATE.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-              -
-                macro: '{#UNIT.NAME}'
+              - macro: '{#UNIT.NAME}'
                 value: '{$SYSTEMD.NAME.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              -
-                macro: '{#UNIT.NAME}'
+              - macro: '{#UNIT.NAME}'
                 value: '{$SYSTEMD.NAME.SERVICE.MATCHES}'
                 formulaid: D
           description: 'Discover systemd service units and their details.'
           item_prototypes:
-            -
-              uuid: 78587e9b16b5431bbccd2855998171fa
+            - uuid: 78587e9b16b5431bbccd2855998171fa
               name: '{#UNIT.NAME}: Active state'
               type: DEPENDENT
               key: 'systemd.service.active_state["{#UNIT.NAME}"]'
@@ -72,33 +61,27 @@ zabbix_export:
               valuemap:
                 name: 'Unit Active State'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.ActiveState.state
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 30m
               master_item:
                 key: 'systemd.unit.get["{#UNIT.NAME}"]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: service
               trigger_prototypes:
-                -
-                  uuid: 5237bd423307449b8a58f692082d2a0a
+                - uuid: 5237bd423307449b8a58f692082d2a0a
                   expression: 'last(/Systemd by Zabbix agent 2/systemd.service.active_state["{#UNIT.NAME}"])<>1'
                   name: '{#UNIT.NAME}: Service is not running'
                   priority: WARNING
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-            -
-              uuid: bed610e6ce33494b817eb787e34e18c2
+            - uuid: bed610e6ce33494b817eb787e34e18c2
               name: '{#UNIT.NAME}: Load state'
               type: DEPENDENT
               key: 'systemd.service.load_state["{#UNIT.NAME}"]'
@@ -108,22 +91,18 @@ zabbix_export:
               valuemap:
                 name: 'Unit Load State'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.LoadState.state
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 30m
               master_item:
                 key: 'systemd.unit.get["{#UNIT.NAME}"]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: service
-            -
-              uuid: f1174eb5abf74e028a75ab9bb8eec649
+            - uuid: f1174eb5abf74e028a75ab9bb8eec649
               name: '{#UNIT.NAME}: Unit file state'
               type: DEPENDENT
               key: 'systemd.service.unitfile_state["{#UNIT.NAME}"]'
@@ -133,22 +112,18 @@ zabbix_export:
               valuemap:
                 name: 'Unit File State'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.UnitFileState.state
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 30m
               master_item:
                 key: 'systemd.unit.get["{#UNIT.NAME}"]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: service
-            -
-              uuid: a35992b54d944a389c1bb44748a37fdb
+            - uuid: a35992b54d944a389c1bb44748a37fdb
               name: '{#UNIT.NAME}: Active time'
               type: DEPENDENT
               key: 'systemd.service.uptime["{#UNIT.NAME}"]'
@@ -158,8 +133,7 @@ zabbix_export:
               units: s
               description: 'Number of seconds since unit entered the active state.'
               preprocessing:
-                -
-                  type: JAVASCRIPT
+                - type: JAVASCRIPT
                   parameters:
                     - |
                       data = JSON.parse(value)
@@ -170,12 +144,10 @@ zabbix_export:
               master_item:
                 key: 'systemd.unit.get["{#UNIT.NAME}"]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: service
               trigger_prototypes:
-                -
-                  uuid: e2292c5ead924500a06d38b6356930c7
+                - uuid: e2292c5ead924500a06d38b6356930c7
                   expression: 'last(/Systemd by Zabbix agent 2/systemd.service.uptime["{#UNIT.NAME}"])<10m'
                   name: '{#UNIT.NAME}: has been restarted'
                   event_name: '{#UNIT.NAME}: has been restarted (uptime < 10m)'
@@ -183,11 +155,9 @@ zabbix_export:
                   description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: bdb94d1182114985a8734de7d5d92380
+            - uuid: bdb94d1182114985a8734de7d5d92380
               name: '{#UNIT.NAME}: Get unit info'
               key: 'systemd.unit.get["{#UNIT.NAME}"]'
               history: '0'
@@ -197,51 +167,41 @@ zabbix_export:
                 Returns all properties of a systemd service unit.
                  Unit description: {#UNIT.DESCRIPTION}.
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: raw
-                -
-                  tag: component
+                - tag: component
                   value: unit
-        -
-          uuid: 5c337762ae7b43a98fcb9dc3102a8467
+        - uuid: 5c337762ae7b43a98fcb9dc3102a8467
           name: 'Socket units discovery'
           key: 'systemd.unit.discovery[socket]'
           delay: 30m
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#UNIT.ACTIVESTATE}'
+              - macro: '{#UNIT.ACTIVESTATE}'
                 value: '{$SYSTEMD.ACTIVESTATE.SOCKET.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#UNIT.ACTIVESTATE}'
+              - macro: '{#UNIT.ACTIVESTATE}'
                 value: '{$SYSTEMD.ACTIVESTATE.SOCKET.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              -
-                macro: '{#UNIT.UNITFILESTATE}'
+              - macro: '{#UNIT.UNITFILESTATE}'
                 value: '{$SYSTEMD.UNITFILESTATE.SOCKET.MATCHES}'
                 formulaid: E
-              -
-                macro: '{#UNIT.UNITFILESTATE}'
+              - macro: '{#UNIT.UNITFILESTATE}'
                 value: '{$SYSTEMD.UNITFILESTATE.SOCKET.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-              -
-                macro: '{#UNIT.NAME}'
+              - macro: '{#UNIT.NAME}'
                 value: '{$SYSTEMD.NAME.SOCKET.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              -
-                macro: '{#UNIT.NAME}'
+              - macro: '{#UNIT.NAME}'
                 value: '{$SYSTEMD.NAME.SOCKET.MATCHES}'
                 formulaid: D
           description: 'Discover systemd socket units and their details.'
           item_prototypes:
-            -
-              uuid: 462ee6b9e70146c8ab6a917c182f3ce7
+            - uuid: 462ee6b9e70146c8ab6a917c182f3ce7
               name: '{#UNIT.NAME}: Connections accepted per sec'
               type: DEPENDENT
               key: 'systemd.socket.conn_accepted.rate["{#UNIT.NAME}"]'
@@ -249,22 +209,18 @@ zabbix_export:
               history: 7d
               description: 'The number of accepted socket connections (NAccepted) per second.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.NAccepted
-                -
-                  type: CHANGE_PER_SECOND
+                - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
                 key: 'systemd.unit.get["{#UNIT.NAME}",Socket]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: socket
-            -
-              uuid: 258a899aba9546db956b8e235738bd89
+            - uuid: 258a899aba9546db956b8e235738bd89
               name: '{#UNIT.NAME}: Connections connected'
               type: DEPENDENT
               key: 'systemd.socket.conn_count["{#UNIT.NAME}"]'
@@ -272,18 +228,15 @@ zabbix_export:
               history: 7d
               description: 'The current number of socket connections (NConnections).'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.NConnections
               master_item:
                 key: 'systemd.unit.get["{#UNIT.NAME}",Socket]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: socket
-            -
-              uuid: 83ffad5a484d48e388ac658511d4b803
+            - uuid: 83ffad5a484d48e388ac658511d4b803
               name: '{#UNIT.NAME}: Get unit info'
               key: 'systemd.unit.get["{#UNIT.NAME}",Socket]'
               history: '0'
@@ -293,198 +246,145 @@ zabbix_export:
                 Returns all properties of a systemd socket unit.
                  Unit description: {#UNIT.DESCRIPTION}.
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: raw
-                -
-                  tag: component
+                - tag: component
                   value: socket
       tags:
-        -
-          tag: class
+        - tag: class
           value: software
-        -
-          tag: target
+        - tag: target
           value: systemd
       macros:
-        -
-          macro: '{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}'
+        - macro: '{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}'
           value: active
           description: 'Filter of systemd service units by active state'
-        -
-          macro: '{$SYSTEMD.ACTIVESTATE.SERVICE.NOT_MATCHES}'
+        - macro: '{$SYSTEMD.ACTIVESTATE.SERVICE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter of systemd service units by active state'
-        -
-          macro: '{$SYSTEMD.ACTIVESTATE.SOCKET.MATCHES}'
+        - macro: '{$SYSTEMD.ACTIVESTATE.SOCKET.MATCHES}'
           value: active
           description: 'Filter of systemd socket units by active state'
-        -
-          macro: '{$SYSTEMD.ACTIVESTATE.SOCKET.NOT_MATCHES}'
+        - macro: '{$SYSTEMD.ACTIVESTATE.SOCKET.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter of systemd socket units by active state'
-        -
-          macro: '{$SYSTEMD.NAME.SERVICE.MATCHES}'
+        - macro: '{$SYSTEMD.NAME.SERVICE.MATCHES}'
           value: '.*'
           description: 'Filter of systemd service units by name'
-        -
-          macro: '{$SYSTEMD.NAME.SERVICE.NOT_MATCHES}'
+        - macro: '{$SYSTEMD.NAME.SERVICE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter of systemd service units by name'
-        -
-          macro: '{$SYSTEMD.NAME.SOCKET.MATCHES}'
+        - macro: '{$SYSTEMD.NAME.SOCKET.MATCHES}'
           value: '.*'
           description: 'Filter of systemd socket units by name'
-        -
-          macro: '{$SYSTEMD.NAME.SOCKET.NOT_MATCHES}'
+        - macro: '{$SYSTEMD.NAME.SOCKET.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter of systemd socket units by name'
-        -
-          macro: '{$SYSTEMD.UNITFILESTATE.SERVICE.MATCHES}'
+        - macro: '{$SYSTEMD.UNITFILESTATE.SERVICE.MATCHES}'
           value: enabled
           description: 'Filter of systemd service units by unit file state'
-        -
-          macro: '{$SYSTEMD.UNITFILESTATE.SERVICE.NOT_MATCHES}'
+        - macro: '{$SYSTEMD.UNITFILESTATE.SERVICE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter of systemd service units by unit file state'
-        -
-          macro: '{$SYSTEMD.UNITFILESTATE.SOCKET.MATCHES}'
+        - macro: '{$SYSTEMD.UNITFILESTATE.SOCKET.MATCHES}'
           value: enabled
           description: 'Filter of systemd socket units by unit file state'
-        -
-          macro: '{$SYSTEMD.UNITFILESTATE.SOCKET.NOT_MATCHES}'
+        - macro: '{$SYSTEMD.UNITFILESTATE.SOCKET.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter of systemd socket units by unit file state'
       dashboards:
-        -
-          uuid: 35c40e164dc64c3997206b042a49f5c4
+        - uuid: 35c40e164dc64c3997206b042a49f5c4
           name: 'Systemd: Overview'
           pages:
-            -
-              name: Services
+            - name: Services
               widgets:
-                -
-                  type: graphprototype
+                - type: graphprototype
                   width: '24'
                   height: '20'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '2'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '5'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: source_type
                       value: '3'
-                    -
-                      type: ITEM_PROTOTYPE
+                    - type: ITEM_PROTOTYPE
                       name: itemid
                       value:
                         host: 'Systemd by Zabbix agent 2'
                         key: 'systemd.service.active_state["{#UNIT.NAME}"]'
-            -
-              name: Sockets
+            - name: Sockets
               widgets:
-                -
-                  type: graphprototype
+                - type: graphprototype
                   width: '24'
                   height: '20'
                   fields:
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: columns
                       value: '2'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: rows
                       value: '5'
-                    -
-                      type: INTEGER
+                    - type: INTEGER
                       name: source_type
                       value: '3'
-                    -
-                      type: ITEM_PROTOTYPE
+                    - type: ITEM_PROTOTYPE
                       name: itemid
                       value:
                         host: 'Systemd by Zabbix agent 2'
                         key: 'systemd.socket.conn_count["{#UNIT.NAME}"]'
       valuemaps:
-        -
-          uuid: fe20979701834a80a823c514d11c19e7
+        - uuid: fe20979701834a80a823c514d11c19e7
           name: 'Unit Active State'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: unknown
-            -
-              value: '1'
+            - value: '1'
               newvalue: active
-            -
-              value: '2'
+            - value: '2'
               newvalue: reloading
-            -
-              value: '3'
+            - value: '3'
               newvalue: inactive
-            -
-              value: '4'
+            - value: '4'
               newvalue: failed
-            -
-              value: '5'
+            - value: '5'
               newvalue: activating
-            -
-              value: '6'
+            - value: '6'
               newvalue: deactivating
-        -
-          uuid: e0a5e55e5a074a26935386c5e29a0e36
+        - uuid: e0a5e55e5a074a26935386c5e29a0e36
           name: 'Unit File State'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: unknown
-            -
-              value: '1'
+            - value: '1'
               newvalue: enabled
-            -
-              value: '2'
+            - value: '2'
               newvalue: enabled-runtime
-            -
-              value: '3'
+            - value: '3'
               newvalue: linked
-            -
-              value: '4'
+            - value: '4'
               newvalue: linked-runtime
-            -
-              value: '5'
+            - value: '5'
               newvalue: masked
-            -
-              value: '6'
+            - value: '6'
               newvalue: masked-runtime
-            -
-              value: '7'
+            - value: '7'
               newvalue: static
-            -
-              value: '8'
+            - value: '8'
               newvalue: disabled
-            -
-              value: '9'
+            - value: '9'
               newvalue: invalid
-        -
-          uuid: 0309ef57e92a4ea2ae4404a685f0e7b8
+        - uuid: 0309ef57e92a4ea2ae4404a685f0e7b8
           name: 'Unit Load State'
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: unknown
-            -
-              value: '1'
+            - value: '1'
               newvalue: loaded
-            -
-              value: '2'
+            - value: '2'
               newvalue: error
-            -
-              value: '3'
+            - value: '3'
               newvalue: masked
