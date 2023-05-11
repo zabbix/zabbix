@@ -225,7 +225,6 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 				case ZBX_REGEXP_NO_MATCH:
 					*result = (ZBX_CONDITION_OPERATOR_NOT_REGEXP == condition->op ? 1 : 0);
 					break;
-					break;
 				default:
 					*err_msg = zbx_strdcatf(*err_msg,
 						"Cannot accurately apply filter: invalid regular expression \"%s\".\n",
