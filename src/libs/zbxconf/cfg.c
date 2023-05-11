@@ -23,7 +23,14 @@
 #include "log.h"
 #include "zbxip.h"
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#include <shlwapi.h>
+#else
+#include <libgen.h>
+#endif
+
 static const char	*program_type_str = NULL;
+static const char	*main_cfg_file = NULL;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
 		int noexit);
@@ -291,6 +298,52 @@ out:
 }
 #endif
 
+static char	*expand_include_path(char *raw_path)
+{
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	wchar_t	*wraw_path;
+
+	wraw_path = zbx_utf8_to_unicode(raw_path);
+
+	if (TRUE == PathIsRelativeW(wraw_path))
+	{
+		wchar_t	*wconfig_path, dir_buf[_MAX_DIR];
+		char	*dir_utf8, *result = NULL;
+
+		zbx_free(wraw_path);
+
+		wconfig_path = zbx_utf8_to_unicode(main_cfg_file);
+		_wsplitpath(wconfig_path, NULL, dir_buf, NULL, NULL);
+
+		zbx_free(wconfig_path);
+
+		dir_utf8 = zbx_unicode_to_utf8(dir_buf);
+		result = zbx_dsprintf(result, "%s%s", dir_utf8, raw_path);
+
+		zbx_free(raw_path);
+		zbx_free(dir_utf8);
+
+		return result;
+	}
+
+	zbx_free(wraw_path);
+#else
+	if ('/' != *raw_path)
+	{
+		char	*cfg_file, *path;
+
+		cfg_file = zbx_strdup(NULL, main_cfg_file);
+		path = zbx_dsprintf(NULL, "%s/%s", dirname(cfg_file), raw_path);
+		zbx_free(cfg_file);
+
+		zbx_free(raw_path);
+
+		return path;
+	}
+#endif
+	return raw_path;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parse "Include=..." line in configuration file                    *
@@ -313,6 +366,8 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
 		goto clean;
+
+	path = expand_include_path(path);
 
 	if (0 != zbx_stat(path, &sb))
 	{
@@ -557,9 +612,10 @@ error:
 	return FAIL;
 }
 
-void	zbx_init_library_cfg(unsigned char program_type)
+void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
 {
 	program_type_str = get_program_type_string(program_type);
+	main_cfg_file = cfg_file;
 }
 
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)

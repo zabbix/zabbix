@@ -158,6 +158,7 @@ int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 	return add_to_metrics(&commands, metric, error, max_error_len);
 }
 
+#ifdef WITH_COMMON_METRICS
 /******************************************************************************
  *                                                                            *
  * Purpose: registers a new item key as local into the system                 *
@@ -167,6 +168,7 @@ static int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_le
 {
 	return add_to_metrics(&commands_local, metric, error, max_error_len);
 }
+#endif /* WITH_COMMON_METRICS */
 
 #if !defined(__MINGW32__)
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
@@ -274,8 +276,13 @@ int	sysinfo_get_config_timeout(void)
 
 void	zbx_init_metrics(void)
 {
+#if (defined(WITH_AGENT_METRICS) || defined(WITH_COMMON_METRICS) || defined(WITH_HTTP_METRICS) ||	\
+	defined(WITH_SPECIFIC_METRICS) || defined(WITH_SIMPLE_METRICS))
 	int	i;
 	char	error[MAX_STRING_LEN];
+#elif (defined(WITH_HOSTNAME_METRIC))
+	char	error[MAX_STRING_LEN];
+#endif
 
 	zbx_init_key_access_rules();
 

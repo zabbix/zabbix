@@ -114,7 +114,7 @@ int	zbx_connector_get_diag_stats(zbx_uint64_t *queued, char **error)
 		zabbix_log(LOG_LEVEL_DEBUG, "connector is not initialized: please check \"StartConnectors\""
 				" configuration parameter");
 
-		queued = 0;
+		*queued = 0;
 		return SUCCEED;
 	}
 

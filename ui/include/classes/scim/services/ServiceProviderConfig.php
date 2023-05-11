@@ -40,7 +40,7 @@ class ServiceProviderConfig extends ScimApiService {
 	public function get(array $options = []): array {
 		return [
 			'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig'],
-			'patch' => ['supported' => false],
+			'patch' => ['supported' => true],
 			'bulk' => [
 				'supported' => false,
 				'maxOperations' => 0,

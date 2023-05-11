@@ -354,16 +354,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->setEnabled(!$data['readonly']);
 		}
 		else {
-			$media_name = new CDiv([
-				$media['name'],
-				(new CSpan([
-					' ',
-					makeWarningIcon(
-						_('Media type disabled by Administration.')
-					)
-				]))
-			]);
-
+			$media_name = new CDiv([$media['name'], makeWarningIcon(_('Media type disabled by Administration.'))]);
 			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);
 		}
 
@@ -495,7 +486,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
+						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];
@@ -508,7 +499,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
+						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];

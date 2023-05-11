@@ -756,7 +756,9 @@ void	DCrequeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num);
 void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+#ifdef HAVE_OPENIPMI
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
+#endif
 
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
@@ -1184,4 +1186,9 @@ zbx_maintenance_type_t;
 #define ZBX_CORR_CONDITION_EVENT_TAG_PAIR		3
 #define ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE		4
 #define ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE		5
+
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(int *ts_from, int table_group);
+
 #endif

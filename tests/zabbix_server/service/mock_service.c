@@ -38,7 +38,6 @@ int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_
 void	__wrap_zbx_clean_events(void);
 int	__wrap_zbx_interface_availability_is_set(const void *ia);
 
-
 /* stubs to satisfy hard link dependenceies */
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);

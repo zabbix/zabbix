@@ -538,8 +538,9 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_GET_SCOPE(task)	(int)(((unsigned int)task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
 #define ZBX_RTC_GET_DATA(task)	(int)(((unsigned int)task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
 
-#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
-	(data << ZBX_RTC_DATA_SHIFT))
+#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	(((zbx_uint32_t)msg << ZBX_RTC_MSG_SHIFT) | \
+						((zbx_uint32_t)scope << ZBX_RTC_SCOPE_SHIFT) | \
+						((zbx_uint32_t)data << ZBX_RTC_DATA_SHIFT))
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576

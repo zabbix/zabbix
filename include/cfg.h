@@ -70,7 +70,7 @@ typedef struct
 void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from);
 void	zbx_addr_free(zbx_addr_t *addr);
 
-void	zbx_init_library_cfg(unsigned char program_type);
+void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
 
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit);
 

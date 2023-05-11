@@ -59,9 +59,9 @@ function make_decoration($haystack, $needle, $class = null) {
 	$pos = mb_strpos($tmpHaystack, $tmpNeedle);
 
 	if ($pos !== false) {
-		$start = CHtml::encode(mb_substr($haystack, 0, $pos));
-		$end = CHtml::encode(mb_substr($haystack, $pos + mb_strlen($needle)));
-		$found = CHtml::encode(mb_substr($haystack, $pos, mb_strlen($needle)));
+		$start = mb_substr($haystack, 0, $pos);
+		$end = mb_substr($haystack, $pos + mb_strlen($needle));
+		$found = mb_substr($haystack, $pos, mb_strlen($needle));
 
 		if (is_null($class)) {
 			$result = [$start, bold($found), $end];
@@ -138,17 +138,49 @@ function BR() {
 	return new CTag('br');
 }
 
+function BULLET() {
+	return new CHtmlEntity('&bullet;');
+}
+
+function COPYR() {
+	return new CHtmlEntity('&copy;');
+}
+
+function HELLIP() {
+	return new CHtmlEntity('&hellip;');
+}
+
+function LARR() {
+	return new CHtmlEntity('&lArr;');
+}
+
+function NBSP() {
+	return new CHtmlEntity('&nbsp;');
+}
+
+function NDASH() {
+	return new CHtmlEntity('&ndash;');
+}
+
+function RARR() {
+	return new CHtmlEntity('&rArr;');
+}
+
+function ZWSPACE() {
+	return new CHtmlEntity('&#8203;');
+}
+
 function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favorite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
-				$icon = (new CRedirectButton(SPACE, null))
+				$icon = (new CRedirectButton(NBSP(), null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
 					->setTitle(_('Remove from favorites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
-				$icon = (new CRedirectButton(SPACE, null))
+				$icon = (new CRedirectButton(NBSP(), null))
 					->addClass(ZBX_STYLE_BTN_ADD_FAV)
 					->setTitle(_('Add to favorites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
@@ -159,7 +191,7 @@ function get_icon($type, $params = []) {
 
 		case 'kioskmode':
 			if ($params['mode'] == ZBX_LAYOUT_KIOSKMODE) {
-				$icon = (new CButton(null, '&nbsp;'))
+				$icon = (new CButton(null, NBSP()))
 					->setTitle(_('Normal view'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 					->addClass(ZBX_LAYOUT_MODE)
@@ -167,7 +199,7 @@ function get_icon($type, $params = []) {
 					->addClass(ZBX_STYLE_BTN_MIN);
 			}
 			else {
-				$icon = (new CButton(null, '&nbsp;'))
+				$icon = (new CButton(null, NBSP()))
 					->setTitle(_('Kiosk mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
 					->addClass(ZBX_LAYOUT_MODE)
@@ -308,7 +340,7 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$host = new CSpan(
-			(new CLink(CHtml::encode($db_host['name']),
+			(new CLink($db_host['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'host.edit')
 					->setArgument('hostid', $db_host['hostid'])
@@ -437,11 +469,11 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	else {
 		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
-				CHtml::encode($db_discovery_rule['name']),
-					(new CUrl('host_discovery.php'))
-						->setArgument('form', 'update')
-						->setArgument('itemid', $db_discovery_rule['itemid'])
-						->setArgument('context', $context)
+				$db_discovery_rule['name'],
+				(new CUrl('host_discovery.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
 			)
 		);
 
@@ -631,7 +663,7 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the host group
  *
- * @return CDiv
+ * @return CLink
  */
 function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -658,7 +690,7 @@ function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the host
  *
- * @return CDiv
+ * @return CLink
  */
 function getHostLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -685,7 +717,7 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the graph
  *
- * @return CDiv
+ * @return CLink
  */
 function getGraphLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -712,7 +744,7 @@ function getGraphLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the trigger
  *
- * @return CDiv
+ * @return CLink
  */
 function getTriggerLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.
@@ -739,7 +771,7 @@ function getTriggerLifetimeIndicator($current_time, $ts_delete) {
  * @param string $current_time	current Unix timestamp
  * @param array  $ts_delete		deletion timestamp of the item
  *
- * @return CDiv
+ * @return CLink
  */
 function getItemLifetimeIndicator($current_time, $ts_delete) {
 	// Check if the element should've been deleted in the past.

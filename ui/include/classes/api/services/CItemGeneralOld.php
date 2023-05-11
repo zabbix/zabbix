@@ -61,6 +61,7 @@ abstract class CItemGeneralOld extends CApiService {
 		// system - values should not be updated
 		// host - value should be null for template items
 		$this->fieldRules = [
+			'uuid'					=> ['template' => 1],
 			'type'					=> ['template' => 1],
 			'snmp_oid'				=> ['template' => 1],
 			'hostid'				=> [],
@@ -136,8 +137,7 @@ abstract class CItemGeneralOld extends CApiService {
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
-			'uuid' => ['type' => API_UUID]
+			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
 		]];
 		if ($update) {
 			unset($api_input_rules['fields']['type']['flags']);
@@ -184,6 +184,8 @@ abstract class CItemGeneralOld extends CApiService {
 				'value_type' => null,
 				'delay' => null
 			];
+
+			$dbItems = null;
 
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'status', 'name'],
@@ -254,6 +256,13 @@ abstract class CItemGeneralOld extends CApiService {
 			}
 			unset($item);
 		}
+		else {
+			foreach ($items as &$item) {
+				$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
+				unset($item['itemid']);
+			}
+			unset($item);
+		}
 
 		$item_key_parser = new CItemKey();
 		$ip_range_parser = new CIPRangeParser([
@@ -296,12 +305,16 @@ abstract class CItemGeneralOld extends CApiService {
 					$item['name']
 				);
 
-				// apply rules
-				foreach ($this->fieldRules as $field => $rules) {
-					if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
-						$rules['template'] = 1;
-					}
+				$field_rules = $this->fieldRules;
 
+				if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
+					$field_rules = [
+						'params' => ['template' => 1]
+					] + $this->fieldRules;
+				}
+
+				// apply rules
+				foreach ($field_rules as $field => $rules) {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
 
@@ -449,14 +462,14 @@ abstract class CItemGeneralOld extends CApiService {
 
 			// item key
 			if ($fullItem['type'] == ITEM_TYPE_DB_MONITOR) {
-				if (!isset($fullItem['flags']) || $fullItem['flags'] != ZBX_FLAG_DISCOVERY_RULE) {
+				if ($fullItem['flags'] != ZBX_FLAG_DISCOVERY_RULE) {
 					if (strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('Check the key, please. Default example was passed.')
 						);
 					}
 				}
-				elseif ($fullItem['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
+				else {
 					if (strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('Check the key, please. Default example was passed.')
@@ -596,47 +609,96 @@ abstract class CItemGeneralOld extends CApiService {
 
 		$this->validateValueMaps($items);
 
-		$this->checkAndAddUuid($items, $dbHosts, $update);
+		self::validateUuid($items, $dbHosts);
+
+		if (!$update) {
+			self::addUuid($items, $dbHosts);
+		}
+
+		self::checkUuidDuplicates($items, $dbItems);
 		$this->checkExistingItems($items);
 	}
 
 	/**
-	 * Check that only items on templates have UUID. Add UUID to all host prototypes on templates,
-	 *   if it doesn't exist.
-	 *
-	 * @param array $items_to_create
+	 * @param array $items
 	 * @param array $db_hosts
-	 * @param bool $is_update
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
-		if ($is_update) {
-			return;
+	private static function validateUuid(array $items, array $db_hosts): void {
+		foreach ($items as &$item) {
+			$item['host_status'] = $db_hosts[$item['hostid']]['status'];
 		}
+		unset($item);
 
-		foreach ($items_to_create as $index => &$item) {
-			if ($db_hosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE && array_key_exists('uuid', $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
-			}
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			]]
+		]];
 
+		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
+	 * Add the UUID to those of the given items that belong to a template and don't have the 'uuid' parameter set.
+	 *
+	 * @param array $items
+	 * @param array $db_hosts
+	 */
+	private static function addUuid(array &$items, array $db_hosts): void {
+		foreach ($items as &$item) {
 			if ($db_hosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
 				$item['uuid'] = generateUuidV4();
 			}
 		}
 		unset($item);
+	}
 
-		$db_uuid = DB::select('items', [
+	/**
+	 * Verify item UUIDs are not repeated.
+	 *
+	 * @param array      $items
+	 * @param array|null $db_items
+	 *
+	 * @throws APIException
+	 */
+	private static function checkUuidDuplicates(array $items, ?array $db_items): void {
+		$item_indexes = [];
+
+		foreach ($items as $i => $item) {
+			if (!array_key_exists('uuid', $item) || $item['uuid'] === '') {
+				continue;
+			}
+
+			if ($db_items === null || $item['uuid'] !== $db_items[$item['itemid']]['uuid']) {
+				$item_indexes[$item['uuid']] = $i;
+			}
+		}
+
+		if (!$item_indexes) {
+			return;
+		}
+
+		$duplicates = DB::select('items', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($items_to_create, 'uuid')],
+			'filter' => [
+				'flags' => ZBX_FLAG_DISCOVERY_RULE,
+				'uuid' => array_keys($item_indexes)
+			],
 			'limit' => 1
 		]);
 
-		if ($db_uuid) {
+		if ($duplicates) {
+
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
+				_s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+					_('LLD rule with the same UUID already exists')
+				)
 			);
 		}
 	}
@@ -2893,9 +2955,7 @@ abstract class CItemGeneralOld extends CApiService {
 
 		// Select tags from database.
 		$db_tags = DBselect(
-			'SELECT itemtagid, itemid, tag, value'.
-			' FROM item_tag'.
-			' WHERE '.dbConditionInt('itemid', array_keys($items))
+			'SELECT itemtagid,itemid,tag,value FROM item_tag WHERE '.dbConditionInt('itemid', array_keys($items))
 		);
 
 		array_walk($items, function (&$item) {
