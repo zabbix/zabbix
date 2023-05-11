@@ -232,11 +232,12 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 	}
 
 	$sysmapIds = getRequest('maps', []);
-	$sysmap_count = count($sysmapIds);
 
 	if (hasRequest('sysmapid')) {
 		$sysmapIds[] = getRequest('sysmapid');
 	}
+
+	$sysmap_count = count($sysmapIds);
 
 	DBstart();
 
