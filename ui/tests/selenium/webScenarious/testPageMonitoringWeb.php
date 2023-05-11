@@ -19,17 +19,17 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup hosts, httptest
  *
  * @onBefore prepareHostWebData
  */
-class testPageWeb extends CWebTest {
+class testPageMonitoringWeb extends CWebTest {
 
 	use TableTrait;
 
@@ -138,7 +138,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks the layout of Web page.
 	 */
-	public function testPageWeb_Layout() {
+	public function testPageMonitoringWeb_Layout() {
 		// Logins directly into required page.
 		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -178,7 +178,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks if button "Reset" works properly.
 	 */
-	public function testPageWeb_ResetButtonCheck() {
+	public function testPageMonitoringWeb_ResetButtonCheck() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
@@ -216,7 +216,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks Hosts context menu.
 	 */
-	public function testPageWeb_HostContextMenu() {
+	public function testPageMonitoringWeb_CheckHostContextMenu() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC')->waitUntilReady();
 		$titles = [
 			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Web', 'Configuration', 'Detect operating system',
@@ -245,7 +245,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks if disabled web services aren't displayed.
 	 */
-	public function testPageWeb_DisabledWebServices() {
+	public function testPageMonitoringWeb_DisabledWebServices() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$values = $this->getTableResult('Name');
 
@@ -255,9 +255,18 @@ class testPageWeb extends CWebTest {
 			$this->query('xpath://input[@id="all_httptests"]')->one()->click();
 			$this->query('xpath://button[normalize-space()="'.$status.'"]')->one()->click();
 			$this->page->acceptAlert();
+
+			if ($status === 'Disable') {
+				$this->assertMessage(TEST_GOOD, 'Web scenarios disabled');
+			}
+			else {
+				$this->assertMessage(TEST_GOOD, 'Web scenarios enabled');
+			}
+
 			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-			$changed = ($status === 'Disable') ? array_diff($values, ['Web scenario 1 step', 'Web scenario 2 step',
-					'Web scenario 3 step']) : $values;
+			$changed = ($status === 'Disable')
+				? array_diff($values, ['Web scenario 1 step', 'Web scenario 2 step', 'Web scenario 3 step'])
+				: $values;
 			$this->assertTableDataColumn($changed);
 		}
 	}
@@ -265,7 +274,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks number of steps for web services displayed.
 	 */
-	public function testPageWeb_WebServiceNumberOfSteps() {
+	public function testPageMonitoringWeb_CheckWebServiceNumberOfSteps() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
 		$sql = 'SELECT * FROM httptest, hosts, httpstep WHERE httptest.hostid = hosts.hostid'.
@@ -306,7 +315,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks sorting by Name/Host column.
 	 */
-	public function testPageWeb_Sorting() {
+	public function testPageMonitoringWeb_Sorting() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -327,7 +336,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks that title field disappears while Kioskmode is active.
 	 */
-	public function testPageWeb_KioskMode() {
+	public function testPageMonitoringWeb_KioskMode() {
 		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 
 		// Check title, filter and table display after pressing Kiosk mode/Normal view.
@@ -349,21 +358,8 @@ class testPageWeb extends CWebTest {
 		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
 	}
 
-	/**
-	 * Function which checks links to "Details of Web scenario".
-	 */
-	public function testPageWeb_Links() {
-		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', 'testFormWeb1')
-				->query('link', 'testFormWeb1')->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader('Details of web scenario: testFormWeb1');
-		$this->page->assertTitle('Details of web scenario');
-	}
-
 	public static function getFilterData() {
 		return [
-			// #0.
 			[
 				[
 					'filter' => [
@@ -383,7 +379,6 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #1.
 			[
 				[
 					'filter' => [
@@ -397,7 +392,6 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #2.
 			[
 				[
 					'filter' => [
@@ -410,7 +404,6 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #3.
 			[
 				[
 					'filter' => [
@@ -430,7 +423,6 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #4.
 			[
 				[
 					'filter' => [
@@ -454,7 +446,6 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #5.
 			[
 				[
 					'filter' => [
@@ -482,7 +473,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * @dataProvider getFilterData
 	 */
-	public function testPageWeb_Filter($data) {
+	public function testPageMonitoringWeb_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill($data['filter'])->submit();
 		$this->page->waitUntilReady();
