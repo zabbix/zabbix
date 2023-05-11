@@ -302,7 +302,7 @@ class User extends ScimApiService {
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-		[$db_user] = APIRPC::User()->get([
+		$db_user = APIRPC::User()->get([
 			'output' => ['userid', 'userdirectoryid'],
 			'userids' => $options['id'],
 			'filter' => ['userdirectoryid' => $userdirectoryid]
@@ -336,12 +336,16 @@ class User extends ScimApiService {
 	public function patch(array $options): array {
 		// In order to comply with Azure SCIM without flag "aadOptscim062020", attribute active value is transformed to
 		// boolean.
-		foreach ($options['Operations'] as &$operation) {
-			if ($operation['path'] === 'active') {
-				$operation['value'] = strtolower($operation['value']) === 'true';
+		if (array_key_exists('Operations', $options)) {
+			foreach ($options['Operations'] as &$operation) {
+				if (array_key_exists('path', $operation) && $operation['path'] === 'active'
+						&& !is_bool($operation['value'])
+				) {
+					$operation['value'] = strtolower($operation['value']) === 'true';
+				}
 			}
+			unset($operation);
 		}
-		unset($operation);
 
 		$this->validatePatch($options, $db_user);
 
@@ -415,7 +419,7 @@ class User extends ScimApiService {
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-		[$db_user] = APIRPC::User()->get([
+		$db_user = APIRPC::User()->get([
 			'output' => ['userid', 'name', 'surname', 'userdirectoryid', 'roleid'],
 			'userids' => $options['id'],
 			'filter' => ['userdirectoryid' => $userdirectoryid]
@@ -424,6 +428,8 @@ class User extends ScimApiService {
 		if (!$db_user) {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
 		}
+
+		$db_user = $db_user[0];
 
 		foreach ($options['Operations'] as &$operation) {
 			$operation['op'] = strtolower($operation['op']);
