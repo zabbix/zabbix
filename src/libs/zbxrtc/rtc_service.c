@@ -415,7 +415,7 @@ static void	rtc_subscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
 	data += zbx_deserialize_value(data, &sub->process_type);
 	data += zbx_deserialize_value(data, &sub->process_num);
 	data += rtc_deserialize_msgs(data, &sub->msgs);
-	data += zbx_deserialize_str(data, &sub->source.service, service_len);
+	(void)zbx_deserialize_str(data, &sub->source.service, service_len);
 
 	zbx_vector_rtc_sub_append(&rtc->subs, sub);
 }
