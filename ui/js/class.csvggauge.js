@@ -84,8 +84,8 @@ class CSVGGauge {
 
 		this.radiusValueArc = 0;
 		this.radiusThresholdArc = 0;
-		this.thicknessValueArc = 70;
-		this.thicknessThresholdArc = 70;
+		this.thicknessValueArc = 0;
+		this.thicknessThresholdArc = 0;
 
 		// Radius of needle's round part at the bottom
 		this.thicknessNeedle = 15;
@@ -242,43 +242,35 @@ class CSVGGauge {
 		this.#prepareThresholdsArcParts();
 
 		// Maximum available space for arc depending on widget size
-		let maxSpace = this.height;
+		let maxSpace = this.height - this.elements.description.height;
 
 		if (this.width <= this.height) {
-			maxSpace = this.width;
+			maxSpace = this.width - this.elements.description.height - (this.elements.min?.width || 0) * 2;
+		}
+
+		if (this.data.needle.show && this.data.angle === 180) {
+			maxSpace -= this.thicknessNeedle + this.elements.value.height;
+			this.y -= this.thicknessNeedle + this.elements.value.height;
+		}
+		else if (this.data.angle === 270) {
+			// TODO: calculate more precise
+			this.y -= maxSpace * 0.43;
+			maxSpace *= 0.57;
+		}
+
+		if (this.width <= maxSpace * 2 + (this.elements.min?.width || 0) * 2) {
+			// Widget's width is too small - need to shrink elements
+			const offset = maxSpace - this.width / 2 + (this.elements.min?.width || 0);
+			maxSpace -= offset;
 		}
 
 		// Show both arcs
 		if (this.data.value.show_arc && this.data.thresholds.show_arc && this.data.thresholds.data.length) {
-			this.thicknessThresholdArc = 20;
-			this.thicknessValueArc = 50;
+			this.radiusThresholdArc = maxSpace;
+			this.thicknessThresholdArc = (this.data.thresholds.arc_size * (maxSpace - this.gapBetweenArcs)) / 100;
 
-			this.radiusThresholdArc = maxSpace - this.elements.description.height - this.thicknessThresholdArc;
-			this.radiusValueArc = maxSpace - this.elements.description.height - this.thicknessValueArc - this.thicknessThresholdArc - this.gapBetweenArcs;
-
-			if (this.data.needle.show && this.data.angle === 180) {
-				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
-				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
-			}
-
-			if (this.width <= this.radiusThresholdArc * 2 + this.thicknessThresholdArc * 2 + (this.elements.min?.width || 0) * 2) {
-				// Widget width is too small - need to shrink elements
-				const offsetThresholdArc = this.radiusThresholdArc - this.width / 2 + this.thicknessThresholdArc + (this.elements.min?.width || 0);
-				const offsetValueArc = this.radiusValueArc - this.width / 2 + this.thicknessValueArc + (this.elements.min?.width || 0) + this.thicknessThresholdArc + this.gapBetweenArcs;
-				this.radiusThresholdArc -= offsetThresholdArc;
-				this.radiusValueArc -= offsetValueArc;
-			}
-
-			if (this.data.angle === 270) {
-				this.y -= this.radiusThresholdArc / 2.4;
-				this.radiusThresholdArc /= 2;
-				this.radiusValueArc /= 2;
-				this.radiusValueArc -= this.thicknessThresholdArc + this.gapBetweenArcs;
-			}
-
-			if (this.data.needle.show && this.data.angle === 180) {
-				this.y -= this.thicknessNeedle + this.elements.value.height;
-			}
+			this.radiusValueArc = maxSpace - this.thicknessThresholdArc - this.gapBetweenArcs;
+			this.thicknessValueArc = (this.data.value.arc_size * (maxSpace - this.gapBetweenArcs)) / 100;
 
 			this.#addThresholdArc();
 			this.#addValueArc();
@@ -287,61 +279,21 @@ class CSVGGauge {
 		else if (this.data.value.show_arc && !this.data.thresholds.show_arc) {
 			this.elements.thresholdArcContainer?.node?.remove();
 			this.elements.thresholdsLabelsContainer?.node?.remove();
-
 			delete this.elements.thresholdArcContainer;
 			delete this.elements.thresholdsLabelsContainer;
 
-			this.thicknessValueArc = 70;
-			this.radiusValueArc = maxSpace - this.elements.description.height - this.thicknessValueArc;
-
-			if (this.data.needle.show && this.data.angle === 180) {
-				this.radiusValueArc -= this.thicknessNeedle + this.elements.value.height;
-			}
-
-			if (this.width <= this.radiusValueArc * 2 + this.thicknessValueArc * 2 + (this.elements.min?.width || 0) * 2) {
-				// Widget width is too small - need to shrink elements
-				const offsetValueArc = this.radiusValueArc - this.width / 2 + this.thicknessValueArc + (this.elements.min?.width || 0);
-				this.radiusValueArc -= offsetValueArc;
-			}
-
-			if (this.data.angle === 270) {
-				this.y -= this.radiusValueArc / 1.9;
-				this.radiusValueArc /= 2.2;
-			}
-
-			if (this.data.needle.show && this.data.angle === 180) {
-				this.y -= this.thicknessNeedle + this.elements.value.height;
-			}
+			this.radiusValueArc = maxSpace;
+			this.thicknessValueArc = (this.data.value.arc_size * this.radiusValueArc) / 100;
 
 			this.#addValueArc();
 		}
 		// Show only threshold arc
 		else if (!this.data.value.show_arc && this.data.thresholds.show_arc && this.data.thresholds.data.length) {
 			this.elements.valueArcContainer?.node?.remove();
-
 			delete this.elements.valueArcContainer;
 
-			this.thicknessThresholdArc = 70;
-			this.radiusThresholdArc = maxSpace - this.elements.description.height - this.thicknessThresholdArc;
-
-			if (this.data.needle.show && this.data.angle === 180) {
-				this.radiusThresholdArc -= this.thicknessNeedle + this.elements.value.height;
-			}
-
-			if (this.width <= this.radiusThresholdArc * 2 + this.thicknessThresholdArc * 2 + (this.elements.min?.width || 0) * 2) {
-				// Widget width is too small - need to shrink elements
-				const offsetThresholdArc = this.radiusThresholdArc - this.width / 2 + this.thicknessThresholdArc + (this.elements.min?.width || 0);
-				this.radiusThresholdArc -= offsetThresholdArc;
-			}
-
-			if (this.data.angle === 270) {
-				this.y -= this.radiusThresholdArc / 1.9;
-				this.radiusThresholdArc /= 2.2;
-			}
-
-			if (this.data.needle.show && this.data.angle === 180) {
-				this.y -= this.thicknessNeedle + this.elements.value.height;
-			}
+			this.radiusThresholdArc = maxSpace;
+			this.thicknessThresholdArc = (this.data.thresholds.arc_size * this.radiusThresholdArc) / 100;
 
 			this.#addThresholdArc();
 		}
@@ -524,8 +476,8 @@ class CSVGGauge {
 
 		const radians = this.#degreesToRadians(angle);
 
-		const x = (this.x + Math.cos(radians) * (this.radiusThresholdArc + this.thicknessThresholdArc));
-		const y = (this.y + Math.sin(radians) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+		const x = this.x + (Math.cos(radians) * this.radiusThresholdArc);
+		const y = this.y + (Math.sin(radians) * this.radiusThresholdArc);
 
 		let anchor = '';
 
@@ -942,10 +894,10 @@ class CSVGGauge {
 		let length = 0;
 
 		if (this.data.thresholds.show_arc) {
-			length = this.radiusThresholdArc + this.thicknessThresholdArc / 2;
+			length = this.radiusThresholdArc - this.thicknessThresholdArc / 2;
 		}
 		else if (this.data.value.show_arc) {
-			length = this.radiusValueArc + this.thicknessValueArc / 2;
+			length = this.radiusValueArc - this.thicknessValueArc / 2;
 		}
 
 		// 0 degrees (needle points to the top) because here is defined only needle's path
@@ -965,18 +917,18 @@ class CSVGGauge {
 	}
 
 	#defineArc(x, y, radius, startAngle, endAngle, thickness) {
-		const innerStart = this.#polarToCartesian(x, y, radius, endAngle);
-		const innerEnd = this.#polarToCartesian(x, y, radius, startAngle);
-		const outerStart = this.#polarToCartesian(x, y, radius + thickness, endAngle);
-		const outerEnd = this.#polarToCartesian(x, y, radius + thickness, startAngle);
+		const innerStart = this.#polarToCartesian(x, y, radius - thickness, endAngle);
+		const innerEnd = this.#polarToCartesian(x, y, radius - thickness, startAngle);
+		const outerStart = this.#polarToCartesian(x, y, radius, endAngle);
+		const outerEnd = this.#polarToCartesian(x, y, radius, startAngle);
 
 		const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
 
 		return [
 			'M', outerStart.x, outerStart.y,
-			'A', radius + thickness, radius + thickness, 0, largeArcFlag, 0, outerEnd.x, outerEnd.y,
+			'A', radius, radius, 0, largeArcFlag, 0, outerEnd.x, outerEnd.y,
 			'L', innerEnd.x, innerEnd.y,
-			'A', radius, radius, 0, largeArcFlag, 1, innerStart.x, innerStart.y,
+			'A', radius - thickness, radius - thickness, 0, largeArcFlag, 1, innerStart.x, innerStart.y,
 			'L', outerStart.x, outerStart.y,
 			'Z'
 		].join(' ');
@@ -1094,11 +1046,11 @@ class CSVGGauge {
 				const radiansMin = this.#degreesToRadians(angleMin);
 				const radiansMax = this.#degreesToRadians(angleMax);
 
-				minX = (this.x + Math.cos(radiansMin) * (this.radiusThresholdArc + this.thicknessThresholdArc));
-				minY = (this.y + Math.sin(radiansMin) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+				minX = this.x + (Math.cos(radiansMin) * this.radiusThresholdArc);
+				minY = this.y + (Math.sin(radiansMin) * this.radiusThresholdArc);
 
-				maxX = (this.x + Math.cos(radiansMax) * (this.radiusThresholdArc + this.thicknessThresholdArc));
-				maxY = (this.y + Math.sin(radiansMax) * (this.radiusThresholdArc + this.thicknessThresholdArc));
+				maxX = this.x + (Math.cos(radiansMax) * this.radiusThresholdArc);
+				maxY = this.y + (Math.sin(radiansMax) * this.radiusThresholdArc);
 
 				minX -= this.elements.min.height;
 				maxX += this.elements.max.height;
@@ -1227,19 +1179,16 @@ class CSVGGauge {
 		container.height = rect.height;
 
 		let radius = 0;
-		let thickness = 0;
 
 		if (this.data.thresholds.show_arc) {
 			radius = this.radiusThresholdArc;
-			thickness = this.thicknessThresholdArc;
 		}
 		else {
 			radius = this.radiusValueArc;
-			thickness = this.thicknessValueArc;
 		}
 
-		const x = this.x - radius - thickness;
-		const y = this.y - radius - thickness;
+		const x = this.x - radius;
+		const y = this.y - radius;
 
 		container.coordinates = this.#calcCoordinates(x, y, rect.width, rect.height);
 	}
