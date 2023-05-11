@@ -36,10 +36,6 @@ window.script_edit_popup = new class {
 		this.#loadView(script);
 		this.#initActions();
 
-		if (typeof(script.parameters) === 'object') {
-			script.parameters = Object.values(script.parameters);
-		}
-
 		for (const parameter of script.parameters) {
 			this.#addParameter(parameter);
 		}

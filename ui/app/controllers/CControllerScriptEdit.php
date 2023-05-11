@@ -147,6 +147,8 @@ class CControllerScriptEdit extends CController {
 			}
 		}
 
+		$data['parameters'] = array_values($data['parameters']);
+
 		// Get host group.
 		if ($data['groupid'] == 0) {
 			$data['hostgroup'] = null;
