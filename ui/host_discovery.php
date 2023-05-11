@@ -708,7 +708,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 	$result = (bool) API::DiscoveryRule()->update($lld_rules);
 
 	if ($result) {
-		uncheckTableRows($checkbox_hash);
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
 
 	$updated = count($itemids);
@@ -726,7 +726,7 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));
 
 	if ($result) {
-		uncheckTableRows($checkbox_hash);
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }

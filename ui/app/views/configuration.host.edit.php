@@ -55,11 +55,19 @@ $data += [
 		]
 ];
 
-if ($data['warning']) {
-	CMessageHelper::addWarning($data['warning']);
-	show_messages();
+if ($data['warnings']) {
+	foreach ($data['warnings'] as $msg) {
+		CMessageHelper::addWarning($msg);
+	}
 
-	$data['warning'] = null;
+	if (count($data['warnings']) > 1) {
+		show_messages(null, _('Cloned host parameter values have been modified.'));
+	}
+	else {
+		show_messages();
+	}
+
+	$data['warnings'] = null;
 }
 
 (new CHtmlPage())

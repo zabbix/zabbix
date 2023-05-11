@@ -1,0 +1,1 @@
+.......PS. [ZBX-22741] fixed memory leak in preprocessing cache with bad snmp data (wiper)

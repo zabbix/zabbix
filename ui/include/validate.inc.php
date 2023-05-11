@@ -345,7 +345,8 @@ function check_field(&$fields, &$field, $checks) {
 
 			$csrf_token_form = getRequest(CCsrfTokenHelper::CSRF_TOKEN_NAME, '');
 
-			if (!is_string($csrf_token_form) || !CCsrfTokenHelper::check($csrf_token_form, $action)) {
+			if (!isRequestMethod('post') || !is_string($csrf_token_form) || $csrf_token_form === ''
+					|| !CCsrfTokenHelper::check($csrf_token_form, $action)) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}

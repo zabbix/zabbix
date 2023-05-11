@@ -241,6 +241,9 @@ struct zbx_db_version_info_t
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
+#ifdef HAVE_ORACLE
+	struct zbx_json		tables_json;
+#endif
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

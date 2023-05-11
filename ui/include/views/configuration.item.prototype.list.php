@@ -86,7 +86,7 @@ foreach ($data['items'] as $item) {
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($item['master_item']['name']);
+			$description[] = $item['master_item']['name'];
 		}
 		else {
 			$link = ($item['master_item']['source'] === 'itemprototypes')
@@ -98,7 +98,7 @@ foreach ($data['items'] as $item) {
 					->setArgument('filter_hostids', [$item['hostid']])
 					->setArgument('context', $data['context']);
 
-			$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
+			$description[] = (new CLink($item['master_item']['name'],
 				$link
 					->setArgument('form', 'update')
 					->setArgument('itemid', $item['master_item']['itemid'])
@@ -185,7 +185,7 @@ foreach ($data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
 		$description,
-		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
 		$item['trends'],

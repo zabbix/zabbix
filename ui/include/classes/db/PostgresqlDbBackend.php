@@ -177,7 +177,7 @@ class PostgresqlDbBackend extends DbBackend {
 			$is_secure = ($row && $row['ssl'] === 'on');
 		}
 		else {
-			$is_secure = (bool) DBfetch(DBselect('SELECT datname, usename, ssl, client_addr, cipher FROM pg_stat_ssl'.
+			$is_secure = (bool) DBfetch(DBselect('SELECT datname,usename,ssl,client_addr,cipher FROM pg_stat_ssl'.
 				' JOIN pg_stat_activity ON pg_stat_ssl.pid=pg_stat_activity.pid'.
 					' AND pg_stat_activity.usename='.zbx_dbstr($this->user)));
 		}
