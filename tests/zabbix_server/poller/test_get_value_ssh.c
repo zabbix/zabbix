@@ -28,7 +28,8 @@
 #	include "../../../src/zabbix_server/poller/ssh2_run.c"
 #endif
 
-int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options);
+int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options,
+		int timeout);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error)
@@ -37,7 +38,7 @@ int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error)
 	int		ret;
 
 	zbx_init_agent_result(&result);
-	ret = get_value_ssh(item, &result);
+	ret = get_value_ssh(item, SEC_PER_MIN, &result);
 
 	if (NULL != result.msg && '\0' != *(result.msg))
 	{
@@ -51,7 +52,8 @@ int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error)
 }
 #endif
 
-int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options)
+int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options,
+		int timeout)
 {
 	int	ret = SYSINFO_RET_OK;
 
@@ -59,6 +61,7 @@ int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encodi
 
 	ZBX_UNUSED(item);
 	ZBX_UNUSED(encoding);
+	ZBX_UNUSED(timeout);
 
 #if defined(HAVE_SSH) || defined(HAVE_SSH2)
 	char	*err_msg = NULL;

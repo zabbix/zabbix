@@ -31,7 +31,7 @@ int	zbx_get_value_telnet_test_run(zbx_dc_item_t *item, char **error)
 	int		ret;
 
 	zbx_init_agent_result(&result);
-	ret = get_value_telnet(item, &result);
+	ret = get_value_telnet(item, 0, &result);
 
 	if (NULL != result.msg && '\0' != *(result.msg))
 	{

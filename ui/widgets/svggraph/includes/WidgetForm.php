@@ -402,8 +402,9 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
-			->addField(
-				(new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -415,7 +416,7 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))

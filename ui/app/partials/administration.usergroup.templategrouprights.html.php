@@ -60,7 +60,7 @@ foreach ($data['templategroup_rights'] as $groupid => $group_right) {
 				->removeId();
 			$form_data_json[$groupid]['grouped'] = $group_right['grouped'];
 
-			$group_name = [$group_right['name'], SPACE, italic('('._('including subgroups').')')];
+			$group_name = [$group_right['name'], NBSP(), italic('('._('including subgroups').')')];
 		}
 		else {
 			$group_name = $group_right['name'];

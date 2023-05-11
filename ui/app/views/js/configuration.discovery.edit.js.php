@@ -343,11 +343,16 @@
 		]);
 
 		var data = $form
-				.find('#type, #ports, input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
-				.serialize(),
+				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible,'
+					+ ' input[type=checkbox]:checked:visible')
+				.serializeJSON(),
 			dialogueid = $form
 				.closest("[data-dialogueid]")
 				.data('dialogueid');
+
+		$form.find('z-select:visible').each((_, zselect) => {
+			data[zselect.name] = zselect.value;
+		});
 
 		if (!dialogueid) {
 			return false;
@@ -381,6 +386,9 @@
 				if (dcheck.key_) {
 					dcheck.name += ' "' + dcheck.key_ + '"';
 				}
+				if (dcheck.allow_redirect == 1) {
+					dcheck.name += ' "' + <?= json_encode(_('allow redirect')) ?> + '"';
+				}
 				dcheck.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val()
 					|| '<?= ZBX_DISCOVERY_DNS ?>';
 				dcheck.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val()
@@ -408,14 +416,18 @@
 		var $form = jQuery(document.forms['dcheck_form']),
 			dcheckid = jQuery('#dcheckid').val(),
 			dcheck = $form
-				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
+				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible,'
+					+ ' input[type=checkbox]:checked:visible')
 				.serializeJSON(),
 			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase'
+				'snmpv3_privpassphrase', 'allow_redirect'
 			];
 
-		dcheck['type'] = $form.find('z-select').val();
+		$form.find('z-select:visible').each((_, zselect) => {
+			dcheck[zselect.name] = zselect.value;
+		});
+
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
 		if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
@@ -424,16 +436,16 @@
 		}
 
 		for (var zbx_dcheckid in ZBX_CHECKLIST) {
-			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] !== dcheck['type']) {
+			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] != dcheck['type']) {
 				continue;
 			}
 
 			if (typeof dcheckid === 'undefined' || dcheckid != zbx_dcheckid) {
 				var duplicate_fields = fields
 					.map(function(value) {
-						return typeof dcheck[value] === 'undefined'
-							|| dcheck[value] === ''
-							|| ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value];
+						return (typeof dcheck[value] === 'undefined'
+								&& typeof ZBX_CHECKLIST[zbx_dcheckid][value] === 'undefined')
+							|| ZBX_CHECKLIST[zbx_dcheckid][value] == dcheck[value];
 					})
 					.filter(function(value) {
 						return !!value;

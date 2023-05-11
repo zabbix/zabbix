@@ -20,6 +20,7 @@
 #include "zbxalgo.h"
 
 ZBX_VECTOR_IMPL(uint64, zbx_uint64_t)
+ZBX_VECTOR_IMPL(uint32, zbx_uint32_t)
 ZBX_PTR_VECTOR_IMPL(str, char *)
 ZBX_PTR_VECTOR_IMPL(ptr, void *)
 ZBX_VECTOR_IMPL(ptr_pair, zbx_ptr_pair_t)

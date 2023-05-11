@@ -81,7 +81,7 @@ typedef struct
 }
 zbx_curlpage_t;
 
-static zbx_curlpage_t	page_w[ITEM_VALUE_TYPE_MAX];
+static zbx_curlpage_t	page_w[ITEM_VALUE_TYPE_BIN + 1];
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -115,6 +115,11 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 		case ITEM_VALUE_TYPE_UINT64:
 			ZBX_STR2UINT64(value.ui64, str);
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return value;
@@ -137,6 +142,11 @@ static const char	*history_value2str(const zbx_dc_history_t *h)
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return buffer;

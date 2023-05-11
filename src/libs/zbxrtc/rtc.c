@@ -21,12 +21,10 @@
 
 #include "zbxnum.h"
 #include "zbxprof.h"
+#include "zbxstr.h"
 
 static int	rtc_parse_scope(const char *str, int *scope)
 {
-	if (NULL == scope)
-		return FAIL;
-
 	if (0 == strcmp(str, "rwlock"))
 		*scope = ZBX_PROF_RWLOCK;
 	else if (0 == strcmp(str, "mutex"))
@@ -41,123 +39,197 @@ static int	rtc_parse_scope(const char *str, int *scope)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse runtime control option                                      *
+ * Purpose: get rtc option parameter                                          *
  *                                                                            *
- * Parameters: opt       - [IN] runtime control option                        *
- *             len       - [IN] runtime control option length without         *
- *                              parameter                                     *
- *             pid       - [OUT] target pid (if specified)                    *
- *             proc_type - [OUT] target process type (if specified)           *
- *             proc_num  - [OUT] target process num (if specified)            *
- *             scope     - [OUT] scope (if specified)                         *
- *             error     - [OUT] error message                                *
+ * Parameters: opt   - [IN] runtime control option parameter                  *
+ *             size  - [OUT] number of parsed bytes                           *
+ *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - runtime control option was processed               *
+ * Return value: SUCCEED - parameter was found or not specified               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_parse_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
-		int *scope, char **error)
+int	rtc_option_get_parameter(const char *param, size_t *size, char **error)
 {
-	const char	*rtc_options;
-
-	rtc_options = opt + len;
-
-	if ('\0' == *rtc_options)
-		return SUCCEED;
-
-	if ('=' != *rtc_options)
+	switch (*param)
 	{
-		*error = zbx_dsprintf(NULL, "invalid runtime control option \"%s\"", opt);
-		return FAIL;
+		case '\0':
+			*size = 0;
+			return SUCCEED;
+		case '=':
+			/* check for empty parameter */
+			if ('\0' == param[1])
+				break;
+
+			*size = 1;
+			return SUCCEED;
 	}
-	else if (0 != isdigit(*(++rtc_options)))
+
+	*error = zbx_dsprintf(*error, "unspecified process identifier or type: \"%s\"", param);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get unsigned value from parameter                                 *
+ *                                                                            *
+ * Parameters: param - [IN] runtime control option parameter                  *
+ *             size  - [OUT] number of parsed bytes                           *
+ *             value - [OUT] parsed value                                     *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - value was parsed or not specified                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	rtc_option_get_ui64(const char *param, size_t *size, zbx_uint64_t *value)
+{
+	const char	*ptr = param;
+
+	while (0 != isdigit(*ptr))
+		ptr++;
+
+	if (ptr != param)
 	{
-		char	*scope_ptr;
-
-		if (NULL != (scope_ptr = strchr(rtc_options, ',')))
-			*scope_ptr++ = '\0';
-		/* convert PID */
-		if (FAIL == zbx_is_uint32(rtc_options, pid) || 0 == *pid)
-		{
-			*error = zbx_dsprintf(NULL, "invalid control target - invalid or unsupported process"
-					" identifier");
+		if (FAIL == zbx_is_uint64_n(param, (size_t)(ptr - param), value))
 			return FAIL;
-		}
-
-		if (NULL != scope_ptr)
-		{
-			if (FAIL == rtc_parse_scope(scope_ptr, scope))
-			{
-				*error = zbx_dsprintf(NULL, "invalid control target -"
-						" invalid or unsupported scope \"%s\"", scope_ptr);
-				return FAIL;
-			}
-		}
 	}
-	else if (FAIL == rtc_parse_scope(rtc_options, scope))
-	{
-		char	proc_name[MAX_STRING_LEN], *proc_num_ptr;
 
-		if ('\0' == *rtc_options)
-		{
-			*error = zbx_dsprintf(NULL, "invalid control target - unspecified process identifier or type");
-			return FAIL;
-		}
-
-		zbx_strlcpy(proc_name, rtc_options, sizeof(proc_name));
-
-		if (NULL != (proc_num_ptr = strchr(proc_name, ',')))
-			*proc_num_ptr++ = '\0';
-
-		if ('\0' == *proc_name)
-		{
-			*error = zbx_dsprintf(NULL, "invalid control target - unspecified process type");
-			return FAIL;
-		}
-
-		if (ZBX_PROCESS_TYPE_UNKNOWN == (*proc_type = get_process_type_by_name(proc_name)))
-		{
-			*error = zbx_dsprintf(NULL, "invalid control target - unknown process type \"%s\"",
-					proc_name);
-			return FAIL;
-		}
-
-		if (NULL != proc_num_ptr)
-		{
-			if ('\0' == *proc_num_ptr)
-			{
-				*error = zbx_dsprintf(NULL, "invalid control target - unspecified process number");
-				return FAIL;
-			}
-
-			if (FAIL == rtc_parse_scope(proc_num_ptr, scope))
-			{
-				char	*scope_ptr;
-
-				if (NULL != (scope_ptr = strchr(proc_num_ptr, ',')))
-					*scope_ptr++ = '\0';
-
-				if (FAIL == zbx_is_uint32(proc_num_ptr, proc_num) || 0 == *proc_num)
-				{
-					/* convert Zabbix process number (e.g. "2" in "poller,2") */
-					*error = zbx_dsprintf(NULL, "invalid control target -"
-							" invalid or unsupported process number \"%s\"", proc_num_ptr);
-					return FAIL;
-				}
-
-				if (NULL != scope_ptr)
-				{
-					if (FAIL == rtc_parse_scope(scope_ptr, scope))
-					{
-						*error = zbx_dsprintf(NULL, "invalid control target"
-								" invalid or unsupported scope \"%s\"", scope_ptr);
-						return FAIL;
-					}
-				}
-			}
-		}
-	}
+	*size = (size_t)(ptr - param);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get pid parameter                                                 *
+ *                                                                            *
+ * Parameters: param - [IN] runtime control option parameter                  *
+ *             size  - [OUT] number of parsed bytes                           *
+ *             pid   - [OUT] parsed pid                                       *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - pid was parsed or not specified                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	rtc_option_get_pid(const char *param, size_t *size, pid_t *pid, char **error)
+{
+	zbx_uint64_t	pid_ui64 = 0;
+
+	if (SUCCEED != rtc_option_get_ui64(param, size, &pid_ui64) || (0 != *size && 0 == pid_ui64))
+	{
+		*error = zbx_dsprintf(*error, "invalid process identifier: \"%s\"", param);
+		return FAIL;
+	}
+
+	*pid = (pid_t)pid_ui64;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get process type                                                  *
+ *                                                                            *
+ * Parameters: param     - [IN] runtime control option parameter              *
+ *             size      - [OUT] number of parsed bytes                       *
+ *             proc_type - [OUT] parsed process type                          *
+ *             error     - [OUT] error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - pid was parsed or not specified                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	rtc_option_get_process_type(const char *param, size_t *size, int *proc_type, char **error)
+{
+	char		*str = NULL;
+	const char	*ptr;
+	size_t		str_alloc = 0, str_offset = 0;
+	int		ret = FAIL;
+
+	if (NULL != (ptr = strchr(param, ',')))
+		*size = (size_t)(ptr - param);
+	else
+		*size = strlen(param);
+
+	zbx_strncpy_alloc(&str, &str_alloc, &str_offset, param, *size);
+
+	if (ZBX_PROCESS_TYPE_UNKNOWN == (*proc_type = get_process_type_by_name(str)))
+		*error = zbx_dsprintf(*error, "invalid process type: \"%s\"", param);
+	else
+		ret = SUCCEED;
+
+	zbx_free(str);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get process number                                                *
+ *                                                                            *
+ * Parameters: param     - [IN] runtime control option parameter              *
+ *             size      - [OUT] number of parsed bytes                       *
+ *             proc_num  - [OUT] parsed process number                        *
+ *             error     - [OUT] error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - pid was parsed or not specified                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	rtc_option_get_process_num(const char *param, size_t *size, int *proc_num, char **error)
+{
+	zbx_uint64_t	value = 0;
+
+	switch (*param)
+	{
+		case '\0':
+			*size = 0;
+			return SUCCEED;
+		case ',':
+
+			if (SUCCEED != rtc_option_get_ui64(param + 1, size, &value) || 0 == *size || 0 == value ||
+					INT_MAX < value)
+			{
+				break;
+			}
+
+			*proc_num = (int)value;
+
+			/* add ',' to the parsed number */
+			(*size)++;
+			return SUCCEED;
+	}
+
+	*error = zbx_dsprintf(*error, "invalid process number: \"%s\"", param);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get profiler scope                                                *
+ *                                                                            *
+ * Parameters: param     - [IN] runtime control option parameter              *
+ *             pos       - [IN] position in parameter string (after '=')      *
+ *             scope     - [OUT] parsed profiler scope                        *
+ *                                                                            *
+ * Return value: SUCCEED - pid was parsed or not specified                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	rtc_option_get_prof_scope(const char *param, size_t pos, int *scope)
+{
+	if (',' == *param)
+	{
+		if (1 == pos)
+			return FAIL;
+		param++;
+	}
+	else if (1 != pos)
+		return FAIL;
+
+	return rtc_parse_scope(param, scope);
 }
