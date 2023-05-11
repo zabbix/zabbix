@@ -1497,6 +1497,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	results = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
 	zbx_vector_var_create(results);
 
+
 	for (i = 0; i < data->itemids.values_num; i++)
 	{
 		zbx_dc_item_t	*dcitem;
@@ -1504,22 +1505,34 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		double		le;
 		char		bucket[ZBX_MAX_DOUBLE_LEN + 1];
 
+
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
+		{
 			continue;
+		}
 
 		if (ITEM_STATUS_ACTIVE != dcitem->status)
+		{
 			continue;
+		}
 
 		if (HOST_STATUS_MONITORED != dcitem->host.status)
+		{
 			continue;
+		}
 
 		if (ITEM_VALUE_TYPE_NONE == dcitem->value_type)
+		{
 			continue;
+		}
 
 		if (0 != zbx_get_key_param(dcitem->key_orig, pos, bucket, sizeof(bucket)))
+		{
 			continue;
+		}
 
 		zbx_strupper(bucket);
+
 
 		if (0 == strcmp(bucket, "+INF") || 0 == strcmp(bucket, "INF"))
 			le = ZBX_INFINITY;
@@ -1534,6 +1547,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		zbx_vector_var_append(results, rate);
 	}
 
+
 	if (ZBX_MIXVALUE_FUNC_BRATE == item_func)
 	{
 		zbx_variant_set_vector(value, results);
@@ -1545,6 +1559,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		zbx_vector_dbl_t	results_tmp;
 
 		zbx_vector_dbl_create(&results_tmp);
+
 
 		if (SUCCEED == (ret = zbx_vector_dbl_from_vector_var(results, &results_tmp, error)))
 		{

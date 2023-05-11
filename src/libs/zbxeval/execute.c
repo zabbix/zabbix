@@ -2318,12 +2318,35 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 	if (2 == token->opt)
 	{
-		v = (zbx_vector_dbl_t*)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
+		zbx_vector_var_t	*input_vector = output->values[i].data.vector;
 
+		v = (zbx_vector_dbl_t*)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
 		zbx_vector_dbl_create(v);
 
-		if (FAIL == zbx_vector_dbl_from_vector_var(output->values[i].data.vector, v, error))
-			return FAIL;
+		for (i = 0; i < input_vector->values_num; i++)
+		{
+
+			if (&input_vector->values[i].type == ZBX_VARIANT_STR)
+			{
+				zbx_variant_t	value_dbl;
+
+				if (SUCCEED != (ret = variant_convert_suffixed_num(&value_dbl, &input_vector->values[i])))
+				{
+					*error = zbx_strdup(*error, "input data is not numeric");
+					goto out;
+				}
+
+				zbx_variant_clear(&input_vector->values[i]);
+				zbx_vector_dbl_append(v, value_dbl.data.dbl);
+			}
+			else if (SUCCEED != (ret = zbx_variant_convert(&input_vector->values[i], ZBX_VARIANT_DBL)))
+			{
+				*error = zbx_strdup(*error, "input data is not numeric");
+				goto out;
+			}
+
+			zbx_vector_dbl_append(v, input_vector->values[i].data.dbl);
+		}
 	}
 	else
 	{
@@ -2340,7 +2363,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 		zbx_variant_set_dbl(&value, result);
 		eval_function_return(token->opt, &value, output);
 	}
-
+out:
 	if (NULL != v)
 	{
 		zbx_vector_dbl_destroy(v);
