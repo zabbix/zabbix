@@ -619,6 +619,15 @@ class testItem extends CAPITest {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
 						'delay' => '1m'
+					],
+					[
+						'name' => 'httpagent.credentials.length',
+						'key_' => 'httpagent.credentials.length',
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'url' => 'test.com',
+						'authtype' => ZBX_HTTP_AUTH_BASIC,
+						'delay' => '1m'
 					]
 				]
 			]
@@ -669,27 +678,28 @@ class testItem extends CAPITest {
 
 			'Reject too long Basic authentication username' => [
 				'request_data' => [
-					'key_' => 'httpagent.reject.username',
+					'item' => 'testItem_Update:httpagent.credentials.length',
 					'username' => str_repeat('z', 256)
 				],
 				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
 			],
 			'Reject too long Basic authentication password' => [
 				'request_data' => [
-					'key_' => 'httpagent.reject.password',
+					'item' => 'testItem_Update:httpagent.credentials.length',
 					'password' => str_repeat('z', 256)
 				],
 				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
 			],
 			'Accept longest Basic authentication username' => [
 				'request_data' => [
-					'key_' => 'httpagent.accept.username',
+					'item' => 'testItem_Update:httpagent.credentials.length',
 					'username' => str_repeat('z', 255)
 				],
 				'expected_error' => null
 			],
 			'Accept longest Basic authentication password' => [
 				'request_data' => [
+					'item' => 'testItem_Update:httpagent.credentials.length',
 					'password' => str_repeat('z', 255)
 				],
 				'expected_error' => null
@@ -707,17 +717,31 @@ class testItem extends CAPITest {
 		$result = $this->call('item.update', $request_data, $expected_error);
 
 		if ($expected_error === null) {
-			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
-
+			if (array_key_exists('type', $request_data)
+					&& $request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE
+					&& substr($request_data['key_'], 0, 8) === 'mqtt.get') {
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
 			}
 
-			foreach ($result['result']['itemids'] as $id) {
-				$db_item = CDBHelper::getRow('SELECT key_, type, delay FROM items WHERE itemid='.zbx_dbstr($id));
+			$optional_fields = array_flip(['key_', 'type', 'delay']);
 
-				foreach (['key_', 'type', 'delay'] as $field) {
-					$this->assertSame($db_item[$field], strval($request_data[$field]));
+			foreach ($result['result']['itemids'] as $id) {
+				$optional_updates = array_map('strval', array_intersect_key($request_data, $optional_fields));
+
+				if (!$optional_updates) {
+					continue;
 				}
+
+				$db_item = CDBHelper::getRow(
+					'SELECT '.implode(',', array_keys($optional_updates)).
+					' FROM items'.
+					' WHERE '.dbConditionId('itemid', [$id])
+				);
+
+				ksort($db_item);
+				ksort($optional_updates);
+
+				$this->assertSame($db_item, $optional_updates, 'Should match expected update values');
 			}
 		}
 	}

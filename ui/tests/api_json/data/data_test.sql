@@ -1557,6 +1557,3 @@ INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node-active','
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58739, 99013, 50022, 0, 0, 'master.for.binary', 'master.for.binary', '1d', '90d', 0, '', '', '', '');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58740, 99013, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '', '', '', '');
 INSERT INTO history_bin (itemid, clock, value, ns) VALUES (58740, 1549350962, 'This should be binary', 594538048);
-
--- HTTP Agent item credentials length check
-INSERT INTO items (itemid, type, hostid, name, key_, delay, value_type, templateid, valuemapid, authtype, username, password, interfaceid, master_itemid, url) VALUES (58741, 19, 50009, 'auth.credential.length', 'auth.credential.length', '1m', 3, 0, 0, 1, 'username', 'password', 50022, 0, 'test.com')
