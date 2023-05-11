@@ -32,9 +32,19 @@ class CWidgetFieldMultiSelectItemPrototypeView extends CWidgetFieldMultiSelectVi
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		$parameters = $this->popup_parameters + [
 			'srctbl' => 'item_prototypes',
 			'srcfld1' => 'itemid'
 		];
+
+		return $parameters + ($this->field->isTemplateDashboard()
+			? [
+				'hostid' => $this->field->getTemplateId(),
+				'hide_host_filter' => false
+			]
+			: [
+				'real_hosts' => true
+			]
+		);
 	}
 }

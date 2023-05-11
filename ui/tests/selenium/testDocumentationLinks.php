@@ -717,7 +717,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/clock'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/action_log'
 				]
 			],
 			// #71 Add Template dashboard page configuration popup.

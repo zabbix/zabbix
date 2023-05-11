@@ -99,7 +99,7 @@ foreach ($data['scripts'] as $script) {
 					$i++;
 
 					if ($i > $data['config']['max_in_table']) {
-						$actions[] = ' &hellip;';
+						$actions[] = [' ', HELLIP()];
 
 						break;
 					}
@@ -207,9 +207,7 @@ foreach ($data['scripts'] as $script) {
 		$actions,
 		$type,
 		$execute_on,
-		(new CCol(
-			zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8'))
-		))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+		(new CCol(zbx_nl2br($script['command'])))->addClass(ZBX_STYLE_MONOSPACE_FONT),
 		($script['userGroupName'] === null) ? _('All') : $script['userGroupName'],
 		($script['hostGroupName'] === null) ? _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
@@ -221,8 +219,12 @@ $scriptsForm->addItem([
 	$scriptsTable,
 	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
-		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?'),
-			'csrf_token' => CCsrfTokenHelper::get('script')]
+		'script.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected script?'),
+			'confirm_plural' => _('Delete selected scripts?'),
+			'csrf_token' => CCsrfTokenHelper::get('script')
+		]
 	], 'script')
 ]);
 

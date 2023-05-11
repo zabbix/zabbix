@@ -32,11 +32,21 @@ class CWidgetFieldMultiSelectGraphView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		$parameters = $this->popup_parameters + [
 			'srctbl' => 'graphs',
 			'srcfld1' => 'graphid',
 			'srcfld2' => 'name',
 			'with_graphs' => true
 		];
+
+		return $parameters + ($this->field->isTemplateDashboard()
+			? [
+				'hostid' => $this->field->getTemplateId(),
+				'hide_host_filter' => false
+			]
+			: [
+				'real_hosts' => true
+			]
+		);
 	}
 }

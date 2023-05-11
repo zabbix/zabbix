@@ -9,7 +9,6 @@
 	"description": "Displays the value of a single item prominently.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/item_value",
 	"widget": {
-		"template_support": true,
 		"size": {
 			"width": 4,
 			"height": 3

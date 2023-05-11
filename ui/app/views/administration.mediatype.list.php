@@ -198,6 +198,7 @@ $mediaTypeForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => [
+
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massenable')
@@ -209,7 +210,6 @@ $mediaTypeForm->addItem([
 				->setId('js-massdisable')
 				->addClass('no-chkbxrange')
 		],
-
 		'mediatype.export' => [
 			'content' => new CButtonExport('export.mediatypes',
 				(new CUrl('zabbix.php'))

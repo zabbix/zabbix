@@ -117,13 +117,22 @@ $discoveryForm->addItem([
 	$discoveryTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'druleids', [
-		'discovery.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?'),
+		'discovery.enable' => [
+			'name' => _('Enable'),
+			'confirm_singular' => _('Enable selected discovery rule?'),
+			'confirm_plural' => _('Enable selected discovery rules?'),
 			'csrf_token' => $csrf_token
 		],
-		'discovery.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?'),
+		'discovery.disable' => [
+			'name' => _('Disable'),
+			'confirm_singular' => _('Disable selected discovery rule?'),
+			'confirm_plural' => _('Disable selected discovery rules?'),
 			'csrf_token' => $csrf_token
 		],
-		'discovery.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'),
+		'discovery.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected discovery rule?'),
+			'confirm_plural' => _('Delete selected discovery rules?'),
 			'csrf_token' => $csrf_token
 		]
 	], 'discovery')

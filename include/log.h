@@ -42,7 +42,7 @@
 
 #define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
 
-extern int	zbx_log_level;
+extern ZBX_THREAD_LOCAL int	*zbx_plog_level;
 
 typedef struct
 {
@@ -54,7 +54,7 @@ typedef struct
 
 #define ZBX_CHECK_LOG_LEVEL(level)			\
 		((LOG_LEVEL_INFORMATION != (level) &&	\
-		((level) > zbx_log_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
+		((level) > *zbx_plog_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
 
 #ifdef HAVE___VA_ARGS__
 #	define ZBX_ZABBIX_LOG_CHECK
@@ -78,12 +78,23 @@ void	zabbix_close_log(void);
 int		zabbix_increase_log_level(void);
 int		zabbix_decrease_log_level(void);
 const char	*zabbix_get_log_level_string(void);
+
+typedef struct
+{
+	int		level;
+	const char	*name;
+}
+zbx_log_component_t;
+
+void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
+void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+
 #endif
 
-char		*strerror_from_system(unsigned long error);
+char		*strerror_from_system(zbx_syserror_t error);
 
 #ifdef _WINDOWS
-char		*strerror_from_module(unsigned long error, const wchar_t *module);
+char		*strerror_from_module(zbx_syserror_t error, const wchar_t *module);
 #endif
 
 int		zbx_redirect_stdio(const char *filename);
@@ -96,6 +107,6 @@ int		zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_
 void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format,
 		...) __zbx_attr_format_printf(5, 6);
 
-void	zbx_set_log_component(const char *component);
+int	zbx_get_log_level(void);
 
 #endif
