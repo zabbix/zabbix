@@ -1025,18 +1025,21 @@ class CSVGGauge {
 			let maxX = 0;
 			let minY = 0;
 			let maxY = 0;
+			let radius = 0;
 
 			if (this.data.thresholds.show_arc) {
 				minX = this.elements.thresholdArcEmpty.coordinates.x1;
 				maxX = this.elements.thresholdArcEmpty.coordinates.x2;
 				minY = this.elements.thresholdArcEmpty.coordinates.y4;
 				maxY = this.elements.thresholdArcEmpty.coordinates.y4;
+				radius = this.radiusThresholdArc;
 			}
 			else {
 				minX = this.elements.valueArcEmpty.coordinates.x1;
 				maxX = this.elements.valueArcEmpty.coordinates.x2;
 				minY = this.elements.valueArcEmpty.coordinates.y4;
 				maxY = this.elements.valueArcEmpty.coordinates.y4;
+				radius = this.radiusValueArc;
 			}
 
 			if (this.data.angle === 270) {
@@ -1046,11 +1049,11 @@ class CSVGGauge {
 				const radiansMin = this.#degreesToRadians(angleMin);
 				const radiansMax = this.#degreesToRadians(angleMax);
 
-				minX = this.x + (Math.cos(radiansMin) * this.radiusThresholdArc);
-				minY = this.y + (Math.sin(radiansMin) * this.radiusThresholdArc);
+				minX = this.x + (Math.cos(radiansMin) * radius);
+				minY = this.y + (Math.sin(radiansMin) * radius);
 
-				maxX = this.x + (Math.cos(radiansMax) * this.radiusThresholdArc);
-				maxY = this.y + (Math.sin(radiansMax) * this.radiusThresholdArc);
+				maxX = this.x + (Math.cos(radiansMax) * radius);
+				maxY = this.y + (Math.sin(radiansMax) * radius);
 
 				minX -= this.elements.min.height;
 				maxX += this.elements.max.height;
