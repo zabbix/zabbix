@@ -295,6 +295,10 @@ $preloader-color: #ccd5d9 !default;
 $preloader-disabled-color: #fdfdfd !default;
 $preloader-accent-color: #0275b8 !default;
 
+// List table.
+$compact-view-color: #1f2c33 !default;
+$compact-view-tag-color: #ffffff !default;
+
 // Dashboard list table.
 $dashboard-shared-bg-color: darken(desaturate($alt-yellow, 9%), 20%) !default;
 $dashboard-my-bg-color: darken(desaturate($alt-green, 10%), 20%) !default;

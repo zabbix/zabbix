@@ -972,7 +972,7 @@ class CScreenProblem extends CScreenBase {
 			));
 
 			$this->data['filter']['compact_view']
-				? $header_check_box->addStyle('width: 18px;')
+				? $header_check_box->addStyle('width: 16px;')
 				: $header_check_box->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			$link = $url->getUrl();
@@ -1006,7 +1006,7 @@ class CScreenProblem extends CScreenBase {
 				$col_header = (new CColHeader())->addClass(ZBX_STYLE_THIRD_COL);
 
 				if ($this->data['filter']['compact_view']) {
-					$header[] = $col_header->addStyle('width: 18px;');
+					$header[] = $col_header->addStyle('width: 16px;');
 				}
 				else {
 					$header[] = $col_header->addClass(ZBX_STYLE_CELL_WIDTH);

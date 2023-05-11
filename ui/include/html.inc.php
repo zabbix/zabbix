@@ -903,7 +903,7 @@ function makeInformationList($info_icons) {
  * @param string $name         Name of the maintenance.
  * @param string $description  Description of the maintenance.
  */
-function makeMaintenanceIcon($type, string $name, string $description): CLink {
+function makeMaintenanceIcon($type, string $name, string $description): CButtonIcon {
 	$hint = $name.' ['.($type
 		? _('Maintenance without data collection')
 		: _('Maintenance with data collection')).']';
@@ -912,8 +912,8 @@ function makeMaintenanceIcon($type, string $name, string $description): CLink {
 		$hint .= "\n".$description;
 	}
 
-	return (new CLink())
-		->addClass(ZBX_ICON_WRENCH_ALT)
+	return (new CButtonIcon(ZBX_ICON_WRENCH_ALT_SMALL))
+		->addClass(ZBX_STYLE_COLOR_WARNING)
 		->setHint($hint);
 }
 

@@ -440,176 +440,58 @@
 				border-bottom-style: none;
 			}
 		}
-	}
-}
 
+		[class*='flh-'] {
+			&:not(.row-selected):not(:hover) {
+				a,
+				td,
+				sup {
+					color: $compact-view-color;
+				}
 
+				.link-alt {
+					border-bottom-color: $compact-view-color;
+				}
 
+				.link-action {
+					color: $font-color;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-._list-table {
-	// TODO - check
-	span.zi-calendar-warning {
-		display: inline-block;
-		width: 18px;
-		height: 18px;
-
-		&::before {
-			display: inline-block;
-			width: 18px;
-			height: 18px;
-		}
-	}
-
-	td {
-		.zi-wrench-alt {
-			display: inline-block;
-			margin-left: 6px;
-			width: 16px;
-			height: 16px;
-			cursor: pointer;
-			border-bottom: none;
-
-			&::before {
-				margin-left: 2px;
-				vertical-align: middle;
-				font-size: $icon-small-size;
-				color: $icon-maintenance;
-			}
-
-			&:focus {
-				box-shadow: 0 0 0 2px $btn-focus-outline-color;
-				border-radius: 2px;
-			}
-		}
-	}
-}
-
-._list-table {
-	&.problem-list {
-
-
-
-
-		&.compact-view {
-			tr {
-				&[class*='flh-'] {
-					@if $theme-name == 'blue' {
-						&:not(.row-selected):not(:hover) {
-							td {
-								color: $font-color;
-
-								sup,
-								a,
-								.problem-unack-fg,
-								.problem-ack-fg,
-								.ok-unack-fg,
-								.ok-ack-fg {
-									color: $font-color;
-									border-bottom-color: rgba($font-color, .5);
-								}
-
-								.tag {
-									background-color: rgba($font-color, .5);
-								}
-
-								button:focus {
-									box-shadow: 0 0 0 2px rgba($font-color, .5);
-								}
-							}
-						}
+					&:hover,
+					&:focus {
+						color: $link-hover-color;
 					}
 
-					@if $theme-name == 'dark' {
-						&:not(.row-selected):not(:hover) {
-							td {
-								color: #000000;
-
-								sup,
-								a,
-								.problem-unack-fg,
-								.problem-ack-fg,
-								.ok-unack-fg,
-								.ok-ack-fg {
-									color: #000000;
-									border-bottom-color: rgba(0, 0, 0, .5);
-								}
-
-								button:focus {
-									box-shadow: 0 0 0 2px rgba(0, 0, 0, .5);
-								}
-							}
-						}
+					&.red {
+						color: $negative-color;
 					}
 
-					@if $theme-name == 'blue' or $theme-name == 'dark' {
-						&:not(.row-selected):not(:hover) {
-							td {
-								// TODO - AS: check
-								//[class*='icon-'] {
-								//	background-color: $ui-bg-color;
-								//	border-radius: 2px;
-								//}
+					&.orange {
+						color: $orange;
+					}
 
-								// TODO - AS: check
-								//[class*='icon-depend-'],
-								//.icon-description,
-								//.icon-wizard-action {
-								//	background-color: transparent;
-								//}
-							}
-						}
+					&.yellow {
+						color: $warning-color;
+					}
+
+					&.green {
+						color: $positive-color;
 					}
 				}
-			}
 
-
-
-			[class^="event-action-"], [class*=" event-action-"] {
-				&::before {
-					top: 7px;
+				.btn-icon,
+				.icon {
+					background-color: $ui-bg-color;
 				}
 
-				&::after {
-					top: -1px;
-				}
-			}
-
-			.link-action {
-				color: $font-color;
-
-				&:hover,
-				&:focus {
-					color: $link-hover-color;
+				.symptoms-count {
+					margin-top: 0;
+					margin-bottom: 0;
+					border: 1px solid $ui-bg-color;
 				}
 
-				// deprecated use .color-negative
-				&.red {
-					color: $red;
-				}
-
-				&.orange {
-					color: $orange;
-				}
-
-				&.yellow {
-					color: $dark-yellow;
-				}
-
-				&.green {
-					color: $green;
+				.tag {
+					color: $compact-view-tag-color;
+					background-color: rgba($compact-view-color, .5);
 				}
 			}
 		}

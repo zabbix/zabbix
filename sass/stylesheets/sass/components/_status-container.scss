@@ -13,6 +13,7 @@
 	border-style: solid;
 
 	&:not(:last-of-type) {
+		padding-right: 4px;
 		border-right-style: none;
 	}
 

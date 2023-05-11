@@ -2312,6 +2312,7 @@ define('ZBX_ICON_USER_FILLED', 'zi-user-filled');
 define('ZBX_ICON_USERS', 'zi-users');
 define('ZBX_ICON_USERS_FILLED', 'zi-users-filled');
 define('ZBX_ICON_WRENCH_ALT', 'zi-wrench-alt');
+define('ZBX_ICON_WRENCH_ALT_SMALL', 'zi-wrench-alt-small');
 define('ZBX_ICON_Z', 'zi-z');
 
 // server variables

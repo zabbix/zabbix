@@ -8,10 +8,11 @@
 	&::after {
 		content: attr(data-content);
 		position: absolute;
-		top: 3px;
+		top: 50%;
 		font-size: 9px;
 		line-height: 1;
 		letter-spacing: -.25px;
+		transform: translateY(calc(-50% - 2px));
 	}
 }
 
@@ -24,11 +25,6 @@
 .zi-alert-with-content {
 	@extend .zi-alert;
 	@extend %icon-with-content;
-
-	&::before {
-		font-size: 20px;
-		line-height: 18px;
-	}
 
 	&::after {
 		color: $icon-content-color;
@@ -130,5 +126,10 @@
 
 .zi-remove-small {
 	@extend .zi-remove;
+	@extend %icon-small;
+}
+
+.zi-wrench-alt-small {
+	@extend .zi-wrench-alt;
 	@extend %icon-small;
 }
