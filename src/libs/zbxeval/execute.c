@@ -62,7 +62,7 @@ zbx_function_trim_optype_t;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
+static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_t *value_num)
 {
 	char	suffix;
 	double	result;
