@@ -70,7 +70,8 @@ class ColumnEdit extends CController {
 			'thresholds' => 'array',
 			'text' => 'string',
 			'edit' => 'in 1',
-			'update' => 'in 1'
+			'update' => 'in 1',
+			'templateid' => 'string'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields($this->getInputAll());
@@ -95,7 +96,7 @@ class ColumnEdit extends CController {
 			$input += $this->column_defaults;
 		}
 
-		unset($input['edit'], $input['update']);
+		unset($input['edit'], $input['update'], $input['templateid']);
 		$field->setValue([$input]);
 		$errors = $field->validate();
 		array_map('error', $errors);
@@ -113,13 +114,14 @@ class ColumnEdit extends CController {
 
 		if (!$this->hasInput('update')) {
 			$this->setResponse(new CControllerResponseData([
-					'action' => $this->getAction(),
-					'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
-					'errors' => hasErrorMessages() ? getMessages() : null,
-					'user' => [
-						'debug_mode' => $this->getDebugMode()
-					]
-				] + $input + $this->column_defaults));
+				'action' => $this->getAction(),
+				'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
+				'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
+				'errors' => hasErrorMessages() ? getMessages() : null,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
+			] + $input + $this->column_defaults));
 
 			return;
 		}

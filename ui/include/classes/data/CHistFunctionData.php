@@ -78,7 +78,11 @@ final class CHistFunctionData {
 		],
 		'count_foreach' => [
 			['rules' => [['type' => 'query']]],
-			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]]
+			['rules' => [['type' => 'period', 'mode' => self::PERIOD_MODE_SEC_ONLY]]],
+			['rules' => [['type' => 'regexp', 'pattern' => '/^(eq|ne|gt|ge|lt|le|like|bitand|regexp|iregexp)$/']],
+				'required' => false
+			],
+			['required' => false]
 		],
 		'countunique' => [
 			['rules' => [['type' => 'query']]],
@@ -299,54 +303,110 @@ final class CHistFunctionData {
 	 * @var array
 	 */
 	private const EXPRESSION_RULES = [
-		'avg_foreach' => [[
-			'type' => 'require_math_parent',
-			'in' => ['avg', 'count', 'max', 'min', 'sum'],
-			'parameters' => ['count' => 1],
-			'position' => 0
-		]],
+		'avg_foreach' => [
+			[
+				'type' => 'require_math_parent',
+				'in' => ['avg', 'max', 'min', 'sum'],
+				'parameters' => ['count' => 1],
+				'position' => 0
+			],
+			[
+				'type' => 'require_math_parent',
+				'in' => ['count'],
+				'parameters' => ['min' => 1, 'max' => 3],
+				'position' => 0
+			]
+		],
 		'bucket_rate_foreach' => [[
 			'type' => 'require_math_parent',
 			'in' => ['histogram_quantile'],
 			'parameters' => ['count' => 2],
 			'position' => 1
 		]],
-		'count_foreach' => [[
-			'type' => 'require_math_parent',
-			'in' => ['avg', 'count', 'max', 'min', 'sum'],
-			'parameters' => ['count' => 1],
-			'position' => 0
-		]],
-		'exists_foreach' => [[
-			'type' => 'require_math_parent',
-			'in' => ['avg', 'count', 'max', 'min', 'sum'],
-			'parameters' => ['count' => 1],
-			'position' => 0
-		]],
-		'last_foreach' => [[
-			'type' => 'require_math_parent',
-			'in' => ['avg', 'count', 'max', 'min', 'sum'],
-			'parameters' => ['count' => 1],
-			'position' => 0
-		]],
-		'max_foreach' => [[
-			'type' => 'require_math_parent',
-			'in' => ['avg', 'count', 'max', 'min', 'sum'],
-			'parameters' => ['count' => 1],
-			'position' => 0
-		]],
-		'min_foreach' => [[
-			'type' => 'require_math_parent',
-			'in' => ['avg', 'count', 'max', 'min', 'sum'],
-			'parameters' => ['count' => 1],
-			'position' => 0
-		]],
-		'sum_foreach' => [[
-			'type' => 'require_math_parent',
-			'in' => ['avg', 'count', 'max', 'min', 'sum'],
-			'parameters' => ['count' => 1],
-			'position' => 0
-		]]
+		'count_foreach' => [
+			[
+				'type' => 'require_math_parent',
+				'in' => ['avg', 'max', 'min', 'sum'],
+				'parameters' => ['count' => 1],
+				'position' => 0
+			],
+			[
+				'type' => 'require_math_parent',
+				'in' => ['count'],
+				'parameters' => ['min' => 1, 'max' => 3],
+				'position' => 0
+			]
+		],
+		'exists_foreach' => [
+			[
+				'type' => 'require_math_parent',
+				'in' => ['avg', 'max', 'min', 'sum'],
+				'parameters' => ['count' => 1],
+				'position' => 0
+			],
+			[
+				'type' => 'require_math_parent',
+				'in' => ['count'],
+				'parameters' => ['min' => 1, 'max' => 3],
+				'position' => 0
+			]
+		],
+		'last_foreach' => [
+			[
+				'type' => 'require_math_parent',
+				'in' => ['avg', 'max', 'min', 'sum'],
+				'parameters' => ['count' => 1],
+				'position' => 0
+			],
+			[
+				'type' => 'require_math_parent',
+				'in' => ['count'],
+				'parameters' => ['min' => 1, 'max' => 3],
+				'position' => 0
+			]
+		],
+		'max_foreach' => [
+			[
+				'type' => 'require_math_parent',
+				'in' => ['avg', 'max', 'min', 'sum'],
+				'parameters' => ['count' => 1],
+				'position' => 0
+			],
+			[
+				'type' => 'require_math_parent',
+				'in' => ['count'],
+				'parameters' => ['min' => 1, 'max' => 3],
+				'position' => 0
+			]
+		],
+		'min_foreach' => [
+			[
+				'type' => 'require_math_parent',
+				'in' => ['avg', 'max', 'min', 'sum'],
+				'parameters' => ['count' => 1],
+				'position' => 0
+			],
+			[
+				'type' => 'require_math_parent',
+				'in' => ['count'],
+				'parameters' => ['min' => 1, 'max' => 3],
+				'position' => 0
+			]
+		],
+		'sum_foreach' => [
+			[
+				'type' => 'require_math_parent',
+				'in' => ['avg', 'max', 'min', 'sum'],
+				'parameters' => ['count' => 1],
+				'position' => 0
+			],
+			[
+				'type' => 'require_math_parent',
+				'in' => ['count'],
+				'parameters' => ['min' => 1, 'max' => 3],
+				'position' => 0
+			]
+		]
 	];
 
 	/**

@@ -26,18 +26,31 @@
 
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
-$this->addJsFile('colorpicker.js');
+$this->addJsFile('leaflet.js');
+$this->addJsFile('leaflet.markercluster.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
+$this->addJsFile('class.geomaps.js');
 $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.calendar.js');
+$this->addJsFile('class.coverride.js');
+$this->addJsFile('class.crangecontrol.js');
+$this->addJsFile('colorpicker.js');
+$this->addJsFile('class.csvggraph.js');
+$this->addJsFile('class.cnavtree.js');
+$this->addJsFile('class.svg.canvas.js');
+$this->addJsFile('class.svg.map.js');
+$this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('configuration.dashboard.edit.js.php');
+
+$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Dashboards'))
@@ -54,7 +67,7 @@ $html_page = (new CHtmlPage())
 							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
 						))->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
-							(new CButton('dashboard-add', '&#8203;'))
+							(new CButton('dashboard-add', ZWSPACE()))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
 						),

@@ -491,14 +491,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 	}
 	else if (0 == strcmp(tmp, "java"))			/* zabbix["java",...] */
 	{
-		int	res;
-
-		zbx_alarm_on((unsigned int)config_comms->config_timeout);
-		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
-				config_comms->config_timeout);
-		zbx_alarm_off();
-
-		if (SUCCEED != res)
+		if (SUCCEED != get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
+				config_comms->config_timeout))
 		{
 			tmp1 = get_rparam(&request, 2);
 			/* the default error code "NOTSUPPORTED" renders nodata() trigger function nonfunctional */
@@ -644,6 +638,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_LOG_COUNTER));
 			else if (0 == strcmp(tmp1, "text"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_TEXT_COUNTER));
+			else if (0 == strcmp(tmp1, "bin"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_BIN_COUNTER));
 			else if (0 == strcmp(tmp1, "not supported"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_NOTSUPPORTED_COUNTER));
 			else
