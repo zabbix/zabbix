@@ -675,6 +675,14 @@ int	zbx_discovery_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **er
 {
 	unsigned char	*result;
 
+	if (DISCOVERER_INITIALIZED_YES != discoverer_initialized)
+	{
+		*error = zbx_strdup(NULL, "discoverer is not initialized: please check \"StartDiscoverers\""
+				" configuration parameter");
+
+		return FAIL;
+	}
+
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_DISCOVERER, ZBX_IPC_DISCOVERER_USAGE_STATS,
 			SEC_PER_MIN, NULL, 0, &result, error))
 	{
