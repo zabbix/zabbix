@@ -638,56 +638,6 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	return variant_compare_str(value1, value2);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: populate dbl vector with values converted to dbl from var vector  *
- *                                                                            *
- * Return value: SUCCEED - if conversion and copy succeeded                   *
- *               FAIL    - conversion failed                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vector_dbl_from_vector_var(zbx_vector_var_t *input, zbx_vector_dbl_t *output, char **error)
-{
-	int 	i;
-
-	for (i = 0; i < input->values_num; i++)
-	{
-		if (SUCCEED != zbx_variant_to_value_type(&input->values[i], ITEM_VALUE_TYPE_FLOAT, error))
-		{
-			*error = zbx_dsprintf(*error, "conv failed on '%s'", zbx_variant_value_desc(&input->values[i]));
-			return FAIL;
-		}
-
-		zbx_vector_dbl_append(output, input->values[i].data.dbl);
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: convert all values in variant vector to dbl                       *
- *                                                                            *
- * Return value: SUCCEED - if conversion succeeded                            *
- *               FAIL    - conversion failed                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vector_var_to_dbl(zbx_vector_var_t *values, char **error)
-{
-	int 	i;
-
-	for (i = 0; i < values->values_num; i++)
-	{
-		if (SUCCEED != zbx_variant_to_value_type(&values->values[i], ITEM_VALUE_TYPE_FLOAT, error))
-		{
-			*error = zbx_strdup(*error, "input data is not numeric");
-			return FAIL;
-		}
-	}
-
-	return SUCCEED;
-}
-
 int	zbx_vector_var_get_type(zbx_vector_var_t *v)
 {
 	int 	i, type = ITEM_VALUE_TYPE_MAX;

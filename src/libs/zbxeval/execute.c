@@ -726,11 +726,20 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 		for (; i < output->values_num; i++)
 		{
 			if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i], error))
+			{
+				for (i = 0; i < tmp_vector->values_num; i++)
+					zbx_variant_clear(&tmp_vector->values[i]);
+
+				zbx_vector_var_destroy(tmp_vector);
+				zbx_free(tmp_vector);
+
 				return FAIL;
+			}
 
 			zbx_vector_var_append(tmp_vector, output->values[i]);
 		}
 
+		zbx_variant_clear(&output->values[output->values_num - token->opt]);
 		zbx_variant_set_vector(&output->values[output->values_num - token->opt], tmp_vector);
 	}
 	else
