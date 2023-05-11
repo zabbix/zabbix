@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -29,6 +30,15 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup drules
  */
 class testFormNetworkDiscovery extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	public function getCreateValidationData() {
 		return [
@@ -497,12 +507,13 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 	public function testFormNetworkDiscovery_Update($data) {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickLinkText($data['old_name']);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->fillInFields($data);
 
 		// Get amount of check rows in discovery form.
 		$checks_on_page = count($this->webDriver->findElements(WebDriverBy::xpath('//div[@id="dcheckList"]'.
 								'//tr[contains(@id,"dcheckRow")]')));
-		$this->zbxTestClick('update');
+		$dialog->query('button:Update')->waitUntilClickable()->one()->click();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -550,7 +561,9 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		foreach (CDBHelper::getRandom('SELECT name FROM drules', 3) as $discovery) {
 			$this->zbxTestClickLinkTextWait($discovery['name']);
-			$this->zbxTestClickWait('update');
+			COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Update')->waitUntilClickable()
+					->one()->click();
+
 			// Check the results in frontend.
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
 		}
@@ -659,8 +672,10 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$name = 'Discovery rule to check delete';
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestClickAndAcceptAlert('delete');
+		COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Delete')->waitUntilClickable()
+				->one()->click();
+		$this->page->acceptAlert();
+
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule deleted');
 
@@ -673,10 +688,13 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		foreach (CDBHelper::getRandom('SELECT name FROM drules WHERE druleid IN (2,3)', 2) as $drule) {
 			$this->zbxTestClickLinkTextWait($drule['name']);
-			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestClickWait('clone');
+			COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Clone')->waitUntilClickable()
+					->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->zbxTestInputType('name', 'CLONE: '.$drule['name']);
-			$this->zbxTestClickWait('add');
+			$dialog->asForm()->submit();
+			$dialog->ensureNotPresent();
+			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
 
 			$sql_drules = [];
 			$sql_dchecks = [];
@@ -742,33 +760,41 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				]
 			];
 			$this->zbxTestClickButtonText('Create discovery rule');
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->fillInFields($discovery);
+			$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 		}
 		else {
 			$discovery = CDBHelper::getRandom('SELECT name FROM drules', 1);
 			$discovery = $discovery[0];
 			$name = $discovery['name'];
 			$this->zbxTestClickLinkTextWait($name);
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$cancel_button = $dialog->query('button:Cancel')->waitUntilClickable()->one();
 
 			switch ($action) {
 				case 'update':
 					$name .= ' (updated)';
 					$this->zbxTestInputTypeOverwrite('name', $name);
+					$cancel_button->click();
 					break;
 
 				case 'clone':
 					$name .= ' (cloned)';
-					$this->zbxTestClickWait('clone');
+					$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
 					$this->zbxTestInputTypeOverwrite('name', $name);
+					$cancel_button->click();
 					break;
 
 				case 'delete':
-					$this->zbxTestClickWait('delete');
-					$this->webDriver->switchTo()->alert()->dismiss();
+					$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
+					$this->page->dismissAlert();
+					$dialog->close();
 					break;
 			}
 		}
-		$this->zbxTestClickWait('cancel');
+
+		$dialog->ensureNotPresent();
 
 		// Check the results in frontend.
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
