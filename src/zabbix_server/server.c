@@ -1732,7 +1732,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 {
 	int		i;
 	char		*error = NULL;
-	zbx_ha_config_t	*ha_config = NULL;
+	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
 
 	/* hard kill all zabbix processes, no logging or other  */
 
@@ -1789,7 +1789,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif
-	ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
 	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
@@ -1812,7 +1811,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 static void	server_restart_ha(zbx_rtc_t *rtc)
 {
 	char		*error = NULL;
-	zbx_ha_config_t	*ha_config = NULL;
+	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
 
 	zbx_unset_child_signal_handler();
 
@@ -1837,7 +1836,6 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 	zbx_locks_enable();
 #endif
 
-	ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
 	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
@@ -1863,7 +1861,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	time_t		standby_warning_time;
 	zbx_rtc_t	rtc;
 	zbx_timespec_t	rtc_timeout = {1, 0};
-	zbx_ha_config_t	*ha_config = NULL;
+	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -2054,7 +2052,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_unset_exit_on_terminate();
 
-	ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
 	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
