@@ -19,18 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup hosts, httptest
  *
  * @onBefore prepareHostWebData
  */
-class testPageWeb extends CWebTest {
+class testPageMonitoringWeb extends CWebTest {
 
 	use TagTrait;
 	use TableTrait;
@@ -170,7 +170,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks the layout of Web page.
 	 */
-	public function testPageWeb_Layout() {
+	public function testPageMonitoringWeb_CheckLayout() {
 		// Logins directly into required page.
 		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -198,7 +198,8 @@ class testPageWeb extends CWebTest {
 		// Check fields maximum length.
 		foreach(['filter_tags[0][tag]', 'filter_tags[0][value]'] as $field) {
 			$this->assertEquals(255, $form->query('xpath:.//input[@name="'.$field.'"]')
-					->one()->getAttribute('maxlength'));
+					->one()->getAttribute('maxlength')
+			);
 		}
 
 		// Check if links to Hosts and to Web scenarios are clickable.
@@ -216,8 +217,8 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks if button "Reset" works properly.
 	 */
-	public function testPageWeb_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1')->waitUntilReady();
+	public function testPageMonitoringWeb_ResetButtonCheck() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
 		$empty_form = [
@@ -258,11 +259,12 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks Hosts context menu.
 	 */
-	public function testPageWeb_HostContextMenu() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC')->waitUntilReady();
+	public function testPageMonitoringWeb_CheckHostContextMenu() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
+
 		$titles = [
 			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Web', 'Configuration', 'Detect operating system',
-					'Ping', 'Traceroute'
+			'Ping', 'Traceroute'
 		];
 
 		foreach (['WebData Host', 'Simple form test host'] as $name) {
@@ -285,7 +287,7 @@ class testPageWeb extends CWebTest {
 	/**
 	 * Function which checks if disabled web services aren't displayed.
 	 */
-	public function testPageWeb_DisabledWebServices() {
+	public function testPageMonitoringWeb_CheckDisabledWebServices() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$values = $this->getTableResult('Name');
 
@@ -295,18 +297,27 @@ class testPageWeb extends CWebTest {
 			$this->query('xpath://input[@id="all_httptests"]')->one()->click();
 			$this->query('xpath://button[normalize-space()="'.$status.'"]')->one()->click();
 			$this->page->acceptAlert();
+
+			if ($status === 'Disable') {
+				$this->assertMessage(TEST_GOOD, 'Web scenarios disabled');
+			}
+			else {
+				$this->assertMessage(TEST_GOOD, 'Web scenarios enabled');
+			}
+
 			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-			$changed = ($status === 'Disable') ? array_diff($values, ['Web scenario 1 step', 'Web scenario 2 step',
-					'Web scenario 3 step']) : $values;
+			$changed = ($status === 'Disable')
+				? array_diff($values, ['Web scenario 1 step', 'Web scenario 2 step', 'Web scenario 3 step'])
+				: $values;
 			$this->assertTableDataColumn($changed);
 		}
 	}
 
-	public static function getTagsFilterData() {
+	public static function getFilterData() {
 		return [
-			// #0.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
@@ -318,9 +329,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #1.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -336,9 +347,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #2.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
@@ -350,9 +361,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #3.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -364,9 +375,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #4.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
@@ -379,9 +390,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #5.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -395,9 +406,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #6.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
@@ -420,9 +431,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #7.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -445,9 +456,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #8.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
@@ -471,9 +482,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #9.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -497,9 +508,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #10.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
@@ -522,9 +533,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #11.
 			[
 				[
+					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -548,148 +559,11 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #12.
 			[
 				[
-					'tag_options' => [
-						'type' => 'And/Or',
-						'tags' => [
-							['name' => 'FirstTag', 'operator' => 'Exists'],
-							['name' => 'SecondTag', 'value' => 'value 2', 'operator' => 'Equals'],
-							['name' => 'ThirdTag', 'value' => 'value 3', 'operator' => 'Contains'],
-							['name' => 'FourthTag', 'operator' => 'Does not exist'],
-							['name' => 'FifthTag', 'value' => 'value 6', 'operator' => 'Does not equal'],
-							['name' => 'SixthTag', 'value' => 'value 7', 'operator' => 'Does not contain']
-						]
-					],
-					'Name' => []
-				]
-			]
-		];
-	}
-
-	/**
-	 * Function which checks if Web service tags are properly displayed.
-	 * @dataProvider getTagsFilterData
-	 */
-	public function testPageWeb_TagsFilter($data) {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
-		$this->setTagSelector('id:filter-tags');
-		$this->setTags($data['tag_options']['tags']);
-		$form->submit();
-		$this->page->waitUntilReady();
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'Name', []));
-		$this->query('button:Reset')->one()->waitUntilClickable()->click();
-	}
-
-	/**
-	 * Function which checks number of steps for web services displayed.
-	 */
-	public function testPageWeb_WebServiceNumberOfSteps() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
-		$sql = 'SELECT * FROM httptest, hosts, httpstep WHERE httptest.hostid = hosts.hostid'.
-				' AND hosts.hostid ='.self::$hostid['WebData Host'].
-				' AND httptest.httptestid = httpstep.httptestid'.
-				' AND httptest.httptestid ='.self::$httptestid['Web scenario 3 step'];
-
-		// Check if steps in DB are equal to the frontend amount of steps.
-		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
-		$this->assertEquals($row->getColumn('Number of steps')->getText(), CDBHelper::getCount($sql));
-
-		// Directly open API created Web scenario and add/remove one step.
-		foreach (['Add' => '4', 'Remove' => '3'] as $action => $count) {
-			$this->page->open("httpconf.php?context=host&form=update&hostid=".self::$hostid['WebData Host']."&httptestid=".
-					self::$httptestid['Web scenario 3 step'])->waitUntilReady();
-			$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
-			$this->query('id:stepTab')->asTable()->one()->query("xpath:.//button[text()=".
-					CXPathHelper::escapeQuotes($action) . ']')->one()->click();
-
-			if ($action === 'Add') {
-				COverlayDialogElement::find()->one()->waitUntilReady();
-				$this->query('id:http_step')->asForm()->one()
-						->fill(['Name' => 'Step number 4', 'id:url' => 'test.com'])->submit();
-				COverlayDialogElement::find()->one()->waitUntilNotVisible();
-			}
-
-			$this->query('button:Update')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Web scenario updated');
-
-			// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
-			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-			$this->assertEquals($count, $row->getColumn('Number of steps')->getText());
-			$this->assertEquals($row->getColumn('Number of steps')->getText(), CDBHelper::getCount($sql));
-		}
-	}
-
-	/**
-	 * Function which checks sorting by Name/Host column.
-	 */
-	public function testPageWeb_Sorting() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC')->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-
-		foreach (['Host', 'Name'] as $column_name) {
-			if ($column_name === 'Name') {
-				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
-			}
-			$column_values = $this->getTableResult($column_name);
-
-			foreach (['asc', 'desc'] as $sorting) {
-				$expected = ($sorting === 'asc') ? $column_values : array_reverse($column_values);
-				$this->assertEquals($expected, $this->getTableResult($column_name));
-				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
-			}
-		}
-	}
-
-	/**
-	 * Function which checks that title field disappears while Kioskmode is active.
-	 */
-	public function testPageWeb_KioskMode() {
-		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
-
-		// Check title, filter and table display after pressing Kiosk mode/Normal view.
-		foreach (['Kiosk mode', 'Normal view'] as $status) {
-			$this->query('xpath://button[@title="'.$status.'"]')->one()->click();
-			$this->page->waitUntilReady();
-
-			if ($status === 'Kiosk mode') {
-				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
-			}
-			else {
-				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
-			}
-
-			$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
-			$this->assertTrue($this->query('id:flickerfreescreen_httptest')->exists());
-		}
-
-		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
-	}
-
-	/**
-	 * Function which checks links to "Details of Web scenario".
-	 */
-	public function testPageWeb_Links() {
-		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', 'testFormWeb1')
-				->query('link', 'testFormWeb1')->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader('Details of web scenario: testFormWeb1');
-		$this->page->assertTitle('Details of web scenario');
-	}
-
-	public static function getFilterData() {
-		return [
-			// #0.
-			[
-				[
+					'tag_fill' => 'no',
 					'filter' => [
-						'Host groups' => 'Zabbix servers'
+					'Host groups' => 'Zabbix servers'
 					],
 					'expected' => [
 						'Web ZBX6663 Second',
@@ -705,9 +579,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #1.
 			[
 				[
+					'tag_fill' => 'no',
 					'filter' => [
 						'Hosts' => 'Simple form test host'
 					],
@@ -719,9 +593,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #2.
 			[
 				[
+					'tag_fill' => 'no',
 					'filter' => [
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'Host ZBX6663'
@@ -732,9 +606,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #3.
 			[
 				[
+					'tag_fill' => 'no',
 					'filter' => [
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => [
@@ -752,9 +626,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #4.
 			[
 				[
+					'tag_fill' => 'no',
 					'filter' => [
 						'Hosts' => [
 							'Host ZBX6663',
@@ -776,9 +650,9 @@ class testPageWeb extends CWebTest {
 					]
 				]
 			],
-			// #5.
 			[
 				[
+					'tag_fill' => 'no',
 					'filter' => [
 						'Host groups' => [
 							'WebData HostGroup',
@@ -802,12 +676,98 @@ class testPageWeb extends CWebTest {
 	}
 
 	/**
+	 * Function which checks if Web service tags are properly displayed.
 	 * @dataProvider getFilterData
 	 */
-	public function testPageWeb_Filter($data) {
+	public function testPageMonitoringWeb_TagsFilter($data) {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->query('class:list-table')->waitUntilPresent()->one();
+		if ($data['tag_fill'] === 'yes') {
+			$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
+			$this->setTagSelector('id:filter-tags');
+			$this->setTags($data['tag_options']['tags']);
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			$table->waitUntilReloaded();
+			$this->assertTableHasDataColumn(CTestArrayHelper::get($data, 'Name', []));
+			$this->query('button:Reset')->one()->waitUntilClickable()->click();
+			$table->waitUntilReloaded();
+		} else {
+			$form->fill($data['filter'])->submit();
+			$this->page->waitUntilReady();
+			$this->assertTableDataColumn($data['expected']);
+		}
+	}
+
+	/**
+	 * Function which checks number of steps for web services displayed.
+	 */
+	public function testPageMonitoringWeb_CheckWebServiceNumberOfSteps() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill($data['filter'])->submit();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
+		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
+
+		// Directly open API created Web scenario and add one more step.
+		$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
+				self::$httptestid['Web scenario 3 step'])->waitUntilReady();
+		$this->query('id:http-form')->asForm()->one()->selectTab('Steps');
+		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:http_step')->asForm()->one();
+		$form->fill(['Name' => 'Step number 4', 'id:url' => 'test.com']);
+		$form->submit();
+		$this->query('button:Update')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertTableDataColumn($data['expected']);
+		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
+
+		// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
+		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+		$this->assertEquals('4', $row->getColumn('Number of steps')->getText());
+	}
+
+	/**
+	 * Function which checks sorting by Name column.
+	 */
+	public function testPageMonitoringWeb_CheckSorting() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC');
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		foreach (['Host', 'Name'] as $column_name) {
+			if ($column_name === 'Name') {
+				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
+			}
+			$column_values = $this->getTableResult($column_name);
+
+			foreach (['asc', 'desc'] as $sorting) {
+				$expected = ($sorting === 'asc') ? $column_values : array_reverse($column_values);
+				$this->assertEquals($expected, $this->getTableResult($column_name));
+				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
+			}
+		}
+	}
+
+	/**
+	 * Function which checks that title field disappears while Kioskmode is active.
+	 */
+	public function testPageMonitoringWeb_CheckKioskMode() {
+		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
+
+		// Check title, filter and table display after pressing Kiosk mode/Normal view.
+		foreach (['Kiosk mode', 'Normal view'] as $status) {
+			$this->query('xpath://button[@title="'.$status.'"]')->one()->click();
+			$this->page->waitUntilReady();
+
+			if ($status === 'Kiosk mode') {
+				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
+			}
+			else {
+				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
+			}
+
+			$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
+			$this->assertTrue($this->query('id:flickerfreescreen_httptest')->exists());
+		}
+
+		$this->query('xpath://button[@title="Kiosk mode"]')->waitUntilVisible();
 	}
 }
