@@ -654,7 +654,8 @@ int	zbx_vector_dbl_from_vector_var(zbx_vector_var_t *input, zbx_vector_dbl_t *ou
 	{
 		if (SUCCEED != zbx_variant_to_value_type(&input->values[i], ITEM_VALUE_TYPE_FLOAT, error))
 		{
-			*error = zbx_strdup(*error, "input data is not numeric");
+			//*error = zbx_strdup(*error, "input data is not numeric");
+			*error = zbx_dsprintf(*error, "conv failed on '%s'", zbx_variant_value_desc(&input->values[i]));
 			return FAIL;
 		}
 

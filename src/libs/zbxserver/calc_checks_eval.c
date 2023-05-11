@@ -1547,7 +1547,6 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		zbx_vector_var_append(results, rate);
 	}
 
-
 	if (ZBX_MIXVALUE_FUNC_BRATE == item_func)
 	{
 		zbx_variant_set_vector(value, results);
@@ -1559,7 +1558,6 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		zbx_vector_dbl_t	results_tmp;
 
 		zbx_vector_dbl_create(&results_tmp);
-
 
 		if (SUCCEED == (ret = zbx_vector_dbl_from_vector_var(results, &results_tmp, error)))
 		{
