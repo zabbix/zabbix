@@ -298,8 +298,16 @@ foreach ($data['items'] as $item) {
 }
 
 $button_list = [
-	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?'), 'csrf_token' => $csrf_token],
-	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?'),
+	'item.massenable' => [
+		'name' => _('Enable'),
+		'confirm_singular' => _('Enable selected item?'),
+		'confirm_plural' => _('Enable selected items?'),
+		'csrf_token' => $csrf_token
+	],
+	'item.massdisable' => [
+		'name' => _('Disable'),
+		'confirm_singular' => _('Disable selected item?'),
+		'confirm_plural' => _('Disable selected items?'),
 		'csrf_token' => $csrf_token
 	]
 ];
@@ -307,12 +315,14 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$massclearhistory = [
 		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?'),
+		'confirm_singular' => _('Delete history of selected item?'),
+		'confirm_plural' => _('Delete history of selected items?'),
 		'csrf_token' => $csrf_token
 	];
 
 	if ($data['config']['compression_status']) {
-		unset($massclearhistory['confirm']);
+		unset($massclearhistory['confirm_singular']);
+		unset($massclearhistory['confirm_plural']);
 	}
 
 	$button_list += [
@@ -346,7 +356,12 @@ $button_list += [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeAttribute('id')
 	],
-	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'), 'csrf_token' => $csrf_token]
+	'item.massdelete' => [
+		'name' => _('Delete'),
+		'confirm_singular' => _('Delete selected item?'),
+		'confirm_plural' => _('Delete selected items?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.
