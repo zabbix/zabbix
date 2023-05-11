@@ -2320,6 +2320,8 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 	{
 		v = (zbx_vector_dbl_t*)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
 
+		zbx_vector_dbl_create(v);
+
 		if (FAIL == zbx_vector_dbl_from_vector_var(output->values[i].data.vector, v, error))
 			return FAIL;
 	}
