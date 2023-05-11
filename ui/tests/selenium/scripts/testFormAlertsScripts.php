@@ -1440,6 +1440,7 @@ class testFormAlertsScripts extends CWebTest {
 
 		$this->openScriptForEditing(self::$ids['URI schemes'], false);
 		$this->assertUriScheme($form, array_merge($default_valid_schemes, $invalid_schemes));
+		$modal->close();
 	}
 
 	/**
