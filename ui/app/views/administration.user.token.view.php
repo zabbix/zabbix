@@ -37,11 +37,11 @@ $token_from_list = (new CFormList())
 	->addRow(_('Name').':', $data['name'])
 	->addRow(_('Auth token').':', [
 		$data['auth_token'],
-		'&nbsp;',
+		NBSP(),
 		makeWarningIcon(
 			_("Make sure to copy the auth token as you won't be able to view it after the page is closed.")
 		),
-		'&nbsp;',
+		NBSP(),
 		(new CLinkAction(_('Copy to clipboard')))
 			->onClick('writeTextClipboard("'.$data['auth_token'].'")')
 			->setAttribute('autofocus', 'autofocus')
@@ -49,7 +49,7 @@ $token_from_list = (new CFormList())
 	->addRow(_('Expires at').':', [
 		($data['expires_at'] == 0) ? '-' : date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at']),
 		($data['expires_at'] != 0 && time() > $data['expires_at'])
-			? ['&nbsp;', makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))]
+			? [NBSP(), makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))]
 			: null
 	])
 	->addRow(_('Description').':', (new CDiv($data['description']))->addClass(ZBX_STYLE_WORDBREAK))
