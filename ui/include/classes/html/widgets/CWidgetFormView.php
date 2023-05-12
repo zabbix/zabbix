@@ -41,17 +41,15 @@ class CWidgetFormView {
 
 	/**
 	 * Add fieldset with multiple CWidgetFieldView-s as content.
-	 *
-	 * @param CWidgetFormFieldsetCollapsibleView|null $fieldset
-	 *
-	 * @return $this
 	 */
 	public function addFieldset(?CWidgetFormFieldsetCollapsibleView $fieldset): self {
-		if ($fieldset !== null) {
-			foreach ($fieldset->getFields() as $field) {
-				if ($field instanceof CWidgetFieldView) {
-					$this->registerField($field);
-				}
+		if ($fieldset === null) {
+			return $this;
+		}
+
+		foreach ($fieldset->getFields() as $field) {
+			if ($field instanceof CWidgetFieldView) {
+				$this->registerField($field);
 			}
 		}
 
@@ -60,17 +58,15 @@ class CWidgetFormView {
 
 	/**
 	 * Add configuration row with single label and multiple CWidgetFieldView-s as content.
-	 *
-	 * @param CWidgetFieldsGroupView|null $fields_group
-	 *
-	 * @return $this
 	 */
 	public function addFieldsGroup(?CWidgetFieldsGroupView $fields_group): self {
-		if ($fields_group !== null) {
-			foreach ($fields_group->getFields() as $field) {
-				if ($field instanceof CWidgetFieldView) {
-					$this->registerField($field);
-				}
+		if ($fields_group === null) {
+			return $this;
+		}
+
+		foreach ($fields_group->getFields() as $field) {
+			if ($field instanceof CWidgetFieldView) {
+				$this->registerField($field);
 			}
 		}
 
@@ -79,28 +75,28 @@ class CWidgetFormView {
 
 	/**
 	 * Add configuration row based on single CWidgetFieldView.
-	 *
-	 * @param CWidgetFieldView|null $field
-	 *
-	 * @return $this
 	 */
 	public function addField(?CWidgetFieldView $field): self {
-		if ($field !== null) {
-			$this->registerField($field);
-
-			$this->form_grid->addItem([
-				$field->getLabel(),
-				(new CFormField($field->getView()))->addClass($field->getClass())
-			]);
+		if ($field === null) {
+			return $this;
 		}
+
+		$this->registerField($field);
+
+		$this->form_grid->addItem([
+			$field->getLabel(),
+			(new CFormField($field->getView()))->addClass($field->getClass())
+		]);
 
 		return $this;
 	}
 
 	public function addFieldVar(?CWidgetField $field): self {
-		if ($field !== null) {
-			$this->vars[] = new CVar($field->getName(), $field->getValue());
+		if ($field === null) {
+			return $this;
 		}
+
+		$this->vars[] = new CVar($field->getName(), $field->getValue());
 
 		return $this;
 	}

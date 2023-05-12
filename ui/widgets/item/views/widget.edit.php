@@ -49,7 +49,7 @@ $form
 				getTimeFieldsGroupViews($form, $data['fields'])
 			)
 			->addFieldsGroup(
-				getChangeIndicatorFieldsGroupViews($form, $data['fields'])
+				getChangeIndicatorFieldsGroupViews($data['fields'])
 			)
 			->addField(
 				new CWidgetFieldColorView($data['fields']['bg_color'])
@@ -111,14 +111,11 @@ function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): C
 function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$decimal_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['decimal_size']));
 	$value_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
-	$value_color = $form->registerField(new CWidgetFieldColorView($fields['value_color']));
 	$units_show = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
 	$units = $form->registerField(
 		(new CWidgetFieldTextBoxView($fields['units']))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	);
 	$units_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['units_size']));
-	$units_bold = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_bold']));
-	$units_color = $form->registerField(new CWidgetFieldColorView($fields['units_color']));
 
 	return (new CWidgetFieldsGroupView(_('Value')))
 		->addField(
@@ -144,10 +141,9 @@ function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidget
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['value_bold'])
 		)
-		->addItem([
-			$value_color->getLabel()->addClass('offset-3'),
-			new CFormField($value_color->getView())
-		])
+		->addField(
+			(new CWidgetFieldColorView($fields['value_color']))->addLabelClass('offset-3')
+		)
 		->addItem(
 			new CTag('hr')
 		)
@@ -170,20 +166,17 @@ function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidget
 			$units_size->getLabel(),
 			(new CFormField([$units_size->getView(), '%']))->addClass('field-size')
 		])
-		->addItem([
-			$units_bold->getLabel()->addClass('offset-3'),
-			new CFormField($units_bold->getView())
-		])
-		->addItem([
-			$units_color->getLabel()->addClass('offset-3'),
-			new CFormField($units_color->getView())
-		])
+		->addField(
+			(new CWidgetFieldCheckBoxView($fields['units_bold']))->addLabelClass('offset-3')
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['units_color']))->addLabelClass('offset-3')
+		)
 		->addRowClass('fields-group-value');
 }
 
 function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$time_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
-	$time_color = $form->registerField(new CWidgetFieldColorView($fields['time_color']));
 
 	return (new CWidgetFieldsGroupView(_('Time')))
 		->addField(
@@ -199,36 +192,36 @@ function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetF
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['time_bold'])
 		)
-		->addItem([
-			$time_color->getLabel()->addClass('offset-3'),
-			new CFormField($time_color->getView())
-		])
+		->addField(
+			(new CWidgetFieldColorView($fields['time_color']))->addLabelClass('offset-3')
+		)
 		->addRowClass('fields-group-time');
 }
 
-function getChangeIndicatorFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$up_color = $form->registerField(new CWidgetFieldColorView($fields['up_color']));
-	$down_color = $form->registerField(new CWidgetFieldColorView($fields['down_color']));
-	$updown_color = $form->registerField(new CWidgetFieldColorView($fields['updown_color']));
-
+function getChangeIndicatorFieldsGroupViews(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Change indicator')))
-		->addItem([
+		->addItem(
 			(new CSvgArrow(['up' => true, 'fill_color' => $fields['up_color']->getValue()]))
 				->setId('change-indicator-up')
-				->setSize(14, 20),
-			new CFormField($up_color->getView())
-		])
-		->addItem([
+				->setSize(14, 20))
+		->addField(
+			(new CWidgetFieldColorView($fields['up_color']))->removeLabel()
+		)
+		->addItem(
 			(new CSvgArrow(['down' => true, 'fill_color' => $fields['down_color']->getValue()]))
 				->setId('change-indicator-down')
 				->setSize(14, 20),
-			new CFormField($down_color->getView())
-		])
-		->addItem([
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['down_color']))->removeLabel()
+		)
+		->addItem(
 			(new CSvgArrow(['up' => true, 'down' => true, 'fill_color' => $fields['updown_color']->getValue()]))
 				->setId('change-indicator-updown')
-				->setSize(14, 20),
-			new CFormField($updown_color->getView())
-		])
+				->setSize(14, 20)
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['updown_color']))->removeLabel()
+		)
 		->addRowClass('fields-group-change-indicator');
 }

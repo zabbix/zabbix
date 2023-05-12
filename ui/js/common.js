@@ -409,13 +409,12 @@ function PopUp(action, parameters, {
 
 				for (const grid of overlay.$dialogue.$body[0].querySelectorAll('form .form-grid')) {
 					new ResizeObserver(() => {
-						const label = grid.querySelector(':scope > label:first-of-type');
-
-						if (label !== null) {
+						for (const label of grid.querySelectorAll(':scope > label')) {
 							const rect = label.getBoundingClientRect();
 
 							if (rect.width > 0) {
 								grid.style.setProperty('--label-width', Math.ceil(rect.width) + 'px');
+								break;
 							}
 						}
 					}).observe(grid);
