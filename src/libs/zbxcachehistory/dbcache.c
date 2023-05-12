@@ -4477,7 +4477,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_BIN:
-		case ZBX_VARIANT_DBL_VECTOR:
+		case ZBX_VARIANT_VECTOR:
 		case ZBX_VARIANT_ERR:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;

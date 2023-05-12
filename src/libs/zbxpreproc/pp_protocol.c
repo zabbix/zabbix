@@ -327,7 +327,7 @@ static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t 
 			offset += zbx_deserialize_bin(offset, &value->data.bin, value_len);
 			break;
 		case ZBX_VARIANT_NONE:
-		case ZBX_VARIANT_DBL_VECTOR:
+		case ZBX_VARIANT_VECTOR:
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
