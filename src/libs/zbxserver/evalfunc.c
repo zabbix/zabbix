@@ -1295,7 +1295,7 @@ int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char valu
 		}
 	}
 	else if (OP_LIKE != pdata->op && OP_REGEXP != pdata->op && OP_IREGEXP != pdata->op && OP_EQ != pdata->op &&
-			OP_NE != pdata->op && ITEM_VALUE_TYPE_MAX != value_type)
+			OP_NE != pdata->op && ITEM_VALUE_TYPE_NONE != value_type)
 	{
 		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting textual values", operator);
 		return FAIL;
