@@ -90,7 +90,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.4/manual
 |{$APACHE.STATUS.SCHEME}|<p>The request scheme, which may be either HTTP or HTTPS.</p>|`http`|
 |{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>The maximum Apache response time expressed in seconds for a trigger expression.</p>|`10`|
 |{$APACHE.PROCESS_NAME}|<p>The process name filter for the Apache process discovery.</p>|`(httpd\|apache2)`|
-|{$APACHE.PROCESS.NAME.PARAMETER}|<p>The process name of the Apache web server (Apache) used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
+|{$APACHE.PROCESS.NAME.PARAMETER}|<p>The process name of the Apache web server used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
 
 ### Items
 

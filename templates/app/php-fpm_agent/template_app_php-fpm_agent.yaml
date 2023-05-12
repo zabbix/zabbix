@@ -259,8 +259,8 @@ zabbix_export:
           triggers:
             - uuid: 231e0fbfb6e94f34b790576766244602
               expression: 'last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)'
-              name: 'PHP-FPM: Manager  changed'
-              event_name: 'PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})'
+              name: 'PHP-FPM: Manager changed'
+              event_name: 'PHP-FPM: Manager changed (new value received: {ITEM.VALUE})'
               priority: INFO
               description: 'The PHP-FPM manager has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'

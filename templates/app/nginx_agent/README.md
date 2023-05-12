@@ -72,7 +72,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.4/manual
 |{$NGINX.RESPONSE_TIME.MAX.WARN}|<p>The maximum response time of Nginx expressed in seconds for a trigger expression.</p>|`10`|
 |{$NGINX.DROP_RATE.MAX.WARN}|<p>The critical rate of the dropped connections for a trigger expression.</p>|`1`|
 |{$NGINX.PROCESS_NAME}|<p>The process name filter for the Nginx process discovery.</p>|`nginx`|
-|{$NGINX.PROCESS.NAME.PARAMETER}|<p>The process name of the Nginx server (Nginx) used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
+|{$NGINX.PROCESS.NAME.PARAMETER}|<p>The process name of the Nginx server used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
 
 ### Items
 

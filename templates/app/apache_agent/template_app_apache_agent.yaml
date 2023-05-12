@@ -806,7 +806,7 @@ zabbix_export:
           value: apache
       macros:
         - macro: '{$APACHE.PROCESS.NAME.PARAMETER}'
-          description: 'The process name of the Apache web server (Apache) used in the item key `proc.get`. It could be specified if the correct process name is known.'
+          description: 'The process name of the Apache web server used in the item key `proc.get`. It could be specified if the correct process name is known.'
         - macro: '{$APACHE.PROCESS_NAME}'
           value: (httpd|apache2)
           description: 'The process name filter for the Apache process discovery.'

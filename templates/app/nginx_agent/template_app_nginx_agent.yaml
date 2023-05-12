@@ -489,7 +489,7 @@ zabbix_export:
           value: '1'
           description: 'The critical rate of the dropped connections for a trigger expression.'
         - macro: '{$NGINX.PROCESS.NAME.PARAMETER}'
-          description: 'The process name of the Nginx server (Nginx) used in the item key `proc.get`. It could be specified if the correct process name is known.'
+          description: 'The process name of the Nginx server used in the item key `proc.get`. It could be specified if the correct process name is known.'
         - macro: '{$NGINX.PROCESS_NAME}'
           value: nginx
           description: 'The process name filter for the Nginx process discovery.'
