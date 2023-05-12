@@ -137,7 +137,9 @@ class ScimHttpResponse {
 		return [
 			'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
 			'totalResults' => $total_users,
-			'startIndex' => max($this->request_data['startIndex'], 1),
+			'startIndex' => array_key_exists('startIndex', $this->request_data)
+				? max($this->request_data['startIndex'], 1)
+				: 1,
 			'itemsPerPage' => min($total_users, max($total_users, 0)),
 			'Resources' => $resources
 		];
@@ -178,19 +180,13 @@ class ScimHttpResponse {
 			'Resources' => []
 		];
 
-		if (array_key_exists('startIndex', $this->request_data)) {
-			$data['startIndex'] = max($this->request_data['startIndex'], 1);
-		}
-		else {
-			$data['startIndex'] = 1;
-		}
+		$data['startIndex'] = array_key_exists('startIndex', $this->request_data)
+			? max($this->request_data['startIndex'], 1)
+			: 1;
 
-		if (array_key_exists('count', $this->request_data)) {
-			$data['itemsPerPage'] = min($total_groups, max($this->request_data['count'], 0));
-		}
-		else {
-			$data['itemsPerPage'] = $total_groups;
-		}
+		$data['itemsPerPage'] = array_key_exists('count', $this->request_data)
+			? min($total_groups, max($this->request_data['count'], 0))
+			: $total_groups;
 
 		foreach ($this->response_data as $groupid => $group_data) {
 			$data['Resources'][] = [
