@@ -172,6 +172,8 @@ type procStatus struct {
 	PageFaults    int64   `json:"page_faults"`
 	User          string  `json:"user"`
 	Group         string  `json:"group"`
+	UserID        int64  `json:"uid"`
+	GroupID       int64  `json:"gid"`
 }
 
 type procSummary struct {
@@ -209,6 +211,8 @@ type thread struct {
 	PageFaults    int64   `json:"page_faults"`
 	User          string  `json:"user"`
 	Group         string  `json:"group"`
+	UserID        int64  `json:"uid"`
+	GroupID       int64  `json:"gid"`
 }
 
 type procStat struct {
@@ -829,14 +833,24 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				continue
 			}
 
-			u, err := user.LookupId(strconv.FormatInt(pu.uid, 10))
+			data.UserID = pu.uid
+			data.GroupID = pu.gid
+
+			uStr := strconv.FormatInt(pu.uid, 10)
+			gStr := strconv.FormatInt(pu.gid, 10)
+
+			u, err := user.LookupId(uStr)
 			if err == nil {
 				data.User = u.Username
+			} else {
+				data.User = uStr
 			}
 
-			g, err := user.LookupGroupId(strconv.FormatInt(pu.gid, 10))
+			g, err := user.LookupGroupId(gStr)
 			if err == nil {
 				data.Group = g.Name
+			} else {
+				data.Group = gStr
 			}
 
 			pi := procInfo{int64(data.Pid), data.Name, pu.uid, "", data.Name, ""}
@@ -870,21 +884,31 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				continue
 			}
 
-			u, err := user.LookupId(strconv.FormatInt(pu.uid, 10))
+			data.UserID = pu.uid
+			data.GroupID = pu.gid
+
+			uStr := strconv.FormatInt(pu.uid, 10)
+			gStr := strconv.FormatInt(pu.gid, 10)
+
+			u, err := user.LookupId(uStr)
 			if err == nil {
 				data.User = u.Username
+			} else {
+				data.User = uStr
 			}
 
-			g, err := user.LookupGroupId(strconv.FormatInt(pu.gid, 10))
+			g, err := user.LookupGroupId(gStr)
 			if err == nil {
 				data.Group = g.Name
+			} else {
+				data.Group = gStr
 			}
 
 			pi := procInfo{int64(data.Pid), data.Name, pu.uid, data.Cmdline, data.Name, ""}
 			if query.match(&pi) {
 				threadArray = append(threadArray, thread{data.Tgid, data.Ppid, data.Name, data.Pid,
 					data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
-					data.PageFaults, data.User, data.Group})
+					data.PageFaults, data.User, data.Group, data.UserID, data.GroupID})
 				}
 			}
 		}
