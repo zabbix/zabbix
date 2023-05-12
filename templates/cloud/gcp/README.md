@@ -5,7 +5,7 @@
 
 This template is designed to monitor Google Cloud Platform (hereinafter - GCP) by HTTP.
 It works without any external scripts and uses the script item.
-Currently the template supports discovery of [Compute Engine](https://cloud.google.com/compute) and [Cloud SQL](https://cloud.google.com/sql) instances. 
+Currently the template supports discovery of [Compute Engine](https://cloud.google.com/compute) and [Cloud SQL](https://cloud.google.com/sql) instances.
 
 
 ## Requirements
@@ -138,7 +138,7 @@ This template has been tested on:
 |GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Raw data|<p>GCP Compute Engine: Get metrics for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "{#GCE.QUOTA.NAME}")].first()`</p></li></ul>|
 |GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Usage|<p>GCP Compute Engine: The current usage value for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.usage[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage`</p></li></ul>|
 |GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Limit|<p>GCP Compute Engine: The current limit value for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.limit`</p></li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percent used|<p>GCP Compute Engine Percentage usage for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.p_used`</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percent used|<p>GCP Compute Engine Percentage usage for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.p_used`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Trigger prototypes for GCP Compute Engine: Project quotas discovery
 
