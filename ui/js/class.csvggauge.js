@@ -145,27 +145,11 @@ class CSVGGauge {
 		this.minMaxFontSize = (this.height * this.data.minmax.font_size / 100) * FONT_SIZE_RATIO;
 
 		this.#addDescription();
-
-		if (this.data.description.pos === DESC_V_POSITION_TOP) {
-			this.#reposition(this.elements.description, this.x, 0, 'top center');
-			this.#show(this.elements.description);
-		}
-
 		this.#processMinMax();
-
 		this.#addValue();
-
 		this.#processArc();
-
 		this.#addNeedle();
-
-		if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
-			this.#reposition(this.elements.description, this.x, this.height, 'bottom center');
-			this.#show(this.elements.description);
-		}
-
 		this.#positionMinMaxElements();
-
 		this.#positionValueElement();
 	}
 
@@ -174,61 +158,61 @@ class CSVGGauge {
 		const line_height = this.height * this.data.description.font_size / 100;
 		const font_size = line_height * FONT_SIZE_RATIO;
 
-		let foreign_object = this.svg.querySelector('#description-container');
-		let div = this.svg.querySelector('#description-container-div');
+		let container = this.svg.querySelector('#description-container');
 
-		if (this.initialLoad || (!foreign_object || !div)) {
-			foreign_object = document.createElementNS(SVGNS, 'foreignObject');
-			div = document.createElement('div');
-
-			this.#addAttributesNS(foreign_object, {id: 'description-container'});
-			this.#addAttributes(div, {xmlns: XMLNS, style: 'display: inline-flex;', id: 'description-container-div'});
-
-			foreign_object.appendChild(div);
-			this.svg.appendChild(foreign_object);
-		}
-		else {
-			div.innerHTML = '';
+		if (!container) {
+			container = document.createElementNS(SVGNS, 'text');
+			container.id = 'description-container';
+			container.setAttribute('text-anchor', 'middle');
+			this.svg.appendChild(container);
 		}
 
-		this.#addAttributesNS(foreign_object, {x: 0, y: 0, width: '100%', height: '100%', visibility: 'hidden'});
-		this.#addAttributes(div, {style: `font-size: ${font_size}px;`});
+		container.innerHTML = '';
 
-		this.#setFontWeight(div, this.data.description.is_bold);
-		this.#setColor(div, this.data.description.color, 'color');
+		container.style.fontSize = font_size + 'px';
+		container.style.fontWeight = this.data.description.is_bold ? 'bold' : 'normal';
+		container.style.fill = this.data.description.color ? '#' + this.data.description.color : '';
 
-		const lines = this.data.description.text.split('\n');
+		const lines = this.data.description.text.split('\r\n');
 
-		let line_count;
+		for (let i = 0; i < lines.length; i++) {
+			let line = document.createElementNS(SVGNS, 'tspan');
+			container.appendChild(line);
 
-		for (line_count = 0; line_count < lines.length; line_count++) {
-			div.appendChild(document.createTextNode(lines[line_count]));
+			line.textContent = lines[i];
+			line.setAttribute('x', '50%');
+			line.setAttribute('dominant-baseline', 'text-before-edge');
 
-			if (line_count < lines.length - 1) {
-				div.appendChild(document.createElement('br'));
+			// Simulate new line
+			if (i > 0) {
+				const bbox = line.getBBox();
+				line.setAttribute('dy', bbox.height + 'px');
+			}
+
+			// Add ellipsis if text overflows
+			while (line.getComputedTextLength() > this.width && line.textContent.length >= 4) {
+				line.textContent = line.textContent.slice(0, -4) + '...';
 			}
 		}
 
-		const block_height = line_height * line_count;
-		const height = div.offsetHeight + (block_height - div.offsetHeight);
-
-		let width = div.offsetWidth;
-
-		// In case description is wider, than the actual space of SVG, limit the description and add overflow ellipsis.
-		if (width > this.width) {
-			this.#addAttributes(div, {style: 'overflow: hidden; text-overflow: ellipsis;'});
-			width = this.width;
-		}
-
-		this.#addAttributesNS(foreign_object, {height: `${height}px`, width: `${width}px`});
-		this.#addAttributes(div, {style: 'height: 100%; width: 100%; display: block;'});
+		const bbox = container.getBBox();
 
 		this.elements.description = {
-			parent: foreign_object,
-			node: div,
-			width: width,
-			height: height
+			node: container,
+			width: bbox.width,
+			height: bbox.height
 		};
+
+		const title = document.createElementNS(SVGNS, 'title');
+		title.textContent = this.data.description.text;
+		container.appendChild(title);
+
+		if (this.data.description.pos === DESC_V_POSITION_TOP) {
+			container.setAttribute('y', '0px');
+		}
+		else if (this.data.description.pos === DESC_V_POSITION_BOTTOM) {
+			container.setAttribute('y', this.height - bbox.height + 'px');
+		}
 	}
 
 	#processArc() {
