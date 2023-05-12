@@ -32,7 +32,7 @@ AC_DEFUN([LIBSSH_ACCEPT_VERSION],
 [
 	# Zabbix minimal major supported version of libssh:
 	minimal_libssh_major_version=0
-	minimal_libssh_minor_version=6
+	minimal_libssh_minor_version=9
 
 	# get the major version
 	found_ssh_version_major=`cat $1 | $EGREP \#define.*'LIBSSH_VERSION_MAJOR ' | $AWK '{print @S|@3;}'`
