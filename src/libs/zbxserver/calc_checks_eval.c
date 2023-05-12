@@ -1522,12 +1522,9 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 			continue;
 
 		if (0 != zbx_get_key_param(dcitem->key_orig, pos, bucket, sizeof(bucket)))
-		{
 			continue;
-		}
 
 		zbx_strupper(bucket);
-
 
 		if (0 == strcmp(bucket, "+INF") || 0 == strcmp(bucket, "INF"))
 			le = ZBX_INFINITY;
