@@ -140,7 +140,7 @@ class CSVGGauge {
 		}
 
 		// Set background color of widget
-		this.#setColor(this.widgetContents, this.data.bg_color, 'background-color');
+		this.widgetContents.style.backgroundColor = this.data.bg_color ? '#' + this.data.bg_color : '';
 
 		this.minMaxFontSize = (this.height * this.data.minmax.font_size / 100) * FONT_SIZE_RATIO;
 
@@ -569,7 +569,7 @@ class CSVGGauge {
 
 		this.#addAttributesNS(path, {d: pathDefinition});
 
-		this.#setColor(path, this.data.empty_color, 'fill');
+		path.style.fill = this.data.empty_color ? '#' + this.data.empty_color : '';
 
 		this.#calculateCoordinatesOfArcContainer(this.elements[elementName]);
 	}
@@ -622,11 +622,10 @@ class CSVGGauge {
 			this.#addAttributes(value_div, {xmlns: XMLNS, style: `font-size: ${value_font_size}px;`});
 			this.#addAttributes(units_div, {xmlns: XMLNS, style: `font-size: ${units_font_size}px;`});
 
-			this.#setFontWeight(value_div, this.data.value.is_bold);
-			this.#setFontWeight(units_div, this.data.units.is_bold);
-
-			this.#setColor(value_div, this.data.value.color, 'color');
-			this.#setColor(units_div, this.data.units.color, 'color');
+			value_div.style.fontWeight = this.data.value.is_bold ? 'bold' : 'normal';
+			units_div.style.fontWeight = this.data.units.is_bold ? 'bold' : 'normal';
+			value_div.style.color = this.data.value.color ? '#' + this.data.value.color : '';
+			units_div.style.color = this.data.units.color ? '#' + this.data.units.color : '';
 
 			if (this.data.units.pos === UNITS_POSITION_BEFORE) {
 				// Take the largest height from both.
@@ -697,8 +696,8 @@ class CSVGGauge {
 
 			this.#addAttributes(div, {style: `font-size: ${value_font_size}px;`});
 
-			this.#setFontWeight(div, this.data.value.is_bold);
-			this.#setColor(div, this.data.value.color, 'color');
+			div.style.fontWeight = this.data.value.is_bold ? 'bold' : 'normal';
+			div.style.color = this.data.value.color ? '#' + this.data.value.color : '';
 
 			div.appendChild(document.createTextNode(this.data.value.text));
 		}
@@ -858,7 +857,7 @@ class CSVGGauge {
 		else if (this.data.thresholds.data.length) {
 			// Use thresholds colors
 			const color = this.#getCurrentThresholdColor(angle);
-			this.#setColor(this.elements.needle.node, color, 'fill');
+			this.elements.needle.node.style.fill = '#' + color;
 		}
 		else {
 			// Use default theme color
@@ -1186,26 +1185,6 @@ class CSVGGauge {
 		const y = this.y - radius;
 
 		container.coordinates = this.#calcCoordinates(x, y, rect.width, rect.height);
-	}
-
-	#setFontWeight(element, isBold) {
-		if (isBold) {
-			this.#addAttributes(element, {style: 'font-weight: bold;'});
-		}
-		else {
-			this.#addAttributes(element, {style: 'font-weight: normal;'});
-		}
-	}
-
-	#setColor(element, color, attribute) {
-		if (color === '') {
-			// Use default color
-			this.#removeAttributes(element, {style: attribute});
-		}
-		else {
-			// Use user chosen color
-			this.#addAttributes(element, {style: `${attribute}: #${color};`});
-		}
 	}
 
 	// TO DO: add description
