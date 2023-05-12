@@ -60,8 +60,6 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data)
 
 void	zbx_variant_clear(zbx_variant_t *value)
 {
-	int	i;
-
 	switch (value->type)
 	{
 		case ZBX_VARIANT_STR:
