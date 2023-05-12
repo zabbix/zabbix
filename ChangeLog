@@ -2540,6 +2540,8 @@ Changes for 5.0.35rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 ...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
 
