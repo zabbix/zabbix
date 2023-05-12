@@ -44,7 +44,7 @@ typedef zbx_mutex_t tls_mutex_t;
 
 int	tls_mutex_create(tls_mutex_t *mutex, char **error)
 {
-	return zbx_mutex_create(mutex, NULL, &error))
+	return zbx_mutex_create(mutex, NULL, &error);
 }
 
 void	tls_mutex_destroy(tls_mutex_t *mutex)

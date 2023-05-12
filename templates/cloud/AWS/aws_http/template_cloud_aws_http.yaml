@@ -1,22 +1,17 @@
 zabbix_export:
   version: '7.0'
   template_groups:
-    -
-      uuid: c2c162144c2d4c5491c8801193af4945
+    - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
   host_groups:
-    -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Applications
-    -
-      uuid: 748ad4d098d447d492bb935c907f652f
+    - uuid: 748ad4d098d447d492bb935c907f652f
       name: Databases
-    -
-      uuid: 137f19e6e2dc4219b33553b812627bc2
+    - uuid: 137f19e6e2dc4219b33553b812627bc2
       name: 'Virtual machines'
   templates:
-    -
-      uuid: c60e5929ab474f67bbe67dc6b04e709d
+    - uuid: c60e5929ab474f67bbe67dc6b04e709d
       template: 'AWS by HTTP'
       name: 'AWS by HTTP'
       description: |
@@ -29,11 +24,9 @@ zabbix_export:
         name: Zabbix
         version: 7.0-0
       groups:
-        -
-          name: Templates/Cloud
+        - name: Templates/Cloud
       discovery_rules:
-        -
-          uuid: c651911bad9244ad9c8d2dad5b0d70e4
+        - uuid: c651911bad9244ad9c8d2dad5b0d70e4
           name: 'EC2 instances discovery'
           type: SCRIPT
           key: aws.ec2.discovery
@@ -201,60 +194,46 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#AWS.EC2.INSTANCE.NAME}'
+              - macro: '{#AWS.EC2.INSTANCE.NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#AWS.EC2.INSTANCE.NAME}'
+              - macro: '{#AWS.EC2.INSTANCE.NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Get EC2 instances.'
           host_prototypes:
-            -
-              uuid: c4c830c727294b07926c39b00cf19046
+            - uuid: c4c830c727294b07926c39b00cf19046
               host: '{#AWS.EC2.INSTANCE.ID}'
               name: '{#AWS.EC2.INSTANCE.NAME}'
               group_links:
-                -
-                  group:
+                - group:
                     name: 'Virtual machines'
               templates:
-                -
-                  name: 'AWS EC2 by HTTP'
+                - name: 'AWS EC2 by HTTP'
               macros:
-                -
-                  macro: '{$AWS.EC2.INSTANCE.ID}'
+                - macro: '{$AWS.EC2.INSTANCE.ID}'
                   value: '{#AWS.EC2.INSTANCE.ID}'
                   description: 'EC2 instance ID.'
               custom_interfaces: 'YES'
               interfaces:
-                -
-                  ip: '{#AWS.EC2.INSTANCE.ID}'
+                - ip: '{#AWS.EC2.INSTANCE.ID}'
           timeout: 15s
           parameters:
-            -
-              name: access_key
+            - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            -
-              name: secret_key
+            - name: secret_key
               value: '{$AWS.SECRET.ACCESS.KEY}'
-            -
-              name: region
+            - name: region
               value: '{$AWS.REGION}'
-            -
-              name: proxy
+            - name: proxy
               value: '{$AWS.PROXY}'
           lld_macro_paths:
-            -
-              lld_macro: '{#AWS.EC2.INSTANCE.ID}'
+            - lld_macro: '{#AWS.EC2.INSTANCE.ID}'
               path: $.instancesSet.item.instanceId
-            -
-              lld_macro: '{#AWS.EC2.INSTANCE.NAME}'
+            - lld_macro: '{#AWS.EC2.INSTANCE.NAME}'
               path: $.instanceName
-        -
-          uuid: c1127e674b7548b2802cd8771f3a4768
+        - uuid: c1127e674b7548b2802cd8771f3a4768
           name: 'RDS instances discovery'
           type: SCRIPT
           key: aws.rds.discovery
@@ -391,57 +370,44 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#AWS.RDS.INSTANCE.ID}'
+              - macro: '{#AWS.RDS.INSTANCE.ID}'
                 value: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#AWS.RDS.INSTANCE.ID}'
+              - macro: '{#AWS.RDS.INSTANCE.ID}'
                 value: '{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Get RDS instances.'
           host_prototypes:
-            -
-              uuid: 799663c52a644f78aa3b3c14d4cc7235
+            - uuid: 799663c52a644f78aa3b3c14d4cc7235
               host: '{#AWS.RDS.INSTANCE.ID}'
               name: '{#AWS.RDS.INSTANCE.ID}'
               group_links:
-                -
-                  group:
+                - group:
                     name: Databases
               templates:
-                -
-                  name: 'AWS RDS instance by HTTP'
+                - name: 'AWS RDS instance by HTTP'
               macros:
-                -
-                  macro: '{$AWS.RDS.INSTANCE.ID}'
+                - macro: '{$AWS.RDS.INSTANCE.ID}'
                   value: '{#AWS.RDS.INSTANCE.ID}'
                   description: 'RDS instance ID.'
               custom_interfaces: 'YES'
               interfaces:
-                -
-                  ip: '{#AWS.RDS.INSTANCE.ID}'
+                - ip: '{#AWS.RDS.INSTANCE.ID}'
           timeout: 15s
           parameters:
-            -
-              name: access_key
+            - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            -
-              name: secret_key
+            - name: secret_key
               value: '{$AWS.SECRET.ACCESS.KEY}'
-            -
-              name: region
+            - name: region
               value: '{$AWS.REGION}'
-            -
-              name: proxy
+            - name: proxy
               value: '{$AWS.PROXY}'
           lld_macro_paths:
-            -
-              lld_macro: '{#AWS.RDS.INSTANCE.ID}'
+            - lld_macro: '{#AWS.RDS.INSTANCE.ID}'
               path: $.DBInstanceIdentifier
-        -
-          uuid: ab6a97a108fb4dbc9fd1e07378721ffe
+        - uuid: ab6a97a108fb4dbc9fd1e07378721ffe
           name: 'S3 buckets discovery'
           type: SCRIPT
           key: aws.s3.discovery
@@ -607,109 +573,82 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#AWS.S3.NAME}'
+              - macro: '{#AWS.S3.NAME}'
                 value: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#AWS.S3.NAME}'
+              - macro: '{#AWS.S3.NAME}'
                 value: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Get S3 bucket instances.'
           host_prototypes:
-            -
-              uuid: e45bd9810ea14718b17b875aad3fc544
+            - uuid: e45bd9810ea14718b17b875aad3fc544
               host: '{#AWS.S3.NAME}'
               name: '{#AWS.S3.NAME}'
               group_links:
-                -
-                  group:
+                - group:
                     name: Applications
               group_prototypes:
-                -
-                  name: '{#AWS.S3.REGION}'
+                - name: '{#AWS.S3.REGION}'
               templates:
-                -
-                  name: 'AWS S3 bucket by HTTP'
+                - name: 'AWS S3 bucket by HTTP'
               macros:
-                -
-                  macro: '{$AWS.REGION}'
+                - macro: '{$AWS.REGION}'
                   value: '{#AWS.S3.REGION}'
                   description: 'Amazon S3 region code.'
-                -
-                  macro: '{$AWS.S3.BUCKET.NAME}'
+                - macro: '{$AWS.S3.BUCKET.NAME}'
                   value: '{#AWS.S3.NAME}'
                   description: 'S3 bucket name.'
-                -
-                  macro: '{$AWS.S3.FILTER.ID}'
+                - macro: '{$AWS.S3.FILTER.ID}'
                   value: '1'
                   description: 'S3 bucket requests filter identifier.'
               custom_interfaces: 'YES'
               interfaces:
-                -
-                  ip: '{#AWS.S3.NAME}'
+                - ip: '{#AWS.S3.NAME}'
           timeout: 15s
           parameters:
-            -
-              name: access_key
+            - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            -
-              name: secret_key
+            - name: secret_key
               value: '{$AWS.SECRET.ACCESS.KEY}'
-            -
-              name: proxy
+            - name: proxy
               value: '{$AWS.PROXY}'
           lld_macro_paths:
-            -
-              lld_macro: '{#AWS.S3.NAME}'
+            - lld_macro: '{#AWS.S3.NAME}'
               path: $.Name
-            -
-              lld_macro: '{#AWS.S3.REGION}'
+            - lld_macro: '{#AWS.S3.REGION}'
               path: $.location
       tags:
-        -
-          tag: class
+        - tag: class
           value: software
-        -
-          tag: target
+        - tag: target
           value: aws
       macros:
-        -
-          macro: '{$AWS.ACCESS.KEY.ID}'
+        - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
-        -
-          macro: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
+        - macro: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable EC2 instances by namespace.'
-        -
-          macro: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
+        - macro: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered EC2 instances by namespace.'
-        -
-          macro: '{$AWS.PROXY}'
+        - macro: '{$AWS.PROXY}'
           description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
-        -
-          macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
+        - macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable RDS instances by namespace.'
-        -
-          macro: '{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}'
+        - macro: '{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered RDS instances by namespace.'
-        -
-          macro: '{$AWS.REGION}'
+        - macro: '{$AWS.REGION}'
           value: us-west-1
           description: 'Amazon EC2 region code.'
-        -
-          macro: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
+        - macro: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable S3 buckets by namespace.'
-        -
-          macro: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
+        - macro: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered S3 buckets by namespace.'
-        -
-          macro: '{$AWS.SECRET.ACCESS.KEY}'
+        - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
