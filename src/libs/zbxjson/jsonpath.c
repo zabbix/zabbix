@@ -47,18 +47,22 @@ zbx_jsonobj_index_t;
 ZBX_PTR_VECTOR_DECL(jsonobj_index_ptr, zbx_jsonobj_index_t *)
 ZBX_PTR_VECTOR_IMPL(jsonobj_index_ptr, zbx_jsonobj_index_t *)
 
+#if !defined(_WINDOWS)
 struct zbx_jsonpath_index
 {
 	zbx_vector_jsonobj_index_ptr_t	indexes;
 	pthread_mutex_t			lock;
 };
 
+static zbx_hashset_t	*jsonpath_index_get(zbx_jsonpath_index_t *index, zbx_jsonobj_t *obj,
+		zbx_jsonpath_token_t *token);
+
+#endif
+
 static int	jsonpath_query_object(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *obj, int path_depth);
 static int	jsonpath_query_array(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *array, int path_depth);
 static int	jsonpath_str_copy_value(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj);
 static void	jsonpath_ctx_clear(zbx_jsonpath_context_t *ctx);
-static zbx_hashset_t	*jsonpath_index_get(zbx_jsonpath_index_t *index, zbx_jsonobj_t *obj,
-		zbx_jsonpath_token_t *token);
 
 /* define token groups and precedence */
 static zbx_jsonpath_token_def_t	jsonpath_tokens[] = {
@@ -2229,14 +2233,16 @@ static int	jsonpath_query_object(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *obj
 		if (FAIL == ret || 1 != segment->detached)
 			return ret;
 	}
+#if !defined(WINDOWS)
 	else if (ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION == segment->type && NULL != segment->data.expression.index_token)
 	{
 		zbx_hashset_t	*index;
 
 		if (NULL != (index = jsonpath_index_get(ctx->index, obj, segment->data.expression.index_token)))
 			return jsonpath_match_indexed_expression(ctx, index, path_depth);
-	}
 
+	}
+#endif
 	zbx_hashset_iter_reset(&obj->data.object, &iter);
 	while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&iter)) && SUCCEED == ret &&
 			0 == ctx->found)
@@ -2383,6 +2389,7 @@ static int	jsonpath_query_array(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *arra
 			if (FAIL == ret || 1 != segment->detached)
 				return ret;
 			break;
+#if !defined(WINDOWS)
 		case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
 			if (NULL != segment->data.expression.index_token)
 			{
@@ -2395,6 +2402,7 @@ static int	jsonpath_query_array(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *arra
 				}
 			}
 			break;
+#endif
 		default:
 			break;
 	}
@@ -2931,6 +2939,7 @@ int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output)
 	return zbx_jsonobj_query_ext(obj, NULL, path, output);
 }
 
+#if !defined(_WINDOWS)
 /* jsonobject index hashset support */
 
 static zbx_hash_t	jsonobj_index_el_hash(const void *v)
@@ -3007,6 +3016,7 @@ static void	jsonobj_index_add_element(zbx_hashset_t *index, const char *name, zb
 	ref.external = 0;
 	zbx_vector_jsonobj_ref_append(&el->objects, ref);
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -3141,6 +3151,7 @@ zbx_jsonpath_index_t	*zbx_jsonpath_index_create(void)
 	index = (zbx_jsonpath_index_t *)zbx_malloc(NULL, sizeof(zbx_jsonpath_index_t));
 
 	zbx_vector_jsonobj_index_ptr_create(&index->indexes);
+
 	pthread_mutex_init(&index->lock, NULL);
 
 	return index;
@@ -3154,8 +3165,11 @@ zbx_jsonpath_index_t	*zbx_jsonpath_index_create(void)
 void	zbx_jsonpath_index_free(zbx_jsonpath_index_t *index)
 {
 	pthread_mutex_destroy(&index->lock);
+
 	zbx_vector_jsonobj_index_ptr_clear_ext(&index->indexes, jsonobj_index_free);
 	zbx_vector_jsonobj_index_ptr_destroy(&index->indexes);
 
 	zbx_free(index);
 }
+
+#endif
