@@ -670,3 +670,4 @@ void	zbx_vector_var_clear_ext(zbx_vector_var_t *v)
 	for (i = 0; i < v->values_num; i++)
 		zbx_variant_clear(&v->values[i]);
 }
+
