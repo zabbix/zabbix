@@ -402,7 +402,7 @@ zabbix_export:
               value: health
         - uuid: 99b1a38ed45b4212974b0bea72b076d2
           name: 'Apache: Get processes summary'
-          key: 'proc.get[,,,summary]'
+          key: 'proc.get[{$APACHE.PROCESS.NAME.PARAMETER},,,summary]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -626,7 +626,7 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#NAME}'
+              - macro: '{#APACHE.NAME}'
                 value: '{$APACHE.PROCESS_NAME}'
                 formulaid: A
           description: 'The discovery of the Apache process summary.'
@@ -634,30 +634,30 @@ zabbix_export:
             - uuid: 458bfecc83f64540838e3ffc3a7f3cb1
               name: 'Apache: Get process data'
               type: DEPENDENT
-              key: 'apache.proc.get[{#NAME}]'
+              key: 'apache.proc.get[{#APACHE.NAME}]'
               delay: '0'
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The summary metrics aggregated by a process {#NAME}.'
+              description: 'The summary metrics aggregated by a process {#APACHE.NAME}.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@["name"]=="{#NAME}")].first()'
+                    - '$.[?(@["name"]=="{#APACHE.NAME}")].first()'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: 'Failed to retrieve process {#NAME} data'
+                  error_handler_params: 'Failed to retrieve process {#APACHE.NAME} data'
               master_item:
-                key: 'proc.get[,,,summary]'
+                key: 'proc.get[{$APACHE.PROCESS.NAME.PARAMETER},,,summary]'
               tags:
                 - tag: component
                   value: raw
             - uuid: 233b5466014640e4b990ffd81fa19fa1
               name: 'Apache: Number of running processes'
               type: DEPENDENT
-              key: 'apache.proc.num[{#NAME}]'
+              key: 'apache.proc.num[{#APACHE.NAME}]'
               delay: '0'
               history: 7d
-              description: 'The number of running processes {#NAME}.'
+              description: 'The number of running processes {#APACHE.NAME}.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -668,13 +668,13 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'apache.proc.get[{#NAME}]'
+                key: 'apache.proc.get[{#APACHE.NAME}]'
               tags:
                 - tag: component
                   value: system
               trigger_prototypes:
                 - uuid: b62f49b09d6b4c6ca01ff60cd9dd2209
-                  expression: 'last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])=0'
+                  expression: 'last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])=0'
                   name: 'Apache: Process is not running'
                   priority: HIGH
                   tags:
@@ -683,71 +683,71 @@ zabbix_export:
             - uuid: 683d4489dbb549f3bb5b45d3c2696c4f
               name: 'Apache: Memory usage, %'
               type: DEPENDENT
-              key: 'apache.proc.pmem[{#NAME}]'
+              key: 'apache.proc.pmem[{#APACHE.NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'The percentage of real memory used by a process {#NAME}.'
+              description: 'The percentage of real memory used by a process {#APACHE.NAME}.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.pmem
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'apache.proc.get[{#NAME}]'
+                key: 'apache.proc.get[{#APACHE.NAME}]'
               tags:
                 - tag: component
                   value: memory
             - uuid: 384bf197e6a241b3b63bb89d009bba6b
               name: 'Apache: Memory usage (rss)'
               type: DEPENDENT
-              key: 'apache.proc.rss[{#NAME}]'
+              key: 'apache.proc.rss[{#APACHE.NAME}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'The summary of resident set size memory used by a process {#NAME} expressed in bytes.'
+              description: 'The summary of resident set size memory used by a process {#APACHE.NAME} expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.rss
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'apache.proc.get[{#NAME}]'
+                key: 'apache.proc.get[{#APACHE.NAME}]'
               tags:
                 - tag: component
                   value: memory
             - uuid: f20b7a01ff134a128c54ea83af8557e2
               name: 'Apache: Memory usage (vsize)'
               type: DEPENDENT
-              key: 'apache.proc.vmem[{#NAME}]'
+              key: 'apache.proc.vmem[{#APACHE.NAME}]'
               delay: '0'
               history: 7d
               units: B
-              description: 'The summary of virtual memory used by a process {#NAME} expressed in bytes.'
+              description: 'The summary of virtual memory used by a process {#APACHE.NAME} expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.vsize
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'apache.proc.get[{#NAME}]'
+                key: 'apache.proc.get[{#APACHE.NAME}]'
               tags:
                 - tag: component
                   value: memory
             - uuid: b73280fb0af64c7899abfc74cc074b13
               name: 'Apache: CPU utilization'
-              key: 'proc.cpu.util[{#NAME}]'
+              key: 'proc.cpu.util[{#APACHE.NAME}]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'The percentage of the CPU utilization by a process {#NAME}.'
+              description: 'The percentage of the CPU utilization by a process {#APACHE.NAME}.'
               tags:
                 - tag: component
                   value: cpu
           trigger_prototypes:
             - uuid: 0166ec63913e4bbea25c54b458b3213a
-              expression: 'nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+              expression: 'nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
               name: 'Apache: Failed to fetch status page'
               event_name: 'Apache: Failed to fetch status page (or no data for 30m)'
               priority: WARNING
@@ -755,12 +755,12 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Apache: Service is down'
-                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
               tags:
                 - tag: scope
                   value: availability
             - uuid: e24dbf9b89c34d839cb12a22b1103df3
-              expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+              expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
               name: 'Apache: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -768,36 +768,36 @@ zabbix_export:
                 - tag: scope
                   value: availability
             - uuid: 128905793a4b4a1db5a49f87e87d3383
-              expression: 'min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+              expression: 'min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
               name: 'Apache: Service response time is too high'
               event_name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 - name: 'Apache: Service is down'
-                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
               tags:
                 - tag: scope
                   value: performance
           graph_prototypes:
             - uuid: d317a2ccde4f4a2ab20e983b27ae64e2
-              name: 'Apache: Memory usage[{#NAME}]'
+              name: 'Apache: Memory usage[{#APACHE.NAME}]'
               graph_items:
                 - drawtype: BOLD_LINE
                   color: 199C0D
                   item:
                     host: 'Apache by Zabbix agent'
-                    key: 'apache.proc.vmem[{#NAME}]'
+                    key: 'apache.proc.vmem[{#APACHE.NAME}]'
                 - sortorder: '1'
                   drawtype: BOLD_LINE
                   color: F63100
                   item:
                     host: 'Apache by Zabbix agent'
-                    key: 'apache.proc.rss[{#NAME}]'
+                    key: 'apache.proc.rss[{#APACHE.NAME}]'
           master_item:
-            key: 'proc.get[,,,summary]'
+            key: 'proc.get[{$APACHE.PROCESS.NAME.PARAMETER},,,summary]'
           lld_macro_paths:
-            - lld_macro: '{#NAME}'
+            - lld_macro: '{#APACHE.NAME}'
               path: $.name
       tags:
         - tag: class
@@ -805,15 +805,17 @@ zabbix_export:
         - tag: target
           value: apache
       macros:
+        - macro: '{$APACHE.PROCESS.NAME.PARAMETER}'
+          description: 'The process name of the Apache web server used in the item key `proc.get`. It could be specified if the correct process name is known.'
         - macro: '{$APACHE.PROCESS_NAME}'
           value: (httpd|apache2)
-          description: 'The process name of the Apache web server (Apache).'
+          description: 'The process name filter for the Apache process discovery.'
         - macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'
           value: '10'
           description: 'The maximum Apache response time expressed in seconds for a trigger expression.'
         - macro: '{$APACHE.STATUS.HOST}'
           value: 127.0.0.1
-          description: 'The hostname or an IP address of the Apache status page.'
+          description: 'The hostname or IP address of the Apache status page.'
         - macro: '{$APACHE.STATUS.PATH}'
           value: 'server-status?auto'
           description: 'The URL path.'
