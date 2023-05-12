@@ -87,8 +87,8 @@ static void	mock_read_callbacks(const char *path)
 					if (ZBX_MOCK_SUCCESS != zbx_mock_string(hvalue, &value))
 						fail_msg("cannot read callback retval");
 
-					zbx_variant_set_dbl(&tmp, atof(value));
-
+					zbx_variant_set_str(&tmp, zbx_strdup(NULL, value));
+					zbx_variant_convert(&tmp, ZBX_VARIANT_DBL);
 					zbx_vector_var_append(values, tmp);
 				}
 
@@ -138,6 +138,7 @@ static int 	callback_cb(const char *name, size_t len, int args_num, zbx_variant_
 				return FAIL;
 			}
 			zbx_variant_copy(value, &cb->retval);
+
 			return SUCCEED;
 		}
 	}

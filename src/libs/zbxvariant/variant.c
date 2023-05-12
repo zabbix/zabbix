@@ -72,8 +72,14 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			zbx_free(value->data.err);
 			break;
 		case ZBX_VARIANT_VECTOR:
-			zbx_vector_var_clear_ext(value->data.vector);
-			zbx_vector_var_destroy(value->data.vector);
+			if (NULL != value->data.vector)
+			{
+				if (0 < value->data.vector->values_num)
+					zbx_vector_var_clear_ext(value->data.vector);
+
+				zbx_vector_var_destroy(value->data.vector);
+			}
+
 			zbx_free(value->data.vector);
 			break;
 	}
