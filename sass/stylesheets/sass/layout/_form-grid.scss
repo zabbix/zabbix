@@ -25,6 +25,11 @@
 		&.fields-group-label {
 			padding-top: 5px;
 		}
+
+		.btn-icon,
+		.icon {
+			margin-left: 5px;
+		}
 	}
 
 	> .form-field,
@@ -76,6 +81,12 @@
 				vertical-align: middle;
 				line-height: 24px;
 			}
+
+			.btn-icon,
+			.icon {
+				width: 18px;
+				min-height: 18px;
+			}
 		}
 
 		th {
@@ -97,7 +108,9 @@
 	}
 
 	.btn-icon {
-		margin-left: 5px;
+		&:not(:first-child) {
+			margin-left: 5px;
+		}
 
 		&.btn-small {
 			top: 1px;

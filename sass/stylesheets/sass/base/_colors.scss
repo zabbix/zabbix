@@ -165,6 +165,7 @@ $input-placeholder-color: #9d9d9d !default;
 $form-search-color: #ffffff !default;
 $form-search-icon-color: #8cb2ca !default;
 $form-search-icon-hover-color: #ffffff !default;
+$form-search-icon-focus-color: $form-search-icon-hover-color !default;
 $form-search-bg-color: #092637 !default;
 $form-search-border-color: #010a0f !default;
 $form-search-focused-color: $form-search-color !default;

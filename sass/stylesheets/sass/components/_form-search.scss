@@ -18,6 +18,10 @@
 			color: $form-search-focused-color;
 			background: $form-search-focused-bg-color;
 			border-color: $form-search-focused-border-color;
+
+			& ~ .btn-icon {
+				color: $form-search-icon-focus-color !important;
+			}
 		}
 	}
 
@@ -28,23 +32,21 @@
 		width: 20px;
 		min-height: 20px;
 
-		&:hover,
-		&:focus {
-			&::before {
-				color: $form-search-icon-hover-color;
-			}
+		&:hover {
+			color: $form-search-icon-hover-color;
 		}
 
 		&:focus {
+			color: $form-search-icon-focus-color;
 			box-shadow: 0 0 0 1.5px $form-search-focused-border-color;
 		}
 
-		&,
+		/*&,
 		&[disabled] {
 			&::before, {
-				color: $form-search-icon-color;
+				color: $form-search-icon-color; // FIXME: DF TO AS
 			}
-		}
+		}*/
 	}
 }
 

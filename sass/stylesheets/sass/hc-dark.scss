@@ -173,6 +173,8 @@ $icon-color: #dddddd;
 $icon-btn-color: #7d7d7d;
 $icon-btn-hover-color: #ffffff;
 
+$icon-content-color: #000000;
+
 // Error messages
 $msg-bad-btn-color: $font-color;
 
@@ -482,7 +484,7 @@ a.btn-icon,
 
 			&:focus + label {
 				background-color: darken($btn-bg-color, 10%) !important;
-				box-shadow: 0 0 0 2px $blue !important;
+				box-shadow: 0 0 0 2px $btn-focus-outline-color !important;
 				color: $white;
 			}
 
@@ -611,7 +613,7 @@ a.icon-count {
 
 .multiselect {
 	&.active {
-		box-shadow: 0 0 0 1px $blue;
+		box-shadow: 0 0 0 1px $btn-focus-outline-color;
 		transition: box-shadow .2s ease-out;
 	}
 
@@ -634,14 +636,14 @@ a.icon-count {
 
 .checkbox-radio {
 	&:focus + label span {
-		box-shadow: 0 0 0 1px $blue;
+		box-shadow: 0 0 0 1px $btn-focus-outline-color;
 		transition: box-shadow .2s ease-out;
 	}
 }
 
 %form-input-style {
 	&:focus {
-		box-shadow: 0 0 0 1px $blue;
+		box-shadow: 0 0 0 1px $btn-focus-outline-color;
 	}
 }
 
@@ -955,7 +957,7 @@ td.inactive-bg {
 
 		&:focus {
 			background-color: darken($btn-bg-color, 10%);
-			box-shadow: 0 0 0 2px $blue;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 	}
 
@@ -963,14 +965,14 @@ td.inactive-bg {
 		.btn-time,
 		.filter-trigger {
 			background-color: darken($btn-bg-color, 10%);
-			box-shadow: 0 0 0 2px $blue;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 
 		&.ui-tabs-active {
 			.btn-time,
 			.filter-trigger {
 				background-color: $ui-hover-color;
-				box-shadow: 0 0 0 2px $blue;
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
@@ -980,7 +982,7 @@ td.inactive-bg {
 	li {
 		a {
 			&:focus {
-				box-shadow: 0 0 0 2px $blue;
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
@@ -988,32 +990,35 @@ td.inactive-bg {
 
 .problem-icon-link {
 	&:focus {
-		box-shadow: 0 0 0 2px $blue;
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
 }
 
 .problem-icon-link, // TODO: check
 .problem-icon-list { // TODO: check
 	.problem-icon-list-item { // TODO: check
-		background: transparent;
+		padding-left: 0;
 		color: $font-color;
-		position: relative;
-		padding-left: 20px;
+		border: none;
+		background: transparent;
 
 		&::before {
-			background-repeat: no-repeat;
-			border-radius: 3px;
-			position: absolute;
-			top: 0;
-			left: 0;
-			height: 17px;
-			width: 17px;
-			font-size: $icon-medium-size;
+			@extend %icons-font;
+
+			margin-right: 4px;
 			color: #000000;
-			text-align: center;
+			font-size: $icon-medium-size;
+			border-radius: 3px;
 		}
 	}
-
+	// Dynamically generated classes:
+	//  .status-na-bg
+	//  .status-normal-bg
+	//  .status-info-bg
+	//  .status-average-bg
+	//  .status-warning-bg
+	//  .status-high-bg
+	//  .status-disaster-bg
 	@each $type, $icon in (
 		na-bg: $zi-circle-question-filled,
 		normal-bg: $zi-circle-check-filled,
@@ -1023,8 +1028,6 @@ td.inactive-bg {
 		high-bg: $zi-triangle-flipped-warning,
 		disaster-bg: $zi-stop-sign
 	) {
-		@extend %icons-font;
-
 		.status-#{$type}::before {
 			content: $icon;
 		}
@@ -1089,7 +1092,7 @@ td.inactive-bg {
 // InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused { // TODO FIX to input:focus + .btn-undo, textarea:focus + .btn-undo
-	box-shadow: 0 1px 0 $blue, 0 -1px 0 $blue;
+	box-shadow: 0 1px 0 $btn-focus-outline-color, 0 -1px 0 $btn-focus-outline-color;
 }
 
 // Tabfilter.
@@ -1097,7 +1100,7 @@ td.inactive-bg {
 .filter-container.tabfilter-container {
 	.tabfilter-item-label {
 		&.focused {
-			box-shadow: 0 0 0 2px $blue;
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 	}
 }

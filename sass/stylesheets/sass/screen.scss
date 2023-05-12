@@ -893,6 +893,11 @@ form {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+
+			.btn-icon,
+			.icon {
+				margin-left: 5px;
+			}
 		}
 	}
 
@@ -942,6 +947,14 @@ form {
 			}
 		}
 
+		table {
+			.btn-icon,
+			.icon {
+				width: 18px;
+				min-height: 18px;
+			}
+		}
+
 		.wrap-multiple-controls {
 			display: flex;
 		}
@@ -973,7 +986,9 @@ form {
 	}
 
 	.btn-icon {
-		margin-left: 5px;
+		&:not(:first-child) {
+			margin-left: 5px;
+		}
 
 		&.btn-small {
 			top: 1px;
@@ -989,11 +1004,11 @@ form {
 	padding: 5px;
 	position: relative;
 
-	[class^="zi-"], [class*="zi-"] { // TODO - check
+	/*[class^="zi-"], [class*="zi-"] { // TODO - check DF clean
 		&::before {
 			color: $icon-color;
 		}
-	}
+	}*/
 }
 
 .border-left {
@@ -2472,21 +2487,23 @@ select {
 }
 
 // Problem notification overlay.
-.notif {
+.notif.overlay-dialogue {
 	width: 250px;
 
 	.dashboard-widget-head {
-		margin: -13px -10px 7px;
-		padding: 0;
-
 		ul {
-			margin: 4px 0 0 1px;
+			margin: 0 auto 0 0;
 
 			li {
 				display: inline-block;
 
 				&:not(:first-child) {
-					margin-left: 2px;
+					margin-left: 5px;
+				}
+
+				.btn-icon {
+					margin-left: 0;
+					margin-right: 0;
 				}
 			}
 		}
@@ -3722,7 +3739,6 @@ svg {
 			.tools {
 				.btn-icon {
 					width: 18px;
-					min-width: 18px;
 					min-height: 18px;
 
 					&:not(:first-of-type) {

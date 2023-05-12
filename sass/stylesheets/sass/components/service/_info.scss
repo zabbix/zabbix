@@ -30,6 +30,12 @@
 			&:not(:last-child) {
 				margin-right: 10px;
 			}
+
+			.btn-icon {
+				width: 18px;
+				min-height: 18px;
+				margin-left: 5px;
+			}
 		}
 	}
 

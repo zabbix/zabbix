@@ -1973,17 +1973,16 @@ function makeActionTableIcon(array $action): ?CTag {
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
-				$icon = $action['new_severity'] > $action['old_severity']
-					? ZBX_STYLE_SEVERITY_UP			// TODO: ZBX_STYLE_ACTION_ICON_SEV_UP
-					: ZBX_STYLE_SEVERITY_DOWN;		// TODO: ZBX_STYLE_ACTION_ICON_SEV_DOWN
+				$button = $action['new_severity'] > $action['old_severity']
+					? (new CButtonIcon(ZBX_ICON_ARROW_UP_SMALL))->addClass(ZBX_STYLE_COLOR_NEGATIVE) // TODO: ZBX_STYLE_ACTION_ICON_SEV_UP
+					: (new CButtonIcon(ZBX_ICON_ARROW_DOWN_SMALL))->addClass(ZBX_STYLE_COLOR_POSITIVE); // TODO: ZBX_STYLE_ACTION_ICON_SEV_DOW
 
 				$old_severity_name = CSeverityHelper::getName((int) $action['old_severity']);
 				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);
 
-				$action_icons[] = (new CButtonIcon($icon))
-					->setHint($old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name, // TODO fix to NBSP()
-						ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL
-					);
+				$action_icons[] = $button->setHint(
+					$old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL// TODO fix to NBSP()
+				);
 			}
 
 			return (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP);

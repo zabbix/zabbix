@@ -118,6 +118,8 @@ $scrollbar-thumb-color-darken: 30%;
 
 // Search form
 $form-search-icon-color: #ffffff;
+$form-search-icon-hover-color: #ffffff;
+$form-search-icon-focus-color: #000000;
 $form-search-bg-color: #000000;
 $form-search-border-color: #ffffff;
 $form-search-focused-color: #000000;
@@ -536,14 +538,14 @@ a.link-action {
 
 .checkbox-radio {
 	&:focus + label span {
-		box-shadow: 0 0 0 1px $blue;
+		box-shadow: 0 0 0 1px $btn-focus-outline-color;
 		transition: box-shadow .2s ease-out;
 	}
 }
 
 %form-input-style {
 	&:focus {
-		box-shadow: 0 0 0 1px $blue;
+		box-shadow: 0 0 0 1px $btn-focus-outline-color;
 		transition: box-shadow .2s ease-out;
 	}
 }

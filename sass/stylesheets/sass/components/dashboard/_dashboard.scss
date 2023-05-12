@@ -253,18 +253,22 @@
 		top: calc(50% - #{$icon-size / 2});
 		right: 0;
 		bottom: 0;
-		padding: 0 5px 5px;
 		text-align: center;
 
 		&::before {
 			@extend %icons-font;
 
 			content: $zi-widget-add;
+			margin: 0 -4px;
 			font-size: $icon-size;
 		}
 
 		.hidden {
 			display: none;
+		}
+
+		div {
+			padding: 0 5px 5px;
 		}
 	}
 
