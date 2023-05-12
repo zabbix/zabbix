@@ -21,6 +21,19 @@
 #define ZABBIX_JSONPATH_H
 
 #include "zbxjson.h"
+#include "jsonobj.h"
+
+typedef struct
+{
+	zbx_jsonobj_t			*root;		/* the root object */
+	zbx_jsonpath_t			*path;
+	unsigned char			found;		/* set to 1 when one object was matched and */
+							/* no more matches are required             */
+	zbx_vector_jsonobj_ref_t	objects;	/* the matched objects */
+
+	zbx_jsonpath_index_t		*index;
+}
+zbx_jsonpath_context_t;
 
 typedef struct zbx_jsonpath_token zbx_jsonpath_token_t;
 
@@ -167,5 +180,12 @@ struct zbx_jsonpath_token
 	char		*text;
 	zbx_jsonpath_t	*path;
 };
+
+typedef struct
+{
+	char				*value;		/* the value found at indexed path */
+	zbx_vector_jsonobj_ref_t	objects;	/* the objects matching value at indexed path */
+}
+zbx_jsonobj_index_el_t;
 
 #endif
