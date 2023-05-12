@@ -264,11 +264,20 @@ class CSVGGauge {
 			maxSpace -= offset;
 		}
 
+		// Reserve space for threshold labels if they should be displayed
+		if (this.data.thresholds.show_arc && this.data.thresholds.show_labels) {
+			maxSpace -= this.minMaxFontSize;
+		}
+
 		// Show both arcs
 		if (this.data.value.show_arc && this.data.thresholds.show_arc && this.data.thresholds.data.length) {
+			// Don't allow to exceed 100% for both arcs in total - shrink thresholds arc
+			if (this.data.value.arc_size + this.data.thresholds.arc_size > 100) {
+				this.data.thresholds.arc_size = 100 - this.data.value.arc_size;
+			}
+
 			this.radiusThresholdArc = maxSpace;
 			this.thicknessThresholdArc = (this.data.thresholds.arc_size * (maxSpace - this.gapBetweenArcs)) / 100;
-
 			this.radiusValueArc = maxSpace - this.thicknessThresholdArc - this.gapBetweenArcs;
 			this.thicknessValueArc = (this.data.value.arc_size * (maxSpace - this.gapBetweenArcs)) / 100;
 
@@ -334,12 +343,6 @@ class CSVGGauge {
 			this.elements.thresholdArcContainer = {
 				node: thresholdArcContainer
 			};
-		}
-
-		// Reserve space for threshold labels on top if they should be displayed.
-		if (this.data.thresholds.show_labels) {
-			this.radiusThresholdArc -= this.minMaxFontSize;
-			this.radiusValueArc -= this.minMaxFontSize;
 		}
 
 		this.#addArcEmpty(this.elements.thresholdArcContainer.node);
