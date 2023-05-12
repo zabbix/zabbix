@@ -1041,6 +1041,7 @@ class CConfigurationImport {
 
 		$discovery_rules_to_create = [];
 		$discovery_rules_to_update = [];
+		$upd_discovery_rule_hostids = [];
 
 		/*
 		 * It's possible that some LLD rules use master items which are web items. They don't reside in item
@@ -1107,6 +1108,15 @@ class CConfigurationImport {
 					$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes']
 				);
 
+				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+				];
+
+				if (!in_array($discovery_rule['type'], $delay_types)) {
+					unset($discovery_rule['delay']);
+				}
+
 				if (array_key_exists('interface_ref', $discovery_rule) && $discovery_rule['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $discovery_rule['interface_ref']);
 
@@ -1118,6 +1128,7 @@ class CConfigurationImport {
 
 					$discovery_rule['interfaceid'] = $interfaceid;
 				}
+				unset($discovery_rule['interface_ref']);
 
 				if ($discovery_rule['type'] == ITEM_TYPE_HTTPAGENT) {
 					$headers = [];
@@ -1187,9 +1198,33 @@ class CConfigurationImport {
 				}
 				unset($preprocessing_step);
 
+				if (array_key_exists('filter', $discovery_rule)) {
+					foreach ($discovery_rule['filter']['conditions'] as &$condition) {
+						if ($discovery_rule['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+							unset($condition['formulaid']);
+						}
+					}
+					unset($condition);
+				}
+
+				foreach ($discovery_rule['overrides'] as &$override) {
+					if (!array_key_exists('filter', $override)) {
+						continue;
+					}
+
+					foreach ($override['filter']['conditions'] as &$condition) {
+						if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+							unset($condition['formulaid']);
+						}
+					}
+					unset($condition);
+				}
+				unset($override);
+
 				if ($itemid !== null) {
 					$discovery_rule['itemid'] = $itemid;
-					$discovery_rules_to_update[] = $discovery_rule;
+					$discovery_rules_to_update[] = array_diff_key($discovery_rule, array_flip(['hostid']));
+					$upd_discovery_rule_hostids[] = $discovery_rule['hostid'];
 				}
 				else {
 					/*
@@ -1219,7 +1254,9 @@ class CConfigurationImport {
 			API::DiscoveryRule()->update($discovery_rules_to_update);
 
 			foreach ($discovery_rules_to_update as $discovery_rule) {
-				$processed_discovery_rules[$discovery_rule['hostid']][$discovery_rule['key_']] = 1;
+				$hostid = array_shift($upd_discovery_rule_hostids);
+
+				$processed_discovery_rules[$hostid][$discovery_rule['key_']] = 1;
 			}
 		}
 

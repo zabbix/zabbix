@@ -242,56 +242,40 @@ check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
-$item = [];
 
 /*
  * Permissions
  */
-$hostid = getRequest('hostid', 0);
+$itemid = getRequest('itemid');
 
-if (getRequest('itemid', false)) {
-	$item = API::DiscoveryRule()->get([
-		'itemids' => getRequest('itemid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => ['hostid', 'name', 'status', 'flags'],
-		'selectFilter' => ['formula', 'evaltype', 'conditions'],
-		'selectLLDMacroPaths' => ['lld_macro', 'path'],
-		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-		'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+if ($itemid) {
+	$items = API::DiscoveryRule()->get([
+		'output' => ['itemid'],
+		'selectHosts' => ['hostid', 'status', 'name'],
+		'itemids' => $itemid,
 		'editable' => true
 	]);
-	$item = reset($item);
-	if (!$item) {
+
+	if (!$items) {
 		access_deny();
 	}
-	$_REQUEST['hostid'] = $item['hostid'];
-	$host = reset($item['hosts']);
 
-	foreach ($item['overrides'] as &$override) {
-		if (!array_key_exists('operations', $override)) {
-			continue;
-		}
-
-		foreach ($override['operations'] as &$operation) {
-			if (array_key_exists('optag', $operation)) {
-				CArrayHelper::sort($operation['optag'], ['tag', 'value']);
-				$operation['optag'] = array_values($operation['optag']);
-			}
-		}
-		unset($operation);
-	}
-	unset($override);
+	$hosts = $items[0]['hosts'];
 }
-elseif ($hostid) {
-	$hosts = API::Host()->get([
-		'output' => ['hostid', 'name', 'status'],
-		'hostids' => $hostid,
-		'templated_hosts' => true,
-		'editable' => true
-	]);
-	$host = reset($hosts);
-	if (!$host) {
-		access_deny();
+else {
+	$hostid = getRequest('hostid');
+
+	if ($hostid) {
+		$hosts = API::Host()->get([
+			'output' => ['hostid', 'status', 'name'],
+			'hostids' => $hostid,
+			'templated_hosts' => true,
+			'editable' => true
+		]);
+
+		if (!$hosts) {
+			access_deny();
+		}
 	}
 }
 
@@ -387,16 +371,6 @@ sort($filter_hostids);
 
 $checkbox_hash = crc32(implode('', $filter_hostids));
 
-// Convert CR+LF to LF in preprocessing script.
-if (hasRequest('preprocessing')) {
-	foreach ($_REQUEST['preprocessing'] as &$step) {
-		if ($step['type'] == ZBX_PREPROC_SCRIPT) {
-			$step['params'][0] = CRLFtoLF($step['params'][0]);
-		}
-	}
-	unset($step);
-}
-
 /*
  * Actions
  */
@@ -411,262 +385,140 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$result = true;
+	try {
+		$type = (int) getRequest('type', DB::getDefault('items', 'type'));
+		$key = getRequest('key', DB::getDefault('items', 'key_'));
 
-	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
-	$type = getRequest('type', ITEM_TYPE_ZABBIX);
-	$item_key = getRequest('key', '');
-
-	if (($type == ITEM_TYPE_DB_MONITOR && $item_key === ZBX_DEFAULT_KEY_DB_MONITOR)
-			|| ($type == ITEM_TYPE_SSH && $item_key === ZBX_DEFAULT_KEY_SSH)
-			|| ($type == ITEM_TYPE_TELNET && $item_key === ZBX_DEFAULT_KEY_TELNET)) {
-		error(_('Check the key, please. Default example was passed.'));
-		$result = false;
-	}
-
-	/*
-	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
-	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
-	 */
-	if ($result && $type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
-			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item_key, 'mqtt.get', 8) !== 0)
-			&& hasRequest('delay_flex')) {
-		$intervals = [];
-		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
-		$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
-		$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
-
-		foreach (getRequest('delay_flex') as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-				if ($interval['delay'] === '' && $interval['period'] === '') {
-					continue;
-				}
-
-				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
-					$result = false;
-					error(_s('Invalid interval "%1$s".', $interval['delay']));
-					break;
-				}
-
-				if ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
-					$result = false;
-					error(_s('Invalid interval "%1$s".', $interval['period']));
-					break;
-				}
-
-				$intervals[] = $interval['delay'].'/'.$interval['period'];
-			}
-			else {
-				if ($interval['schedule'] === '') {
-					continue;
-				}
-
-				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
-					$result = false;
-					error(_s('Invalid interval "%1$s".', $interval['schedule']));
-					break;
-				}
-
-				$intervals[] = $interval['schedule'];
-			}
+		if (isItemExampleKey($type, $key)) {
+			throw new Exception();
 		}
 
-		if ($intervals) {
-			$delay .= ';'.implode(';', $intervals);
+		$delay_flex = getRequest('delay_flex', []);
+
+		if (!isValidCustomIntervals($delay_flex, true)) {
+			throw new Exception();
 		}
-	}
 
-	if ($result) {
-		$preprocessing = getRequest('preprocessing', []);
-		$preprocessing = normalizeItemPreprocessingSteps($preprocessing);
+		$request_method = getRequest('request_method', DB::getDefault('items', 'request_method'));
+		$retrieve_mode_default = $request_method == HTTPCHECK_REQUEST_HEAD
+			? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
+			: DB::getDefault('items', 'retrieve_mode');
 
-		$newItem = [
-			'itemid' => getRequest('itemid'),
-			'interfaceid' => getRequest('interfaceid', 0),
-			'name' => getRequest('name'),
-			'description' => getRequest('description'),
-			'key_' => $item_key,
-			'hostid' => getRequest('hostid'),
-			'delay' => $delay,
+		$input = [
+			'name' => getRequest('name', DB::getDefault('items', 'name')),
+			'type' => $type,
+			'key_' => $key,
+			'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
+			'description' => getRequest('description', DB::getDefault('items', 'description')),
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
-			'type' => getRequest('type'),
-			'snmp_oid' => getRequest('snmp_oid'),
-			'trapper_hosts' => getRequest('trapper_hosts'),
-			'authtype' => getRequest('authtype'),
-			'username' => getRequest('username'),
-			'password' => getRequest('password'),
-			'publickey' => getRequest('publickey'),
-			'privatekey' => getRequest('privatekey'),
-			'params' => getRequest('params'),
-			'ipmi_sensor' => getRequest('ipmi_sensor'),
-			'lifetime' => getRequest('lifetime')
+			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
+			'lld_macro_paths' => prepareLldMacroPaths(getRequest('lld_macro_paths', [])),
+			'overrides' => prepareLldOverrides(getRequest('overrides', [])),
+
+			// Type fields.
+			// The fields used for multiple item types.
+			'interfaceid' => getRequest('interfaceid', 0),
+			'authtype' => $type == ITEM_TYPE_HTTPAGENT
+				? getRequest('http_authtype', DB::getDefault('items', 'authtype'))
+				: getRequest('authtype', DB::getDefault('items', 'authtype')),
+			'username' => $type == ITEM_TYPE_HTTPAGENT
+				? getRequest('http_username', DB::getDefault('items', 'username'))
+				: getRequest('username', DB::getDefault('items', 'username')),
+			'password' => $type == ITEM_TYPE_HTTPAGENT
+				? getRequest('http_password', DB::getDefault('items', 'password'))
+				: getRequest('password', DB::getDefault('items', 'password')),
+			'params' => getRequest('params', DB::getDefault('items', 'params')),
+			'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+			'delay' => getDelayWithCustomIntervals(getRequest('delay', DB::getDefault('items', 'delay')), $delay_flex),
+			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
+
+			// Dependent item type specific fields.
+			'master_itemid' => getRequest('master_itemid', 0),
+
+			// HTTP Agent item type specific fields.
+			'url' => getRequest('url', DB::getDefault('items', 'url')),
+			'query_fields' => prepareItemQueryFields(getRequest('query_fields', [])),
+			'request_method' => $request_method,
+			'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+			'posts' => getRequest('posts', DB::getDefault('items', 'posts')),
+			'headers' => prepareItemHeaders(getRequest('headers', [])),
+			'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+			'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
+			'retrieve_mode' => getRequest('retrieve_mode', $retrieve_mode_default),
+			'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+			'http_proxy' => getRequest('http_proxy', DB::getDefault('items', 'http_proxy')),
+			'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
+			'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
+			'ssl_cert_file' => getRequest('ssl_cert_file', DB::getDefault('items', 'ssl_cert_file')),
+			'ssl_key_file' => getRequest('ssl_key_file', DB::getDefault('items', 'ssl_key_file')),
+			'ssl_key_password' => getRequest('ssl_key_password', DB::getDefault('items', 'ssl_key_password')),
+			'allow_traps' => getRequest('allow_traps', DB::getDefault('items', 'allow_traps')),
+
+			// IPMI item type specific fields.
+			'ipmi_sensor' => getRequest('ipmi_sensor', DB::getDefault('items', 'ipmi_sensor')),
+
+			// JMX item type specific fields.
+			'jmx_endpoint' => getRequest('jmx_endpoint', DB::getDefault('items', 'jmx_endpoint')),
+
+			// Script item type specific fields.
+			'parameters' => prepareItemParameters(getRequest('parameters', [])),
+
+			// SNMP item type specific fields.
+			'snmp_oid' => getRequest('snmp_oid', DB::getDefault('items', 'snmp_oid')),
+
+			// SSH item type specific fields.
+			'publickey' => getRequest('publickey', DB::getDefault('items', 'publickey')),
+			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
 		];
 
-		if ($newItem['type'] == ITEM_TYPE_HTTPAGENT) {
-			$http_item = [
-				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-				'url' => getRequest('url'),
-				'query_fields' => getRequest('query_fields', []),
-				'posts' => getRequest('posts'),
-				'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-				'follow_redirects' => (int) getRequest('follow_redirects'),
-				'post_type' => (int) getRequest('post_type'),
-				'http_proxy' => getRequest('http_proxy'),
-				'headers' => getRequest('headers', []),
-				'retrieve_mode' => (int) getRequest('retrieve_mode'),
-				'request_method' => (int) getRequest('request_method'),
-				'output_format' => (int) getRequest('output_format'),
-				'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-				'ssl_cert_file' => getRequest('ssl_cert_file'),
-				'ssl_key_file' => getRequest('ssl_key_file'),
-				'ssl_key_password' => getRequest('ssl_key_password'),
-				'verify_peer' => (int) getRequest('verify_peer'),
-				'verify_host' => (int) getRequest('verify_host'),
-				'authtype' => getRequest('http_authtype', ZBX_HTTP_AUTH_NONE),
-				'username' => getRequest('http_username', ''),
-				'password' => getRequest('http_password', '')
-			];
-			$newItem = prepareItemHttpAgentFormData($http_item) + $newItem;
+		$lld_filter = prepareLldFilter([
+			'evaltype' => getRequest('evaltype', DB::getDefault('items', 'evaltype')),
+			'formula' => getRequest('formula', DB::getDefault('items', 'formula')),
+			'conditions' => getRequest('conditions', [])
+		]);
+
+		if ($lld_filter) {
+			$input['filter'] = $lld_filter;
 		}
 
-		if ($newItem['type'] == ITEM_TYPE_SCRIPT) {
-			$script_item = [
-				'parameters' => getRequest('parameters', []),
-				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
-			];
+		$result = true;
 
-			$newItem = prepareScriptItemFormData($script_item) + $newItem;
-		}
+		if (hasRequest('add')) {
+			$item = ['hostid' => $hostid];
 
-		if ($newItem['type'] == ITEM_TYPE_JMX) {
-			$newItem['jmx_endpoint'] = getRequest('jmx_endpoint', '');
-		}
+			$item += getSanitizedItemFields($input + [
+				'templateid' => 0,
+				'flags' => ZBX_FLAG_DISCOVERY_RULE,
+				'hosts' => $hosts
+			]);
 
-		if (getRequest('type') == ITEM_TYPE_DEPENDENT) {
-			$newItem['master_itemid'] = getRequest('master_itemid');
-		}
+			$response = API::DiscoveryRule()->create($item);
 
-		// add macros; ignore empty new macros
-		$lld_rule_filter = [
-			'evaltype' => getRequest('evaltype'),
-			'conditions' => []
-		];
-		$conditions = getRequest('conditions', []);
-		ksort($conditions);
-		$conditions = array_values($conditions);
-		foreach ($conditions as $condition) {
-			if (!zbx_empty($condition['macro'])) {
-				$condition['macro'] = mb_strtoupper($condition['macro']);
-
-				$lld_rule_filter['conditions'][] = $condition;
+			if ($response === false) {
+				throw new Exception();
 			}
 		}
-		if ($lld_rule_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-			// if only one or no conditions are left, reset the evaltype to and/or and clear the formula
-			if (count($lld_rule_filter['conditions']) <= 1) {
-				$lld_rule_filter['formula'] = '';
-				$lld_rule_filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
-			}
-			else {
-				$lld_rule_filter['formula'] = getRequest('formula');
-			}
-		}
-		$newItem['filter'] = $lld_rule_filter;
-
-		$lld_macro_paths = getRequest('lld_macro_paths', []);
-
-		foreach ($lld_macro_paths as &$lld_macro_path) {
-			$lld_macro_path['lld_macro'] = mb_strtoupper($lld_macro_path['lld_macro']);
-		}
-		unset($lld_macro_path);
-
-		$newItem['lld_macro_paths'] = $lld_macro_paths;
-
-		foreach ($newItem['lld_macro_paths'] as $i => $lld_macro_path) {
-			if ($lld_macro_path['lld_macro'] === '' && $lld_macro_path['path'] === '') {
-				unset($newItem['lld_macro_paths'][$i]);
-			}
-		}
-
-		$overrides = getRequest('overrides', []);
-		$newItem['overrides'] = $overrides;
 
 		if (hasRequest('update')) {
-			DBstart();
+			$db_items = API::DiscoveryRule()->get([
+				'output' => ['templateid', 'type', 'key_', 'authtype', 'allow_traps'],
+				'itemids' => $itemid
+			]);
 
-			// Unset equal values if item script type and parameters have not changed.
-			$compare = function($arr, $arr2) {
-				return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
-					array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
-				);
-			};
-			if ($newItem['type'] == ITEM_TYPE_SCRIPT && $newItem['type'] == $item['type']
-					&& $compare($item['parameters'], $newItem['parameters'])) {
-				unset($newItem['parameters']);
-			}
+			$item = getSanitizedItemFields($input + $db_items[0] + [
+				'flags' => ZBX_FLAG_DISCOVERY_RULE,
+				'hosts' => $hosts
+			]);
 
-			if ($newItem['type'] == $item['type']) {
-				$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
-			}
+			$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
 
-			// don't update the filter if it hasn't changed
-			$conditionsChanged = false;
-			if (count($newItem['filter']['conditions']) != count($item['filter']['conditions'])) {
-				$conditionsChanged = true;
+			if ($response === false) {
+				throw new Exception();
 			}
-			else {
-				$conditions = $item['filter']['conditions'];
-				foreach ($newItem['filter']['conditions'] as $i => $condition) {
-					if (CArrayHelper::unsetEqualValues($condition, $conditions[$i])) {
-						$conditionsChanged = true;
-						break;
-					}
-				}
-			}
-			$lld_rule_filter = CArrayHelper::unsetEqualValues($newItem['filter'], $item['filter']);
-			if (!isset($lld_rule_filter['evaltype']) && !isset($lld_rule_filter['formula']) && !$conditionsChanged) {
-				unset($newItem['filter']);
-			}
-
-			$lld_macro_paths_changed = false;
-
-			if (count($newItem['lld_macro_paths']) != count($item['lld_macro_paths'])) {
-				$lld_macro_paths_changed = true;
-			}
-			else {
-				$lld_macro_paths = array_values($item['lld_macro_paths']);
-				$newItem['lld_macro_paths'] = array_values($newItem['lld_macro_paths']);
-
-				foreach ($newItem['lld_macro_paths'] as $i => $lld_macro_path) {
-					if (CArrayHelper::unsetEqualValues($lld_macro_path, $lld_macro_paths[$i])) {
-						$lld_macro_paths_changed = true;
-						break;
-					}
-				}
-			}
-
-			if (!$lld_macro_paths_changed) {
-				unset($newItem['lld_macro_paths']);
-			}
-
-			if ($item['preprocessing'] !== $preprocessing) {
-				$newItem['preprocessing'] = $preprocessing;
-			}
-
-			$result = API::DiscoveryRule()->update($newItem);
-			$result = DBend($result);
 		}
-		else {
-			if (!$newItem['lld_macro_paths']) {
-				unset($newItem['lld_macro_paths']);
-			}
-
-			if ($preprocessing) {
-				$newItem['preprocessing'] = $preprocessing;
-			}
-
-			$result = API::DiscoveryRule()->create([$newItem]);
-		}
+	}
+	catch (Exception $e) {
+		$result = false;
 	}
 
 	if (hasRequest('add')) {
@@ -749,40 +601,56 @@ if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
  * Display
  */
 if (hasRequest('form')) {
+	$master_itemid = getRequest('master_itemid', 0);
 	$has_errors = false;
-	$form_item = (hasRequest('itemid') && !hasRequest('clone')) ? $item : [];
-	$master_itemid = $form_item && !hasRequest('form_refresh')
-		? $form_item['master_itemid']
-		: getRequest('master_itemid');
 
-	if (getRequest('type', $form_item ? $form_item['type'] : null) == ITEM_TYPE_DEPENDENT && $master_itemid != 0) {
+	if (hasRequest('itemid') && !hasRequest('clone')) {
+		$items = API::DiscoveryRule()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => ['hostid', 'name', 'status', 'flags'],
+			'selectFilter' => ['formula', 'evaltype', 'conditions'],
+			'selectLLDMacroPaths' => ['lld_macro', 'path'],
+			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'itemids' => $itemid
+		]);
+		$item = $items[0];
+		$host = $item['hosts'][0];
+		unset($item['hosts']);
+
+		if (!hasRequest('form_refresh')) {
+			$master_itemid = $item['master_itemid'];
+		}
+	}
+	else {
+		$item = [];
+		$host = $hosts[0];
+	}
+
+	if (getRequest('type', $item ? $item['type'] : null) == ITEM_TYPE_DEPENDENT && $master_itemid != 0) {
 		$db_master_items = API::Item()->get([
-			'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+			'output' => ['itemid', 'name'],
 			'itemids' => $master_itemid,
 			'webitems' => true
 		]);
 
-		if (!$db_master_items) {
-			show_messages(false, '', _('No permissions to referred object or it does not exist!'));
-			$has_errors = true;
-		}
-		else {
-			$form_item['master_item'] = $db_master_items[0];
+		if ($db_master_items) {
+			$item['master_item'] = $db_master_items[0];
 		}
 	}
 
-	$data = getItemFormData($form_item, ['form' => getRequest('form'), 'is_discovery_rule' => true]);
+	$data = getItemFormData($item, ['form' => getRequest('form'), 'is_discovery_rule' => true]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
-	$data['host'] = $host;
+	$data['host'] = $hosts[0];
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
-	$data['display_interfaces'] = ($host['status'] == HOST_STATUS_MONITORED
-		|| $host['status'] == HOST_STATUS_NOT_MONITORED
+	$data['display_interfaces'] = ($hosts[0]['status'] == HOST_STATUS_MONITORED
+		|| $hosts[0]['status'] == HOST_STATUS_NOT_MONITORED
 	);
 	$data['backurl'] = getRequest('backurl');
 

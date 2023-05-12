@@ -216,7 +216,7 @@ class CConditionFormula {
 		}
 
 		if ($level != 0 || isset($this->formula[$this->pos]) || $state == self::STATE_AFTER_OPERATOR) {
-			$this->error = _s('check expression starting from "%1$s"',
+			$this->error = _s('invalid expression starting from "%1$s"',
 				substr($this->formula, $this->pos == 0 ? 0 : $this->pos - 1)
 			);
 			$this->isValid = false;

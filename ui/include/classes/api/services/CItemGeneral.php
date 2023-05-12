@@ -50,14 +50,29 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @var array
 	 */
-	protected const PREPROC_TYPES_WITH_PARAMS = [];
+	protected const PREPROC_TYPES_WITH_PARAMS = [
+		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
+		ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
+		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
+		ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
+		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON
+	];
 
 	/**
 	 * A list of preprocessing types that supports the error handling.
 	 *
 	 * @var array
 	 */
-	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [];
+	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [
+		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
+		ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
+		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
+		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
+		ZBX_PREPROC_SNMP_WALK_TO_JSON
+	];
 
 	/**
 	 * A list of supported item types.
@@ -310,7 +325,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array
 	 */
 	protected static function getTagsValidationRules(): array {
-		return ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+		return ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 			'tag' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
 			'value' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
 		]];
@@ -324,6 +339,7 @@ abstract class CItemGeneral extends CApiService {
 	public static function getPreprocessingValidationRules(int $flags = 0x00): array {
 		return [
 			'type' => API_OBJECTS,
+			'flags' => API_NORMALIZE,
 			'uniq_by_values' => [
 				['type' => [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED]],
 				['type' => [ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
@@ -478,6 +494,12 @@ abstract class CItemGeneral extends CApiService {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
 					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
 						_('item with the same UUID already exists')
+					);
+					break;
+
+				case ZBX_FLAG_DISCOVERY_RULE:
+					$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($item_indexes[$duplicates[0]['uuid']] + 1),
+						_('LLD rule with the same UUID already exists')
 					);
 					break;
 
@@ -2146,6 +2168,10 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	private static function checkCircularDependencies(array $items, array $dep_item_links): void {
 		foreach ($items as $i => $item) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
+				continue;
+			}
+
 			$master_itemid = $item['master_itemid'];
 
 			while ($master_itemid != 0) {

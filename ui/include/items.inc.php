@@ -2357,6 +2357,91 @@ function prepareItemTags(array $tags): array {
 }
 
 /**
+ * Format LLD macro paths received via form for API input.
+ *
+ * @param array $macro_paths  Array of LLD macro paths, as received from form submit.
+ *
+ * @return array
+ */
+function prepareLldMacroPaths(array $macro_paths): array {
+	foreach ($macro_paths as $i => &$macro_path) {
+		if ($macro_path['lld_macro'] === '' && $macro_path['path'] === '') {
+			unset($macro_paths[$i]);
+			continue;
+		}
+
+		$macro_path['lld_macro'] = mb_strtoupper($macro_path['lld_macro']);
+	}
+	unset($macro_path);
+
+	return array_values($macro_paths);
+}
+
+/**
+ * Format LLD rule filter data received via form for API input.
+ *
+ * @param array $filter  Array of LLD filters, as received from form submit.
+ *
+ * @return array
+ */
+function prepareLldFilter(array $filter): array {
+	ksort($filter['conditions']);
+
+	foreach ($filter['conditions'] as $i => &$condition) {
+		if ($condition['macro'] === '') {
+			unset($filter['conditions'][$i]);
+			continue;
+		}
+
+		$condition['macro'] = mb_strtoupper($condition['macro']);
+
+		if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			$condition['formulaid'] = '';
+		}
+	}
+	unset($condition);
+
+	if (!$filter['conditions']) {
+		return [];
+	}
+
+	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) == 1) {
+		$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+		$filter['formula'] = '';
+	}
+
+	if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+		$filter['formula'] = '';
+	}
+
+	return $filter;
+}
+
+/**
+ * Format LLD rule filter data received via form for API input.
+ *
+ * @param array $filter  Array of LLD filters, as received from form submit.
+ *
+ * @return array
+ */
+function prepareLldOverrides(array $overrides): array {
+	foreach ($overrides as &$override) {
+		if (!array_key_exists('filter', $override)) {
+			continue;
+		}
+
+		foreach ($override['filter']['conditions'] as &$condition) {
+			if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+				$condition['formulaid'] = '';
+			}
+		}
+	}
+	unset($override);
+
+	return $overrides;
+}
+
+/**
  * Format query fields received via form for API input.
  *
  * @param array $query_fields
@@ -2481,6 +2566,16 @@ function getMainItemFieldNames(array $input): array {
 			}
 			else {
 				return ['history', 'trends', 'inventory_link', 'description', 'status', 'tags'];
+			}
+
+		case ZBX_FLAG_DISCOVERY_RULE:
+			if ($input['templateid'] == 0) {
+				return ['name', 'type', 'key_', 'lifetime', 'description', 'status', 'preprocessing',
+					'lld_macro_paths', 'filter', 'overrides'
+				];
+			}
+			else {
+				return ['lifetime', 'description', 'status', 'filters'];
 			}
 
 		case ZBX_FLAG_DISCOVERY_PROTOTYPE:

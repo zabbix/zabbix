@@ -22,7 +22,7 @@
 /**
  * Class containing methods for operations with discovery rules.
  */
-class CDiscoveryRule extends CItemGeneralOld {
+class CDiscoveryRule extends CItemGeneral {
 
 	public const ACCESS_RULES = parent::ACCESS_RULES + [
 		'copy' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
@@ -33,13 +33,11 @@ class CDiscoveryRule extends CItemGeneralOld {
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'type', 'status'];
 
 	/**
-	 * Define a set of supported pre-processing rules.
-	 *
-	 * @var array
+	 * @inheritDoc
 	 */
-	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
-		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_XPATH, ZBX_PREPROC_ERROR_FIELD_XML,
+	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
+		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
+		ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON,
 		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
 		ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
@@ -54,15 +52,20 @@ class CDiscoveryRule extends CItemGeneralOld {
 		ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 	];
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->errorMessages = array_merge($this->errorMessages, [
-			self::ERROR_EXISTS_TEMPLATE => _('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.'),
-			self::ERROR_EXISTS => _('Discovery rule "%1$s" already exists on "%2$s".'),
-			self::ERROR_INVALID_KEY => _('Invalid key "%1$s" for discovery rule "%2$s" on "%3$s": %4$s.')
-		]);
-	}
+	/**
+	 * A list of supported operation fields indexed by table name.
+	 */
+	const OPERATION_FIELDS = [
+		'lld_override_opdiscover' => 'opdiscover',
+		'lld_override_opstatus' => 'opstatus',
+		'lld_override_opperiod' => 'opperiod',
+		'lld_override_ophistory' => 'ophistory',
+		'lld_override_optrends' => 'optrends',
+		'lld_override_opseverity' => 'opseverity',
+		'lld_override_optag' => 'optag',
+		'lld_override_optemplate' => 'optemplate',
+		'lld_override_opinventory' => 'opinventory'
+	];
 
 	/**
 	 * Get DiscoveryRule data
@@ -349,190 +352,1588 @@ class CDiscoveryRule extends CItemGeneralOld {
 	}
 
 	/**
-	 * Add DiscoveryRule.
-	 *
 	 * @param array $items
 	 *
 	 * @return array
 	 */
-	public function create($items) {
-		$items = zbx_toArray($items);
-		$this->checkInput($items);
+	public function create(array $items): array {
+		self::validateCreate($items);
 
-		foreach ($items as &$item) {
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if (array_key_exists('query_fields', $item)) {
-					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
-				}
+		self::createForce($items);
+		self::inherit($items);
 
-				if (array_key_exists('headers', $item)) {
-					$item['headers'] = $this->headersArrayToString($item['headers']);
-				}
-
-				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
-						&& !array_key_exists('retrieve_mode', $item)) {
-					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
-				}
-			}
-			else {
-				$item['query_fields'] = '';
-				$item['headers'] = '';
-			}
-
-			// Option 'Convert to JSON' is not supported for discovery rule.
-			unset($item['itemid'], $item['output_format']);
-		}
-		unset($item);
-
-		// Get only hosts not templates from items
-		$hosts = API::Host()->get([
-			'output' => [],
-			'hostids' => zbx_objectValues($items, 'hostid'),
-			'preservekeys' => true
-		]);
-		foreach ($items as &$item) {
-			if (array_key_exists($item['hostid'], $hosts)) {
-				$item['rtdata'] = true;
-			}
-		}
-		unset($item);
-
-		$this->validateCreateLLDMacroPaths($items);
-		$this->validateDependentItems($items);
-		$this->createReal($items);
-		$this->inherit($items);
-
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		return ['itemids' => array_column($items, 'itemid')];
 	}
 
 	/**
-	 * Update DiscoveryRule.
+	 * @param array $items
 	 *
+	 * @throws APIException
+	 */
+	private static function validateCreate(array &$items): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkHostsAndTemplates($items, $db_hosts, $db_templates);
+		self::addHostStatus($items, $db_hosts, $db_templates);
+		self::addFlags($items, ZBX_FLAG_DISCOVERY_RULE);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
+			'host_status' =>		['type' => API_ANY],
+			'flags' =>				['type' => API_ANY],
+			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			]],
+			'hostid' =>				['type' => API_ANY],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
+			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
+			'key_' =>				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
+			'lifetime' =>			['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'preprocessing' =>		self::getPreprocessingValidationRules(),
+			'lld_macro_paths' =>	self::getLldMacroPathsValidationRules(),
+			'filter' =>				self::getFilterValidationRules('items', 'item_condition'),
+			'overrides' =>			self::getOverridesValidationRules()
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::validateByType(array_keys($api_input_rules['fields']), $items);
+
+		self::addUuid($items);
+
+		self::checkUuidDuplicates($items);
+		self::checkDuplicates($items);
+		self::checkHostInterfaces($items);
+		self::checkDependentItems($items);
+		self::checkPreprocessingSteps($items);
+		self::checkFilterFormula($items);
+		self::checkOverridesFilterFormula($items);
+		self::checkOverridesOperationTemplates($items);
+	}
+
+	/**
+	 * @param array $items
+	 */
+	private static function createForce(array &$items): void {
+		self::addValueType($items);
+
+		$itemids = DB::insert('items', $items);
+
+		$ins_items_rtdata = [];
+		$host_statuses = [];
+
+		foreach ($items as &$item) {
+			$item['itemid'] = array_shift($itemids);
+
+			if (in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
+				$ins_items_rtdata[] = ['itemid' => $item['itemid']];
+			}
+
+			$host_statuses[] = $item['host_status'];
+			unset($item['host_status'], $item['flags'], $item['value_type']);
+		}
+		unset($item);
+
+		if ($ins_items_rtdata) {
+			DB::insertBatch('item_rtdata', $ins_items_rtdata, false);
+		}
+
+		self::updateParameters($items);
+		self::updatePreprocessing($items);
+		self::updateLldMacroPaths($items);
+		self::updateItemFilters($items);
+		self::updateOverrides($items);
+
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DISCOVERY_RULE, $items);
+
+		foreach ($items as &$item) {
+			$item['host_status'] = array_shift($host_statuses);
+			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
+		}
+		unset($item);
+	}
+
+	/**
+	 * Add value_type property to given items.
+	 *
+	 * @param array $items
+	 */
+	private static function addValueType(array &$items): void {
+		foreach ($items as &$item) {
+			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
+		}
+		unset($item);
+	}
+
+	/**
 	 * @param array $items
 	 *
 	 * @return array
 	 */
-	public function update(array $items) {
-		$items = zbx_toArray($items);
+	public function update(array $items): array {
+		$this->validateUpdate($items, $db_items);
 
-		$db_items = $this->get([
-			'output' => ['itemid', 'name', 'type', 'master_itemid', 'authtype', 'allow_traps', 'retrieve_mode'],
-			'selectFilter' => ['evaltype', 'formula', 'conditions'],
-			'itemids' => zbx_objectValues($items, 'itemid'),
+		$itemids = array_column($items, 'itemid');
+
+		self::updateForce($items, $db_items);
+		self::inherit($items, $db_items);
+// self::exception();
+		return ['itemids' => $itemids];
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 *
+	 * @throws APIException
+	 */
+	protected function validateUpdate(array &$items, ?array &$db_items): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
+			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$count = $this->get([
+			'countOutput' => true,
+			'itemids' => array_column($items, 'itemid'),
+			'editable' => true
+		]);
+
+		if ($count != count($items)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		/*
+		 * The fields "headers" and "query_fields" in API are arrays, but there is necessary to get the values of these
+		 * fields as they stored in database.
+		 */
+		$db_items = DB::select('items', [
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'
+			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		]);
 
-		$this->checkInput($items, true, $db_items);
-		$this->validateUpdateLLDMacroPaths($items);
+		self::addInternalFields($db_items);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'authtype',
-			'master_itemid'
-		]);
-		$this->validateDependentItems($items);
+		foreach ($items as $i => &$item) {
+			$db_item = $db_items[$item['itemid']];
+			$item['host_status'] = $db_item['host_status'];
 
-		$defaults = DB::getDefaults('items');
-		$clean = [
-			ITEM_TYPE_HTTPAGENT => [
-				'url' => '',
-				'query_fields' => '',
-				'timeout' => $defaults['timeout'],
-				'status_codes' => $defaults['status_codes'],
-				'follow_redirects' => $defaults['follow_redirects'],
-				'request_method' => $defaults['request_method'],
-				'allow_traps' => $defaults['allow_traps'],
-				'post_type' => $defaults['post_type'],
-				'http_proxy' => '',
-				'headers' => '',
-				'retrieve_mode' => $defaults['retrieve_mode'],
-				'output_format' => $defaults['output_format'],
-				'ssl_key_password' => '',
-				'verify_peer' => $defaults['verify_peer'],
-				'verify_host' => $defaults['verify_host'],
-				'ssl_cert_file' => '',
-				'ssl_key_file' => '',
-				'posts' => ''
-			]
-		];
+			$api_input_rules = $db_item['templateid'] == 0
+				? self::getValidationRules()
+				: self::getInheritedValidationRules();
 
-		// set the default values required for updating
-		foreach ($items as &$item) {
-			$type_change = (array_key_exists('type', $item) && $item['type'] != $db_items[$item['itemid']]['type']);
-
-			if (isset($item['filter'])) {
-				foreach ($item['filter']['conditions'] as &$condition) {
-					$condition += [
-						'operator' => DB::getDefault('item_condition', 'operator')
-					];
-				}
-				unset($condition);
+			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
-
-			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_HTTPAGENT) {
-				$item = array_merge($item, $clean[ITEM_TYPE_HTTPAGENT]);
-
-				if ($item['type'] != ITEM_TYPE_SSH) {
-					$item['authtype'] = $defaults['authtype'];
-					$item['username'] = '';
-					$item['password'] = '';
-				}
-
-				if ($item['type'] != ITEM_TYPE_TRAPPER) {
-					$item['trapper_hosts'] = '';
-				}
-			}
-
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				// Clean username and password when authtype is set to ZBX_HTTP_AUTH_NONE.
-				if ($item['authtype'] == ZBX_HTTP_AUTH_NONE) {
-					$item['username'] = '';
-					$item['password'] = '';
-				}
-
-				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF
-						&& $item['allow_traps'] != $db_items[$item['itemid']]['allow_traps']) {
-					$item['trapper_hosts'] = '';
-				}
-
-				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
-				}
-
-				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
-					$item['headers'] = $this->headersArrayToString($item['headers']);
-				}
-
-				if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD
-						&& !array_key_exists('retrieve_mode', $item)
-						&& $db_items[$item['itemid']]['retrieve_mode'] != HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
-					$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
-				}
-			}
-			else {
-				$item['query_fields'] = '';
-				$item['headers'] = '';
-			}
-
-			if ($type_change && $db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
-				if ($item['type'] != ITEM_TYPE_SSH && $item['type'] != ITEM_TYPE_DB_MONITOR
-						&& $item['type'] != ITEM_TYPE_TELNET && $item['type'] != ITEM_TYPE_CALCULATED) {
-					$item['params'] = '';
-				}
-
-				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
-					$item['timeout'] = $defaults['timeout'];
-				}
-			}
-
-			// Option 'Convert to JSON' is not supported for discovery rule.
-			unset($item['output_format']);
 		}
 		unset($item);
 
-		// update
-		$this->updateReal($items);
-		$this->inherit($items);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'key_']);
 
-		return ['itemids' => zbx_objectValues($items, 'itemid')];
+		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
+
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags']);
+
+		self::validateUniqueness($items);
+
+		self::addAffectedObjects($items, $db_items);
+
+		self::checkUuidDuplicates($items, $db_items);
+		self::checkDuplicates($items, $db_items);
+		self::checkHostInterfaces($items, $db_items);
+		self::checkDependentItems($items, $db_items);
+		self::checkPreprocessingSteps($items);
+		self::checkFilterFormula($items);
+		self::checkOverridesFilterFormula($items);
+		self::checkOverridesOperationTemplates($items);
+	}
+
+	/**
+	 * @return array
+	 */
+	private static function getValidationRules(): array {
+		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'host_status' =>		['type' => API_ANY],
+			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			]],
+			'itemid' =>				['type' => API_ANY],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
+			'type' =>				['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
+			'key_' =>				['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
+			'lifetime' =>			['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'preprocessing' =>		self::getPreprocessingValidationRules(),
+			'lld_macro_paths' =>	self::getLldMacroPathsValidationRules(),
+			'filter' =>				self::getFilterValidationRules('items', 'item_condition'),
+			'overrides' =>			self::getOverridesValidationRules()
+		]];
+	}
+
+	/**
+	 * @return array
+	 */
+	private static function getInheritedValidationRules(): array {
+		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'host_status' =>		['type' => API_ANY],
+			'uuid' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'itemid' =>				['type' => API_ANY],
+			'name' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'type' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'key_' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'lifetime' =>			['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
+			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'preprocessing' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'lld_macro_paths' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'filter' =>				self::getFilterValidationRules('items', 'item_condition'),
+			'overrides' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
+		]];
+	}
+
+	/**
+	 * @return array
+	 */
+	private static function getLldMacroPathsValidationRules(): array {
+		return ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['lld_macro']], 'fields' => [
+			'lld_macro' =>	['type' => API_LLD_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_macro_path', 'lld_macro')],
+			'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_macro_path', 'path')]
+		]];
+	}
+
+	/**
+	 * @param string $base_table
+	 * @param string $condition_table
+	 *
+	 * @return array
+	 */
+	private static function getFilterValidationRules(string $base_table, string $condition_table): array {
+		$condition_fields = [
+			'macro' =>		['type' => API_LLD_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength($condition_table, 'macro')],
+			'operator' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS])],
+			'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength($condition_table, 'value')]
+		];
+
+		return ['type' => API_OBJECT, 'fields' => [
+			'evaltype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
+			'formula' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength($base_table, 'formula')],
+								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault($base_table, 'formula')]
+			]],
+			'conditions' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED | API_NORMALIZE | API_NOT_EMPTY, 'rules' => [
+								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'uniq' => [['formulaid']], 'fields' => [
+									'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
+								] + $condition_fields],
+								['else' => true, 'type' => API_OBJECTS, 'fields' => [
+									'formulaid' => ['type' => API_STRING_UTF8, 'in' => '', 'unset' => true]
+								] + $condition_fields]
+			]]
+		]];
+	}
+
+	/**
+	 * @return array
+	 */
+	private static function getOverridesValidationRules(): array {
+		return ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name'], ['step']], 'fields' => [
+			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override', 'name')],
+			'step' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(':', [1, ZBX_MAX_INT32])],
+			'stop' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_OVERRIDE_STOP_NO, ZBX_LLD_OVERRIDE_STOP_YES])],
+			'filter' =>		self::getFilterValidationRules('lld_override', 'lld_override_condition'),
+			'operations' =>	self::getOperationsValidationRules()
+		]];
+	}
+
+	/**
+	 * @return array
+	 */
+	private static function getOperationsValidationRules(): array {
+		return ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+			'operationobject' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE])],
+			'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP])],
+			'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_operation', 'value')],
+			'opdiscover' =>			['type' => API_OBJECT, 'fields' => [
+				'discover' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])]
+			]],
+			'opstatus' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
+											'status' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED])]
+										]],
+										['else' => true, 'type' => API_OBJECT, 'fields' => []]
+			]],
+			'opperiod' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
+											'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
+										]],
+										['else' => true, 'type' => API_OBJECT, 'fields' => []]
+			]],
+			'ophistory' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
+											'history' =>		['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
+										]],
+										['else' => true, 'type' => API_OBJECT, 'fields' => []]
+			]],
+			'optrends' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
+											'trends' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
+										]],
+										['else' => true, 'type' => API_OBJECT, 'fields' => []]
+			]],
+			'opseverity' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_TRIGGER_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
+											'severity' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER])]
+										]],
+										['else' => true, 'type' => API_OBJECT, 'fields' => []]
+			]],
+			'optag' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+											'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_optag', 'tag')],
+											'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_optag', 'value'), 'default' => DB::getDefault('lld_override_optag', 'value')]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]],
+			'optemplate' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_HOST_PROTOTYPE])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+											'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]],
+			'opinventory' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'operationobject', 'in' => implode(',', [OPERATION_OBJECT_HOST_PROTOTYPE])], 'type' => API_OBJECT, 'fields' => [
+											'inventory_mode' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
+										]],
+										['else' => true, 'type' => API_OBJECT, 'fields' => []]
+			]]
+		]];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected static function addAffectedObjects(array $items, array &$db_items): void {
+		self::addAffectedPreprocessing($items, $db_items);
+		self::addAffectedLldMacroPaths($items, $db_items);
+		self::addAffectedItemFilters($items, $db_items);
+		self::addAffectedOverrides($items, $db_items);
+		self::addAffectedParameters($items, $db_items);
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	private static function addAffectedLldMacroPaths(array $items, array &$db_items): void {
+		$itemids = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('lld_macro_paths', $item)) {
+				$itemids[] = $item['itemid'];
+				$db_items[$item['itemid']]['lld_macro_paths'] = [];
+			}
+		}
+
+		if (!$itemids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['lld_macro_pathid', 'itemid', 'lld_macro', 'path'],
+			'filter' => ['itemid' => $itemids]
+		];
+		$db_lld_macro_paths = DBselect(DB::makeSql('lld_macro_path', $options));
+
+		while ($db_lld_macro_path = DBfetch($db_lld_macro_paths)) {
+			$db_items[$db_lld_macro_path['itemid']]['lld_macro_paths'][$db_lld_macro_path['lld_macro_pathid']] =
+				array_diff_key($db_lld_macro_path, array_flip(['itemid']));
+		}
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	private static function addAffectedItemFilters(array $items, array &$db_items): void {
+		$_db_items = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('filter', $item)) {
+				$_db_items[$item['itemid']] = &$db_items[$item['itemid']];
+			}
+		}
+
+		if (!$_db_items) {
+			return;
+		}
+
+		self::addAffectedFilters($_db_items, 'items', 'item_condition');
+	}
+
+	/**
+	 * @param array  $db_objects
+	 * @param string $base_table
+	 * @param string $condition_table
+	 */
+	private static function addAffectedFilters(array &$db_objects, string $base_table, string $condition_table): void {
+		$base_pk = DB::getPk($base_table);
+		$condition_pk = DB::getPk($condition_table);
+
+		foreach ($db_objects as &$db_object) {
+			$db_object['filter'] = [];
+		}
+		unset($db_object);
+
+		$options = [
+			'output' => [$base_pk, 'evaltype', 'formula'],
+			'filter' => [$base_pk => array_keys($db_objects)]
+		];
+		$db_filters = DBselect(DB::makeSql($base_table, $options));
+
+		$object_formulaids = [];
+
+		while ($db_filter = DBfetch($db_filters)) {
+			if ($db_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$object_formulaids[$db_filter[$base_pk]] = CConditionHelper::getFormulaIds($db_filter['formula']);
+
+				$db_filter['formula'] = CConditionHelper::replaceNumericIds($db_filter['formula'],
+					$object_formulaids[$db_filter[$base_pk]]
+				);
+			}
+
+			$db_objects[$db_filter[$base_pk]]['filter'] =
+				array_diff_key($db_filter, array_flip([$base_pk])) + ['conditions' => []];
+		}
+
+		$options = [
+			'output' => [$condition_pk, $base_pk, 'operator', 'macro', 'value'],
+			'filter' => [$base_pk => array_keys($db_objects)]
+		];
+		$db_conditions = DBselect(DB::makeSql($condition_table, $options));
+
+		while ($db_condition = DBfetch($db_conditions)) {
+			if ($db_objects[$db_condition[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$db_condition['formulaid'] = $object_formulaids[$db_condition[$base_pk]][$db_condition[$condition_pk]];
+			}
+			else {
+				$db_condition['formulaid'] = '';
+			}
+
+			$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] =
+				array_diff_key($db_condition, array_flip([$base_pk]));
+		}
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	private static function addAffectedOverrides(array $items, array &$db_items): void {
+		$itemids = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('overrides', $item)) {
+				$itemids[] = $item['itemid'];
+				$db_items[$item['itemid']]['overrides'] = [];
+			}
+		}
+
+		if (!$itemids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['lld_overrideid', 'itemid', 'name', 'step', 'stop'],
+			'filter' => ['itemid' => $itemids]
+		];
+		$result = DBselect(DB::makeSql('lld_override', $options));
+
+		$db_overrides = [];
+
+		while ($db_override = DBfetch($result)) {
+			$db_items[$db_override['itemid']]['overrides'][$db_override['lld_overrideid']] =
+				array_diff_key($db_override, array_flip(['itemid']));
+
+			$db_overrides[$db_override['lld_overrideid']] = &$db_items[$db_override['itemid']]['overrides'][$db_override['lld_overrideid']];
+		}
+
+		if (!$db_overrides) {
+			return;
+		}
+
+		self::addAffectedOverrideFilters($db_overrides);
+		self::addAffectedOverrideOperations($db_overrides);
+	}
+
+	/**
+	 * @param array $db_overrides
+	 */
+	private static function addAffectedOverrideFilters(array &$db_overrides): void {
+		self::addAffectedFilters($db_overrides, 'lld_override', 'lld_override_condition');
+	}
+
+	/**
+	 * @param array $db_overrides
+	 */
+	private static function addAffectedOverrideOperations(array &$db_overrides): void {
+		foreach ($db_overrides as &$db_override) {
+			$db_override['operations'] = [];
+		}
+		unset($db_override);
+
+		$options = [
+			'output' => ['lld_override_operationid', 'lld_overrideid', 'operationobject', 'operator', 'value'],
+			'filter' => ['lld_overrideid' => array_keys($db_overrides)]
+		];
+		$result = DBselect(DB::makeSql('lld_override_operation', $options));
+
+		$db_operations = [];
+
+		while ($db_operation = DBfetch($result)) {
+			$db_overrides[$db_operation['lld_overrideid']]['operations'][$db_operation['lld_override_operationid']] =
+				array_diff_key($db_operation, array_flip(['lld_overrideid']));
+
+			$db_operations[$db_operation['lld_override_operationid']] =
+				&$db_overrides[$db_operation['lld_overrideid']]['operations'][$db_operation['lld_override_operationid']];
+		}
+
+		if (!$db_operations) {
+			return;
+		}
+
+		self::addAffectedOverrideOperationSingleObjectFields($db_operations);
+		self::addAffectedOverrideOperationTags($db_operations);
+		self::addAffectedOverrideOperationTemplates($db_operations);
+	}
+
+	/**
+	 * @param array $db_operations
+	 */
+	private static function addAffectedOverrideOperationSingleObjectFields(array &$db_operations): void {
+		$db_op_fields = DBselect(
+			'SELECT op.lld_override_operationid,d.discover AS d_discover,s.status AS s_status,p.delay AS p_delay,'.
+				'h.history AS h_history,t.trends AS t_trends,ss.severity AS ss_severity,'.
+				'i.inventory_mode AS i_inventory_mode'.
+			' FROM lld_override_operation op'.
+			' LEFT JOIN lld_override_opdiscover d ON op.lld_override_operationid=d.lld_override_operationid'.
+			' LEFT JOIN lld_override_opstatus s ON op.lld_override_operationid=s.lld_override_operationid'.
+			' LEFT JOIN lld_override_opperiod p ON op.lld_override_operationid=p.lld_override_operationid'.
+			' LEFT JOIN lld_override_ophistory h ON op.lld_override_operationid=h.lld_override_operationid'.
+			' LEFT JOIN lld_override_optrends t ON op.lld_override_operationid=t.lld_override_operationid'.
+			' LEFT JOIN lld_override_opseverity ss ON op.lld_override_operationid=ss.lld_override_operationid'.
+			' LEFT JOIN lld_override_opinventory i ON op.lld_override_operationid=i.lld_override_operationid'.
+			' WHERE '.dbConditionId('op.lld_override_operationid', array_keys($db_operations))
+		);
+
+		$single_op_fields = [
+			'd' => 'opdiscover',
+			's' => 'opstatus',
+			'p' => 'opperiod',
+			'h' => 'ophistory',
+			't' => 'optrends',
+			'ss' => 'opseverity',
+			'i' => 'opinventory',
+		];
+
+		while ($db_op_field = DBfetch($db_op_fields, false)) {
+			foreach ($single_op_fields as $alias => $opfield) {
+				$fields = [];
+				$has_filled_fields = false;
+
+				foreach ($db_op_field as $aliased_name => $value) {
+					if (strncmp($aliased_name, $alias.'_', strlen($alias) + 1) != 0) {
+						continue;
+					}
+
+					$fields[substr($aliased_name, strlen($alias) + 1)] = $value;
+
+					if ($value !== null) {
+						$has_filled_fields = true;
+					}
+				}
+
+				$db_operations[$db_op_field['lld_override_operationid']][$opfield] = $has_filled_fields ? $fields : [];
+			}
+		}
+	}
+
+	/**
+	 * @param array $db_operations
+	 */
+	private static function addAffectedOverrideOperationTags(array &$db_operations): void {
+		$tag_operationobjects = [
+			OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE
+		];
+		$operationids = [];
+
+		foreach ($db_operations as &$db_operation) {
+			$db_operation['optag'] = [];
+
+			if (in_array($db_operation['operationobject'], $tag_operationobjects)) {
+				$operationids[] = $db_operation['lld_override_operationid'];
+			}
+		}
+		unset($db_operation);
+
+		if (!$operationids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['lld_override_optagid', 'lld_override_operationid', 'tag', 'value'],
+			'filter' => ['lld_override_operationid' => $operationids]
+		];
+		$db_tags = DBselect(DB::makeSql('lld_override_optag', $options));
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$db_operations[$db_tag['lld_override_operationid']]['optag'][$db_tag['lld_override_optagid']] =
+				array_diff_key($db_tag, array_flip(['lld_override_operationid']));
+		}
+	}
+
+	/**
+	 * @param array $db_operations
+	 */
+	private static function addAffectedOverrideOperationTemplates(array &$db_operations): void {
+		$operationids = [];
+
+		foreach ($db_operations as &$db_operation) {
+			$db_operation['optemplate'] = [];
+
+			if ($db_operation['operationobject'] == OPERATION_OBJECT_HOST_PROTOTYPE) {
+				$operationids[] = $db_operation['lld_override_operationid'];
+			}
+		}
+		unset($db_operation);
+
+		if (!$operationids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['lld_override_optemplateid', 'lld_override_operationid', 'templateid'],
+			'filter' => ['lld_override_operationid' => $operationids]
+		];
+		$db_templates = DBselect(DB::makeSql('lld_override_optemplate', $options));
+
+		while ($db_template = DBfetch($db_templates)) {
+			$db_operations[$db_template['lld_override_operationid']]['optemplate'][$db_template['lld_override_optemplateid']] =
+				array_diff_key($db_template, array_flip(['lld_override_operationid']));
+		}
+	}
+
+	/**
+	 * Check that all constants of formula are specified in the filter conditions of the given LLD rules or overrides.
+	 *
+	 * @param array  $objects
+	 * @param string $path
+	 *
+	 * @throws APIException
+	 */
+	private static function checkFilterFormula(array $objects, string $path = '/'): void {
+		$condition_formula_parser = new CConditionFormula();
+
+		foreach ($objects as $i => $object) {
+			if (!array_key_exists('filter', $object)
+					|| $object['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+				continue;
+			}
+
+			$condition_formula_parser->parse($object['filter']['formula']);
+
+			$constants = array_unique(array_column($condition_formula_parser->constants, 'value'));
+			$subpath = ($path === '/' ? $path : $path.'/').($i + 1).'/filter';
+
+			if (count($object['filter']['conditions']) != count($constants)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $subpath.'/conditions', _('incorrect number of conditions'))
+				);
+			}
+
+			foreach ($object['filter']['conditions'] as $j => $condition) {
+				if (!in_array($condition['formulaid'], $constants)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$subpath.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
+					));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check that specific checks for overrides of given LLD rules are valid.
+	 *
+	 * @param array $items
+	 */
+	private static function checkOverridesFilterFormula(array $items): void {
+		foreach ($items as $i => $item) {
+			if (!array_key_exists('overrides', $item)) {
+				continue;
+			}
+
+			$path = '/'.($i + 1).'/overrides';
+
+			self::checkFilterFormula($item['overrides'], $path);
+		}
+	}
+
+	/**
+	 * Check that templates specified in override operations of the given LLD rules are valid.
+	 *
+	 * @param array  $items
+	 * @param string $path
+	 *
+	 * @throws APIException
+	 */
+	private static function checkOverridesOperationTemplates(array $items): void {
+		$template_indexes = [];
+
+		foreach ($items as $i1 => $item) {
+			if (!array_key_exists('overrides', $item)) {
+				continue;
+			}
+
+			foreach ($item['overrides'] as $i2 => $override) {
+				if (!array_key_exists('operations', $override)) {
+					continue;
+				}
+
+				foreach ($override['operations'] as $i3 => $operation) {
+					if (!array_key_exists('optemplate', $operation)) {
+						continue;
+					}
+
+					foreach ($operation['optemplate'] as $i4 => $template) {
+						$template_indexes[$template['templateid']][$i1][$i2][$i3] = $i4;
+					}
+				}
+			}
+		}
+
+		if (!$template_indexes) {
+			return;
+		}
+
+		$db_templates = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys($template_indexes),
+			'preservekeys' => true
+		]);
+
+		$template_indexes = array_diff_key($template_indexes, $db_templates);
+		$index = reset($template_indexes);
+
+		if ($index === false) {
+			return;
+		}
+
+		$i1 = key($index);
+		$i2 = key($index[$i1]);
+		$i3 = key($index[$i1][$i2]);
+		$i4 = $index[$i1][$i2][$i3];
+
+		self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+			'/'.($i1 + 1).'/overrides/'.($i2 + 1).'/operations/'.($i3 + 1).'/optemplate/'.($i4 + 1).'/templateid',
+			_('a template ID is expected')
+		));
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	private static function updateForce(array &$items, array &$db_items): void {
+		// Helps to avoid deadlocks.
+		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
+
+		self::addFieldDefaultsByType($items, $db_items);
+
+		$upd_items = [];
+		$upd_itemids = [];
+
+		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
+		$nested_object_fields = array_flip(['preprocessing', 'lld_macro_paths', 'filter', 'overrides', 'parameters']);
+
+		foreach ($items as $i => &$item) {
+			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
+
+			if ($upd_item) {
+				$upd_items[] = [
+					'values' => $upd_item,
+					'where' => ['itemid' => $item['itemid']]
+				];
+
+				if (array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$item = array_intersect_key($item,
+						array_flip(['authtype']) + $internal_fields + $upd_item + $nested_object_fields
+					);
+				}
+				else {
+					$item = array_intersect_key($item, $internal_fields + $upd_item + $nested_object_fields);
+				}
+
+				$upd_itemids[$i] = $item['itemid'];
+			}
+			else {
+				$item = array_intersect_key($item, $internal_fields + $nested_object_fields);
+			}
+		}
+		unset($item);
+
+		if ($upd_items) {
+			DB::update('items', $upd_items);
+		}
+
+		self::updateParameters($items, $db_items, $upd_itemids);
+		self::updatePreprocessing($items, $db_items, $upd_itemids);
+		self::updateLldMacroPaths($items, $db_items, $upd_itemids);
+		self::updateItemFilters($items, $db_items, $upd_itemids);
+		self::updateOverrides($items, $db_items, $upd_itemids);
+
+		$items = array_intersect_key($items, $upd_itemids);
+		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DISCOVERY_RULE, $items, $db_items);
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
+	 */
+	private static function updateLldMacroPaths(array &$items, array $db_items = null,
+			array &$upd_itemids = null): void {
+		$ins_lld_macro_paths = [];
+		$upd_lld_macro_paths = [];
+		$del_lld_macro_pathids = [];
+
+		foreach ($items as $i => &$item) {
+			if (!array_key_exists('lld_macro_paths', $item)) {
+				continue;
+			}
+
+			$changed = false;
+			$db_lld_macro_paths = $db_items !== null
+				? array_column($db_items[$item['itemid']]['lld_macro_paths'], null, 'lld_macro')
+				: [];
+
+			foreach ($item['lld_macro_paths'] as &$lld_macro_path) {
+				if (array_key_exists($lld_macro_path['lld_macro'], $db_lld_macro_paths)) {
+					$db_lld_macro_path = $db_lld_macro_paths[$lld_macro_path['lld_macro']];
+					$lld_macro_path['lld_macro_pathid'] = $db_lld_macro_path['lld_macro_pathid'];
+					unset($db_lld_macro_paths[$lld_macro_path['lld_macro']]);
+
+					$upd_lld_macro_path = DB::getUpdatedValues('lld_macro_path', $lld_macro_path, $db_lld_macro_path);
+
+					if ($upd_lld_macro_path) {
+						$upd_lld_macro_paths[] = [
+							'values' => $upd_lld_macro_path,
+							'where' => ['lld_macro_pathid' => $db_lld_macro_path['lld_macro_pathid']]
+						];
+						$changed = true;
+					}
+				}
+				else {
+					$ins_lld_macro_paths[] = ['itemid' => $item['itemid']] + $lld_macro_path;
+					$changed = true;
+				}
+			}
+			unset($lld_macro_path);
+
+			if ($db_lld_macro_paths) {
+				$del_lld_macro_pathids =
+					array_merge($del_lld_macro_pathids, array_column($db_lld_macro_paths, 'lld_macro_pathid'));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['lld_macro_paths']);
+				}
+			}
+		}
+		unset($item);
+
+		if ($del_lld_macro_pathids) {
+			DB::delete('lld_macro_path', ['lld_macro_pathid' => $del_lld_macro_pathids]);
+		}
+
+		if ($upd_lld_macro_paths) {
+			DB::update('lld_macro_path', $upd_lld_macro_paths);
+		}
+
+		if ($ins_lld_macro_paths) {
+			$lld_macro_pathids = DB::insert('lld_macro_path', $ins_lld_macro_paths);
+		}
+
+		foreach ($items as &$item) {
+			if (!array_key_exists('lld_macro_paths', $item)) {
+				continue;
+			}
+
+			foreach ($item['lld_macro_paths'] as &$lld_macro_path) {
+				if (!array_key_exists('lld_macro_pathid', $lld_macro_path)) {
+					$lld_macro_path['lld_macro_pathid'] = array_shift($lld_macro_pathids);
+				}
+			}
+			unset($lld_macro_path);
+		}
+		unset($item);
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
+	 */
+	private static function updateItemFilters(array &$items, array $db_items = null, array &$upd_itemids = null): void {
+		self::updateFilters($items, $db_items, $upd_itemids, 'items', 'item_condition');
+	}
+
+	/**
+	 * @param array      $objects
+	 * @param array|null $db_objects
+	 * @param array|null $upd_objectids
+	 * @param string     $base_table
+	 * @param string     $condition_table
+	 */
+	private static function updateFilters(array &$objects, ?array $db_objects, ?array &$upd_objectids,
+			string $base_table, string $condition_table): void {
+		$base_pk = DB::getPk($base_table);
+		$condition_pk = DB::getPk($condition_table);
+
+		$_upd_objectids = $db_objects !== null ? [] : null;
+
+		self::updateFilterConditions($objects, $db_objects, $_upd_objectids, $base_table, $condition_table);
+
+		$upd_objects = [];
+
+		foreach ($objects as $i => &$object) {
+			if (!array_key_exists('filter', $object)) {
+				continue;
+			}
+
+			$upd_object = [];
+			$changed = false;
+
+			if ($db_objects === null
+					|| $object['filter']['evaltype'] != $db_objects[$object[$base_pk]]['filter']['evaltype']) {
+				$upd_object['evaltype'] = $object['filter']['evaltype'];
+			}
+
+			if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$upd_object['formula'] = CConditionHelper::replaceLetterIds($object['filter']['formula'],
+					array_column($object['filter']['conditions'], $condition_pk, 'formulaid')
+				);
+			}
+			elseif ($db_objects !== null
+					&& $db_objects[$object[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$upd_object['formula'] = DB::getDefault($base_table, 'formula');
+				$object['formula'] = DB::getDefault($base_table, 'formula');
+			}
+
+			if ($upd_object) {
+				$upd_objects[] = [
+					'values' => $upd_object,
+					'where' => [$base_pk => $object[$base_pk]]
+				];
+				$changed = true;
+			}
+
+			if ($db_objects !== null) {
+				if ($changed || array_key_exists($i, $_upd_objectids)) {
+					$upd_objectids[$i] = $object[$base_pk];
+				}
+				else {
+					unset($object['filter']);
+				}
+			}
+		}
+		unset($object);
+
+		if ($upd_objects) {
+			DB::update($base_table, $upd_objects);
+		}
+	}
+
+	/**
+	 * @param array      $objects
+	 * @param array|null $db_objects
+	 * @param array|null $upd_objectids
+	 * @param string     $base_table
+	 * @param string     $condition_table
+	 */
+	private static function updateFilterConditions(array &$objects, array $db_objects = null,
+			array &$upd_objectids = null, string $base_table, string $condition_table): void {
+		$base_pk = DB::getPk($base_table);
+		$condition_pk = DB::getPk($condition_table);
+
+		$ins_conditions = [];
+		$del_conditionids = [];
+
+		foreach ($objects as $i => &$object) {
+			if (!array_key_exists('filter', $object) || !array_key_exists('conditions', $object['filter'])) {
+				continue;
+			}
+
+			if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$condition_indexes = [];
+
+				foreach ($object['filter']['conditions'] as $j => $condition) {
+					$condition_indexes[$condition['formulaid']] = $j;
+				}
+
+				$formula = CConditionHelper::replaceLetterIds($object['filter']['formula'], $condition_indexes);
+				$formulaids = CConditionHelper::getFormulaIds($formula);
+
+				$object['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
+			}
+
+			$changed = false;
+			$db_conditions = $db_objects !== null ? $db_objects[$object[$base_pk]]['filter']['conditions'] : [];
+
+			foreach ($object['filter']['conditions'] as $j => &$condition) {
+				if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$condition['formulaid'] = $formulaids[$j];
+				}
+				elseif ($db_objects[$object[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$condition['formulaid'] = '';
+				}
+
+				$db_conditionid = self::getConditionId($condition_table, $condition, $db_conditions);
+
+				if ($db_conditionid !== null) {
+					$condition[$condition_pk] = $db_conditionid;
+
+					if (array_key_exists('formulaid', $condition)
+							&& $condition['formulaid'] != $db_conditions[$db_conditionid]['formulaid']) {
+						$changed = true;
+					}
+
+					unset($db_conditions[$db_conditionid]);
+
+				} else {
+					$ins_conditions[] = [$base_pk => $object[$base_pk]] + $condition;
+					$changed = true;
+				}
+			}
+			unset($condition);
+
+			if ($db_conditions) {
+				$del_conditionids =
+					array_merge($del_conditionids, array_column($db_conditions, $condition_pk));
+				$changed = true;
+			}
+
+			if ($db_objects !== null) {
+				if ($changed) {
+					$upd_objectids[$i] = $object[$base_pk];
+				}
+				elseif ($object['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					unset($object['filter']['conditions']);
+				}
+			}
+		}
+		unset($object);
+
+		if ($del_conditionids) {
+			DB::delete($condition_table, [$condition_pk => $del_conditionids]);
+		}
+
+		if ($ins_conditions) {
+			$conditionids = DB::insert($condition_table, $ins_conditions);
+		}
+
+		foreach ($objects as &$object) {
+			if (!array_key_exists('filter', $object) || !array_key_exists('conditions', $object['filter'])) {
+				continue;
+			}
+
+			foreach ($object['filter']['conditions'] as &$condition) {
+				if (!array_key_exists($condition_pk, $condition)) {
+					$condition[$condition_pk] = array_shift($conditionids);
+				}
+			}
+			unset($condition);
+		}
+		unset($object);
+	}
+
+	/**
+	 * @param string $condition_table
+	 * @param array  $condition
+	 * @param array  $db_conditions
+	 *
+	 * @return array|null
+	 */
+	private static function getConditionId(string $condition_table, array $condition, array $db_conditions): ?string {
+		$condition += ['operator' => DB::getDefault($condition_table, 'operator')];
+
+		$condition_pk = DB::getPk($condition_table);
+
+		foreach ($db_conditions as $db_condition) {
+			if (!DB::getUpdatedValues($condition_table, $condition, $db_condition)) {
+				return $db_condition[$condition_pk];
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
+	 */
+	private static function updateOverrides(array &$items, array $db_items = null, array &$upd_itemids = null): void {
+		$ins_overrides = [];
+		$upd_overrides = [];
+		$del_overrideids = [];
+
+		$_upd_itemids = $db_items !== null ? [] : null;
+
+		foreach ($items as $i => &$item) {
+			if (!array_key_exists('overrides', $item)) {
+				continue;
+			}
+
+			$changed = false;
+			$db_overrides = $db_items !== null
+				? array_column($db_items[$item['itemid']]['overrides'], null, 'step')
+				: [];
+
+			foreach ($item['overrides'] as &$override) {
+				if (array_key_exists($override['step'], $db_overrides)) {
+					$db_override = $db_overrides[$override['step']];
+					$override['lld_overrideid'] = $db_override['lld_overrideid'];
+					unset($db_overrides[$override['step']]);
+
+					$upd_override = DB::getUpdatedValues('lld_override', $override, $db_override);
+
+					if ($upd_override) {
+						$upd_overrides[] = [
+							'values' => $upd_override,
+							'where' => ['lld_overrideid' => $db_override['lld_overrideid']]
+						];
+						$changed = true;
+					}
+
+					$override += [
+						'filter' => [
+							'evaltype' => DB::getDefault('lld_override', 'evaltype'),
+							'formula' => DB::getDefault('lld_override', 'formula'),
+							'conditions' => []
+						],
+						'operations' => []
+					];
+				}
+				else {
+					$ins_overrides[] = ['itemid' => $item['itemid']] + $override;
+					$changed = true;
+				}
+			}
+			unset($override);
+
+			if ($db_overrides) {
+				$del_overrideids = array_merge($del_overrideids, array_column($db_overrides, 'lld_overrideid'));
+				$changed = true;
+			}
+
+			if ($db_items !== null && $changed) {
+				$_upd_itemids[$i] = $item['itemid'];
+			}
+		}
+		unset($item);
+
+		if ($del_overrideids) {
+			self::deleteOverrides($del_overrideids);
+		}
+
+		if ($upd_overrides) {
+			DB::update('lld_override', $upd_overrides);
+		}
+
+		if ($ins_overrides) {
+			$overrideids = DB::insert('lld_override', $ins_overrides);
+		}
+
+		$overrides = [];
+		$db_overrides = null;
+		$upd_overrideids = null;
+
+		if ($db_items !== null) {
+			$db_overrides = [];
+			$upd_overrideids = [];
+			$item_indexes = [];
+		}
+
+		foreach ($items as $i => &$item) {
+			if (!array_key_exists('overrides', $item)) {
+				continue;
+			}
+
+			foreach ($item['overrides'] as &$override) {
+				if (!array_key_exists('lld_overrideid', $override)) {
+					$override['lld_overrideid'] = array_shift($overrideids);
+
+					if ($db_items !== null) {
+						$db_overrides[$override['lld_overrideid']] = [
+							'lld_overrideid' => $override['lld_overrideid']
+						];
+
+						if (array_key_exists('filter', $override)) {
+							$db_overrides[$override['lld_overrideid']]['filter'] = [
+								'evaltype' => DB::getDefault('lld_override', 'evaltype'),
+								'formula' => DB::getDefault('lld_override', 'formula'),
+								'conditions' => []
+							];
+						}
+
+						if (array_key_exists('operations', $override)) {
+							$db_overrides[$override['lld_overrideid']]['operations'] = [];
+						}
+					}
+				}
+				else {
+					$db_overrides[$override['lld_overrideid']] =
+						$db_items[$item['itemid']]['overrides'][$override['lld_overrideid']];
+				}
+
+				$overrides[] = &$override;
+
+				if ($db_items !== null) {
+					$item_indexes[] = $i;
+				}
+			}
+			unset($override);
+		}
+		unset($item);
+
+		if (!$overrides) {
+			return;
+		}
+
+		self::updateOverrideFilters($overrides, $db_overrides, $upd_overrideids);
+		self::updateOverrideOperations($overrides, $db_overrides, $upd_overrideids);
+
+		if ($db_items !== null) {
+			foreach (array_unique(array_intersect_key($item_indexes, $upd_overrideids)) as $i) {
+				$_upd_itemids[$i] = $items[$i]['itemid'];
+			}
+
+			foreach ($items as $i => &$item) {
+				if (!array_key_exists($i, $_upd_itemids)) {
+					unset($item['overrides']);
+				}
+			}
+			unset($item);
+
+			$upd_itemids += $_upd_itemids;
+		}
+	}
+
+	/**
+	 * @param array $del_overrideids
+	 */
+	private static function deleteOverrides(array $del_overrideids): void {
+		DB::delete('lld_override_condition', ['lld_overrideid' => $del_overrideids]);
+
+		$options = [
+			'output' => ['lld_override_operationid'],
+			'filter' => ['lld_overrideid' => $del_overrideids]
+		];
+		$del_operationids =
+			DBfetchColumn(DBselect(DB::makeSql('lld_override_operation', $options)), 'lld_override_operationid');
+
+		self::deleteOverrideOperations($del_operationids);
+
+		DB::delete('lld_override', ['lld_overrideid' => $del_overrideids]);
+	}
+
+	/**
+	 * @param array      $overrides
+	 * @param array|null $db_overrides
+	 * @param array|null $upd_overrideids
+	 */
+	private static function updateOverrideFilters(array &$overrides, ?array $db_overrides,
+			?array &$upd_overrideids): void {
+		self::updateFilters($overrides, $db_overrides, $upd_overrideids, 'lld_override', 'lld_override_condition');
+	}
+
+	/**
+	 * @param array      $overrides
+	 * @param array|null $db_overrides
+	 * @param array|null $upd_overrideids
+	 */
+	private static function updateOverrideOperations(array &$overrides, ?array $db_overrides,
+			?array &$upd_overrideids): void {
+		$ins_operations = [];
+		$del_operationids = [];
+
+		$_upd_overrideids = $db_overrides !== null ? [] : null;
+
+		foreach ($overrides as $i => &$override) {
+			if (!array_key_exists('operations', $override)) {
+				continue;
+			}
+
+			$changed = false;
+			$db_operations = $db_overrides !== null ? $db_overrides[$override['lld_overrideid']]['operations'] : [];
+
+			foreach ($override['operations'] as &$operation) {
+				self::setOperationId($operation, $db_operations);
+
+				if (array_key_exists('lld_override_operationid', $operation)) {
+					unset($db_operations[$operation['lld_override_operationid']]);
+				}
+				else {
+					$ins_operations[] = ['lld_overrideid' => $override['lld_overrideid']] + $operation;
+					$changed = true;
+				}
+			}
+			unset($operation);
+
+			if ($db_operations) {
+				$del_operationids = array_merge($del_operationids, array_keys($db_operations));
+				$changed = true;
+			}
+
+			if ($db_overrides !== null && $changed) {
+				$_upd_overrideids[$i] = $override['lld_overrideid'];
+			}
+		}
+		unset($override);
+
+		if ($del_operationids) {
+			self::deleteOverrideOperations($del_operationids);
+		}
+
+		if ($ins_operations) {
+			$operationids = DB::insert('lld_override_operation', $ins_operations);
+		}
+
+		$operations = [];
+		$upd_operationids = null;
+
+		if ($db_overrides !== null) {
+			$upd_operationids = [];
+			$override_indexes = [];
+		}
+
+		foreach ($overrides as $i => &$override) {
+			if (!array_key_exists('operations', $override)) {
+				continue;
+			}
+
+			foreach ($override['operations'] as &$operation) {
+				if (!array_key_exists('lld_override_operationid', $operation)) {
+					$operation['lld_override_operationid'] = array_shift($operationids);
+
+					$operations[] = &$operation;
+
+					if ($db_overrides !== null) {
+						$override_indexes[] = $i;
+					}
+				}
+			}
+			unset($operation);
+		}
+		unset($override);
+
+		if (!$operations) {
+			return;
+		}
+
+		self::createOverrideOperationFields($operations, $upd_operationids);
+
+		if ($db_overrides !== null) {
+			foreach (array_unique(array_intersect_key($override_indexes, $upd_operationids)) as $i) {
+				$_upd_overrideids[$i] = $overrides[$i]['lld_overrideid'];
+			}
+
+			foreach ($overrides as $i => &$override) {
+				if (!array_key_exists($i, $_upd_overrideids)) {
+					unset($override['operations']);
+				}
+			}
+			unset($override);
+
+			$upd_overrideids += $_upd_overrideids;
+		}
+	}
+
+	/**
+	 * Set the ID of override operation if all fields of the given operation are equal to all fields of one of existing
+	 * override operations.
+	 *
+	 * @param array $operation
+	 * @param array $db_operations
+	 */
+	private static function setOperationId(array &$operation, array $db_operations): void {
+		$_operation = $operation
+			+ array_intersect_key(DB::getDefaults('lld_override_operation'), array_flip(['operator', 'value']))
+			+ array_fill_keys(self::OPERATION_FIELDS, []);
+
+		foreach ($db_operations as $db_operation) {
+			if (self::operationMatches($_operation, $db_operation)) {
+				$operation = $_operation;
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Check whether the existing override operation in database matches the given override operation.
+	 *
+	 * @param array $operation
+	 * @param array $db_operation
+	 *
+	 * @return bool
+	 */
+	private static function operationMatches(array &$operation, array $db_operation): bool {
+		if (DB::getUpdatedValues('lld_override_operation', $operation, $db_operation)) {
+			return false;
+		}
+
+		foreach (self::OPERATION_FIELDS as $optable => $opfield) {
+			$pk = DB::getPk($optable);
+
+			if ($operation[$opfield]) {
+				if (in_array($opfield, ['optag', 'optemplate'])) {
+					if (!$db_operation[$opfield]) {
+						return false;
+					}
+
+					foreach ($operation[$opfield] as &$op) {
+						foreach ($db_operation[$opfield] as $i => $db_op) {
+							if (DB::getUpdatedValues($optable, $op, $db_op)) {
+								continue;
+							}
+
+							unset($db_operation[$opfield][$i]);
+							$op[$pk] = $db_op[$pk];
+							continue 2;
+						}
+
+						return false;
+					}
+					unset($op);
+
+					if ($db_operation[$opfield]) {
+						return false;
+					}
+				}
+				elseif (DB::getUpdatedValues($optable, $operation[$opfield], $db_operation[$opfield])) {
+					return false;
+				}
+			}
+			elseif ($db_operation[$opfield]) {
+				return false;
+			}
+		}
+
+		$operation['lld_override_operationid'] = $db_operation['lld_override_operationid'];
+
+		return true;
+	}
+
+	/**
+	 * @param array $del_operationids
+	 */
+	private static function deleteOverrideOperations(array $del_operationids): void {
+		foreach (self::OPERATION_FIELDS as $optable => $foo) {
+			DB::delete($optable, ['lld_override_operationid' => $del_operationids]);
+		}
+
+		DB::delete('lld_override_operation', ['lld_override_operationid' => $del_operationids]);
+	}
+
+	/**
+	 * @param array      $operations
+	 * @param array|null $upd_operationids
+	 */
+	private static function createOverrideOperationFields(array &$operations, ?array &$upd_operationids): void {
+		foreach (self::OPERATION_FIELDS as $optable => $opfield) {
+			$pk = DB::getPk($optable);
+
+			if (in_array($opfield, ['optag', 'optemplate'])) {
+				$ins_opfields = [];
+
+				foreach ($operations as $i => $operation) {
+					if (!array_key_exists($opfield, $operation) || !$operation[$opfield]) {
+						continue;
+					}
+
+					foreach ($operation[$opfield] as $_opfield) {
+						$ins_opfields[] =
+							['lld_override_operationid' => $operation['lld_override_operationid']] + $_opfield;
+					}
+
+					if ($upd_operationids !== null) {
+						$upd_operationids[$i] = $operation['lld_override_operationid'];
+					}
+				}
+
+				if ($ins_opfields) {
+					$opfieldids = DB::insert($optable, $ins_opfields);
+				}
+
+				foreach ($operations as &$operation) {
+					if (!array_key_exists($opfield, $operation)) {
+						continue;
+					}
+
+					foreach ($operation[$opfield] as &$_opfield) {
+						$_opfield[$pk] = array_shift($opfieldids);
+					}
+					unset($_opfield);
+				}
+				unset($operation);
+			}
+			else {
+				$ins_opfields = [];
+
+				foreach ($operations as $i => &$operation) {
+					if (!array_key_exists($opfield, $operation) || !$operation[$opfield]) {
+						continue;
+					}
+
+					$ins_opfields[] = [$pk => $operation['lld_override_operationid']] + $operation[$opfield];
+
+					if ($upd_operationids !== null) {
+						$upd_operationids[$i] = $operation['lld_override_operationid'];
+					}
+				}
+				unset($operation);
+
+				if ($ins_opfields) {
+					DB::insert($optable, $ins_opfields, false);
+				}
+			}
+		}
+	}
+
+	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
+			bool $is_dep_items = false): void {
+
 	}
 
 	/**
@@ -669,48 +2070,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 	 *
 	 * @return array Array of discovery rule IDs.
 	 */
-	public function syncTemplates(array $templateids, array $hostids): array {
-		$output = [];
-		foreach ($this->fieldRules as $field_name => $rules) {
-			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
-				$output[] = $field_name;
-			}
-		}
+	public function syncTemplates(array $templateids, array $hostids): void {
 
-		$tpl_items = $this->get([
-			'output' => $output,
-			'selectFilter' => ['formula', 'evaltype', 'conditions'],
-			'selectLLDMacroPaths' => ['lld_macro', 'path'],
-			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
-			'hostids' => $templateids,
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		foreach ($tpl_items as &$item) {
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if (array_key_exists('query_fields', $item) && is_array($item['query_fields'])) {
-					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
-				}
-
-				if (array_key_exists('headers', $item) && is_array($item['headers'])) {
-					$item['headers'] = $this->headersArrayToString($item['headers']);
-				}
-			}
-			else {
-				$item['query_fields'] = '';
-				$item['headers'] = '';
-			}
-
-			// Option 'Convert to JSON' is not supported for discovery rule.
-			unset($item['output_format']);
-		}
-		unset($item);
-
-		$this->inherit($tpl_items, $hostids);
-
-		return array_keys($tpl_items);
 	}
 
 	/**
@@ -1011,1156 +2372,66 @@ class CDiscoveryRule extends CItemGeneralOld {
 		return $result;
 	}
 
-	protected function createReal(array &$items) {
-		$items_rtdata = [];
-		$create_items = [];
-
-		// create items without formulas, they will be updated when items and conditions are saved
-		foreach ($items as $key => $item) {
-			if (array_key_exists('filter', $item)) {
-				$item['evaltype'] = $item['filter']['evaltype'];
-				unset($item['filter']);
-			}
-
-			if (array_key_exists('rtdata', $item)) {
-				$items_rtdata[$key] = [];
-				unset($item['rtdata']);
-			}
-
-			$create_items[] = $item;
-		}
-		$create_items = DB::save('items', $create_items);
-
-		foreach ($items_rtdata as $key => &$value) {
-			$value['itemid'] = $create_items[$key]['itemid'];
-		}
-		unset($value);
-
-		DB::insert('item_rtdata', $items_rtdata, false);
-
-		$conditions = [];
-		$itemids = [];
-
-		foreach ($items as $key => &$item) {
-			$item['itemid'] = $create_items[$key]['itemid'];
-			$itemids[$key] = $item['itemid'];
-
-			// conditions
-			if (isset($item['filter'])) {
-				foreach ($item['filter']['conditions'] as $condition) {
-					$condition['itemid'] = $item['itemid'];
-
-					$conditions[] = $condition;
-				}
-			}
-		}
-		unset($item);
-
-		$conditions = DB::save('item_condition', $conditions);
-
-		$item_conditions = [];
-
-		foreach ($conditions as $condition) {
-			$item_conditions[$condition['itemid']][] = $condition;
-		}
-
-		$lld_macro_paths = [];
-
-		foreach ($items as $item) {
-			// update formulas
-			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$this->updateFormula($item['itemid'], $item['filter']['formula'], $item_conditions[$item['itemid']]);
-			}
-
-			// $item['lld_macro_paths'] expects to be filled with validated fields 'lld_macro' and 'path' and values.
-			if (array_key_exists('lld_macro_paths', $item)) {
-				foreach ($item['lld_macro_paths'] as $lld_macro_path) {
-					$lld_macro_paths[] = $lld_macro_path + ['itemid' => $item['itemid']];
-				}
-			}
-		}
-
-		DB::insertBatch('lld_macro_path', $lld_macro_paths);
-
-		$this->createItemParameters($items, $itemids);
-		$this->createItemPreprocessing($items);
-		$this->createOverrides($items);
-	}
-
 	/**
-	 * Creates overrides for low-level discovery rules.
+	 * Returns the interface that best matches the given item.
 	 *
-	 * @param array $items  Low-level discovery rules.
+	 * @param array $item_type  An item type
+	 * @param array $interfaces An array of interfaces to choose from
+	 *
+	 * @return array|boolean    The best matching interface;
+	 *							an empty array of no matching interface was found;
+	 *							false, if the item does not need an interface
 	 */
-	protected function createOverrides(array $items) {
-		$overrides = [];
+	public static function findInterfaceForItem($item_type, array $interfaces) {
+		$type = itemTypeInterface($item_type);
 
-		foreach ($items as $item) {
-			if (array_key_exists('overrides', $item)) {
-				foreach ($item['overrides'] as $override) {
-					// Formula will be added after conditions.
-					$new_override = [
-						'itemid' => $item['itemid'],
-						'name' => $override['name'],
-						'step' => $override['step'],
-						'stop' => array_key_exists('stop', $override) ? $override['stop'] : ZBX_LLD_OVERRIDE_STOP_NO
-					];
-
-					$new_override['evaltype'] = array_key_exists('filter', $override)
-						? $override['filter']['evaltype']
-						: DB::getDefault('lld_override', 'evaltype');
-
-					$overrides[] = $new_override;
-				}
-			}
+		if ($type == INTERFACE_TYPE_OPT) {
+			return false;
 		}
+		elseif ($type == INTERFACE_TYPE_ANY) {
+			return self::findInterfaceByPriority($interfaces);
+		}
+		// the item uses a specific type of interface
+		elseif ($type !== false) {
+			$interface_by_type = [];
 
-		$overrideids = DB::insertBatch('lld_override', $overrides);
-
-		if ($overrideids) {
-			$ovrd_conditions = [];
-			$ovrd_idx = 0;
-			$cnd_idx = 0;
-
-			foreach ($items as &$item) {
-				if (array_key_exists('overrides', $item)) {
-					foreach ($item['overrides'] as &$override) {
-						$override['lld_overrideid'] = $overrideids[$ovrd_idx++];
-
-						if (array_key_exists('filter', $override)) {
-							foreach ($override['filter']['conditions'] as $condition) {
-								$ovrd_conditions[] = [
-									'macro' => $condition['macro'],
-									'value' => $condition['value'],
-									'formulaid' => array_key_exists('formulaid', $condition)
-										? $condition['formulaid']
-										: '',
-									'operator' => array_key_exists('operator', $condition)
-										? $condition['operator']
-										: DB::getDefault('lld_override_condition', 'operator'),
-									'lld_overrideid' => $override['lld_overrideid']
-								];
-							}
-						}
-					}
-					unset($override);
-				}
-			}
-			unset($item);
-
-			$conditionids = DB::insertBatch('lld_override_condition', $ovrd_conditions);
-
-			$ids = [];
-
-			if ($conditionids) {
-				foreach ($items as &$item) {
-					if (array_key_exists('overrides', $item)) {
-						foreach ($item['overrides'] as &$override) {
-							if (array_key_exists('filter', $override)) {
-								foreach ($override['filter']['conditions'] as &$condition) {
-									$condition['lld_override_conditionid'] = $conditionids[$cnd_idx++];
-								}
-								unset($condition);
-							}
-						}
-						unset($override);
-					}
-				}
-				unset($item);
-
-				foreach ($items as $item) {
-					if (array_key_exists('overrides', $item)) {
-						foreach ($item['overrides'] as $override) {
-							if (array_key_exists('filter', $override)
-									&& $override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-								$ids = [];
-								foreach ($override['filter']['conditions'] as $condition) {
-									$ids[$condition['formulaid']] = $condition['lld_override_conditionid'];
-								}
-
-								$formula = CConditionHelper::replaceLetterIds($override['filter']['formula'], $ids);
-								DB::updateByPk('lld_override', $override['lld_overrideid'], ['formula' => $formula]);
-							}
-						}
-					}
+			foreach ($interfaces as $interface) {
+				if ($interface['main'] == INTERFACE_PRIMARY) {
+					$interface_by_type[$interface['type']] = $interface;
 				}
 			}
 
-			$operations = [];
-			foreach ($items as $item) {
-				if (array_key_exists('overrides', $item)) {
-					foreach ($item['overrides'] as $override) {
-						if (array_key_exists('operations', $override)) {
-							foreach ($override['operations'] as $operation) {
-								$operations[] = [
-									'lld_overrideid' => $override['lld_overrideid'],
-									'operationobject' => $operation['operationobject'],
-									'operator' => array_key_exists('operator', $operation)
-										? $operation['operator']
-										: DB::getDefault('lld_override_operation', 'operator'),
-									'value' => array_key_exists('value', $operation) ? $operation['value'] : ''
-								];
-							}
-						}
-					}
-				}
-			}
-
-			$operationids = DB::insertBatch('lld_override_operation', $operations);
-
-			$opr_idx = 0;
-			$opstatus = [];
-			$opdiscover = [];
-			$opperiod = [];
-			$ophistory = [];
-			$optrends = [];
-			$opseverity = [];
-			$optag = [];
-			$optemplate = [];
-			$opinventory = [];
-
-			foreach ($items as $item) {
-				if (array_key_exists('overrides', $item)) {
-					foreach ($item['overrides'] as $override) {
-						if (array_key_exists('operations', $override)) {
-							foreach ($override['operations'] as $operation) {
-								$operation['lld_override_operationid'] = $operationids[$opr_idx++];
-
-								// Discover status applies to all operation object types.
-								if (array_key_exists('opdiscover', $operation)) {
-									$opdiscover[] = [
-										'lld_override_operationid' => $operation['lld_override_operationid'],
-										'discover' => $operation['opdiscover']['discover']
-									];
-								}
-
-								switch ($operation['operationobject']) {
-									case OPERATION_OBJECT_ITEM_PROTOTYPE:
-										if (array_key_exists('opstatus', $operation)) {
-											$opstatus[] = [
-												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'status' => $operation['opstatus']['status']
-											];
-										}
-
-										if (array_key_exists('opperiod', $operation)) {
-											$opperiod[] = [
-												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'delay' => $operation['opperiod']['delay']
-											];
-										}
-
-										if (array_key_exists('ophistory', $operation)) {
-											$ophistory[] = [
-												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'history' => $operation['ophistory']['history']
-											];
-										}
-
-										if (array_key_exists('optrends', $operation)) {
-											$optrends[] = [
-												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'trends' => $operation['optrends']['trends']
-											];
-										}
-
-										if (array_key_exists('optag', $operation)) {
-											foreach ($operation['optag'] as $tag) {
-												$optag[] = [
-													'lld_override_operationid' =>
-														$operation['lld_override_operationid'],
-													'tag' => $tag['tag'],
-													'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
-												];
-											}
-										}
-										break;
-
-									case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-										if (array_key_exists('opstatus', $operation)) {
-											$opstatus[] = [
-												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'status' => $operation['opstatus']['status']
-											];
-										}
-
-										if (array_key_exists('opseverity', $operation)) {
-											$opseverity[] = [
-												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'severity' => $operation['opseverity']['severity']
-											];
-										}
-
-										if (array_key_exists('optag', $operation)) {
-											foreach ($operation['optag'] as $tag) {
-												$optag[] = [
-													'lld_override_operationid' =>
-														$operation['lld_override_operationid'],
-													'tag' => $tag['tag'],
-													'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
-												];
-											}
-										}
-										break;
-
-									case OPERATION_OBJECT_HOST_PROTOTYPE:
-										if (array_key_exists('opstatus', $operation)) {
-											$opstatus[] = [
-												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'status' => $operation['opstatus']['status']
-											];
-										}
-
-										if (array_key_exists('optemplate', $operation)) {
-											foreach ($operation['optemplate'] as $template) {
-												$optemplate[] = [
-													'lld_override_operationid' =>
-														$operation['lld_override_operationid'],
-													'templateid' => $template['templateid']
-												];
-											}
-										}
-
-										if (array_key_exists('optag', $operation)) {
-											foreach ($operation['optag'] as $tag) {
-												$optag[] = [
-													'lld_override_operationid' =>
-														$operation['lld_override_operationid'],
-													'tag' => $tag['tag'],
-													'value'	=> array_key_exists('value', $tag) ? $tag['value'] : ''
-												];
-											}
-										}
-
-										if (array_key_exists('opinventory', $operation)) {
-											$opinventory[] = [
-												'lld_override_operationid' => $operation['lld_override_operationid'],
-												'inventory_mode' => $operation['opinventory']['inventory_mode']
-											];
-										}
-										break;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			DB::insertBatch('lld_override_opstatus', $opstatus, false);
-			DB::insertBatch('lld_override_opdiscover', $opdiscover, false);
-			DB::insertBatch('lld_override_opperiod', $opperiod, false);
-			DB::insertBatch('lld_override_ophistory', $ophistory, false);
-			DB::insertBatch('lld_override_optrends', $optrends, false);
-			DB::insertBatch('lld_override_opseverity', $opseverity, false);
-			DB::insertBatch('lld_override_optag', $optag);
-			DB::insertBatch('lld_override_optemplate', $optemplate);
-			DB::insertBatch('lld_override_opinventory', $opinventory, false);
+			return array_key_exists($type, $interface_by_type) ? $interface_by_type[$type] : [];
 		}
-	}
-
-	protected function updateReal(array $items) {
-		CArrayHelper::sort($items, ['itemid']);
-
-		$ruleIds = zbx_objectValues($items, 'itemid');
-
-		$data = [];
-		foreach ($items as $item) {
-			$values = $item;
-
-			if (isset($item['filter'])) {
-				// clear the formula for non-custom expression rules
-				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					$values['formula'] = '';
-				}
-
-				$values['evaltype'] = $item['filter']['evaltype'];
-				unset($values['filter']);
-			}
-
-			$data[] = ['values' => $values, 'where' => ['itemid' => $item['itemid']]];
-		}
-		DB::update('items', $data);
-
-		$newRuleConditions = null;
-		foreach ($items as $item) {
-			// conditions
-			if (isset($item['filter'])) {
-				if ($newRuleConditions === null) {
-					$newRuleConditions = [];
-				}
-
-				$newRuleConditions[$item['itemid']] = [];
-				foreach ($item['filter']['conditions'] as $condition) {
-					$condition['itemid'] = $item['itemid'];
-
-					$newRuleConditions[$item['itemid']][] = $condition;
-				}
-			}
-		}
-
-		// replace conditions
-		$ruleConditions = [];
-		if ($newRuleConditions !== null) {
-			// fetch existing conditions
-			$exConditions = DBfetchArray(DBselect(
-				'SELECT item_conditionid,itemid,macro,value,operator'.
-				' FROM item_condition'.
-				' WHERE '.dbConditionInt('itemid', $ruleIds).
-				' ORDER BY item_conditionid'
-			));
-			$exRuleConditions = [];
-			foreach ($exConditions as $condition) {
-				$exRuleConditions[$condition['itemid']][] = $condition;
-			}
-
-			// replace and add the new IDs
-			$conditions = DB::replaceByPosition('item_condition', $exRuleConditions, $newRuleConditions);
-			foreach ($conditions as $condition) {
-				$ruleConditions[$condition['itemid']][] = $condition;
-			}
-		}
-
-		$itemids = [];
-		$lld_macro_paths = [];
-		$db_lld_macro_paths = [];
-
-		foreach ($items as $item) {
-			// update formulas
-			if (isset($item['filter']) && $item['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$this->updateFormula($item['itemid'], $item['filter']['formula'], $ruleConditions[$item['itemid']]);
-			}
-
-			// "lld_macro_paths" could be empty or filled with fields "lld_macro", "path" or "lld_macro_pathid".
-			if (array_key_exists('lld_macro_paths', $item)) {
-				$itemids[$item['itemid']] = true;
-
-				if ($item['lld_macro_paths']) {
-					foreach ($item['lld_macro_paths'] as $lld_macro_path) {
-						$lld_macro_paths[] = $lld_macro_path + ['itemid' => $item['itemid']];
-					}
-				}
-			}
-		}
-
-		// Gather all existing LLD macros from given discovery rules.
-		if ($itemids) {
-			$db_lld_macro_paths = DB::select('lld_macro_path', [
-				'output' => ['lld_macro_pathid', 'itemid', 'lld_macro', 'path'],
-				'filter' => ['itemid' => array_keys($itemids)]
-			]);
-		}
-
-		/*
-		 * DB::replaceByPosition() does not allow to change records one by one due to unique indexes on two table
-		 * columns. Problems arise when given records are the same as records in DB and they are sorted differently.
-		 * That's why checking differences between old and new records is done manually.
-		 */
-
-		$lld_macro_paths_to_update = [];
-
-		foreach ($lld_macro_paths as $idx1 => $lld_macro_path) {
-			foreach ($db_lld_macro_paths as $idx2 => $db_lld_macro_path) {
-				if (array_key_exists('lld_macro_pathid', $lld_macro_path)) {
-					// Update records by primary key.
-
-					// Find matching "lld_macro_pathid" and update fields accordingly.
-					if (bccomp($lld_macro_path['lld_macro_pathid'], $db_lld_macro_path['lld_macro_pathid']) == 0) {
-						$fields_to_update = [];
-
-						if (array_key_exists('lld_macro', $lld_macro_path)
-								&& $lld_macro_path['lld_macro'] === $db_lld_macro_path['lld_macro']) {
-							// If same "lld_macro" is found in DB, update only "path" if necessary.
-
-							if (array_key_exists('path', $lld_macro_path)
-									&& $lld_macro_path['path'] !== $db_lld_macro_path['path']) {
-								$fields_to_update['path'] = $lld_macro_path['path'];
-							}
-						}
-						else {
-							/*
-							 * Update all other fields that correspond to given "lld_macro_pathid". Except for primary
-							 * key "lld_macro_pathid" and "itemid".
-							 */
-
-							foreach ($lld_macro_path as $field => $value) {
-								if ($field !== 'itemid' && $field !== 'lld_macro_pathid') {
-									$fields_to_update[$field] = $value;
-								}
-							}
-						}
-
-						/*
-						 * If there are any changes made, update fields in DB. Otherwise skip updating and result in
-						 * success anyway.
-						 */
-						if ($fields_to_update) {
-							$lld_macro_paths_to_update[] = $fields_to_update
-								+ ['lld_macro_pathid' => $lld_macro_path['lld_macro_pathid']];
-						}
-
-						/*
-						 * Remove processed LLD macros from the list. Macros left in $db_lld_macro_paths will be removed
-						 * afterwards.
-						 */
-						unset($db_lld_macro_paths[$idx2]);
-						unset($lld_macro_paths[$idx1]);
-					}
-					// Incorrect "lld_macro_pathid" cannot be given due to validation done previously.
-				}
-				else {
-					// Add or update fields by given "lld_macro".
-
-					if (bccomp($lld_macro_path['itemid'], $db_lld_macro_path['itemid']) == 0) {
-						if ($lld_macro_path['lld_macro'] === $db_lld_macro_path['lld_macro']) {
-							// If same "lld_macro" is given, add primary key and update only "path", if necessary.
-
-							if ($lld_macro_path['path'] !== $db_lld_macro_path['path']) {
-								$lld_macro_paths_to_update[] = [
-									'lld_macro_pathid' => $db_lld_macro_path['lld_macro_pathid'],
-									'path' => $lld_macro_path['path']
-								];
-							}
-
-							/*
-							 * Remove processed LLD macros from the list. Macros left in $db_lld_macro_paths will
-							 * be removed afterwards. And macros left in $lld_macro_paths will be created.
-							 */
-							unset($db_lld_macro_paths[$idx2]);
-							unset($lld_macro_paths[$idx1]);
-						}
-					}
-				}
-			}
-		}
-
-		// After all data has been collected, proceed with record update in DB.
-		$lld_macro_pathids_to_delete = zbx_objectValues($db_lld_macro_paths, 'lld_macro_pathid');
-
-		if ($lld_macro_pathids_to_delete) {
-			DB::delete('lld_macro_path', ['lld_macro_pathid' => $lld_macro_pathids_to_delete]);
-		}
-
-		if ($lld_macro_paths_to_update) {
-			$data = [];
-
-			foreach ($lld_macro_paths_to_update as $lld_macro_path) {
-				$data[] = [
-					'values' => $lld_macro_path,
-					'where' => [
-						'lld_macro_pathid' => $lld_macro_path['lld_macro_pathid']
-					]
-				];
-			}
-
-			DB::update('lld_macro_path', $data);
-		}
-
-		DB::insertBatch('lld_macro_path', $lld_macro_paths);
-
-		$this->updateItemParameters($items);
-		$this->updateItemPreprocessing($items);
-
-		// Delete old overrides and replace with new ones if any.
-		$ovrd_itemids = [];
-		foreach ($items as $item) {
-			if (array_key_exists('overrides', $item)) {
-				$ovrd_itemids[$item['itemid']] = true;
-			}
-		}
-
-		if ($ovrd_itemids) {
-			DBexecute('DELETE FROM lld_override WHERE '.dbConditionId('itemid', array_keys($ovrd_itemids)));
-		}
-
-		$this->createOverrides($items);
-	}
-
-	/**
-	 * Converts a formula with letters to a formula with IDs and updates it.
-	 *
-	 * @param string 	$itemId
-	 * @param string 	$evalFormula		formula with letters
-	 * @param array 	$conditions
-	 */
-	protected function updateFormula($itemId, $evalFormula, array $conditions) {
-		$ids = [];
-		foreach ($conditions as $condition) {
-			$ids[$condition['formulaid']] = $condition['item_conditionid'];
-		}
-		$formula = CConditionHelper::replaceLetterIds($evalFormula, $ids);
-
-		DB::updateByPk('items', $itemId, [
-			'formula' => $formula
-		]);
-	}
-
-	/**
-	 * Check item data and set missing default values.
-	 *
-	 * @param array $items passed by reference
-	 * @param bool  $update
-	 * @param array $dbItems
-	 */
-	protected function checkInput(array &$items, $update = false, array $dbItems = []) {
-		// add the values that cannot be changed, but are required for further processing
-		foreach ($items as &$item) {
-			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
-
-			// unset fields that are updated using the 'filter' parameter
-			unset($item['evaltype']);
-			unset($item['formula']);
-		}
-		unset($item);
-
-		parent::checkInput($items, $update);
-
-		$validateItems = $items;
-		if ($update) {
-			$validateItems = $this->extendFromObjects(zbx_toHash($validateItems, 'itemid'), $dbItems, ['name']);
-		}
-
-		// filter validator
-		$filterValidator = new CSchemaValidator($this->getFilterSchema());
-
-		// condition validation
-		$conditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-		foreach ($validateItems as $item) {
-			// validate custom formula and conditions
-			if (isset($item['filter'])) {
-				$filterValidator->setObjectName($item['name']);
-				$this->checkValidator($item['filter'], $filterValidator);
-
-				foreach ($item['filter']['conditions'] as $condition) {
-					$conditionValidator->setObjectName($item['name']);
-					$this->checkValidator($condition, $conditionValidator);
-				}
-			}
-		}
-
-		$this->validateOverrides($validateItems);
-	}
-
-	/**
-	 * Validate low-level discovery rule overrides.
-	 *
-	 * @param array $items  Low-level discovery rules.
-	 *
-	 * @throws APIException
-	 */
-	protected function validateOverrides(array $items): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name'], ['step']], 'fields' => [
-			'step' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1:'.ZBX_MAX_INT32],
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override', 'name')],
-			'stop' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_OVERRIDE_STOP_NO, ZBX_LLD_OVERRIDE_STOP_YES]), 'default' => ZBX_LLD_OVERRIDE_STOP_NO],
-			'filter' =>			['type' => API_OBJECT, 'fields' => [
-				'evaltype' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
-				'formula' =>		['type' => API_STRING_UTF8],
-				'conditions' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-					'macro' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_condition', 'macro')],
-					'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('lld_override_condition', 'operator')],
-					'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('lld_override_condition', 'value')],
-					'formulaid' =>		['type' => API_STRING_UTF8]
-				]]
-			]],
-			'operations' =>	['type' => API_OBJECTS, 'fields' => [
-				'operationobject' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [OPERATION_OBJECT_ITEM_PROTOTYPE, OPERATION_OBJECT_TRIGGER_PROTOTYPE, OPERATION_OBJECT_GRAPH_PROTOTYPE, OPERATION_OBJECT_HOST_PROTOTYPE])],
-				'operator' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]), 'default' => DB::getDefault('lld_override_operation', 'operator')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_operation', 'value')],
-				'opstatus' =>			['type' => API_OBJECT, 'fields' => [
-					'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_STATUS_ENABLED, ZBX_PROTOTYPE_STATUS_DISABLED])]
-				]],
-				'opdiscover' =>			['type' => API_OBJECT, 'fields' => [
-					'discover' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER])]
-				]],
-				'opperiod' =>			['type' => API_OBJECT, 'fields' => [
-					'delay' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_opperiod', 'delay')]
-				]],
-				'ophistory' =>			['type' => API_OBJECT, 'fields' => [
-					'history' =>			['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_ophistory', 'history')]
-				]],
-				'optrends' =>			['type' => API_OBJECT, 'fields' => [
-					'trends' =>				['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('lld_override_optrends', 'trends')]
-				]],
-				'opseverity' =>			['type' => API_OBJECT, 'fields' => [
-					'severity' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))]
-				]],
-				'optag' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['tag', 'value']], 'fields' => [
-					'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_override_optag', 'tag')],
-					'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('lld_override_optag', 'value'), 'default' => DB::getDefault('lld_override_optag', 'value')]
-				]],
-				'optemplate' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
-					'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-				]],
-				'opinventory' =>		['type' => API_OBJECT, 'fields' => [
-					'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
-				]]
-			]]
-		]];
-
-		// Schema for filter is already validated in API validator. Create the formula validator for filter.
-		$condition_validator = new CConditionValidator([
-			'messageMissingFormula' => _('Formula missing for override "%1$s".'),
-			'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for override "%1$s": %3$s.'),
-			'messageMissingCondition' =>
-				_('Condition "%2$s" used in formula "%3$s" for override "%1$s" is not defined.'),
-			'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for override "%1$s".')
-		]);
-
-		$update_interval_parser = new CUpdateIntervalParser([
-			'usermacros' => true,
-			'lldmacros' => true
-		]);
-
-		$lld_idx = 0;
-		foreach ($items as $item) {
-			if (array_key_exists('overrides', $item)) {
-				$path = '/'.(++$lld_idx).'/overrides';
-
-				if (!CApiInputValidator::validate($api_input_rules, $item['overrides'], $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-
-				foreach ($item['overrides'] as $ovrd_idx => $override) {
-					if (array_key_exists('filter', $override)) {
-						$condition_validator->setObjectName($override['name']);
-
-						// Validate the formula and check if they are in the conditions.
-						if (!$condition_validator->validate($override['filter'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $condition_validator->getError());
-						}
-
-						// Validate that conditions have correct macros and 'formulaid' for custom expressions.
-						if (array_key_exists('conditions', $override['filter'])) {
-							foreach ($override['filter']['conditions'] as $cnd_idx => $condition) {
-								// API validator only checks if 'macro' field exists and is not empty. It must be macro.
-								if (!preg_match('/^'.ZBX_PREG_EXPRESSION_LLD_MACROS.'$/', $condition['macro'])) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Incorrect filter condition macro for override "%1$s".', $override['name'])
-									);
-								}
-
-								if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-									/*
-									 * Check only if 'formulaid' exists. It cannot be empty or incorrect, but that is
-									 * already validated by previously set conditionValidator.
-									 */
-									if (!array_key_exists('formulaid', $condition)) {
-										$cond_path = $path.'/'.($ovrd_idx + 1).'/filter/conditions/'.($cnd_idx + 1);
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Invalid parameter "%1$s": %2$s.', $path,
-												_s('the parameter "%1$s" is missing', 'formulaid')
-											)
-										);
-									}
-								}
-							}
-						}
-					}
-
-					// Check integrity of 'overrideobject' and its fields.
-					if (array_key_exists('operations', $override)) {
-						foreach ($override['operations'] as $opr_idx => $operation) {
-							$opr_path = $path.'/'.($ovrd_idx + 1).'/operations/'.($opr_idx + 1);
-
-							switch ($operation['operationobject']) {
-								case OPERATION_OBJECT_ITEM_PROTOTYPE:
-									foreach (['opseverity', 'optemplate', 'opinventory'] as $field) {
-										if (array_key_exists($field, $operation)) {
-											self::exception(ZBX_API_ERROR_PARAMETERS,
-												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
-													_s('unexpected parameter "%1$s"', $field)
-												)
-											);
-										}
-									}
-
-									if (!array_key_exists('opstatus', $operation)
-											&& !array_key_exists('opperiod', $operation)
-											&& !array_key_exists('ophistory', $operation)
-											&& !array_key_exists('optrends', $operation)
-											&& !array_key_exists('optag', $operation)
-											&& !array_key_exists('opdiscover', $operation)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-											$opr_path, _s('value must be one of %1$s',
-												'opstatus, opdiscover, opperiod, ophistory, optrends, optag'
-											)
-										));
-									}
-
-									if (array_key_exists('opperiod', $operation)
-											&& !validateDelay($update_interval_parser, 'delay',
-												$operation['opperiod']['delay'], $error)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-									}
-									break;
-
-								case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-									foreach (['opperiod', 'ophistory', 'optrends', 'optemplate', 'opinventory'] as
-											$field) {
-										if (array_key_exists($field, $operation)) {
-											self::exception(ZBX_API_ERROR_PARAMETERS,
-												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
-													_s('unexpected parameter "%1$s"', $field)
-												)
-											);
-										}
-									}
-
-									if (!array_key_exists('opstatus', $operation)
-											&& !array_key_exists('opseverity', $operation)
-											&& !array_key_exists('optag', $operation)
-											&& !array_key_exists('opdiscover', $operation)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-											$opr_path,
-											_s('value must be one of %1$s', 'opstatus, opdiscover, opseverity, optag')
-										));
-									}
-									break;
-
-								case OPERATION_OBJECT_GRAPH_PROTOTYPE:
-									foreach (['opstatus', 'opperiod', 'ophistory', 'optrends', 'opseverity', 'optag',
-											'optemplate', 'opinventory'] as $field) {
-										if (array_key_exists($field, $operation)) {
-											self::exception(ZBX_API_ERROR_PARAMETERS,
-												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
-													_s('unexpected parameter "%1$s"', $field)
-												)
-											);
-										}
-									}
-
-									if (!array_key_exists('opdiscover', $operation)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-											$opr_path,
-											_s('value must be one of %1$s', 'opdiscover')
-										));
-									}
-									break;
-
-								case OPERATION_OBJECT_HOST_PROTOTYPE:
-									foreach (['opperiod', 'ophistory', 'optrends', 'opseverity'] as $field) {
-										if (array_key_exists($field, $operation)) {
-											self::exception(ZBX_API_ERROR_PARAMETERS,
-												_s('Invalid parameter "%1$s": %2$s.', $opr_path,
-													_s('unexpected parameter "%1$s"', $field)
-												)
-											);
-										}
-									}
-
-									if (!array_key_exists('opstatus', $operation)
-											&& !array_key_exists('optemplate', $operation)
-											&& !array_key_exists('optag', $operation)
-											&& !array_key_exists('opinventory', $operation)
-											&& !array_key_exists('opdiscover', $operation)) {
-										self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-											$opr_path, _s('value must be one of %1$s',
-												'opstatus, opdiscover, optemplate, optag, opinventory'
-											)
-										));
-									}
-
-									if (array_key_exists('optemplate', $operation)) {
-										$templates_cnt = API::Template()->get([
-											'countOutput' => true,
-											'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
-										]);
-
-										if (count($operation['optemplate']) != $templates_cnt) {
-											self::exception(ZBX_API_ERROR_PERMISSIONS,
-												_('No permissions to referred object or it does not exist!')
-											);
-										}
-									}
-									break;
-							}
-						}
-					}
-				}
-			}
+		// the item does not need an interface
+		else {
+			return false;
 		}
 	}
 
 	/**
-	 * Returns the parameters for creating a discovery rule filter validator.
+	 * Return first main interface matched from list of preferred types, or NULL.
 	 *
-	 * @return array
+	 * @param array $interfaces  An array of interfaces to choose from.
+	 *
+	 * @return ?array
 	 */
-	protected function getFilterSchema() {
-		return [
-			'validators' => [
-				'evaltype' => new CLimitedSetValidator([
-					'values' => [
-						CONDITION_EVAL_TYPE_OR,
-						CONDITION_EVAL_TYPE_AND,
-						CONDITION_EVAL_TYPE_AND_OR,
-						CONDITION_EVAL_TYPE_EXPRESSION
-					],
-					'messageInvalid' => _('Incorrect type of calculation for discovery rule "%1$s".')
-				]),
-				'formula' => new CStringValidator([
-					'empty' => true
-				]),
-				'conditions' => new CCollectionValidator([
-					'empty' => true,
-					'messageInvalid' => _('Incorrect conditions for discovery rule "%1$s".')
-				])
-			],
-			'postValidators' => [
-				new CConditionValidator([
-					'messageMissingFormula' => _('Formula missing for discovery rule "%1$s".'),
-					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
-					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for discovery rule "%1$s" is not defined.'),
-					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".')
-				])
-			],
-			'required' => ['evaltype', 'conditions'],
-			'messageRequired' => _('No "%2$s" given for the filter of discovery rule "%1$s".'),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" for the filter of discovery rule "%1$s".')
-		];
-	}
+	public static function findInterfaceByPriority(array $interfaces): ?array {
+		$interface_by_type = [];
 
-	/**
-	 * Returns the parameters for creating a discovery rule filter condition validator.
-	 *
-	 * @return array
-	 */
-	protected function getFilterConditionSchema() {
-		return [
-			'validators' => [
-				'macro' => new CStringValidator([
-					'regex' => '/^'.ZBX_PREG_EXPRESSION_LLD_MACROS.'$/',
-					'messageEmpty' => _('Empty filter condition macro for discovery rule "%1$s".'),
-					'messageRegex' => _('Incorrect filter condition macro for discovery rule "%1$s".')
-				]),
-				'value' => new CStringValidator([
-					'empty' => true
-				]),
-				'formulaid' => new CStringValidator([
-					'regex' => '/[A-Z]+/',
-					'messageEmpty' => _('Empty filter condition formula ID for discovery rule "%1$s".'),
-					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
-				]),
-				'operator' => new CLimitedSetValidator([
-					'values' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS,
-						CONDITION_OPERATOR_NOT_EXISTS
-					],
-					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
-				])
-			],
-			'required' => ['macro', 'value'],
-			'messageRequired' => _('No "%2$s" given for a filter condition of discovery rule "%1$s".'),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" for a filter condition of discovery rule "%1$s".')
-		];
-	}
-
-	/**
-	 * Check discovery rule specific fields.
-	 *
-	 * @param array  $item    An array of single item data.
-	 * @param string $method  A string of "create" or "update" method.
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function checkSpecificFields(array $item, $method) {
-		if (array_key_exists('lifetime', $item)
-				&& !validateTimeUnit($item['lifetime'], SEC_PER_HOUR, 25 * SEC_PER_YEAR, true, $error,
-					['usermacros' => true])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'lifetime', $error)
-			);
-		}
-	}
-
-	/**
-	 * Checks if LLD macros contain duplicate names in "lld_macro".
-	 *
-	 * @param array  $lld_macro_paths                 Array of items to validate.
-	 * @param string $lld_macro_paths[]['lld_macro']  LLD macro string (optional for update method).
-	 * @param array  $macro_names                     Array where existing macro names are collected.
-	 * @param string $path                            Path to API object.
-	 *
-	 * @throws APIException if same discovery rules contains duplicate LLD macro names.
-	 */
-	protected function checkDuplicateLLDMacros(array $lld_macro_paths, $macro_names, $path) {
-		foreach ($lld_macro_paths as $num => $lld_macro_path) {
-			if (array_key_exists('lld_macro', $lld_macro_path)) {
-				if (array_key_exists($lld_macro_path['lld_macro'], $macro_names)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths/'.($num + 1).'/lld_macro',
-							_s('value "%1$s" already exists', $lld_macro_path['lld_macro'])
-						)
-					);
-				}
-
-				$macro_names[$lld_macro_path['lld_macro']] = true;
+		foreach ($interfaces as $interface) {
+			if ($interface['main'] == INTERFACE_PRIMARY) {
+				$interface_by_type[$interface['type']] = $interface;
 			}
 		}
-	}
 
-	/**
-	 * Validates parameters in "lld_macro_paths" property for each item in create method.
-	 *
-	 * @param array  $items                                      Array of items to validate.
-	 * @param array  $items[]['lld_macro_paths']                 Array of LLD macro paths to validate for each
-	 *                                                           discovery rule (optional).
-	 * @param string $items[]['lld_macro_paths'][]['lld_macro']  LLD macro string. Required if "lld_macro_paths" exists.
-	 * @param string $items[]['lld_macro_paths'][]['path']       Path string. Validates as regular string. Required if
-	 *                                                           "lld_macro_paths" exists.
-	 *
-	 * @throws APIException if incorrect fields and values given.
-	 */
-	protected function validateCreateLLDMacroPaths(array $items) {
-		$rules = [
-			'lld_macro_paths' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
-				'lld_macro' =>			['type' => API_LLD_MACRO, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_macro_path', 'lld_macro')],
-				'path' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_macro_path', 'path')]
-			]]
-		];
-
-		foreach ($items as $key => $item) {
-			if (array_key_exists('lld_macro_paths', $item)) {
-				$item = array_intersect_key($item, $rules);
-				$path = '/'.($key + 1);
-
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-
-				$this->checkDuplicateLLDMacros($item['lld_macro_paths'], [], $path);
+		foreach (self::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
+			if (array_key_exists($interface_type, $interface_by_type)) {
+				return $interface_by_type[$interface_type];
 			}
 		}
-	}
 
-	/**
-	 * Validates parameters in "lld_macro_paths" property for each item in create method.
-	 *
-	 * @param array  $items                                             Array of items to validate.
-	 * @param array  $items[]['lld_macro_paths']                        Array of LLD macro paths to validate for each
-	 *                                                                  discovery rule (optional).
-	 * @param string $items[]['lld_macro_paths'][]['lld_macro_pathid']  LLD macro path ID from DB (optional).
-	 * @param string $items[]['lld_macro_paths'][]['lld_macro']         LLD macro string. Required if "lld_macro_pathid"
-	 *                                                                  does not exist.
-	 * @param string $items[]['lld_macro_paths'][]['path']              Path string. Validates as regular string.
-	 *                                                                  Required if "lld_macro_pathid" and "lld_macro"
-	 *                                                                  do not exist.
-	 *
-	 * @throws APIException if incorrect fields and values given.
-	 */
-	protected function validateUpdateLLDMacroPaths(array $items) {
-		$rules = [
-			'lld_macro_paths' =>	['type' => API_OBJECTS, 'fields' => [
-				'lld_macro_pathid' =>	['type' => API_ID],
-				'lld_macro' =>			['type' => API_LLD_MACRO, 'length' => DB::getFieldLength('lld_macro_path', 'lld_macro')],
-				'path' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('lld_macro_path', 'path')]
-			]]
-		];
-
-		$items = $this->extendObjects('items', $items, ['templateid']);
-
-		foreach ($items as $key => $item) {
-			if (array_key_exists('lld_macro_paths', $item)) {
-				$itemid = $item['itemid'];
-				$templateid = $item['templateid'];
-
-				$item = array_intersect_key($item, $rules);
-				$path = '/'.($key + 1);
-
-				if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $item, $path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-
-				if (array_key_exists('lld_macro_paths', $item)) {
-					if ($templateid != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths',
-								_('cannot update property for templated discovery rule')
-							)
-						);
-					}
-
-					$lld_macro_pathids = [];
-
-					// Check that fields exists, are not empty, do not duplicate and collect IDs to compare with DB.
-					foreach ($item['lld_macro_paths'] as $num => $lld_macro_path) {
-						$subpath = $num + 1;
-
-						// API_NOT_EMPTY will not work, so we need at least one field to be present.
-						if (!array_key_exists('lld_macro', $lld_macro_path)
-								&& !array_key_exists('path', $lld_macro_path)
-								&& !array_key_exists('lld_macro_pathid', $lld_macro_path)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths/'.$subpath,
-									_('cannot be empty')
-								)
-							);
-						}
-
-						// API 'uniq' => true will not work, because we validate API_ID not API_IDS. So make IDs unique.
-						if (array_key_exists('lld_macro_pathid', $lld_macro_path)) {
-							$lld_macro_pathids[$lld_macro_path['lld_macro_pathid']] = true;
-						}
-						else {
-							/*
-							 * In case "lld_macro_pathid" does not exist, we need to treat it as a new LLD macro with
-							 * both fields present.
-							 */
-							if (array_key_exists('lld_macro', $lld_macro_path)
-									&& !array_key_exists('path', $lld_macro_path)) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths/'.$subpath,
-										_s('the parameter "%1$s" is missing', 'path')
-									)
-								);
-							}
-							elseif (array_key_exists('path', $lld_macro_path)
-									&& !array_key_exists('lld_macro', $lld_macro_path)) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Invalid parameter "%1$s": %2$s.', $path.'/lld_macro_paths/'.$subpath,
-										_s('the parameter "%1$s" is missing', 'lld_macro')
-									)
-								);
-							}
-						}
-					}
-
-					$this->checkDuplicateLLDMacros($item['lld_macro_paths'], [], $path);
-
-					/*
-					 * Validate "lld_macro_pathid" field. If "lld_macro_pathid" doesn't correspond to given "itemid"
-					 * or does not exist, throw an exception.
-					 */
-					if ($lld_macro_pathids) {
-						$lld_macro_pathids = array_keys($lld_macro_pathids);
-
-						$db_lld_macro_paths = DBfetchArrayAssoc(DBselect(
-							'SELECT lmp.lld_macro_pathid,lmp.lld_macro'.
-							' FROM lld_macro_path lmp'.
-							' WHERE lmp.itemid='.zbx_dbstr($itemid).
-								' AND '.dbConditionId('lmp.lld_macro_pathid', $lld_macro_pathids)
-						), 'lld_macro_pathid');
-
-						if (count($db_lld_macro_paths) != count($lld_macro_pathids)) {
-							self::exception(ZBX_API_ERROR_PERMISSIONS,
-								_('No permissions to referred object or it does not exist!')
-							);
-						}
-
-						$macro_names = [];
-
-						foreach ($item['lld_macro_paths'] as $num => $lld_macro_path) {
-							if (array_key_exists('lld_macro_pathid', $lld_macro_path)
-									&& !array_key_exists('lld_macro', $lld_macro_path)) {
-								$db_lld_macro_path = $db_lld_macro_paths[$lld_macro_path['lld_macro_pathid']];
-								$macro_names[$db_lld_macro_path['lld_macro']] = true;
-							}
-						}
-
-						$this->checkDuplicateLLDMacros($item['lld_macro_paths'], $macro_names, $path);
-					}
-				}
-			}
-		}
+		return null;
 	}
 
 	/**

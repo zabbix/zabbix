@@ -117,6 +117,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DISCOVERY_RULE => 'items',
 		self::RESOURCE_HOST => 'hosts',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
 		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
@@ -170,6 +171,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_DISCOVERY_RULE => 'name',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'name',
 		self::RESOURCE_HOST_PROTOTYPE => 'host',
@@ -212,6 +214,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DISCOVERY_RULE => 'discoveryrule',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'hostgroup',
 		self::RESOURCE_HOST_PROTOTYPE => 'hostprototype',
@@ -263,6 +266,25 @@ class CAudit {
 				'conditions' => ['authtype' => ZBX_HTTP_AUTH_BEARER]
 			],
 			['paths' => ['connector.ssl_key_password']]
+		],
+		self::RESOURCE_DISCOVERY_RULE => [
+			[
+				'paths' => ['discoveryrule.password'],
+				'conditions' => [
+					[
+						'type' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+							ITEM_TYPE_JMX
+						]
+					],
+					[
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'authtype' => [ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+							ZBX_HTTP_AUTH_DIGEST
+						]
+					]
+				]
+			],
+			['paths' => ['discoveryrule.ssl_key_password'], 'conditions' => ['type' => ITEM_TYPE_HTTPAGENT]]
 		],
 		self::RESOURCE_HOST_PROTOTYPE => [
 			'paths' => ['hostprototype.macros.value'],
@@ -364,6 +386,24 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_page',
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
+		'discoveryrule.filter' => 'items',
+		'discoveryrule.filter.conditions' => 'item_condition',
+		'discoveryrule.lld_macro_paths' => 'lld_macro_path',
+		'discoveryrule.overrides' => 'lld_override',
+		'discoveryrule.overrides.filter' => 'lld_override',
+		'discoveryrule.overrides.filter.conditions' => 'lld_override_condition',
+		'discoveryrule.overrides.operations' => 'lld_override_operation',
+		'discoveryrule.overrides.operations.opdiscover' => 'lld_override_opdiscover',
+		'discoveryrule.overrides.operations.ophistory' => 'lld_override_ophistory',
+		'discoveryrule.overrides.operations.opinventory' => 'lld_override_opinventory',
+		'discoveryrule.overrides.operations.opperiod' => 'lld_override_opperiod',
+		'discoveryrule.overrides.operations.opseverity' => 'lld_override_opseverity',
+		'discoveryrule.overrides.operations.opstatus' => 'lld_override_opstatus',
+		'discoveryrule.overrides.operations.optag' => 'lld_override_optag',
+		'discoveryrule.overrides.operations.optemplate' => 'lld_override_optemplate',
+		'discoveryrule.overrides.operations.optrends' => 'lld_override_optrends',
+		'discoveryrule.parameters' => 'item_parameter',
+		'discoveryrule.preprocessing' => 'item_preproc',
 		'hostgroup.hosts' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
@@ -453,6 +493,15 @@ class CAudit {
 		'dashboard.pages' => 'dashboard_pageid',
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
+		'discoveryrule.filter.conditions' => 'item_conditionid',
+		'discoveryrule.lld_macro_paths' => 'lld_macro_pathid',
+		'discoveryrule.overrides' => 'lld_overrideid',
+		'discoveryrule.overrides.filter.conditions' => 'lld_override_conditionid',
+		'discoveryrule.overrides.operations' => 'lld_override_operationid',
+		'discoveryrule.overrides.operations.optag' => 'lld_override_optagid',
+		'discoveryrule.overrides.operations.optemplate' => 'lld_override_optemplateid',
+		'discoveryrule.parameters' => 'item_parameterid',
+		'discoveryrule.preprocessing' => 'item_preprocid',
 		'hostgroup.hosts' => 'hostgroupid',
 		'hostprototype.groupLinks' => 'group_prototypeid',
 		'hostprototype.groupPrototypes' => 'group_prototypeid',
@@ -672,7 +721,9 @@ class CAudit {
 				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
-				$db_details = self::convertKeysToPaths($api_name, self::intersectObjects($db_object, $object));
+				$db_details = self::convertKeysToPaths($api_name,
+					self::intersectObjects($api_name, $db_object, $object)
+				);
 
 				return self::handleUpdate($resource, $details, $db_details);
 		}
@@ -682,23 +733,45 @@ class CAudit {
 	 * Computes the intersection of $db_object and $object using keys for comparison.
 	 * Recursively removes $db_object properties if they are not present in $object.
 	 *
-	 * @param array $db_object
-	 * @param array $object
+	 * @param string $path
+	 * @param array  $db_object
+	 * @param array  $object
 	 *
 	 * @return array
 	 */
-	private static function intersectObjects(array $db_object, array $object): array {
+	private static function intersectObjects(string $path, array $db_object, array $object): array {
 		foreach ($db_object as $db_key => &$db_value) {
 			if (is_string($db_key) && !array_key_exists($db_key, $object)) {
 				unset($db_object[$db_key]);
 				continue;
 			}
 
-			if (is_int($db_key) || !is_array($db_value)) {
+			if (!is_array($db_value)) {
 				continue;
 			}
 
-			$db_value = self::intersectObjects($db_value, $object[$db_key]);
+			$key = $db_key;
+			$subpath = $path.'.'.$db_key;
+
+			if (is_int($db_key)) {
+				$key = null;
+
+				$pk = self::NESTED_OBJECTS_ID_FIELD_NAMES[$path];
+
+				foreach ($object as $i => $nested_object) {
+					if (bccomp($nested_object[$pk], $db_key) == 0) {
+						$key = $i;
+						$subpath = $path;
+						break;
+					}
+				}
+
+				if ($key === null) {
+					continue;
+				}
+			}
+
+			$db_value = self::intersectObjects($subpath, $db_value, $object[$key]);
 		}
 		unset($db_value);
 
