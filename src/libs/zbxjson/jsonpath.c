@@ -47,7 +47,7 @@ zbx_jsonobj_index_t;
 ZBX_PTR_VECTOR_DECL(jsonobj_index_ptr, zbx_jsonobj_index_t *)
 ZBX_PTR_VECTOR_IMPL(jsonobj_index_ptr, zbx_jsonobj_index_t *)
 
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32)
 struct zbx_jsonpath_index
 {
 	zbx_vector_jsonobj_index_ptr_t	indexes;
@@ -2233,7 +2233,7 @@ static int	jsonpath_query_object(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *obj
 		if (FAIL == ret || 1 != segment->detached)
 			return ret;
 	}
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32)
 	else if (ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION == segment->type && NULL != segment->data.expression.index_token)
 	{
 		zbx_hashset_t	*index;
@@ -2389,7 +2389,7 @@ static int	jsonpath_query_array(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *arra
 			if (FAIL == ret || 1 != segment->detached)
 				return ret;
 			break;
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32)
 		case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
 			if (NULL != segment->data.expression.index_token)
 			{
@@ -2939,7 +2939,7 @@ int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output)
 	return zbx_jsonobj_query_ext(obj, NULL, path, output);
 }
 
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32)
 /* jsonobject index hashset support */
 
 static zbx_hash_t	jsonobj_index_el_hash(const void *v)
