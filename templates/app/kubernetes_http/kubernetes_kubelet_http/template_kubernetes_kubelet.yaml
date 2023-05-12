@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-11T08:05:26Z'
+  date: '2023-05-12T01:16:24Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -467,9 +467,6 @@ zabbix_export:
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -484,8 +481,8 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              units: '!s'
-              description: 'Cumulative system cpu time consumed.'
+              units: s
+              description: 'System cpu time consumed. It is calculated from the cumulative value using the `Change per second` preprocessing step.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -510,8 +507,8 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              units: '!s'
-              description: 'Cumulative cpu time consumed.'
+              units: s
+              description: 'Consumed cpu time. It is calculated from the cumulative value using the `Change per second` preprocessing step.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -536,8 +533,8 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              units: '!s'
-              description: 'Cumulative user cpu time consumed.'
+              units: s
+              description: 'User cpu time consumed. It is calculated from the cumulative value using the `Change per second` preprocessing step.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
