@@ -152,6 +152,9 @@ type exporterTask struct {
 }
 
 func (t *exporterTask) perform(s Scheduler) {
+	if t.item.remoteCommand == -1 {
+		return
+	}
 	// pass item key as parameter so it can be safely updated while task is being processed in its goroutine
 	go func(itemkey string) {
 		var result *plugin.Result
@@ -165,6 +168,7 @@ func (t *exporterTask) perform(s Scheduler) {
 			var ret interface{}
 			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 
+			///if t.item.remoteCommand != -1 {
 			if ret, err = exporter.Export(key, params, t); err == nil {
 				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 				if ret != nil {
@@ -175,11 +179,12 @@ func (t *exporterTask) perform(s Scheduler) {
 					case reflect.Array:
 						s := reflect.ValueOf(ret)
 						for i := 0; i < s.Len(); i++ {
-							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
+							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface(),
+								t.item.remoteCommand)
 							t.output.Write(result)
 						}
 					default:
-						result = itemutil.ValueToResult(t.item.itemid, now, ret)
+						result = itemutil.ValueToResult(t.item.itemid, now, ret, t.item.remoteCommand)
 						t.output.Write(result)
 					}
 				}
@@ -187,9 +192,13 @@ func (t *exporterTask) perform(s Scheduler) {
 				log.Debugf("failed to execute exporter task for itemid:%d key '%s' error: '%s'",
 					t.item.itemid, itemkey, err.Error())
 			}
+			///}
+		}
+		if t.item.remoteCommand == 1 {
+			t.item.remoteCommand = -1
 		}
 		if err != nil {
-			result = &plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now}
+			result = &plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now, RemoteCommand: t.item.remoteCommand}
 			t.output.Write(result)
 		}
 		// set failed state based on last result
@@ -287,7 +296,7 @@ func (t *directExporterTask) perform(s Scheduler) {
 						case reflect.Slice, reflect.Array:
 							err = errors.New("Multiple return values are not supported for single passive checks")
 						default:
-							result = itemutil.ValueToResult(t.item.itemid, now, ret)
+							result = itemutil.ValueToResult(t.item.itemid, now, ret, t.item.remoteCommand)
 							t.output.Write(result)
 							t.done = true
 						}

@@ -36,9 +36,10 @@ import (
 
 // clientItem represents item monitored by client
 type clientItem struct {
-	itemid uint64
-	delay  string
-	key    string
+	itemid        uint64
+	delay         string
+	key           string
+	remoteCommand int
 }
 
 // pluginInfo is used to track plugin usage by client
@@ -51,8 +52,9 @@ type pluginInfo struct {
 // client represents source of items (metrics) to be queried.
 // Each server for active checks is represented by a separate client.
 // There is a predefined clients to handle:
-//    all single passive checks (client id 1)
-//    all internal checks (resolving HostnameItem, HostMetadataItem, HostInterfaceItem) (client id 0)
+//
+//	all single passive checks (client id 1)
+//	all internal checks (resolving HostnameItem, HostMetadataItem, HostInterfaceItem) (client id 0)
 type client struct {
 	// Client id. Predefined clients have ids < 100, while clients active checks servers (ServerActive)
 	// have auto incrementing id starting with 100.
@@ -155,15 +157,20 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				}
 			}
 
+			///!!!AKDBGif !ok || r.RemoteCommand != -1 {
 			if !ok {
 				// create and register new exporter task
 				task = &exporterTask{
 					taskBase: taskBase{plugin: p, active: true, recurring: true},
-					item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
+					item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, remoteCommand: r.RemoteCommand},
 					updated:  now,
 					client:   c,
 					output:   sink,
 				}
+
+				///if r.RemoteCommand == 1 {
+				///	r.RemoteCommand = -1
+				///}
 
 				if scheduling == false && (firstActiveChecksRefreshed == true || p.forceActiveChecksOnStart != 0) {
 					task.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)

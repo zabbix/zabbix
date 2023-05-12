@@ -121,13 +121,16 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		int config_timeout)
 {
 	char	*info = NULL;
-	int	ret;
+	int	ret = SUCCEED, data_ret, commands_ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = zbx_process_agent_history_data(sock, jp, ts, &info)) &&
-			SUCCEED != (ret = zbx_process_agent_commands(jp, &info)))
+	data_ret = zbx_process_agent_history_data(sock, jp, ts, &info);
+	commands_ret = zbx_process_agent_commands(jp, &info);
+
+	if (SUCCEED != data_ret && SUCCEED != commands_ret)
 	{
+		ret = FAIL;
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data or command results from \"%s\": %s",
 				sock->peer, info);
 	}

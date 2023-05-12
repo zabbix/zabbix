@@ -177,11 +177,20 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 
 	c.updateExpressions(update.expressions)
 
+	var commandRequest int
+	var dataRequest int
+
 	for _, r := range update.requests {
 		var key string
 		var params []string
 		var err error
 		var p *pluginAgent
+
+		if r.RemoteCommand == 0 {
+			dataRequest++
+		} else {
+			commandRequest++
+		}
 
 		r.Key = m.aliases.Get(r.Key)
 		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
@@ -215,6 +224,9 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 	}
 
+	if dataRequest == 0 && commandRequest != 0 {
+		return
+	}
 	m.cleanupClient(c, now)
 }
 

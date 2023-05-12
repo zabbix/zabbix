@@ -58,43 +58,62 @@ type DiskCache struct {
 	persistFlag   uint32
 }
 
-func (c *DiskCache) resultFetch(rows *sql.Rows) (d *AgentData, err error) {
-	var tmp uint64
+func (c *DiskCache) resultFetch(rows *sql.Rows) (d *AgentData, rc *AgentCommands, maxid uint64, err error) {
+	var tmp, id, itemid uint64
 	var LastLogSize int64
 	var data AgentData
-	var Mtime, State, EventID, EventSeverity, EventTimestamp int
+	var command AgentCommands
+	var Mtime, State, EventID, EventSeverity, EventTimestamp, Clock, Ns, RemoteCommand int
 	var Value, EventSource string
 
-	err = rows.Scan(&data.Id, &data.Itemid, &LastLogSize, &Mtime, &State, &Value, &EventSource, &EventID,
-		&EventSeverity, &EventTimestamp, &data.Clock, &data.Ns)
+	err = rows.Scan(&id, &itemid, &LastLogSize, &Mtime, &State, &Value, &EventSource, &EventID,
+		&EventSeverity, &EventTimestamp, &Clock, &Ns, &RemoteCommand)
 	if err == nil {
-		if LastLogSize != DbVariableNotSet {
-			tmp = uint64(LastLogSize)
-			data.LastLogsize = &tmp
-		}
-		if Mtime != DbVariableNotSet {
-			data.Mtime = &Mtime
-		}
-		if State != DbVariableNotSet {
-			data.State = &State
-		}
-		if Value != "" {
-			data.Value = &Value
-		}
-		if EventSource != "" {
-			data.EventSource = &EventSource
-		}
-		if EventID != DbVariableNotSet {
-			data.EventID = &EventID
-		}
-		if EventSeverity != DbVariableNotSet {
-			data.EventSeverity = &EventSeverity
-		}
-		if EventTimestamp != DbVariableNotSet {
-			data.EventTimestamp = &EventTimestamp
+		if RemoteCommand == 0 {
+			data.Id = id
+			data.Itemid = itemid
+			data.Clock = Clock
+			data.Ns = Ns
+			if LastLogSize != DbVariableNotSet {
+				tmp = uint64(LastLogSize)
+				data.LastLogsize = &tmp
+			}
+			if Mtime != DbVariableNotSet {
+				data.Mtime = &Mtime
+			}
+			if State != DbVariableNotSet {
+				data.State = &State
+			}
+			if Value != "" {
+				data.Value = &Value
+			}
+			if EventSource != "" {
+				data.EventSource = &EventSource
+			}
+			if EventID != DbVariableNotSet {
+				data.EventID = &EventID
+			}
+			if EventSeverity != DbVariableNotSet {
+				data.EventSeverity = &EventSeverity
+			}
+			if EventTimestamp != DbVariableNotSet {
+				data.EventTimestamp = &EventTimestamp
+			}
+
+			return &data, nil, id, nil
+		} else {
+			command.Id = itemid
+			if State == itemutil.StateNotSupported {
+				command.Error = &Value
+			} else {
+				command.Value = &Value
+			}
+
+			return nil, &command, id, nil
 		}
 	}
-	return &data, err
+
+	return nil, nil, 0, err
 }
 
 func (c *DiskCache) getOldestWriteClock(table string) (clock int64, err error) {
@@ -160,47 +179,57 @@ func (c *DiskCache) updateLogRange() (err error) {
 	return
 }
 
-func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLogId uint64, err error) {
+func (c *DiskCache) resultsGet() (results []*AgentData, cresults []*AgentCommands, maxDataId uint64, maxLogId uint64,
+	err error) {
 	var result *AgentData
+	var cresult *AgentCommands
 	var rows *sql.Rows
+	var maxId uint64
 
 	cacheLock.Lock()
 	defer cacheLock.Unlock()
 
 	if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
-		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
+		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns,rcmd"+
 		" FROM data_%d"+
 		" UNION ALL"+
 		" SELECT "+
-		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
+		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns,rcmd"+
 		" FROM log_%d"+
 		" ORDER BY id LIMIT ?", c.serverID, c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from data table: %s", err.Error())
-		return nil, 0, 0, err
+		return nil, nil, 0, 0, err
 	}
 
 	for rows.Next() {
-		if result, err = c.resultFetch(rows); err != nil {
+		if result, cresult, maxId, err = c.resultFetch(rows); err != nil {
 			rows.Close()
-			return nil, 0, 0, err
+			return nil, nil, 0, 0, err
 		}
-		result.persistent = false
-		results = append(results, result)
-		if result.LastLogsize == nil {
-			maxDataId = result.Id
-		} else {
-			maxLogId = result.Id
+		if result != nil {
+			result.persistent = false
+			results = append(results, result)
+			if result.LastLogsize == nil {
+				maxDataId = result.Id
+			} else {
+				maxLogId = result.Id
+			}
+		}
+		if cresult != nil {
+			cresults = append(cresults, cresult)
+			maxDataId = maxId
 		}
 	}
 	if err = rows.Err(); err != nil {
-		return nil, 0, 0, err
+		return nil, nil, 0, 0, err
 	}
 
-	return results, maxDataId, maxLogId, nil
+	return results, cresults, maxDataId, maxLogId, nil
 }
 
 func (c *DiskCache) upload(u Uploader) (err error) {
 	var results []*AgentData
+	var cresults []*AgentCommands
 	var maxDataId, maxLogId uint64
 	var errs []error
 
@@ -216,20 +245,23 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		}
 	}()
 
-	if results, maxDataId, maxLogId, err = c.resultsGet(); err != nil {
+	if results, cresults, maxDataId, maxLogId, err = c.resultsGet(); err != nil {
 		return
 	}
 
-	if len(results) == 0 {
+	reqLen := len(results) + len(cresults)
+
+	if reqLen == 0 {
 		return
 	}
 
 	request := AgentDataRequest{
-		Request: "agent data",
-		Data:    results,
-		Session: u.Session(),
-		Host:    u.Hostname(),
-		Version: version.Short(),
+		Request:  "agent data",
+		Data:     results,
+		Commands: cresults,
+		Session:  u.Session(),
+		Host:     u.Hostname(),
+		Version:  version.Short(),
 	}
 
 	var data []byte
@@ -239,7 +271,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		return
 	}
 
-	timeout := len(results) * c.timeout
+	timeout := reqLen * c.timeout
 	if timeout > 60 {
 		timeout = 60
 	}
@@ -342,6 +374,8 @@ func (c *DiskCache) write(r *plugin.Result) {
 		EventTimestamp = *r.EventTimestamp
 	}
 
+	var rcmd int = r.RemoteCommand
+
 	var stmt *sql.Stmt
 
 	now := time.Now().Unix()
@@ -389,7 +423,7 @@ func (c *DiskCache) write(r *plugin.Result) {
 	}
 	if stmt != nil {
 		_, err = stmt.Exec(c.lastDataID, now, r.Itemid, LastLogsize, Mtime, State, Value,
-			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns)
+			EventSource, EventID, EventSeverity, EventTimestamp, clock, ns, rcmd)
 		if err != nil {
 			c.Errf("cannot execute SQL statement : %s", err)
 		}
@@ -432,9 +466,10 @@ func (c *DiskCache) updateOptions(options *agent.AgentOptions) {
 func (c *DiskCache) insertResultTable(table string) string {
 	return fmt.Sprintf(
 		"INSERT INTO %s"+
-			"(id,write_clock,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns)"+
+			"(id,write_clock,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,"+
+			"clock,ns,rcmd)"+
 			"VALUES"+
-			"(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			"(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 		table)
 }
 

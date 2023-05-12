@@ -75,11 +75,17 @@ type activeChecksRequest struct {
 	ListenPort     int    `json:"port,omitempty"`
 }
 
+type CommandRequest struct {
+	Id      uint64 `json:"id"`
+	Command string `json:"command"`
+}
+
 type activeChecksResponse struct {
 	Response       string               `json:"response"`
 	Info           string               `json:"info"`
 	ConfigRevision uint64               `json:"config_revision,omitempty"`
 	Data           []*plugin.Request    `json:"data"`
+	Commands       []*CommandRequest    `json:"commands"`
 	Expressions    []*glexpr.Expression `json:"regexp"`
 }
 
@@ -160,15 +166,18 @@ func (c *Connector) refreshActiveChecks() {
 	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.addresses)
 
-	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostInterface",
-		c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen, agent.LocalChecksClientID); err != nil {
+	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second,
+		"HostInterface", c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen,
+		agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host interface: %s", err)
+
 		return
 	}
 
 	if a.HostMetadata, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostMetadata",
 		c.options.HostMetadata, c.options.HostMetadataItem, agent.HostMetadataLen, agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host metadata: %s", err)
+
 		return
 	}
 
@@ -235,12 +244,16 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	if response.Data == nil {
+	if response.Data == nil && response.Commands == nil {
 		if c.configRevision == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
 				c.addresses[0])
 		}
 		return
+	}
+
+	if response.Data == nil {
+		goto commands
 	}
 
 	c.configRevision = response.ConfigRevision
@@ -319,6 +332,27 @@ func (c *Connector) refreshActiveChecks() {
 				c.clientID, c.addresses[0])
 			return
 		}
+	}
+commands:
+	for i := 0; i < len(response.Commands); i++ {
+		if len(response.Commands[i].Command) == 0 {
+			log.Errf("[%d] cannot parse list of active commands from [%s]: command is missing for id '%d'",
+				c.clientID, c.addresses[0], response.Commands[i].Id)
+			return
+		}
+
+		var commandItem plugin.Request
+		var dummyMtime int
+		var dummyLastlogsize uint64
+
+		commandItem.Itemid = response.Commands[i].Id
+		commandItem.Key = fmt.Sprintf("system.run[%s, nowait]", response.Commands[i].Command)
+		commandItem.Delay = "1"
+		commandItem.RemoteCommand = 1
+		commandItem.LastLogsize = &dummyLastlogsize
+		commandItem.Mtime = &dummyMtime
+
+		response.Data = append(response.Data, &commandItem)
 	}
 
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
