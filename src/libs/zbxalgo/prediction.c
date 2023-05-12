@@ -92,13 +92,11 @@ error:
 
 static int	zbx_identity_matrix(zbx_matrix_t *m, int n)
 {
-	int	i, j;
-
 	if (SUCCEED != zbx_matrix_alloc(m, n, n))
 		return FAIL;
 
-	for (i = 0; i < n; i++)
-		for (j = 0; j < n; j++)
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
 			ZBX_MATRIX_EL(m, i, j) = (i == j ? 1.0 : 0.0);
 
 	return SUCCEED;
@@ -106,16 +104,14 @@ static int	zbx_identity_matrix(zbx_matrix_t *m, int n)
 
 static int	zbx_transpose_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 {
-	int	i, j;
-
 	if (!ZBX_VALID_MATRIX(m))
 		goto error;
 
 	if (SUCCEED != zbx_matrix_alloc(r, m->columns, m->rows))
 		return FAIL;
 
-	for (i = 0; i < r->rows; i++)
-		for (j = 0; j < r->columns; j++)
+	for (int i = 0; i < r->rows; i++)
+		for (int j = 0; j < r->columns; j++)
 			ZBX_MATRIX_EL(r, i, j) = ZBX_MATRIX_EL(m, j, i);
 
 	return SUCCEED;
@@ -128,9 +124,8 @@ error:
 static void	zbx_matrix_swap_rows(zbx_matrix_t *m, int r1, int r2)
 {
 	double	tmp;
-	int	i;
 
-	for (i = 0; i < m->columns; i++)
+	for (int i = 0; i < m->columns; i++)
 	{
 		tmp = ZBX_MATRIX_EL(m, r1, i);
 		ZBX_MATRIX_EL(m, r1, i) = ZBX_MATRIX_EL(m, r2, i);
@@ -140,17 +135,13 @@ static void	zbx_matrix_swap_rows(zbx_matrix_t *m, int r1, int r2)
 
 static void	zbx_matrix_divide_row_by(zbx_matrix_t *m, int row, double denominator)
 {
-	int	i;
-
-	for (i = 0; i < m->columns; i++)
+	for (int i = 0; i < m->columns; i++)
 		ZBX_MATRIX_EL(m, row, i) /= denominator;
 }
 
 static void	zbx_matrix_add_rows_with_factor(zbx_matrix_t *m, int dest, int src, double factor)
 {
-	int	i;
-
-	for (i = 0; i < m->columns; i++)
+	for (int i = 0; i < m->columns; i++)
 		ZBX_MATRIX_EL(m, dest, i) += ZBX_MATRIX_EL(m, src, i) * factor;
 }
 
@@ -275,7 +266,6 @@ error:
 static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t *result)
 {
 	double	element;
-	int	i, j, k;
 
 	if (!ZBX_VALID_MATRIX(left) || !ZBX_VALID_MATRIX(right) || left->columns != right->rows)
 		goto error;
@@ -283,13 +273,13 @@ static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t
 	if (SUCCEED != zbx_matrix_alloc(result, left->rows, right->columns))
 		return FAIL;
 
-	for (i = 0; i < result->rows; i++)
+	for (int i = 0; i < result->rows; i++)
 	{
-		for (j = 0; j < result->columns; j++)
+		for (int j = 0; j < result->columns; j++)
 		{
 			element = 0;
 
-			for (k = 0; k < left->columns; k++)
+			for (int k = 0; k < left->columns; k++)
 				element += ZBX_MATRIX_EL(left, i, k) * ZBX_MATRIX_EL(right, k, j);
 
 			ZBX_MATRIX_EL(result, i, j) = element;
@@ -343,14 +333,12 @@ out:
 
 static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m)
 {
-	int	i;
-
 	if (FIT_LINEAR == fit || FIT_POLYNOMIAL == fit || FIT_LOGARITHMIC == fit)
 	{
 		if (SUCCEED != zbx_matrix_alloc(m, n, 1))
 			return FAIL;
 
-		for (i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 			ZBX_MATRIX_EL(m, i, 0) = x[i];
 	}
 	else if (FIT_EXPONENTIAL == fit || FIT_POWER == fit)
@@ -358,7 +346,7 @@ static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m)
 		if (SUCCEED != zbx_matrix_alloc(m, n, 1))
 			return FAIL;
 
-		for (i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			if (0.0 >= x[i])
 			{
@@ -376,14 +364,13 @@ static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m)
 static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, int k, zbx_matrix_t *m)
 {
 	double	element;
-	int	i, j;
 
 	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit)
 	{
 		if (SUCCEED != zbx_matrix_alloc(m, n, 2))
 			return FAIL;
 
-		for (i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			ZBX_MATRIX_EL(m, i, 0) = 1.0;
 			ZBX_MATRIX_EL(m, i, 1) = t[i];
@@ -394,7 +381,7 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, int k, zbx_matr
 		if (SUCCEED != zbx_matrix_alloc(m, n, 2))
 			return FAIL;
 
-		for (i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			ZBX_MATRIX_EL(m, i, 0) = 1.0;
 			ZBX_MATRIX_EL(m, i, 1) = log(t[i]);
@@ -408,11 +395,11 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, int k, zbx_matr
 		if (SUCCEED != zbx_matrix_alloc(m, n, k+1))
 			return FAIL;
 
-		for (i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			element = 1.0;
 
-			for (j = 0; j < k; j++)
+			for (int j = 0; j < k; j++)
 			{
 				ZBX_MATRIX_EL(m, i, j) = element;
 				element *= t[i];
@@ -452,9 +439,8 @@ out:
 static double	zbx_polynomial_value(double t, zbx_matrix_t *coefficients)
 {
 	double	pow = 1.0, res = 0.0;
-	int	i;
 
-	for (i = 0; i < coefficients->rows; i++, pow *= t)
+	for (int i = 0; i < coefficients->rows; i++, pow *= t)
 		res += ZBX_MATRIX_EL(coefficients, i, 0) * pow;
 
 	return res;
@@ -463,9 +449,8 @@ static double	zbx_polynomial_value(double t, zbx_matrix_t *coefficients)
 static double	zbx_polynomial_antiderivative(double t, zbx_matrix_t *coefficients)
 {
 	double	pow = t, res = 0.0;
-	int	i;
 
-	for (i = 0; i < coefficients->rows; i++, pow *= t)
+	for (int i = 0; i < coefficients->rows; i++, pow *= t)
 		res += ZBX_MATRIX_EL(coefficients, i, 0) * pow / (i + 1);
 
 	return res;
@@ -795,7 +780,7 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 {
 	zbx_matrix_t	*shifted_coefficients = NULL, *roots = NULL;
 	double		tmp;
-	int		i, res, no_root = 1;
+	int		res, no_root = 1;
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 		goto error;
@@ -814,7 +799,7 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 	/* choose the closest root right from now or set result to -1 otherwise */
 	/* if zbx_polynomial_value(tmp) is not close enough to zero it must be a complex root and must be skipped */
 
-	for (i = 0; i < roots->rows; i++)
+	for (int i = 0; i < roots->rows; i++)
 	{
 		tmp = ZBX_MATRIX_EL(roots, i, 0);
 

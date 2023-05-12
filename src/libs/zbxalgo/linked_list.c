@@ -58,10 +58,10 @@ void	zbx_list_destroy(zbx_list_t *list)
  *                                                                            *
  * Purpose: allocate memory and initialize a new list item                    *
  *                                                                            *
- * Parameters: list     - [IN]                                                *
- *             value    - [IN] Data to be stored. Ownership of 'value' goes   *
+ * Parameters: list    - [IN]                                                 *
+ *             value   - [IN] Data to be stored. Ownership of 'value' goes    *
  *                             to list item.                                  *
- *             created  - [OUT] pointer to the created list item              *
+ *             created - [OUT] pointer to the created list item               *
  *                                                                            *
  ******************************************************************************/
 static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **created)

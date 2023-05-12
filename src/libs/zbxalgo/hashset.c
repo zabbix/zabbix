@@ -96,10 +96,9 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 
 void	zbx_hashset_destroy(zbx_hashset_t *hs)
 {
-	int			i;
 	ZBX_HASHSET_ENTRY_T	*entry, *next_entry;
 
-	for (i = 0; i < hs->num_slots; i++)
+	for (int i = 0; i < hs->num_slots; i++)
 	{
 		entry = hs->slots[i];
 
@@ -362,10 +361,9 @@ void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data)
 
 void	zbx_hashset_clear(zbx_hashset_t *hs)
 {
-	int			slot;
 	ZBX_HASHSET_ENTRY_T	*entry;
 
-	for (slot = 0; slot < hs->num_slots; slot++)
+	for (int slot = 0; slot < hs->num_slots; slot++)
 	{
 		while (NULL != hs->slots[slot])
 		{
@@ -462,7 +460,6 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
  *********************************************************************************/
 void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size)
 {
-	int			i;
 	ZBX_HASHSET_ENTRY_T	*entry, **ref;
 
 	*dst = *src;
@@ -471,7 +468,7 @@ void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size)
 			sizeof(ZBX_HASHSET_ENTRY_T *));
 	memset(dst->slots, 0, (size_t)dst->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
 
-	for (i = 0; i < src->num_slots; i++)
+	for (int i = 0; i < src->num_slots; i++)
 	{
 		if (0 == src->slots[i])
 			continue;

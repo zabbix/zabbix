@@ -80,7 +80,6 @@ zbx_hash_t	zbx_default_string_hash_func(const void *data)
 zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data)
 {
 	const zbx_uint64_pair_t	*pair = (const zbx_uint64_pair_t *)data;
-
 	zbx_hash_t		hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&pair->first);
@@ -186,8 +185,6 @@ void	zbx_default_mem_free_func(void *ptr)
 
 static int	is_prime(int n)
 {
-	int i;
-
 	if (n <= 1)
 		return 0;
 	if (n == 2)
@@ -195,7 +192,7 @@ static int	is_prime(int n)
 	if (n % 2 == 0)
 		return 0;
 
-	for (i = 3; i * i <= n; i+=2)
+	for (int i = 3; i * i <= n; i+=2)
 		if (n % i == 0)
 			return 0;
 
@@ -214,7 +211,7 @@ int	next_prime(int n)
  *                                                                            *
  * Purpose: calculate integer part of square root of a 32 bit integer value   *
  *                                                                            *
- * Parameters: value     - [IN] value to calculate square root for            *
+ * Parameters: value - [IN] value to calculate square root for                *
  *                                                                            *
  * Return value: the integer part of square root                              *
  *                                                                            *
@@ -224,9 +221,9 @@ int	next_prime(int n)
  ******************************************************************************/
 unsigned int	zbx_isqrt32(unsigned int value)
 {
-	unsigned int	i, remainder = 0, result = 0, p;
+	unsigned int	remainder = 0, result = 0, p;
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		result <<= 1;
 		remainder = (remainder << 2) + (value >> 30);

@@ -174,7 +174,7 @@ void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue)
  ******************************************************************************/
 void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value)
 {
-	int	i, start_pos;
+	int	start_pos;
 
 	if (queue->tail_pos == queue->head_pos)
 		return;
@@ -184,7 +184,7 @@ void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value)
 	else
 		start_pos = 0;
 
-	for (i = start_pos; i < queue->head_pos; i++)
+	for (int i = start_pos; i < queue->head_pos; i++)
 	{
 		if (queue->values[i] == value)
 		{
@@ -199,7 +199,7 @@ void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value)
 	if (queue->tail_pos <= queue->head_pos)
 		return;
 
-	for (i = queue->alloc_num - 1; i >= queue->tail_pos; i--)
+	for (int i = queue->alloc_num - 1; i >= queue->tail_pos; i--)
 	{
 		if (queue->values[i] == value)
 		{
