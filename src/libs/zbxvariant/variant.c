@@ -646,18 +646,18 @@ int	zbx_vector_var_get_type(zbx_vector_var_t *v)
 
 	for (i = 0; i < v->values_num; i++)
 	{
-		if (v->values[i].type == ZBX_VARIANT_UI64)
+		if (ZBX_VARIANT_UI64 == v->values[i].type)
 		{
-			if (type == ITEM_VALUE_TYPE_MAX)
+			if (ITEM_VALUE_TYPE_MAX == type)
 				type = ITEM_VALUE_TYPE_UINT64;
-			else if (type != ITEM_VALUE_TYPE_UINT64)
+			else if (ITEM_VALUE_TYPE_UINT64 != type)
 				return ITEM_VALUE_TYPE_STR;
 		}
-		else if (v->values[i].type == ZBX_VARIANT_DBL)
+		else if (ZBX_VARIANT_DBL == v->values[i].type)
 		{
-			if (type == ITEM_VALUE_TYPE_MAX)
+			if (ITEM_VALUE_TYPE_MAX == type)
 				type = ITEM_VALUE_TYPE_FLOAT;
-			else if (type != ITEM_VALUE_TYPE_FLOAT)
+			else if (ITEM_VALUE_TYPE_FLOAT != type)
 				return ITEM_VALUE_TYPE_STR;
 		}
 		else
