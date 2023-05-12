@@ -145,9 +145,9 @@
 		}
 
 		_testEdit(parameters) {
-			PopUp("mediatype.test.edit", parameters, {
-				dialogueid: "mediatypetest_edit",
-				dialogue_class: "modal-popup-medium"
+			PopUp('mediatype.test.edit', parameters, {
+				dialogueid: 'mediatypetest_edit',
+				dialogue_class: 'modal-popup-medium'
 			});
 		}
 

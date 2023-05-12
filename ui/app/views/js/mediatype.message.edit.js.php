@@ -46,7 +46,7 @@ window.mediatype_message_popup = new class {
 	_getDefaultMessageTemplate(message_type) {
 		const message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>;
 		const media_type = this.form.querySelector('#type').value;
-		const message_format = document.querySelector('input[name="content_type"]:checked'). value;
+		const message_format = document.querySelector(`input[name='content_type']:checked`). value;
 
 		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
 			return {
