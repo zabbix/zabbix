@@ -2233,7 +2233,7 @@ static int	jsonpath_query_object(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *obj
 		if (FAIL == ret || 1 != segment->detached)
 			return ret;
 	}
-#if !defined(WINDOWS)
+#if !defined(_WINDOWS)
 	else if (ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION == segment->type && NULL != segment->data.expression.index_token)
 	{
 		zbx_hashset_t	*index;
@@ -2389,7 +2389,7 @@ static int	jsonpath_query_array(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *arra
 			if (FAIL == ret || 1 != segment->detached)
 				return ret;
 			break;
-#if !defined(WINDOWS)
+#if !defined(_WINDOWS)
 		case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
 			if (NULL != segment->data.expression.index_token)
 			{
