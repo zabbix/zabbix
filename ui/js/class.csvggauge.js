@@ -850,9 +850,9 @@ class CSVGGauge {
 			};
 
 			// Move needle element to the bottom of svg tree, so it can be shown on top of arc
-			const needleClone = this.elements.needle.node;
+			const clone = this.elements.needle.node;
 			this.elements.needle.node.remove();
-			this.svg.appendChild(needleClone);
+			this.svg.appendChild(clone);
 
 			window.requestAnimationFrame(() => {
 				this.#animate(this.angleOld, (currentAngle) => {
@@ -1101,6 +1101,11 @@ class CSVGGauge {
 		else if (this.data.angle === 270) {
 			yWithNeedle = y;
 		}
+
+		// Move value element to the bottom of svg tree, so it can be shown on top of arc
+		const clone = this.elements.value.parent;
+		this.elements.value.parent.remove();
+		this.svg.appendChild(clone);
 
 		if (this.data.needle.show) {
 			this.#reposition(this.elements.value, this.width / 2, yWithNeedle, anchor);
