@@ -232,7 +232,7 @@ window.mediatype_edit_popup = new class {
 			const params = {
 				type: this.form.querySelector('#type').value,
 				content_type: this.form.querySelector(`input[name='content_type']:checked`).value,
-				message_types: Array.from(this.form.querySelectorAll('tr[data-message-type]')).map(function(tr) {
+				message_types: Array.from(this.form.querySelectorAll('tr[data-message-type]')).map((tr) => {
 					return tr.dataset.messageType;
 				})
 			};
@@ -406,15 +406,19 @@ window.mediatype_edit_popup = new class {
 		const maxsessions_type = this.form.querySelectorAll(`#maxsessions_type input[type='radio']`);
 
 		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
-			maxsessions_type.forEach(function (radio) {
-				radio.disabled = true;
+			maxsessions_type.forEach((radio) => {
 				if (radio.value === 'one') {
+					radio.checked = true;
 					radio.disabled = false;
+				}
+				else {
+					radio.disabled = true;
+					radio.checked = false;
 				}
 			});
 		}
 		else {
-			maxsessions_type.forEach(function (radio) {
+			maxsessions_type.forEach((radio) => {
 				radio.disabled = false;
 			});
 		}
@@ -484,11 +488,12 @@ window.mediatype_edit_popup = new class {
 				break;
 		}
 
-		this._setMaxSessionsType(this.type);
-
 		show_fields.forEach((field) => {
 			this.form.querySelector(field).style.display = '';
 		});
+
+		this._setMaxSessionsType(this.type);
+		this.form.querySelector('#maxsessions_type').dispatchEvent(new Event('change'));
 	}
 
 	/**
