@@ -19,8 +19,19 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 class testPageNetworkDiscovery extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	public function testPageNetworkDiscovery_CheckLayout() {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
@@ -48,7 +59,9 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestClickLinkText($drule['name']);
-		$this->zbxTestClickWait('update');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button:Update')->waitUntilClickable()->one()->click();
+		$dialog->ensureNotPresent();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rule updated');
@@ -66,11 +79,11 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('druleids_'.$drule['druleid']);
-		$this->zbxTestClickButton('discovery.delete');
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rule deleted');
+		$this->assertMessage(TEST_GOOD, 'Discovery rule deleted');
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE druleid='.$drule['druleid']));
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dchecks WHERE druleid='.$drule['druleid']));
@@ -82,11 +95,11 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
-		$this->zbxTestClickButton('discovery.disable');
+		$this->query('button:Disable')->waitUntilClickable()->one()->click();
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rules disabled');
+		$this->assertMessage(TEST_GOOD, 'Discovery rules disabled');
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE status='.DRULE_STATUS_ACTIVE));
 	}
@@ -100,11 +113,11 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('druleids_'.$drule['druleid']);
-		$this->zbxTestClickButton('discovery.disable');
+		$this->query('button:Disable')->waitUntilClickable()->one()->click();
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rule disabled');
+		$this->assertMessage(TEST_GOOD, 'Discovery rule disabled');
 
 		$this->assertEquals(1, CDBHelper::getCount(
 			'SELECT *'.
@@ -120,11 +133,11 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_drules');
-		$this->zbxTestClickButton('discovery.enable');
+		$this->query('button:Enable')->waitUntilClickable()->one()->click();
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rules enabled');
+		$this->assertMessage(TEST_GOOD, 'Discovery rules enabled');
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE status='.DRULE_STATUS_DISABLED));
 	}
@@ -138,11 +151,11 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('druleids_'.$drule['druleid']);
-		$this->zbxTestClickButton('discovery.enable');
+		$this->query('button:Enable')->waitUntilClickable()->one()->click();
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rule enabled');
+		$this->assertMessage(TEST_GOOD, 'Discovery rule enabled');
 
 		$this->assertEquals(1, CDBHelper::getCount(
 			'SELECT *'.
