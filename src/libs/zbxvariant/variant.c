@@ -649,20 +649,20 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 
 int	zbx_vector_var_get_type(zbx_vector_var_t *v)
 {
-	int 	i, type = ITEM_VALUE_TYPE_MAX;
+	int 	i, type = ITEM_VALUE_TYPE_NONE;
 
 	for (i = 0; i < v->values_num; i++)
 	{
 		if (ZBX_VARIANT_UI64 == v->values[i].type)
 		{
-			if (ITEM_VALUE_TYPE_MAX == type)
+			if (ITEM_VALUE_TYPE_NONE == type)
 				type = ITEM_VALUE_TYPE_UINT64;
 			else if (ITEM_VALUE_TYPE_UINT64 != type)
 				return ITEM_VALUE_TYPE_STR;
 		}
 		else if (ZBX_VARIANT_DBL == v->values[i].type)
 		{
-			if (ITEM_VALUE_TYPE_MAX == type)
+			if (ITEM_VALUE_TYPE_NONE == type)
 				type = ITEM_VALUE_TYPE_FLOAT;
 			else if (ITEM_VALUE_TYPE_FLOAT != type)
 				return ITEM_VALUE_TYPE_STR;
