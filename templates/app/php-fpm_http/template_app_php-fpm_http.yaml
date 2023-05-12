@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:19:27Z'
+  date: '2023-05-12T00:41:30Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -287,8 +287,8 @@ zabbix_export:
           triggers:
             - uuid: 8cfa50bcea744075954d0a9c8a132330
               expression: 'last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2)'
-              name: 'PHP-FPM: Manager  changed'
-              event_name: 'PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})'
+              name: 'PHP-FPM: Manager changed'
+              event_name: 'PHP-FPM: Manager changed (new value received: {ITEM.VALUE})'
               priority: INFO
               description: 'The PHP-FPM manager has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -425,7 +425,7 @@ zabbix_export:
       macros:
         - macro: '{$PHP_FPM.HOST}'
           value: localhost
-          description: 'The hostname or an IP address of the PHP-FPM status for a host or container.'
+          description: 'The hostname or IP address of the PHP-FPM status for a host or container.'
         - macro: '{$PHP_FPM.PING.PAGE}'
           value: ping
           description: 'The path of the PHP-FPM ping page.'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:19:58Z'
+  date: '2023-05-12T00:43:24Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -940,7 +940,7 @@ zabbix_export:
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
-                It responds with a status code`200 OK` if there are no alarms in effect in the cluster.
+                It responds with a status code `200 OK` if there are no alarms in effect in the cluster.
                 Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -997,7 +997,7 @@ zabbix_export:
       macros:
         - macro: '{$RABBITMQ.API.CLUSTER_HOST}'
           value: 127.0.0.1
-          description: 'The hostname or an IP of the API endpoint for the RabbitMQ cluster.'
+          description: 'The hostname or IP of the API endpoint for the RabbitMQ cluster.'
         - macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
         - macro: '{$RABBITMQ.API.PORT}'
@@ -1741,7 +1741,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the node'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -2431,7 +2431,7 @@ zabbix_export:
       macros:
         - macro: '{$RABBITMQ.API.HOST}'
           value: 127.0.0.1
-          description: 'The hostname or an IP of the API endpoint for the RabbitMQ.'
+          description: 'The hostname or IP of the API endpoint for the RabbitMQ.'
         - macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
         - macro: '{$RABBITMQ.API.PORT}'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:18:29Z'
+  date: '2023-05-12T00:36:59Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -389,7 +389,7 @@ zabbix_export:
           description: 'The maximum response time of Nginx expressed in seconds for a trigger expression.'
         - macro: '{$NGINX.STUB_STATUS.HOST}'
           value: localhost
-          description: 'The hostname or an IP address of the Nginx host or Nginx container of `astub_status`.'
+          description: 'The hostname or IP address of the Nginx host or Nginx container of `astub_status`.'
         - macro: '{$NGINX.STUB_STATUS.PATH}'
           value: basic_status
           description: 'The path of the `Nginx stub_status` page.'
