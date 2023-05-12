@@ -354,6 +354,8 @@ class Group extends ScimApiService {
 		}
 
 		$db_users = [];
+		$db_users_new = [];
+		$db_users_delete = [];
 		$new_userids = [];
 		$del_userids = [];
 		$do_replace = false;

@@ -55,6 +55,10 @@ catch (Throwable $e) {
 		$e = new Exception($e->getMessage(), 500);
 	}
 
+	if ($e->getCode() == ZBX_API_ERROR_PARAMETERS && strpos($e->getMessage(), 'No permissions') !== false) {
+		$e = new Exception($e->getMessage(), 403);
+	}
+
 	$response->setException($e);
 }
 
