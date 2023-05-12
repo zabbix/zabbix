@@ -182,6 +182,9 @@ class testSystemInformation extends CWebTest {
 			self::$skip_fields[] = $this->query('xpath://footer')->one();
 		}
 
+		// Hide frontend version.
+		self::$skip_fields[] = $this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one();
+
 		// Check and hide the text of messages, because they contain ip addresses of the current host.
 		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" failed. Possible reasons:\n".
 				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".

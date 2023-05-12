@@ -66,7 +66,7 @@ function sdii($msg = 'SDII', $for = '', $showInvisible = true) {
 function vdp($var, $msg = null) {
 	echo 'DEBUG DUMP: ';
 	if (isset($msg)) {
-		echo '"'.$msg.'"'.SPACE;
+		echo '"'.$msg.'"&nbsp;';
 	}
 	var_dump($var);
 	echo BR();

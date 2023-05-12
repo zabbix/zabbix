@@ -44,6 +44,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "version.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -95,7 +96,8 @@ zbx_section_entry_t;
 typedef enum
 {
 	ZBX_SECTION_ENTRY_THE_ONLY,
-	ZBX_SECTION_ENTRY_PER_PROXY
+	ZBX_SECTION_ENTRY_PER_PROXY,
+	ZBX_SECTION_ENTRY_SERVER_STATS
 }
 zbx_entry_type_t;
 
@@ -434,7 +436,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_dc_free_item_queue(&queue);
 	zbx_vector_ptr_destroy(&queue);
@@ -665,8 +667,20 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
+	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,
+		{
+			{NULL}
+		}
+	},
 	{NULL}
 };
+
+static void	server_stats_entry_export(struct zbx_json *json, const zbx_status_section_t *section)
+{
+	zbx_json_addobject(json, section->name);
+	zbx_json_addstring(json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(json);
+}
 
 static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t *entry,
 		zbx_counter_value_t counter_value, const zbx_uint64_t *proxyid)
@@ -732,6 +746,12 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 
 		if (NULL != section->res && SUCCEED != *section->res)	/* skip section we have no information for */
 			continue;
+
+		if (ZBX_SECTION_ENTRY_SERVER_STATS == section->entry_type)
+		{
+			server_stats_entry_export(json, section);
+			continue;
+		}
 
 		zbx_json_addarray(json, section->name);
 
@@ -837,7 +857,7 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_json_free(&json);
 
@@ -934,7 +954,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 		zbx_json_close(&json);
 	}
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_comms->config_timeout);
 	ret = SUCCEED;
 param_error:
 	zbx_json_free(&json);
@@ -984,7 +1004,8 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len)
 {
-	int	i, ret = SUCCEED;
+	int	ret = SUCCEED;
+	size_t	i;
 	char	*data_b64 = NULL;
 
 	assert(NULL != host && 0 != host_len);
@@ -997,7 +1018,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "host", &data_b64))
 	{
-		zbx_base64_decode(data_b64, host, (int)host_len - 1, &i);
+		zbx_base64_decode(data_b64, host, host_len - 1, &i);
 		host[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1009,7 +1030,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "key", &data_b64))
 	{
-		zbx_base64_decode(data_b64, key, (int)key_len - 1, &i);
+		zbx_base64_decode(data_b64, key, key_len - 1, &i);
 		key[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1021,7 +1042,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "data", &data_b64))
 	{
-		zbx_base64_decode(data_b64, data, (int)data_len - 1, &i);
+		zbx_base64_decode(data_b64, data, data_len - 1, &i);
 		data[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1033,7 +1054,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "lastlogsize", &data_b64))
 	{
-		zbx_base64_decode(data_b64, lastlogsize, (int)lastlogsize_len - 1, &i);
+		zbx_base64_decode(data_b64, lastlogsize, lastlogsize_len - 1, &i);
 		lastlogsize[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1042,7 +1063,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "timestamp", &data_b64))
 	{
-		zbx_base64_decode(data_b64, timestamp, (int)timestamp_len - 1, &i);
+		zbx_base64_decode(data_b64, timestamp, timestamp_len - 1, &i);
 		timestamp[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1051,7 +1072,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "source", &data_b64))
 	{
-		zbx_base64_decode(data_b64, source, (int)source_len - 1, &i);
+		zbx_base64_decode(data_b64, source, source_len - 1, &i);
 		source[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1060,7 +1081,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "severity", &data_b64))
 	{
-		zbx_base64_decode(data_b64, severity, (int)severity_len - 1, &i);
+		zbx_base64_decode(data_b64, severity, severity_len - 1, &i);
 		severity[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1251,10 +1272,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
 		zbx_process_history_data(&item, &av, &errcode, 1, NULL);
 
-		zbx_alarm_on(config_comms->config_timeout);
-		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))
+		if (SUCCEED != zbx_tcp_send_ext(sock, "OK", ZBX_CONST_STRLEN("OK"), 0, 0, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
-		zbx_alarm_off();
 	}
 
 	return ret;
@@ -1275,6 +1294,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
 {
+#define POLL_TIMEOUT	1
 	zbx_thread_trapper_args	*trapper_args_in = (zbx_thread_trapper_args *)
 					(((zbx_thread_args_t *)args)->args);
 	double			sec = 0.0;
@@ -1327,8 +1347,11 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED,
-				trapper_args_in->config_comms->config_timeout);
+				POLL_TIMEOUT);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
+
+		if (TIMEOUT_ERROR == ret)
+			continue;
 
 		if (SUCCEED == ret)
 		{
@@ -1366,7 +1389,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 			zbx_tcp_unaccept(&s);
 		}
-		else if (EINTR != zbx_socket_last_error())
+		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
 					zbx_socket_strerror());
@@ -1379,4 +1402,6 @@ out:
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
+
+#undef POLL_TIMEOUT
 }

@@ -140,7 +140,7 @@ $icon_mapping_link = (new CLink(_('show icon mappings'), (new CUrl('zabbix.php')
 	))
 	->setTarget('_blank');
 $map_tab->addRow(new CLabel(_('Automatic icon mapping'), $icon_mapping->getFocusableElementId()),
-	[$icon_mapping, SPACE, $icon_mapping_link]
+	[$icon_mapping, NBSP(), $icon_mapping_link]
 );
 
 // Append multiple checkboxes to form list.
@@ -419,12 +419,11 @@ $sharing_tab = (new CFormList('sharing_form'))
 $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab, TAB_INDICATOR_SHARING);
 
 // Append buttons to form.
-if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'full_clone') {
+if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !== 'clone') {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new	CButton('clone', _('Clone')),
-			new CButton('full_clone', _('Full clone')),
 			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
 				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
 			),

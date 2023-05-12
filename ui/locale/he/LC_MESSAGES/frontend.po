@@ -1236,6 +1236,10 @@ msgstr "רשימת היתר"
 msgid "Allow manual close"
 msgstr "לאפשר סגירה ידנית"
 
+#: app/views/popup.discovery.check.php:125
+msgid "Allow redirect"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
 #: include/views/configuration.item.edit.php:945
@@ -1578,6 +1582,10 @@ msgstr "יחוס"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
+msgstr ""
+
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
 msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
@@ -2967,6 +2975,16 @@ msgstr "לא ניתן להריץ סקריפט."
 msgid "Cannot expand macros."
 msgstr "לא ניתן להרחיב מאקרואים."
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:217
+#, c-format
+msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:241
+#, c-format
+msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -3075,10 +3093,25 @@ msgstr "לא ניתן למצוא את הפריט „%1$s” תחת „%2$s” ש
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
 msgstr "לא ניתן למצוא את הפריט „%1$s” שנמצא בשימוש בלוח המחוונים „%2$s”."
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:193
+#, c-format
+msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "לא ניתן למצוא את המפה „%1$s“ הנמצאת בשימוש במפה „%2$s“."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:253
+#, c-format
+msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:205
+#, c-format
+msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
@@ -3095,6 +3128,11 @@ msgstr "לא ניתן למצוא את התבנית „%1$s” למעקף „%2$s
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "לא ניתן למצוא את ההקפצה „%1$s” שנעשה בה שימוש במפה „%2$s”."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:229
+#, c-format
+msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1510
 msgid "Cannot find user directory for LDAP."
@@ -4356,6 +4394,15 @@ msgstr "סוג שעון"
 #: include/views/monitoring.sysmap.edit.php:423 jsLoader.php:355
 msgid "Clone"
 msgstr "שכפול"
+
+#: app/views/configuration.host.edit.php:61
+#: app/views/js/popup.host.edit.js.php:45 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:195
+msgid "Cloned template parameter values have been modified."
+msgstr ""
 
 #: app/views/popup.import.compare.php:162 app/views/popup.token.view.php:86
 #: include/func.inc.php:1723 include/views/js/monitoring.sysmaps.js.php:339
@@ -9249,6 +9296,11 @@ msgstr "סקירת מאגר מארח"
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
 msgstr "סוג תווית מארח"
+
+#: widgets/dataover/includes/WidgetForm.php:64
+#: widgets/trigover/includes/WidgetForm.php:71
+msgid "Host location"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
@@ -18259,6 +18311,11 @@ msgstr "מקוצר"
 msgid "Show"
 msgstr "הצגה"
 
+#: widgets/hostavail/includes/WidgetForm.php:61
+#: widgets/web/includes/WidgetForm.php:65
+msgid "Show data in maintenance"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:182
 #: app/partials/monitoring.problem.filter.php:277
 msgid "Show details"
@@ -19573,6 +19630,10 @@ msgstr "התרשים לא מתגלה יותר ויימחק תוך %1$s‏ (ב־%
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "התרשים לא מתגלה עוד ויימחק בפעם הבאה שכלל הגילוי יעובד."
 
+#: app/controllers/CControllerHostEdit.php:283 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
+
 #: include/html.inc.php:637
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -19635,6 +19696,10 @@ msgstr "ה־JSON שהתקבל אינו בקשת JSON-RPC תקנית."
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "הפקודה המרוחקת המבוקשת אינה קיימת / זמינה"
+
+#: templates.php:181
+msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -23050,6 +23115,10 @@ msgstr "סוכן Zabbix"
 msgid "Zabbix agent (active)"
 msgstr "סוכן Zabbix (פעיל)"
 
+#: app/partials/administration.system.info.php:45
+msgid "Zabbix frontend version"
+msgstr ""
+
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
 msgstr "מערכת ה־Zabbix קיבלה בקשה שגויה."
@@ -23108,6 +23177,10 @@ msgstr "שרת ה־Zabbix פעיל"
 #: include/classes/setup/CSetupWizard.php:747
 msgid "Zabbix server name"
 msgstr "שם שרת ה־Zabbix"
+
+#: app/partials/administration.system.info.php:40
+msgid "Zabbix server version"
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -23301,6 +23374,13 @@ msgstr "הכול"
 msgid "all media"
 msgstr "כל סוגי המדיה"
 
+#: app/views/js/configuration.discovery.edit.js.php:390
+#: include/classes/screens/CScreenDiscovery.php:104
+#: include/classes/screens/CScreenDiscovery.php:207
+#: include/discovery.inc.php:84
+msgid "allow redirect"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
 msgstr ""
@@ -23451,6 +23531,10 @@ msgstr "atan()‎ - הטנגנס ההפוך של ערך כזווית, מבוטא
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2()‎ - הארקטנגנס של הנקודות בצירים האנכי והאופקי שמיוצגים כזווית, ברדיאנים"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
 
 #: include/events.inc.php:63
 msgid "autoregistered host"

@@ -458,7 +458,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 					while (NULL != (ptr = strchr(ptr, '-')))
 					{
-						if (ptr > range_str && 'e' != ptr[-1] && 'E' != ptr[-1])
+						if (ptr > range_str && 'e' != *(ptr - 1) && 'E' != *(ptr - 1))
 							break;
 						ptr++;
 					}
@@ -1461,8 +1461,7 @@ void	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, int
 static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
 		const zbx_timespec_t *ts, int limit, int unique, char **error)
 {
-	int				arg1, nparams, count = 0, ret = FAIL;
-	int				seconds = 0, nvalues = 0, time_shift;
+	int				arg1, nparams, count = 0, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
 	char				*operator = NULL, *pattern = NULL;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
@@ -2789,7 +2788,8 @@ out:
 static int	evaluate_TREND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *func,
 		const char *parameters, const zbx_timespec_t *ts, char **error)
 {
-	int		start, end, ret = FAIL;
+	time_t		start, end;
+	int		ret = FAIL;
 	char		*period = NULL;
 	const char	*table;
 	double		value_dbl;
