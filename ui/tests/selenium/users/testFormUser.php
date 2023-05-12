@@ -27,6 +27,15 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  */
 class testFormUser extends CWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
 	public function getCreateData() {
 		return [
 			// Username is already taken by another user.
@@ -54,6 +63,7 @@ class testFormUser extends CWebTest {
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
 					],
+					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value for field "username": cannot be empty.'
 				]
@@ -68,18 +78,36 @@ class testFormUser extends CWebTest {
 						'Password' => 'test5678',
 						'Password (once again)' => 'test5678'
 					],
+					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value for field "username": cannot be empty.'
 				]
 			],
-			// Empty 'Group' field.
+			// Empty 'Role' field.
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'fields' => [
 						'Username' => 'Negative_Test1',
+						'Groups' => 'Zabbix administrators',
 						'Password' => 'test5678',
 						'Password (once again)' => 'test5678'
+					],
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Field "roleid" is mandatory.'
+				]
+			],
+			// Empty mandatory fields
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Username' => ''
+					],
+					'error_title' => 'Cannot add user',
+					'error_details' => [
+						'Incorrect value for field "username": cannot be empty.',
+						'Field "roleid" is mandatory.'
 					]
 				]
 			],
@@ -150,6 +178,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'test5678',
 						'Refresh' => ''
 					],
+					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value for field "refresh": cannot be empty.'
 				]
@@ -389,6 +418,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => ''
 					],
+					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value for field "autologout": cannot be empty.'
 				]
@@ -489,6 +519,18 @@ class testFormUser extends CWebTest {
 					'check_user' => true
 				]
 			],
+			// Creating user without a user group.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Username' => 'No_usergroup',
+						'Password' => 'test5678',
+						'Password (once again)' => 'test5678'
+					],
+					'role' => 'Super admin role'
+				]
+			],
 			// Verification that field password is not mandatory for users with LDAP authentication.
 			[
 				[
@@ -536,11 +578,15 @@ class testFormUser extends CWebTest {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		// Verify that the user was created.
-		$this->assertUserMessage($data, 'User added', 'Cannot add user');
 
+		// Verify that the user was created.
 		if ($data['expected'] === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'User added');
+			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username'])));
 		}
 
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
@@ -638,7 +684,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'User with username "Admin" already exists.'
 				]
 			],
-			// Empty 'Group' field.
+			// Empty 'Username' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -957,9 +1003,13 @@ class testFormUser extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Verify if the user was updated.
-		$this->assertUserMessage($data, 'User updated', 'Cannot update user');
 		if ($data['expected'] === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'User updated');
+			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username'])));
 		}
 
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
@@ -1056,6 +1106,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'username' => 'guest',
+					'error_title' => 'Cannot delete user',
 					'error_details' => 'Cannot delete Zabbix internal user "guest", try disabling that user.'
 				]
 			],
@@ -1069,6 +1120,7 @@ class testFormUser extends CWebTest {
 						'column' => 'name',
 						'value' => 'Local network'
 					],
+					'error_title' => 'Cannot delete user',
 					'error_details' => 'User "user-zabbix" is map "Local network" owner.'
 				]
 			],
@@ -1077,6 +1129,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'username' => 'test-timezone',
+					'error_title' => 'Cannot delete user',
 					'error_details' => 'User "test-timezone" is dashboard "Testing share dashboard" owner.'
 				]
 			],
@@ -1090,7 +1143,8 @@ class testFormUser extends CWebTest {
 						'column' => 'operationid',
 						'value' => '19'
 					],
-					'User "user-zabbix" is used in "Trigger action 4" action.'
+					'error_title' => 'Cannot delete user',
+					'error_details' => 'User "user-for-blocking" is used in "Trigger action 4" action.'
 				]
 			]
 		];
@@ -1124,10 +1178,15 @@ class testFormUser extends CWebTest {
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
+
 		// Validate if the user was deleted.
-		$this->assertUserMessage($data, 'User deleted', 'Cannot delete user');
 		if ($data['expected'] === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username =' . zbx_dbstr($username)));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'User deleted');
+			$this->assertEquals(0, CDBHelper::getCount('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username'])));
 		}
 	}
 
@@ -1163,31 +1222,6 @@ class testFormUser extends CWebTest {
 		$this->query('id:name')->one()->fill('Boris');
 		$this->query('button:Cancel')->one()->click();
 		$this->assertEquals($user_hash, CDBHelper::getHash($sql_users));
-	}
-
-	private function assertUserMessage($data, $good_title, $bad_title) {
-		$message = CMessageElement::find()->one();
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->assertTrue($message->isGood());
-				$this->assertEquals($good_title, $message->getTitle());
-				$user_count = CDBHelper::getCount('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username']));
-				if ($good_title === 'User deleted') {
-					$this->assertTrue($user_count === 0);
-				}
-				else {
-					$this->assertTrue($user_count === 1);
-				}
-				break;
-
-			case TEST_BAD:
-				$this->assertTrue($message->isBad());
-				$this->assertEquals(CTestArrayHelper::get($data, 'error_title', $data['error_title'] = $bad_title), $message->getTitle());
-				if (array_key_exists('error_details', $data)) {
-					$this->assertTrue($message->hasLine($data['error_details']));
-				}
-				break;
-		}
 	}
 
 	private function setAutoLogout($data) {
