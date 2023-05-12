@@ -1618,17 +1618,27 @@ select {
 }
 
 .action-buttons {
-	margin: 10px 0 0;
+	margin-top: 10px;
 	color: $font-alt-color;
 
 	button {
-		margin: 0 10px 10px 0;
+		vertical-align: top;
 	}
-}
 
-.selected-item-count {
-	display: inline-block;
-	margin: 0 14px 0 0;
+	& > button,
+	.btn-split {
+		&:not(:first-child) {
+			margin-right: 0;
+			margin-left: 10px;
+		}
+	}
+
+	.selected-item-count {
+		display: inline-block;
+		margin-right: 4px;
+		line-height: 24px;
+		vertical-align: top;
+	}
 }
 
 .zi-tree-top-right,
@@ -4108,19 +4118,27 @@ a.icon-count {
 
 		&[class^="zi-"], &[class*=" zi-"] {
 			padding-left: 3px;
+			color: $icon-color;
 
 			&::before {
 				margin-top: 2px;
 				margin-right: 2px;
-				color: $icon-color;
 			}
 
 			&:hover,
 			&:active,
 			&:focus {
-				&::before {
-					color: $btn-color;
-				}
+				color: $btn-color;
+			}
+
+			&[disabled] {
+				color: $btn-disabled-color;
+			}
+
+			&[aria-expanded="true"] {
+				color: $btn-color;
+				background-color: $btn-hover-bg-color;
+				border-color: $btn-hover-border-color;
 			}
 		}
 
@@ -4128,7 +4146,7 @@ a.icon-count {
 			@extend %icons-font;
 			content: $zi-chevron-down;
 			margin-top: 7px;
-			font-size: $icon-medium-size * .5;
+			font-size: 10px;
 		}
 
 		&:not(:empty) {
@@ -4162,22 +4180,23 @@ a.icon-count {
 			button {
 				border-top-left-radius: 0;
 				border-bottom-left-radius: 0;
+
+				&[aria-expanded="true"] {
+					color: $btn-color;
+					background-color: $btn-hover-bg-color;
+					border-color: $btn-hover-border-color;
+				}
 			}
 		}
 
 		&:only-child button {
 			border-radius: 2px;
 		}
+	}
 
-		.zi-chevron-down {
-			&::before {
-				font-size: $icon-small-size;
-			}
-
-			&[aria-expanded="true"] {
-				@extend button:hover;
-			}
-		}
+	button {
+		margin-right: 0;
+		margin-bottom: 0;
 	}
 }
 

@@ -2252,6 +2252,7 @@ define('ZBX_ICON_CHECK', 'zi-check');
 define('ZBX_ICON_CHECKBOX', 'zi-checkbox');
 define('ZBX_ICON_CHEVRON_DOUBLE_RIGHT', 'zi-chevron-double-right');
 define('ZBX_ICON_CHEVRON_DOWN', 'zi-chevron-down');
+define('ZBX_ICON_CHEVRON_DOWN_SMALL', 'zi-chevron-down-small');
 define('ZBX_ICON_CHEVRON_LEFT', 'zi-chevron-left');
 define('ZBX_ICON_CHEVRON_RIGHT', 'zi-chevron-right');
 define('ZBX_ICON_CHEVRON_UP', 'zi-chevron-up');

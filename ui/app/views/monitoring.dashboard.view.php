@@ -138,7 +138,7 @@ $html_page = (new CHtmlPage())
 						->addItem(
 							(new CButton('dashboard-add'))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_ICON_CHEVRON_DOWN)
+								->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
 						),
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),

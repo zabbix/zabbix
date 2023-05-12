@@ -64,6 +64,11 @@
 	}
 }
 
+.zi-chevron-down-small {
+	@extend .zi-chevron-down;
+	@extend %icon-small;
+}
+
 .zi-help-small {
 	@extend .zi-help;
 	@extend %icon-small;
