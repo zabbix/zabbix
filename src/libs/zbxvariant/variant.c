@@ -74,9 +74,7 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			zbx_free(value->data.err);
 			break;
 		case ZBX_VARIANT_VECTOR:
-			for (i = 0; i < value->data.vector->values_num; i++)
-				zbx_variant_clear(&value->data.vector->values[i]);
-
+			zbx_vector_var_clear_ext(value->data.vector);
 			zbx_vector_var_destroy(value->data.vector);
 			zbx_free(value->data.vector);
 			break;
@@ -665,3 +663,10 @@ int	zbx_vector_var_get_type(zbx_vector_var_t *v)
 	return type;
 }
 
+void	zbx_vector_var_clear_ext(zbx_vector_var_t *v)
+{
+	int	i;
+
+	for (i = 0; i < v->values_num; i++)
+		zbx_variant_clear(&v->values[i]);
+}

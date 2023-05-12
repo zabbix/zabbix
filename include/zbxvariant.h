@@ -29,6 +29,7 @@
 #define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
 
 ZBX_VECTOR_DECL(var, zbx_variant_t)
+void	zbx_vector_var_clear_ext(zbx_vector_var_t *v);
 
 typedef union
 {

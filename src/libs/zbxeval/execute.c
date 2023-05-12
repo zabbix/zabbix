@@ -727,9 +727,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 		{
 			if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_DBL, &output->values[i], error))
 			{
-				for (i = 0; i < tmp_vector->values_num; i++)
-					zbx_variant_clear(&tmp_vector->values[i]);
-
+				zbx_vector_var_clear_ext(tmp_vector);
 				zbx_vector_var_destroy(tmp_vector);
 				zbx_free(tmp_vector);
 
@@ -2149,7 +2147,7 @@ static int	eval_execute_function_ascii(const zbx_eval_context_t *ctx, const zbx_
 static int	eval_execute_function_between(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int		i, ret;
+	int		ret;
 	double		between;
 	zbx_variant_t	value;
 	zbx_vector_var_t	*input_vector;
