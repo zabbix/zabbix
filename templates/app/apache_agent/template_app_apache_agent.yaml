@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:13:40Z'
+  date: '2023-05-12T00:40:16Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -706,7 +706,7 @@ zabbix_export:
           description: 'The maximum Apache response time expressed in seconds for a trigger expression.'
         - macro: '{$APACHE.STATUS.HOST}'
           value: 127.0.0.1
-          description: 'The hostname or an IP address of the Apache status page.'
+          description: 'The hostname or IP address of the Apache status page.'
         - macro: '{$APACHE.STATUS.PATH}'
           value: 'server-status?auto'
           description: 'The URL path.'

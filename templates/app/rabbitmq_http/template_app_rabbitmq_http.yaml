@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:20:15Z'
+  date: '2023-05-12T00:44:01Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1660,7 +1660,7 @@ zabbix_export:
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
-                It responds with a status code`200 OK` if there are no alarms in effect in the cluster. 
+                It responds with a status code `200 OK` if there are no alarms in effect in the cluster.
                 Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
