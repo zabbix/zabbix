@@ -36,19 +36,17 @@ window.mediatype_message_popup = new class {
 
 	_initActions() {
 		this.form.querySelector('#message_type').onchange = (e) => {
-
 			const message_template = this._getDefaultMessageTemplate(e.target.value);
 
-			jQuery('#subject').val(message_template.subject);
-			jQuery('#message').val(message_template.message);
+			this.form.querySelector('#subject').value = message_template.subject;
+			this.form.querySelector('#message').value = message_template.message;
 		};
 	}
 
 	_getDefaultMessageTemplate(message_type) {
-		let message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>;
-
-		var media_type = jQuery('#type').val(),
-			message_format = jQuery('input[name="content_type"]:checked').val();
+		const message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>;
+		const media_type = this.form.querySelector('#type').value;
+		const message_format = document.querySelector('input[name="content_type"]:checked'). value;
 
 		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
 			return {
@@ -71,7 +69,7 @@ window.mediatype_message_popup = new class {
 
 	submit() {
 		const curl = new Curl('zabbix.php');
-		let fields = getFormFields(this.form);
+		const fields = getFormFields(this.form);
 
 		curl.setArgument('action', 'mediatype.message.check');
 		this._post(curl.getUrl(), fields);

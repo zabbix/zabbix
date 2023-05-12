@@ -170,8 +170,7 @@ window.mediatype_edit_popup = new class {
 					}
 				}
 
-				let title;
-				let messages;
+				let title, messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
@@ -574,7 +573,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	_loadSmtpSecurityFields() {
-		let smtp_security = this.form.querySelector(`input[name='smtp_security']:checked`).value;
+		const smtp_security = this.form.querySelector(`input[name='smtp_security']:checked`).value;
 
 		if (parseInt(this.type) === <?= MEDIA_TYPE_EMAIL ?>) {
 			switch (parseInt(smtp_security)) {
@@ -608,7 +607,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	_loadAuthenticationFields(provider) {
-		let authentication = this.form.querySelector(`input[name='smtp_authentication']:checked`).value;
+		const authentication = this.form.querySelector(`input[name='smtp_authentication']:checked`).value;
 		const passwd_label = this.form.querySelector('#passwd_label');
 		const passwd = this.form.querySelector('#passwd');
 		const smtp_auth_1 = this.form.querySelector(`label[for= 'smtp_authentication_1']`);
