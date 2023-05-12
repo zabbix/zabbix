@@ -197,6 +197,7 @@ class CControllerMediatypeEdit extends CController {
 					$data['parameters_webhook'] = $this->mediatype['parameters'];
 
 					CArrayHelper::sort($data['parameters_webhook'], ['name']);
+					$data['parameters_webhook'] = array_values($data['parameters_webhook']);
 					break;
 			}
 

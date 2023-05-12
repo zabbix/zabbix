@@ -165,7 +165,7 @@ class CRouter {
 		'mediatype.message.check'					=> ['CControllerMediatypeMessageCheck',					'layout.json',			null],
 		'mediatype.message.edit'					=> ['CControllerMediatypeMessageEdit',					'layout.json',			'mediatype.message.edit'],
 		'mediatype.test.edit'						=> ['CControllerMediatypeTestEdit',						'layout.json',			'mediatype.test.edit'],
-		'mediatypetest.send'						=> ['CControllerMediatypeTestSend',						'layout.json',			null],
+		'mediatype.test.send'						=> ['CControllerMediatypeTestSend',						'layout.json',			null],
 		'mediatype.update'							=> ['CControllerMediatypeUpdate',						'layout.json',			null],
 		'menu.popup'								=> ['CControllerMenuPopup',								'layout.json',			null],
 		'miscconfig.edit'							=> ['CControllerMiscConfigEdit',						'layout.htmlpage',		'administration.miscconfig.edit'],

@@ -35,7 +35,8 @@ $form = (new CForm())
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->disablePasswordAutofill()
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 // Create form grid.
 $mediatype_form_grid = (new CFormGrid())
@@ -497,17 +498,7 @@ $form
 			]).');'))->setOnDocumentReady()
 	);
 
-if ($data['mediatypeid'] === null) {
-	$buttons = [
-		[
-			'title' => _('Add'),
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'mediatype_edit_popup.submit();'
-		]
-	];
-}
-else {
+if ($data['mediatypeid']) {
 	$buttons = [
 		[
 			'title' => _('Update'),
@@ -517,15 +508,14 @@ else {
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'mediatype_edit_popup.clone('.json_encode([
-					'title' => _('New script'),
+					'title' => _('New media type'),
 					'buttons' => [
 						[
 							'title' => _('Add'),
-							'class' => 'js-add',
 							'keepOpen' => true,
 							'isSubmit' => true,
 							'action' => 'mediatype_edit_popup.submit();'
@@ -541,7 +531,7 @@ else {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete script?'),
+			'confirmation' => _('Delete media type?'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
@@ -549,7 +539,16 @@ else {
 		]
 	];
 }
-
+else {
+	$buttons = [
+		[
+			'title' => _('Add'),
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'mediatype_edit_popup.submit();'
+		]
+	];
+}
 
 $output = [
 	'header' => $data['mediatypeid'] === null ? _('New media type') : _('Media type'),

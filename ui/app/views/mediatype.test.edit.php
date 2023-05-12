@@ -25,9 +25,9 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatypetest')))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatype')))->removeId())
 	->setName('mediatypetest_form')
-	->addVar('action', 'mediatypetest.send')
+	->addVar('action', 'mediatype.test.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem(getMessages());
 

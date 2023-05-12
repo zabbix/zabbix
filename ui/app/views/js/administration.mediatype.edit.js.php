@@ -191,21 +191,13 @@ window.mediatype_edit_popup = new class {
 	}
 
 	_addParameterData() {
-		if (typeof(this.mediatype.parameters_webhook) === 'object') {
-			this.mediatype.parameters_webhook = Object.values(this.mediatype.parameters_webhook);
-
-			for (const parameter of this.mediatype.parameters_webhook) {
-				this._addWebhookParam(parameter);
-			}
+		for (const parameter of this.mediatype.parameters_webhook) {
+			this._addWebhookParam(parameter);
 		}
 
-		if (typeof(this.mediatype.parameters_exec) === 'object') {
-			this.mediatype.parameters_exec = Object.values(this.mediatype.parameters_exec);
-
-			for (const parameter of this.mediatype.parameters_exec) {
-				this._addExecParam(parameter);
-				this.row_num ++;
-			}
+		for (const parameter of this.mediatype.parameters_exec) {
+			this._addExecParam(parameter);
+			this.row_num ++;
 		}
 	}
 
