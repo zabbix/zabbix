@@ -28,7 +28,13 @@
 
 use Widgets\Problems\Includes\WidgetProblems;
 
-$item = new WidgetProblems($data);
+if ($data['error'] !== null) {
+	$item = new CTableInfo();
+	$item->setNoDataMessage($data['error']);
+}
+else {
+	$item = new WidgetProblems($data);
+}
 
 (new CWidgetView($data))
 	->addItem($item)

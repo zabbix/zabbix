@@ -230,9 +230,9 @@ typedef enum
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
-	/* the number of defined value types */
-	ITEM_VALUE_TYPE_MAX,
-	ITEM_VALUE_TYPE_NONE,
+	ITEM_VALUE_TYPE_BIN,	/* Last real value. In some places it is also used in size of array or */
+				/* upper bound for iteration. Do not forget to update when adding new types. */
+	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
@@ -538,8 +538,9 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_GET_SCOPE(task)	(int)(((unsigned int)task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
 #define ZBX_RTC_GET_DATA(task)	(int)(((unsigned int)task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
 
-#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
-	(data << ZBX_RTC_DATA_SHIFT))
+#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	(((zbx_uint32_t)msg << ZBX_RTC_MSG_SHIFT) | \
+						((zbx_uint32_t)scope << ZBX_RTC_SCOPE_SHIFT) | \
+						((zbx_uint32_t)data << ZBX_RTC_DATA_SHIFT))
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
@@ -709,21 +710,6 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
-#define ZBX_HTTPFIELD_HEADER		0
-#define ZBX_HTTPFIELD_VARIABLE		1
-#define ZBX_HTTPFIELD_POST_FIELD	2
-#define ZBX_HTTPFIELD_QUERY_FIELD	3
-
-#define ZBX_POSTTYPE_RAW		0
-#define ZBX_POSTTYPE_FORM		1
-#define ZBX_POSTTYPE_JSON		2
-#define ZBX_POSTTYPE_XML		3
-#define ZBX_POSTTYPE_NDJSON		4
-
-#define ZBX_RETRIEVE_MODE_CONTENT	0
-#define ZBX_RETRIEVE_MODE_HEADERS	1
-#define ZBX_RETRIEVE_MODE_BOTH		2
-
 void	__zbx_update_env(double time_now);
 
 #ifdef _WINDOWS
@@ -745,9 +731,6 @@ do							\
 }							\
 while (0)
 #endif
-
-#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
-#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 /* includes terminating '\0' */
 #define CUID_LEN	26

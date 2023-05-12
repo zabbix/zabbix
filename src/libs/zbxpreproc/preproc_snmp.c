@@ -129,14 +129,10 @@ static int	snmp_hex_to_utf8_dyn(char *value, char **out)
 
 static int	snmp_hex_to_mac(char *out)
 {
-	int	hex_num = 0;
-
 	while ('\0' != *out)
 	{
 		if (0 == isxdigit((unsigned char)out[0]) || 0 == isxdigit((unsigned char)out[1]))
 			return FAIL;
-
-		hex_num++;
 
 		if ('\0' == out[2])
 			break;
@@ -749,7 +745,10 @@ int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, c
 			snmp_value_pair_compare_func);
 
 	if (FAIL == preproc_snmp_walk_to_pairs(&cache->pairs, data, error))
+	{
+		zbx_snmp_value_cache_clear(cache);
 		return FAIL;
+	}
 
 	return SUCCEED;
 }

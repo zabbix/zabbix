@@ -58,15 +58,15 @@ class CWidgetFieldLatLngView extends CWidgetFieldView {
 	}
 
 	public function getView(): CTextBox {
-		$textbox = (new CTextBox($this->field->getName(), $this->field->getValue()))
+		$view = (new CTextBox($this->field->getName(), $this->field->getValue(), false, $this->field->getMaxLength()))
 			->setWidth($this->width)
 			->setEnabled(!$this->isDisabled())
 			->setAriaRequired($this->isRequired());
 
 		if ($this->placeholder !== '') {
-			$textbox = $textbox->setAttribute('placeholder', $this->placeholder);
+			$view->setAttribute('placeholder', $this->placeholder);
 		}
 
-		return $textbox;
+		return $view;
 	}
 }

@@ -1688,7 +1688,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestClickButton('discoveryrule.massdelete');
 
 			$this->zbxTestAcceptAlert();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rule deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
 			$this->assertEquals(0, CDBHelper::getCount($sql), 'Discovery rule has not been deleted from DB.');

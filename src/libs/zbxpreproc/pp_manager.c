@@ -810,6 +810,11 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 		zbx_variant_set_str(var, value->result->text);
 		value->result->text = NULL;
 	}
+	else if (ZBX_ISSET_BIN(value->result))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
 	else
 		zbx_variant_set_none(var);
 
@@ -1256,3 +1261,25 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 #undef PP_MANAGER_DELAY_NS
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change worker log level                                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_manager_change_worker_loglevel(zbx_pp_manager_t *manager, int worker_num, int direction)
+{
+	if (0 > worker_num || manager->workers_num < worker_num)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Cannot change log level for preprocessing worker #%d:"
+				" no such instance", worker_num);
+		return;
+	}
+
+	for (int i = 0; i < manager->workers_num; i++)
+	{
+		if (0 != worker_num && worker_num != i + 1)
+			continue;
+
+		zbx_change_component_log_level(&manager->workers[i].logger, direction);
+	}
+}

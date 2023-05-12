@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -22,21 +22,20 @@
 /**
  * Controller class containing operations for adding and updating discovery checks.
  */
-class CControllerPopupDiscoveryCheck extends CController {
+class CControllerDiscoveryCheckEdit extends CController {
 
 	/**
 	 * Default discovery check type.
 	 */
 	const DEFAULT_TYPE = SVC_FTP;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'update' =>					'in 1',
-			'validate' =>				'in 1',
 			'dcheckid' =>				'string',
 			'type' =>					'in '.implode(',', array_keys(discovery_check_type2str())),
 			'ports' =>					'string|not_empty|db dchecks.ports',
@@ -49,23 +48,11 @@ class CControllerPopupDiscoveryCheck extends CController {
 			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.implode(',', array_keys(getSnmpV3AuthProtocols())),
 			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
 			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.implode(',', array_keys(getSnmpV3PrivProtocols())),
-			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase'
+			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase',
+			'allow_redirect' =>			'db dchecks.allow_redirect|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret && $this->hasInput('ports') && !validate_port_list($this->getInput('ports'))) {
-			info(_('Incorrect port range.'));
-			$ret = false;
-		}
-
-		if ($ret && $this->hasInput('type') && $this->getInput('type') == SVC_AGENT) {
-			$item_key_parser = new CItemKey();
-			if ($item_key_parser->parse($this->getInput('key_')) != CParser::PARSE_SUCCESS) {
-				info(_s('Invalid key "%1$s": %2$s.', $this->getInput('key_'), $item_key_parser->getError()));
-				$ret = false;
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -80,11 +67,11 @@ class CControllerPopupDiscoveryCheck extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		return true;
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = array_merge([
 			'type' => self::DEFAULT_TYPE,
 			'ports' => svc_default_port(self::DEFAULT_TYPE)
@@ -93,19 +80,9 @@ class CControllerPopupDiscoveryCheck extends CController {
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
 		$params['name'] = discovery_check_type2str($data['type']);
 
-		if ($this->getInput('validate', 0)) {
-			if ($params['type'] == SVC_SNMPv1 || $params['type'] == SVC_SNMPv2c || $params['type'] == SVC_SNMPv3) {
-				$params['key_'] = $data['snmp_oid'];
-			}
-
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode(['params' => $params])]))->disableView()
-			);
-			return;
-		}
-
 		$output = [
 			'title' => _('Discovery check'),
+			'dcheckid' => $data['dcheckid'],
 			'params' => $params + DB::getDefaults('dchecks'),
 			'update' => $this->getInput('update', 0),
 			'user' => [

@@ -58,7 +58,7 @@ foreach ($data['group_rights'] as $groupid => $group_right) {
 			$form_vars[] = (new CVar('group_rights['.$groupid.'][grouped]', $group_right['grouped']))->removeId();
 			$form_data_json[$groupid]['grouped'] = $group_right['grouped'];
 
-			$group_name = [$group_right['name'], SPACE, italic('('._('including subgroups').')')];
+			$group_name = [$group_right['name'], NBSP(), italic('('._('including subgroups').')')];
 		}
 		else {
 			$group_name = $group_right['name'];

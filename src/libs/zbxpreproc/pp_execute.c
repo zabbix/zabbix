@@ -268,33 +268,32 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 	}
 	else
 	{
-		zbx_jsonobj_t	*obj;
+		zbx_pp_cache_jsonpath_t	*index;
 
-		if (NULL == (obj = (zbx_jsonobj_t *)cache->data))
+		if (NULL == (index = (zbx_pp_cache_jsonpath_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
 
-			obj = (zbx_jsonobj_t *)zbx_malloc(NULL, sizeof(zbx_jsonobj_t));
+			index = (zbx_pp_cache_jsonpath_t *)zbx_malloc(NULL, sizeof(zbx_pp_cache_jsonpath_t));
 
-			if (SUCCEED != zbx_jsonobj_open(value->data.str, obj))
+			if (SUCCEED != zbx_jsonobj_open(value->data.str, &index->obj))
 			{
 				*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
-				zbx_free(obj);
+				zbx_free(index);
 				cache->type = ZBX_PREPROC_NONE;
 				return FAIL;
 			}
 
-			cache->data = (void *)obj;
+			index->index = zbx_jsonpath_index_create();
+			cache->data = (void *)index;
 		}
 
-		if (FAIL == zbx_jsonobj_query(obj, params, &data))
+		if (FAIL == zbx_jsonobj_query_ext(&index->obj, index->index, params, &data))
 		{
 			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 			return FAIL;
 		}
-
-		zbx_jsonobj_disable_indexing(obj);
 	}
 
 	if (NULL == data)
@@ -926,8 +925,6 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 {
 	int	ret;
 
-	pp_cache_copy_value(cache, step->type, value);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__,
 			step->type, ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), (void *)cache);
 
@@ -1049,17 +1046,25 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 			zbx_variant_value_desc(NULL == cache ? value_in : &cache->value),
 			zbx_variant_type_desc(NULL == cache ? value_in : &cache->value));
 
-	if (NULL == cache)
-		zbx_variant_copy(value_out, value_in);
-	else
-		value_in = &cache->value;
-
 	if (NULL == preproc || 0 == preproc->steps_num)
 	{
-		if (NULL != cache)
-			zbx_variant_copy(value_out, &cache->value);
+		zbx_variant_copy(value_out, NULL != cache ? &cache->value : value_in);
 
 		goto out;
+	}
+
+	if (NULL == cache)
+	{
+		zbx_variant_copy(value_out, value_in);
+	}
+	else
+	{
+		/* preprocessing cache is enabled only for the first step, */
+		/* so prepare output value based on first step type        */
+		pp_cache_prepare_output_value(cache, preproc->steps[0].type, value_out);
+
+		/* set input value for error reporting */
+		value_in = &cache->value;
 	}
 
 	results = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t) * (size_t)preproc->steps_num);

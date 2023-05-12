@@ -1240,6 +1240,10 @@ msgstr ""
 msgid "Allow manual close"
 msgstr ""
 
+#: app/views/popup.discovery.check.php:125
+msgid "Allow redirect"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
 #: include/views/configuration.item.edit.php:945
@@ -1580,6 +1584,10 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
+msgstr ""
+
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
 msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
@@ -2974,6 +2982,16 @@ msgstr ""
 msgid "Cannot expand macros."
 msgstr ""
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:217
+#, c-format
+msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:241
+#, c-format
+msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -3082,10 +3100,25 @@ msgstr "Δεν βρίσκω συλλέκτη \"%1$s\" σε \"%2$s\" με χρή�
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
 msgstr ""
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:193
+#, c-format
+msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Δεν βρίσκω χάρτη \"%1$s\" με χρήση σε χάρτη \"%2$s\"."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:253
+#, c-format
+msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:205
+#, c-format
+msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
@@ -3102,6 +3135,11 @@ msgstr ""
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Δεν βρίσκω έναυσμα \"%1$s\" με χρήση σε χάρτη \"%2$s\"."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:229
+#, c-format
+msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1510
 msgid "Cannot find user directory for LDAP."
@@ -4366,6 +4404,15 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:423 jsLoader.php:355
 msgid "Clone"
 msgstr "Κλώνος"
+
+#: app/views/configuration.host.edit.php:61
+#: app/views/js/popup.host.edit.js.php:45 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:195
+msgid "Cloned template parameter values have been modified."
+msgstr ""
 
 #: app/views/popup.import.compare.php:162 app/views/popup.token.view.php:86
 #: include/func.inc.php:1723 include/views/js/monitoring.sysmaps.js.php:339
@@ -9240,6 +9287,11 @@ msgstr "Επισκόπηση απογραφής ξενιστή"
 msgid "Host label type"
 msgstr "Τύπος ετικέτας ξενιστή"
 
+#: widgets/dataover/includes/WidgetForm.php:64
+#: widgets/trigover/includes/WidgetForm.php:71
+msgid "Host location"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
 msgstr ""
@@ -11895,6 +11947,10 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:925
 #: include/views/configuration.host.discovery.edit.php:978
 msgid "LLD macros"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneralOld.php:700
+msgid "LLD rule with the same UUID already exists"
 msgstr ""
 
 #: app/partials/popup.operations.php:257
@@ -18252,6 +18308,11 @@ msgstr ""
 msgid "Show"
 msgstr "Εμφάνιση"
 
+#: widgets/hostavail/includes/WidgetForm.php:61
+#: widgets/web/includes/WidgetForm.php:65
+msgid "Show data in maintenance"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:182
 #: app/partials/monitoring.problem.filter.php:277
 msgid "Show details"
@@ -19566,6 +19627,10 @@ msgstr ""
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
+#: app/controllers/CControllerHostEdit.php:283 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
+
 #: include/html.inc.php:637
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -19628,6 +19693,10 @@ msgstr ""
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Η ζητούμενη απομακρυσμένη-διαδικασία δεν υπάρχει / δεν είναι διαθέσιμη"
+
+#: templates.php:181
+msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -23044,6 +23113,10 @@ msgstr "Αντιπρόσωπος Zabbix"
 msgid "Zabbix agent (active)"
 msgstr "Αντιπρόσωπος Zabbix (ενεργός)"
 
+#: app/partials/administration.system.info.php:45
+msgid "Zabbix frontend version"
+msgstr ""
+
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix έλαβε λανθασμένο αίτημα."
@@ -23096,6 +23169,10 @@ msgstr "Ο Εξυπηρετητής Zabbix λειτουργεί"
 #: include/classes/setup/CSetupWizard.php:747
 msgid "Zabbix server name"
 msgstr "Όνομα εξυπηρετητή Zabbix"
+
+#: app/partials/administration.system.info.php:40
+msgid "Zabbix server version"
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -23289,6 +23366,13 @@ msgstr "όλα"
 msgid "all media"
 msgstr "όλα τα μέσα"
 
+#: app/views/js/configuration.discovery.edit.js.php:390
+#: include/classes/screens/CScreenDiscovery.php:104
+#: include/classes/screens/CScreenDiscovery.php:207
+#: include/discovery.inc.php:84
+msgid "allow redirect"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
 msgstr ""
@@ -23438,6 +23522,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr ""
 
 #: include/events.inc.php:63
@@ -24005,6 +24093,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "καθολικές ρυθμίσεις τακτοποίησης"
 
+#: include/classes/api/services/CGraphGeneral.php:874
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:868
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:82
 #, c-format
 msgid "group name must match %1$s group name"
@@ -24029,6 +24125,10 @@ msgstr "ξενιστής"
 #: include/classes/api/services/CMap.php:1317
 msgid "host group"
 msgstr "ομάδα ξενιστή"
+
+#: include/classes/api/services/CHostGroup.php:795
+msgid "host group with the same UUID already exists"
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
@@ -24269,6 +24369,14 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:819
 #: include/classes/widgets/CWidgetHelper.php:1175
 msgid "item pattern"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:486
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:480
+msgid "item with the same UUID already exists"
 msgstr ""
 
 #: include/classes/parsers/CItemKey.php:54
@@ -24914,6 +25022,10 @@ msgstr ""
 msgid "service"
 msgstr ""
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr "σύντομη περιγραφή"
@@ -25040,6 +25152,18 @@ msgstr ""
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "το ID σχεδιότυπου \"%1$s\" πέρασε %2$s φορές"
+
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplateGroup.php:594
+msgid "template group with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:458
+msgid "template with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1577
 #: include/classes/api/services/CItemGeneral.php:1594
@@ -25172,8 +25296,16 @@ msgstr ""
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr ""
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1888
 msgid "trigger with linkages cannot be moved to another template or host"
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
@@ -25405,6 +25537,10 @@ msgstr ""
 msgid "value is too long"
 msgstr ""
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -25507,6 +25643,10 @@ msgstr "μέσω"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
+msgstr ""
+
+#: include/classes/api/services/CHttpTest.php:440
+msgid "web scenario with the same UUID already exists"
 msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:83

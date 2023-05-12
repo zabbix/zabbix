@@ -1110,9 +1110,12 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
 		}
 		else {
-			$this->assertEquals(['Clock', 'Graph (classic)', 'Graph prototype', 'Item value', 'Plain text', 'URL'],
-					$form->getField('Type')->getOptions()->asText()
-			);
+			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Geomap', 'Graph',
+					'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
+					'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
+					'Top hosts', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
+			];
+			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}
 		$dialog->close();
 	}

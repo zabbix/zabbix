@@ -40,6 +40,11 @@ zbx_host_template_link_type;
 typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *, const char *,
 		const zbx_timespec_t *, char **);
 
+typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
+		zbx_timespec_t *ts, char *error);
+
+void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func);
+
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *server);
 
@@ -125,5 +130,8 @@ void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **exp
 		zbx_trigger_func_t eval_func_cb, int recovery);
 void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index, char **value,
 		zbx_trigger_func_t eval_func_cb, int recovery);
+
+#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
+#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #endif /* ZABBIX_DBWRAP_H */

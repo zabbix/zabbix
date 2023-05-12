@@ -19,6 +19,7 @@
 
 #include "lld_manager.h"
 
+#include "zbxalgo.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
@@ -150,8 +151,6 @@ static void	lld_worker_free(zbx_lld_worker_t *worker)
  *                                                                            *
  * Purpose: initializes LLD manager                                           *
  *                                                                            *
- * Parameters: manager - [IN] the manager to initialize                       *
- *                                                                            *
  ******************************************************************************/
 static void	lld_manager_init(zbx_lld_manager_t *manager, zbx_get_config_forks_f get_config_forks_cb)
 {
@@ -190,8 +189,6 @@ static void	lld_manager_init(zbx_lld_manager_t *manager, zbx_get_config_forks_f 
  *                                                                            *
  * Purpose: destroys LLD manager                                              *
  *                                                                            *
- * Parameters: manager - [IN] the manager to destroy                          *
- *                                                                            *
  ******************************************************************************/
 static void	lld_manager_destroy(zbx_lld_manager_t *manager)
 {
@@ -207,8 +204,8 @@ static void	lld_manager_destroy(zbx_lld_manager_t *manager)
  *                                                                            *
  * Purpose: returns worker by connected IPC client data                       *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             client  - [IN] the connected worker                            *
+ * Parameters: manager - [IN]                                                 *
+ *             client  - [IN] connected worker                                *
  *                                                                            *
  * Return value: The LLD worker                                               *
  *                                                                            *
@@ -233,9 +230,9 @@ static zbx_lld_worker_t	*lld_get_worker_by_client(zbx_lld_manager_t *manager, zb
  *                                                                            *
  * Purpose: registers worker                                                  *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             client  - [IN] the connected worker IPC client data            *
- *             message - [IN] the received message                            *
+ * Parameters: manager - [IN]                                                 *
+ *             client  - [IN] connected worker IPC client data                *
+ *             message - [IN] received message                                *
  *                                                                            *
  ******************************************************************************/
 static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *client,
@@ -275,8 +272,8 @@ static void	lld_register_worker(zbx_lld_manager_t *manager, zbx_ipc_client_t *cl
  *                                                                            *
  * Purpose: queues LLD rule                                                   *
  *                                                                            *
- * Parameters: manager - [IN] the LLD manager                                 *
- *             rule    - [IN] the LLD rule                                    *
+ * Parameters: manager - [IN]                                                 *
+ *             rule    - [IN]                                                 *
  *                                                                            *
  ******************************************************************************/
 static void	lld_queue_rule(zbx_lld_manager_t *manager, zbx_lld_rule_t *rule)
@@ -290,8 +287,8 @@ static void	lld_queue_rule(zbx_lld_manager_t *manager, zbx_lld_rule_t *rule)
  *                                                                            *
  * Purpose: queues low level discovery request                                *
  *                                                                            *
- * Parameters: manager - [IN] the LLD manager                                 *
- *             message - [IN] the message with LLD request                    *
+ * Parameters: manager - [IN]                                                 *
+ *             message - [IN] message with LLD request                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_t *message)
@@ -358,8 +355,8 @@ out:
  *                                                                            *
  * Purpose: processes next LLD request from queue                             *
  *                                                                            *
- * Parameters: manager - [IN] the LLD manager                                 *
- *             worker  - [IN] the target worker                               *
+ * Parameters: manager - [IN]                                                 *
+ *             worker  - [IN] target worker                                   *
  *                                                                            *
  ******************************************************************************/
 static void	lld_process_next_request(zbx_lld_manager_t *manager, zbx_lld_worker_t *worker)
@@ -384,8 +381,6 @@ static void	lld_process_next_request(zbx_lld_manager_t *manager, zbx_lld_worker_
  *                                                                            *
  * Purpose: sends queued LLD rules to free workers                            *
  *                                                                            *
- * Parameters: manager - [IN] the LLD manager                                 *
- *                                                                            *
  ******************************************************************************/
 static void	lld_process_queue(zbx_lld_manager_t *manager)
 {
@@ -404,8 +399,8 @@ static void	lld_process_queue(zbx_lld_manager_t *manager)
  *                                                                            *
  * Purpose: processes LLD worker 'done' response                              *
  *                                                                            *
- * Parameters: manager - [IN] the LLD manager                                 *
- * Parameters: client  - [IN] the worker's IPC client connection              *
+ * Parameters: manager - [IN]                                                 *
+ * Parameters: client  - [IN] worker's IPC client connection                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *client)
@@ -451,8 +446,8 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
  *                                                                            *
  * Purpose: processes external diagnostic statistics request                  *
  *                                                                            *
- * Parameters: manager - [IN] the LLD manager                                 *
- * Parameters: client  - [IN] the external IPC connection                     *
+ * Parameters: manager - [IN]                                                 *
+ * Parameters: client  - [IN] external IPC connection                         *
  *                                                                            *
  ******************************************************************************/
 static void	lld_process_diag_stats(zbx_lld_manager_t *manager, zbx_ipc_client_t *client)
@@ -483,9 +478,9 @@ static int	lld_diag_item_compare_values_desc(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: processes external top items request                              *
  *                                                                            *
- * Parameters: manager - [IN] the manager                                     *
- *             client  - [IN] the connected worker IPC client data            *
- *             message - [IN] the received message                            *
+ * Parameters: manager - [IN]                                                 *
+ *             client  - [IN] connected worker IPC client data                *
+ *             message - [IN] received message                                *
  *                                                                            *
  ******************************************************************************/
 static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *client,

@@ -5,6 +5,8 @@ noinst_LIBRARIES = libzbxlld.a
 libzbxlld_a_SOURCES = \
 	lld.c \
 	lld.h \
+	lld_audit.c \
+	lld_audit.h \
 	lld_common.c \
 	lld_graph.c \
 	lld_host.c \
