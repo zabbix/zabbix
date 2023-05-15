@@ -181,7 +181,7 @@ static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_
  *             j          - [OUT] the output json                             *
  *                                                                            *
  ******************************************************************************/
-static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table, 
+static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table,
 		const char *alias, struct zbx_json *j)
 {
 	int	i;
@@ -433,7 +433,7 @@ static int	proxyconfig_get_table_data_ext(const char *table_name, const char *ke
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_uint64_t	recid;
-	
+
 			ZBX_STR2UINT64(recid, row[0]);
 
 			if (NULL != key_ids_filter && NULL == zbx_hashset_search(key_ids_filter, &recid))
@@ -707,7 +707,6 @@ static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct 
 	if (SUCCEED != proxyconfig_get_item_data(hostids, &itemids, &items, j, error))
 		goto out;
 
-	
 	if (0 != items.num_data)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " join items i on i.itemid=t.itemid and");
