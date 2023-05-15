@@ -89,9 +89,8 @@ div.dashboard-widget-gauge {
 		$line-height: 1.2em;
 
 		> div {
-			box-sizing: border-box;
 			height: 100%;
-			padding: 10px;
+			padding: 0 10px;
 		}
 	}
 }
