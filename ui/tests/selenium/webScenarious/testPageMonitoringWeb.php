@@ -168,10 +168,11 @@ class testPageMonitoringWeb extends CWebTest {
 			$this->assertTrue($table->getRow(0)->getColumn($field)->query('xpath:.//a')->one()->isClickable());
 		}
 
-		// Check if the correct amount of rows is displayed.
-		$table->findRow('Name', 'testFormWeb1')->query('link', 'testFormWeb1')->one()->click();
+		// Check that the correct details of scenario are opened.
+		$first_row_name = $table->getRow(0)->getColumn('Name')->getText();
+		$table->findRow('Name', $first_row_name)->getColumn('Name')->query('tag:a')->one()->click();
 		$this->page->waitUntilReady();
-		$this->page->assertHeader('Details of web scenario: testFormWeb1');
+		$this->page->assertHeader('Details of web scenario: '.$first_row_name);
 		$this->page->assertTitle('Details of web scenario');
 	}
 
@@ -218,9 +219,8 @@ class testPageMonitoringWeb extends CWebTest {
 	 */
 	public function testPageMonitoringWeb_CheckHostContextMenu() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC')->waitUntilReady();
-		$titles = [
-			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Web', 'Configuration', 'Detect operating system',
-					'Ping', 'Selenium script', 'Traceroute'
+		$titles = ['Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Web', 'Configuration',
+				'Detect operating system', 'Ping', 'Selenium script', 'Traceroute'
 		];
 
 		foreach (['WebData Host', 'Simple form test host'] as $name) {
@@ -256,12 +256,7 @@ class testPageMonitoringWeb extends CWebTest {
 			$this->query('xpath://button[normalize-space()="'.$status.'"]')->one()->click();
 			$this->page->acceptAlert();
 
-			if ($status === 'Disable') {
-				$this->assertMessage(TEST_GOOD, 'Web scenarios disabled');
-			}
-			else {
-				$this->assertMessage(TEST_GOOD, 'Web scenarios enabled');
-			}
+			$this->assertMessage(TEST_GOOD, ($status === 'Disable' ? 'Web scenarios disabled' :'Web scenarios enabled'));
 
 			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 			$changed = ($status === 'Disable')
@@ -360,6 +355,7 @@ class testPageMonitoringWeb extends CWebTest {
 
 	public static function getFilterData() {
 		return [
+			// #0.
 			[
 				[
 					'filter' => [
@@ -379,6 +375,7 @@ class testPageMonitoringWeb extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'filter' => [
@@ -392,6 +389,7 @@ class testPageMonitoringWeb extends CWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'filter' => [
@@ -404,6 +402,7 @@ class testPageMonitoringWeb extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'filter' => [
@@ -423,6 +422,7 @@ class testPageMonitoringWeb extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'filter' => [
@@ -446,6 +446,7 @@ class testPageMonitoringWeb extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'filter' => [
