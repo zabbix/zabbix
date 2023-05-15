@@ -31,6 +31,8 @@ class CTrigger extends CTriggerGeneral {
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
+
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname'];

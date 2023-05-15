@@ -124,6 +124,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE};
 
 	zbx_thread_server_trigger_housekeeper_args	*trigger_housekeeper_args_in =
 			(zbx_thread_server_trigger_housekeeper_args *) ((((zbx_thread_args_t *)args))->args);
@@ -139,7 +140,8 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	zbx_setproctitle("%s [startup idle for %d second(s)]", get_process_type_string(process_type),
 			CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
 
-	zbx_rtc_subscribe(process_type, process_num, trigger_housekeeper_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs),
+			trigger_housekeeper_args_in->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

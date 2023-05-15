@@ -123,7 +123,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('SLA report')]);
 		$dialog->waitUntilReady();
 
-		$this->assertEquals(["Type", "Name", "Refresh interval", "SLA", "Service", "Show periods", "From", "To"],
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'SLA', 'Service', 'Show periods', 'From', 'To'],
 				$form->getLabels()->asText()
 		);
 		$form->checkValue(['Show header' => true, 'Refresh interval' => 'Default (No refresh)']);

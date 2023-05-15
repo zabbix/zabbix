@@ -784,8 +784,6 @@ class CWidget extends CBaseComponent {
 	}
 
 	_setErrorContents({error}) {
-		this._setHeaderName(this._defaults.name);
-
 		const message_box = makeMessageBox('bad', error.messages, error.title)[0];
 
 		this._content_body.innerHTML = '';

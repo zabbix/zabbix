@@ -1409,7 +1409,6 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
-	zbx_init_library_cfg(program_type);
 	zbx_init_library_sysinfo(get_config_timeout);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_progname);
@@ -1429,6 +1428,7 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
+
 
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
@@ -1454,6 +1454,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
+
+	zbx_init_library_cfg(program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	zbx_init_metrics();

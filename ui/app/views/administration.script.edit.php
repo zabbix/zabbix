@@ -271,7 +271,7 @@ $form_list
 	->addRow(new CLabel(_('Confirmation text'), 'confirmation'), [
 		(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		SPACE,
+		NBSP(),
 		(new CButton('testConfirmation', _('Test confirmation')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setId('test-confirmation')

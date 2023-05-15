@@ -388,7 +388,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 				->getUrl()
 		))->setTitle(_s('This field is automatically populated by item "%1$s".', $item_name));
 
-		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
+		$inventory_item = (new CSpan([' ', LARR(), ' ', $link]))->addClass('populating_item');
 		$input_field->addClass('linked_to_item');
 
 		if ($data['host']['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {

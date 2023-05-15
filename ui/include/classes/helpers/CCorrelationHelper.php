@@ -116,44 +116,44 @@ class CCorrelationHelper {
 			case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 				$description[] = _('Old event tag name');
 				$description[] = ' '.self::getLabelByOperator((int) $condition['operator']).' ';
-				$description[] = italic(CHtml::encode($condition['tag']));
+				$description[] = italic($condition['tag']);
 				break;
 
 			case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 				$description[] = _('New event tag name');
 				$description[] = ' '.self::getLabelByOperator((int) $condition['operator']).' ';
-				$description[] = italic(CHtml::encode($condition['tag']));
+				$description[] = italic($condition['tag']);
 				break;
 
 			case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 				$description[] = _('New event host group');
 				$description[] = ' '.self::getLabelByOperator((int) $condition['operator']).' ';
-				$description[] = italic(CHtml::encode(array_key_exists($condition['groupid'], $group_names)
+				$description[] = italic(array_key_exists($condition['groupid'], $group_names)
 					? $group_names[$condition['groupid']]
 					: _('Unknown')
-				));
+				);
 				break;
 
 			case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 				$description[] = _('Value of old event tag').' ';
-				$description[] = italic(CHtml::encode($condition['oldtag']));
+				$description[] = italic($condition['oldtag']);
 				$description[] = ' '.self::getLabelByOperator((int) $condition['operator']).' '.
 					_('value of new event tag').' ';
-				$description[] = italic(CHtml::encode($condition['newtag']));
+				$description[] = italic($condition['newtag']);
 				break;
 
 			case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 				$description[] = _('Value of old event tag').' ';
-				$description[] = italic(CHtml::encode($condition['tag']));
+				$description[] = italic($condition['tag']);
 				$description[] = ' '.self::getLabelByOperator((int) $condition['operator']).' ';
-				$description[] = italic(CHtml::encode($condition['value']));
+				$description[] = italic($condition['value']);
 				break;
 
 			case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 				$description[] = _('Value of new event tag').' ';
-				$description[] = italic(CHtml::encode($condition['tag']));
+				$description[] = italic($condition['tag']);
 				$description[] = ' '.self::getLabelByOperator((int) $condition['operator']).' ';
-				$description[] = italic(CHtml::encode($condition['value']));
+				$description[] = italic($condition['value']);
 				break;
 		}
 
