@@ -1306,7 +1306,6 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 #ifdef HAVE_NETSNMP
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 	zbx_ipc_async_socket_t	rtc;
-	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 #endif
 
 	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
