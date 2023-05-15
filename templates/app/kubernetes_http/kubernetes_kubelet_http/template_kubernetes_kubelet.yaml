@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:17:28Z'
+  date: '2023-05-12T01:16:24Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -463,7 +463,7 @@ zabbix_export:
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'container_cpu_load_average_10s{pod="{#NAME}", namespace="{#NAMESPACE}"}'
+                    - 'container_cpu_load_average_10s{container!="", container!="POD", pod="{#NAME}", namespace="{#NAMESPACE}"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
@@ -482,14 +482,43 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              description: 'The number of cores used for system time.'
+              description: 'System cpu time consumed. It is calculated from the cumulative value using the `Change per second` preprocessing step.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'container_cpu_system_seconds_total{pod="{#NAME}", namespace="{#NAMESPACE}"}'
+                    - 'container_cpu_system_seconds_total{container!="", container!="POD", pod="{#NAME}", namespace="{#NAMESPACE}"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                - tag: component
+                  value: pod
+                - tag: pod
+                  value: '{#NAME}'
+            - uuid: 08ae25c1a6a34fae9f3131b14c061e4d
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Usage seconds, total'
+              type: DEPENDENT
+              key: 'kube.pod.container_cpu_usage_seconds_total[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Consumed cpu time. It is calculated from the cumulative value using the `Change per second` preprocessing step.'
+              preprocessing:
+                - type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_cpu_usage_seconds_total{container!="", container!="POD", pod="{#NAME}", namespace="{#NAMESPACE}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: kube.cadvisor.metrics
               tags:
@@ -505,14 +534,17 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
-              description: 'The number of cores used for user time.'
+              description: 'User cpu time consumed. It is calculated from the cumulative value using the `Change per second` preprocessing step.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
-                    - 'container_cpu_user_seconds_total{pod="{#NAME}", namespace="{#NAMESPACE}"}'
+                    - 'container_cpu_user_seconds_total{container!="", container!="POD", pod="{#NAME}", namespace="{#NAMESPACE}"}'
                     - function
                     - sum
                   error_handler: DISCARD_VALUE
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: kube.cadvisor.metrics
               tags:
