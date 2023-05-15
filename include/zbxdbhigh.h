@@ -754,8 +754,8 @@ typedef struct
 	char				*version_str;
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
-	int				lastaccess;
-	int				last_version_error_time;
+	time_t				lastaccess;
+	time_t				last_version_error_time;
 	int				proxy_delay;
 	int				more_data;
 	zbx_proxy_suppress_t		nodata_win;

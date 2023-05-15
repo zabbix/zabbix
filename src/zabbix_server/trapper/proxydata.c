@@ -197,7 +197,7 @@ out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */
 				/* we are trying to save info about lastaccess to detect communication problem */
 	{
-		int	lastaccess;
+		time_t	lastaccess;
 
 		if (ZBX_PROXY_UPLOAD_DISABLED == upload_status)
 			lastaccess = time(NULL);

@@ -1321,7 +1321,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT,
-							ZBX_TM_STATUS_NEW, (int)zbx_time(), 0, 0);
+							ZBX_TM_STATUS_NEW, (time_t)zbx_time(), 0, 0);
 					task->data = zbx_tm_remote_command_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1368,7 +1368,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-							(int)zbx_time(), 0, 0);
+							(time_t)zbx_time(), 0, 0);
 					task->data = zbx_tm_data_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1634,7 +1634,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	sec1 = zbx_time();
 
-	sleeptime = ZBX_TM_PROCESS_PERIOD - (int)sec1 % ZBX_TM_PROCESS_PERIOD;
+	sleeptime = ZBX_TM_PROCESS_PERIOD - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD;
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
@@ -1661,18 +1661,18 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
-		tasks_num = tm_process_tasks(&rtc, (int)sec1);
+		tasks_num = tm_process_tasks(&rtc, (time_t)sec1);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
-			tm_remove_old_tasks((int)sec1);
-			cleanup_time = (int)sec1;
+			tm_remove_old_tasks((time_t)sec1);
+			cleanup_time = (time_t)sec1;
 		}
 
 		sec2 = zbx_time();
 
-		nextcheck = (int)sec1 - (int)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
+		nextcheck = (time_t)sec1 - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
 
-		if (0 > (sleeptime = nextcheck - (int)sec2))
+		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
 
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",

@@ -1696,11 +1696,11 @@ done:
 
 			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
 			{
-				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
+				proxy->proxy_config_nextcheck = calculate_proxy_nextcheck(
 						hostid, proxyconfig_frequency, now);
-				proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
+				proxy->proxy_data_nextcheck = calculate_proxy_nextcheck(
 						hostid, proxyconfig_frequency, now);
-				proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
+				proxy->proxy_tasks_nextcheck = calculate_proxy_nextcheck(
 						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
 
 				DCupdate_proxy_queue(proxy);
@@ -11894,7 +11894,8 @@ int	zbx_dc_config_get_last_sync_time(void)
  ******************************************************************************/
 int	zbx_dc_config_get_proxypoller_hosts(zbx_dc_proxy_t *proxies, int max_hosts)
 {
-	int			now, num = 0;
+	time_t			now;
+	int			num = 0;
 	zbx_binary_heap_t	*queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -11991,24 +11992,24 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, i
 		if (SUCCEED == proxy_conn_err)
 			dc_proxy->last_cfg_error_time = 0;
 		else if (CONFIG_ERROR == proxy_conn_err)
-			dc_proxy->last_cfg_error_time = (int)now;
+			dc_proxy->last_cfg_error_time = now;
 
 		if (HOST_STATUS_PROXY_PASSIVE == dc_host->status)
 		{
 			if (0 != (update_nextcheck & ZBX_PROXY_CONFIG_NEXTCHECK))
 			{
-				dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
+				dc_proxy->proxy_config_nextcheck = calculate_proxy_nextcheck(
 						hostid, proxyconfig_frequency, now);
 			}
 
 			if (0 != (update_nextcheck & ZBX_PROXY_DATA_NEXTCHECK))
 			{
-				dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
+				dc_proxy->proxy_data_nextcheck = calculate_proxy_nextcheck(
 						hostid, proxydata_frequency, now);
 			}
 			if (0 != (update_nextcheck & ZBX_PROXY_TASKS_NEXTCHECK))
 			{
-				dc_proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
+				dc_proxy->proxy_tasks_nextcheck = calculate_proxy_nextcheck(
 						hostid, ZBX_TASK_UPDATE_FREQUENCY, now);
 			}
 
@@ -13736,7 +13737,7 @@ int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
 	if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
 		ret = FAIL;
 	else
-		dc_proxy->proxy_config_nextcheck = (int)time(NULL);
+		dc_proxy->proxy_config_nextcheck = time(NULL);
 
 	UNLOCK_CACHE;
 
@@ -14294,7 +14295,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
 {
 	ZBX_DC_PROXY	*proxy;
-	int		now;
+	time_t		now;
 
 	if (ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY < (now = time(NULL)) - config->proxy_lastaccess_ts)
 	{
@@ -14695,7 +14696,7 @@ int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error)
  *               FAIL    - proxy lastaccess cannot be retrieved               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error)
+int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, time_t *lastaccess, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
 	const ZBX_DC_PROXY	*dc_proxy;

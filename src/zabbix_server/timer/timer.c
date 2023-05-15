@@ -561,7 +561,8 @@ static int	update_host_maintenances(void)
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
 	double			sec;
-	int			maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
+	time_t			maintenance_time = 0, update_time = 0;
+	int			idle = 1, events_num, hosts_num, update;
 	char			*info = NULL;
 	size_t			info_alloc = 0, info_offset = 0;
 	const zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
@@ -605,7 +606,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				else
 					hosts_num = 0;
 
-				db_remove_expired_event_suppress_data((int)sec);
+				db_remove_expired_event_suppress_data((time_t)sec);
 
 				if (SUCCEED == update)
 				{
@@ -621,7 +622,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 						"updated %d hosts, suppressed %d events in " ZBX_FS_DBL " sec",
 						hosts_num, events_num, zbx_time() - sec);
 
-				update_time = (int)sec;
+				update_time = (time_t)sec;
 			}
 		}
 		else if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))
@@ -635,7 +636,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			zbx_snprintf_alloc(&info, &info_alloc, &info_offset, "suppressed %d events in " ZBX_FS_DBL
 					" sec", events_num, zbx_time() - sec);
 
-			update_time = (int)sec;
+			update_time = (time_t)sec;
 			zbx_dc_maintenance_reset_update_flag(process_num);
 		}
 
@@ -644,7 +645,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			update_time -= update_time % 60;
 			maintenance_time = update_time;
 
-			if (0 > (idle = ZBX_TIMER_DELAY - (int)(zbx_time() - maintenance_time)))
+			if (0 > (idle = ZBX_TIMER_DELAY - (time_t)zbx_time() - maintenance_time))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",

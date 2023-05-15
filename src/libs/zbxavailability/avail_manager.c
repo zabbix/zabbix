@@ -36,7 +36,7 @@
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	int		lastaccess;
+	time_t		lastaccess;
 }
 zbx_active_avail_proxy_t;
 
@@ -333,12 +333,12 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 		zbx_active_avail_proxy_t	proxy_avail_local;
 
 		proxy_avail_local.hostid = proxy_hostid;
-		proxy_avail_local.lastaccess = (int)time(NULL);
+		proxy_avail_local.lastaccess = time(NULL);
 
 		zbx_hashset_insert(&cache->proxy_avail, &proxy_avail_local, sizeof(zbx_active_avail_proxy_t));
 	}
 	else
-		proxy_avail->lastaccess = (int)time(NULL);
+		proxy_avail->lastaccess = time(NULL);
 
 	zbx_vector_uint64_destroy(&status_unknown);
 	zbx_vector_uint64_destroy(&status_available);
@@ -370,7 +370,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 {
 	zbx_hashset_iter_t		iter;
 	zbx_active_avail_proxy_t	*proxy_avail;
-	int				now;
+	time_t				now;
 
 	if (0 == cache->proxy_avail.num_data)
 		return;
@@ -401,7 +401,7 @@ static void	update_proxy_heartbeat(zbx_avail_active_hb_cache_t *cache, zbx_ipc_m
 	zbx_availability_deserialize_active_proxy_hb_update(message->data, &proxy_hostid);
 
 	if (NULL != (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxy_hostid)))
-		proxy_avail->lastaccess = (int)time(NULL);
+		proxy_avail->lastaccess = time(NULL);
 }
 
 

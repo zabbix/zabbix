@@ -1543,7 +1543,8 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		char **error)
 {
 	zbx_expression_query_many_t	*data;
-	int				ret = FAIL, item_func, count, seconds, i;
+	int				ret = FAIL, item_func, count, i;
+	time_t				seconds;
 	zbx_vector_history_record_t	values;
 	zbx_vector_dbl_t		*results_vector;
 	double				result;
@@ -1588,11 +1589,15 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 			if (ZBX_VARIANT_STR == args[0].type)
 			{
-				if (FAIL == zbx_is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+				int	tmp = (time_t)seconds;
+
+				if (FAIL == zbx_is_time_suffix(args[0].data.str, &tmp, ZBX_LENGTH_UNLIMITED))
 				{
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
 				}
+
+				seconds = tmp;
 			}
 			else
 			{
@@ -1605,7 +1610,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 					goto out;
 				}
 
-				seconds = (int)arg.data.dbl;
+				seconds = (time_t)arg.data.dbl;
 				zbx_variant_clear(&arg);
 			}
 			count = 0;

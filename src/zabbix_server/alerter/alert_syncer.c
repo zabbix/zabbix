@@ -965,9 +965,9 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 		sec2 = zbx_time();
 
-		nextcheck = (int)sec1 + ZBX_POLL_INTERVAL;
+		nextcheck = (time_t)sec1 + ZBX_POLL_INTERVAL;
 
-		if (0 > (sleeptime = nextcheck - (int)sec2))
+		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
 
 		zbx_setproctitle("%s [queued %d alerts(s), flushed %d result(s) in " ZBX_FS_DBL " sec, idle %d sec]",

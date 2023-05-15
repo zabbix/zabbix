@@ -1136,7 +1136,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	version_str = zbx_get_proxy_protocol_version_str(jp);
 	version_int = zbx_get_proxy_protocol_version_int(version_str);
 
-	zbx_update_proxy_data(&proxy, version_str, version_int, (int)time(NULL),
+	zbx_update_proxy_data(&proxy, version_str, version_int, time(NULL),
 				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
 
 	if (0 != proxy.auto_compress)

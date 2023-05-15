@@ -78,7 +78,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (int)zbx_time(), 0, 0);
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)zbx_time(), 0, 0);
 
 	ZBX_STR2UINT64(parent_taskid, row[9]);
 
@@ -275,7 +275,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, (int)zbx_time(), 0, 0);
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, (time_t)zbx_time(), 0, 0);
 	ZBX_STR2UINT64(parent_taskid, row[0]);
 
 	if (0 != ttl && clock + ttl < now)
@@ -415,7 +415,7 @@ static void	force_config_sync(void)
 
 	zbx_db_begin();
 
-	task = zbx_tm_task_create(taskid, ZBX_TM_PROXYDATA, ZBX_TM_STATUS_NEW, (int)time(NULL), 0, 0);
+	task = zbx_tm_task_create(taskid, ZBX_TM_PROXYDATA, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
 
 	zbx_json_init(&j, 1024);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_NAME, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
@@ -435,10 +435,10 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 							(((zbx_thread_args_t *)args)->args);
-	static int			cleanup_time = 0;
+	static time_t			cleanup_time = 0, sleeptime, nextcheck;
 
 	double				sec1, sec2;
-	int				tasks_num, sleeptime, nextcheck;
+	int				tasks_num;
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -459,7 +459,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	sec1 = zbx_time();
 
-	sleeptime = ZBX_TM_PROCESS_PERIOD - (int)sec1 % ZBX_TM_PROCESS_PERIOD;
+	sleeptime = ZBX_TM_PROCESS_PERIOD - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD;
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
@@ -491,22 +491,22 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
-		tasks_num = tm_process_tasks(&rtc, (int)sec1, taskmanager_args_in->config_comms,
+		tasks_num = tm_process_tasks(&rtc, (time_t)sec1, taskmanager_args_in->config_comms,
 				taskmanager_args_in->config_startup_time,
 				taskmanager_args_in->config_enable_remote_commands,
 				taskmanager_args_in->config_log_remote_commands);
 
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
-			tm_remove_old_tasks((int)sec1);
-			cleanup_time = (int)sec1;
+			tm_remove_old_tasks((time_t)sec1);
+			cleanup_time = (time_t)sec1;
 		}
 
 		sec2 = zbx_time();
 
-		nextcheck = (int)sec1 - (int)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
+		nextcheck = (time_t)sec1 - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
 
-		if (0 > (sleeptime = nextcheck - (int)sec2))
+		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
 
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",

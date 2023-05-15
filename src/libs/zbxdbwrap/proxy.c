@@ -2925,7 +2925,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *j
 		char **error)
 {
 	struct zbx_json_parse	jp_data;
-	int			ret = SUCCEED, flags_old;
+	int			ret = SUCCEED, flags_old, lastaccess;
 	char			*error_step = NULL, value[MAX_STRING_LEN];
 	size_t			error_alloc = 0, error_offset = 0;
 	zbx_proxy_diff_t	proxy_diff;
@@ -2936,12 +2936,14 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *j
 	proxy_diff.hostid = proxy->hostid;
 
 	if (SUCCEED != (ret = zbx_dc_get_proxy_nodata_win(proxy_diff.hostid, &proxy_diff.nodata_win,
-			&proxy_diff.lastaccess)))
+			&lastaccess)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy communication delay");
 		ret = FAIL;
 		goto out;
 	}
+
+	proxy_diff.lastaccess = lastaccess;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MORE, value, sizeof(value), NULL))
 		proxy_diff.more_data = atoi(value);
@@ -3256,8 +3258,8 @@ static zbx_proxy_compatibility_t	zbx_get_proxy_compatibility(int proxy_version)
  * Comments: The proxy parameter properties are also updated.                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, int lastaccess, int compress,
-		zbx_uint64_t flags_add)
+void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, time_t lastaccess,
+		int compress, zbx_uint64_t flags_add)
 {
 	zbx_proxy_diff_t		diff;
 	zbx_proxy_compatibility_t	compatibility;
@@ -3334,7 +3336,7 @@ int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version)
 		if (proxy->last_version_error_time <= now)
 		{
 			print_log = 1;
-			proxy->last_version_error_time = (int)now + 5 * SEC_PER_MIN;
+			proxy->last_version_error_time = now + 5 * SEC_PER_MIN;
 			zbx_update_proxy_lasterror(proxy);
 		}
 
