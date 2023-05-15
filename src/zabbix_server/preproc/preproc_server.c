@@ -64,7 +64,7 @@ void	preproc_flush_value_server(zbx_pp_manager_t *manager, zbx_uint64_t itemid, 
 
 			if (NULL != value_lld || NULL != error_lld || 0 != meta)
 			{
-				zbx_lld_process_value(itemid, item->preproc->hostid, value_lld, &ts, meta, lastlogsize,
+				zbx_lld_queue_value(itemid, item->preproc->hostid, value_lld, &ts, meta, lastlogsize,
 						mtime, error_lld);
 			}
 		}

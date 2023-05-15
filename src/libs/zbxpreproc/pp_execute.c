@@ -931,8 +931,6 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__,
 			step->type, ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), (void *)cache);
 
-	pp_cache_copy_value(cache, step->type, value);
-
 	if (NULL != step->params)
 	{
 		params = zbx_strdup(NULL, step->params);
