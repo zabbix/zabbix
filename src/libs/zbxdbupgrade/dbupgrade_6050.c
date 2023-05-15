@@ -177,7 +177,8 @@ static int	DBpatch_6050014(void)
 
 static int	DBpatch_6050015(void)
 {
-	const zbx_db_field_t	field = {"http_password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"http_password", "", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBmodify_field_type("httptest", &field, NULL);
 }
