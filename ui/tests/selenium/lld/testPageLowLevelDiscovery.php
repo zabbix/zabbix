@@ -592,7 +592,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'keys' => [
 						'drule-ZBX6663-second'
 					],
-					'message' => 'Cannot delete discovery rules',
+					'message' => 'Cannot delete discovery rule',
 					'details' => 'Cannot delete templated items.',
 					'db_count' => 1
 				]
