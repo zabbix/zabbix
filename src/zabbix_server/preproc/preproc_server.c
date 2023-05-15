@@ -22,8 +22,8 @@
 #include "zbxpreproc.h"
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
-#include "zbxlld.h"
 #include "zbxvariant.h"
+#include "../lld/lld_protocol.h"
 
 void	preproc_flush_value_server(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
 	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt)

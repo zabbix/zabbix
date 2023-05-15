@@ -27,10 +27,6 @@
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
 
-extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
-
 typedef struct
 {
 	zbx_uint64_t	history_counter;	/* the total number of processed values */
@@ -39,6 +35,7 @@ typedef struct
 	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
 	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
 	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
+	zbx_uint64_t	history_bin_counter;	/* the number of processed bin values */
 	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
 }
 zbx_dc_stats_t;
@@ -62,7 +59,8 @@ void	zbx_log_sync_history_cache_progress(void);
 #define ZBX_SYNC_NONE	0
 #define ZBX_SYNC_ALL	1
 
-int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, char **error);
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_uint64_t history_cache_size,
+		zbx_uint64_t history_index_cache_size,zbx_uint64_t *trends_cache_size, char **error);
 void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
 
 void	zbx_change_proxy_history_count(int change_count);
@@ -91,6 +89,8 @@ int	zbx_get_proxy_history_count(void);
 #define ZBX_STATS_HISTORY_INDEX_FREE	19
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
+#define ZBX_STATS_HISTORY_BIN_COUNTER	22
+
 void	*zbx_dc_get_stats(int request);
 void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);
 

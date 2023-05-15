@@ -50,6 +50,7 @@ class testItem extends CAPITest {
 			ITEM_TYPE_SCRIPT => null
 		];
 		$item_type_tests = [];
+		$binary_valuetype_tests = [];
 
 		foreach ($valid_item_types as $type => $interfaceid) {
 			switch ($type) {
@@ -156,6 +157,48 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => null
 			];
+
+			$binary_valuetype_tests[] = [
+				'request_data' => $params + [
+					'hostid' => '50009',
+					'name' => 'Test binary with item type '.$type,
+					'key_' => 'test.binary.'.$type,
+					'type' => $type,
+					'value_type' => ITEM_VALUE_TYPE_BINARY
+				],
+				'expected_error' => $type == ITEM_TYPE_DEPENDENT
+					? null
+					: 'Invalid parameter "/1/value_type": value must be one of '.implode(', ', [
+						ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+						ITEM_VALUE_TYPE_TEXT
+					]).'.'
+			];
+
+			if ($type == ITEM_TYPE_DEPENDENT) {
+				$rejected_fields = [
+					['units', 'b', 'Invalid parameter "/1/units": value must be empty.'],
+					['trends', '1h', 'Invalid parameter "/1/trends": value must be 0.'],
+					['valuemapid', 123, 'Invalid parameter "/1/valuemapid": value must be 0.'],
+					['inventory_link', 123, 'Invalid parameter "/1/inventory_link": value must be 0.'],
+					['logtimefmt', 'x', 'Invalid parameter "/1/logtimefmt": value must be empty.']
+				];
+
+				foreach ($rejected_fields as $config) {
+					[$field, $value, $error] = $config;
+
+					$binary_valuetype_tests[] = [
+						'request_data' => $params + [
+							'hostid' => '50009',
+							'name' => 'Test binary with item type '.$type,
+							'key_' => 'test.binary.'.$type,
+							'type' => $type,
+							'value_type' => ITEM_VALUE_TYPE_BINARY,
+							$field => $value
+						],
+						'expected_error' => $error
+					];
+				}
+			}
 		}
 
 		$interfaces_tests = [];
@@ -181,12 +224,126 @@ class testItem extends CAPITest {
 
 				$interfaces_tests[] = ['request_data' => $request_data] + $item_type_test;
 			}
-			else if (in_array($item_type_test['request_data']['type'], $required)) {
+			elseif (in_array($item_type_test['request_data']['type'], $required)) {
 				unset($item_type_test['request_data']['interfaceid']);
 				$item_type_test['expected_error'] = 'Invalid parameter "/1": the parameter "interfaceid" is missing.';
 				$interfaces_tests[] = $item_type_test;
 			}
 		}
+
+		$uuid = generateUuidV4();
+		$uuid_tests = [
+			'Reject item with non-empty UUID on host' => [
+				'request_data' => [
+					'hostid' => '50009',
+					'uuid' => $uuid,
+					'name' => 'UUIDItem1',
+					'key_' => 'UUIDItem1',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => 'Invalid parameter "/1/uuid": value must be empty.'
+			],
+			'Accept item with empty UUID on host' => [
+				'request_data' => [
+					'hostid' => '50009',
+					'uuid' => '',
+					'name' => 'UUIDItem2',
+					'key_' => 'UUIDItem2',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			'Accept multiple items with empty UUID on host' => [
+				'request_data' => [
+					[
+						'hostid' => '50009',
+						'uuid' => '',
+						'name' => 'UUIDItem2.1',
+						'key_' => 'UUIDItem2.1',
+						'interfaceid' => 0,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => '30s',
+						'url' => '192.168.0.1'
+					],
+					[
+						'hostid' => '50009',
+						'uuid' => '',
+						'name' => 'UUIDItem2.2',
+						'key_' => 'UUIDItem2.2',
+						'interfaceid' => 0,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => '30s',
+						'url' => '192.168.0.1'
+					]
+				],
+				'expected_error' => null
+			],
+			'Accept item with non-empty UUID on template' => [
+				'request_data' => [
+					'hostid' => '50010',
+					'uuid' => $uuid,
+					'name' => 'UUIDItem3',
+					'key_' => 'UUIDItem3',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			'Reject item with empty UUID on template' => [
+				'request_data' => [
+					'hostid' => '50010',
+					'uuid' => '',
+					'name' => 'UUIDItem4',
+					'key_' => 'UUIDItem4',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => 'Invalid parameter "/1/uuid": cannot be empty.'
+			],
+			'Reject same UUID for two template items' => [
+				'request_data' => [
+					[
+						'hostid' => '50010',
+						'uuid' => $uuid,
+						'name' => 'UUIDItem5',
+						'key_' => 'UUIDItem5',
+						'interfaceid' => 0,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => '30s',
+						'url' => '192.168.0.1'
+					],
+					[
+						'hostid' => '50010',
+						'uuid' => $uuid,
+						'name' => 'UUIDItem6',
+						'key_' => 'UUIDItem6',
+						'interfaceid' => 0,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'delay' => '30s',
+						'url' => '192.168.0.1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (uuid)=('.$uuid.') already exists.'
+			]
+		];
 
 		return array_merge([
 			[
@@ -313,7 +470,7 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
 			]
-		], $item_type_tests, $interfaces_tests);
+		], $item_type_tests, $interfaces_tests, $uuid_tests, $binary_valuetype_tests);
 	}
 
 	/**
@@ -322,8 +479,18 @@ class testItem extends CAPITest {
 	public function testItem_Create($request_data, $expected_error) {
 		$result = $this->call('item.create', $request_data, $expected_error);
 
-		if ($expected_error === null) {
-			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
+		if ($expected_error !== null) {
+			return;
+		}
+
+		$match_fields = ['uuid', 'hostid', 'name', 'key_', 'type', 'delay'];
+		$requests = zbx_toArray($request_data);
+
+		foreach ($requests as $request_data) {
+			$id = array_shift($result['result']['itemids']);
+
+			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE
+					&& substr($request_data['key_'], 0, 8) === 'mqtt.get') {
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
 			}
 
@@ -331,23 +498,29 @@ class testItem extends CAPITest {
 				$request_data['delay'] = 0;
 			}
 
-			foreach ($result['result']['itemids'] as $id) {
-				$db_item = CDBHelper::getRow('SELECT hostid, name, key_, type, delay FROM items WHERE itemid='.zbx_dbstr($id));
+			$db_item = CDBHelper::getRow(
+				'SELECT '.implode(',', $match_fields).' FROM items WHERE '.dbConditionId('itemid', [$id])
+			);
 
-				foreach (['hostid', 'name', 'key_', 'type', 'delay'] as $field) {
-					$this->assertSame($db_item[$field], strval($request_data[$field]));
+			foreach ($match_fields as $field) {
+				if ($field === 'uuid' && !array_key_exists($field, $request_data)) {
+					continue;
 				}
 
-				if (array_key_exists('tags', $request_data)) {
-					$db_tags = DBFetchArray(DBSelect('SELECT tag, value FROM item_tag WHERE itemid='.zbx_dbstr($id)));
-					uasort($request_data['tags'], function ($a, $b) {
-						return strnatcasecmp($a['value'], $b['value']);
-					});
-					uasort($db_tags, function ($a, $b) {
-						return strnatcasecmp($a['value'], $b['value']);
-					});
-					$this->assertTrue(array_values($db_tags) === array_values($request_data['tags']));
-				}
+				$this->assertSame($db_item[$field], strval($request_data[$field]));
+			}
+
+			if (array_key_exists('tags', $request_data)) {
+				$db_tags = DBFetchArray(DBSelect(
+					'SELECT tag,value FROM item_tag WHERE '.dbConditionId('itemid', [$id])
+				));
+				uasort($request_data['tags'], function ($a, $b) {
+					return strnatcasecmp($a['value'], $b['value']);
+				});
+				uasort($db_tags, function ($a, $b) {
+					return strnatcasecmp($a['value'], $b['value']);
+				});
+				$this->assertEquals(array_values($db_tags), array_values($request_data['tags']), 'Tags should match');
 			}
 		}
 	}

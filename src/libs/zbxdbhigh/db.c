@@ -61,10 +61,6 @@
 #	define ZBX_ROW_DL	";\n"
 #endif
 
-#if defined(HAVE_POSTGRESQL)
-extern char	ZBX_PG_ESCAPE_BACKSLASH;
-#endif
-
 static int	connection_failure;
 
 static const zbx_config_dbhigh_t	*zbx_cfg_dbhigh = NULL;
@@ -255,12 +251,15 @@ int	zbx_db_connect(int flag)
 	return err;
 }
 
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error)
+int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, int log_slow_queries, char **error)
 {
 	zbx_cb_nextid = cb_nextid;
 
 	if (ZBX_PROGRAM_TYPE_SERVER != program)
-		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(), error);
+	{
+		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(),
+				log_slow_queries, error);
+	}
 
 	return SUCCEED;
 }
@@ -532,12 +531,13 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n)
 }
 
 #ifdef HAVE_MYSQL
-static size_t	get_string_field_size(unsigned char type)
+static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
-	switch(type)
+	switch(field->type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
-			return ZBX_SIZE_T_MAX;
+			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
@@ -550,16 +550,20 @@ static size_t	get_string_field_size(unsigned char type)
 	}
 }
 #elif defined(HAVE_ORACLE)
-static size_t	get_string_field_size(unsigned char type)
+static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
-	switch(type)
+	switch(field->type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
-			return ZBX_SIZE_T_MAX;
+			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
-			return 4000u;
+			if (4000 < field->length)
+				return 32767u;
+			else
+				return 4000u;
 		case ZBX_TYPE_CUID:
 			return CUID_LEN - 1;
 		default:
@@ -568,6 +572,16 @@ static size_t	get_string_field_size(unsigned char type)
 	}
 }
 #endif
+
+static size_t	get_string_field_chars(const zbx_db_field_t *field)
+{
+	if ((ZBX_TYPE_LONGTEXT == field->type || ZBX_TYPE_BLOB == field->type) && 0 == field->length)
+		return ZBX_SIZE_T_MAX;
+	else if (ZBX_TYPE_CUID == field->type)
+		return CUID_LEN - 1;
+	else
+		return field->length;
+}
 
 char	*zbx_db_dyn_escape_string_len(const char *src, size_t length)
 {
@@ -581,19 +595,10 @@ char	*zbx_db_dyn_escape_string(const char *src)
 
 static char	*DBdyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag)
 {
-	size_t	length;
-
-	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
-		length = ZBX_SIZE_T_MAX;
-	else if (ZBX_TYPE_CUID == field->type)
-		length = CUID_LEN;
-	else
-		length = field->length;
-
 #if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
-	return zbx_db_dyn_escape_string_basic(src, get_string_field_size(field->type), length, flag);
+	return zbx_db_dyn_escape_string_basic(src, get_string_field_size(field), get_string_field_chars(field), flag);
 #else
-	return zbx_db_dyn_escape_string_basic(src, ZBX_SIZE_T_MAX, length, flag);
+	return zbx_db_dyn_escape_string_basic(src, ZBX_SIZE_T_MAX, get_string_field_chars(field), flag);
 #endif
 }
 
@@ -616,9 +621,9 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 	return zbx_db_dyn_escape_like_pattern_basic(src);
 }
 
-const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
+static zbx_db_table_t	*db_get_table(const char *tablename)
 {
-	const zbx_db_table_t	*tables = zbx_dbschema_get_tables();
+	zbx_db_table_t	*tables = zbx_dbschema_get_tables();
 
 	for (int t = 0; NULL != tables[t].table; t++)
 	{
@@ -629,7 +634,7 @@ const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
 	return NULL;
 }
 
-const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname)
+static zbx_db_field_t	*db_get_field(zbx_db_table_t *table, const char *fieldname)
 {
 	int	f;
 
@@ -640,6 +645,47 @@ const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *
 	}
 
 	return NULL;
+}
+
+const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
+{
+	return db_get_table(tablename);
+}
+
+const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname)
+{
+	return db_get_field((zbx_db_table_t *)table, fieldname);
+}
+
+int	zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str)
+{
+	const zbx_db_table_t	*table;
+	const zbx_db_field_t	*field;
+	size_t			max_bytes, max_chars;
+
+	if (NULL == (table = zbx_db_get_table(tablename)) || NULL == (field = zbx_db_get_field(table, fieldname)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid table: \"%s\" field: \"%s\"", tablename, fieldname);
+		return FAIL;
+	}
+
+#if defined(HAVE_MYSQL) || defined(HAVE_ORACLE)
+	max_bytes = get_string_field_size(field);
+#else
+	max_bytes = ZBX_SIZE_T_MAX;
+#endif
+	max_chars = get_string_field_chars(field);
+
+	if (max_bytes < strlen(str))
+		return FAIL;
+
+	if (ZBX_SIZE_T_MAX == max_chars)
+		return SUCCEED;
+
+	if (max_chars != max_bytes && max_chars < zbx_strlen_utf8(str))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1278,23 +1324,23 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 #endif
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: This function is similar to DBadd_condition_alloc(), except it is *
- *          designed for generating WHERE conditions for strings. Hence, this *
- *          function is simpler, because only IN condition is possible.       *
- *                                                                            *
- * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
- *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
- *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
- *             fieldname  - [IN] field name to be used in SQL WHERE condition *
- *             values     - [IN] array of string values                       *
- *             num        - [IN] number of elements in 'values' array         *
- *                                                                            *
- * Comments: To support Oracle empty values are checked separately (is null   *
- *           for Oracle and ='' for the other databases).                     *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: This function is similar to the zbx_db_add_condition_alloc(), except *
+ *          it is designed for generating WHERE conditions for strings. Hence,   *
+ *          this function is simpler, because only IN condition is possible.     *
+ *                                                                               *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction           *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                    *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer        *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition    *
+ *             values     - [IN] array of string values                          *
+ *             num        - [IN] number of elements in 'values' array            *
+ *                                                                               *
+ * Comments: To support Oracle empty values are checked separately (is null      *
+ *           for Oracle and ='' for the other databases).                        *
+ *                                                                               *
+ *********************************************************************************/
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char **values, const int num)
 {
@@ -2181,7 +2227,9 @@ int	zbx_db_table_exists(const char *table_name)
 
 int	zbx_db_field_exists(const char *table_name, const char *field_name)
 {
+#if (defined(HAVE_MYSQL) || defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3))
 	zbx_db_result_t	result;
+#endif
 #if defined(HAVE_MYSQL)
 	char		*field_name_esc;
 	int		ret;
@@ -2263,6 +2311,119 @@ int	zbx_db_field_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+#if defined(HAVE_ORACLE)
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json)
+{
+#define ZBX_TYPE_CHAR_STR	"nvarchar2"
+#define ZBX_PROTO_TAG_FIELDS	"fields"
+#define ZBX_PROTO_TAG_LENGTH	"length"
+#define ZBX_PROTO_TAG_CHAR	"char"
+	zbx_db_table_t		*table;
+	int			i;
+	zbx_vector_str_t	names;
+	size_t			offset;
+
+	if (NULL != json)
+		offset = json->buffer_offset;
+
+	zbx_vector_str_create(&names);
+
+	if (NULL == (table = db_get_table(tablename)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot find table '%s'", __func__, tablename);
+
+		goto cleanup;
+	}
+
+	for (i = 0; NULL != table->fields[i].name; i++)
+	{
+		switch (table->fields[i].type)
+		{
+			case ZBX_TYPE_TEXT:
+				zbx_vector_str_append(&names, (char *)table->fields[i].name);
+				break;
+			default:
+				break;
+		}
+	}
+
+	if (0 != names.values_num)
+	{
+		zbx_db_row_t	row;
+		zbx_db_result_t	result;
+		char		*table_name_esc;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+
+		table_name_esc = zbx_db_dyn_escape_string(table->table);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select column_name,data_type,char_length"
+				" from user_tab_columns"
+				" where lower(table_name)='%s'"
+					" and",
+				table_name_esc);
+
+		zbx_free(table_name_esc);
+
+		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "lower(column_name)",
+				(const char **)names.values, names.values_num);
+
+		result = zbx_db_select("%s", sql);
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_db_field_t	*field;
+
+			zbx_strlower(row[0]);
+			if (NULL == (field = db_get_field(table, row[0])))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s(): table '%s', cannot find field '%s'", __func__,
+						table->table, row[0]);
+				continue;
+			}
+
+			zbx_strlower(row[1]);
+			if (0 != strcmp(row[1], ZBX_TYPE_CHAR_STR))
+				continue;
+
+			field->type = ZBX_TYPE_CHAR;
+			field->length = (unsigned short)atoi(row[2]);
+
+			if (NULL != json)
+			{
+				if (offset == json->buffer_offset)
+				{
+					zbx_json_addobject(json, tablename);
+					zbx_json_addobject(json, ZBX_PROTO_TAG_FIELDS);
+				}
+
+				zbx_json_addobject(json, field->name);
+				zbx_json_addstring(json, ZBX_PROTO_TAG_TYPE, ZBX_PROTO_TAG_CHAR, ZBX_JSON_TYPE_STRING);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_LENGTH, field->length);
+				zbx_json_close(json);
+			}
+		}
+		zbx_db_free_result(result);
+
+		zbx_free(sql);
+	}
+cleanup:
+	zbx_vector_str_destroy(&names);
+
+	if (NULL != json)
+	{
+		if (offset != json->buffer_offset)
+		{
+			zbx_json_close(json);
+			zbx_json_close(json);
+		}
+	}
+#undef ZBX_TYPE_CHAR_STR
+#undef ZBX_PROTO_TAG_FIELDS
+#undef ZBX_PROTO_TAG_LENGTH
+#undef ZBX_PROTO_TAG_CHAR
+}
+#endif
 
 #ifndef HAVE_SQLITE3
 int	zbx_db_trigger_exists(const char *table_name, const char *trigger_name)
@@ -2743,6 +2904,7 @@ static char	*zbx_db_format_values(zbx_db_field_t **fields, const zbx_db_value_t 
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%s'", value->str);
 				break;
 			case ZBX_TYPE_FLOAT:
@@ -2791,7 +2953,9 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
+				case ZBX_TYPE_BLOB:
 					zbx_free(row[j].str);
+					break;
 			}
 		}
 
@@ -2911,7 +3075,7 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  *           for insert preparation functions.                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num)
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num)
 {
 	int		i;
 	zbx_db_value_t	*row;
@@ -2936,15 +3100,23 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 #ifdef HAVE_ORACLE
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
 #else
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
 #endif
 				break;
-			default:
+			case ZBX_TYPE_INT:
+			case ZBX_TYPE_FLOAT:
+			case ZBX_TYPE_UINT:
+			case ZBX_TYPE_ID:
+			case ZBX_TYPE_SERIAL:
 				row[i] = *value;
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 	}
 
@@ -2989,6 +3161,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 				value->str = va_arg(args, char *);
 				break;
 			case ZBX_TYPE_INT:
@@ -3011,11 +3184,44 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	va_end(args);
 
-	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
+	zbx_db_insert_add_values_dyn(self, (zbx_db_value_t **)values.values, values.values_num);
 
 	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
 }
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decodes Base64 encoded binary data and escapes it allowing it to  *
+ *          be used inside sql statement                                      *
+ *                                                                            *
+ * Parameters: sql_insert_data     - [IN/OUT] base64 encoded unescaped data   *
+ *                                                                            *
+ * Comment: input data is released from memory and replaced with pointer      *
+ *          to the output data.                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
+{
+	size_t	binary_data_len;
+	char	*escaped_binary;
+
+	size_t	binary_data_max_len = strlen(*sql_insert_data) * 3 / 4 + 1;
+	char	*binary_data = (char*)zbx_malloc(NULL, binary_data_max_len);
+
+	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
+#if defined (HAVE_MYSQL)
+	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	zbx_mysql_escape_bin(binary_data, escaped_binary, binary_data_len);
+#elif defined (HAVE_POSTGRESQL)
+	zbx_postgresql_escape_bin(binary_data, &escaped_binary, binary_data_len);
+#endif
+	zbx_free(binary_data);
+	zbx_free(*sql_insert_data);
+	*sql_insert_data = escaped_binary;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -3187,7 +3393,7 @@ retry_oracle:
 #	endif
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			const zbx_db_value_t	*value = &values[j];
+			zbx_db_value_t	*value = &values[j];
 
 			field = (const zbx_db_field_t *)self->fields.values[j];
 
@@ -3201,6 +3407,16 @@ retry_oracle:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					break;
+				case ZBX_TYPE_BLOB:
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+					decode_and_escape_binary_value_for_sql(&(value->str));
+#elif defined(HAVE_ORACLE)
+					/* Oracle converts base64 to binary when it formats prepared statement */
+#endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
@@ -3684,3 +3900,117 @@ char	*zbx_db_get_schema_esc(void)
 	return name;
 }
 #endif
+
+#if defined(HAVE_ORACLE)
+static int	validate_db_type_name(const int expected_type, const char *type_name,
+		const int type_precision, const int type_length)
+{
+#define COMPAT_TYPE_INT4_STR		"NUMBER"
+#define COMPAT_TYPE_INT8_STR		"NUMBER"
+#define COMPAT_TYPE_VARCHAR_STR		"NVARCHAR2"
+#define COMPAT_TYPE_FLOAT_STR		"BINARY_DOUBLE"
+#define COMPAT_TYPE_BLOB_STR		"BLOB"
+#define COMPAT_TYPE_TEXT_STR		"NCLOB"
+
+#define COMPAT_TYPE_INT4_LEN		10
+#define COMPAT_TYPE_INT8_LEN		20
+#define COMPAT_TYPE_FLOAT_LEN		8
+#define COMPAT_TYPE_SHORTTEXT_LEN	2000
+#define COMPAT_TYPE_TEXT_LEN		4000
+#define COMPAT_TYPE_CUID_LEN		75
+
+	switch(expected_type)
+	{
+		case ZBX_TYPE_UINT:
+		case ZBX_TYPE_ID:
+		case ZBX_TYPE_SERIAL:
+			if (0 == strcmp(COMPAT_TYPE_INT8_STR, type_name) && COMPAT_TYPE_INT8_LEN <= type_precision)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_INT:
+			if (0 == strcmp(COMPAT_TYPE_INT4_STR, type_name) && COMPAT_TYPE_INT4_LEN <= type_precision)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_FLOAT:
+			if (0 == strcmp(COMPAT_TYPE_FLOAT_STR, type_name) && COMPAT_TYPE_FLOAT_LEN <= type_length)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_BLOB:
+			if (0 == strcmp(COMPAT_TYPE_BLOB_STR, type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_TEXT:
+			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name) || COMPAT_TYPE_TEXT_LEN <= type_length)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_SHORTTEXT:
+			if (COMPAT_TYPE_SHORTTEXT_LEN <= type_length)
+				return SUCCEED;
+			ZBX_FALLTHROUGH;
+		case ZBX_TYPE_CHAR:
+			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_LONGTEXT:
+			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_CUID:
+			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name) && COMPAT_TYPE_CUID_LEN <= type_length)
+				return SUCCEED;
+			break;
+		default:
+			return FAIL;
+	}
+
+	return FAIL;
+
+#undef COMPAT_TYPE_INT4_STR
+#undef COMPAT_TYPE_INT8_STR
+#undef COMPAT_TYPE_VARCHAR_STR
+#undef COMPAT_TYPE_FLOAT_STR
+#undef COMPAT_TYPE_BLOB_STR
+#undef COMPAT_TYPE_TEXT_STR
+
+#undef COMPAT_TYPE_INT4_LEN
+#undef COMPAT_TYPE_INT8_LEN
+#undef COMPAT_TYPE_FLOAT_LEN
+#undef COMPAT_TYPE_SHORTTEXT_LEN
+#undef COMPAT_TYPE_TEXT_LEN
+#undef COMPAT_TYPE_CUID_LEN
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if the column of specific table in the database has        *
+ *              correct type                                                  *
+ *                                                                            *
+ * Return value: SUCCEED - Column has correct type                            *
+ *               FAIL    - Otherwise                                          *
+ ******************************************************************************/
+int	zbx_db_check_oracle_colum_type(const char *table_name, const char *column_name, int expected_type)
+{
+	zbx_db_result_t	result = NULL;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	if (NULL == (result = zbx_db_select(
+			"select data_type,data_precision,data_length "
+				"from user_tab_columns "
+				"where lower(table_name)='%s' and lower(column_name)='%s'",
+			table_name, column_name)))
+	{
+		goto clean;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		ret = validate_db_type_name(expected_type, row[0], NULL == row[1] ? 0 : atoi(row[1]),
+				NULL == row[2] ? 0 : atoi(row[2]));
+	}
+clean:
+	zbx_db_free_result(result);
+
+	return ret;
+}
+#endif /* defined(HAVE_ORACLE) */

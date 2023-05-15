@@ -77,7 +77,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 
 		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
 			$strict_validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+
+			if (!$this->isTemplateDashboard()) {
+				self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+			}
+
 			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($strict_validation_rules['fields']['color'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($strict_validation_rules['fields']['timeshift'], API_NOT_EMPTY);
@@ -88,6 +92,12 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 		}
 
 		return $this;
+	}
+
+	public function setTemplateId($templateid): self {
+		parent::setTemplateId($templateid);
+
+		return $this->setFlags($this->getFlags());
 	}
 
 	public function validate(bool $strict = false): array {

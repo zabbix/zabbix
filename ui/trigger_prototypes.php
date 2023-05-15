@@ -453,7 +453,13 @@ elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massd
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
-	show_messages($result, _('Trigger prototypes deleted'), _('Cannot delete trigger prototypes'));
+
+	$trigger_prototypes_count = count(getRequest('g_triggerid'));
+	$messageSuccess = _n('Trigger prototype deleted', 'Trigger prototypes deleted', $trigger_prototypes_count);
+	$messageFailed = _n('Cannot delete trigger prototype', 'Cannot delete trigger prototype',
+		$trigger_prototypes_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (getRequest('action') && hasRequest('g_triggerid')
 		&& in_array(getRequest('action'), ['triggerprototype.discover.enable', 'triggerprototype.discover.disable'])) {

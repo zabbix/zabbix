@@ -44,6 +44,7 @@
 #define ZBX_RTC_SUBSCRIBE			100
 #define ZBX_RTC_SHUTDOWN			101
 #define ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT	102
+#define ZBX_RTC_SUBSCRIBE_SERVICE		103
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999

@@ -39,7 +39,12 @@ require_once dirname(__FILE__).'/authentication/testUsersAuthenticationLdap.php'
 require_once dirname(__FILE__).'/authentication/testUsersAuthenticationSaml.php';
 require_once dirname(__FILE__).'/authentication/testUsersPasswordComplexity.php';
 
+// Connectors.
+require_once dirname(__FILE__).'/connectors/testFormConnectors.php';
+require_once dirname(__FILE__).'/connectors/testPageConnectors.php';
+
 // Dashboards.
+require_once dirname(__FILE__).'/dashboard/testDashboardClockWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteGraphsWidget.php';
@@ -58,6 +63,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardSlaReportWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardURLWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboardList.php';
@@ -82,6 +88,14 @@ require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
 require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
+
+// Host and template groups.
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroup.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupSearchPage.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupStandalone.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroup.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupSearchPage.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupStandalone.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
@@ -129,6 +143,11 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 
 // Monitoring.
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
+
+// Permissions.
+require_once dirname(__FILE__).'/permissions/testPermissionsWithoutCSRF.php';
+require_once dirname(__FILE__).'/permissions/testTagBasedPermissions.php';
+require_once dirname(__FILE__).'/permissions/testUrlUserPermissions.php';
 
 // Preprocessing.
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
@@ -241,7 +260,6 @@ require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
-require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
@@ -262,17 +280,14 @@ require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
 require_once dirname(__FILE__).'/testMultiselect.php';
-require_once dirname(__FILE__).'/testTagBasedPermissions.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testTriggerDependencies.php';
 require_once dirname(__FILE__).'/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
-require_once dirname(__FILE__).'/testUrlUserPermissions.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
-require_once dirname(__FILE__).'/testSID.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -300,7 +315,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testUsersAuthenticationSaml');
 		$suite->addTestSuite('testUsersPasswordComplexity');
 
+		// Connectors.
+		$suite->addTestSuite('testFormConnectors');
+		$suite->addTestSuite('testPageConnectors');
+
 		// Dashboards.
+		$suite->addTestSuite('testDashboardClockWidget');
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
@@ -319,6 +339,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardTopHostsWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
+		$suite->addTestSuite('testDashboardURLWidget');
 		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testPageDashboardList');
@@ -343,6 +364,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
+
+		// Groups.
+		$suite->addTestSuite('testFormHostGroup');
+		$suite->addTestSuite('testFormHostGroupSearchPage');
+		$suite->addTestSuite('testFormHostGroupStandalone');
+		$suite->addTestSuite('testFormTemplateGroup');
+		$suite->addTestSuite('testFormTemplateGroupSearchPage');
+		$suite->addTestSuite('testFormTemplateGroupStandalone');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
@@ -384,6 +413,11 @@ class SeleniumTests {
 
 		// Monitoring.
 		$suite->addTestSuite('testPageMonitoringLatestData');
+
+		// Permissions.
+		$suite->addTestSuite('testPermissionsWithoutCSRF');
+		$suite->addTestSuite('testTagBasedPermissions');
+		$suite->addTestSuite('testUrlUserPermissions');
 
 		// Preprocessing.
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
@@ -496,7 +530,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormEventCorrelation');
-		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
@@ -517,17 +550,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
 		$suite->addTestSuite('testMultiselect');
-		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testTemplateInheritance');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testTriggerDependencies');
 		$suite->addTestSuite('testTriggerExpressions');
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testUrlParameters');
-		$suite->addTestSuite('testUrlUserPermissions');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testSID');
 
 		return $suite;
 	}
