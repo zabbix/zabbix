@@ -254,8 +254,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (!$history) {
 			return [
 				'value' => null,
-				'value_label' => _('No data.'),
-				'units_label' => ''
+				'value_text' => _('No data.'),
+				'units_text' => ''
 			];
 		}
 
@@ -274,8 +274,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		return [
 			'value' => $value,
-			'value_label' => $labels['value'],
-			'units_label' => $labels['units']
+			'value_text' => $labels['value'],
+			'units_text' => $labels['units']
 		];
 	}
 

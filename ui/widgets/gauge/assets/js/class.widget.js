@@ -65,8 +65,8 @@ class CWidgetGauge extends CWidget {
 		if ('value' in response) {
 			this.gauge.setValue({
 				value: response.value,
-				value_label: response.value_label,
-				units_label: response.units_label
+				value_text: response.value_text,
+				units_text: response.units_text
 			});
 		}
 	}

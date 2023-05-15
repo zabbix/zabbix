@@ -111,8 +111,8 @@ class CSVGGauge {
 		console.log('CSVGGauge::setSize', {width, height});
 	}
 
-	setValue({value, value_label, units_label}) {
-		console.log('CSVGGauge::setValue', {value, value_label, units_label});
+	setValue({value, value_text, units_text}) {
+		console.log('CSVGGauge::setValue', {value, value_text, units_text});
 	}
 
 	destroy() {
