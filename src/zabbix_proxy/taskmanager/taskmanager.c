@@ -526,4 +526,4 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_sleep(SEC_PER_MIN);
 }
 #undef ZBX_TM_PROCESS_PERIOD
-#define ZBX_TM_CLEANUP_PERIOD
+#undef ZBX_TM_CLEANUP_PERIOD
