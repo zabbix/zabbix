@@ -717,7 +717,7 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/clock'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/action_log'
 				]
 			],
 			// #71 Add Template dashboard page configuration popup.
@@ -1472,14 +1472,26 @@ class testDocumentationLinks extends CWebTest {
 			// #153 Create network discovery form view.
 			[
 				[
-					'url' => 'zabbix.php?action=discovery.edit',
+					'url' => 'zabbix.php?action=discovery.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create discovery rule'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/network_discovery/rule#rule-attributes'
 				]
 			],
 			// #154 Edit network discovery form view.
 			[
 				[
-					'url' => 'zabbix.php?action=discovery.edit&druleid=2',
+					'url' => 'zabbix.php?action=discovery.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Local network'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/network_discovery/rule#rule-attributes'
 				]
 			],

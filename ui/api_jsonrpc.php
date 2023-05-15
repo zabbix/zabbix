@@ -60,7 +60,7 @@ try {
 	API::setWrapper();
 
 	$jsonRpc = new CJsonRpc($apiClient, $data);
-	echo $jsonRpc->execute();
+	echo $jsonRpc->execute($http_request);
 }
 catch (Exception $e) {
 	// decode input json request to get request's id

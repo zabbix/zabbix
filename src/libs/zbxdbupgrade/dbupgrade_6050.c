@@ -91,6 +91,11 @@ static int	DBpatch_6050008(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+#if defined(HAVE_ORACLE)
+	if (SUCCEED == zbx_db_check_oracle_colum_type("history", "value", ZBX_TYPE_FLOAT))
+		return SUCCEED;
+#endif /* defined(HAVE_ORACLE) */
+
 	return DBmodify_field_type("history", &field, &field);
 }
 
@@ -100,6 +105,11 @@ static int	DBpatch_6050009(void)
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
+
+#if defined(HAVE_ORACLE)
+	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_min", ZBX_TYPE_FLOAT))
+		return SUCCEED;
+#endif /* defined(HAVE_ORACLE) */
 
 	return DBmodify_field_type("trends", &field, &field);
 }
@@ -111,12 +121,22 @@ static int	DBpatch_6050010(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+#if defined(HAVE_ORACLE)
+	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_avg", ZBX_TYPE_FLOAT))
+		return SUCCEED;
+#endif /* defined(HAVE_ORACLE) */
+
 	return DBmodify_field_type("trends", &field, &field);
 }
 
 static int	DBpatch_6050011(void)
 {
 	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
+
+#if defined(HAVE_ORACLE)
+	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_max", ZBX_TYPE_FLOAT))
+		return SUCCEED;
+#endif /* defined(HAVE_ORACLE) */
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -132,6 +152,23 @@ static int	DBpatch_6050012(void)
 }
 
 static int	DBpatch_6050013(void)
+{
+	const zbx_db_table_t	table =
+			{"history_bin", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050014(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -170,5 +207,6 @@ DBPATCH_ADD(6050010, 0, 1)
 DBPATCH_ADD(6050011, 0, 1)
 DBPATCH_ADD(6050012, 0, 1)
 DBPATCH_ADD(6050013, 0, 1)
+DBPATCH_ADD(6050014, 0, 1)
 
 DBPATCH_END()

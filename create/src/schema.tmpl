@@ -1037,6 +1037,12 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_text		|''	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 
+TABLE|history_bin|itemid,clock,ns|0
+FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
+FIELD		|value		|t_bin		|''	|NOT NULL	|0
+
 TABLE|proxy_history|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
@@ -2112,4 +2118,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050013	|6050013
+ROW		|1		|6050014	|6050014
