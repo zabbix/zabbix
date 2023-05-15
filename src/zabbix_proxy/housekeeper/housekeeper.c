@@ -94,7 +94,7 @@ static int	delete_history(const char *table, const char *fieldname, int now, int
 	zbx_free(condition);
 
 	zbx_db_commit();
-#undef HK_MAX_DELETE_PERIODS
+
 	return records;
 rollback:
 	zbx_db_free_result(result);
