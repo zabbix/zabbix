@@ -262,7 +262,8 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::CHAR => CXmlConstantName::CHAR,
 		CXmlConstantValue::LOG => CXmlConstantName::LOG,
 		CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED,
-		CXmlConstantValue::TEXT => CXmlConstantName::TEXT
+		CXmlConstantValue::TEXT => CXmlConstantName::TEXT,
+		CXmlConstantValue::BINARY => CXmlConstantName::BINARY
 	];
 
 	private $TRIGGER_PRIORITY = [

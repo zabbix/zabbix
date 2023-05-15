@@ -1822,6 +1822,18 @@ msgstr ""
 msgid "Below value"
 msgstr ""
 
+#: app/partials/configuration.filter.items.php:147
+#: app/views/popup.massupdate.item.php:159 include/items.inc.php:133
+#: include/views/configuration.item.edit.php:126
+#: include/views/configuration.item.prototype.edit.php:112
+msgid "Binary"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1397
+#, c-format
+msgid "Binary item \"%1$s\" cannot be used in trigger"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
 msgstr "Bind DN"
@@ -2530,6 +2542,11 @@ msgstr[0] "유지 관리 \"%2$s\"에 하나 이상의 호스트 또는 호스트
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
 msgstr "호스트 그룹을 삭제할 수 없습니다."
+
+#: host_prototypes.php:293
+msgid "Cannot delete host prototype"
+msgid_plural "Cannot delete host prototypes"
+msgstr[0] ""
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -5195,6 +5212,14 @@ msgstr "호스트 그룹 생성"
 msgid "Create host prototype"
 msgstr "호스트 프로토타입 생성"
 
+#: include/views/configuration.host.prototype.list.php:205
+msgid "Create hosts from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:199
+msgid "Create hosts from selected prototype as enabled?"
+msgstr ""
+
 #: include/views/configuration.host.prototype.list.php:197
 msgid "Create hosts from selected prototypes as disabled?"
 msgstr "선택한 프로토타입에서 호스트를 비활성으로 생성하시겠습니까?"
@@ -5226,6 +5251,14 @@ msgstr "아이템 생성(먼저 템플릿 선택)"
 #: include/views/configuration.item.prototype.list.php:36
 msgid "Create item prototype"
 msgstr "아이템 프로토타입 생성"
+
+#: include/views/configuration.item.prototype.list.php:213
+msgid "Create items from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.item.prototype.list.php:207
+msgid "Create items from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototypes as disabled?"
@@ -5291,6 +5324,14 @@ msgstr "트리거 생성(먼저 템플릿 선택)"
 #: include/views/configuration.trigger.prototype.list.php:36
 msgid "Create trigger prototype"
 msgstr "트리거 프로토타입 생성"
+
+#: include/views/configuration.trigger.prototype.list.php:212
+msgid "Create triggers from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.list.php:206
+msgid "Create triggers from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.list.php:205
 msgid "Create triggers from selected prototypes as disabled?"
@@ -5934,6 +5975,10 @@ msgstr "가져오기 파일에 없는 모든 요소를 삭제하시겠습니까?
 msgid "Delete and clear"
 msgstr "삭제와 클리어"
 
+#: include/views/configuration.template.list.php:320
+msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
 #: include/views/configuration.template.list.php:294
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "선택한 템플릿과 데이터를 삭제하시겠습니까? (경고: 링크되어 있는 모든 호스트에서 데이터가 삭제됩니다!)"
@@ -5974,9 +6019,17 @@ msgstr "그래프 프로토타입을 삭제하시겠습니까?"
 msgid "Delete graph?"
 msgstr "그래프를 삭제하시겠습니까?"
 
+#: include/views/configuration.item.list.php:318
+msgid "Delete history of selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
 msgstr "선택한 아이템의 히스토리를 삭제하시겠습니까?"
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Delete history of selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6050,14 +6103,28 @@ msgstr ""
 msgid "Delete selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:159
+msgid "Delete selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "선택한 상관관계를 삭제하시겠습니까?"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
+msgid "Delete selected dashboard?"
+msgstr ""
+
+#: app/views/configuration.dashboard.list.php:68
+#: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboards?"
 msgstr "선택한 대시보드를 삭제하시겠습니까?"
+
+#: app/views/js/configuration.discovery.list.js.php:124
+#: include/views/configuration.host.discovery.list.php:369
+msgid "Delete selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6068,9 +6135,17 @@ msgstr "선택한 디스커버리 규칙를 삭제하시겠습니까?"
 msgid "Delete selected elements?"
 msgstr "선택한 요소를 삭제하시겠습니까?"
 
+#: include/views/configuration.graph.list.php:269
+msgid "Delete selected graph prototype?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
 msgstr "선택한 그래프 프로토타입을 삭제하시겠습니까?"
+
+#: include/views/configuration.graph.list.php:270
+msgid "Delete selected graph?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6115,9 +6190,17 @@ msgstr "선택한 호스트를 삭제하시겠습니까?"
 msgid "Delete selected image?"
 msgstr "선택한 이미지를 삭제하시겠습니까?"
 
+#: include/views/configuration.item.prototype.list.php:232
+msgid "Delete selected item prototype?"
+msgstr ""
+
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
 msgstr "선택한 아이템 프로토타입을 삭제하시겠습니까?"
+
+#: include/views/configuration.item.list.php:361
+msgid "Delete selected item?"
+msgstr ""
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6139,6 +6222,10 @@ msgstr "선택한 맵을 삭제하시겠습니까?"
 msgid "Delete selected maps?"
 msgstr "선택한 맵을 삭제하시겠습니까?"
 
+#: app/views/administration.mediatype.list.php:217
+msgid "Delete selected media type?"
+msgstr ""
+
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
 msgstr "선택한 미디어 타입을 삭제하시겠습니까?"
@@ -6150,6 +6237,10 @@ msgstr "선택한 프록시를 삭제하시겠습니까?"
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
 msgstr "선택한 프록시를 삭제하시겠습니까?"
+
+#: app/views/administration.regex.list.php:83
+msgid "Delete selected regular expression?"
+msgstr ""
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -6170,6 +6261,10 @@ msgstr "선택한 예약 보고서를 삭제하시겠습니까?"
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
 msgstr "선택한 예약 보고서를 삭제하시겠습니까?"
+
+#: app/views/administration.script.list.php:224
+msgid "Delete selected script?"
+msgstr ""
 
 #: app/views/administration.script.list.php:203
 msgid "Delete selected scripts?"
@@ -6197,6 +6292,10 @@ msgstr "선택한 템플릿 그룹을 삭제하시겠습니까?"
 msgid "Delete selected template groups?"
 msgstr "선택한 템플릿 그룹을 삭제하시겠습니까?"
 
+#: include/views/configuration.template.list.php:313
+msgid "Delete selected template?"
+msgstr ""
+
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
 msgstr "선택한 템플릿을 삭제하시겠습니까?"
@@ -6211,9 +6310,17 @@ msgstr "선택한 토큰을 삭제하시겠습니까?"
 msgid "Delete selected tokens?"
 msgstr "선택한 토큰을 삭제하시겠습니까?"
 
+#: include/views/configuration.trigger.prototype.list.php:231
+msgid "Delete selected trigger prototype?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
 msgstr "선택한 트리거 프로토타입을 삭제하시겠습니까?"
+
+#: include/views/configuration.triggers.list.php:393
+msgid "Delete selected trigger?"
+msgstr ""
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6226,6 +6333,10 @@ msgstr "선택한 사용자를 삭제하시겠습니까?"
 #: app/views/administration.user.list.php:251
 msgid "Delete selected users?"
 msgstr "선택한 사용자를 삭제하시겠습니까?"
+
+#: include/views/configuration.httpconf.list.php:248
+msgid "Delete selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6435,6 +6546,10 @@ msgstr "비활성"
 msgid "Disable debug mode"
 msgstr "디버그 모드 비활성"
 
+#: app/views/administration.usergroup.list.php:249
+msgid "Disable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
 msgstr "선택한 그룹의 디버그 모드를 비활성하겠습니까?"
@@ -6463,6 +6578,11 @@ msgstr "선택한 프록시에 의한 호스트 감시를 비활성으로 하시
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "선택한 프록시에서 모니터링하는 호스트를 비활성화하시겠습니까?"
+
+#: app/views/administration.token.list.php:211
+#: app/views/administration.user.token.list.php:164
+msgid "Disable selected API token?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6493,26 +6613,51 @@ msgstr ""
 msgid "Disable selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:153
+msgid "Disable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
 msgstr "선택한 상관관계를 비활성으로 하시겠습니까?"
+
+#: app/views/js/configuration.discovery.list.js.php:108
+#: include/views/configuration.host.discovery.list.php:348
+msgid "Disable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "선택한 디스커버리 규칙을 비활성으로 하시겠습니까?"
 
+#: app/views/administration.usergroup.list.php:229
+msgid "Disable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
 msgstr "선택한 그룹을 비활성으로 하시겠습니까?"
+
+#: app/views/configuration.host.list.php:534
+msgid "Disable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
 msgstr "선택한 호스트을 비활성으로 하시겠습니까?"
 
+#: include/views/configuration.item.list.php:309
+msgid "Disable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
 msgstr "선택한 아이템을 비활성으로 하시겠습니까?"
+
+#: app/views/administration.mediatype.list.php:203
+msgid "Disable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:182
 msgid "Disable selected media types?"
@@ -6526,13 +6671,25 @@ msgstr ""
 msgid "Disable selected modules?"
 msgstr "선택한 모듈을 비활성화하시겠습니까?"
 
+#: app/views/reports.scheduledreport.list.php:96
+msgid "Disable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
 msgstr "선택한 예약 보고서를 비활성화하시겠습니까?"
 
+#: include/views/configuration.triggers.list.php:368
+msgid "Disable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
 msgstr "선택한 트리거를 비활성으로 하시겠습니까?"
+
+#: include/views/configuration.httpconf.list.php:228
+msgid "Disable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:215
 msgid "Disable selected web scenarios?"
@@ -7269,6 +7426,10 @@ msgstr "확인을 활성화"
 msgid "Enable debug mode"
 msgstr "디버그 모드를 활성화"
 
+#: app/views/administration.usergroup.list.php:239
+msgid "Enable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:226
 msgid "Enable debug mode in selected groups?"
 msgstr "선택한 그룹의 디버그 모드를 활성화하시겠습니까?"
@@ -7311,6 +7472,11 @@ msgstr "선택한 프록시에서 모니터링하는 호스트를 사용하시�
 msgid "Enable internal housekeeping"
 msgstr "데이터 삭제처리를 활성화"
 
+#: app/views/administration.token.list.php:205
+#: app/views/administration.user.token.list.php:158
+msgid "Enable selected API token?"
+msgstr ""
+
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
 msgid "Enable selected API tokens?"
@@ -7340,27 +7506,52 @@ msgstr ""
 msgid "Enable selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:147
+msgid "Enable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "선택한 상관관계를 활성화 하시겠습니까?"
+
+#: app/views/js/configuration.discovery.list.js.php:92
+#: include/views/configuration.host.discovery.list.php:342
+msgid "Enable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:121
 #: include/views/configuration.host.discovery.list.php:328
 msgid "Enable selected discovery rules?"
 msgstr "선택한 디스커버리 규칙를 활성화 하시겠습니까?"
 
+#: app/views/administration.usergroup.list.php:219
+msgid "Enable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
 msgstr "선택한 그룹을 활성화 하시겠습니까?"
+
+#: app/views/configuration.host.list.php:526
+msgid "Enable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:500
 #: include/views/configuration.hostgroups.list.php:201
 msgid "Enable selected hosts?"
 msgstr "선택한 호스트를 활성화 하시겠습니까?"
 
+#: include/views/configuration.item.list.php:303
+msgid "Enable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
 msgstr "선택한 아이템를 활성화 하시겠습니까?"
+
+#: app/views/administration.mediatype.list.php:197
+msgid "Enable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:181
 msgid "Enable selected media types?"
@@ -7374,13 +7565,25 @@ msgstr ""
 msgid "Enable selected modules?"
 msgstr "선택한 모듈을 활성화 하시겠습니까?"
 
+#: app/views/reports.scheduledreport.list.php:89
+msgid "Enable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
 msgstr "선택한 예약 보고서를 활성화 하시겠습니까?"
 
+#: include/views/configuration.triggers.list.php:362
+msgid "Enable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
 msgstr "선택한 트리거를 활성화 하시겠습니까?"
+
+#: include/views/configuration.httpconf.list.php:222
+msgid "Enable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:214
 msgid "Enable selected web scenarios?"
@@ -13650,6 +13853,11 @@ msgstr ""
 msgid "New dashboard"
 msgstr "신규 대시보드"
 
+#: app/views/configuration.discovery.edit.php:234
+#: app/views/configuration.discovery.edit.php:275
+msgid "New discovery rule"
+msgstr ""
+
 #: jsLoader.php:280
 msgid "New element"
 msgstr "새 요소"
@@ -16068,6 +16276,10 @@ msgstr "제공된 비밀 쿼리 문자열 \"%1$s\"이(가) 잘못되었습니다
 
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
+msgstr ""
+
+#: app/views/administration.user.list.php:304
+msgid "Provision selected LDAP user?"
 msgstr ""
 
 #: app/views/administration.user.list.php:303
@@ -20576,6 +20788,10 @@ msgstr ""
 msgid "Unblock"
 msgstr "블록을 해제"
 
+#: app/views/administration.user.list.php:310
+msgid "Unblock selected user?"
+msgstr ""
+
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "선택한 사용자의 블록을 해제하시겠습니까?"
@@ -23382,6 +23598,10 @@ msgstr "atan() - 라디안으로 표현되는 각도 값의 아크탄젠트"
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() - 라디안으로 표시되는 각도로 지정된 세로좌표(exprue) 및 가로좌표의 아크탄젠트"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr ""
@@ -23416,6 +23636,19 @@ msgstr "baselinewma() - 계절의 데이터 기간을 평균하여 기준선을 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - 값이 주어진 범위에 속하는지 확인합니다(1 - 범위 내, 0 - 그렇지 않은 경우)."
+
+#: app/partials/monitoring.latest.view.html.php:149
+#: include/classes/screens/CScreenHistory.php:309
+#: include/classes/screens/CScreenHistory.php:432
+#: include/classes/screens/CScreenHistory.php:518
+#: include/classes/screens/CScreenProblem.php:1794
+#: include/classes/screens/CScreenProblem.php:1818 include/items.inc.php:1352
+#: include/items.inc.php:1445 widgets/item/actions/WidgetView.php:210
+#: widgets/plaintext/actions/WidgetView.php:98
+#: widgets/tophosts/views/widget.view.php:105
+#: widgets/tophosts/views/widget.view.php:106
+msgid "binary value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"

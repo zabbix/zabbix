@@ -1004,7 +1004,8 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len)
 {
-	int	i, ret = SUCCEED;
+	int	ret = SUCCEED;
+	size_t	i;
 	char	*data_b64 = NULL;
 
 	assert(NULL != host && 0 != host_len);
@@ -1017,7 +1018,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "host", &data_b64))
 	{
-		zbx_base64_decode(data_b64, host, (int)host_len - 1, &i);
+		zbx_base64_decode(data_b64, host, host_len - 1, &i);
 		host[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1029,7 +1030,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "key", &data_b64))
 	{
-		zbx_base64_decode(data_b64, key, (int)key_len - 1, &i);
+		zbx_base64_decode(data_b64, key, key_len - 1, &i);
 		key[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1041,7 +1042,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "data", &data_b64))
 	{
-		zbx_base64_decode(data_b64, data, (int)data_len - 1, &i);
+		zbx_base64_decode(data_b64, data, data_len - 1, &i);
 		data[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1053,7 +1054,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "lastlogsize", &data_b64))
 	{
-		zbx_base64_decode(data_b64, lastlogsize, (int)lastlogsize_len - 1, &i);
+		zbx_base64_decode(data_b64, lastlogsize, lastlogsize_len - 1, &i);
 		lastlogsize[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1062,7 +1063,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "timestamp", &data_b64))
 	{
-		zbx_base64_decode(data_b64, timestamp, (int)timestamp_len - 1, &i);
+		zbx_base64_decode(data_b64, timestamp, timestamp_len - 1, &i);
 		timestamp[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1071,7 +1072,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "source", &data_b64))
 	{
-		zbx_base64_decode(data_b64, source, (int)source_len - 1, &i);
+		zbx_base64_decode(data_b64, source, source_len - 1, &i);
 		source[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}
@@ -1080,7 +1081,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 
 	if (SUCCEED == zbx_xml_get_data_dyn(xml, "severity", &data_b64))
 	{
-		zbx_base64_decode(data_b64, severity, (int)severity_len - 1, &i);
+		zbx_base64_decode(data_b64, severity, severity_len - 1, &i);
 		severity[i] = '\0';
 		zbx_xml_free_data_dyn(&data_b64);
 	}

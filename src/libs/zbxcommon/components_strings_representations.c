@@ -176,6 +176,10 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 			return "Numeric (unsigned)";
 		case ITEM_VALUE_TYPE_TEXT:
 			return "Text";
+		case ITEM_VALUE_TYPE_BIN:
+			return "Binary";
+		case ITEM_VALUE_TYPE_NONE:
+			return "None";
 		default:
 			return "unknown";
 	}

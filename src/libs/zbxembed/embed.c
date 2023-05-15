@@ -273,7 +273,7 @@ void	zbx_es_destroy(zbx_es_t *es)
 {
 	char	*error = NULL;
 
-	if (SUCCEED != zbx_es_destroy_env(es, &error))
+	if (SUCCEED == zbx_es_is_env_initialized(es) && SUCCEED != zbx_es_destroy_env(es, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot destroy embedded scripting engine environment: %s", error);
 	}
