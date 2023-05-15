@@ -240,15 +240,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			 */
 			if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
 				// Overwrite item name with the custom description.
-				$items[$itemid]['name'] = $this->fields_values['description'];
+				$items[$itemid]['widget_description'] = $this->fields_values['description'];
 
 				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
 				if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
-					$items = CMacrosResolverHelper::resolveWidgetItemNames($items);
+					$items = CMacrosResolverHelper::resolveItemWidgetDescriptions($items);
 				}
 
 				// All macros in item name are resolved here.
-				$description = $items[$itemid]['name'];
+				$description = $items[$itemid]['widget_description'];
 			}
 
 			$cells = self::arrangeByCells($this->fields_values, [

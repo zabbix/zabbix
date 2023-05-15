@@ -22,563 +22,272 @@
 namespace Widgets\Gauge\Actions;
 
 use API,
+	CMacrosResolverHelper,
+	CNumberParser,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CMacrosResolverHelper,
 	CSettingsHelper,
-	CUrl,
-	CValueMapHelper,
-	Manager,
-	CNumberParser,
-	CParser,
-	CWebUser;
+	Manager;
 
 use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerDashboardWidgetView {
-
-	/**
-	 * Array of items.
-	 *
-	 * @var array
-	 */
-	private $items = [];
-
-	/**
-	 * Item ID.
-	 *
-	 * @var string
-	 */
-	private $itemid = null;
-
-	/**
-	 * If host is currently dynamically selected.
-	 *
-	 * @var bool
-	 */
-	private $is_dynamic = false;
-
-	/**
-	 * If user is selecting host dynamically, set temporary items to later calculate real itemm by key.
-	 * @var array
-	 */
-	private $tmp_items = [];
-
-	/**
-	 * Set base units string from either item or custom units in widget configuration.
-	 *
-	 * @var string
-	 */
-	private $unit_base = '';
-
-	/**
-	 * Set value defaults. Use text type for errors or no data as default.
-	 *
-	 * @var array
-	 */
-	private $value = [
-		'type' => ITEM_VALUE_TYPE_TEXT,
-		'raw' => null,
-		'units' => '',
-		'power' => null
-	];
-
-	/**
-	 * Array of gauge min values. Contains raw value and converted value with units.
-	 *
-	 * @var array
-	 */
-	private $min = [];
-
-	/**
-	 * Array of gauge max values. Contains raw value and converted value with units.
-	 *
-	 * @var array
-	 */
-	private $max = [];
-
-	/**
-	 * Array of threshold values and colors.
-	 *
-	 * @var array
-	 */
-	private $thresholds;
-
-	private const GAUGE_WIDTH_MIN = 1;
-	private const GAUGE_WIDTH_MAX = 65535;
-	private const GAUGE_HEIGHT_MIN = 1;
-	private const GAUGE_HEIGHT_MAX = 65535;
 
 	protected function init(): void {
 		parent::init();
 
 		$this->addValidationRules([
 			'dynamic_hostid' => 'db hosts.hostid',
-			'contents_width' => 'int32|ge '.self::GAUGE_WIDTH_MIN.'|le '.self::GAUGE_WIDTH_MAX,
-			'contents_height' => 'int32|ge '.self::GAUGE_HEIGHT_MIN.'|le '.self::GAUGE_HEIGHT_MAX
+			'with_config' => 'in 1'
 		]);
 	}
 
 	protected function doAction(): void {
-		$error = '';
-		$url = '';
-
-		// Set default text in case there is no data for item.
-		$this->value['text'] = _('No data.');
-
-		$this->is_dynamic = ($this->hasInput('dynamic_hostid')
-			&& ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
-		);
-
-		$this->setItems();
-		$this->setItemUnits();
-		$this->setUnitBase();
-
-		if ($this->items) {
-			$history = $this->getItemHistory();
-			$this->setValue($history);
-
-			$is_binary = false || in_array($this->unit_base, ['B', 'Bps']);
-			$calc_power = false || $this->unit_base === '' || $this->unit_base[0] !== '!';
-
-			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-			$this->min['raw'] = $number_parser->parse($this->fields_values['min']) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
-				: null;
-
-			$this->max['raw'] = $number_parser->parse($this->fields_values['max']) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
-				: null;
-
-			if ($this->fields_values['minmax_show_units'] == 1) {
-				// At this point the Min/Max should be floating point values. If not, that is a critical system error.
-				$minmax_power = $calc_power
-					? (int) min(8, max(0, floor(log(max(
-						abs(truncateFloat($this->min['raw'])),
-						abs(truncateFloat($this->max['raw']))
-					), $is_binary ? ZBX_KIBIBYTE : 1000))))
-					: 0;
-
-				$power = $minmax_power;
-			}
-			else {
-				$power = $this->value['power'];
-			}
-
-			$options = $this->getConvertUnitsOptions($is_binary, $power);
-			$this->setMin($options);
-			$this->setMax($options);
-			$this->setThresholds($options);
-
-			// Create and URL to history. Widget will be placed inside <a>.
-			$url = (new CUrl('history.php'))
-				->setArgument('action', HISTORY_GRAPH)
-				->setArgument('itemids[]', $this->itemid);
-		}
-		else {
-			$error = _('No permissions to referred object or it does not exist!');
-		}
-
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getWidgetName(),
-			'error' => $error,
-			'url' => $url,
-			'contents_width' => (int) $this->getInput('contents_width', self::GAUGE_WIDTH_MIN),
-			'contents_height' => (int) $this->getInput('contents_height', self::GAUGE_HEIGHT_MIN),
-			'data' => [
-				'angle' => $this->fields_values['angle'],
-				'description' => [
-					'text' => $this->getDescription($this->items),
-					'font_size' => $this->fields_values['desc_size'],
-					'pos' => $this->fields_values['desc_v_pos'],
-					'is_bold' => ($this->fields_values['desc_bold'] == 1),
-					'color' => $this->fields_values['desc_color']
-				],
-				'value' => [
-					'type' => $this->value['type'],
-					'text' => $this->value['text'],
-					'raw' => $this->value['raw'],
-					'font_size' => $this->fields_values['value_size'],
-					'is_bold' => ($this->fields_values['value_bold'] == 1),
-					'color' => $this->fields_values['value_color'],
-					'show_arc' => ($this->fields_values['value_arc'] == 1),
-					'arc_size' => $this->fields_values['value_arc_size']
-				],
-				'units' => [
-					'text' => $this->value['units'],
-					'base' => $this->unit_base,
-					'pos' => $this->fields_values['units_pos'],
-					'show' => ($this->fields_values['units_show'] == 1),
-					'font_size' => $this->fields_values['units_size'],
-					'is_bold' => ($this->fields_values['units_bold'] == 1),
-					'color' => $this->fields_values['units_color']
-				],
-				'needle' => [
-					'show' => ($this->fields_values['needle_show'] == 1),
-					'color' => $this->fields_values['needle_color']
-				],
-				'minmax' => [
-					'min' => $this->min,
-					'max' => $this->max,
-					'show' => ($this->fields_values['minmax_show'] == 1),
-					'font_size' => $this->fields_values['minmax_size']
-				],
-				'empty_color' => $this->fields_values['empty_color'],
-				'bg_color' => $this->fields_values['bg_color'],
-				'thresholds' => [
-					'data' => $this->thresholds,
-					'show_arc' => ($this->fields_values['th_show_arc'] == 1),
-					'arc_size' => $this->fields_values['th_arc_size'],
-					'show_labels' => ($this->fields_values['th_show_labels'] == 1),
-					'font_size' => $this->fields_values['minmax_size']
-				]
-			],
+		$data = [
+			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'user' => [
-				'debug_mode' => $this->getDebugMode(),
-				'theme' => getUserTheme(CWebUser::$data)
+				'debug_mode' => $this->getDebugMode()
 			]
-		]));
-	}
-
-	/**
-	 * Get widget name based on default settings, custom name and item name. If a custom name is set, use that as widget
-	 * name. Show "Gauge" as widget name if user is in template dashboards or item does not exist and custom name is not
-	 * set. If item exists and user is in normal dashboards, use both host name and item name using name delimiter.
-	 *
-	 * @return string
-	 */
-	private function getWidgetName(): string {
-		$item = $this->items[$this->itemid] ?? null;
-		$name = $this->widget->getDefaultName();
-
-		if ($this->getInput('name', '') === '' && $item !== null) {
-			if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
-				$name = $item['name'];
-			}
-
-			if (!$this->isTemplateDashboard()) {
-				$name = $item['hosts'][0]['name'].NAME_DELIMITER.$name;
-			}
-		}
-
-		return $this->getInput('name', $name);
-	}
-
-	/**
-	 * Get description. Resolve macros in description if item exists and user is not templated dashboards or dynamic
-	 * host is requested.
-	 *
-	 * @param array $items  Array of items with keys as item IDs. So that macros can be resolved in item name.
-	 *
-	 * $items = [
-	 *     <itemid> => [
-	 *         'name' => (string) Item name.
-	 *     ]
-	 * ]
-	 *
-	 * @return string
-	 */
-	private function getDescription(array $items): string {
-		$description = $this->fields_values['description'];
-
-		if ($items) {
-			// Overwrite item name with the custom description.
-			$items[$this->itemid]['name'] = $description;
-
-			// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
-			if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
-				$items = CMacrosResolverHelper::resolveWidgetItemNames($items);
-			}
-
-			// All macros in item name are resolved here.
-			$description = $items[$this->itemid]['name'];
-		}
-
-		return $description;
-	}
-
-	/**
-	 * Compose and return array options for item.get API. In case of dynamic host selection, set temporary items.
-	 *
-	 * @return array
-	 */
-	private function getItemOptions(): array {
-		$options = [
-			'output' => ['value_type'],
-			'selectValueMap' => ['mappings'],
-			'itemids' => $this->fields_values['itemid'],
-			'webitems' => true,
-			'preservekeys' => true
 		];
 
-		if ($this->is_dynamic) {
-			$this->tmp_items = API::Item()->get([
+		$item = $this->getItem();
+
+		if ($item === null) {
+			$this->setResponse(new CControllerResponseData($data + [
+				'error' => _('No permissions to referred object or it does not exist!')
+			]));
+
+			return;
+		}
+
+		if ($this->getInput('name', '') === '') {
+			$data['name'] = $this->isTemplateDashboard()
+				? $item['name']
+				: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
+		}
+
+		$data['vars'] = [];
+
+		if ($this->hasInput('with_config')) {
+			$data['vars']['config'] = $this->getConfig($item);
+		}
+
+		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
+			$data['vars'] += $this->getValueData($item);
+		}
+
+		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	private function getDynamicHostId(): ?string {
+		if (($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
+				&& $this->hasInput('dynamic_hostid')) {
+			return $this->getInput('dynamic_hostid');
+		}
+
+		return null;
+	}
+
+	private function getItem(): ?array {
+		$dynamic_hostid = $this->getDynamicHostId();
+
+		$item_options = [
+			'output' => ['itemid', 'hostid', 'name', 'value_type', 'units'],
+			'selectHosts' => !$this->isTemplateDashboard() ? ['name'] : null,
+			'selectValueMap' => ['mappings'],
+			'filter' => [
+				'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+			],
+			'webitems' => true
+		];
+
+		if ($dynamic_hostid) {
+			$src_items = API::Item()->get([
 				'output' => ['key_'],
 				'itemids' => $this->fields_values['itemid'],
 				'webitems' => true
 			]);
 
-			if ($this->tmp_items) {
-				$options = [
-					'output' => ['value_type'],
-					'selectValueMap' => ['mappings'],
-					'hostids' => [$this->getInput('dynamic_hostid')],
-					'webitems' => true,
-					'filter' => [
-						'key_' => $this->tmp_items[0]['key_']
-					],
-					'preservekeys' => true
-				];
-			}
-		}
-
-		/*
-		 * Select original item name in several cases: if user is in normal dashboards or in template dashboards when
-		 * user is in view mode to display that item name in widget name. Item name should be select only if it is not
-		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
-		 */
-		if ($this->getInput('name', '') === '') {
-			if (!$this->isTemplateDashboard() || ($this->hasInput('dynamic_hostid') && $this->tmp_items)) {
-				$options['output'] = array_merge($options['output'], ['name']);
+			if (!$src_items) {
+				return null;
 			}
 
-			if (!$this->isTemplateDashboard()) {
-				$options['selectHosts'] = ['name'];
-			}
-		}
-
-		// Add other fields in case current widget is set in dynamic mode, template dashboard or has a specified host.
-		if (($this->is_dynamic && $this->tmp_items) || !$this->is_dynamic) {
-			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
-			$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
-
-			// Get units from item.
-			if ($this->fields_values['units_show'] == 1 && $this->fields_values['units'] === '') {
-				$options['output'][] = 'units';
-			}
-		}
-
-		return $options;
-	}
-
-	/**
-	 * Set the data to items array and item ID depending on options and whether there were previously temporary items
-	 * set in case of dynamic host selection.
-	 */
-	private function setItems(): void {
-		$options = $this->getItemOptions();
-
-		if ($this->is_dynamic) {
-			if ($this->tmp_items) {
-				$this->items = API::Item()->get($options);
-				$this->itemid = key($this->items);
-			}
+			$item_options['hostids'] = $dynamic_hostid;
+			$item_options['filter']['key_'] = $src_items[0]['key_'];
 		}
 		else {
-			$this->items = API::Item()->get($options);
-
-			if ($this->fields_values['itemid']) {
-				$this->itemid = $this->fields_values['itemid'][0];
-			}
+			$item_options['itemids'] = $this->fields_values['itemid'];
 		}
+
+		$items = API::Item()->get($item_options);
+
+		if (!$items) {
+			return null;
+		}
+
+		return $items[0];
 	}
 
-	/**
-	 * Set units to items array if units are supposed to be shown and overwritten.
-	 */
-	private function setItemUnits(): void {
-		if (!$this->items) {
-			return;
+	private function getConfig(array $item): array {
+		$config = [
+			'angle' => $this->fields_values['angle'],
+			'empty_color' => $this->fields_values['empty_color'],
+			'bg_color' => $this->fields_values['bg_color'],
+
+		];
+
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true
+		]);
+
+		$number_parser->parse($this->fields_values['min']);
+		$config['min'] = $number_parser->calcValue();
+
+		$number_parser->parse($this->fields_values['max']);
+		$config['max'] = $number_parser->calcValue();
+
+		if ($this->fields_values['minmax_show'] == 1) {
+			$config['minmax'] = [
+				'show' => true,
+				'size' => $this->fields_values['minmax_size']
+			];
+
+			if ($this->fields_values['units_show'] == 1 && $this->fields_values['minmax_show_units'] == 1) {
+				$minmax_units = $this->fields_values['units'] !== '' ? $this->fields_values['units'] : $item['units'];
+			}
+			else {
+				$minmax_units = '';
+			}
+
+			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $config['min']);
+			$config['minmax']['min_text'] = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
+
+			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $config['max']);
+			$config['minmax']['max_text'] = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
 		}
+		else {
+			$config['minmax']['show'] = false;
+
+			$minmax_units = '';
+		}
+
+		$widget_description = $this->fields_values['description'];
+
+		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
+			[[
+				'widget_description' => $widget_description
+			]] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item + [
+				'widget_description' => $widget_description
+			]]);
+		}
+
+		$config['description'] = [
+			'text' => $widget_description,
+			'position' => $this->fields_values['desc_v_pos'],
+			'size' => $this->fields_values['desc_size'],
+			'is_bold' => $this->fields_values['desc_bold'] == 1,
+			'color' => $this->fields_values['desc_color']
+		];
+
+		$config['value'] = [
+			'size' => $this->fields_values['value_size'],
+			'is_bold' => $this->fields_values['value_bold'] == 1,
+			'color' => $this->fields_values['value_color'],
+			'arc' => $this->fields_values['value_arc'] == 1
+				? [
+					'show' => true,
+					'size' => $this->fields_values['value_arc_size'],
+					'needle' => $this->fields_values['needle_show'] == 1
+						? [
+							'show' => true,
+							'color' => $this->fields_values['needle_color']
+						]
+						: [
+							'show' => false
+						]
+				]
+				: [
+					'show' => false
+				]
+		];
+
+		$config['units'] = $this->fields_values['units_show'] == 1
+			? [
+				'show' => true,
+				'position' => $this->fields_values['units_pos'],
+				'size' => $this->fields_values['units_size'],
+				'is_bold' => $this->fields_values['units_bold'] == 1,
+				'color' => $this->fields_values['units_color']
+			]
+			: [
+				'show' => false
+			];
+
+		$config['thresholds'] = [
+			'show_labels' => $this->fields_values['th_show_labels'] == 1,
+			'arc' => $this->fields_values['th_show_arc'] == 1
+				? [
+					'show' => true,
+					'size' => $this->fields_values['th_arc_size'],
+				]
+				: [
+					'show' => false
+				],
+			'data' => []
+		];
+
+		foreach ($this->fields_values['thresholds'] as $threshold) {
+			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $threshold['threshold_value']);
+
+			$config['thresholds']['data'][] = [
+				'color' => $threshold['color'],
+				'value' => $threshold['threshold_value'],
+				'text' => $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '')
+			];
+		}
+
+		return $config;
+	}
+
+	private function getValueData(array $item): array {
+		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		$history = Manager::History()->getLastValues([$item], 1, $history_period);
+
+		if (!$history) {
+			return [
+				'value' => null,
+				'value_label' => _('No data.'),
+				'units_label' => ''
+			];
+		}
+
+		$value = $history[$item['itemid']][0]['value'];
 
 		if ($this->fields_values['units_show'] == 1) {
 			if ($this->fields_values['units'] !== '') {
-				// Overwrite units for item.
-				$this->items[$this->itemid]['units'] = $this->fields_values['units'];
+				$item['units'] = $this->fields_values['units'];
 			}
 		}
 		else {
-			// Do not make any unit conversions if units are supposed to be hidden.
-			$this->items[$this->itemid]['units'] = '';
+			$item['units'] = '';
 		}
-	}
 
-	/**
-	 * Set base unit string depending on units set in widget configuration or item. Base units can be custom, can be
-	 * binary or any other supported units. For example if units are Bps, after item value is formatted, units that
-	 * widget will display can change to MBps, but this unit base string is the same - Bps.
-	 */
-	private function setUnitBase(): void {
-		// Try to show units either ones that are custom set by widget or get them from the item.
-		if ($this->fields_values['units_show'] == 1) {
-			if ($this->fields_values['units'] === '') {
-				// Get units from item.
-				$this->unit_base = $this->items[$this->itemid]['units'] ?? '';
-			}
-			else {
-				// Get units from widget configuration.
-				$this->unit_base = $this->fields_values['units'];
-			}
-		}
-	}
+		$labels = $this->makeValueLabels($item, $value);
 
-	/**
-	 * Get one latest history data value.
-	 *
-	 * @return array
-	 */
-	private function getItemHistory(): array {
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		$history = Manager::History()->getLastValues($this->items, 1, $history_period);
-
-		return $history;
-	}
-
-	/**
-	 * Set the value to display based on history data. If there is history data, format the value according to widget
-	 * configuration: set exact decimals and units. Set raw value from database, so that it can be used to draw the SVG.
-	 * Also set the power by which the value was converted which later can be used to change Min/Max units. For example
-	 * if item unit base string is B and raw value in database is "1000000". The value will be "976.56", units are "KB"
-	 * and the power by which the converion happened is "1".
-	 *
-	 * @param array $history  Array of history data.
-	 *
-	 * $history = [
-	 *     <itemid> => [
-	 *         0 => 'value' (string)  Item value from the history data.
-	 *     ]
-	 * ]
-	 */
-	private function setValue(array $history): void {
-		$this->value['type'] = $this->items[$this->itemid]['value_type'];
-
-		if ($history) {
-			$this->value['raw'] = $history[$this->itemid][0]['value'];
-
-			$formatted_value = formatHistoryValueRaw($this->value['raw'], $this->items[$this->itemid], false, [
-				'decimals' => $this->fields_values['decimal_places'],
-				'decimals_exact' => true,
-				'small_scientific' => false,
-				'zero_as_zero' => false
-			]);
-
-			$value = $formatted_value['value'];
-			$value_units = $formatted_value['units'];
-			$value_power = $formatted_value['power'];
-			$decimals = '';
-
-			if (!$formatted_value['is_mapped']) {
-				$numeric_formatting = getNumericFormatting();
-				$decimal_pos = strrpos($value, $numeric_formatting['decimal_point']);
-
-				if ($decimal_pos !== false) {
-					$decimals = substr($value, $decimal_pos);
-					$value = substr($value, 0, $decimal_pos);
-				}
-			}
-
-			$this->value['text'] = $value.$decimals;
-			$this->value['units'] = $value_units;
-			$this->value['power'] = $value_power;
-		}
-		else {
-			// Otherwise the "No data." is displayed as text.
-			$this->value['type'] = ITEM_VALUE_TYPE_TEXT;
-		}
-	}
-
-	/**
-	 * Get the unit conversion options.
-	 *
-	 * @param bool     $is_binary  If true, use 1024 as base. Use 1000 otherwise.
-	 * @param int|null $power      Convert to the specific power (0 => '', 1 => K, 2 => M, ...)
-	 *
-	 * @return array
-	 */
-	private function getConvertUnitsOptions(bool $is_binary, ?int $power): array {
 		return [
-			'units' => $this->unit_base,
-			'unit_base' => $is_binary ? ZBX_KIBIBYTE : 1000,
-			'power' => $power,
-			'ignore_milliseconds' => ($this->min['raw'] <= -1 || $this->max['raw'] >= 1),
-			'decimals' => $this->fields_values['decimal_places']
+			'value' => $value,
+			'value_label' => $labels['value'],
+			'units_label' => $labels['units']
 		];
 	}
 
-	/**
-	 * Set the Min values. If a mapped value is found, return that value. Otherwise use the converted value and add
-	 * units if needed.
-	 *
-	 * @param array  $options  Array of unit conversion options.
-	 */
-	private function setMin(array $options): void {
-		$mapped_value = CValueMapHelper::getMappedValue(ITEM_VALUE_TYPE_UINT64, $this->min['raw'],
-			$this->items[$this->itemid]['valuemap']
-		);
-
-		if ($mapped_value !== false) {
-			$this->min['text'] = $mapped_value;
-		}
-		else {
-			$min = convertUnitsRaw(['value' => $this->min['raw']] + $options);
-
-			// In case Min value is "0" and unit base is "s", display simply "0" to maintain consistency with graphs.
-			$this->min['text'] = $min['value'];
-			$this->min['text'] .= ($this->fields_values['minmax_show_units'] == 1 && $min['units'] !== '')
-				? ' '.$min['units']
-				: '';
-		}
-	}
-
-	/**
-	 * Set the Max values. If a mapped value is found, return that value. Otherwise use the converted value and add
-	 * units if needed.
-	 *
-	 * @param array  $options  Array of unit conversion options.
-	 */
-	private function setMax(array $options): void {
-		$mapped_value = CValueMapHelper::getMappedValue(ITEM_VALUE_TYPE_UINT64, $this->max['raw'],
-			$this->items[$this->itemid]['valuemap']
-		);
-
-		if ($mapped_value !== false) {
-			$this->max['text'] = $mapped_value;
-		}
-		else {
-			$max = convertUnitsRaw(['value' => $this->max['raw']] + $options);
-
-			// In case Max value is "0" and unit base is "s", display simply "0" to maintain consistency with graphs.
-			$this->max['text'] = $max['value'];
-			$this->max['text'] .= ($this->fields_values['minmax_show_units'] == 1 && $max['units'] !== '')
-				? ' '.$max['units']
-				: '';
-		}
-	}
-
-	/**
-	 * Set the threshold values. If a mapped value is found, return that value. Otherwise use the converted value and
-	 * add units if needed. Thresholds values depend on Min/Max units. In case Min/Max units are hidden, thresholds will
-	 * use units from item. Meaning it will use the same power by which items were converted.
-	 *
-	 * @param array  $options  Array of unit conversion options.
-	 */
-	private function setThresholds(array $options): void {
-		foreach ($this->fields_values['thresholds'] as &$threshold) {
-			$mapped_value = CValueMapHelper::getMappedValue(ITEM_VALUE_TYPE_FLOAT,
-				$threshold['threshold_value'], $this->items[$this->itemid]['valuemap']
-			);
-
-			if ($mapped_value !== false) {
-				$threshold['text'] = $mapped_value;
-			}
-			else {
-				$converted = convertUnitsRaw(['value' => $threshold['threshold_value']] + $options);
-				$threshold['text'] = $converted['value'];
-			}
-		}
-		unset($threshold);
-
-		$this->thresholds = $this->fields_values['thresholds'];
+	private function makeValueLabels(array $item, $value): array {
+		return formatHistoryValueRaw($value, $item, false, [
+			'decimals' => $this->fields_values['decimal_places'],
+			'decimals_exact' => true,
+			'small_scientific' => false,
+			'zero_as_zero' => false
+		]);
 	}
 }

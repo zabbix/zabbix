@@ -35,7 +35,11 @@ const MAX_WIDTH_MINMAX_RATIO = 0.25;
 
 class CSVGGauge {
 	// TO DO: add description?
-	constructor(options, data) {
+	constructor(container, options) {
+		console.log('CSVGGauge::constructor', {container, options});
+
+		return;
+
 		this.options = options;
 		this.container = options.container;
 		this.data = data;
@@ -101,6 +105,18 @@ class CSVGGauge {
 		this.#draw();
 
 		this.initialLoad = false;
+	}
+
+	setSize({width, height}) {
+		console.log('CSVGGauge::setSize', {width, height});
+	}
+
+	setValue({value, value_label, units_label}) {
+		console.log('CSVGGauge::setValue', {value, value_label, units_label});
+	}
+
+	destroy() {
+		console.log('CSVGGauge::destroy');
 	}
 
 	update(data) {

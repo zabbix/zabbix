@@ -18,104 +18,63 @@
 **/
 
 
-// Must be synced with PHP.
-const ZBX_STYLE_SVG_GAUGE_CONTAINER = 'svg-gauge-container';
-
 class CWidgetGauge extends CWidget {
-	_init() {
-		super._init();
 
-		this._initial_load = true;
-		this._has_contents = false;
-		this._svg = false;
+	onInitialize() {
+		this.gauge_container = null;
 		this.gauge = null;
 	}
 
-	start() {
-		super.start();
+	onStart() {
+		this.gauge_container = document.createElement('div');
+		this._body.appendChild(this.gauge_container);
+	}
 
-		const container = this._target.querySelector('.' + ZBX_STYLE_SVG_GAUGE_CONTAINER);
+	onResize() {
+		if (this._state === WIDGET_STATE_ACTIVE && this.gauge !== null) {
+			this.gauge.setSize(this.#getGaugeContainerSize());
+		}
+	}
+
+	updateProperties({name, view_mode, fields}) {
+		if (this.gauge !== null) {
+			this.gauge.destroy();
+			this.gauge = null;
+		}
+
+		super.updateProperties({name, view_mode, fields});
 	}
 
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			initial_load: this._initial_load ? 1 : 0
+			with_config: this.gauge === null ? 1 : undefined
 		};
 	}
 
-	onResize() {
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
-	}
-
-	resize() {
-		super.resize();
-
-		if (this.gauge !== null) {
-			const container = this._target.querySelector('.' + ZBX_STYLE_SVG_GAUGE_CONTAINER);
-			const padding = this.#getContainerPadding(container);
-			const width = this._contents_size.contents_width - padding.left - padding.right;
-			const height = this._contents_size.contents_height - padding.top - padding.bottom;
-
-			this.gauge.resize(width, height);
-		}
-	}
-
-	#getContainerPadding(container) {
-		const top = parseInt(window.getComputedStyle(container).getPropertyValue('padding-top'));
-		const right = parseInt(window.getComputedStyle(container).getPropertyValue('padding-right'));
-		const left = parseInt(window.getComputedStyle(container).getPropertyValue('padding-left'));
-		const bottom = parseInt( window.getComputedStyle(container).getPropertyValue('padding-bottom'));
-
-		return {top, right, left, bottom}
-	}
-
-	processUpdateResponse(response) {
-		// If there will a necesity for tooltips due to threshold overhaul, we probably need to stop all widget activity first
-
-		if (response.gauge_data !== undefined) {
-			this._has_contents = true;
-
-			if (this._initial_load) {
-				super.processUpdateResponse(response);
-
-				const container = this._target.querySelector('.' + ZBX_STYLE_SVG_GAUGE_CONTAINER);
-				const padding = this.#getContainerPadding(container);
-				const width = response.gauge_data.contents_width - padding.left - padding.right;
-				const height = response.gauge_data.contents_height - padding.top - padding.bottom;
-
-				this.gauge = new CSVGGauge({
-					container: container,
-					theme: response.gauge_data.user.theme,
-					canvas: {
-						width: width,
-						height: height
-					},
-				}, response.gauge_data.data);
-
-				this._svg = this._body.querySelector('svg');
-			}
-			else {
-				this.gauge.update(response.gauge_data.data);
+	setContents(response) {
+		if (this.gauge === null) {
+			if (!('config' in response)) {
+				throw new Error('Unexpected server error.');
 			}
 
-			if (response.gauge_data.error_msg !== undefined) {
-				this._content_body.innerHTML = response.gauge_data.error_msg;
-			}
-		}
-		else {
-			this._has_contents = false;
+			this.gauge = new CSVGGauge(this.gauge_container, response.config);
+			this.gauge.setSize(this.#getGaugeContainerSize());
 		}
 
-		this._initial_load = false;
+		if ('value' in response) {
+			this.gauge.setValue({
+				value: response.value,
+				value_label: response.value_label,
+				units_label: response.units_label
+			});
+		}
 	}
 
 	getActionsContextMenu({can_paste_widget}) {
 		const menu = super.getActionsContextMenu({can_paste_widget});
 
-		if (this._is_edit_mode) {
+		if (this.isEditMode()) {
 			return menu;
 		}
 
@@ -150,6 +109,24 @@ class CWidgetGauge extends CWidget {
 	}
 
 	hasPadding() {
-		return false;
+		return true;
+	}
+
+	#getGaugeContainerSize() {
+		const computed_style = getComputedStyle(this.gauge_container);
+
+		const width = Math.floor(
+			parseFloat(computed_style.width)
+				- parseFloat(computed_style.paddingLeft) - parseFloat(computed_style.paddingRight)
+				- parseFloat(computed_style.borderLeftWidth) - parseFloat(computed_style.borderRightWidth)
+		);
+
+		const height = Math.floor(
+			parseFloat(computed_style.height)
+				- parseFloat(computed_style.paddingTop) - parseFloat(computed_style.paddingBottom)
+				- parseFloat(computed_style.borderTopWidth) - parseFloat(computed_style.borderBottomWidth)
+		);
+
+		return {width, height};
 	}
 }

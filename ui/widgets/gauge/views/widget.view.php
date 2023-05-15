@@ -26,14 +26,15 @@
  * @var array $data
  */
 
-if ($data['error'] !== '') {
-	$body = (new CTableInfo())->setNoDataMessage($data['error']);
+$view = new CWidgetView($data);
+
+if (array_key_exists('error', $data)) {
+	$view->addItem((new CTableInfo())->setNoDataMessage($data['error']));
 }
 else {
-	$body = (new CDiv())->addClass(ZBX_STYLE_SVG_GAUGE_CONTAINER);
+	foreach ($data['vars'] as $name => $value) {
+		$view->setVar($name, $value);
+	}
 }
 
-(new CWidgetView($data))
-	->addItem($body)
-	->setVar('gauge_data', $data)
-	->show();
+$view->show();

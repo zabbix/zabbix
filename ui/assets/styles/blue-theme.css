@@ -1658,7 +1658,7 @@ form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show {
 div.dashboard-widget-gauge .dashboard-grid-widget-body > div {
   box-sizing: border-box;
   height: 100%;
-  padding: 10px; }
+  padding: 0 10px; }
 
 .svg-gauge div {
   line-height: 1.2em;

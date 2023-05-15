@@ -722,7 +722,6 @@ function convertUnitsRaw(array $options): array {
 		return [
 			'value' => $value,
 			'units' => '',
-			'power' => null,
 			'is_numeric' => false
 		];
 	}
@@ -733,7 +732,6 @@ function convertUnitsRaw(array $options): array {
 		return [
 			'value' => zbx_date2str(DATE_TIME_FORMAT_SECONDS, $value),
 			'units' => '',
-			'power' => null,
 			'is_numeric' => false
 		];
 	}
@@ -742,7 +740,6 @@ function convertUnitsRaw(array $options): array {
 		return [
 			'value' => convertUnitsUptime($value),
 			'units' => '',
-			'power' => null,
 			'is_numeric' => false
 		];
 	}
@@ -751,7 +748,6 @@ function convertUnitsRaw(array $options): array {
 		return [
 			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
 			'units' => '',
-			'power' => null,
 			'is_numeric' => false
 		];
 	}
@@ -789,8 +785,6 @@ function convertUnitsRaw(array $options): array {
 		$unit_base = ($units === 'B' || $units === 'Bps') ? ZBX_KIBIBYTE : 1000;
 	}
 
-	$result_power = null;
-
 	if ($options['power'] === null) {
 		$result = null;
 		$unit_prefix = null;
@@ -807,7 +801,6 @@ function convertUnitsRaw(array $options): array {
 			]);
 
 			$unit_prefix = $prefix;
-			$result_power = $power;
 
 			if (abs($result) < $unit_base) {
 				break;
@@ -817,7 +810,6 @@ function convertUnitsRaw(array $options): array {
 	else {
 		$unit_power = array_key_exists($options['power'], $power_table) ? $options['power'] : count($power_table) - 1;
 		$unit_prefix = $power_table[$unit_power];
-		$result_power = $unit_power;
 
 		$result = formatFloat($value / pow($unit_base, $unit_power), [
 			'precision' => $options['precision'],
@@ -835,7 +827,6 @@ function convertUnitsRaw(array $options): array {
 	return [
 		'value' => $result,
 		'units' => $result_units,
-		'power' => $result_power,
 		'is_numeric' => true
 	];
 }
