@@ -219,8 +219,12 @@ $scriptsForm->addItem([
 	$scriptsTable,
 	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
-		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?'),
-			'csrf_token' => CCsrfTokenHelper::get('script')]
+		'script.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected script?'),
+			'confirm_plural' => _('Delete selected scripts?'),
+			'csrf_token' => CCsrfTokenHelper::get('script')
+		]
 	], 'script')
 ]);
 

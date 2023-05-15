@@ -160,6 +160,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	unsigned char		process_type = info->process_type;
 	int			server_num = info->server_num;
 	int			process_num = info->process_num;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_HOUSEKEEPER_EXECUTE};
 
 	zbx_thread_proxy_housekeeper_args	*housekeeper_args_in = (zbx_thread_proxy_housekeeper_args *)
 			((((zbx_thread_args_t *)args))->args);
@@ -184,7 +185,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 				housekeeper_args_in->config_housekeeping_frequency);
 	}
 
-	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), housekeeper_args_in->config_timeout,
+			&rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

@@ -1295,9 +1295,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, config_unavailable_delay};
 #endif
-	zbx_thread_pp_manager_args		preproc_man_args =
-						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
-						zbx_config_source_ip};
+	zbx_thread_pp_manager_args		preproc_man_args = {
+							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+							zbx_config_source_ip};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 
@@ -1412,7 +1412,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED != zbx_init_database_cache(get_program_type, config_history_cache_size,
-			config_history_index_cache_size, config_trends_cache_size,&error))
+			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);

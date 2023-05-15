@@ -268,33 +268,32 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 	}
 	else
 	{
-		zbx_jsonobj_t	*obj;
+		zbx_pp_cache_jsonpath_t	*index;
 
-		if (NULL == (obj = (zbx_jsonobj_t *)cache->data))
+		if (NULL == (index = (zbx_pp_cache_jsonpath_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
 
-			obj = (zbx_jsonobj_t *)zbx_malloc(NULL, sizeof(zbx_jsonobj_t));
+			index = (zbx_pp_cache_jsonpath_t *)zbx_malloc(NULL, sizeof(zbx_pp_cache_jsonpath_t));
 
-			if (SUCCEED != zbx_jsonobj_open(value->data.str, obj))
+			if (SUCCEED != zbx_jsonobj_open(value->data.str, &index->obj))
 			{
 				*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
-				zbx_free(obj);
+				zbx_free(index);
 				cache->type = ZBX_PREPROC_NONE;
 				return FAIL;
 			}
 
-			cache->data = (void *)obj;
+			index->index = zbx_jsonpath_index_create();
+			cache->data = (void *)index;
 		}
 
-		if (FAIL == zbx_jsonobj_query(obj, params, &data))
+		if (FAIL == zbx_jsonobj_query_ext(&index->obj, index->index, params, &data))
 		{
 			*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 			return FAIL;
 		}
-
-		zbx_jsonobj_disable_indexing(obj);
 	}
 
 	if (NULL == data)

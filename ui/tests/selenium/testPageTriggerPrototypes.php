@@ -88,7 +88,7 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
 		$this->zbxTestTextPresent($data['d_name']);
-		$this->zbxTestTextPresent('Trigger prototypes deleted');
+		$this->zbxTestTextPresent('Trigger prototype deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -130,7 +130,7 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
-		$this->zbxTestTextPresent('Trigger prototypes deleted');
+		$this->zbxTestTextPresent('Trigger prototype deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerid', $triggerids);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
