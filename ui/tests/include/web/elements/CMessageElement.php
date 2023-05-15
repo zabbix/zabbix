@@ -119,6 +119,6 @@ class CMessageElement extends CElement {
 	 */
 	public function close() {
 		$this->query('xpath:.//button[contains(@class, "overlay-close-btn")]')->one()->click();
-		return $this->waitUntilNotPresent();
+		return $this->waitUntilNotVisible();
 	}
 }

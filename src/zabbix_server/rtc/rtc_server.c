@@ -28,7 +28,7 @@
 #include "zbxjson.h"
 #include "zbxtime.h"
 
-static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
+static int	rtc_parse_options_server(const char *opt, zbx_uint32_t *code, struct zbx_json *j, char **error)
 {
 	const char	*param;
 
@@ -62,14 +62,8 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 
 		if ('=' == *param)
 		{
-			struct zbx_json	j;
-
 			*code = ZBX_RTC_HA_REMOVE_NODE;
-
-			zbx_json_init(&j, 1024);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_NODE, param + 1, ZBX_JSON_TYPE_STRING);
-			*data = zbx_strdup(NULL, j.buffer);
-			zbx_json_clean(&j);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_NODE, param + 1, ZBX_JSON_TYPE_STRING);
 
 			return SUCCEED;
 		}
@@ -93,8 +87,6 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 		{
 			if (SUCCEED == zbx_is_time_suffix(param + 1, &delay, ZBX_LENGTH_UNLIMITED))
 			{
-				struct zbx_json	j;
-
 				if (delay < 10 || delay > 15 * SEC_PER_MIN)
 				{
 					*error = zbx_strdup(NULL, "failover delay must be in range from 10s to 15m");
@@ -102,11 +94,7 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 				}
 
 				*code = ZBX_RTC_HA_SET_FAILOVER_DELAY;
-
-				zbx_json_init(&j, 1024);
-				zbx_json_addint64(&j, ZBX_PROTO_TAG_FAILOVER_DELAY, delay);
-				*data = zbx_strdup(NULL, j.buffer);
-				zbx_json_clean(&j);
+				zbx_json_addint64(j, ZBX_PROTO_TAG_FAILOVER_DELAY, delay);
 
 				return SUCCEED;
 			}
@@ -126,10 +114,7 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 
 	if (0 == strncmp(opt, ZBX_PROXY_CONFIG_CACHE_RELOAD, ZBX_CONST_STRLEN(ZBX_PROXY_CONFIG_CACHE_RELOAD)))
 	{
-		struct zbx_json	j;
 		param = opt + ZBX_CONST_STRLEN(ZBX_PROXY_CONFIG_CACHE_RELOAD);
-
-		zbx_json_init(&j, 1024);
 
 		if ('=' == *param)
 		{
@@ -138,25 +123,20 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 			if ('\0' == *(param + 1))
 			{
 				*error = zbx_strdup(NULL, "missing proxy name(s)");
-				zbx_json_free(&j);
 				return FAIL;
 			}
 
+			zbx_json_addarray(j, ZBX_PROTO_TAG_PROXY_NAMES);
+
 			p = zbx_strdup(NULL, param + 1);
-
-			zbx_json_addarray(&j, ZBX_PROTO_TAG_PROXY_NAMES);
-
 			token = strtok(p, ",");
 
 			while (NULL != token)
 			{
-				zbx_json_addstring(&j, NULL, token, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(j, NULL, token, ZBX_JSON_TYPE_STRING);
 				token = strtok(NULL, ",");
 			}
 
-			zbx_json_close(&j);
-			*data = zbx_strdup(NULL, j.buffer);
-			zbx_json_free(&j);
 			zbx_free(p);
 
 			*code = ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD;
@@ -166,10 +146,6 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
 
 		if ('\0' == *param)
 		{
-			zbx_json_close(&j);
-			*data = zbx_strdup(NULL, j.buffer);
-			zbx_json_free(&j);
-
 			*code = ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD;
 
 			return SUCCEED;
@@ -195,37 +171,26 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
  *                         default loglevel command handler                   *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_process_option(int direction, const char *data, char **result)
+static int	rtc_process_server_loglevel_option(int direction, const char *data, char **result)
 {
-	struct zbx_json_parse	jp;
-	char			buf[MAX_STRING_LEN];
-	int			process_num = 0;
+	int	proc_num, proc_type;
+	pid_t	pid;
 
-	if (NULL == data)
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, NULL, result))
+		return SUCCEED;
+
+	/* change loglevel for all processes */
+	if (0 == pid && ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
 		(void)zbx_ha_change_loglevel(direction, result);
 		return FAIL;
 	}
 
-	if (FAIL == zbx_json_open(data, &jp))
+	if (ZBX_PROCESS_TYPE_HA_MANAGER == proc_type)
 	{
-		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
-		return SUCCEED;
-	}
-
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
-		process_num = atoi(buf);
-
-	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
-	{
-		return FAIL;
-	}
-
-	if (0 == strcmp(buf, "ha manager"))
-	{
-		if (0 != process_num && 1 != process_num)
+		if (0 != proc_num && 1 != proc_num)
 		{
-			*result = zbx_dsprintf(NULL, "Invalid option parameter \"%d\"\n", process_num);
+			*result = zbx_dsprintf(NULL, "Invalid option parameter \"%d\"\n", proc_num);
 		}
 		else
 		{
@@ -483,15 +448,15 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
  *                         rtc command handler                                *
  *                                                                            *
  ******************************************************************************/
-int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex_server(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data, char **result)
 {
 	switch (code)
 	{
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			return rtc_process_option(1, (const char *)data, result);
+			return rtc_process_server_loglevel_option(1, (const char *)data, result);
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			return rtc_process_option(-1, (const char *)data, result);
+			return rtc_process_server_loglevel_option(-1, (const char *)data, result);
 #endif
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
 			zbx_service_reload_cache();
@@ -518,8 +483,8 @@ int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char 
 			rtc_ha_remove_node((const char *)data, result);
 			return SUCCEED;
 		case ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD:
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD, data,
-					(zbx_uint32_t)strlen((const char *)data) + 1);
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD,
+					(const char *)data, (zbx_uint32_t)strlen((const char *)data) + 1);
 			return SUCCEED;
 		case ZBX_RTC_PROXYPOLLER_PROCESS:
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
@@ -544,24 +509,33 @@ int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char 
 int	rtc_process(const char *option, int config_timeout, char **error)
 {
 	zbx_uint32_t	code = ZBX_RTC_UNKNOWN;
-	char		*data = NULL;
+	char		*data;
+	int		ret = FAIL;
+	struct zbx_json	j;
 
-	if (SUCCEED != zbx_rtc_parse_options(option, &code, &data, error))
-		return FAIL;
+	zbx_json_init(&j, 1024);
+
+	if (SUCCEED != zbx_rtc_parse_options(option, &code, &j, error))
+		goto out;
 
 	if (ZBX_RTC_UNKNOWN == code)
 	{
-		if (SUCCEED != rtc_parse_options_ex(option, &code, &data, error))
-			return FAIL;
+		if (SUCCEED != rtc_parse_options_server(option, &code, &j, error))
+			goto out;
 
 		if (ZBX_RTC_UNKNOWN == code)
 		{
 			*error = zbx_dsprintf(NULL, "unknown option \"%s\"", option);
-			return FAIL;
+			goto out;
 		}
 	}
 
-	return zbx_rtc_async_exchange(&data, code, config_timeout, error);
+	data = zbx_strdup(NULL, j.buffer);
+	ret = zbx_rtc_async_exchange(&data, code, config_timeout, error);
+out:
+	zbx_json_free(&j);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -573,12 +547,7 @@ void	rtc_reset(zbx_rtc_t *rtc)
 {
 	int	i;
 
-	for (i = 0; i < rtc->subs.values_num; i++)
-	{
-		zbx_ipc_client_close(rtc->subs.values[i]->client);
-		zbx_free(rtc->subs.values[i]);
-	}
-	zbx_vector_rtc_sub_clear(&rtc->subs);
+	zbx_vector_rtc_sub_clear_ext(&rtc->subs, zbx_rtc_sub_free);
 
 	for (i = 0; i < rtc->hooks.values_num; i++)
 		zbx_free(rtc->hooks.values[i]);
