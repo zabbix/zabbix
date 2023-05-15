@@ -675,7 +675,6 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => null
 			],
-
 			'Reject too long Basic authentication username' => [
 				'request_data' => [
 					'item' => 'testItem_Update:httpagent.credentials.length',
