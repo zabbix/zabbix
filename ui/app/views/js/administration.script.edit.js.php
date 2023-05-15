@@ -142,7 +142,7 @@ window.script_edit_popup = new class {
 		const fields = getFormFields(this.form);
 
 		for (let key in fields) {
-			if (typeof fields[key] === 'string') {
+			if (typeof fields[key] === 'string' && key !== 'confirmation') {
 				fields[key] = fields[key].trim();
 			}
 		}
