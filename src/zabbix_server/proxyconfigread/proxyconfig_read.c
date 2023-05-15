@@ -19,6 +19,7 @@
 
 #include "proxyconfig_read.h"
 
+#include "zbxcommon.h"
 #include "zbxdbwrap.h"
 #include "zbxdbhigh.h"
 #include "zbxkvs.h"
@@ -370,14 +371,15 @@ out:
  ******************************************************************************/
 static int	proxyconfig_get_table_data_ext(const char *table_name, const char *key_name,
 		const zbx_vector_uint64_t *key_ids, const char *condition, const char *join,
-		const zbx_hashset_t *key_ids_filter, zbx_vector_uint64_t *recids, struct zbx_json *j, char **error)
+		const zbx_hashset_t *ids_filter, const char *filter_name, zbx_vector_uint64_t *recids, struct zbx_json *j,
+		char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	const ZBX_TABLE	*table;
 	char		*sql = NULL;
 	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		ret = FAIL;
+	int		ret = FAIL, i, fld_ids_filter = -1;
 	const char	*alias = "t.", *alias_from = " t";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -385,12 +387,27 @@ static int	proxyconfig_get_table_data_ext(const char *table_name, const char *ke
 	table = zbx_db_get_table(table_name);
 	zbx_json_addobject(j, table->table);
 
+	if (NULL != ids_filter)
+	{
+		for (i = 0; 0 != table->fields[i].name; i++)
+		{
+			if (0 == strcmp(filter_name, table->fields[i].name))
+			{
+				fld_ids_filter = i;
+				break;
+			}
+		}
+
+		if (-1 == fld_ids_filter)
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
 	proxyconfig_get_fields(&sql, &sql_alloc, &sql_offset, table, alias, j);
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
 
-	if ((NULL == key_ids || 0 != key_ids->values_num) && (NULL == key_ids_filter || 0 != key_ids_filter->num_data))
+	if ((NULL == key_ids || 0 != key_ids->values_num) && (NULL == ids_filter || 0 != ids_filter->num_data))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s%s", table->table, alias_from);
 
@@ -432,12 +449,15 @@ static int	proxyconfig_get_table_data_ext(const char *table_name, const char *ke
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_uint64_t	recid;
+			if (-1 != fld_ids_filter)
+			{
+				zbx_uint64_t	recid;
 
-			ZBX_STR2UINT64(recid, row[0]);
+				ZBX_STR2UINT64(recid, row[fld_ids_filter]);
 
-			if (NULL != key_ids_filter && NULL == zbx_hashset_search(key_ids_filter, &recid))
-				continue;
+				if (NULL == zbx_hashset_search(ids_filter, &recid))
+					continue;
+			}
 
 			zbx_json_addarray(j, NULL);
 			proxyconfig_add_row(j, row, table, recids);
@@ -465,7 +485,7 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 		const zbx_vector_uint64_t *key_ids, const char *condition, zbx_vector_uint64_t *recids,
 		struct zbx_json *j, char **error)
 {
-	return proxyconfig_get_table_data_ext(table_name, key_name, key_ids, condition, NULL, NULL, recids, j, error);
+	return proxyconfig_get_table_data_ext(table_name, key_name, key_ids, condition, NULL, NULL, NULL, recids, j, error);
 }
 
 typedef struct
@@ -714,13 +734,13 @@ static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct 
 				hostids->values_num);
 	}
 
-	if (SUCCEED != proxyconfig_get_table_data_ext("item_rtdata", NULL, NULL, NULL, sql, &items, NULL, j, error))
+	if (SUCCEED != proxyconfig_get_table_data_ext("item_rtdata", NULL, NULL, NULL, sql, &items, "itemid", NULL, j, error))
 		goto out;
 
-	if (SUCCEED != proxyconfig_get_table_data_ext("item_preproc", NULL, NULL, NULL, sql, &items, NULL, j, error))
+	if (SUCCEED != proxyconfig_get_table_data_ext("item_preproc", NULL, NULL, NULL, sql, &items, "itemid", NULL, j, error))
 		goto out;
 
-	if (SUCCEED != proxyconfig_get_table_data_ext("item_parameter", NULL, NULL, NULL, sql, &items, NULL, j, error))
+	if (SUCCEED != proxyconfig_get_table_data_ext("item_parameter", NULL, NULL, NULL, sql, &items, "itemid", NULL, j, error))
 		goto out;
 
 	ret = SUCCEED;
