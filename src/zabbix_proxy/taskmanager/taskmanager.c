@@ -216,7 +216,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
  *                                                                            *
  * Purpose: process data task with json contents                              *
  *                                                                            *
- * Return value: SUCCEED - the data task was executed                         *
+ * Return value: SUCCEED - data task was executed                             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -250,7 +250,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
  *                                                                            *
  * Purpose: process data task                                                 *
  *                                                                            *
- * Return value: SUCCEED - the data task was executed                         *
+ * Return value: SUCCEED - data task was executed                             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
