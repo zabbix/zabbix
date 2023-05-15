@@ -107,12 +107,12 @@ foreach (getRequest('items', []) as $item) {
 			&& array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype'])
 			&& array_key_exists('calc_fnc', $gitem) && ctype_digit($gitem['calc_fnc'])
 			&& array_key_exists('yaxisside', $gitem) && ctype_digit($gitem['yaxisside'])) {
-		if (!array_key_exists('color', $gitem) || !$color_validator->validate($gitem['color'])) {
+		if (array_key_exists('color', $gitem) && !$color_validator->validate($gitem['color'])) {
 			$gitem['color'] = CHtml::encode($gitem['color']);
 			error($color_validator->getError());
 		}
 
-		$gitems[] = $gitem;
+		$gitems[] = $gitem + ['color' => ''];
 	}
 }
 
