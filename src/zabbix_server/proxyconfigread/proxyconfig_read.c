@@ -487,7 +487,8 @@ static int	proxyconfig_get_table_data(const char *table_name, const char *key_na
 		const zbx_vector_uint64_t *key_ids, const char *condition, zbx_vector_uint64_t *recids,
 		struct zbx_json *j, char **error)
 {
-	return proxyconfig_get_table_data_ext(table_name, key_name, key_ids, condition, NULL, NULL, NULL, recids, j, error);
+	return proxyconfig_get_table_data_ext(table_name, key_name, key_ids, condition, NULL, NULL, NULL, recids, j,
+			error);
 }
 
 typedef struct
@@ -736,14 +737,23 @@ static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct 
 				hostids->values_num);
 	}
 
-	if (SUCCEED != proxyconfig_get_table_data_ext("item_rtdata", NULL, NULL, NULL, sql, &items, "itemid", NULL, j, error))
+	if (SUCCEED != proxyconfig_get_table_data_ext("item_rtdata", NULL, NULL, NULL, sql, &items, "itemid", NULL, j,
+			error))
+	{
 		goto out;
+	}
 
-	if (SUCCEED != proxyconfig_get_table_data_ext("item_preproc", NULL, NULL, NULL, sql, &items, "itemid", NULL, j, error))
+	if (SUCCEED != proxyconfig_get_table_data_ext("item_preproc", NULL, NULL, NULL, sql, &items, "itemid", NULL, j,
+			error))
+	{
 		goto out;
+	}
 
-	if (SUCCEED != proxyconfig_get_table_data_ext("item_parameter", NULL, NULL, NULL, sql, &items, "itemid", NULL, j, error))
+	if (SUCCEED != proxyconfig_get_table_data_ext("item_parameter", NULL, NULL, NULL, sql, &items, "itemid", NULL,
+			j, error))
+	{
 		goto out;
+	}
 
 	ret = SUCCEED;
 out:
