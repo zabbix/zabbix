@@ -1477,18 +1477,15 @@ static int	eval_execute_statistical_function(const zbx_eval_context_t *ctx, cons
 	if (UNKNOWN != (ret = eval_validate_statistical_function_args(ctx, token, output, &args_dbl, error)))
 		goto out;
 
-
-	if (FAIL == stat_func(&args_dbl, &result, error))
+	if (SUCCEED == (ret = stat_func(&args_dbl, &result, error)))
 	{
-		ret = FAIL;
-		goto out;
+		zbx_variant_set_dbl(&value, result);
+		eval_function_return((int)token->opt, &value, output);
 	}
-
-	zbx_variant_set_dbl(&value, result);
-	eval_function_return((int)token->opt, &value, output);
 out:
 	zbx_vector_dbl_destroy(&args_dbl);
-	return SUCCEED;
+
+	return ret;
 }
 
 /******************************************************************************
