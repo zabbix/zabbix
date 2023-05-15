@@ -35,7 +35,7 @@ class CControllerDiscoveryCreate extends CController {
 			'concurrency_max_type' =>	'in '.implode(',', [ZBX_DISCOVERY_CHECKS_ONE, ZBX_DISCOVERY_CHECKS_UNLIMITED, ZBX_DISCOVERY_CHECKS_CUSTOM]),
 			'concurrency_max' =>		'db drules.concurrency_max|ge '.ZBX_DISCOVERY_CHECKS_UNLIMITED.'|le '.ZBX_DISCOVERY_CHECKS_MAX,
 			'uniqueness_criteria' =>	'string',
-			'dchecks' =>				'required|array',
+			'dchecks' =>				'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
