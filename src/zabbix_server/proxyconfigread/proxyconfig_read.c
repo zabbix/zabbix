@@ -180,6 +180,7 @@ static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_
  *             sql_offset - [IN/OUT]                                          *
  *             table      - [IN] the table                                    *
  *             j          - [OUT] the output json                             *
+ *             alias      - [IN] the table alias                              *
  *                                                                            *
  ******************************************************************************/
 static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table,
@@ -541,25 +542,25 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
  *                                                                            *
  * Purpose: get item data from items table                                    *
  *                                                                            *
- * Parameters: hostids    - [IN] the target host identifiers                  *
- *             itemids    - [IN] the selected item identifiers, sorted        *
- *             j          - [OUT] the output json                             *
- *             error      - [OUT] the error message                           *
+ * Parameters: hostids - [IN] the target host identifiers                     *
+ *             items   - [IN] the selected item identifiers                   *
+ *             j       - [OUT] the output json                                *
+ *             error   - [OUT] the error message                              *
  *                                                                            *
  * Return value: SUCCEED - the data was read successfully                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vector_uint64_t *itemids,
-		zbx_hashset_t *items, struct zbx_json *j, char **error)
+static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_hashset_t *items, struct zbx_json *j,
+ 		char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	const ZBX_TABLE	*table;
-	char		*sql;
-	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
-	zbx_uint64_t	itemid, master_itemid;
+	DB_RESULT		result;
+	DB_ROW			row;
+	const ZBX_TABLE		*table;
+	char			*sql;
+	size_t			sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
+	zbx_uint64_t		itemid, master_itemid;
 
 	zbx_vector_proxyconfig_dep_item_ptr_t	dep_items;
 	zbx_proxyconfig_dep_item_t		*dep_item;
@@ -626,7 +627,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 			if (ITEM_TYPE_DEPENDENT != atoi(row[fld_type]))
 			{
 				zbx_json_addarray(j, NULL);
-				proxyconfig_add_row(j, row, table, itemids);
+				proxyconfig_add_row(j, row, table, NULL);
 				zbx_json_close(j);
 
 				zbx_hashset_insert(items, &itemid, sizeof(itemid));
@@ -654,7 +655,7 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 					if (NULL != zbx_hashset_search(items, &dep_item->master_itemid))
 					{
 						zbx_json_addarray(j, NULL);
-						proxyconfig_add_row(j, dep_item->row, table, itemids);
+						proxyconfig_add_row(j, dep_item->row, table, NULL);
 						zbx_json_close(j);
 
 						zbx_hashset_insert(items, &dep_item->itemid, sizeof(zbx_uint64_t));
@@ -671,8 +672,6 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 
 	zbx_json_close(j);
 	zbx_json_close(j);
-
-	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	ret = SUCCEED;
 out:
@@ -700,7 +699,7 @@ out:
  ******************************************************************************/
 static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct zbx_json *j, char **error)
 {
-	zbx_vector_uint64_t	interfaceids, itemids;
+	zbx_vector_uint64_t	interfaceids;
 	int			ret = FAIL;
 	char			*sql = NULL;
 	size_t			sql_alloc =  0, sql_offset = 0;
@@ -709,7 +708,6 @@ static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&interfaceids);
-	zbx_vector_uint64_create(&itemids);
 	zbx_hashset_create(&items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (SUCCEED != proxyconfig_get_table_data("hosts", "hostid", hostids, NULL, NULL, j, error))
@@ -727,7 +725,7 @@ static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct 
 	if (SUCCEED != proxyconfig_get_table_data("host_inventory", "hostid", hostids, NULL, NULL, j, error))
 		goto out;
 
-	if (SUCCEED != proxyconfig_get_item_data(hostids, &itemids, &items, j, error))
+	if (SUCCEED != proxyconfig_get_item_data(hostids, &items, j, error))
 		goto out;
 
 	if (0 != items.num_data)
@@ -757,7 +755,6 @@ static int	proxyconfig_get_host_data(const zbx_vector_uint64_t *hostids, struct 
 
 	ret = SUCCEED;
 out:
-	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&interfaceids);
 	zbx_hashset_destroy(&items);
 	zbx_free(sql);
