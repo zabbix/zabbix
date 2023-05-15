@@ -22,12 +22,12 @@
 #include "pp_error.h"
 #include "log.h"
 #include "item_preproc.h"
+#include "zbxpreprocbase.h"
 #include "zbxprometheus.h"
 #include "zbxxml.h"
 #include "preproc_snmp.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
-#include "pp_history.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
@@ -912,6 +912,8 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Parameters: ctx              - [IN] worker specific execution context      *
  *             cache            - [IN] preprocessing cache                    *
+ *             um_handle        - [IN] shared user macro cache handle         *
+ *             hostid           - [IN] item host identifier                   *
  *             value_type       - [IN] item value type                        *
  *             value            - [IN/OUT] input/output value                 *
  *             ts               - [IN] value timestamp                        *
@@ -924,27 +926,46 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
-int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char value_type,
-		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_step_t *step, zbx_variant_t *history_value,
-		zbx_timespec_t *history_ts, const char *config_source_ip)
+int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shared_handle_t *um_handle,
+		zbx_uint64_t hostid, unsigned char value_type, zbx_variant_t *value, zbx_timespec_t ts,
+		const zbx_pp_step_t *step, zbx_variant_t *history_value, zbx_timespec_t *history_ts,
+		const char *config_source_ip)
 {
 	int	ret;
+	char	*params = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__,
 			step->type, ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), (void *)cache);
 
+	if (NULL != step->params)
+	{
+		params = zbx_strdup(NULL, step->params);
+
+		if (NULL != um_handle)
+		{
+			char	*error = NULL;
+
+			if (SUCCEED != zbx_dc_expand_user_macros_from_cache(um_handle->um_cache, &params, &hostid, 1,
+					&error))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
+				zbx_free(error);
+			}
+		}
+	}
+
 	switch (step->type)
 	{
 		case ZBX_PREPROC_MULTIPLIER:
-			ret = pp_execute_multiply(value_type, value, step->params);
+			ret = pp_execute_multiply(value_type, value, params);
 			goto out;
 		case ZBX_PREPROC_RTRIM:
 		case ZBX_PREPROC_LTRIM:
 		case ZBX_PREPROC_TRIM:
-			ret = pp_execute_trim(step->type, value, step->params);
+			ret = pp_execute_trim(step->type, value, params);
 			goto out;
 		case ZBX_PREPROC_REGSUB:
-			ret = pp_execute_regsub(value, step->params);
+			ret = pp_execute_regsub(value, params);
 			goto out;
 		case ZBX_PREPROC_BOOL2DEC:
 		case ZBX_PREPROC_OCT2DEC:
@@ -956,61 +977,61 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 			ret = pp_execute_delta(step->type, value_type, value, ts, history_value, history_ts);
 			goto out;
 		case ZBX_PREPROC_XPATH:
-			ret = pp_execute_xpath(value, step->params);
+			ret = pp_execute_xpath(value, params);
 			goto out;
 		case ZBX_PREPROC_JSONPATH:
-			ret = pp_execute_jsonpath(cache, value, step->params);
+			ret = pp_execute_jsonpath(cache, value, params);
 			goto out;
 		case ZBX_PREPROC_VALIDATE_RANGE:
-			ret = pp_validate_range(value_type, value, step->params);
+			ret = pp_validate_range(value_type, value, params);
 			goto out;
 		case ZBX_PREPROC_VALIDATE_REGEX:
-			ret = pp_validate_regex(value, step->params);
+			ret = pp_validate_regex(value, params);
 			goto out;
 		case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-			ret = pp_validate_not_regex(value, step->params);
+			ret = pp_validate_not_regex(value, params);
 			goto out;
 		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
 			ret = pp_check_not_error(value);
 			goto out;
 		case ZBX_PREPROC_ERROR_FIELD_JSON:
-			ret = pp_error_from_json(value, step->params);
+			ret = pp_error_from_json(value, params);
 			goto out;
 		case ZBX_PREPROC_ERROR_FIELD_XML:
-			ret = pp_error_from_xml(value, step->params);
+			ret = pp_error_from_xml(value, params);
 			goto out;
 		case ZBX_PREPROC_ERROR_FIELD_REGEX:
-			ret = pp_error_from_regex(value, step->params);
+			ret = pp_error_from_regex(value, params);
 			goto out;
 		case ZBX_PREPROC_THROTTLE_VALUE:
 			ret = item_preproc_throttle_value(value, &ts, history_value, history_ts);
 			goto out;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-			ret = pp_throttle_timed_value(value, ts, step->params, history_value, history_ts);
+			ret = pp_throttle_timed_value(value, ts, params, history_value, history_ts);
 			goto out;
 		case ZBX_PREPROC_SCRIPT:
-			ret = pp_execute_script(ctx, value, step->params, history_value, config_source_ip);
+			ret = pp_execute_script(ctx, value, params, history_value, config_source_ip);
 			goto out;
 		case ZBX_PREPROC_PROMETHEUS_PATTERN:
-			ret = pp_execute_prometheus_pattern(cache, value, step->params);
+			ret = pp_execute_prometheus_pattern(cache, value, params);
 			goto out;
 		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-			ret = pp_execute_prometheus_to_json(value, step->params);
+			ret = pp_execute_prometheus_to_json(value, params);
 			goto out;
 		case ZBX_PREPROC_CSV_TO_JSON:
-			ret = pp_execute_csv_to_json(value, step->params);
+			ret = pp_execute_csv_to_json(value, params);
 			goto out;
 		case ZBX_PREPROC_XML_TO_JSON:
 			ret = pp_execute_xml_to_json(value);
 			goto out;
 		case ZBX_PREPROC_STR_REPLACE:
-			ret = pp_execute_str_replace(value, step->params);
+			ret = pp_execute_str_replace(value, params);
 			goto out;
 		case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
-			ret = pp_execute_snmp_to_value(cache, value, step->params);
+			ret = pp_execute_snmp_to_value(cache, value, params);
 			goto out;
 		case ZBX_PREPROC_SNMP_WALK_TO_JSON:
-			ret = pp_execute_snmp_to_json(value, step->params);
+			ret = pp_execute_snmp_to_json(value, params);
 			goto out;
 		default:
 			zbx_variant_clear(value);
@@ -1018,6 +1039,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 			ret = FAIL;
 		}
 out:
+	zbx_free(params);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%s", __func__, zbx_result_string(ret),
 			zbx_variant_value_desc(value));
 
@@ -1031,6 +1054,7 @@ out:
  * Parameters: ctx              - [IN] worker specific execution context      *
  *             preproc          - [IN] item preprocessing data                *
  *             cache            - [IN] preprocessing cache                    *
+ *             um_handle        - [IN] shared user macro cache handle         *
  *             value_in         - [IN]                                        *
  *             ts               - [IN] value timestamp                        *
  *             config_source_ip - [IN]                                        *
@@ -1040,8 +1064,9 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_cache_t *cache,
-		zbx_variant_t *value_in, zbx_timespec_t ts, const char *config_source_ip, zbx_variant_t *value_out,
-		zbx_pp_result_t **results_out, int *results_num_out)
+		zbx_dc_um_shared_handle_t *um_handle, zbx_variant_t *value_in, zbx_timespec_t ts,
+		const char *config_source_ip, zbx_variant_t *value_out, zbx_pp_result_t **results_out,
+		int *results_num_out)
 {
 	zbx_pp_result_t		*results;
 	zbx_pp_history_t	*history;
@@ -1090,10 +1115,10 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		action = ZBX_PREPROC_FAIL_DEFAULT;
 		quote_error = 0;
 
-		pp_history_pop(preproc->history, i, &history_value, &history_ts);
+		zbx_pp_history_pop(preproc->history, i, &history_value, &history_ts);
 
-		if (SUCCEED != pp_execute_step(ctx, cache, preproc->value_type, value_out, ts, preproc->steps + i,
-				&history_value, &history_ts, config_source_ip))
+		if (SUCCEED != pp_execute_step(ctx, cache, um_handle, preproc->hostid, preproc->value_type, value_out,
+				ts, preproc->steps + i, &history_value, &history_ts, config_source_ip))
 		{
 			zbx_variant_copy(&value_raw, value_out);
 			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(value_out, preproc->steps + i)))
@@ -1126,7 +1151,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		/* reset preprocessing history in the case of error */
 		if (NULL != history)
 		{
-			pp_history_free(history);
+			zbx_pp_history_free(history);
 			history = NULL;
 		}
 
@@ -1143,7 +1168,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	/* replace preprocessing history */
 
 	if (NULL != preproc->history)
-		pp_history_free(preproc->history);
+		zbx_pp_history_free(preproc->history);
 
 	preproc->history = history;
 

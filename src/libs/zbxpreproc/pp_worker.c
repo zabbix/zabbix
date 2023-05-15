@@ -40,7 +40,8 @@ static void	pp_task_process_test(zbx_pp_context_t *ctx, zbx_pp_task_t *task, con
 {
 	zbx_pp_task_test_t	*d = (zbx_pp_task_test_t *)PP_TASK_DATA(task);
 
-	pp_execute(ctx, d->preproc, NULL, &d->value, d->ts, config_source_ip, &d->result, &d->results, &d->results_num);
+	pp_execute(ctx, d->preproc, NULL, NULL, &d->value, d->ts, config_source_ip, &d->result, &d->results,
+			&d->results_num);
 }
 
 /******************************************************************************
@@ -52,7 +53,7 @@ static void	pp_task_process_value(zbx_pp_context_t *ctx, zbx_pp_task_t *task, co
 {
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 
-	pp_execute(ctx, d->preproc, d->cache, &d->value, d->ts, config_source_ip, &d->result, NULL, NULL);
+	pp_execute(ctx, d->preproc, d->cache, d->um_handle, &d->value, d->ts, config_source_ip, &d->result, NULL, NULL);
 }
 
 /******************************************************************************
@@ -65,8 +66,8 @@ static void	pp_task_process_dependent(zbx_pp_context_t *ctx, zbx_pp_task_t *task
 	zbx_pp_task_dependent_t	*d = (zbx_pp_task_dependent_t *)PP_TASK_DATA(task);
 	zbx_pp_task_value_t	*d_first = (zbx_pp_task_value_t *)PP_TASK_DATA(d->primary);
 
-	pp_execute(ctx, d_first->preproc, d->cache, &d_first->value, d_first->ts, config_source_ip, &d_first->result,
-			NULL, NULL);
+	pp_execute(ctx, d_first->preproc, d->cache, d_first->um_handle, &d_first->value, d_first->ts, config_source_ip,
+			&d_first->result, NULL, NULL);
 }
 
 /******************************************************************************
