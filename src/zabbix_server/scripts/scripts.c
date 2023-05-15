@@ -164,12 +164,6 @@ int	zbx_init_remote_commands_cache(char **error)
 			__remote_commands_shmem_free_func);
 
 	remote_commands->strpool_sz = 0;
-
-
-
-
-
-
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -215,24 +209,7 @@ void	zbx_deinit_remote_commands_cache(void)
 
 	if (NULL != remote_commands_mem)
 	{
-		/////zbx_hashset_iter_t		iter_comands, iter_results;
-		/////zbx_remote_commands_command_t	*command;
-		/////zbx_remote_commands_result_t	*result;
-
-		/*zbx_hashset_iter_reset(&remote_commands->commands, &iter_comands);
-
-		while (NULL != (command = (zbx_remote_commands_command_t *)zbx_hashset_iter_next(&iter_comands)))
-			zbx_free(command->command);*/
-
 		zbx_hashset_destroy(&remote_commands->commands);
-
-		/*zbx_hashset_iter_reset(&remote_commands->results, &iter_results);
-
-		while (NULL != (result = (zbx_remote_commands_result_t *)zbx_hashset_iter_next(&iter_results)))
-		{
-			zbx_free(result->value);
-			zbx_free(result->error);
-		}*/
 
 		zbx_hashset_destroy(&remote_commands->results);
 		zbx_hashset_destroy(&remote_commands->strpool);
@@ -576,7 +553,6 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
-
 }
 
 static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
