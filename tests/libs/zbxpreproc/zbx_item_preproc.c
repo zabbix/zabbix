@@ -30,6 +30,7 @@
 #include "zbxpreproc.h"
 #include "libs/zbxpreproc/pp_execute.h"
 #include "libs/zbxpreproc/preproc_snmp.h"
+#include "libs/zbxpreproc/pp_cache.h"
 
 #ifdef HAVE_NETSNMP
 #define SNMP_NO_DEBUGGING
@@ -241,20 +242,17 @@ static int	check_mib_existence(zbx_pp_step_t *op)
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_variant_t		value, history_value;
+	zbx_variant_t		value, value_in, history_value, history_value_in;
 	unsigned char		value_type;
-	zbx_timespec_t		ts, history_ts, expected_history_ts;
+	zbx_timespec_t		ts, history_ts, history_ts_in, expected_history_ts;
 	zbx_pp_step_t		step;
-	int			returned_ret, expected_ret;
-	zbx_pp_context_t	ctx;
-
-	ZBX_UNUSED(state);
+	int			returned_ret, expected_ret, i;
+	zbx_pp_context_t	ctx = {0};
+	zbx_pp_cache_t		*cache, *step_cache;
+	zbx_pp_item_preproc_t	preproc;
 
 #ifdef HAVE_NETSNMP
-	int				mib_translation_case = 0;
-
-	preproc_init_snmp();
-	pp_context_init(&ctx);
+	int			mib_translation_case = 0;
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		mib_translation_case = 1;
@@ -263,122 +261,147 @@ void	zbx_mock_test_entry(void **state)
 		skip();
 #endif
 
-	ZBX_UNUSED(state);
-
-	read_value("in.value", &value_type, &value, &ts);
-	read_step("in.step", &step);
-
-#ifdef HAVE_NETSNMP
-	/* MIB translation test cases will fail if system lacks MIBs - in this case test case should be skipped */
-	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
-	{
-		preproc_shutdown_snmp();
-		zbx_variant_clear(&value);
-		skip();
-	}
-#endif
-
 #if !defined(HAVE_OPENSSL) && !defined(HAVE_GNUTLS)
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.encryption_required"))
 		skip();
 #endif
 
+	ZBX_UNUSED(state);
+
+	read_step("in.step", &step);
+
+#ifdef HAVE_NETSNMP
+	preproc_init_snmp();
+
+	/* MIB translation test cases will fail if system lacks MIBs - in this case test case should be skipped */
+	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
+	{
+		preproc_shutdown_snmp();
+		skip();
+	}
+#endif
+
+	pp_context_init(&ctx);
+
+	read_value("in.value", &value_type, &value_in, &ts);
+
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
-		read_history_value("in.history", &history_value, &history_ts);
+		read_history_value("in.history", &history_value_in, &history_ts_in);
 	}
 	else
 	{
-		zbx_variant_set_none(&history_value);
-		history_ts.sec = 0;
-		history_ts.ns = 0;
+		zbx_variant_set_none(&history_value_in);
+		history_ts_in.sec = 0;
+		history_ts_in.ns = 0;
 	}
 
-	if (FAIL == (returned_ret = pp_execute_step(&ctx, NULL, value_type, &value, ts, &step, &history_value,
-			&history_ts)))
+	preproc.steps = &step;
+	preproc.steps_num = 1;
+	cache = pp_cache_create(&preproc, &value_in);
+
+	for (i = 0; i < 4; i++)
 	{
-		pp_error_on_fail(&value, &step);
+		zbx_variant_copy(&value, &value_in);
+		zbx_variant_copy(&history_value, &history_value_in);
+		history_ts = history_ts_in;
 
-		if (ZBX_VARIANT_ERR != value.type)
-			returned_ret = SUCCEED;
-	}
-
-	if (SUCCEED != returned_ret && ZBX_VARIANT_ERR == value.type)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", value.data.err);
-	}
-
-	if (SUCCEED == is_step_supported(step.type))
-		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	else
-		expected_ret = FAIL;
-
-	zbx_mock_assert_result_eq("zbx_item_preproc() return", expected_ret, returned_ret);
-
-	if (SUCCEED == returned_ret)
-	{
-		if (SUCCEED == is_step_supported(step.type) &&
-				ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
-		{
-			zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
-		}
+		/* run first and last test with no cache */
+		if (0 == i || 3 == i || SUCCEED != pp_cache_is_supported(&preproc))
+			step_cache = NULL;
 		else
-		{
-			if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.value"))
-			{
-				if (ZBX_VARIANT_NONE == value.type)
-					fail_msg("preprocessing result was empty value");
+			step_cache = cache;
 
-				if (ZBX_VARIANT_DBL == value.type)
+		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
+				&history_value, &history_ts)))
+		{
+			pp_error_on_fail(&value, &step);
+
+			if (ZBX_VARIANT_ERR != value.type)
+				returned_ret = SUCCEED;
+		}
+
+		if (SUCCEED != returned_ret && ZBX_VARIANT_ERR == value.type)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", value.data.err);
+		}
+
+		if (SUCCEED == is_step_supported(step.type))
+			expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+		else
+			expected_ret = FAIL;
+
+		zbx_mock_assert_result_eq("zbx_item_preproc() return", expected_ret, returned_ret);
+
+		if (SUCCEED == returned_ret)
+		{
+			if (SUCCEED == is_step_supported(step.type) &&
+					ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
+			{
+				zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
+			}
+			else
+			{
+				if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.value"))
 				{
-					zbx_mock_assert_double_eq("processed value",
-							atof(zbx_mock_get_parameter_string("out.value")),
-							value.data.dbl);
+					if (ZBX_VARIANT_NONE == value.type)
+						fail_msg("preprocessing result was empty value");
+
+					if (ZBX_VARIANT_DBL == value.type)
+					{
+						zbx_mock_assert_double_eq("processed value",
+								atof(zbx_mock_get_parameter_string("out.value")),
+								value.data.dbl);
+					}
+					else
+					{
+						zbx_variant_convert(&value, ZBX_VARIANT_STR);
+						zbx_mock_assert_str_eq("processed value",
+								zbx_mock_get_parameter_string("out.value"), value.data.str);
+					}
 				}
 				else
 				{
-					zbx_variant_convert(&value, ZBX_VARIANT_STR);
-					zbx_mock_assert_str_eq("processed value",
-							zbx_mock_get_parameter_string("out.value"), value.data.str);
+					if (ZBX_VARIANT_NONE != value.type)
+						fail_msg("expected empty value, but got %s", zbx_variant_value_desc(&value));
 				}
-			}
-			else
-			{
-				if (ZBX_VARIANT_NONE != value.type)
-					fail_msg("expected empty value, but got %s", zbx_variant_value_desc(&value));
-			}
 
-			if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.history"))
-			{
-				if (ZBX_VARIANT_NONE == history_value.type)
-					fail_msg("preprocessing history was empty value");
-
-				zbx_variant_convert(&history_value, ZBX_VARIANT_STR);
-				zbx_mock_assert_str_eq("preprocessing step history value",
-						zbx_mock_get_parameter_string("out.history.data"),
-						history_value.data.str);
-
-				zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.history.time"),
-						&expected_history_ts);
-				zbx_mock_assert_timespec_eq("preprocessing step history time", &expected_history_ts,
-						&history_ts);
-			}
-			else
-			{
-				/* history_value will contain duktape bytecode if step is a script */
-				if (ZBX_VARIANT_NONE != history_value.type && ZBX_PREPROC_SCRIPT != step.type)
+				if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.history"))
 				{
-					fail_msg("expected empty history, but got %s",
-							zbx_variant_value_desc(&history_value));
+					if (ZBX_VARIANT_NONE == history_value.type)
+						fail_msg("preprocessing history was empty value");
+
+					zbx_variant_convert(&history_value, ZBX_VARIANT_STR);
+					zbx_mock_assert_str_eq("preprocessing step history value",
+							zbx_mock_get_parameter_string("out.history.data"),
+							history_value.data.str);
+
+					zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.history.time"),
+							&expected_history_ts);
+					zbx_mock_assert_timespec_eq("preprocessing step history time", &expected_history_ts,
+							&history_ts);
+				}
+				else
+				{
+					/* history_value will contain duktape bytecode if step is a script */
+					if (ZBX_VARIANT_NONE != history_value.type && ZBX_PREPROC_SCRIPT != step.type)
+					{
+						fail_msg("expected empty history, but got %s",
+								zbx_variant_value_desc(&history_value));
+					}
 				}
 			}
 		}
-	}
-	else
-		zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
+		else
+			zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 
-	zbx_variant_clear(&value);
-	zbx_variant_clear(&history_value);
+		zbx_variant_clear(&value);
+		zbx_variant_clear(&history_value);
+	}
+
+	pp_cache_release(cache);
+	zbx_variant_clear(&value_in);
+	zbx_variant_clear(&history_value_in);
 
 	pp_context_destroy(&ctx);
 #ifdef HAVE_NETSNMP
