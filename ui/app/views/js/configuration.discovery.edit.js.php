@@ -46,6 +46,7 @@ window.drule_edit_popup = new class {
 		this._addRadioButtonValues(drule);
 		this._initActionButtons();
 		this._updateForm();
+		this.overlay.recoverFocus();
 	}
 
 	_initActionButtons() {
