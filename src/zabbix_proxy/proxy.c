@@ -1284,7 +1284,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_proxydata_frequency};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time, zbx_config_enable_remote_commands,
-								zbx_config_log_remote_commands};
+								zbx_config_log_remote_commands, CONFIG_HOSTNAME};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
 								&events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,

@@ -38,9 +38,6 @@
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 
-extern unsigned char			program_type;
-extern char 				*CONFIG_HOSTNAME;
-
 /**************************************************************************************
  *                                                                                    *
  * Purpose: execute remote command task                                               *
@@ -258,7 +255,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
  *                                                                            *
  ******************************************************************************/
 static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -328,7 +325,8 @@ finish:
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands)
+		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands,
+		unsigned char program_type)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -368,7 +366,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 				break;
 			case ZBX_TM_TASK_DATA:
 				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now, config_comms,
-						config_startup_time))
+						config_startup_time, program_type))
 					processed_num++;
 				break;
 			default:
@@ -405,7 +403,7 @@ static void	tm_remove_old_tasks(int now)
  *          (only from passive proxy)                                         *
  *                                                                            *
  ******************************************************************************/
-static void	force_config_sync(void)
+static void	force_config_sync(const char *config_hostname)
 {
 	zbx_tm_task_t	*task;
 	zbx_uint64_t	taskid;
@@ -418,7 +416,7 @@ static void	force_config_sync(void)
 	task = zbx_tm_task_create(taskid, ZBX_TM_PROXYDATA, ZBX_TM_STATUS_NEW, (int)time(NULL), 0, 0);
 
 	zbx_json_init(&j, 1024);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_NAME, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_NAME, config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&j);
 
 	task->data = zbx_tm_data_create(taskid, j.buffer, j.buffer_size, ZBX_TM_DATA_TYPE_PROXY_HOSTNAME);
@@ -485,7 +483,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 #endif
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd &&
 					ZBX_PROXYMODE_PASSIVE == taskmanager_args_in->config_comms->proxymode)
-				force_config_sync();
+			{
+				force_config_sync(taskmanager_args_in->config_hostname);
+			}
 
 			zbx_free(rtc_data);
 
@@ -501,7 +501,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		tasks_num = tm_process_tasks(&rtc, (int)sec1, taskmanager_args_in->config_comms,
 				taskmanager_args_in->config_startup_time,
 				taskmanager_args_in->config_enable_remote_commands,
-				taskmanager_args_in->config_log_remote_commands);
+				taskmanager_args_in->config_log_remote_commands, info->program_type);
 
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{

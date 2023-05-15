@@ -33,6 +33,7 @@ typedef struct
 	int				config_startup_time;
 	int				config_enable_remote_commands;
 	int				config_log_remote_commands;
+	const char			*config_hostname;
 }
 zbx_thread_taskmanager_args;
 
