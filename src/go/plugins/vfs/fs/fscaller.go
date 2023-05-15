@@ -38,7 +38,7 @@ type fsCaller struct {
 	p       *Plugin
 }
 
-func (f *fsCaller) execute(path string) {
+func (f *fsCaller) executeFunc(path string) {
 	stats, err := f.fsFunc(path)
 
 	defer func() {
@@ -55,14 +55,14 @@ func (f *fsCaller) execute(path string) {
 	f.outChan <- stats
 }
 
-func (f *fsCaller) invoke(path string, cc chan interface{}) {
+func (f *fsCaller) checkNotStuckAndExecute(path string, cc chan interface{}) {
 	if isStuck(path) {
 		cc <- fmt.Errorf("mount '%s' is unavailable", path)
 
 		return
 	}
 
-	go f.execute(path)
+	go f.executeFunc(path)
 
 	for {
 		select {
@@ -101,7 +101,7 @@ func (f *fsCaller) run(path string) (stat *FsStats, err error) {
 	const chan_len = 2
 	cc := make(chan interface{}, chan_len)
 
-	go f.invoke(path, cc)
+	go f.checkNotStuckAndExecute(path, cc)
 
 	v := <-cc
 
@@ -111,7 +111,7 @@ func (f *fsCaller) run(path string) (stat *FsStats, err error) {
 	case error:
 		return nil, d
 	default:
-		return nil, fmt.Errorf("Unsupported return typeL %T", d)
+		return nil, fmt.Errorf("Unsupported return type %T", d)
 	}
 }
 
