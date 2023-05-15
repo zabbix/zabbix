@@ -301,7 +301,7 @@ static int	preprocessor_pack_step(zbx_packed_field_t *fields, const zbx_pp_step_
  * Return value: The number of bytes parsed.                                  *
  *                                                                            *
  ******************************************************************************/
-static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t *value)
+static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t *value)
 {
 	const unsigned char	*offset = data;
 	zbx_uint32_t		value_len;
@@ -364,7 +364,7 @@ static int	preprocessor_unpack_history(const unsigned char *data, zbx_pp_history
 			zbx_timespec_t	ts;
 
 			offset += zbx_deserialize_int(offset, &index);
-			offset += preprocesser_unpack_variant(offset, &value);
+			offset += preprocessor_unpack_variant(offset, &value);
 			offset += zbx_deserialize_int(offset, &ts.sec);
 			offset += zbx_deserialize_int(offset, &ts.ns);
 
@@ -685,9 +685,9 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zb
 	for (int i = 0; i < results_num; i++)
 	{
 		result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
-		offset += preprocesser_unpack_variant(offset, &result->value);
+		offset += preprocessor_unpack_variant(offset, &result->value);
 		offset += zbx_deserialize_char(offset, &result->action);
-		offset += preprocesser_unpack_variant(offset, &result->value_raw);
+		offset += preprocessor_unpack_variant(offset, &result->value_raw);
 		zbx_vector_pp_result_ptr_append(results, result);
 	}
 
