@@ -55,10 +55,11 @@ func (f *fsCaller) execute(path string) {
 	f.outChan <- stats
 }
 
-func (f *fsCaller) invoke(path string, cc chan interface{}) (stat *FsStats, err error) {
-
+func (f *fsCaller) invoke(path string, cc chan interface{}) {
 	if isStuck(path) {
-		return nil, fmt.Errorf("mount '%s' is unavailable", path)
+		cc <- fmt.Errorf("mount '%s' is unavailable", path)
+
+		return
 	}
 
 	go f.execute(path)
@@ -71,12 +72,11 @@ func (f *fsCaller) invoke(path string, cc chan interface{}) (stat *FsStats, err 
 				stuckMux.Lock()
 				stuckMounts[path] = 0
 				stuckMux.Unlock()
-
 			}()
 
 			cc <- stat
 
-			return stat, nil
+			return
 		case err := <-f.errChan:
 
 			defer func() {
@@ -86,7 +86,8 @@ func (f *fsCaller) invoke(path string, cc chan interface{}) (stat *FsStats, err 
 			}()
 
 			cc <- err
-			return nil, err
+
+			return
 		case <-time.After(timeout * time.Second):
 			stuckMux.Lock()
 			stuckMounts[path]++
@@ -97,7 +98,8 @@ func (f *fsCaller) invoke(path string, cc chan interface{}) (stat *FsStats, err 
 }
 
 func (f *fsCaller) run(path string) (stat *FsStats, err error) {
-	cc := make(chan interface{}, 2)
+	const chan_len = 2
+	cc := make(chan interface{}, chan_len)
 
 	go f.invoke(path, cc)
 
