@@ -79,17 +79,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getDynamicHostId(): ?string {
+	private function getItem(): ?array {
 		if (($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
 				&& $this->hasInput('dynamic_hostid')) {
-			return $this->getInput('dynamic_hostid');
+			$dynamic_hostid = $this->getInput('dynamic_hostid');
 		}
-
-		return null;
-	}
-
-	private function getItem(): ?array {
-		$dynamic_hostid = $this->getDynamicHostId();
+		else {
+			$dynamic_hostid = null;
+		}
 
 		$item_options = [
 			'output' => ['itemid', 'hostid', 'name', 'value_type', 'units'],
@@ -101,7 +98,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'webitems' => true
 		];
 
-		if ($dynamic_hostid) {
+		if ($dynamic_hostid !== null) {
 			$src_items = API::Item()->get([
 				'output' => ['key_'],
 				'itemids' => $this->fields_values['itemid'],
