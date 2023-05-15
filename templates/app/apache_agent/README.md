@@ -84,12 +84,13 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$APACHE.STATUS.HOST}|<p>The hostname or an IP address of the Apache status page.</p>|`127.0.0.1`|
+|{$APACHE.STATUS.HOST}|<p>The hostname or IP address of the Apache status page.</p>|`127.0.0.1`|
 |{$APACHE.STATUS.PORT}|<p>The port of the Apache status page.</p>|`80`|
 |{$APACHE.STATUS.PATH}|<p>The URL path.</p>|`server-status?auto`|
 |{$APACHE.STATUS.SCHEME}|<p>The request scheme, which may be either HTTP or HTTPS.</p>|`http`|
 |{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>The maximum Apache response time expressed in seconds for a trigger expression.</p>|`10`|
-|{$APACHE.PROCESS_NAME}|<p>The process name of the Apache web server (Apache).</p>|`(httpd\|apache2)`|
+|{$APACHE.PROCESS_NAME}|<p>The process name filter for the Apache process discovery.</p>|`(httpd\|apache2)`|
+|{$APACHE.PROCESS.NAME.PARAMETER}|<p>The process name of the Apache web server used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
 
 ### Items
 
@@ -117,7 +118,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 |Apache: Workers slot with no current process|<p>The number of slots with no current process.</p>|Dependent item|apache.workers.slot<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Workers.slot`</p></li></ul>|
 |Apache: Workers starting up|<p>The number of workers in starting state.</p>|Dependent item|apache.workers.starting<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Workers.starting`</p></li></ul>|
 |Apache: Workers waiting for connection|<p>The number of workers in waiting state.</p>|Dependent item|apache.workers.waiting<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Workers.waiting`</p></li></ul>|
-|Apache: Get processes summary|<p>The aggregated data of summary metrics for all processes.</p>|Zabbix agent|proc.get[,,,summary]|
+|Apache: Get processes summary|<p>The aggregated data of summary metrics for all processes.</p>|Zabbix agent|proc.get[{$APACHE.PROCESS.NAME.PARAMETER},,,summary]|
 
 ### Triggers
 
@@ -153,21 +154,21 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Apache: CPU utilization|<p>The percentage of the CPU utilization by a process {#NAME}.</p>|Zabbix agent|proc.cpu.util[{#NAME}]|
-|Apache: Get process data|<p>The summary metrics aggregated by a process {#NAME}.</p>|Dependent item|apache.proc.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️Custom on fail: Set value to: `Failed to retrieve process {#NAME} data`</p></li></ul>|
-|Apache: Memory usage (rss)|<p>The summary of resident set size memory used by a process {#NAME} expressed in bytes.</p>|Dependent item|apache.proc.rss[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rss`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Apache: Memory usage (vsize)|<p>The summary of virtual memory used by a process {#NAME} expressed in bytes.</p>|Dependent item|apache.proc.vmem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vsize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Apache: Memory usage, %|<p>The percentage of real memory used by a process {#NAME}.</p>|Dependent item|apache.proc.pmem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pmem`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Apache: Number of running processes|<p>The number of running processes {#NAME}.</p>|Dependent item|apache.proc.num[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.processes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Apache: CPU utilization|<p>The percentage of the CPU utilization by a process {#APACHE.NAME}.</p>|Zabbix agent|proc.cpu.util[{#APACHE.NAME}]|
+|Apache: Get process data|<p>The summary metrics aggregated by a process {#APACHE.NAME}.</p>|Dependent item|apache.proc.get[{#APACHE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@["name"]=="{#APACHE.NAME}")].first()`</p><p>⛔️Custom on fail: Set value to: `Failed to retrieve process {#APACHE.NAME} data`</p></li></ul>|
+|Apache: Memory usage (rss)|<p>The summary of resident set size memory used by a process {#APACHE.NAME} expressed in bytes.</p>|Dependent item|apache.proc.rss[{#APACHE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rss`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Apache: Memory usage (vsize)|<p>The summary of virtual memory used by a process {#APACHE.NAME} expressed in bytes.</p>|Dependent item|apache.proc.vmem[{#APACHE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vsize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Apache: Memory usage, %|<p>The percentage of real memory used by a process {#APACHE.NAME}.</p>|Dependent item|apache.proc.pmem[{#APACHE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pmem`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Apache: Number of running processes|<p>The number of running processes {#APACHE.NAME}.</p>|Dependent item|apache.proc.num[{#APACHE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.processes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Apache process discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Apache: Process is not running||`last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])=0`|High||
-|Apache: Service is down||`last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0`|Average|**Manual close**: Yes|
-|Apache: Failed to fetch status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
-|Apache: Service response time is too high||`min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
+|Apache: Process is not running||`last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])=0`|High||
+|Apache: Service is down||`last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0`|Average|**Manual close**: Yes|
+|Apache: Failed to fetch status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
+|Apache: Service response time is too high||`min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
 
 ## Feedback
 

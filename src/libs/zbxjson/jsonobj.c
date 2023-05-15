@@ -26,23 +26,6 @@
 ZBX_PTR_VECTOR_IMPL(jsonobj_ptr, zbx_jsonobj_t *)
 ZBX_VECTOR_IMPL(jsonobj_ref, zbx_jsonobj_ref_t)
 
-/* jsonobject index hashset support */
-
-static zbx_hash_t	jsonobj_index_el_hash(const void *v)
-{
-	const zbx_jsonobj_index_el_t	*el = (const zbx_jsonobj_index_el_t *)v;
-
-	return ZBX_DEFAULT_STRING_HASH_FUNC(el->value);
-}
-
-static int	jsonobj_index_el_compare(const void *v1, const void *v2)
-{
-	const zbx_jsonobj_index_el_t	*el1 = (const zbx_jsonobj_index_el_t *)v1;
-	const zbx_jsonobj_index_el_t	*el2 = (const zbx_jsonobj_index_el_t *)v2;
-
-	return strcmp(el1->value, el2->value);
-}
-
 /* jsonobject values hashset support */
 
 static zbx_hash_t	jsonobj_el_hash(const void *v)
@@ -84,53 +67,6 @@ void	jsonobj_init(zbx_jsonobj_t *obj, zbx_json_type_t type)
 			memset(&obj->data, 0, sizeof(obj->data));
 			break;
 	}
-
-	obj->index = NULL;
-	obj->index_num = 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: free resources allocated by json object index element             *
- *                                                                            *
- * Parameters: v  - [IN] the json index element                               *
- *                                                                            *
- ******************************************************************************/
-static void	jsonobj_index_el_clear(void *v)
-{
-	zbx_jsonobj_index_el_t	*el = (zbx_jsonobj_index_el_t *)v;
-	int			i;
-
-	zbx_free(el->value);
-	for (i = 0; i < el->objects.values_num; i++)
-	{
-		zbx_free(el->objects.values[i].name);
-
-		if (0 != el->objects.values[i].external)
-		{
-			zbx_jsonobj_clear(el->objects.values[i].value);
-			zbx_free(el->objects.values[i].value);
-		}
-	}
-
-	zbx_vector_jsonobj_ref_destroy(&el->objects);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: initialize json object index                                      *
- *                                                                            *
- * Parameters: obj  - [IN/OUT] the json object                                *
- *             path - [IN] the indexed relative path                          *
- *                                                                            *
- ******************************************************************************/
-void	jsonobj_init_index(zbx_jsonobj_t *obj, const char *path)
-{
-	obj->index = (zbx_jsonobj_index_t *)zbx_malloc(NULL, sizeof(zbx_jsonobj_index_t));
-	obj->index->path = zbx_strdup(NULL, path);
-	zbx_hashset_create_ext(&obj->index->objects, 0, jsonobj_index_el_hash, jsonobj_index_el_compare,
-			jsonobj_index_el_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
-			ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
 /******************************************************************************
@@ -249,13 +185,6 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj)
 		default:
 			break;
 	}
-
-	if (NULL != obj->index)
-	{
-		zbx_free(obj->index->path);
-		zbx_hashset_destroy(&obj->index->objects);
-		zbx_free(obj->index);
-	}
 }
 
 /******************************************************************************
@@ -371,11 +300,23 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: disable automatic json object indexing during jsonpath query      *
+ * Purpose: free resources allocated by json object reference                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_jsonobj_disable_indexing(zbx_jsonobj_t *obj)
+void	jsonobj_clear_ref_vector(zbx_vector_jsonobj_ref_t *refs)
 {
-	if (0 == obj->index_num)
-		obj->index_num = -1;
+	int	i;
+
+	for (i = 0; i < refs->values_num; i++)
+	{
+		zbx_jsonobj_ref_t	*ref = &refs->values[i];
+
+		zbx_free(ref->name);
+		if (0 == ref->external)
+		{
+			zbx_jsonobj_clear(ref->value);
+			zbx_free(ref->value);
+		}
+	}
+	zbx_vector_jsonobj_ref_clear(refs);
 }
