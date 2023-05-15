@@ -197,9 +197,7 @@ class testPageMonitoringWeb extends CWebTest {
 
 		// Check fields maximum length.
 		foreach(['filter_tags[0][tag]', 'filter_tags[0][value]'] as $field) {
-			$this->assertEquals(255, $form->query('xpath:.//input[@name="'.$field.'"]')
-					->one()->getAttribute('maxlength')
-			);
+			$this->assertEquals(255, $form->query('xpath:.//input[@name="'.$field.'"]')->one()->getAttribute('maxlength'));
 		}
 
 		// Check if links to Hosts and to Web scenarios are clickable.
@@ -207,10 +205,11 @@ class testPageMonitoringWeb extends CWebTest {
 			$this->assertTrue($table->getRow(0)->getColumn($field)->query('xpath:.//a')->one()->isClickable());
 		}
 
-		// Check if the correct amount of rows is displayed.
-		$table->findRow('Name', 'testFormWeb1')->query('link', 'testFormWeb1')->one()->click();
+		// Check that the correct details of the scenario are opened.
+		$first_row_name = $table->getRow(0)->getColumn('Name')->getText();
+		$table->findRow('Name', $first_row_name)->getColumn('Name')->query('tag:a')->one()->click();
 		$this->page->waitUntilReady();
-		$this->page->assertHeader('Details of web scenario: testFormWeb1');
+		$this->page->assertHeader('Details of web scenario: '.$first_row_name);
 		$this->page->assertTitle('Details of web scenario');
 	}
 
@@ -293,17 +292,13 @@ class testPageMonitoringWeb extends CWebTest {
 
 		// Turn off/on web services and check table results.
 		foreach (['Disable', 'Enable'] as $status) {
-			$this->page->open('httpconf.php?context=host&filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'])->waitUntilReady();
+			$this->page->open('httpconf.php?context=host&filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'])
+					->waitUntilReady();
 			$this->query('xpath://input[@id="all_httptests"]')->one()->click();
 			$this->query('xpath://button[normalize-space()="'.$status.'"]')->one()->click();
 			$this->page->acceptAlert();
 
-			if ($status === 'Disable') {
-				$this->assertMessage(TEST_GOOD, 'Web scenarios disabled');
-			}
-			else {
-				$this->assertMessage(TEST_GOOD, 'Web scenarios enabled');
-			}
+			$this->assertMessage(TEST_GOOD, ($status === 'Disable' ? 'Web scenarios disabled' :'Web scenarios enabled'));
 
 			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 			$changed = ($status === 'Disable')
@@ -315,23 +310,23 @@ class testPageMonitoringWeb extends CWebTest {
 
 	public static function getFilterData() {
 		return [
+			// #0.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
 							['name' => 'FirstTag', 'operator' => 'Exists']
 						]
 					],
-					'Name' => [
+					'expected' => [
 						'Web scenario 1 step'
 					]
 				]
 			],
+			// #1.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -340,125 +335,128 @@ class testPageMonitoringWeb extends CWebTest {
 							['name' => 'FourthTag', 'operator' => 'Exists']
 						]
 					],
-					'Name' => [
-						'Web scenario 3 step',
+					'expected' => [
+						'Web scenario 1 step',
 						'Web scenario 2 step',
-						'Web scenario 1 step'
+						'Web scenario 3 step'
 					]
 				]
 			],
+			// #2.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
-							['name' => 'FirstTag', 'value' => 'value 1', 'operator' => 'Equals'],
+							['name' => 'FirstTag', 'value' => 'value 1', 'operator' => 'Equals']
 						]
 					],
-					'Name' => [
+					'expected' => [
 						'Web scenario 1 step'
 					]
 				]
 			],
+			// #3.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
-							['name' => 'FirstTag', 'value' => 'value 1', 'operator' => 'Equals'],
+							['name' => 'FirstTag', 'value' => 'value 1', 'operator' => 'Equals']
 						]
 					],
-					'Name' => [
+					'expected' => [
 						'Web scenario 1 step'
 					]
 				]
 			],
+			// #4.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
 							['name' => 'SecondTag', 'value' => 'value 2', 'operator' => 'Contains'],
-							['name' => 'ThirdTag', 'value' => 'value 3', 'operator' => 'Contains'],
+							['name' => 'ThirdTag', 'value' => 'value 3', 'operator' => 'Contains']
 						]
 					],
-					'Name' => [
+					'expected' => [
 						'Web scenario 2 step'
 					]
 				]
 			],
+			// #5.
 			[
 				[
-					'tag_fill' => 'yes',
+					'filter' => [
+						'Host groups' => 'WebData Host'
+					],
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
-							['name' => 'SecondTag', 'value' => 'value 2', 'operator' => 'Contains'],
-							['name' => 'SixthTag', 'value' => 'value 6', 'operator' => 'Contains'],
+							['name' => 'SecondTag', 'value' => '2', 'operator' => 'Contains'],
+							['name' => 'SixthTag', 'value' => 'value 6', 'operator' => 'Equals']
 						]
 					],
-					'Name' => [
-						'Web scenario 3 step',
-						'Web scenario 2 step'
+					'expected' => [
+						'Web scenario 2 step',
+						'Web scenario 3 step'
 					]
 				]
 			],
+			// #6.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
 							['name' => 'FourthTag', 'operator' => 'Does not exist']
 						]
 					],
-					'Name' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'Web scenario 2 step',
-						'Web scenario 1 step',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
+					'expected' => [
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #7.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
 							['name' => 'FourthTag', 'operator' => 'Does not exist']
 						]
 					],
-					'Name' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'Web scenario 2 step',
-						'Web scenario 1 step',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
+					'expected' => [
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #8.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
@@ -466,25 +464,25 @@ class testPageMonitoringWeb extends CWebTest {
 							['name' => 'FifthTag', 'value' => 'value 5', 'operator' => 'Does not equal']
 						]
 					],
-					'Name' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'Web scenario 2 step',
-						'Web scenario 1 step',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
+					'expected' => [
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #9.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -492,50 +490,53 @@ class testPageMonitoringWeb extends CWebTest {
 							['name' => 'FifthTag', 'value' => 'value 5', 'operator' => 'Does not equal']
 						]
 					],
-					'Name' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'Web scenario 2 step',
-						'Web scenario 1 step',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
+					'expected' => [
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #10.
 			[
 				[
-					'tag_fill' => 'yes',
 					'tag_options' => [
 						'type' => 'And/Or',
 						'tags' => [
 							['name' => 'FirstTag', 'value' => 'value', 'operator' => 'Does not contain']
 						]
 					],
-					'Name' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'Web scenario 3 step',
-						'Web scenario 2 step',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
+					'expected' => [
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web scenario 2 step',
+						'Web scenario 3 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #11.
 			[
 				[
-					'tag_fill' => 'yes',
+					'filter' => [
+						'Host groups' => 'WebData HostGroup'
+					],
 					'tag_options' => [
 						'type' => 'Or',
 						'tags' => [
@@ -543,72 +544,62 @@ class testPageMonitoringWeb extends CWebTest {
 							['name' => 'FirstTag', 'value' => '1', 'operator' => 'Does not contain']
 						]
 					],
-					'Name' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'Web scenario 3 step',
+					'expected' => [
 						'Web scenario 2 step',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
-						'testFormWeb2',
-						'testFormWeb1'
+						'Web scenario 3 step'
 					]
 				]
 			],
+			// #12.
 			[
 				[
-					'tag_fill' => 'no',
 					'filter' => [
-					'Host groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'expected' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #13.
 			[
 				[
-					'tag_fill' => 'no',
 					'filter' => [
 						'Hosts' => 'Simple form test host'
 					],
 					'expected' => [
-						'testFormWeb4',
-						'testFormWeb3',
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4'
 					]
 				]
 			],
+			// #14.
 			[
 				[
-					'tag_fill' => 'no',
 					'filter' => [
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'Host ZBX6663'
 					],
 					'expected' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663'
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #15.
 			[
 				[
-					'tag_fill' => 'no',
 					'filter' => [
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => [
@@ -617,18 +608,18 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'testFormWeb4',
-						'testFormWeb3',
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #16.
 			[
 				[
-					'tag_fill' => 'no',
 					'filter' => [
 						'Hosts' => [
 							'Host ZBX6663',
@@ -637,22 +628,22 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'testInheritanceWeb4',
-						'testInheritanceWeb3',
-						'testInheritanceWeb2',
-						'testInheritanceWeb1',
-						'testFormWeb4',
-						'testFormWeb3',
+						'testFormWeb1',
 						'testFormWeb2',
-						'testFormWeb1'
+						'testFormWeb3',
+						'testFormWeb4',
+						'testInheritanceWeb1',
+						'testInheritanceWeb2',
+						'testInheritanceWeb3',
+						'testInheritanceWeb4',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
 				]
 			],
+			// #17.
 			[
 				[
-					'tag_fill' => 'no',
 					'filter' => [
 						'Host groups' => [
 							'WebData HostGroup',
@@ -664,12 +655,27 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-						'Web ZBX6663 Second',
-						'Web ZBX6663',
-						'Web scenario 3 step',
+						'Web scenario 1 step',
 						'Web scenario 2 step',
-						'Web scenario 1 step'
+						'Web scenario 3 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
 					]
+				]
+			],
+			// #18.
+			[
+				[
+					'filter' => [
+						'Host groups' => 'Zabbix servers'
+					],
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FirstTag', 'value' => 'value 6', 'operator' => 'Contains']
+						]
+					],
+					'expected' => []
 				]
 			]
 		];
@@ -677,26 +683,26 @@ class testPageMonitoringWeb extends CWebTest {
 
 	/**
 	 * Function which checks if Web service tags are properly displayed.
+	 *
 	 * @dataProvider getFilterData
 	 */
 	public function testPageMonitoringWeb_TagsFilter($data) {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=ASC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table = $this->query('class:list-table')->waitUntilPresent()->one();
-		if ($data['tag_fill'] === 'yes') {
+
+		if (CTestArrayHelper::get($data, 'tag_options')) {
 			$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
-			$this->setTagSelector('id:filter-tags');
 			$this->setTags($data['tag_options']['tags']);
-			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$table->waitUntilReloaded();
-			$this->assertTableHasDataColumn(CTestArrayHelper::get($data, 'Name', []));
-			$this->query('button:Reset')->one()->waitUntilClickable()->click();
-			$table->waitUntilReloaded();
-		} else {
-			$form->fill($data['filter'])->submit();
-			$this->page->waitUntilReady();
-			$this->assertTableDataColumn($data['expected']);
 		}
+
+		if (CTestArrayHelper::get($data, 'filter')) {
+			$form->fill($data['filter']);
+		}
+
+		$form->submit();
+		$table->waitUntilReloaded();
+		$this->assertTableDataColumn($data['expected']);
 	}
 
 	/**
@@ -757,12 +763,10 @@ class testPageMonitoringWeb extends CWebTest {
 			$this->query('xpath://button[@title="'.$status.'"]')->one()->click();
 			$this->page->waitUntilReady();
 
-			if ($status === 'Kiosk mode') {
-				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
-			}
-			else {
-				$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
-			}
+			$header = $this->query('xpath://h1[@id="page-title-general"]');
+			$status === 'Kiosk mode'
+				? $header->waitUntilNotVisible()
+				: $header->one()->waitUntilVisible();
 
 			$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
 			$this->assertTrue($this->query('id:flickerfreescreen_httptest')->exists());
