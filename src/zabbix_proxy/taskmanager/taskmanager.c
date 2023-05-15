@@ -35,9 +35,6 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
-#define ZBX_TM_PROCESS_PERIOD		5
-#define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
-
 /**************************************************************************************
  *                                                                                    *
  * Purpose: execute remote command task                                               *
@@ -429,6 +426,9 @@ static void	force_config_sync(const char *config_hostname)
 	zbx_json_free(&j);
 }
 
+#define ZBX_TM_PROCESS_PERIOD		5
+#define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
+
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
@@ -525,3 +525,5 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 }
+#undef ZBX_TM_PROCESS_PERIOD
+#define ZBX_TM_CLEANUP_PERIOD
