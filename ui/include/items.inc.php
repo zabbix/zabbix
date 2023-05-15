@@ -111,14 +111,14 @@ function item_type2str($type = null) {
 }
 
 /**
- * Returns human readable an item value type
+ * Returns label for value type.
  *
- * @param int $valueType
+ * @param int $value_type
  *
  * @return string
  */
-function itemValueTypeString($valueType) {
-	switch ($valueType) {
+function itemValueTypeString($value_type): string {
+	switch ($value_type) {
 		case ITEM_VALUE_TYPE_UINT64:
 			return _('Numeric (unsigned)');
 		case ITEM_VALUE_TYPE_FLOAT:
@@ -129,7 +129,10 @@ function itemValueTypeString($valueType) {
 			return _('Log');
 		case ITEM_VALUE_TYPE_TEXT:
 			return _('Text');
+		case ITEM_VALUE_TYPE_BINARY:
+			return _('Binary');
 	}
+
 	return _('Unknown');
 }
 
@@ -1345,7 +1348,9 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	}
 
 	if ($item['value'] !== null) {
-		$value = formatHistoryValue($item['value'], $item);
+		$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+			? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+			: formatHistoryValue($item['value'], $item);
 	}
 
 	$col = (new CCol([$value, $ack]))
@@ -1433,6 +1438,13 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 				'value' => $value,
 				'units' => '',
 				'is_mapped' => $mapped_value !== false
+			];
+
+		case ITEM_VALUE_TYPE_BINARY:
+			return [
+				'value' => _('binary value'),
+				'units' => '',
+				'is_mapped' => false
 			];
 
 		default:

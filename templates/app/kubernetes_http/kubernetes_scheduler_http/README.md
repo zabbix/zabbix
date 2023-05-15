@@ -54,7 +54,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 |Kubernetes Scheduler: Get Scheduler metrics|<p>Get raw metrics from Scheduler instance /metrics endpoint.</p>|HTTP agent|kubernetes.scheduler.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes Scheduler: Virtual memory, bytes|<p>Virtual memory size in bytes.</p>|Dependent item|kubernetes.scheduler.process_virtual_memory_bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_virtual_memory_bytes)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes Scheduler: Resident memory, bytes|<p>Resident memory size in bytes.</p>|Dependent item|kubernetes.scheduler.process_resident_memory_bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_resident_memory_bytes)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes Scheduler: CPU|<p>Total user and system CPU usage ratio.</p>|Dependent item|kubernetes.scheduler.cpu.util<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_cpu_seconds_total)`</li><li>Change per second</li><li>Custom multiplier: `100`</li></ul>|
+|Kubernetes Scheduler: CPU|<p>Total user and system CPU usage ratio.</p>|Dependent item|kubernetes.scheduler.cpu.util<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_cpu_seconds_total)`</p></li><li>Change per second</li><li><p>Custom multiplier: `100`</p></li></ul>|
 |Kubernetes Scheduler: Goroutines|<p>Number of goroutines that currently exist.</p>|Dependent item|kubernetes.scheduler.go_goroutines<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(go_goroutines)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes Scheduler: Go threads|<p>Number of OS threads created.</p>|Dependent item|kubernetes.scheduler.go_threads<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(go_threads)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes Scheduler: Fds open|<p>Number of open file descriptors.</p>|Dependent item|kubernetes.scheduler.open_fds<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_open_fds)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -79,7 +79,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Scheduling algorithm histogram|<p>Discovery raw data of scheduling algorithm latency.</p>|Dependent item|kubernetes.scheduler.scheduling_algorithm.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `The text is too long. Please see the template.`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Scheduling algorithm histogram|<p>Discovery raw data of scheduling algorithm latency.</p>|Dependent item|kubernetes.scheduler.scheduling_algorithm.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Scheduling algorithm histogram
 
@@ -95,7 +95,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Binding histogram|<p>Discovery raw data of binding latency.</p>|Dependent item|kubernetes.scheduler.binding.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `{__name__=~ "scheduler_binding_duration_seconds_*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Binding histogram|<p>Discovery raw data of binding latency.</p>|Dependent item|kubernetes.scheduler.binding.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `{__name__=~ "scheduler_binding_duration_seconds_*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Binding histogram
 
@@ -111,7 +111,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|e2e scheduling histogram|<p>Discovery raw data and percentile items of e2e scheduling latency.</p>|Dependent item|kubernetes.controller.e2e_scheduling.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `The text is too long. Please see the template.`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|e2e scheduling histogram|<p>Discovery raw data and percentile items of e2e scheduling latency.</p>|Dependent item|kubernetes.controller.e2e_scheduling.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for e2e scheduling histogram
 
@@ -125,6 +125,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+
