@@ -775,7 +775,8 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 				zbx_variant_clear(&input_vector->values[i]);
 				zbx_variant_copy(&input_vector->values[i], &value_dbl);
 			}
-			else if (SUCCEED != zbx_variant_to_value_type(&input_vector->values[i], ITEM_VALUE_TYPE_FLOAT, error))
+			else if (SUCCEED != zbx_variant_to_value_type(&input_vector->values[i], ITEM_VALUE_TYPE_FLOAT,
+					error))
 			{
 				*error = zbx_strdup(*error, "input data is not numeric");
 				return FAIL;
