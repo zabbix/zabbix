@@ -2616,6 +2616,14 @@ $icon-widget-btn: (
 	%form-disabled {
 		-webkit-text-fill-color: $form-disabled-font-color;
 	}
+
+	input,
+	textarea {
+		&[readonly] {
+			-webkit-text-fill-color: $font-color !important;
+			@extend %form-disabled;
+		}
+	}
 }
 
 .inaccessible {

@@ -2519,7 +2519,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
 .z-select[readonly] button, .multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span,
-.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .input-group button.btn-dropdown-toggle:disabled {
+.checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .safari input[readonly],
+.safari textarea[readonly], .input-group button.btn-dropdown-toggle:disabled {
   color: #9f9f9f;
   background-color: #f0f0f0 !important;
   border-color: #9f9f9f; }
@@ -2529,10 +2530,14 @@ z-select[disabled] button,
 .safari .z-select[disabled] button,
 .z-select[disabled] .safari button, .safari z-select[readonly] button, z-select[readonly] .safari button,
 .safari .z-select[readonly] button,
-.z-select[readonly] .safari button, .safari .multiselect[aria-disabled], .safari .radio-list-control input[type="radio"][disabled] + label, .radio-list-control .safari input[type="radio"][disabled] + label, .safari input[disabled], .safari input[readonly], .safari textarea[disabled], .safari textarea[readonly], .safari select option[disabled], select .safari option[disabled], .safari select[disabled], .safari select[readonly], .safari .checkbox-radio[readonly] span, .checkbox-radio[readonly] .safari span,
+.z-select[readonly] .safari button, .safari .multiselect[aria-disabled], .safari .radio-list-control input[type="radio"][disabled] + label, .radio-list-control .safari input[type="radio"][disabled] + label, .safari input[disabled], .safari textarea[disabled], .safari select option[disabled], select .safari option[disabled], .safari select[disabled], .safari select[readonly], .safari .checkbox-radio[readonly] span, .checkbox-radio[readonly] .safari span,
 .safari .checkbox-radio[readonly] + label span,
-.checkbox-radio[readonly] + label .safari span, .safari .checkbox-radio[disabled] + label span, .checkbox-radio[disabled] + label .safari span, .safari .input-group button.btn-dropdown-toggle:disabled, .input-group .safari button.btn-dropdown-toggle:disabled {
+.checkbox-radio[readonly] + label .safari span, .safari .checkbox-radio[disabled] + label span, .checkbox-radio[disabled] + label .safari span, .safari input[readonly],
+.safari textarea[readonly], .safari .input-group button.btn-dropdown-toggle:disabled, .input-group .safari button.btn-dropdown-toggle:disabled {
   -webkit-text-fill-color: #9f9f9f; }
+.safari input[readonly],
+.safari textarea[readonly] {
+  -webkit-text-fill-color: #000000 !important; }
 
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
