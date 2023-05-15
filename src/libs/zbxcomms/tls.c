@@ -3771,16 +3771,12 @@ out1:
 #	define ZBX_TLS_READ(ctx, buf, len)	gnutls_record_recv(ctx, buf, len)
 #	define ZBX_TLS_WRITE_FUNC_NAME		"gnutls_record_send"
 #	define ZBX_TLS_READ_FUNC_NAME		"gnutls_record_recv"
-#	define ZBX_TLS_WANT_WRITE(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res) ? SUCCEED : FAIL)
-#	define ZBX_TLS_WANT_READ(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res) ? SUCCEED : FAIL)
 #	define ZBX_TLS_ERROR(s, res)		res
 #elif defined(HAVE_OPENSSL)
 #	define ZBX_TLS_WRITE(ctx, buf, len)	SSL_write(ctx, buf, (int)(len))
 #	define ZBX_TLS_READ(ctx, buf, len)	SSL_read(ctx, buf, (int)(len))
 #	define ZBX_TLS_WRITE_FUNC_NAME		"SSL_write"
 #	define ZBX_TLS_READ_FUNC_NAME		"SSL_read"
-#	define ZBX_TLS_WANT_WRITE(res)		FAIL
-#	define ZBX_TLS_WANT_READ(res)		FAIL
 #	define ZBX_TLS_ERROR(s, res)		(size_t)SSL_get_error(s, (int)res)
 /* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
 /* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
