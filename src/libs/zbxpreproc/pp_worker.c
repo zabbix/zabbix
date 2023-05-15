@@ -31,13 +31,6 @@
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
 
-typedef struct
-{
-	zbx_pp_worker_t	*worker;
-	int		log_level;
-}
-zbx_pp_worker_args_t;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process preprocessing testing task                                *
@@ -217,18 +210,13 @@ static void	*pp_worker_entry(void *args)
 int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
 		char **error)
 {
-	int			err, ret = FAIL;
-	zbx_pp_worker_args_t	*args;
+	int	err, ret = FAIL;
 
 	worker->id = id;
 	worker->queue = queue;
 	worker->timekeeper = timekeeper;
 
-	args = (zbx_pp_worker_args_t *)zbx_malloc(NULL, sizeof(zbx_pp_worker_args_t));
-	args->worker = worker;
-	args->log_level = zbx_get_log_level();
-
-	if (0 != (err = pthread_create(&worker->thread, NULL, pp_worker_entry, (void *)args)))
+	if (0 != (err = pthread_create(&worker->thread, NULL, pp_worker_entry, (void *)worker)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;
