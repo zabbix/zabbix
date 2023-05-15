@@ -1218,6 +1218,10 @@ msgstr "允许列表"
 msgid "Allow manual close"
 msgstr "允许手动关闭"
 
+#: app/views/popup.discovery.check.php:125
+msgid "Allow redirect"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
 #: include/views/configuration.item.edit.php:945
@@ -1820,6 +1824,18 @@ msgstr "前值"
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
 msgstr "低值"
+
+#: app/partials/configuration.filter.items.php:147
+#: app/views/popup.massupdate.item.php:159 include/items.inc.php:133
+#: include/views/configuration.item.edit.php:126
+#: include/views/configuration.item.prototype.edit.php:112
+msgid "Binary"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1397
+#, c-format
+msgid "Binary item \"%1$s\" cannot be used in trigger"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -2528,6 +2544,11 @@ msgstr[0] "无法删除主机组 %1$s 因为维护 \"%2$s\" 必须包含至少�
 msgid "Cannot delete host groups"
 msgstr "无法删除主机组"
 
+#: host_prototypes.php:293
+msgid "Cannot delete host prototype"
+msgid_plural "Cannot delete host prototypes"
+msgstr[0] ""
+
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
 msgstr "无法删除主机原型"
@@ -2897,6 +2918,16 @@ msgstr "无法执行脚本。"
 msgid "Cannot expand macros."
 msgstr "无法扩展宏."
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:217
+#, c-format
+msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:241
+#, c-format
+msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -3005,10 +3036,25 @@ msgstr "在 \"%5$s\"中无法找到被自动发现规则\"%4$s\"上的图表模�
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
 msgstr "在仪表盘 \"%2$s\" 中，无法找到使用的监控项 \"%1$s\"。"
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:193
+#, c-format
+msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到地图 \"%1$s\" 用于地图 \"%2$s\"."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:253
+#, c-format
+msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:205
+#, c-format
+msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
@@ -3025,6 +3071,11 @@ msgstr "无法在\"%4$s\"上为自动发现规则 \"%3$s\"上的主机模板\"%2
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到触发器 \"%1$s\" 用于地图 \"%2$s\"."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:229
+#, c-format
+msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1510
 msgid "Cannot find user directory for LDAP."
@@ -4278,6 +4329,15 @@ msgstr "时钟类型"
 msgid "Clone"
 msgstr "克隆"
 
+#: app/views/configuration.host.edit.php:61
+#: app/views/js/popup.host.edit.js.php:45 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:195
+msgid "Cloned template parameter values have been modified."
+msgstr ""
+
 #: app/views/popup.import.compare.php:162 app/views/popup.token.view.php:86
 #: include/func.inc.php:1723 include/views/js/monitoring.sysmaps.js.php:339
 #: include/views/js/monitoring.sysmaps.js.php:498
@@ -5151,6 +5211,14 @@ msgstr "创建主机组"
 msgid "Create host prototype"
 msgstr "创建主机模板"
 
+#: include/views/configuration.host.prototype.list.php:205
+msgid "Create hosts from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:199
+msgid "Create hosts from selected prototype as enabled?"
+msgstr ""
+
 #: include/views/configuration.host.prototype.list.php:197
 msgid "Create hosts from selected prototypes as disabled?"
 msgstr "您是否要从所选原型中禁用主机并创建它？"
@@ -5182,6 +5250,14 @@ msgstr "创建监控项(先选择模板)"
 #: include/views/configuration.item.prototype.list.php:36
 msgid "Create item prototype"
 msgstr "创建监控项原型"
+
+#: include/views/configuration.item.prototype.list.php:213
+msgid "Create items from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.item.prototype.list.php:207
+msgid "Create items from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototypes as disabled?"
@@ -5247,6 +5323,14 @@ msgstr "创建触发器(先选择模板)"
 #: include/views/configuration.trigger.prototype.list.php:36
 msgid "Create trigger prototype"
 msgstr "创建触发器原型"
+
+#: include/views/configuration.trigger.prototype.list.php:212
+msgid "Create triggers from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.list.php:206
+msgid "Create triggers from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.list.php:205
 msgid "Create triggers from selected prototypes as disabled?"
@@ -5890,6 +5974,10 @@ msgstr "删除导入文件中不存在的所有元素？"
 msgid "Delete and clear"
 msgstr "删除并清除"
 
+#: include/views/configuration.template.list.php:320
+msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
 #: include/views/configuration.template.list.php:294
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "删除并清除所选的模板? (警告: 所有链接的主机将被清除!)"
@@ -5930,9 +6018,17 @@ msgstr "删除图表原型？"
 msgid "Delete graph?"
 msgstr "删除图表?"
 
+#: include/views/configuration.item.list.php:318
+msgid "Delete history of selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
 msgstr "删除所选监控项的历史数据?"
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Delete history of selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6006,14 +6102,28 @@ msgstr "删除所选的连接器?"
 msgid "Delete selected connectors?"
 msgstr "删除所选的连接器?"
 
+#: app/views/configuration.correlation.list.php:159
+msgid "Delete selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "删除选定的关联项？"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
+msgid "Delete selected dashboard?"
+msgstr ""
+
+#: app/views/configuration.dashboard.list.php:68
+#: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboards?"
 msgstr "删除选定的仪表盘？"
+
+#: app/views/js/configuration.discovery.list.js.php:124
+#: include/views/configuration.host.discovery.list.php:369
+msgid "Delete selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6024,9 +6134,17 @@ msgstr "删除选定的自动发现规则？"
 msgid "Delete selected elements?"
 msgstr "删除选定的元素？"
 
+#: include/views/configuration.graph.list.php:269
+msgid "Delete selected graph prototype?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
 msgstr "删除所选定的图表原型?"
+
+#: include/views/configuration.graph.list.php:270
+msgid "Delete selected graph?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6071,9 +6189,17 @@ msgstr "删除所选的主机?"
 msgid "Delete selected image?"
 msgstr "删除所选的图像?"
 
+#: include/views/configuration.item.prototype.list.php:232
+msgid "Delete selected item prototype?"
+msgstr ""
+
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
 msgstr "删除所选定的监控项原型?"
+
+#: include/views/configuration.item.list.php:361
+msgid "Delete selected item?"
+msgstr ""
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6095,6 +6221,10 @@ msgstr "删除选择的拓扑图？"
 msgid "Delete selected maps?"
 msgstr "删除选定的拓扑图？"
 
+#: app/views/administration.mediatype.list.php:217
+msgid "Delete selected media type?"
+msgstr ""
+
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
 msgstr "删除所选的媒介类型?"
@@ -6106,6 +6236,10 @@ msgstr "删除所选的proxy?"
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
 msgstr "删除所选的proxy？"
+
+#: app/views/administration.regex.list.php:83
+msgid "Delete selected regular expression?"
+msgstr ""
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -6126,6 +6260,10 @@ msgstr "删除所选的计划报表?"
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
 msgstr "删除所选的计划报表?"
+
+#: app/views/administration.script.list.php:224
+msgid "Delete selected script?"
+msgstr ""
 
 #: app/views/administration.script.list.php:203
 msgid "Delete selected scripts?"
@@ -6153,6 +6291,10 @@ msgstr "删除选定的模板组？"
 msgid "Delete selected template groups?"
 msgstr "删除选定的模板组？"
 
+#: include/views/configuration.template.list.php:313
+msgid "Delete selected template?"
+msgstr ""
+
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
 msgstr "删除所选的模板?"
@@ -6167,9 +6309,17 @@ msgstr "删除选定的令牌？"
 msgid "Delete selected tokens?"
 msgstr "删除选定的令牌？"
 
+#: include/views/configuration.trigger.prototype.list.php:231
+msgid "Delete selected trigger prototype?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
 msgstr "删除所选的触发器原型？"
+
+#: include/views/configuration.triggers.list.php:393
+msgid "Delete selected trigger?"
+msgstr ""
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6182,6 +6332,10 @@ msgstr "删除所选的用户?"
 #: app/views/administration.user.list.php:251
 msgid "Delete selected users?"
 msgstr "删除所选的用户?"
+
+#: include/views/configuration.httpconf.list.php:248
+msgid "Delete selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6391,6 +6545,10 @@ msgstr "禁用"
 msgid "Disable debug mode"
 msgstr "禁用调试模式"
 
+#: app/views/administration.usergroup.list.php:249
+msgid "Disable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
 msgstr "停用所选群组的调试模式?"
@@ -6419,6 +6577,11 @@ msgstr "禁用所选的proxy所监测的主机?"
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "禁用所选的agent代理程序上监测的主机？"
+
+#: app/views/administration.token.list.php:211
+#: app/views/administration.user.token.list.php:164
+msgid "Disable selected API token?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6449,26 +6612,51 @@ msgstr "禁用所选的连接器?"
 msgid "Disable selected connectors?"
 msgstr "禁用所选的连接器?"
 
+#: app/views/configuration.correlation.list.php:153
+msgid "Disable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
 msgstr "禁用选择的关联项？"
+
+#: app/views/js/configuration.discovery.list.js.php:108
+#: include/views/configuration.host.discovery.list.php:348
+msgid "Disable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "禁用所选的自动发现规则?"
 
+#: app/views/administration.usergroup.list.php:229
+msgid "Disable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
 msgstr "禁用所选的用户群组?"
+
+#: app/views/configuration.host.list.php:534
+msgid "Disable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
 msgstr "禁用所选的主机?"
 
+#: include/views/configuration.item.list.php:309
+msgid "Disable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
 msgstr "禁用所选的监控项?"
+
+#: app/views/administration.mediatype.list.php:203
+msgid "Disable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:182
 msgid "Disable selected media types?"
@@ -6482,13 +6670,25 @@ msgstr "禁用所选的组件?"
 msgid "Disable selected modules?"
 msgstr "禁用所选的模块?"
 
+#: app/views/reports.scheduledreport.list.php:96
+msgid "Disable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
 msgstr "禁用所选的计划报表?"
 
+#: include/views/configuration.triggers.list.php:368
+msgid "Disable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
 msgstr "禁用所选的触发器?"
+
+#: include/views/configuration.httpconf.list.php:228
+msgid "Disable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:215
 msgid "Disable selected web scenarios?"
@@ -7223,6 +7423,10 @@ msgstr "启用确认"
 msgid "Enable debug mode"
 msgstr "启用调试模式"
 
+#: app/views/administration.usergroup.list.php:239
+msgid "Enable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:226
 msgid "Enable debug mode in selected groups?"
 msgstr "启用所选用户群组的调试模式?"
@@ -7265,6 +7469,11 @@ msgstr "启用通过选定proxy监控的主机？"
 msgid "Enable internal housekeeping"
 msgstr "开启内部管家服务"
 
+#: app/views/administration.token.list.php:205
+#: app/views/administration.user.token.list.php:158
+msgid "Enable selected API token?"
+msgstr ""
+
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
 msgid "Enable selected API tokens?"
@@ -7294,27 +7503,52 @@ msgstr "启用所选的连接器?"
 msgid "Enable selected connectors?"
 msgstr "启用所选的连接器?"
 
+#: app/views/configuration.correlation.list.php:147
+msgid "Enable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "开启选择的关联项？"
+
+#: app/views/js/configuration.discovery.list.js.php:92
+#: include/views/configuration.host.discovery.list.php:342
+msgid "Enable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:121
 #: include/views/configuration.host.discovery.list.php:328
 msgid "Enable selected discovery rules?"
 msgstr "启用所选的自动发现规则?"
 
+#: app/views/administration.usergroup.list.php:219
+msgid "Enable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
 msgstr "启用所选的群组?"
+
+#: app/views/configuration.host.list.php:526
+msgid "Enable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:500
 #: include/views/configuration.hostgroups.list.php:201
 msgid "Enable selected hosts?"
 msgstr "启用所选的主机?"
 
+#: include/views/configuration.item.list.php:303
+msgid "Enable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
 msgstr "启用所选的监控项？"
+
+#: app/views/administration.mediatype.list.php:197
+msgid "Enable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:181
 msgid "Enable selected media types?"
@@ -7328,13 +7562,25 @@ msgstr "启用所选的组件?"
 msgid "Enable selected modules?"
 msgstr "启用所选的模块?"
 
+#: app/views/reports.scheduledreport.list.php:89
+msgid "Enable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
 msgstr "启用所选的定时报表?"
 
+#: include/views/configuration.triggers.list.php:362
+msgid "Enable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
 msgstr "启用所选的触发器?"
+
+#: include/views/configuration.httpconf.list.php:222
+msgid "Enable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:214
 msgid "Enable selected web scenarios?"
@@ -9151,6 +9397,11 @@ msgstr "主机资产记录概览"
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
 msgstr "主机标签类型"
+
+#: widgets/dataover/includes/WidgetForm.php:64
+#: widgets/trigover/includes/WidgetForm.php:71
+msgid "Host location"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
@@ -13600,6 +13851,11 @@ msgstr "新连接器"
 msgid "New dashboard"
 msgstr "新仪表盘"
 
+#: app/views/configuration.discovery.edit.php:234
+#: app/views/configuration.discovery.edit.php:275
+msgid "New discovery rule"
+msgstr ""
+
 #: jsLoader.php:280
 msgid "New element"
 msgstr "新的组件"
@@ -16020,6 +16276,10 @@ msgstr "提供的秘密查询字符串“%1$s”无效。"
 msgid "Provision now"
 msgstr "现在开通"
 
+#: app/views/administration.user.list.php:304
+msgid "Provision selected LDAP user?"
+msgstr ""
+
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
 msgstr "开通选定的 LDAP 用户？"
@@ -18125,6 +18385,11 @@ msgstr "精简"
 msgid "Show"
 msgstr "查看"
 
+#: widgets/hostavail/includes/WidgetForm.php:61
+#: widgets/web/includes/WidgetForm.php:65
+msgid "Show data in maintenance"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:182
 #: app/partials/monitoring.problem.filter.php:277
 msgid "Show details"
@@ -19438,6 +19703,10 @@ msgstr "该图表不再被发现，并将在 %1$s 中删除（在 %3$s 的 %2$s 
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "该图表不再被发现，将在下次处理发现规则时被删除。"
 
+#: app/controllers/CControllerHostEdit.php:283 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
+
 #: include/html.inc.php:637
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -19498,6 +19767,10 @@ msgstr "收到的 JSON 不是有效的 JSON-RPC 请求。"
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "请求的远程程序不存在/不可用"
+
+#: templates.php:181
+msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -20511,6 +20784,10 @@ msgstr "不可用"
 #: app/views/administration.user.list.php:250
 msgid "Unblock"
 msgstr "解锁"
+
+#: app/views/administration.user.list.php:310
+msgid "Unblock selected user?"
+msgstr ""
 
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
@@ -23160,6 +23437,13 @@ msgstr "所有"
 msgid "all media"
 msgstr "所有介质"
 
+#: app/views/js/configuration.discovery.edit.js.php:390
+#: include/classes/screens/CScreenDiscovery.php:104
+#: include/classes/screens/CScreenDiscovery.php:207
+#: include/discovery.inc.php:84
+msgid "allow redirect"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
 msgstr "将超出允许的依赖层级数"
@@ -23311,6 +23595,10 @@ msgstr "atan() - 反正切，以弧度表示"
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() - 指定为角度的纵坐标（exprue）和横坐标的反正切，以弧度表示"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr "自动注册主机"
@@ -23345,6 +23633,19 @@ msgstr "baselinewma() - 通过平均时期内数据计算基线"
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - 检查一个值是否属于给定范围(1 - 在范围内，0 - 不在范围内)"
+
+#: app/partials/monitoring.latest.view.html.php:149
+#: include/classes/screens/CScreenHistory.php:309
+#: include/classes/screens/CScreenHistory.php:432
+#: include/classes/screens/CScreenHistory.php:518
+#: include/classes/screens/CScreenProblem.php:1794
+#: include/classes/screens/CScreenProblem.php:1818 include/items.inc.php:1352
+#: include/items.inc.php:1445 widgets/item/actions/WidgetView.php:210
+#: widgets/plaintext/actions/WidgetView.php:98
+#: widgets/tophosts/views/widget.view.php:105
+#: widgets/tophosts/views/widget.view.php:106
+msgid "binary value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"

@@ -71,7 +71,12 @@ $fields = [
 										]),
 										'isset({add}) || isset({update})'
 									],
-	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
+	'value_type' =>					[T_ZBX_INT, O_OPT, null,
+										IN([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+											ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+										]),
+										'isset({add}) || isset({update})'
+									],
 	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'authtype' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH
@@ -480,7 +485,12 @@ elseif (hasRequest('action') && getRequest('action') === 'itemprototype.massdele
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
-	show_messages($result, _('Item prototypes deleted'), _('Cannot delete item prototypes'));
+
+	$item_prototypes_count = count(getRequest('group_itemid'));
+	$messageSuccess = _n('Item prototype deleted', 'Item prototypes deleted', $item_prototypes_count);
+	$messageFailed = _n('Cannot delete item prototype', 'Cannot delete item prototypes', $item_prototypes_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('action') && hasRequest('group_itemid')
 		&& in_array(getRequest('action'), ['itemprototype.massdiscover.enable', 'itemprototype.massdiscover.disable'])) {

@@ -59,6 +59,7 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \

@@ -37,6 +37,7 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
+			'state' =>					'in -1,'.ITEM_STATE_NORMAL.','.ITEM_STATE_NOTSUPPORTED,
 			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
 			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
 			'tag_priority' =>			'string',
@@ -57,6 +58,7 @@ class CControllerLatestView extends CControllerLatest {
 			'subfilter_hostids' =>		'array',
 			'subfilter_tagnames' =>		'array',
 			'subfilter_tags' =>			'array',
+			'subfilter_state' =>		'array',
 			'subfilter_data' =>			'array',
 			'subfilters_expanded' =>	'array'
 		];
@@ -80,31 +82,39 @@ class CControllerLatestView extends CControllerLatest {
 		// Validate subfilters.
 		if ($ret && $this->hasInput('subfilter_hostids')) {
 			$hostids = $this->getInput('subfilter_hostids', []);
-			$ret = (!$hostids || count($hostids) === count(array_filter($hostids, 'ctype_digit')));
+			$ret = !$hostids || count($hostids) == count(array_filter($hostids, 'ctype_digit'));
 		}
 
 		if ($ret && $this->hasInput('subfilter_tagnames')) {
 			$tagnames = $this->getInput('subfilter_tagnames', []);
-			$ret = (!$tagnames || count($tagnames) === count(array_filter($tagnames, 'is_string')));
+			$ret = !$tagnames || count($tagnames) == count(array_filter($tagnames, 'is_string'));
 		}
 
 		if ($ret && $this->hasInput('subfilter_tags')) {
 			$tags = $this->getInput('subfilter_tags', []);
 			foreach ($tags as $tag => $values) {
 				if (!is_scalar($tag) || !is_array($values)
-						|| count($values) !== count(array_filter($values, 'is_string'))) {
+						|| count($values) != count(array_filter($values, 'is_string'))) {
 					$ret = false;
 					break;
 				}
 			}
 		}
 
+		if ($ret && $this->hasInput('subfilter_state')) {
+			$state = $this->getInput('subfilter_state', []);
+			$valid = array_filter($state, function ($val) {
+				return $val == ITEM_STATE_NORMAL || $val == ITEM_STATE_NOTSUPPORTED;
+			});
+			$ret = count($state) == count($valid);
+		}
+
 		if ($ret && $this->hasInput('subfilter_data')) {
 			$data = $this->getInput('subfilter_data', []);
 			$valid = array_filter($data, function ($val) {
-				return ($val === '0' || $val === '1');
+				return $val === '0' || $val === '1';
 			});
-			$ret = (count($data) === count($valid));
+			$ret = count($data) == count($valid);
 		}
 
 		if (!$ret) {
@@ -158,6 +168,10 @@ class CControllerLatestView extends CControllerLatest {
 		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
+		if ($filter['state'] != -1) {
+			$subfilters['state'] = [];
+		}
+
 		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
 		$paging_arguments = array_filter(array_intersect_key($filter, self::FILTER_FIELDS_DEFAULT));
 		array_map([$view_url, 'setArgument'], array_keys($paging_arguments), $paging_arguments);
@@ -172,12 +186,14 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' => $filter['show_details'] ? 1 : 0,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'],
+			'state' => $filter['state'],
 			'show_tags' => $filter['show_tags'],
 			'tag_name_format' => $filter['tag_name_format'],
 			'tag_priority' => $filter['tag_priority'],
 			'subfilter_hostids' => $filter['subfilter_hostids'],
 			'subfilter_tagnames' => $filter['subfilter_tagnames'],
 			'subfilter_tags' => $filter['tags'],
+			'subfilter_state' => $filter['subfilter_state'],
 			'subfilter_data' => $filter['subfilter_data'],
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,

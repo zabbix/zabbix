@@ -142,6 +142,22 @@ if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 }
 elseif (hasRequest('templateid') && hasRequest('clone')) {
 	$_REQUEST['form'] = 'clone';
+	$warnings = [];
+
+	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
+		// Reset macro type and value.
+		$macros = array_map(function($value) {
+			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
+				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
+				: $value;
+		}, $macros);
+
+		$warnings[] = _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+	}
+
+	$macros = array_map(function($macro) {
+		return array_diff_key($macro, array_flip(['hostmacroid']));
+	}, $macros);
 
 	$groups = getRequest('groups', []);
 	$groupids = [];
@@ -161,6 +177,10 @@ elseif (hasRequest('templateid') && hasRequest('clone')) {
 			'preservekeys' => true
 		]);
 
+		if (count($groupids) != count($groups_allowed)) {
+			$warnings[] = _("The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template.");
+		}
+
 		foreach ($groups as $idx => $group) {
 			if (!is_array($group) && !array_key_exists($group, $groups_allowed)) {
 				unset($groups[$idx]);
@@ -170,20 +190,13 @@ elseif (hasRequest('templateid') && hasRequest('clone')) {
 		$_REQUEST['groups'] = $groups;
 	}
 
-	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
-		// Reset macro type and value.
-		$macros = array_map(function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
-				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
-				: $value;
-		}, $macros);
+	if ($warnings) {
+		if (count($warnings) > 1) {
+			CMessageHelper::setWarningTitle(_('Cloned template parameter values have been modified.'));
+		}
 
-		warning(_('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
+		array_map('CMessageHelper::addWarning', $warnings);
 	}
-
-	$macros = array_map(function($macro) {
-		return array_diff_key($macro, array_flip(['hostmacroid']));
-	}, $macros);
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	try {
@@ -539,7 +552,11 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 		uncheckTableRows(null, array_keys($templates));
 	}
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
+	$templates_count = count($templateids);
+	$messageSuccess = _n('Template deleted', 'Templates deleted', $templates_count);
+	$messageFailed = _n('Cannot delete template', 'Cannot delete templates', $templates_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*
