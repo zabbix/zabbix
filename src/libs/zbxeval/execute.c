@@ -762,7 +762,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 
 		for (i = 0; i < input_vector->values_num; i++)
 		{
-			if (input_vector->values[i].type == ZBX_VARIANT_STR)
+			if (ZBX_VARIANT_STR == input_vector->values[i].type)
 			{
 				zbx_variant_t	value_dbl;
 
@@ -773,7 +773,7 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 				}
 
 				zbx_variant_clear(&input_vector->values[i]);
-				zbx_variant_copy(&value_dbl, &input_vector->values[i]);
+				zbx_variant_copy(&input_vector->values[i], &value_dbl);
 			}
 			else if (SUCCEED != zbx_variant_to_value_type(&input_vector->values[i], ITEM_VALUE_TYPE_FLOAT, error))
 			{
