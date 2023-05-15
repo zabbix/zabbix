@@ -128,6 +128,9 @@
 #define ZBX_HISTORY_TEXT_VALUE_LEN		65535
 #define ZBX_HISTORY_LOG_VALUE_LEN		65535
 
+/* Binary item type can only be as a dependent item. */
+#define ZBX_HISTORY_BIN_VALUE_LEN		MAX(ZBX_HISTORY_TEXT_VALUE_LEN, ZBX_HISTORY_LOG_VALUE_LEN)
+
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
 #define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
 
@@ -491,7 +494,8 @@ void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 
 #ifdef HAVE_ORACLE
 void	zbx_db_statement_prepare(const char *sql);
-void	zbx_db_table_prepare(const char *tablename, struct zbx_json *j);
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
+int	zbx_db_check_oracle_colum_type(const char *table_name, const char *column_name, int expected_type);
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
@@ -507,6 +511,7 @@ int		zbx_db_end(int ret);
 const zbx_db_table_t	*zbx_db_get_table(const char *tablename);
 const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname);
 int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str);
+
 #define zbx_db_get_maxid(table)	zbx_db_get_maxid_num(table, 1)
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 
@@ -703,7 +708,7 @@ zbx_db_insert_t;
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num);
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num);
 void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
@@ -871,10 +876,12 @@ typedef struct
 }
 zbx_lld_override_operation_t;
 
+ZBX_PTR_VECTOR_DECL(lld_override_operation, zbx_lld_override_operation_t*)
+
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation);
 
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
-		zbx_vector_ptr_t *ops);
+		zbx_vector_lld_override_operation_t *ops);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 

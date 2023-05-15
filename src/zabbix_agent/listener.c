@@ -105,6 +105,7 @@ static void	zbx_listener_sigusr_handler(int flags)
 
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
+#define POLL_TIMEOUT		1
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char				*msg = NULL;
 #endif
@@ -145,9 +146,11 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
-		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes,
-				init_child_args_in->config_timeout);
+		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes, POLL_TIMEOUT);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
+
+		if (TIMEOUT_ERROR == ret)
+			continue;
 
 		if (SUCCEED == ret)
 		{
@@ -169,10 +172,10 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			}
 
 			zbx_tcp_unaccept(&s);
-		}
 
-		if (SUCCEED == ret || EINTR == zbx_socket_last_error())
-			continue;
+			if (SUCCEED == ret)
+				continue;
+		}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (NULL != msg)
@@ -201,4 +204,5 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 #endif
+#undef POLL_TIMEOUT
 }

@@ -1259,6 +1259,10 @@ msgstr "Список разрешений"
 msgid "Allow manual close"
 msgstr "Разрешить закрывать вручную"
 
+#: app/views/popup.discovery.check.php:125
+msgid "Allow redirect"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
 #: include/views/configuration.item.edit.php:945
@@ -1605,6 +1609,10 @@ msgstr "Атрибуция"
 msgid "Attribution HTML"
 msgstr "HTML код авторства"
 
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -1861,6 +1869,18 @@ msgstr "До значения"
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
 msgstr "Ниже значения"
+
+#: app/partials/configuration.filter.items.php:147
+#: app/views/popup.massupdate.item.php:159 include/items.inc.php:133
+#: include/views/configuration.item.edit.php:126
+#: include/views/configuration.item.prototype.edit.php:112
+msgid "Binary"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1397
+#, c-format
+msgid "Binary item \"%1$s\" cannot be used in trigger"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -2597,6 +2617,13 @@ msgstr[2] "Не удалось удалить группы узлов сети %
 msgid "Cannot delete host groups"
 msgstr "Не удалось удалить группы узлов сети"
 
+#: host_prototypes.php:293
+msgid "Cannot delete host prototype"
+msgid_plural "Cannot delete host prototypes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
 msgstr "Не удалось удалить прототипы узлов сети"
@@ -3046,6 +3073,16 @@ msgstr "Не удалось выполнить скрипт."
 msgid "Cannot expand macros."
 msgstr "Не удалось раскрыть макросы."
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:217
+#, c-format
+msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:241
+#, c-format
+msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
@@ -3154,10 +3191,25 @@ msgstr "Не удалось найти элемент данных \"%1$s\" у \
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" используемый на панели \"%2$s\"."
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:193
+#, c-format
+msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти карту сети \"%1$s\" используемую на карте сети \"%2$s\"."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:253
+#, c-format
+msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:205
+#, c-format
+msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
@@ -3174,6 +3226,11 @@ msgstr "Не удалось найти шаблон \"%1$s\" для \"%2$s\" з�
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти триггер \"%1$s\" используемый на карте сети \"%2$s\"."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:229
+#, c-format
+msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1510
 msgid "Cannot find user directory for LDAP."
@@ -4445,6 +4502,15 @@ msgstr "Тип часов"
 msgid "Clone"
 msgstr "Клонировать"
 
+#: app/views/configuration.host.edit.php:61
+#: app/views/js/popup.host.edit.js.php:45 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:195
+msgid "Cloned template parameter values have been modified."
+msgstr ""
+
 #: app/views/popup.import.compare.php:162 app/views/popup.token.view.php:86
 #: include/func.inc.php:1723 include/views/js/monitoring.sysmaps.js.php:339
 #: include/views/js/monitoring.sysmaps.js.php:498
@@ -5336,6 +5402,14 @@ msgstr "Создать группу узлов сети"
 msgid "Create host prototype"
 msgstr "Создать прототип узлов сети"
 
+#: include/views/configuration.host.prototype.list.php:205
+msgid "Create hosts from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:199
+msgid "Create hosts from selected prototype as enabled?"
+msgstr ""
+
 #: include/views/configuration.host.prototype.list.php:197
 msgid "Create hosts from selected prototypes as disabled?"
 msgstr "Создать узлы сети из выбранных прототипов деактивированными?"
@@ -5367,6 +5441,14 @@ msgstr "Создать элемент данных (сначала выбери�
 #: include/views/configuration.item.prototype.list.php:36
 msgid "Create item prototype"
 msgstr "Создать прототип элементов данных"
+
+#: include/views/configuration.item.prototype.list.php:213
+msgid "Create items from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.item.prototype.list.php:207
+msgid "Create items from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototypes as disabled?"
@@ -5432,6 +5514,14 @@ msgstr "Создать триггер (выберите сначала шабл�
 #: include/views/configuration.trigger.prototype.list.php:36
 msgid "Create trigger prototype"
 msgstr "Создать прототип триггеров"
+
+#: include/views/configuration.trigger.prototype.list.php:212
+msgid "Create triggers from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.list.php:206
+msgid "Create triggers from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.list.php:205
 msgid "Create triggers from selected prototypes as disabled?"
@@ -6077,6 +6167,10 @@ msgstr "Удалить все элементы, которые не присут
 msgid "Delete and clear"
 msgstr "Удалить и очистить"
 
+#: include/views/configuration.template.list.php:320
+msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
 #: include/views/configuration.template.list.php:294
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Удалить и очистить выбранные шаблоны? (Внимание: все присоединенные к ним узлы сети будут очищены!)"
@@ -6117,9 +6211,17 @@ msgstr "Удалить прототип графиков?"
 msgid "Delete graph?"
 msgstr "Удалить график?"
 
+#: include/views/configuration.item.list.php:318
+msgid "Delete history of selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
 msgstr "Удалить историю выбранных элементов данных?"
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Delete history of selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6193,14 +6295,28 @@ msgstr "Удалить выбранный коннектор?"
 msgid "Delete selected connectors?"
 msgstr "Удалить выбранные коннекторы?"
 
+#: app/views/configuration.correlation.list.php:159
+msgid "Delete selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "Удалить выбранные корреляции?"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
+msgid "Delete selected dashboard?"
+msgstr ""
+
+#: app/views/configuration.dashboard.list.php:68
+#: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboards?"
 msgstr "Удалить выбранные панели?"
+
+#: app/views/js/configuration.discovery.list.js.php:124
+#: include/views/configuration.host.discovery.list.php:369
+msgid "Delete selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6211,9 +6327,17 @@ msgstr "Удалить выбранные правила обнаружения?
 msgid "Delete selected elements?"
 msgstr "Удалить выбранные элементы?"
 
+#: include/views/configuration.graph.list.php:269
+msgid "Delete selected graph prototype?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
 msgstr "Удалить выбранные прототипы графиков?"
+
+#: include/views/configuration.graph.list.php:270
+msgid "Delete selected graph?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6258,9 +6382,17 @@ msgstr "Удалить выбранные узлы сети?"
 msgid "Delete selected image?"
 msgstr "Удалить выбранное изображение?"
 
+#: include/views/configuration.item.prototype.list.php:232
+msgid "Delete selected item prototype?"
+msgstr ""
+
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
 msgstr "Удалить выбранные прототипы элементов данных?"
+
+#: include/views/configuration.item.list.php:361
+msgid "Delete selected item?"
+msgstr ""
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6282,6 +6414,10 @@ msgstr "Удалить выбранную карту сети?"
 msgid "Delete selected maps?"
 msgstr "Удалить выбранные карты сети?"
 
+#: app/views/administration.mediatype.list.php:217
+msgid "Delete selected media type?"
+msgstr ""
+
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
 msgstr "Удалить выбранные способы оповещений?"
@@ -6293,6 +6429,10 @@ msgstr "Удалить выбранные прокси?"
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
 msgstr "Удалить выбранный прокси?"
+
+#: app/views/administration.regex.list.php:83
+msgid "Delete selected regular expression?"
+msgstr ""
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -6313,6 +6453,10 @@ msgstr "Удалить выбранный регулярный отчет?"
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
 msgstr "Удалить выбранные регулярные отчеты?"
+
+#: app/views/administration.script.list.php:224
+msgid "Delete selected script?"
+msgstr ""
 
 #: app/views/administration.script.list.php:203
 msgid "Delete selected scripts?"
@@ -6340,6 +6484,10 @@ msgstr "Удалить выбранную группу шаблонов?"
 msgid "Delete selected template groups?"
 msgstr "Удалить выбранные группы шаблонов?"
 
+#: include/views/configuration.template.list.php:313
+msgid "Delete selected template?"
+msgstr ""
+
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
 msgstr "Удалить выбранные шаблоны?"
@@ -6354,9 +6502,17 @@ msgstr "Удалить выбранный токен?"
 msgid "Delete selected tokens?"
 msgstr "Удалить выбранные токены?"
 
+#: include/views/configuration.trigger.prototype.list.php:231
+msgid "Delete selected trigger prototype?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
 msgstr "Удалить выбранные прототипы триггеров?"
+
+#: include/views/configuration.triggers.list.php:393
+msgid "Delete selected trigger?"
+msgstr ""
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6369,6 +6525,10 @@ msgstr "Удалить выбранного пользователя?"
 #: app/views/administration.user.list.php:251
 msgid "Delete selected users?"
 msgstr "Удалить выбранных пользователей?"
+
+#: include/views/configuration.httpconf.list.php:248
+msgid "Delete selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6578,6 +6738,10 @@ msgstr "Отключить"
 msgid "Disable debug mode"
 msgstr "Деактивировать режим отладки"
 
+#: app/views/administration.usergroup.list.php:249
+msgid "Disable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
 msgstr "Деактивировать режим отладки у выбранных групп?"
@@ -6606,6 +6770,11 @@ msgstr "Деактивировать узлы сети наблюдаемые в
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "Деактивировать узлы сети наблюдаемые выбранными прокси?"
+
+#: app/views/administration.token.list.php:211
+#: app/views/administration.user.token.list.php:164
+msgid "Disable selected API token?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6636,26 +6805,51 @@ msgstr "Деактивировать выбранный коннектор?"
 msgid "Disable selected connectors?"
 msgstr "Деактивировать выбранные коннекторы?"
 
+#: app/views/configuration.correlation.list.php:153
+msgid "Disable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
 msgstr "Деактивировать выбранные корреляции?"
+
+#: app/views/js/configuration.discovery.list.js.php:108
+#: include/views/configuration.host.discovery.list.php:348
+msgid "Disable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Деактивировать выбранные правила обнаружения?"
 
+#: app/views/administration.usergroup.list.php:229
+msgid "Disable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
 msgstr "Деактивировать выбранные группы?"
+
+#: app/views/configuration.host.list.php:534
+msgid "Disable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
 msgstr "Деактивировать выбранные узлы сети?"
 
+#: include/views/configuration.item.list.php:309
+msgid "Disable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
 msgstr "Деактивировать выбранные элементы данных?"
+
+#: app/views/administration.mediatype.list.php:203
+msgid "Disable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:182
 msgid "Disable selected media types?"
@@ -6669,13 +6863,25 @@ msgstr ""
 msgid "Disable selected modules?"
 msgstr "Деактивировать выбранные модули?"
 
+#: app/views/reports.scheduledreport.list.php:96
+msgid "Disable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
 msgstr "Деактивировать выбранные регулярные отчеты?"
 
+#: include/views/configuration.triggers.list.php:368
+msgid "Disable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
 msgstr "Деактивировать выбранные триггеры?"
+
+#: include/views/configuration.httpconf.list.php:228
+msgid "Disable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:215
 msgid "Disable selected web scenarios?"
@@ -7416,6 +7622,10 @@ msgstr "Включить подтверждение"
 msgid "Enable debug mode"
 msgstr "Активировать режим отладки"
 
+#: app/views/administration.usergroup.list.php:239
+msgid "Enable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:226
 msgid "Enable debug mode in selected groups?"
 msgstr "Активировать режим отладки для выбранных групп?"
@@ -7458,6 +7668,11 @@ msgstr "Активировать узлы сети наблюдаемые выб
 msgid "Enable internal housekeeping"
 msgstr "Активировать внутреннюю очистку истории"
 
+#: app/views/administration.token.list.php:205
+#: app/views/administration.user.token.list.php:158
+msgid "Enable selected API token?"
+msgstr ""
+
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
 msgid "Enable selected API tokens?"
@@ -7487,27 +7702,52 @@ msgstr "Активировать выбранный коннектор?"
 msgid "Enable selected connectors?"
 msgstr "Активировать выбранные коннекторы?"
 
+#: app/views/configuration.correlation.list.php:147
+msgid "Enable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "Активировать выбранные корреляции?"
+
+#: app/views/js/configuration.discovery.list.js.php:92
+#: include/views/configuration.host.discovery.list.php:342
+msgid "Enable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:121
 #: include/views/configuration.host.discovery.list.php:328
 msgid "Enable selected discovery rules?"
 msgstr "Активировать выбранные правила обнаружения?"
 
+#: app/views/administration.usergroup.list.php:219
+msgid "Enable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
 msgstr "Активировать выбранные группы?"
+
+#: app/views/configuration.host.list.php:526
+msgid "Enable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:500
 #: include/views/configuration.hostgroups.list.php:201
 msgid "Enable selected hosts?"
 msgstr "Активировать выбранные узлы сети?"
 
+#: include/views/configuration.item.list.php:303
+msgid "Enable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
 msgstr "Активировать выбранные элементы данных?"
+
+#: app/views/administration.mediatype.list.php:197
+msgid "Enable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:181
 msgid "Enable selected media types?"
@@ -7521,13 +7761,25 @@ msgstr ""
 msgid "Enable selected modules?"
 msgstr "Активировать выбранные модули?"
 
+#: app/views/reports.scheduledreport.list.php:89
+msgid "Enable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
 msgstr "Активировать выбранные регулярные отчеты?"
 
+#: include/views/configuration.triggers.list.php:362
+msgid "Enable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
 msgstr "Активировать выбранные триггеры?"
+
+#: include/views/configuration.httpconf.list.php:222
+msgid "Enable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:214
 msgid "Enable selected web scenarios?"
@@ -9357,6 +9609,11 @@ msgstr "Обзор инвентарных данных узла сети"
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
 msgstr "Тип подписи к узлу сети"
+
+#: widgets/dataover/includes/WidgetForm.php:64
+#: widgets/trigover/includes/WidgetForm.php:71
+msgid "Host location"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
@@ -12020,6 +12277,10 @@ msgstr "LLD макрос"
 msgid "LLD macros"
 msgstr "LLD макросы"
 
+#: include/classes/api/services/CItemGeneralOld.php:700
+msgid "LLD rule with the same UUID already exists"
+msgstr ""
+
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:59
 #: app/views/popup.lldoverride.php:101 include/maps.inc.php:45
@@ -13851,6 +14112,11 @@ msgstr "Новый коннектор"
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
 msgid "New dashboard"
 msgstr "Новая панель"
+
+#: app/views/configuration.discovery.edit.php:234
+#: app/views/configuration.discovery.edit.php:275
+msgid "New discovery rule"
+msgstr ""
 
 #: jsLoader.php:280
 msgid "New element"
@@ -16274,6 +16540,10 @@ msgstr "Указанная строка запроса \"%1$s\" секрета �
 msgid "Provision now"
 msgstr "Инициализировать сейчас"
 
+#: app/views/administration.user.list.php:304
+msgid "Provision selected LDAP user?"
+msgstr ""
+
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
 msgstr "Выполнить инициализацию LDAP пользователей?"
@@ -18399,6 +18669,11 @@ msgstr "Сокращённое"
 msgid "Show"
 msgstr "Показать"
 
+#: widgets/hostavail/includes/WidgetForm.php:61
+#: widgets/web/includes/WidgetForm.php:65
+msgid "Show data in maintenance"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:182
 #: app/partials/monitoring.problem.filter.php:277
 msgid "Show details"
@@ -19714,6 +19989,10 @@ msgstr "График более не обнаруживается и будет 
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "График более не обнаруживается и будет удален при следующей обработке правила обнаружения."
 
+#: app/controllers/CControllerHostEdit.php:283 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
+
 #: include/html.inc.php:637
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -19778,6 +20057,10 @@ msgstr "Полученный JSON не является корректным JSO
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Запрашиваемая удаленная процедура не существует / недоступна"
+
+#: templates.php:181
+msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -20799,6 +21082,10 @@ msgstr "Недоступен"
 #: app/views/administration.user.list.php:250
 msgid "Unblock"
 msgstr "Разблокировать"
+
+#: app/views/administration.user.list.php:310
+msgid "Unblock selected user?"
+msgstr ""
 
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
@@ -23205,6 +23492,10 @@ msgstr "Zabbix агент"
 msgid "Zabbix agent (active)"
 msgstr "Zabbix агент (активный)"
 
+#: app/partials/administration.system.info.php:45
+msgid "Zabbix frontend version"
+msgstr ""
+
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix получил некорректный запрос."
@@ -23263,6 +23554,10 @@ msgstr "Zabbix сервер запущен"
 #: include/classes/setup/CSetupWizard.php:747
 msgid "Zabbix server name"
 msgstr "Имя сервера Zabbix"
+
+#: app/partials/administration.system.info.php:40
+msgid "Zabbix server version"
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -23456,6 +23751,13 @@ msgstr "все"
 msgid "all media"
 msgstr "все способы оповещения"
 
+#: app/views/js/configuration.discovery.edit.js.php:390
+#: include/classes/screens/CScreenDiscovery.php:104
+#: include/classes/screens/CScreenDiscovery.php:207
+#: include/discovery.inc.php:84
+msgid "allow redirect"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
 msgstr "превышено разрешенное количество уровней зависимости"
@@ -23607,6 +23909,10 @@ msgstr "atan() - Арктангенс значения в виде угла, в 
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() - Арктангенс координат ординаты (exprue) и абсциссы, заданный углом, в радианах."
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr "автоматически зарегистрированный узел сети"
@@ -23641,6 +23947,19 @@ msgstr "baselinewma() - Вычисление базиса путем усред�
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - Проверка, входит ли значение в заданный диапазон (1 - в диапазоне, 0 - в противном случае)"
+
+#: app/partials/monitoring.latest.view.html.php:149
+#: include/classes/screens/CScreenHistory.php:309
+#: include/classes/screens/CScreenHistory.php:432
+#: include/classes/screens/CScreenHistory.php:518
+#: include/classes/screens/CScreenProblem.php:1794
+#: include/classes/screens/CScreenProblem.php:1818 include/items.inc.php:1352
+#: include/items.inc.php:1445 widgets/item/actions/WidgetView.php:210
+#: widgets/plaintext/actions/WidgetView.php:98
+#: widgets/tophosts/views/widget.view.php:105
+#: widgets/tophosts/views/widget.view.php:106
+msgid "binary value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"
@@ -24172,6 +24491,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "глобальные настройки очистки истории"
 
+#: include/classes/api/services/CGraphGeneral.php:874
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:868
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:82
 #, c-format
 msgid "group name must match %1$s group name"
@@ -24196,6 +24523,10 @@ msgstr "узел сети"
 #: include/classes/api/services/CMap.php:1317
 msgid "host group"
 msgstr "группа узла сети"
+
+#: include/classes/api/services/CHostGroup.php:795
+msgid "host group with the same UUID already exists"
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
@@ -24437,6 +24768,14 @@ msgstr "элемент данных \"%1$s\" на узле сети \"%2$s\" н�
 #: include/classes/widgets/CWidgetHelper.php:1175
 msgid "item pattern"
 msgstr "шаблон элемента данных"
+
+#: include/classes/api/services/CItemGeneral.php:486
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:480
+msgid "item with the same UUID already exists"
+msgstr ""
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -25081,6 +25420,10 @@ msgstr "выбрано"
 msgid "service"
 msgstr "услуга"
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr "краткое описание"
@@ -25207,6 +25550,18 @@ msgstr "tan() - Тангенс значения"
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
+
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplateGroup.php:594
+msgid "template group with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:458
+msgid "template with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1577
 #: include/classes/api/services/CItemGeneral.php:1594
@@ -25339,9 +25694,17 @@ msgstr "выражение триггера должно содержать по
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "прототип триггера нельзя переместить в другой шаблон или узел сети"
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1888
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "триггер со связями нельзя переместить в другой шаблон или узел сети"
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -25572,6 +25935,10 @@ msgstr "значение %1$s уже существует"
 msgid "value is too long"
 msgstr "значение слишком длинное"
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -25677,6 +26044,10 @@ msgstr "через"
 msgctxt "week short"
 msgid "w"
 msgstr "w"
+
+#: include/classes/api/services/CHttpTest.php:440
+msgid "web scenario with the same UUID already exists"
+msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:83
 msgid "wildcard patterns with '*' may be used"

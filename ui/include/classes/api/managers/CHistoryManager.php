@@ -94,11 +94,10 @@ class CHistoryManager {
 
 		foreach ($itemids_by_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
-				'SELECT itemid'.
+				'SELECT DISTINCT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-					($period !== null ? ' AND clock>'.$period : '').
-				' GROUP BY itemid'
+					($period !== null ? ' AND clock>'.$period : '')
 			), 'itemid');
 
 			$results += array_intersect_key($items, array_flip($type_results));
@@ -1374,7 +1373,8 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_STR => 'str',
 			ITEM_VALUE_TYPE_LOG => 'log',
 			ITEM_VALUE_TYPE_UINT64 => 'uint',
-			ITEM_VALUE_TYPE_TEXT => 'text'
+			ITEM_VALUE_TYPE_TEXT => 'text',
+			ITEM_VALUE_TYPE_BINARY => 'binary'
 		];
 
 		if (array_key_exists($value_type, $mapping)) {
@@ -1398,7 +1398,8 @@ class CHistoryManager {
 			'str' => ITEM_VALUE_TYPE_STR,
 			'log' => ITEM_VALUE_TYPE_LOG,
 			'uint' => ITEM_VALUE_TYPE_UINT64,
-			'text' => ITEM_VALUE_TYPE_TEXT
+			'text' => ITEM_VALUE_TYPE_TEXT,
+			'binary' => ITEM_VALUE_TYPE_BINARY
 		];
 
 		if (array_key_exists($type_name, $mapping)) {
@@ -1519,7 +1520,8 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
 			ITEM_VALUE_TYPE_STR => 'history_str',
 			ITEM_VALUE_TYPE_FLOAT => 'history',
-			ITEM_VALUE_TYPE_UINT64 => 'history_uint'
+			ITEM_VALUE_TYPE_UINT64 => 'history_uint',
+			ITEM_VALUE_TYPE_BINARY => 'history_bin'
 		];
 
 		return ($value_type === null) ? $tables : $tables[$value_type];

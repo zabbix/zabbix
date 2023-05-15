@@ -142,13 +142,22 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'correlationids', [
-		'correlation.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected correlations?'),
+		'correlation.enable' => [
+			'name' => _('Enable'),
+			'confirm_singular' => _('Enable selected correlation?'),
+			'confirm_plural' => _('Enable selected correlations?'),
 			'csrf_token' => $csrf_token
 		],
-		'correlation.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected correlations?'),
+		'correlation.disable' => [
+			'name' => _('Disable'),
+			'confirm_singular' => _('Disable selected correlation?'),
+			'confirm_plural' => _('Disable selected correlations?'),
 			'csrf_token' => $csrf_token
 		],
-		'correlation.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected correlations?'),
+		'correlation.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected correlation?'),
+			'confirm_plural' => _('Delete selected correlations?'),
 			'csrf_token' => $csrf_token
 		]
 	], 'correlation')

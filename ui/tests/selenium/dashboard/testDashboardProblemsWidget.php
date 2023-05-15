@@ -126,9 +126,10 @@ class testDashboardProblemsWidget extends CWebTest {
 		$form->fill(['Type' => 'Problems']);
 		$dialog->waitUntilReady();
 
-		$this->assertEquals(['Type', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Exclude host groups', 'Hosts', 'Problem',
-				'Severity', 'Tags', 'Show tags', 'Tag name', 'Tag display priority', 'Show operational data', 'Show symptoms',
-				'Show suppressed problems', 'Show unacknowledged only', 'Sort entries by', 'Show timeline', 'Show lines'],
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Show', 'Host groups',
+				'Exclude host groups', 'Hosts', 'Problem', 'Severity', 'Problem tags', 'Show tags', 'Tag name',
+				'Tag display priority', 'Show operational data', 'Show symptoms', 'Show suppressed problems',
+				'Show unacknowledged only', 'Sort entries by', 'Show timeline', 'Show lines'],
 				$form->getLabels()->asText()
 		);
 
@@ -141,7 +142,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Host groups' => ['value' => '', 'enabled' => true],
 			'Exclude host groups' => ['value' => '', 'enabled' => true],
 			'Hosts' => ['value' => '', 'enabled' => true],
-			'Problem' => ['value' => '', 'maxlength' => 255, 'enabled' => true],
+			'Problem' => ['value' => '', 'maxlength' => 2048, 'enabled' => true],
 
 			// Severity checkboxes.
 			'id:severities_0' => ['value' => false, 'enabled' => true],
@@ -159,7 +160,7 @@ class testDashboardProblemsWidget extends CWebTest {
 
 			'Show tags' => ['value' => 'None', 'enabled' => true],
 			'Tag name' => ['value' => 'Full', 'enabled' => false],
-			'Tag display priority' => ['value' => '', 'placeholder' => 'comma-separated list', 'enabled' => false, 'maxlength' => 255],
+			'Tag display priority' => ['value' => '', 'placeholder' => 'comma-separated list', 'enabled' => false, 'maxlength' => 2048],
 			'Show operational data' => ['value' => 'None', 'enabled' => true],
 			'Show symptoms' => ['value' => false, 'enabled' => true],
 			'Show suppressed problems' => ['value' => false, 'enabled' => true],
@@ -212,7 +213,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		// Check segmented radiobuttons labels.
 		$radios = [
 			'Show' => ['Recent problems', 'Problems', 'History'],
-			'Tags' => ['And/Or', 'Or'],
+			'Problem tags' => ['And/Or', 'Or'],
 			'Show tags' => ['None', '1', '2', '3'],
 			'Tag name' => ['Full', 'Shortened', 'None'],
 			'Show operational data' => ['None', 'Separately', 'With problem name']
@@ -323,7 +324,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'id:severities_3' => true,
 						'id:severities_4' => true,
 						'id:severities_5' => true,
-						'Tags' => 'Or',
+						'Problem tags' => 'Or',
 						'Show tags' => 1,
 						'Tag name' => 'Shortened',
 						'Tag display priority' => 'tag, tag2, tag4',
@@ -797,4 +798,3 @@ class testDashboardProblemsWidget extends CWebTest {
 		));
 	}
 }
-

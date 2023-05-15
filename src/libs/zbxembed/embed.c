@@ -273,7 +273,7 @@ void	zbx_es_destroy(zbx_es_t *es)
 {
 	char	*error = NULL;
 
-	if (SUCCEED != zbx_es_destroy_env(es, &error))
+	if (SUCCEED == zbx_es_is_env_initialized(es) && SUCCEED != zbx_es_destroy_env(es, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot destroy embedded scripting engine environment: %s", error);
 	}
@@ -545,6 +545,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	zbx_timespec(&es->env->start_time);
 	es->env->http_req_objects = 0;
+	es->env->logged_msgs = 0;
 
 	if (NULL != es->env->json)
 	{

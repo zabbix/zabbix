@@ -25,6 +25,7 @@
 #include "zbxnum.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include "zbxserver.h"
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1
@@ -1770,8 +1771,6 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
 {
 	int		ret;
 	zbx_variant_t	*arg, *pattern, *replacement, value;
-	char		*strval, *p;
-	size_t		pattern_len, replacement_len;
 
 	if (3 != token->opt)
 	{
@@ -1794,24 +1793,11 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
 		return FAIL;
 	}
 
-	strval = zbx_strdup(NULL, arg->data.str);
-	pattern_len = strlen(pattern->data.str);
+	if ('\0' != *pattern->data.str)
+		zbx_variant_set_str(&value, zbx_string_replace(arg->data.str, pattern->data.str, replacement->data.str));
+	else
+		zbx_variant_copy(&value, arg);
 
-	if (0 < pattern_len)
-	{
-		replacement_len = strlen(replacement->data.str);
-
-		while (NULL != (p = strstr(strval, pattern->data.str)))
-		{
-			size_t	str_alloc, str_len;
-
-			str_alloc = str_len = strlen(strval) + 1;
-			zbx_replace_mem_dyn(&strval, &str_alloc, &str_len, (size_t)(p - strval), pattern_len,
-					replacement->data.str, replacement_len);
-		}
-	}
-
-	zbx_variant_set_str(&value, strval);
 	eval_function_return(3, &value, output);
 
 	return SUCCEED;
@@ -2617,29 +2603,81 @@ static int	eval_execute_math_return_value(const zbx_eval_context_t *ctx, const z
 static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	zbx_variant_t	*arg, ret_value;
+	zbx_variant_t	*arg_vector, ret_value;
+	int		ret = SUCCEED;
+	char		*operator = NULL, *pattern = NULL;
 
-	if (1 != token->opt)
+	if (0 == token->opt || 3 < token->opt)
 	{
-		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
+		*error = zbx_dsprintf(*error, "invalid number of argument for function at \"%s\"",
 				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
-	arg = &output->values[output->values_num - 1];
+	arg_vector = &output->values[output->values_num - token->opt];
 
-	if (ZBX_VARIANT_DBL_VECTOR != arg->type)
+	if (ZBX_VARIANT_DBL_VECTOR != arg_vector->type)
 	{
 		*error = zbx_dsprintf(*error, "invalid type of argument for function at \"%s\"",
 				ctx->expression + token->loc.l);
 		return FAIL;
 	}
 
-	zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)arg->data.dbl_vector->values_num);
+	if (1 < token->opt)
+	{
+		zbx_variant_t			*arg_operator;
+		zbx_eval_count_pattern_data_t	pdata;
 
-	eval_function_return(token->opt, &ret_value, output);
+		arg_operator = &output->values[output->values_num - token->opt + 1];
 
-	return SUCCEED;
+		if (ZBX_VARIANT_NONE != arg_operator->type &&
+				SUCCEED != zbx_variant_convert(arg_operator, ZBX_VARIANT_STR))
+		{
+			*error = zbx_strdup(*error, "invalid second parameter");
+			return FAIL;
+		}
+
+		operator = arg_operator->data.str;
+
+		if (2 < token->opt)
+		{
+			zbx_variant_t	*arg_pattern;
+
+			arg_pattern = &output->values[output->values_num - token->opt + 2];
+
+			if (SUCCEED != zbx_variant_convert(arg_pattern, ZBX_VARIANT_STR))
+			{
+				*error = zbx_strdup(NULL, "invalid third parameter");
+				return FAIL;
+			}
+
+			pattern = arg_pattern->data.str;
+		}
+
+		zbx_vector_expression_create(&pdata.regexps);
+
+		if (FAIL == zbx_validate_count_pattern(operator, pattern, ITEM_VALUE_TYPE_FLOAT, &pdata, error))
+		{
+			ret = FAIL;
+		}
+		else
+		{
+			int	result = 0;
+
+			zbx_count_dbl_vector_with_pattern(&pdata, pattern, arg_vector->data.dbl_vector, &result);
+			zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)result);
+		}
+
+		zbx_regexp_clean_expressions(&pdata.regexps);
+		zbx_vector_expression_destroy(&pdata.regexps);
+	}
+	else
+		zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)arg_vector->data.dbl_vector->values_num);
+
+	if (FAIL != ret)
+		eval_function_return(token->opt, &ret_value, output);
+
+	return ret;
 }
 
 /******************************************************************************

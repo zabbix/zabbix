@@ -728,7 +728,12 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	if ($result) {
 		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
-	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
+
+	$host_drules_count = count(getRequest('g_hostdruleid'));
+	$messageSuccess = _n('Discovery rule deleted', 'Discovery rules deleted', $host_drules_count);
+	$messageFailed = _n('Cannot delete discovery rule', 'Cannot delete discovery rules', $host_drules_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
