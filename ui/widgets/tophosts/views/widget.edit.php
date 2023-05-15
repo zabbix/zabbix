@@ -26,7 +26,7 @@
  * @var array $data
  */
 
-$form = (new CWidgetFormView($data));
+$form = new CWidgetFormView($data);
 
 $groupids = array_key_exists('groupids', $data['fields'])
 	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],	$data['captions']['ms']['groups']['groupids'])
