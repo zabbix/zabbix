@@ -2612,7 +2612,7 @@ $icon-widget-btn: (
 }
 
 /* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
-@supports (-webkit-backdrop-filter: blur(1px)) {
+.safari {
 	%form-disabled {
 		-webkit-text-fill-color: $form-disabled-font-color;
 	}
