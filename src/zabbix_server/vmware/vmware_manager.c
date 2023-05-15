@@ -191,7 +191,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	int				services_updated = 0, services_removed = 0,
 					server_num = ((zbx_thread_args_t *)args)->info.server_num,
 					process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	double				time_now, time_stat, time_idle = 0;
+	double				time_stat, time_idle = 0;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	const zbx_thread_vmware_args	*vmware_args_in = (const zbx_thread_vmware_args *)
@@ -211,8 +211,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_vmware_job_t	*job;
+		double			time_now = zbx_time();
 
-		time_now = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		if (STAT_INTERVAL < time_now - time_stat)
