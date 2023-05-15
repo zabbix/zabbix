@@ -1119,10 +1119,10 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	double					time_stat, time_idle = 0, time_now, time_flush, sec;
+	double					time_stat, time_idle = 0, time_flush;
 	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
-	int					ret, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
 						process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_thread_pp_manager_args		*pp_args = ((zbx_thread_args_t *)args)->args;
@@ -1169,7 +1169,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_now = zbx_time();
+		double	time_now = zbx_time();
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
@@ -1185,9 +1185,13 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
+
+		int	ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
+
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-		sec = zbx_time();
+
+		double	sec = zbx_time();
+
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
