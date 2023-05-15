@@ -25,6 +25,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.data.discovery_queue
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "discoverer" processes started. Please check "StartDiscoverers" parameter in the server configuration file.'
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -153,7 +155,7 @@ zabbix_export:
               parameters:
                 - '$.data.process[''discovery manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes discovery manager not started'
+              error_handler_params: 'No "discovery manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -184,7 +186,7 @@ zabbix_export:
               parameters:
                 - '$.data.process[''discovery worker''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes discovery worker not started'
+              error_handler_params: 'No "discovery worker" processes started.'
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
