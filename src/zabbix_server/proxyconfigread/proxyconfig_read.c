@@ -361,6 +361,8 @@ out:
  *                               (optional)                                   *
  *             ids_filter - [IN] the key values used to filter rows           *
  *                               (optional)                                   *
+ *             filter_name- [IN] the filter field name used to filter rows    *
+ *                               (optional)                                   *
  *             recids     - [OUT] the selected record identifiers, sorted     *
  *             j          - [OUT] the output json                             *
  *             error      - [OUT] the error message                           *
@@ -371,8 +373,8 @@ out:
  ******************************************************************************/
 static int	proxyconfig_get_table_data_ext(const char *table_name, const char *key_name,
 		const zbx_vector_uint64_t *key_ids, const char *condition, const char *join,
-		const zbx_hashset_t *ids_filter, const char *filter_name, zbx_vector_uint64_t *recids, struct zbx_json *j,
-		char **error)
+		const zbx_hashset_t *ids_filter, const char *filter_name, zbx_vector_uint64_t *recids,
+		struct zbx_json *j, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
