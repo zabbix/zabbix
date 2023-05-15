@@ -14,6 +14,15 @@ zabbix_export:
       groups:
         - name: Templates/Applications
       items:
+        - uuid: ca8a1cafec6e44a4b31f9ec5a6ed00cb
+          name: 'Zabbix proxy: Discovery queue'
+          type: INTERNAL
+          key: 'zabbix[discovery_queue]'
+          history: 1w
+          description: 'Count of values enqueued in the discovery queue.'
+          tags:
+            - tag: component
+              value: system
         - uuid: 0230306272c24858b49243ef1c61e2ec
           name: 'Zabbix proxy: Preprocessing queue'
           type: INTERNAL
@@ -89,24 +98,46 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
-        - uuid: 1d00c5ef345f4827a921ff3e3617d316
-          name: 'Zabbix proxy: Utilization of discoverer data collector processes, in %'
+        - uuid: 930bf9db6c754a17ab5026961d6369ba
+          name: 'Zabbix proxy: Utilization of discovery manager internal processes, in %'
           type: INTERNAL
-          key: 'zabbix[process,discoverer,avg,busy]'
+          key: 'zabbix[process,discovery manager,avg,busy]'
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time discoverer processes have been busy in the last minute.'
+          description: 'Average percentage of time discovery manager processes have been busy in the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: internal-process
           triggers:
-            - uuid: 080bd8d98f204d8580cbb1088f07d57b
-              expression: 'avg(/Zabbix proxy health/zabbix[process,discoverer,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"discoverer"}'
+            - uuid: e1dd2821756d489cb5443c924e57c356
+              expression: 'avg(/Zabbix proxy health/zabbix[process,discovery manager,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"discovery manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,discoverer,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"discoverer"}'
-              name: 'Zabbix proxy: Utilization of discoverer processes is high'
-              event_name: 'Zabbix proxy: Utilization of discoverer processes over {$ZABBIX.PROXY.UTIL.MAX:"discoverer"}%'
+              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,discovery manager,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"discovery manager"}'
+              name: 'Zabbix proxy: Utilization of discovery manager processes is high'
+              event_name: 'Zabbix proxy: Utilization of discovery manager processes over {$ZABBIX.PROXY.UTIL.MAX:"discovery manager"}%'
+              priority: AVERAGE
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: eeee7e927a854b61b166a13b8eb98f28
+          name: 'Zabbix proxy: Utilization of discovery worker internal processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,discovery worker,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time discovery worker processes have been busy in the last minute.'
+          tags:
+            - tag: component
+              value: internal-process
+          triggers:
+            - uuid: ff023c3fce664dff9fdcb3f8724f4832
+              expression: 'avg(/Zabbix proxy health/zabbix[process,discovery worker,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"discovery worker"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,discovery worker,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"discovery worker"}'
+              name: 'Zabbix proxy: Utilization of discovery worker processes is high'
+              event_name: 'Zabbix proxy: Utilization of discovery worker processes over {$ZABBIX.PROXY.UTIL.MAX:"discovery worker"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -908,46 +939,41 @@ zabbix_export:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,ipmi poller,avg,busy]'
         - sortorder: '3'
-          color: FF33FF
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,discoverer,avg,busy]'
-        - sortorder: '4'
           color: '007700'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,icmp pinger,avg,busy]'
-        - sortorder: '5'
+        - sortorder: '4'
           color: '003300'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,http poller,avg,busy]'
-        - sortorder: '6'
+        - sortorder: '5'
           color: 33FFFF
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,unreachable poller,avg,busy]'
-        - sortorder: '7'
+        - sortorder: '6'
           color: DD0000
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,java poller,avg,busy]'
-        - sortorder: '8'
+        - sortorder: '7'
           color: '000099'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,snmp trapper,avg,busy]'
-        - sortorder: '9'
+        - sortorder: '8'
           color: 00FF00
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,vmware collector,avg,busy]'
-        - sortorder: '10'
+        - sortorder: '9'
           color: 5A2B57
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,history poller,avg,busy]'
-        - sortorder: '11'
+        - sortorder: '10'
           color: 9FA8DA
           item:
             host: 'Zabbix proxy health'
@@ -1006,6 +1032,16 @@ zabbix_export:
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,availability manager,avg,busy]'
+        - sortorder: '10'
+          color: C7A72D
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,discovery manager,avg,busy]'
+        - sortorder: '11'
+          color: BA2A5D
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,discovery worker,avg,busy]'
     - uuid: 787ad6ca2967415c8a1daa4a4400c12d
       name: 'Zabbix proxy: Zabbix internal queues'
       graph_items:
@@ -1013,6 +1049,11 @@ zabbix_export:
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[preprocessing_queue]'
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[discovery_queue]'
     - uuid: d03bdc914520474084d6809312cdf097
       name: 'Zabbix proxy: Zabbix proxy performance'
       graph_items:

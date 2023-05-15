@@ -37,6 +37,24 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: c417ffdf78144a01811935d31e02af69
+          name: 'Remote Zabbix server: Discovery queue'
+          type: DEPENDENT
+          key: discovery_queue
+          delay: '0'
+          history: 1w
+          description: 'The count of values enqueued in the discovery queue.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.discovery_queue
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "discoverer" processes started. Please check "StartDiscoverers" parameter in the server configuration file.'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            - tag: component
+              value: system
         - uuid: adcf44e5179644b0bee34103d3d3688e
           name: 'Remote Zabbix server: LLD queue'
           type: DEPENDENT
@@ -286,33 +304,64 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
-        - uuid: 396cdd296a3a4ee4a247afaa0f64e41c
-          name: 'Remote Zabbix server: Utilization of discoverer data collector processes, in %'
+        - uuid: 09c61eeecc354f2da1a8efcc100d5f5c
+          name: 'Remote Zabbix server: Utilization of discovery manager internal processes, in %'
           type: DEPENDENT
-          key: process.discoverer.avg.busy
+          key: process.discovery_manager.avg.busy
           delay: '0'
           history: 1w
           value_type: FLOAT
           units: '%'
-          description: 'The average percentage of the time during which the discoverer processes have been busy for the last minute.'
+          description: 'The average percentage of the time during which the discovery manager processes have been busy for the last minute.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.data.process[''discoverer''].busy.avg'
+                - '$.data.process[''discovery manager''].busy.avg'
               error_handler: CUSTOM_ERROR
-              error_handler_params: 'No "discoverer" processes started.'
+              error_handler_params: 'No "discovery manager" processes started.'
           master_item:
             key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
           tags:
             - tag: component
-              value: data-collector
+              value: internal-process
           triggers:
-            - uuid: 2ed92415c6c542639a8b8d1f0a4646f4
-              expression: 'avg(/Remote Zabbix server health/process.discoverer.avg.busy,10m)>75'
+            - uuid: 96418e054e834497baffbd9ed0a4f6bf
+              expression: 'avg(/Remote Zabbix server health/process.discovery_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix server health/process.discoverer.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of discoverer processes is high'
-              event_name: 'Remote Zabbix server: Utilization of discoverer processes over 75%'
+              recovery_expression: 'avg(/Remote Zabbix server health/process.discovery_manager.avg.busy,10m)<65'
+              name: 'Remote Zabbix server: Utilization of discovery manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of discovery manager processes over 75%'
+              priority: AVERAGE
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 6bfbac5f75c54f2c87a35f1786ed73e8
+          name: 'Remote Zabbix server: Utilization of discovery worker internal processes, in %'
+          type: DEPENDENT
+          key: process.discovery_worker.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The average percentage of the time during which the discovery worker processes have been busy for the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''discovery worker''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'No "discovery worker" processes started.'
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            - tag: component
+              value: internal-process
+          triggers:
+            - uuid: fd92a81e2c614aa8826f7ff92fad801a
+              expression: 'avg(/Remote Zabbix server health/process.discovery_worker.avg.busy,10m)>75'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix server health/process.discovery_worker.avg.busy,10m)<65'
+              name: 'Remote Zabbix server: Utilization of discovery worker processes is high'
+              event_name: 'Remote Zabbix server: Utilization of discovery worker processes over 75%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -2495,11 +2544,16 @@ zabbix_export:
             host: 'Remote Zabbix server health'
             key: process.availability_manager.avg.busy
         - sortorder: '6'
-          color: 8048B4
+          color: C7A72D
           item:
             host: 'Remote Zabbix server health'
-            key: process.discoverer.avg.busy
+            key: process.discovery_manager.avg.busy
         - sortorder: '7'
+          color: BA2A5D
+          item:
+            host: 'Remote Zabbix server health'
+            key: process.discovery_worker.avg.busy
+        - sortorder: '8'
           color: FD5434
           item:
             host: 'Remote Zabbix server health'
@@ -2617,50 +2671,45 @@ zabbix_export:
             host: 'Remote Zabbix server health'
             key: process.ipmi_poller.avg.busy
         - sortorder: '3'
-          color: FF33FF
-          item:
-            host: 'Remote Zabbix server health'
-            key: process.discoverer.avg.busy
-        - sortorder: '4'
           item:
             host: 'Remote Zabbix server health'
             key: process.icmp_pinger.avg.busy
-        - sortorder: '5'
+        - sortorder: '4'
           color: '003300'
           item:
             host: 'Remote Zabbix server health'
             key: process.http_poller.avg.busy
-        - sortorder: '6'
+        - sortorder: '5'
           color: CCCC00
           item:
             host: 'Remote Zabbix server health'
             key: process.proxy_poller.avg.busy
-        - sortorder: '7'
+        - sortorder: '6'
           color: 33FFFF
           item:
             host: 'Remote Zabbix server health'
             key: process.unreachable_poller.avg.busy
-        - sortorder: '8'
+        - sortorder: '7'
           color: DD0000
           item:
             host: 'Remote Zabbix server health'
             key: process.java_poller.avg.busy
-        - sortorder: '9'
+        - sortorder: '8'
           color: '000099'
           item:
             host: 'Remote Zabbix server health'
             key: process.snmp_trapper.avg.busy
-        - sortorder: '10'
+        - sortorder: '9'
           color: 00FF00
           item:
             host: 'Remote Zabbix server health'
             key: process.vmware_collector.avg.busy
-        - sortorder: '11'
+        - sortorder: '10'
           color: 5A2B57
           item:
             host: 'Remote Zabbix server health'
             key: process.history_poller.avg.busy
-        - sortorder: '12'
+        - sortorder: '11'
           color: 9FA8DA
           item:
             host: 'Remote Zabbix server health'
@@ -2796,6 +2845,11 @@ zabbix_export:
           item:
             host: 'Remote Zabbix server health'
             key: connector_queue
+        - sortorder: '3'
+          color: F7941D
+          item:
+            host: 'Remote Zabbix server health'
+            key: discovery_queue
     - uuid: 954f8afba30d45b99e3404114f0fe3b0
       name: 'Remote Zabbix server: Zabbix server performance'
       graph_items:
