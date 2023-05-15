@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"errors"
 
-//	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
@@ -127,8 +126,9 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 		}
 	}
 
-	var stats *FsStats
 	fsCaller := p.newFSCaller(getStats, 1)
+
+	var stats *FsStats
 	if stats, err = fsCaller.run(params[0]); err != nil {
 		return
 	}
