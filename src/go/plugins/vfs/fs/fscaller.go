@@ -34,7 +34,8 @@ type fsCaller struct {
 	fsFunc  func(path string) (stats *FsStats, err error)
 	paths   []string
 	errChan chan error
-	outChan chan *FsStats
+	outChanStuckUnchecked chan *FsStats
+	outChanStuckChecked chan interface{}
 	p       *Plugin
 }
 
@@ -52,12 +53,12 @@ func (f *fsCaller) executeFunc(path string) {
 		return
 	}
 
-	f.outChan <- stats
+	f.outChanStuckUnchecked <- stats
 }
 
-func (f *fsCaller) checkNotStuckAndExecute(path string, cc chan interface{}) {
+func (f *fsCaller) checkNotStuckAndExecute(path string) {
 	if isStuck(path) {
-		cc <- fmt.Errorf("mount '%s' is unavailable", path)
+		f.outChanStuckChecked <- fmt.Errorf("mount '%s' is unavailable", path)
 
 		return
 	}
@@ -66,7 +67,7 @@ func (f *fsCaller) checkNotStuckAndExecute(path string, cc chan interface{}) {
 
 	for {
 		select {
-		case stat := <-f.outChan:
+		case stat := <-f.outChanStuckUnchecked:
 
 			defer func() {
 				stuckMux.Lock()
@@ -74,7 +75,7 @@ func (f *fsCaller) checkNotStuckAndExecute(path string, cc chan interface{}) {
 				stuckMux.Unlock()
 			}()
 
-			cc <- stat
+			f.outChanStuckChecked <- stat
 
 			return
 		case err := <-f.errChan:
@@ -85,25 +86,23 @@ func (f *fsCaller) checkNotStuckAndExecute(path string, cc chan interface{}) {
 				stuckMux.Unlock()
 			}()
 
-			cc <- err
+			f.outChanStuckChecked <- err
 
 			return
 		case <-time.After(timeout * time.Second):
 			stuckMux.Lock()
 			stuckMounts[path]++
 			stuckMux.Unlock()
-			cc <- fmt.Errorf("operation on mount '%s' timed out", path)
+			f.outChanStuckChecked <- fmt.Errorf("operation on mount '%s' timed out", path)
 		}
 	}
 }
 
 func (f *fsCaller) run(path string) (stat *FsStats, err error) {
-	const chan_len = 2
-	cc := make(chan interface{}, chan_len)
 
-	go f.checkNotStuckAndExecute(path, cc)
+	go f.checkNotStuckAndExecute(path)
 
-	v := <-cc
+	v := <- f.outChanStuckChecked
 
 	switch d := v.(type) {
 	case *FsStats:
@@ -125,7 +124,9 @@ func (p *Plugin) newFSCaller(fsFunc func(path string) (stats *FsStats, err error
 	fc := fsCaller{}
 	fc.fsFunc = fsFunc
 	fc.errChan = make(chan error, fsLen)
-	fc.outChan = make(chan *FsStats, fsLen)
+	fc.outChanStuckUnchecked = make(chan *FsStats, fsLen)
+	const stuckCheckedLen = 2
+	fc.outChanStuckChecked = make(chan interface{}, stuckCheckedLen)
 	fc.p = p
 
 	return &fc
