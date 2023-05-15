@@ -552,7 +552,7 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
  *                                                                            *
  ******************************************************************************/
 static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_hashset_t *items, struct zbx_json *j,
- 		char **error)
+		char **error)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
