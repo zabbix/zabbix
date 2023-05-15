@@ -179,8 +179,8 @@ static void	proxyconfig_add_row(struct zbx_json *j, const DB_ROW row, const ZBX_
  *             sql_alloc  - [IN/OUT]                                          *
  *             sql_offset - [IN/OUT]                                          *
  *             table      - [IN] the table                                    *
- *             j          - [OUT] the output json                             *
  *             alias      - [IN] the table alias                              *
+ *             j          - [OUT] the output json                             *
  *                                                                            *
  ******************************************************************************/
 static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table,
@@ -554,13 +554,13 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
 static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_hashset_t *items, struct zbx_json *j,
 		char **error)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
-	const ZBX_TABLE		*table;
-	char			*sql;
-	size_t			sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int			ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
-	zbx_uint64_t		itemid, master_itemid;
+	DB_RESULT	result;
+	DB_ROW		row;
+	const ZBX_TABLE	*table;
+	char		*sql;
+	size_t		sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		ret = FAIL, fld_key = -1, fld_type = -1, fld_master_itemid = -1, i, fld, dep_items_num;
+	zbx_uint64_t	itemid, master_itemid;
 
 	zbx_vector_proxyconfig_dep_item_ptr_t	dep_items;
 	zbx_proxyconfig_dep_item_t		*dep_item;
