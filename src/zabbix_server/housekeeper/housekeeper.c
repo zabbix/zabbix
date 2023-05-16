@@ -1184,8 +1184,8 @@ static int	housekeeping_problems(int now)
 
 	zbx_snprintf(buffer, sizeof(buffer),
 		"select p1.eventid from problem p1"
-		" where p1.r_clock<>0 and p1.r_clock<%d and p1.eventid not in ("
-			" select cause_eventid"
+		" where p1.r_clock<>0 and p1.r_clock<%d and not exists ("
+			"select NULL"
 			" from problem p2"
 			" where p1.eventid=p2.cause_eventid"
 		")", now - SEC_PER_DAY);
