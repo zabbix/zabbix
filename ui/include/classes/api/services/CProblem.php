@@ -638,12 +638,16 @@ class CProblem extends CApiService {
 	}
 
 	/**
-	 * Apply filter conditions to sql built query.
+	 * Apply filter conditions to SQL built query.
 	 *
 	 * @param array  $options
-	 * @param array  $sqlParts
+	 * @param array  $options['filter']
+	 * @param int    $options['filter']['action']          Acknowledge action(s) that must be performed on filtered
+	 *                                                     problems.
+	 * @param int    $options['filter']['action_userid']   User which has performed acknowledge action.
+	 * @param array  $sql_parts
 	 */
-	protected function applyFilters($options, &$sqlParts): void {
+	protected function applyFilters($options, &$sql_parts): void {
 		// Acknowledge action filter properties.
 		$acknowledge_actions = [
 			'ack.eventid=p.eventid'
@@ -659,7 +663,7 @@ class CProblem extends CApiService {
 		}
 
 		if (count($acknowledge_actions) > 1) {
-			$sqlParts['where'][] = 'EXISTS ('.
+			$sql_parts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM acknowledges ack'.
 				' WHERE '.implode(' AND ', $acknowledge_actions).
@@ -667,6 +671,6 @@ class CProblem extends CApiService {
 		}
 
 		// Apply standard filter properties.
-		$this->dbFilter('problem p', $options, $sqlParts);
+		$this->dbFilter('problem p', $options, $sql_parts);
 	}
 }

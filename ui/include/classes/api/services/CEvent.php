@@ -523,12 +523,17 @@ class CEvent extends CApiService {
 	}
 
 	/**
-	 * Apply filter conditions to sql built query.
+	 * Apply filter conditions to SQL built query.
 	 *
 	 * @param array  $options
-	 * @param array  $sqlParts
+	 * @param array  $options['filter']
+	 * @param int    $options['filter']['action']          Acknowledge action(s) that must be performed on filtered
+	 *                                                     problems.
+	 * @param int    $options['filter']['action_userid']   User which has performed acknowledge action.
+	 * @param array  $options['filter']['cause_eventid']   Cause eventids to filter by.
+	 * @param array  $sql_parts
 	 */
-	protected function applyFilters($options, &$sqlParts): void {
+	protected function applyFilters($options, &$sql_parts): void {
 		// Acknowledge action filter properties.
 		$acknowledge_actions = [
 			'ack.eventid=e.eventid'
@@ -544,7 +549,7 @@ class CEvent extends CApiService {
 		}
 
 		if (count($acknowledge_actions) > 1) {
-			$sqlParts['where'][] = 'EXISTS ('.
+			$sql_parts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM acknowledges ack'.
 				' WHERE '.implode(' AND ', $acknowledge_actions).
@@ -555,13 +560,13 @@ class CEvent extends CApiService {
 		if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
 			zbx_value2array($options['filter']['cause_eventid']);
 
-			$sqlParts['from']['event_symptom'] = 'event_symptom es';
-			$sqlParts['where']['ese'] = 'es.eventid=e.eventid';
-			$sqlParts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
+			$sql_parts['from']['event_symptom'] = 'event_symptom es';
+			$sql_parts['where']['ese'] = 'es.eventid=e.eventid';
+			$sql_parts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
 		}
 
 		// Apply standard filter properties.
-		$this->dbFilter('events e', $options, $sqlParts);
+		$this->dbFilter('events e', $options, $sql_parts);
 	}
 
 	/**

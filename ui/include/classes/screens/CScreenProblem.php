@@ -271,6 +271,7 @@ class CScreenProblem extends CScreenBase {
 			if (array_key_exists('cause_eventid', $filter) && $filter['cause_eventid']) {
 				$filter_options['cause_eventid'] = $filter['cause_eventid'];
 			}
+
 			if (array_key_exists('unacknowledged', $filter)) {
 				switch ($filter['unacknowledged']) {
 					case 1:
