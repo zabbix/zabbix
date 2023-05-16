@@ -243,20 +243,6 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: handle pipe signal SIGPIPE                                        *
- *                                                                            *
- ******************************************************************************/
-static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
-{
-	SIG_CHECK_PARAMS(sig, siginfo, context);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d]. Ignoring ...",
-			sig, get_signal_name(sig),
-			SIG_CHECKED_FIELD(siginfo, si_pid));
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: set the signal handlers used by daemons                           *
  *                                                                            *
  ******************************************************************************/
@@ -273,7 +259,7 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
 	phan.sa_sigaction = user1_signal_handler;
 	sigaction(SIGUSR1, &phan, NULL);
 
-	phan.sa_sigaction = pipe_signal_handler;
+	phan.sa_handler = SIG_IGN;
 	sigaction(SIGPIPE, &phan, NULL);
 }
 
