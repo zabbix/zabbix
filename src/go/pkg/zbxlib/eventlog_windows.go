@@ -45,7 +45,7 @@ void metric_set_unsupported(ZBX_ACTIVE_METRIC *metric);
 int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		zbx_uint64_t lastlogsize_last, int mtime_last);
 
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout, char **error);
 
@@ -127,7 +127,7 @@ static void free_eventlog_result(eventlog_result_t *result)
 	zbx_free(result);
 }
 
-int	process_eventlog_value_cb(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
+int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
 		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
