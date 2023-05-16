@@ -21,60 +21,48 @@
 
 class CControllerDiscoveryUpdate extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
-			'druleid'             => 'required|db drules.druleid',
-			'name'                => 'required|db drules.name|not_empty',
-			'proxy_hostid'        => 'db drules.proxy_hostid',
-			'iprange'             => 'required|db drules.iprange|not_empty|flags '.P_CRLF,
-			'delay'               => 'required|db drules.delay|not_empty',
-			'status'              => 'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
-			'uniqueness_criteria' => 'string',
-			'host_source'         => 'string',
-			'name_source'         => 'string',
-			'dchecks'             => 'required|array',
-			'form_refresh'        => 'int32'
+			'druleid' =>				'required|db drules.druleid',
+			'name' =>					'required|db drules.name|not_empty',
+			'proxy_hostid' =>			'db drules.proxy_hostid',
+			'iprange' =>				'required|db drules.iprange|not_empty|flags '.P_CRLF,
+			'delay' =>					'required|db drules.delay|not_empty',
+			'status' =>					'db drules.status|in '.DRULE_STATUS_ACTIVE,
+			'uniqueness_criteria' =>	'string',
+			'dchecks' =>				'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			switch ($this->getValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'discovery.edit')
-					);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update discovery rule'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update discovery rule'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)) {
-			return false;
-		}
-
-		return (bool) API::DRule()->get([
-			'output' => [],
-			'druleids' => $this->getInput('druleid'),
-			'countOutput' => true,
-			'editable' => true
-		]);
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$drule = [];
-		$this->getInputs($drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks']);
+		$this->getInputs($drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'dchecks']);
 		$uniq = $this->getInput('uniqueness_criteria', 0);
+
+		$drule['status'] = $this->getInput('status', DRULE_STATUS_DISABLED);
 
 		foreach ($drule['dchecks'] as $dcnum => $check) {
 			if (substr($check['dcheckid'], 0, 3) === 'new') {
@@ -86,22 +74,22 @@ class CControllerDiscoveryUpdate extends CController {
 
 		$result = API::DRule()->update($drule);
 
+		$output = [];
+
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'discovery.list')
-				->setArgument('page', CPagerHelper::loadPage('discovery.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Discovery rule updated'));
+			$output['success']['title'] = _('Discovery rule updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'discovery.edit')
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update discovery rule'));
+			$output['error'] = [
+				'title' => _('Cannot update discovery rule'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

@@ -251,13 +251,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pp_cache_t		*cache, *step_cache;
 	zbx_pp_item_preproc_t	preproc;
 
-	ZBX_UNUSED(state);
-
 #ifdef HAVE_NETSNMP
-	int				mib_translation_case = 0;
-
-	preproc_init_snmp();
-	pp_context_init(&ctx);
+	int			mib_translation_case = 0;
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		mib_translation_case = 1;
@@ -266,25 +261,29 @@ void	zbx_mock_test_entry(void **state)
 		skip();
 #endif
 
-	ZBX_UNUSED(state);
-
-	read_value("in.value", &value_type, &value_in, &ts);
-	read_step("in.step", &step);
-
-#ifdef HAVE_NETSNMP
-	/* MIB translation test cases will fail if system lacks MIBs - in this case test case should be skipped */
-	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
-	{
-		preproc_shutdown_snmp();
-		zbx_variant_clear(&value);
-		skip();
-	}
-#endif
-
 #if !defined(HAVE_OPENSSL) && !defined(HAVE_GNUTLS)
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.encryption_required"))
 		skip();
 #endif
+
+	ZBX_UNUSED(state);
+
+	read_step("in.step", &step);
+
+#ifdef HAVE_NETSNMP
+	preproc_init_snmp();
+
+	/* MIB translation test cases will fail if system lacks MIBs - in this case test case should be skipped */
+	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
+	{
+		preproc_shutdown_snmp();
+		skip();
+	}
+#endif
+
+	pp_context_init(&ctx);
+
+	read_value("in.value", &value_type, &value_in, &ts);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
@@ -313,7 +312,7 @@ void	zbx_mock_test_entry(void **state)
 		else
 			step_cache = cache;
 
-		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, value_type, &value, ts, &step,
+		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
 				&history_value, &history_ts)))
 		{
 			pp_error_on_fail(&value, &step);

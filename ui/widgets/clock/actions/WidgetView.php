@@ -170,7 +170,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$items = [];
 		$clock = ['is_enabled' => true];
 
-		if ($this->hasInput('templateid')) {
+		if ($this->isTemplateDashboard()) {
 			if ($this->hasInput('dynamic_hostid')) {
 				$template_items = API::Item()->get([
 					'output' => ['key_'],
@@ -212,7 +212,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item = $items[0];
 			$clock['name'] = $item['hosts'][0]['name'];
 
-			$last_value = Manager::History()->getLastValues([$item]);
+			$last_value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+				? []
+				: Manager::History()->getLastValues([$item]);
 
 			if ($last_value) {
 				$last_value = $last_value[$item['itemid']][0];

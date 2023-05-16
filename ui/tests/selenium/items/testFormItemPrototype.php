@@ -2273,7 +2273,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestClickButton('itemprototype.massdelete');
 
 			$this->zbxTestAcceptAlert();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototypes deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype deleted');
 		}
 	}
 
