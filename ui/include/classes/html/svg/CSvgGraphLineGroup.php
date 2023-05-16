@@ -83,7 +83,7 @@ class CSvgGraphLineGroup extends CSvgGroup {
 
 	public function toString($destroy = true) {
 		$this->setAttribute('data-set', $this->options['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
-			->setAttribute('data-metric', CHtml::encode($this->metric['name']))
+			->setAttribute('data-metric', $this->metric['name'])
 			->setAttribute('data-color', $this->options['color'])
 			->addItem((new CSvgCircle(-10, -10, $this->options['width'] + 4))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE))

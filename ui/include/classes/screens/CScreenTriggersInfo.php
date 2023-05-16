@@ -37,7 +37,7 @@ class CScreenTriggersInfo extends CScreenBase {
 				'groupids' => [$this->screenitem['resourceid']]
 			]);
 
-			$header->addItem((new CList())->addItem([_('Host'), ':', SPACE, $groups[0]['name']]));
+			$header->addItem((new CList())->addItem([_('Host'), ':', NBSP(), $groups[0]['name']]));
 		}
 
 		$table = (new CTriggersInfo($this->screenitem['resourceid']))->setOrientation($this->screenitem['style']);

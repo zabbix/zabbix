@@ -145,7 +145,7 @@ $form_list
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -241,7 +241,7 @@ $form_list
 					(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -664,7 +664,7 @@ foreach ($valuemaps as $valuemap) {
 }
 
 $form_list
-	->addRow(new CLabel(_('Show value'), 'label-valuemap'), [$valuemap_select, SPACE,
+	->addRow(new CLabel(_('Show value'), 'label-valuemap'), [$valuemap_select, NBSP(),
 		(new CLink(_('show value mappings'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'valuemap.list')
 			->getUrl()
@@ -689,7 +689,7 @@ $form_list
 $application_list_box = new CListBox('applications[]', $data['applications'], 6);
 $application_list_box->addItem(0, '-'._('None').'-');
 foreach ($data['db_applications'] as $application) {
-	$application_list_box->addItem($application['applicationid'], CHtml::encode($application['name']));
+	$application_list_box->addItem($application['applicationid'], $application['name']);
 }
 $form_list
 	->addRow(_('Applications'), $application_list_box)

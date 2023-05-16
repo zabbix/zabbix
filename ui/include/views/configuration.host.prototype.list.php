@@ -64,7 +64,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name
 	$name = [];
 	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates']);
-	$name[] = new CLink(CHtml::encode($hostPrototype['name']),
+	$name[] = new CLink($hostPrototype['name'],
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
