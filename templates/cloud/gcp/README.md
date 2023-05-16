@@ -3,9 +3,9 @@
 
 ## Overview
 
-This template is designed to monitor Google Cloud Platform (hereinafter - GCP) by HTTP.
+This template is designed to monitor Google Cloud Platform (hereinafter - GCP) by Zabbix.
 It works without any external scripts and uses the script item.
-Currently the template supports discovery of [Compute Engine](https://cloud.google.com/compute) and [Cloud SQL](https://cloud.google.com/sql) instances.
+Currently the template supports discovery of [Compute Engine](https://cloud.google.com/compute)/[Cloud SQL](https://cloud.google.com/sql) instances project quota metrics.
 
 
 ## Requirements

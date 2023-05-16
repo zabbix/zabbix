@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-12T20:03:45Z'
+  date: '2023-05-16T12:53:47Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -13,7 +13,7 @@ zabbix_export:
       template: 'GCP by HTTP'
       name: 'GCP by HTTP'
       description: |
-        Discover GCP Compute Engine and Cloud SQL Instances and Compute Engine project quota metrics.
+        Discover GCP Compute Engine/Cloud SQL Instances and Compute Engine project quota metrics.
         Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -82,7 +82,7 @@ zabbix_export:
             
             function fromHex(hex) {
                 utf8array = [];
-                if (hex % 2) 
+                if (hex.length % 2) 
                     throw 'HEX string is broken: ' + hex;
                 for (var i = 0; i < hex.length; i += 2) {
                     utf8array.push(parseInt(hex.substr(i, 2), 16));
@@ -7675,6 +7675,7 @@ zabbix_export:
                 - 1h
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://compute.googleapis.com/compute/v1/projects/{$GCP.PROJECT.ID}/zones/{$GCE.INSTANCE.ZONE}/instances/{HOST.NAME}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
