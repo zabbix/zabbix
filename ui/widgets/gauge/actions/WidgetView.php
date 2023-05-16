@@ -129,8 +129,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$config = [
 			'angle' => $this->fields_values['angle'],
 			'empty_color' => $this->fields_values['empty_color'],
-			'bg_color' => $this->fields_values['bg_color'],
-
+			'bg_color' => $this->fields_values['bg_color']
 		];
 
 		$number_parser = new CNumberParser([
