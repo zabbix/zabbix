@@ -544,7 +544,8 @@ class CEvent extends CApiService {
 			$acknowledge_actions[] = 'ack.action & '.$options['filter']['action'].'='.$options['filter']['action'];
 		}
 
-		if (array_key_exists('action_userid', $options['filter']) && ctype_digit($options['filter']['action_userid'])) {
+		if (array_key_exists('action_userid', $options['filter'])
+				&& zbx_ctype_digit($options['filter']['action_userid'])) {
 			$acknowledge_actions[] = dbConditionId('ack.userid', [$options['filter']['action_userid']]);
 		}
 
