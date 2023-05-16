@@ -41,31 +41,11 @@ ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
 static void	rtc_change_service_loglevel(zbx_uint32_t code)
 {
 	if (ZBX_RTC_LOG_LEVEL_INCREASE == code)
-	{
-		if (SUCCEED != zabbix_increase_log_level())
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
-					" maximum level has been already set");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
-					zabbix_get_log_level_string());
-		}
-	}
+		zabbix_increase_log_level();
 	else if (ZBX_RTC_LOG_LEVEL_DECREASE == code)
-	{
-		if (SUCCEED != zabbix_decrease_log_level())
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
-					" minimum level has been already set");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
-					zabbix_get_log_level_string());
-		}
-	}
+		zabbix_decrease_log_level();
+
+	zabbix_report_log_level_change();
 }
 
 /******************************************************************************
