@@ -1026,7 +1026,7 @@ class testFormServicesSla extends CWebTest {
 
 					$downtimes_form->submit();
 
-					if ($expected === TEST_GOOD) {
+					if ($expected === TEST_GOOD || !array_key_exists('downtime_error', $data)) {
 						$downtimes_form->waitUntilNotVisible();
 
 						// Make sure that row was added to table.
