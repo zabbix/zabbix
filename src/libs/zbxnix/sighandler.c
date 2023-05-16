@@ -127,8 +127,6 @@ static void	metric_thread_signal_handler(int sig, siginfo_t *siginfo, void *cont
  ******************************************************************************/
 static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	SIG_CHECK_PARAMS(sig, siginfo, context);
-
 	zbx_alarm_flag_set();	/* set alarm flag */
 }
 
