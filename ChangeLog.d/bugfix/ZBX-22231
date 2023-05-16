@@ -1,0 +1,1 @@
+..F....... [ZBX-22231] removed host and interface macros resolution from http proxy fields in items, item prototypes and discovery rules (epulke)
