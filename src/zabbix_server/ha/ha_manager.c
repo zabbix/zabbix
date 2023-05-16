@@ -25,6 +25,7 @@
 #include "zbxserialize.h"
 #include "threads.h"
 #include "mutexs.h"
+#include "comms.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_ha.h"
@@ -38,6 +39,8 @@ static pid_t			ha_pid = ZBX_THREAD_ERROR;
 
 extern char	*CONFIG_HA_NODE_NAME;
 extern char	*CONFIG_NODE_ADDRESS;
+extern char	*CONFIG_LISTEN_IP;
+extern int	CONFIG_LISTEN_PORT;
 
 extern zbx_cuid_t	ha_sessionid;
 
