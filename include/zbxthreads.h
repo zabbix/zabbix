@@ -104,7 +104,7 @@ void			zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, in
 /* zbx_thread_exit(status) -- declared as define !!! */
 long int		zbx_get_thread_id(void);
 
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_pthread_init_attr(pthread_attr_t *attr);
 #endif
 
