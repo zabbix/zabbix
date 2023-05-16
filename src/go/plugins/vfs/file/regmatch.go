@@ -26,19 +26,20 @@ import (
 	//"bufio"
 	"errors"
 	"fmt"
+	"git.zabbix.com/ap/plugin-support/log"
 	"math"
+	"os"
 	"regexp"
 	"strconv"
-	"time"
-	"git.zabbix.com/ap/plugin-support/log"
 	"strings"
+	"time"
 )
 
 func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error) {
-	var startline, endline/*, curline*/ uint64
+	var startline, endline /*, curline*/ uint64
 
 	start := time.Now()
-	log.Infof("BADGER: %s", strings.Join(params,", "))
+	log.Infof("BADGER: %s", strings.Join(params, ", "))
 
 	if len(params) > 5 {
 		return nil, errors.New("Too many parameters.")
@@ -80,14 +81,13 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		return nil, fmt.Errorf("Cannot open file %s: %s", params[0], err)
 	}
 	defer file.Close()
-	
+
 	// sc2, err := ioutil.ReadFile(params[0])
 	// if err != nil {
 	// 	return nil, fmt.Errorf("Cannot badger")
 	// }
 
 	// log.Infof("BADGER STRATA: %v", sc2)
-
 
 	const MAX_BUFFER_LEN = 65536
 
@@ -105,14 +105,13 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 			return nil, errors.New("Timeout while processing item.")
 		}
 
-
 		bytesread, err := file.Read(buffer)
 
 		if err != nil {
 			if err != io.EOF {
 				fmt.Println(err)
 			}
-			
+
 			break
 		}
 
@@ -124,19 +123,36 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		for _, m := range bytes.Split(x, []byte("\n")) {
 			log.Infof("TOYOTA LINE X: %s", m)
 		}
-		
-		///log.Infof("TOYOTA X: ", x)
 
-
-		
 		if match := r.Match(x); match {
 			ret = 1
 		}
 
+		//while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
+
+		f, e := os.Open(params[0])
+		if e != nil {
+			return nil, e
+		}
+		defer f.Close()
+		buf, nbytes, err := p.readFile(f, encoder)
+		if err != nil {
+			return nil, err
+		}
+		log.Infof("TOYOTA res buf: ->%s<-", buf)
+
+		for 0 < nbytes {
+			buf, nbytes, err = p.readFile(f, encoder)
+			if err != nil {
+				return nil, err
+			}
+			log.Infof("TOYOTA res buf: ->%s<-", buf)
+
+		}
 
 	}
 	return ret, nil
-	
+
 	// Start reading from the file with a reader.
 	// scanner := bufio.NewScanner(file)
 	// curline = 0
