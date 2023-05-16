@@ -29,10 +29,31 @@
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
+typedef struct
+{
+	int	sig;
+	int	pid;
+	int	uid;
+	int	code;
+	int	status;
+}
+zbx_siginfo_t;
+
 int				sig_parent_pid = -1;
 static volatile sig_atomic_t	sig_exiting;
 static volatile sig_atomic_t	sig_exit_on_terminate = 1;
 static zbx_on_exit_t		zbx_on_exit_cb = NULL;
+
+static zbx_siginfo_t	siginfo_exit = {-1, -1, -1, -1, -1};
+
+static void	set_siginfo_exit(int sig, siginfo_t *siginfo)
+{
+	siginfo_exit.sig = sig;
+	siginfo_exit.pid = SIG_CHECKED_FIELD(siginfo, si_pid);
+	siginfo_exit.uid = SIG_CHECKED_FIELD(siginfo, si_uid);
+	siginfo_exit.code = SIG_CHECKED_FIELD(siginfo, si_code);
+	siginfo_exit.status = SIG_CHECKED_FIELD(siginfo, si_status);
+}
 
 void	zbx_set_exiting_with_fail(void)
 {
@@ -113,12 +134,57 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: log signal information if it was shutdown cause                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_log_exit_signal(void)
+{
+	int	zbx_log_level_temp;
+
+	if (-1 == siginfo_exit.sig)
+		return;
+
+	switch (siginfo_exit.sig)
+	{
+		case -1:
+			return;
+		case SIGCHLD:
+			zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
+					siginfo_exit.pid, siginfo_exit.status);
+			return;
+		case SIGINT:
+		case SIGQUIT:
+		case SIGHUP:
+		case SIGTERM:
+		case SIGUSR2:
+			/* temporary variable is used to avoid compiler warning */
+			zbx_log_level_temp = sig_parent_pid == siginfo_exit.pid ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+
+			zabbix_log(zbx_log_level_temp,
+					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
+					"reason:%d]. Exiting ...",
+					siginfo_exit.sig, get_signal_name(siginfo_exit.sig), siginfo_exit.pid,
+					siginfo_exit.uid, siginfo_exit.code);
+
+			return;
+		default:
+			zabbix_log(LOG_LEVEL_WARNING,
+					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
+					"reason:%d]. Exiting ...",
+					siginfo_exit.sig, get_signal_name(siginfo_exit.sig), siginfo_exit.pid,
+					siginfo_exit.uid, siginfo_exit.code);
+			return;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: handle terminate signals: SIGHUP, SIGINT, SIGTERM, SIGUSR2        *
  *                                                                            *
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	int zbx_log_level_temp;
+	ZBX_UNUSED(context);
 
 	if (!SIG_PARENT_PROCESS)
 	{
@@ -132,22 +198,12 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	}
 	else
 	{
-		SIG_CHECK_PARAMS(sig, siginfo, context);
-
 		if (ZBX_EXIT_NONE == sig_exiting)
 		{
 			sig_exiting = ZBX_EXIT_SUCCESS;
 
-			/* temporary variable is used to avoid compiler warning */
-			zbx_log_level_temp = sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
-					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
-			zabbix_log(zbx_log_level_temp,
-					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-					"reason:%d]. Exiting ...",
-					sig, get_signal_name(sig),
-					SIG_CHECKED_FIELD(siginfo, si_pid),
-					SIG_CHECKED_FIELD(siginfo, si_uid),
-					SIG_CHECKED_FIELD(siginfo, si_code));
+			if (-1 == siginfo_exit.sig)
+				set_siginfo_exit(sig, siginfo);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_free_on_signal();
@@ -173,8 +229,9 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	if (ZBX_EXIT_NONE == sig_exiting)
 	{
 		sig_exiting = ZBX_EXIT_FAILURE;
-		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
-				SIG_CHECKED_FIELD(siginfo, si_pid), SIG_CHECKED_FIELD(siginfo, si_status));
+
+		if (-1 == siginfo_exit.sig)
+			set_siginfo_exit(sig, siginfo);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_free_on_signal();

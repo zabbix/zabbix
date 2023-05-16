@@ -1355,6 +1355,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
+	zbx_log_exit_signal();
+
 	ret = ZBX_EXIT_STATUS();
 
 #endif
