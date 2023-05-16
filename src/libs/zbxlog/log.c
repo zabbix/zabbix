@@ -410,8 +410,9 @@ static void	unlock_log(void)
 
 void	zbx_handle_log(void)
 {
+#ifndef _WINDOWS
 	zabbix_report_log_level_change();
-
+#endif
 	if (LOG_TYPE_FILE != log_type)
 		return;
 
@@ -513,9 +514,9 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
-#endif
-
+#else
 	zabbix_report_log_level_change();
+#endif
 
 #ifndef ZBX_ZABBIX_LOG_CHECK
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
