@@ -175,7 +175,15 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			: [];
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
-		$data['internal_auth'] = array_sum(array_column($data['groups'], 'userdirectoryid')) == ZBX_AUTH_INTERNAL;
+
+		$data['internal_auth'] = true;
+
+		foreach ($data['groups'] as $group) {
+			if ($group['userdirectoryid'] != ZBX_AUTH_INTERNAL) {
+				$data['internal_auth'] = false;
+				break;
+			}
+		}
 
 		if ($data['roleid']) {
 			$roles = API::Role()->get([

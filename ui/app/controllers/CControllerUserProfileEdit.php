@@ -116,9 +116,17 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'url' => $this->user['url'],
 			'messages' => $this->getInput('messages', []) + getMessageSettings(),
 			'form_refresh' => 0,
-			'action' => $this->getAction(),
-			'internal_auth' => array_sum(array_column($this->user['usrgrps'], 'userdirectoryid')) == ZBX_AUTH_INTERNAL
+			'action' => $this->getAction()
 		];
+
+		$data['internal_auth'] = true;
+
+		foreach ($this->user['usrgrps'] as $group) {
+			if ($group['userdirectoryid'] != ZBX_AUTH_INTERNAL) {
+				$data['internal_auth'] = false;
+				break;
+			}
+		}
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$data['medias'] = $this->user['medias'];
