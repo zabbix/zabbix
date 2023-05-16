@@ -285,7 +285,7 @@ long int	zbx_get_thread_id(void)
 #endif
 }
 
-#if !defined(_WINDOWS)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_pthread_init_attr(pthread_attr_t *attr)
 {
 	if (0 != pthread_attr_init(attr))
