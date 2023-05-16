@@ -165,8 +165,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		unsigned char	*rtc_data;
 		int		hk_execute = 0;
 
-		sec = zbx_time();
-
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			switch (rtc_cmd)
