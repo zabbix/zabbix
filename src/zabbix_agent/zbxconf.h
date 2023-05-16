@@ -24,23 +24,18 @@
 
 extern char	*CONFIG_HOSTS_ALLOWED;
 extern char	*CONFIG_HOSTNAMES;
-extern char	*CONFIG_HOSTNAME_ITEM;
 extern char	*CONFIG_HOST_METADATA;
 extern char	*CONFIG_HOST_METADATA_ITEM;
 extern int	CONFIG_LISTEN_PORT;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern char	*CONFIG_LISTEN_IP;
-extern int	CONFIG_LOG_LEVEL;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 extern char	**CONFIG_ALIASES;
 extern char	**CONFIG_USER_PARAMETERS;
-extern char	*CONFIG_LOAD_MODULE_PATH;
-extern char	**CONFIG_LOAD_MODULE;
 #ifdef _WINDOWS
 extern char	**CONFIG_PERF_COUNTERS;
 extern char	**CONFIG_PERF_COUNTERS_EN;
 #endif
-extern char	*CONFIG_USER;
 
 void	load_aliases(char **lines);
 int	load_user_parameters(char **lines, char **err);
