@@ -1844,6 +1844,9 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 
 	len_utf8 = zbx_strlen_utf8(str->data.str);
 
+	if (0 == len_utf8)
+		len_utf8 = 1;
+
 	if (num->data.ui64 * len_utf8 >= MAX_STRING_LEN)
 	{
 		*error = zbx_dsprintf(*error, "maximum allowed string length (%d) exceeded: " ZBX_FS_UI64,
