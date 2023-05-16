@@ -179,7 +179,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$data['internal_auth'] = true;
 
 		foreach ($data['groups'] as $group) {
-			if ($group['userdirectoryid'] != ZBX_AUTH_INTERNAL) {
+			if ($group['userdirectoryid'] != 0) {
 				$data['internal_auth'] = false;
 				break;
 			}
