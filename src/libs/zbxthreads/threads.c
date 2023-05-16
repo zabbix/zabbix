@@ -22,6 +22,8 @@
 #include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+#include "zbxwin32.h"
+
 static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
 	__try
