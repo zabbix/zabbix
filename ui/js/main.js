@@ -497,7 +497,7 @@ var hintBox = {
 
 		target.observer.observe(document.documentElement || document.body, {
 			attributes: true,
-			attributeFilter: ['style'],
+			attributeFilter: ['style', 'class'],
 			subtree: true,
 			childList: true
 		});
